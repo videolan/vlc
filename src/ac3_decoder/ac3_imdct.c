@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.15 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_imdct.c,v 1.16 2001/04/26 11:23:16 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -40,6 +40,10 @@
 #include "ac3_internal.h"
 
 #include "ac3_downmix.h"
+
+#ifndef M_PI
+#   define M_PI 3.14159265358979323846
+#endif
 
 void imdct_do_256(imdct_t * p_imdct, float x[],float y[], int id);
 void imdct_do_512(imdct_t * p_imdct, float x[],float y[], int id);

@@ -2,7 +2,7 @@
  * ac3_bit_allocate.c: ac3 allocation tables
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ac3_bit_allocate.c,v 1.18 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_bit_allocate.c,v 1.19 2001/04/26 11:23:16 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -152,12 +152,12 @@ static const s16 baptab[] = { 0,  1,  1,  1,  1,  1,  2,  2,  3,  3,  3,  4,  4,
                      10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14,
                      14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
 
-static __inline__ u16 max (s16 a, s16 b)
+static __inline__ u16 max_value (s16 a, s16 b)
 {
     return (a > b ? a : b);
 }
 
-static __inline__ u16 min (s16 a, s16 b)
+static __inline__ u16 min_value (s16 a, s16 b)
 {
     return (a < b ? a : b);
 }
@@ -167,9 +167,9 @@ static __inline__ s16 logadd (s16 a, s16 b)
     s16 c;
 
     if ((c = a - b) >= 0) {
-        return (a + latab[min(((c) >> 1), 255)]);
+        return (a + latab[min_value(((c) >> 1), 255)]);
     } else {
-        return (b + latab[min(((-c) >> 1), 255)]);
+        return (b + latab[min_value(((-c) >> 1), 255)]);
     }
 }
 
@@ -179,14 +179,14 @@ static __inline__ s16 calc_lowcomp (s16 a, s16 b0, s16 b1, s16 bin)
         if ((b0 + 256) == b1)
             a = 384;
         else if (b0 > b1)
-            a = max(0, a - 64);
+            a = max_value(0, a - 64);
     } else if (bin < 20) {
         if ((b0 + 256) == b1)
             a = 320;
         else if (b0 > b1)
-            a = max(0, a - 64) ;
+            a = max_value(0, a - 64) ;
     } else
-        a = max(0, a - 128);
+        a = max_value(0, a - 128);
 
     return a;
 }
@@ -306,7 +306,7 @@ static void ba_compute_psd (bit_allocate_t * p_bit, s16 start, s16 end, s16 exps
     k = masktab[start];
 
     do {
-        lastbin = min(bndtab[k] + bndsz[k], end);
+        lastbin = min_value(bndtab[k] + bndsz[k], end);
         p_bit->bndpsd[k] = p_bit->psd[j];
         j++;
 
@@ -356,15 +356,15 @@ static void ba_compute_excitation (bit_allocate_t * p_bit, s16 start, s16 end,
             }
         }
 
-        for (bin = begin; bin < min(bndend, 22); bin++) {
+        for (bin = begin; bin < min_value(bndend, 22); bin++) {
             if (!(is_lfe && (bin == 6)))
                 lowcomp = calc_lowcomp (lowcomp, p_bit->bndpsd[bin],
                             p_bit->bndpsd[bin+1], bin);
             fastleak -= p_bit->fdecay ;
-            fastleak = max(fastleak, p_bit->bndpsd[bin] - fgain);
+            fastleak = max_value(fastleak, p_bit->bndpsd[bin] - fgain);
             slowleak -= p_bit->sdecay ;
-            slowleak = max(slowleak, p_bit->bndpsd[bin] - p_bit->sgain);
-            p_bit->excite[bin] = max(fastleak - lowcomp, slowleak);
+            slowleak = max_value(slowleak, p_bit->bndpsd[bin] - p_bit->sgain);
+            p_bit->excite[bin] = max_value(fastleak - lowcomp, slowleak);
         }
         begin = 22;
     } else { /* For coupling channel */
@@ -373,10 +373,10 @@ static void ba_compute_excitation (bit_allocate_t * p_bit, s16 start, s16 end,
 
     for (bin = begin; bin < bndend; bin++) {
         fastleak -= p_bit->fdecay;
-        fastleak = max(fastleak, p_bit->bndpsd[bin] - fgain);
+        fastleak = max_value(fastleak, p_bit->bndpsd[bin] - fgain);
         slowleak -= p_bit->sdecay;
-        slowleak = max(slowleak, p_bit->bndpsd[bin] - p_bit->sgain);
-        p_bit->excite[bin] = max(fastleak, slowleak) ;
+        slowleak = max_value(slowleak, p_bit->bndpsd[bin] - p_bit->sgain);
+        p_bit->excite[bin] = max_value(fastleak, slowleak) ;
     }
 }
 
@@ -397,7 +397,7 @@ static void ba_compute_mask (bit_allocate_t * p_bit, s16 start, s16 end, u16 fsc
         if (p_bit->bndpsd[bin] < p_bit->dbknee) {
             p_bit->excite[bin] += ((p_bit->dbknee - p_bit->bndpsd[bin]) >> 2);
         }
-        p_bit->mask[bin] = max(p_bit->excite[bin], hth[fscod][bin]);
+        p_bit->mask[bin] = max_value(p_bit->excite[bin], hth[fscod][bin]);
     }
 
     /* Perform delta bit modulation if necessary */
@@ -432,7 +432,7 @@ static void ba_compute_bap (bit_allocate_t * p_bit, s16 start, s16 end, s16 snro
     j = masktab[start];
 
     do {
-        lastbin = min(bndtab[j] + bndsz[j], end);
+        lastbin = min_value(bndtab[j] + bndsz[j], end);
         p_bit->mask[j] -= snroffset;
         p_bit->mask[j] -= p_bit->floor;
 
@@ -443,7 +443,7 @@ static void ba_compute_bap (bit_allocate_t * p_bit, s16 start, s16 end, s16 snro
         p_bit->mask[j] += p_bit->floor;
         for (k = i; k < lastbin; k++) {
             address = (p_bit->psd[i] - p_bit->mask[j]) >> 5;
-            address = min(63, max(0, address));
+            address = min_value(63, max_value(0, address));
             bap[i] = baptab[address];
             i++;
         }

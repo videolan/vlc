@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_rematrix.c,v 1.13 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_rematrix.c,v 1.14 2001/04/26 11:23:16 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -41,7 +41,7 @@ struct rematrix_band_s {
 
 static const struct rematrix_band_s rematrix_band[] = { {13,24}, {25,36}, {37 ,60}, {61,252}};
 
-static __inline__ u32 min (u32 a, u32 b)
+static __inline__ u32 min_value (u32 a, u32 b)
 {
     return (a < b ? a : b);
 }
@@ -68,7 +68,7 @@ void rematrix (ac3dec_t * p_ac3dec)
             continue;
 
         start = rematrix_band[i].start;
-        end = min(rematrix_band[i].end ,12 * p_ac3dec->audblk.cplbegf + 36);
+        end = min_value(rematrix_band[i].end ,12 * p_ac3dec->audblk.cplbegf + 36);
 
         for (j=start;j < end; j++) {
             left  = 0.5f * (p_ac3dec->coeffs.fbw[0][j] + p_ac3dec->coeffs.fbw[1][j]);

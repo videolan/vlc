@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_sdl.c,v 1.10 2001/03/21 13:42:34 sam Exp $
+ * $Id: aout_sdl.c,v 1.11 2001/04/26 11:23:16 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -33,7 +33,6 @@
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
-#include <sys/ioctl.h>                                            /* ioctl() */
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* write(), close() */
 #include <stdio.h>                                           /* "intf_msg.h" */
