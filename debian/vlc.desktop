@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=VideoLAN Client
+Name[fr]=Client VideoLAN
+Comment=DVD and MPEG player
+Comment[fr]=Lecteur de DVD et MPEG
+Exec=vlc
+Icon=vlc.png
+Terminal=0
+Type=Application

@@ -61,16 +61,48 @@ install: build
 
 	mkdir -p debian/vlc-gtk/usr/bin/
 	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
+	mkdir -p debian/vlc-gnome/usr/bin/
+	mv debian/vlc/usr/bin/gnome-vlc debian/vlc-gnome/usr/bin/
 	mkdir -p debian/vlc-qt/usr/bin/
 	mv debian/vlc/usr/bin/qvlc debian/vlc-qt/usr/bin/
 
-	mkdir -p debian/vlc-gtk/usr/share/videolan/
-	mv debian/vlc/usr/share/videolan/gvlc.png \
-		debian/vlc/usr/share/videolan/gvlc.xpm \
-			debian/vlc-gtk/usr/share/videolan/
+	mkdir -p debian/vlc/usr/share/pixmaps/
+	mv debian/vlc/usr/share/videolan/vlc.png \
+		debian/vlc/usr/share/pixmaps/
+	mkdir -p debian/vlc/usr/share/gnome/apps/Multimedia/
+	cp debian/vlc.desktop debian/vlc/usr/share/gnome/apps/Multimedia/
 
+	mkdir -p debian/vlc-gtk/usr/share/videolan/ \
+		debian/vlc-gtk/usr/share/pixmaps/
+	mv debian/vlc/usr/share/videolan/gvlc.xpm \
+		debian/vlc-gtk/usr/share/videolan/
+	mv debian/vlc/usr/share/videolan/gvlc.png \
+		debian/vlc-gtk/usr/share/pixmaps/
+	mkdir -p debian/vlc-gtk/usr/share/gnome/apps/Multimedia/
+	cp debian/gvlc.desktop debian/vlc-gtk/usr/share/gnome/apps/Multimedia/
+
+	mkdir -p debian/vlc-gnome/usr/share/videolan/ \
+		debian/vlc-gnome/usr/share/pixmaps/
+	mv debian/vlc/usr/share/videolan/gnome-vlc.xpm \
+		debian/vlc-gnome/usr/share/videolan/
+	mv debian/vlc/usr/share/videolan/gnome-vlc.png \
+		debian/vlc-gnome/usr/share/pixmaps/
+	mkdir -p debian/vlc-gnome/usr/share/gnome/apps/Multimedia/
+	cp debian/gnome-vlc.desktop debian/vlc-gnome/usr/share/gnome/apps/Multimedia/
+
+	mkdir -p debian/vlc-qt/usr/share/videolan/ \
+		debian/vlc-qt/usr/share/pixmaps/
+	mv debian/vlc/usr/share/videolan/qvlc.xpm \
+		debian/vlc-qt/usr/share/videolan/
+	mv debian/vlc/usr/share/videolan/qvlc.png \
+		debian/vlc-qt/usr/share/pixmaps/
+
+	mkdir -p debian/vlc/usr/share/man/man1/
+	gzip < doc/vlc.1 >| debian/vlc/usr/share/man/man1/vlc.1.gz
 	mkdir -p debian/vlc-gtk/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
+	mkdir -p debian/vlc-gnome/usr/share/man/man1/
+	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gnome-vlc.1.gz
 	mkdir -p debian/vlc-qt/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-qt/usr/share/man/man1/qvlc.1.gz
 
@@ -90,9 +122,9 @@ binary-arch: build install
 #	dh_installemacsen
 #	dh_installpam
 #	dh_installinit
-	dh_installcron
-	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa -Nvlc-qt doc/vlc.1
-	dh_installinfo
+	#dh_installcron
+#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa -Nvlc-qt doc/vlc.1
+	#dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa -Nvlc-qt
 	dh_link

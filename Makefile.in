@@ -483,7 +483,7 @@ clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
 	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
 	rm -f src/*/*.o extras/*/*.o
-	rm -f lib/*.so vlc gvlc kvlc qvlc
+	rm -f lib/*.so vlc gnome-vlc gvlc kvlc qvlc
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
@@ -559,9 +559,11 @@ snapshot:
 		changelog changelog-css rules rules-css vlc.dirs \
 		vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-@VLC_VERSION@/debian/ ; done
-	for file in default8x16.psf default8x9.psf gvlc.png vlc.png \
-		gvlc.xpm vlc.xpm ; do \
-			cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
+	for file in default8x16.psf default8x9.psf ; do \
+		cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
+	for icon in vlc gvlc qvlc gnome-vlc ; do \
+		cp share/$$icon.xpm share/$$icon.png \
+			/tmp/vlc-@VLC_VERSION@/share/ ; done
 
 	# build css-enabled archives
 	(cd /tmp ; tar cf vlc-@VLC_VERSION@.tar vlc-@VLC_VERSION@ ; \
@@ -581,7 +583,7 @@ FORCE:
 # GTK/Gnome and Framebuffer aliases - don't add new aliases which could bloat
 # the namespace
 #
-gvlc kvlc qvlc: vlc
+gnome-vlc gvlc kvlc qvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 

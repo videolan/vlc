@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=GNOME VideoLAN Client
+Name[fr]=Client VideoLAN pour GNOME
+Comment=GNOME DVD and MPEG player
+Comment[fr]=Lecteur de DVD et MPEG pour GNOME
+Exec=gnome-vlc
+Icon=gnome-vlc.png
+Terminal=0
+Type=Application

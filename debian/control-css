@@ -2,7 +2,7 @@ Source: vlc-css
 Section: non-US/main
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlib6g-dev
+Build-Depends: debhelper (>=2.2.0)
 Standards-Version: 3.0.1
 
 Package: vlc-css
