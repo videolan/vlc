@@ -399,7 +399,7 @@ AH_TEMPLATE(HAVE_GETNAMEINFO,
 ac_func_getnameinfo_save_LIBS=$LIBS
 AS_IF([test "${SYS}" = "mingw32"],
   [LIBS="-lws2_32 $LIBS"])
-  AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
+AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
 [AC_LINK_IFELSE([AC_LANG_PROGRAM([
 [#include <sys/types.h>
 #if defined( UNDER_CE )
@@ -416,6 +416,26 @@ ac_cv_func_getnameinfo=no)])
 AS_IF([test $ac_cv_func_getnameinfo = yes],
   [AC_DEFINE(HAVE_GETNAMEINFO)])
 LIBS=$ac_func_getnameinfo_save_LIBS
+
+dnl Cannot have gai_strerror if not getaddrinfo
+AH_TEMPLATE(HAVE_GAI_STRERROR,
+  [Define to 1 if you have the `gai_strerror' function.])
+AC_CACHE_CHECK([for gai_strerror], ac_cv_func_gai_strerror,
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([
+[#include <sys/types.h>
+#if defined( UNDER_CE )
+# include <winsock.h>
+#elif defined( WIN32 )
+# include <winsock2.h>
+#else
+# include <sys/socket.h>
+# include <netdb.h>
+#endif]], [[gai_strerror(0);]])],
+ac_cv_func_gai_strerror=yes,
+ac_cv_func_gai_strerror=no)])
+AS_IF([test $ac_cv_func_gai_strerror = yes],
+  [AC_DEFINE(HAVE_GAI_STRERROR)],
+  [gai_support=no])
 
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
