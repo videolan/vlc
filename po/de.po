@@ -725,7 +725,7 @@ msgstr "Interface hinzufügen"
 
 #: src/libvlc.c:286 src/libvlc.c:420
 msgid "C"
-msgstr "C"
+msgstr "de"
 
 #: src/libvlc.c:303
 msgid "Help options"
