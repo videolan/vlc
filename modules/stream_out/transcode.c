@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.78 2004/02/20 19:21:25 massiot Exp $
+ * $Id: transcode.c,v 1.79 2004/02/21 23:50:52 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1041,6 +1041,16 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         id->ff_dec_c->width     = id->f_src.video.i_width;
         id->ff_dec_c->height    = id->f_src.video.i_height;
         id->ff_dec_c->pix_fmt   = get_ff_chroma( id->f_src.i_codec );
+
+#if LIBAVCODEC_BUILD >= 4687
+        if( id->ff_dec_c->width )
+        id->ff_dec_c->sample_aspect_ratio =
+            av_d2q( id->f_src.video.i_aspect / (double)VOUT_ASPECT_FACTOR *
+                    id->ff_dec_c->height / id->ff_dec_c->width, 255 );
+#else
+        id->ff_dec_c->aspect_ratio =
+            id->f_src.video.i_aspect / (float)VOUT_ASPECT_FACTOR;
+#endif
     }
     else
     {
@@ -1276,8 +1286,6 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         block_t *p_block;
         picture_t * p_pic;
         int i_plane;
-
-        p_pic = malloc(sizeof(picture_t));
 
         /* decode frame */
         frame = id->p_ff_pic;
@@ -1519,6 +1527,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* Encoding */
+        p_pic = malloc(sizeof(picture_t));
         vout_InitPicture( VLC_OBJECT(p_stream), p_pic,
                           id->p_encoder->fmt_in.i_codec,
                           id->f_dst.video.i_width, id->f_dst.video.i_height,
@@ -1530,8 +1539,11 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             p_pic->p[i_plane].i_pitch = frame->linesize[i_plane];
             if ( p_sys->i_threads >= 1 )
             {
-                p_pic->p[i_plane].p_pixels = malloc(p_pic->p[i_plane].i_lines * p_pic->p[i_plane].i_pitch);
-                p_stream->p_vlc->pf_memcpy(p_pic->p[i_plane].p_pixels, frame->data[i_plane], p_pic->p[i_plane].i_lines * p_pic->p[i_plane].i_pitch);
+                p_pic->p[i_plane].p_pixels = malloc(p_pic->p[i_plane].i_lines *
+                                                    p_pic->p[i_plane].i_pitch);
+                p_stream->p_vlc->pf_memcpy( p_pic->p[i_plane].p_pixels,
+                    frame->data[i_plane], p_pic->p[i_plane].i_lines *
+                     p_pic->p[i_plane].i_pitch );
             }
             else
             {
