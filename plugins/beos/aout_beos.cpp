@@ -106,7 +106,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     p_aout->p_sys->p_format->channel_count = p_aout->i_channels;
     p_aout->p_sys->p_format->format = gs_audio_format::B_GS_S16;
     p_aout->p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
-    p_aout->p_sys->p_format->buffer_size = 8192;
+    p_aout->p_sys->p_format->buffer_size = 4*8192;
     p_aout->p_sys->i_buffer_pos = 0;
 
     /* Allocate BPushGameSound */
@@ -173,20 +173,16 @@ int aout_BeSetRate( aout_thread_t *p_aout )
  *****************************************************************************/
 long aout_BeGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
-
+    /* Each value is 4 bytes long (stereo signed 16 bits) */
     long i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
 
-    /*fprintf( stderr, "read 0x%.6lx - write 0x%.6lx = ",
-             i_hard_pos, p_aout->p_sys->i_buffer_pos );*/
-
-    if( i_hard_pos < p_aout->p_sys->i_buffer_pos )
+    i_hard_pos = p_aout->p_sys->i_buffer_pos - i_hard_pos;
+    if( i_hard_pos < 0 )
     {
-        i_hard_pos += p_aout->p_sys->i_buffer_size;
+         i_hard_pos += p_aout->p_sys->i_buffer_size;
     }
 
-    /*fprintf( stderr, "0x%.6lx\n", i_hard_pos - p_aout->p_sys->i_buffer_pos ); */
-
-    return( (p_aout->p_sys->i_buffer_size - (i_hard_pos - p_aout->p_sys->i_buffer_pos)) );
+    return( i_hard_pos );
 }
 
 /*****************************************************************************
@@ -198,8 +194,6 @@ void aout_BePlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     long i_newbuf_pos;
 
-    //fprintf( stderr, "writing %i\n", i_size );
-
     if( (i_newbuf_pos = p_aout->p_sys->i_buffer_pos + i_size)
               > p_aout->p_sys->i_buffer_size )
     {
@@ -209,16 +203,18 @@ void aout_BePlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
                 p_aout->p_sys->i_buffer_size - p_aout->p_sys->i_buffer_pos );
 
         memcpy( (void *)((int)p_aout->p_sys->p_buffer),
-                buffer,
+                buffer + p_aout->p_sys->i_buffer_size - p_aout->p_sys->i_buffer_pos,
                 i_size - ( p_aout->p_sys->i_buffer_size
                              - p_aout->p_sys->i_buffer_pos ) );
-
+        
         p_aout->p_sys->i_buffer_pos = i_newbuf_pos - p_aout->p_sys->i_buffer_size;
+
     }
     else
     {
         memcpy( (void *)((int)p_aout->p_sys->p_buffer + p_aout->p_sys->i_buffer_pos),
                 buffer, i_size );
+
         p_aout->p_sys->i_buffer_pos = i_newbuf_pos;
     }
 }
