@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.3 2002/03/04 22:18:25 gbazin Exp $
+ * $Id: aout_pcm.c,v 1.4 2002/04/30 12:56:11 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -52,6 +52,12 @@ void aout_PCMThread( aout_thread_t * p_aout )
 {
     int i_fifo;
     int i_buffer, i_buffer_limit, i_units = 0;
+
+#if defined(WIN32)
+    if( !SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL) )
+        intf_WarnMsg( 2, "aout warning: couldn't change priority of"
+                      "aout_PCMThread()" );
+#endif
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */

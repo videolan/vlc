@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.22 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: modules_plugin.h,v 1.23 2002/04/30 12:56:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -189,8 +189,10 @@ module_error( char *psz_buffer )
     (p_symbols)->p_vout_bank = p_vout_bank; \
     (p_symbols)->config_GetIntVariable = config_GetIntVariable; \
     (p_symbols)->config_GetPszVariable = config_GetPszVariable; \
+    (p_symbols)->config_GetFloatVariable = config_GetFloatVariable; \
     (p_symbols)->config_PutIntVariable = config_PutIntVariable; \
     (p_symbols)->config_PutPszVariable = config_PutPszVariable; \
+    (p_symbols)->config_PutFloatVariable = config_PutFloatVariable; \
     (p_symbols)->config_LoadConfigFile = config_LoadConfigFile; \
     (p_symbols)->config_SaveConfigFile = config_SaveConfigFile; \
     (p_symbols)->config_Duplicate = config_Duplicate; \
