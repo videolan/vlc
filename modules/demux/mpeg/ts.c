@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.18 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: ts.c,v 1.19 2003/02/23 18:07:30 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -1360,7 +1360,11 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xfa;
                     break;
-
+                case MSCODEC_VIDEO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC(0,0,0,0);   // fixed later
+                    p_new_es->i_cat = VIDEO_ES;
+                    p_new_es->i_stream_id = 0xa0;
+                    break;
                 default:
                     p_new_es->i_fourcc = 0;
                     p_new_es->i_cat = UNKNOWN_ES;
@@ -1516,6 +1520,50 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_es_demux->b_mpeg4 = 0;
                 }
 
+            }
+            else if( p_es->i_type == MSCODEC_VIDEO_ES )
+            {
+                /* crapy ms codec stream, search private descriptor */
+                dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
+                es_ts_data_t        *p_es_demux =
+                                        (es_ts_data_t*)p_new_es->p_demux_data;
+
+                while( p_dr && ( p_dr->i_tag != 0xa0 ) )
+                    p_dr = p_dr->p_next;
+                if( p_dr && p_dr->i_length >= 8 )
+                {
+                    int i_size;
+                    int i_bih_size;
+                    BITMAPINFOHEADER *p_bih;
+
+                    p_new_es->i_fourcc = ( p_dr->p_data[0] << 24 )| ( p_dr->p_data[1] << 16 )|
+                                         ( p_dr->p_data[2] <<  8 )| ( p_dr->p_data[3] );
+
+                    i_bih_size = ( ( p_dr->p_data[8] << 8)|( p_dr->p_data[9] ) );
+                    i_size = sizeof( BITMAPINFOHEADER ) + i_bih_size;
+
+                    p_new_es->p_bitmapinfoheader = (void*)p_bih = malloc( i_size );
+                    p_bih->biSize = i_size;
+                    p_bih->biWidth = ( p_dr->p_data[4] << 8 )|p_dr->p_data[5];
+                    p_bih->biHeight = ( p_dr->p_data[6] << 8 )|p_dr->p_data[7];
+                    p_bih->biPlanes = 1;
+                    p_bih->biBitCount = 0;
+                    p_bih->biCompression = 0;
+                    p_bih->biSizeImage = 0;
+                    p_bih->biXPelsPerMeter = 0;
+                    p_bih->biYPelsPerMeter = 0;
+                    p_bih->biClrUsed = 0;
+                    p_bih->biClrImportant = 0;
+                    memcpy( &p_bih[1],
+                            &p_dr->p_data[10],
+                            i_bih_size );
+                }
+                else
+                {
+                    msg_Warn( p_input, "private ms-codec stream without bih private sl_descriptor" );
+                    p_new_es->i_fourcc = 0;
+                    p_new_es->i_cat = UNKNOWN_ES;
+                }
             }
 
             if(    ( p_new_es->i_cat == AUDIO_ES )

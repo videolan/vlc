@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.8 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: ts.c,v 1.9 2003/02/23 18:07:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -71,6 +71,10 @@ typedef struct ts_stream_s
     int             i_stream_type;
     int             i_stream_id;
     int             i_continuity_counter;
+
+    /* to be used for carriege of DIV3 */
+    vlc_fourcc_t    i_bih_codec;
+    int             i_bih_width, i_bih_height;
 
     /* Specific to mpeg4 in mpeg2ts */
     int             i_es_id;
@@ -235,11 +239,36 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
                     p_stream->i_es_id = p_stream->i_pid;
                     p_stream->i_sl_predefined = 0x01;   // NULL SL header
                     break;
+                /* XXX dirty dirty but somebody want that : using crapy MS-codec XXX */
+                /* I didn't want to do that :P */
+                case VLC_FOURCC( 'W', 'M', 'V', '2' ):
+                case VLC_FOURCC( 'H', '2', '6', '3' ):
+                case VLC_FOURCC( 'I', '2', '6', '3' ):
+                case VLC_FOURCC( 'W', 'M', 'V', '1' ):
+                case VLC_FOURCC( 'D', 'I', 'V', '3' ):
+                case VLC_FOURCC( 'D', 'I', 'V', '2' ):
+                case VLC_FOURCC( 'D', 'I', 'V', '1' ):
+                    p_stream->i_stream_type = 0xa0; // private
+                    p_stream->i_stream_id = 0xa0;   // beurk
+                    break;
                 default:
                     return( -1 );
             }
             p_mux->i_video_bound++;
             p_bih = (BITMAPINFOHEADER*)p_input->input_format.p_format;
+            if( p_bih )
+            {
+                p_stream->i_bih_codec = p_input->input_format.i_fourcc;
+                p_stream->i_bih_width = p_bih->biWidth;
+                p_stream->i_bih_height = p_bih->biHeight;
+            }
+            else
+            {
+                p_stream->i_bih_codec = 0x0;
+                p_stream->i_bih_width = 0;
+                p_stream->i_bih_height = 0;
+            }
+
             if( p_bih && p_bih->biSize > sizeof( BITMAPINFOHEADER ) )
             {
                 p_stream->i_decoder_specific_info_len =
@@ -993,6 +1022,30 @@ static int GetPMT( sout_instance_t *p_sout,
 
             dvbpsi_PMTESAddDescriptor( p_es,
                                        0x1f,
+                                       bits.i_data,
+                                       bits.p_data );
+        }
+        else if( p_stream->i_stream_id == 0xa0 )
+        {
+            uint8_t     data[512];
+            bits_buffer_t bits;
+
+            /* private DIV3 descripor */
+            bits_initwrite( &bits, 512, data );
+            bits_write( &bits, 32, p_stream->i_bih_codec );
+            bits_write( &bits, 16, p_stream->i_bih_width );
+            bits_write( &bits, 16, p_stream->i_bih_height );
+            bits_write( &bits, 16, p_stream->i_decoder_specific_info_len );
+            if( p_stream->i_decoder_specific_info_len > 0 )
+            {
+                int i;
+                for( i = 0; i < p_stream->i_decoder_specific_info_len; i++ )
+                {
+                    bits_write( &bits, 8, p_stream->p_decoder_specific_info[i] );
+                }
+            }
+            dvbpsi_PMTESAddDescriptor( p_es,
+                                       0xa0,    // private
                                        bits.i_data,
                                        bits.p_data );
         }
