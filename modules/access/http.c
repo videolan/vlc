@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.13 2002/11/28 18:16:02 sigmunau Exp $
+ * $Id: http.c,v 1.14 2002/12/06 12:18:11 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,6 +28,7 @@
 #include <string.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_playlist.h>
 
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>
@@ -110,10 +111,12 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     byte_t *            psz_parser;
     int                 i_pos, i_returncode, i, i_size;
     char *              psz_return_alpha;
-    char                *psz_protocol;
+    char *              psz_protocol;
     char                psz_line[MAX_LINE];
-    char                *psz_header_name, *psz_header_value;
-
+    char *              psz_header_name;
+    char *              psz_header_value;
+    playlist_t *        p_playlist;
+    
     /* Find an appropriate network module */
     p_access_data = (_input_socket_t *)p_input->p_access_data;
     p_input->p_private = (void*) &p_access_data->socket_desc;
@@ -238,12 +241,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     psz_return_alpha[i] = '\0';
     p_input->p_current_data = &psz_parser[i + 2];
 
-    if ( i_returncode >= 400 ) /* something is wrong */
-    {
-        msg_Err( p_input, "%i %s", i_returncode, psz_return_alpha );
-        return VLC_EGENERIC;
-    }
-    
+    /* read header lines */
     for ( ; ; )
     {
         if( ( i_size = input_Peek( p_input, &psz_parser, MAX_LINE ) ) <= 0 )
@@ -298,9 +296,39 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
             msg_Dbg( p_input, "stream size is %d", p_input->stream.p_selected_area->i_size );
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
-/* parse other headers here */
+        /* redirection support */
+        else if ( ( i_returncode == 301 ||
+                    i_returncode == 302 ||
+                    i_returncode == 303 ||
+                    i_returncode == 307 )
+                  && !strcasecmp( psz_header_name, "location" ) )
+        {
+            p_playlist = (playlist_t *) vlc_object_find( p_input,
+                                                         VLC_OBJECT_PLAYLIST,
+                                                         FIND_ANYWHERE );
+            if( !p_playlist )
+            {
+                msg_Err( p_input, "redirection failed: can't find playlist" );
+                return VLC_EGENERIC;
+            }
+            msg_Dbg( p_input, "%i %s: redircted to %s",
+                       i_returncode, psz_return_alpha, psz_header_value );
+            p_playlist->pp_items[p_playlist->i_index]->b_autodeletion =
+                VLC_TRUE;
+            playlist_Add( p_playlist, psz_header_value,
+                          PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END );
+            vlc_object_release( p_playlist );
+        }
+        /* parse other headers here */
     }
     
+    if ( i_returncode >= 400 ) /* something is wrong */
+    {
+        msg_Err( p_input, "%i %s", i_returncode, psz_return_alpha );
+        return VLC_EGENERIC;
+    }
+
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( !strcmp( psz_protocol, "ICY") )
     {
@@ -668,7 +696,6 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             msg_Err( p_input, "recv failed" );
 #endif
         }
-
         return i_recv;
     }
 
