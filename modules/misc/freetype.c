@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.11 2003/07/23 23:05:25 gbazin Exp $
+ * $Id: freetype.c,v 1.12 2003/07/24 19:30:27 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -292,6 +292,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 pen_y = p_string->i_y_margin;
             }
+            pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.height / 100;
             if ( p_string->i_flags & OSD_ALIGN_RIGHT )
             {
                 pen_x = i_pitch - p_string->i_width
@@ -333,6 +334,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 pen_y = p_string->i_y_margin >> 1;
             }
+            pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.height / 200;
             if ( p_string->i_flags & OSD_ALIGN_RIGHT )
             {
                 pen_x = i_pitch - ( p_string->i_width >> 1 )
@@ -449,16 +451,20 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         i_char = GetUnicodeCharFromUTF8( &psz_string );
 #define face p_vout->p_text_renderer_data->p_face
 #define glyph face->glyph
+        if ( i_char == 13 ) /* ignore CR chars wherever they may be */
+        {
+            continue;
+        }
         if ( i_char == '\n' )
         {
             i_pen_x = 0;
             result.x = __MAX( result.x, line.xMax );
-            result.y += face->size->metrics.height / 26.6;
+            result.y += face->size->metrics.height / 100;
             line.xMin = 0;
             line.xMax = 0;
             line.yMin = 0;
             line.yMax = 0;
-            i_pen_y += face->size->metrics.height / 26.6;
+            i_pen_y += face->size->metrics.height / 100;
             continue;
         }
         i_glyph_index = FT_Get_Char_Index( face, i_char );
@@ -488,7 +494,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
         i_error = FT_Glyph_To_Bitmap( &tmp_glyph,
                                       ft_render_mode_normal,
-                                      &p_string->p_glyph_pos[i],
+                                      NULL,
                                       1 );
         if ( i_error ) continue;
         p_string->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
