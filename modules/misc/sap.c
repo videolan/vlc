@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/input.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>
@@ -106,6 +107,8 @@
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
+static int  OpenSDP ( vlc_object_t * );
+static void CloseSDP( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("SAP interface") );
@@ -125,6 +128,17 @@ vlc_module_begin();
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
+    
+    add_submodule();
+        /* TODO FIXME
+         * This submodule is temporary and has a very high duplicate code rate
+         * This needs to be removed when SDP UDP parsing is fixed in liveMedia
+         */
+        set_description( _("SDP file parser (UDP only)") );
+        add_shortcut( "sdp" );
+        set_capability( "demux2", 51 );
+        set_callbacks( OpenSDP, CloseSDP );
+        
 vlc_module_end();
 
 /*****************************************************************************
@@ -134,13 +148,16 @@ vlc_module_end();
 static void Run    ( intf_thread_t *p_intf );
 static ssize_t NetRead( intf_thread_t *, int fd[2], uint8_t *, int );
 
+static int Demux( demux_t *p_demux );
+static int Control( demux_t *, int, va_list );
+
 typedef struct media_descr_t media_descr_t;
 typedef struct sess_descr_t sess_descr_t;
 typedef struct attr_descr_t attr_descr_t;
 
 static void sess_toitem( intf_thread_t *, sess_descr_t * );
 
-static sess_descr_t *  parse_sdp( intf_thread_t *, char * ) ;
+static sess_descr_t *  parse_sdp( vlc_object_t *, char * ) ;
 static void free_sd( sess_descr_t * );
 
 /* Detect multicast addresses */
@@ -522,7 +539,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( p_sdp < p_end )
         {
-            sess_descr_t *p_sd = parse_sdp( p_intf, p_sdp );
+            sess_descr_t *p_sd = parse_sdp( (vlc_object_t *)p_intf, p_sdp );
             if( p_sd )
             {
                 sess_toitem ( p_intf, p_sd );
@@ -945,13 +962,13 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
  * Make a sess_descr_t with a psz
  ***********************************************************************/
 
-static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
+static sess_descr_t *  parse_sdp( vlc_object_t * p_parent, char *p_packet )
 {
     sess_descr_t *  sd;
 
     if( p_packet[0] != 'v' || p_packet[1] != '=' )
     {
-        msg_Warn( p_intf, "bad SDP packet" );
+        msg_Warn( p_parent, "bad SDP packet" );
         return NULL;
     }
 
@@ -992,7 +1009,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
 
         if( p_packet[1] != '=' )
         {
-            msg_Warn( p_intf, "invalid packet" ) ;
+            msg_Warn( p_parent, "invalid packet" ) ;
             free_sd( sd );
             return NULL;
         }
@@ -1094,7 +1111,6 @@ static void free_sd( sess_descr_t * p_sd )
 /***********************************************************************
  * ismult: returns true if we have a multicast address
  ***********************************************************************/
-
 static int ismult( char *psz_uri )
 {
     char *psz_end;
@@ -1165,4 +1181,257 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     }
     return 0;
 #endif
+}
+
+/*
+ * This submodule is temporary and has a very high duplicate code rate
+ * This needs to be removed when SDP UDP parsing is fixed in liveMedia
+ */
+static int OpenSDP( vlc_object_t * p_this )
+{
+    demux_t *p_demux = (demux_t *)p_this;
+    uint8_t *p_peek;
+
+    if( p_demux->s )
+    {
+        /* See if it looks like a SDP
+           v, o, s fields are mandatory and in this order */
+        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+        {
+            msg_Err( p_demux, "cannot peek" );
+            return VLC_EGENERIC;
+        }
+        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
+            ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
+        {
+            msg_Warn( p_demux, "SDP (UDP) module discarded" );
+            return VLC_EGENERIC;
+        }
+    }
+    
+    p_demux->pf_control = Control;
+    p_demux->pf_demux = Demux;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Demux: reads and demuxes data packets
+ * This submodule is temporary and has a very high duplicate code rate
+ * This needs to be removed when SDP UDP parsing is fixed in liveMedia
+ *****************************************************************************
+ * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
+ *****************************************************************************/
+static int Demux( demux_t *p_demux )
+{
+    sess_descr_t *p_sd = NULL;
+    playlist_t *p_playlist = NULL;
+    int i_sdp = 0;
+    int i_sdp_max = 1000;
+    int i_position = -1;
+    char *p_sdp = (uint8_t*)malloc( i_sdp_max );
+    
+    p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    
+    if( !p_playlist )
+    {
+        msg_Err( p_demux, "can't find playlist" );
+        return -1;
+    }
+    
+    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+    i_position = p_playlist->i_index + 1;
+    
+    /* Gather the complete sdp file */
+    for( ;; )
+    {
+        int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
+
+        if( i_read < 0 )
+        {
+            msg_Err( p_demux, "failed to read SDP" );
+            return VLC_EGENERIC;
+        }
+
+        i_sdp += i_read;
+
+        if( i_read < i_sdp_max - i_sdp - 1 )
+        {
+            p_sdp[i_sdp] = '\0';
+            break;
+        }
+
+        i_sdp_max += 1000;
+        p_sdp = (uint8_t*)realloc( p_sdp, i_sdp_max );
+    }
+
+    msg_Dbg( p_demux, "sdp=%s\n", p_sdp );
+    
+    p_sd = parse_sdp( (vlc_object_t *)p_demux, p_sdp );
+    if( p_sd )
+    {
+        char *psz_uri, *psz_proto, *psz_item_uri;
+        char *psz_port;
+        char *psz_uri_default;
+        int i_count, i, i_id = 0;
+        vlc_bool_t b_http = VLC_FALSE;
+        char *psz_http_path = NULL;
+        playlist_item_t *p_item;
+        psz_uri_default = NULL;
+        
+        if( p_sd->i_media > 1 || !config_GetInt( p_demux, "sap-parse" ) )
+        {
+            /* Let another module try this */
+            asprintf( &psz_uri, "sdp://%s", p_sd->psz_sdp );
+            i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
+                          PLAYLIST_CHECK_INSERT, i_position );
+            free( psz_uri );
+            return 0;
+        }
+        
+        /* We try to parse it ourselves */
+        cfield_parse( p_sd->psz_connection, &psz_uri_default );
+
+        for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
+        {
+            int i_group = 0;
+            int i_packetsize = config_GetInt( p_demux, "mtu" );
+
+            /* Build what we have to put in psz_item_uri, with the m and
+             * c fields  */
+
+            if( !p_sd->pp_media[i_count] )
+            {
+                return -1;
+            }
+
+            mfield_parse( p_sd->pp_media[i_count]->psz_medianame,
+                            &psz_proto, &psz_port );
+
+            if( !psz_proto || !psz_port )
+            {
+                return -1;
+            }
+
+            if( p_sd->pp_media[i_count]->psz_mediaconnection )
+            {
+                cfield_parse( p_sd->pp_media[i_count]->psz_mediaconnection,
+                                & psz_uri );
+            }
+            else
+            {
+                psz_uri = psz_uri_default;
+            }
+
+            if( psz_uri == NULL )
+            {
+                return -1;
+            }
+
+            for( i = 0 ; i< p_sd->i_attributes ; i++ )
+            {
+                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "type" ) &&
+                    strstr( p_sd->pp_attributes[i]->psz_value, "http" ) )
+                {
+                    b_http = VLC_TRUE;
+                }
+                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path" ) )
+                {
+                    psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
+                }
+                if( ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) ) ||
+                    ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "x-plgroup" ) ) )
+                {
+                    int i_group_id;
+
+                    i_group_id = playlist_GroupToId( p_playlist,
+                                     p_sd->pp_attributes[i]->psz_value );
+                    if( i_group_id != 0 )
+                    {
+                        i_group = i_group_id;
+                    }
+                    else
+                    {
+                        playlist_group_t *p_group =
+                                playlist_CreateGroup( p_playlist,
+                                           p_sd->pp_attributes[i]->psz_value );
+                        i_group = p_group->i_id;
+                    }
+                }
+                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "packetsize" ) )
+                {
+                    i_packetsize = strtol( p_sd->pp_attributes[i]->psz_value, NULL, 10 );
+                }
+            }
+
+            /* Filling psz_uri */
+            if( b_http == VLC_FALSE )
+            {
+                if( ismult( psz_uri ) )
+                {
+                    asprintf( &psz_item_uri, "%s://@%s:%s",
+                             psz_proto, psz_uri, psz_port );
+                }
+                else
+                {
+                    asprintf( &psz_item_uri, "%s://%s:%s",
+                             psz_proto, psz_uri, psz_port );
+                }
+            }
+            else
+            {
+                if( psz_http_path == NULL )
+                {
+                    psz_http_path = strdup( "/" );
+                }
+                if( *psz_http_path == '/' )
+                {
+                    asprintf( &psz_item_uri, "%s://%s:%s%s", psz_proto,
+                             psz_uri, psz_port,psz_http_path );
+                }
+                else
+                {
+                    asprintf( &psz_item_uri, "%s://%s:%s/%s", psz_proto, psz_uri,
+                              psz_port, psz_http_path );
+                }
+
+                if( psz_http_path )
+                {
+                    free( psz_http_path );
+                }
+            }
+
+            /* Add the item in the playlist */
+            p_item = playlist_ItemNew( p_demux, psz_item_uri, p_sd->psz_sessionname );
+
+            if( p_item )
+            {
+                playlist_ItemSetGroup( p_item, i_group );
+                if( i_packetsize > config_GetInt( p_demux, "mtu" ) )
+                {
+                    char *psz_packetsize_option;
+                    asprintf( &psz_packetsize_option, "mtu=%i", i_packetsize );
+                    playlist_ItemAddOption( p_item, psz_packetsize_option );
+                    free( psz_packetsize_option );
+                }
+                playlist_AddItem( p_playlist , p_item , PLAYLIST_CHECK_INSERT, i_position );
+            }
+
+            free( psz_item_uri );
+        }
+
+        free_sd ( p_sd );
+    }
+    vlc_object_release( p_playlist );
+    return 0;
+}    
+
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    return VLC_EGENERIC;
+}
+
+static void CloseSDP( vlc_object_t *p_this )
+{
 }
