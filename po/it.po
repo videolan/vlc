@@ -2875,7 +2875,7 @@ msgstr "Norvegese Nynorsk"
 
 #: src/misc/iso-639_def.h:138
 msgid "Norwegian Bokmaal"
-msgstr "Norvegese Bokmal"
+msgstr "Norvegese Bokmål"
 
 #: src/misc/iso-639_def.h:139
 msgid "Chichewa; Nyanja"
