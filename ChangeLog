@@ -4,6 +4,7 @@
 
 HEAD
 
+  * fixed ./plugins/gtk/gtk_callbacks.c to use the dvd_device config option.
   * ./po/ja.po: added Japanese translation from Fumio Nakayama
     <endymion@ca2.so-net.ne.jp>.
   * ./plugins/gtk/gtk_callbacks.c: fixed disc ejection code.
