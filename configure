@@ -3464,7 +3464,7 @@ if test "${enable_dsp+set}" = set; then
 fi
 
 if test x$enable_dsp != xno; then
-  if test -f /dev/dsp; then
+  if test -c /dev/dsp; then
     PLUGINS=${PLUGINS}"dsp "
   fi
 fi
