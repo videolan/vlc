@@ -408,29 +408,29 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	esac
 
 if HAVE_BEOS
-vlc_app_DATA = vlc-bundle
+noinst_lib_DATA = vlc-bundle
 vlc-bundle: vlc
-	rm -Rf $(srcdir)/vlc-bundle ; mkdir -p $(srcdir)/vlc-bundle
-	cp $(srcdir)/vlc $(srcdir)/vlc-bundle/
-	xres -o $(srcdir)/vlc-bundle/vlc $(srcdir)/share/vlc_beos.rsrc
+	rm -Rf $(top_builddir)/vlc-bundle ; mkdir -p $(top_builddir)/vlc-bundle
+	cp $(top_builddir)/vlc $(top_builddir)/vlc-bundle/
+	xres -o $(top_builddir)/vlc-bundle/vlc $(srcdir)/share/vlc_beos.rsrc
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    mkdir -p $(srcdir)/vlc-bundle/plugins ; \
-	    cp "$$i$(LIBEXT)" $(srcdir)/vlc-bundle/plugins/ ; \
+	    mkdir -p $(top_builddir)/vlc-bundle/plugins ; \
+	    cp "$$i$(LIBEXT)" $(top_builddir)/vlc-bundle/plugins/ ; \
 	  fi ; \
 	done
-	if test -d $(srcdir)/extras/contrib/vlc-lib ; then \
-	  mkdir -p $(srcdir)/vlc-bundle/lib ; \
-	  for i in $(srcdir)/extras/contrib/vlc-lib/*.so ; do \
-	    cp $$i $(srcdir)/vlc-bundle/lib/ ; \
+	if test -d $(top_builddir)/extras/contrib/vlc-lib ; then \
+	  mkdir -p $(top_builddir)/vlc-bundle/lib ; \
+	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.so ; do \
+	    cp $$i $(top_builddir)/vlc-bundle/lib/ ; \
 	  done ; \
 	fi
 	for i in $(ALL_LINGUAS); do \
-	  mkdir -p "$(srcdir)/vlc-bundle/locale/$$i/LC_MESSAGES" ; \
-	  cp "$(srcdir)/po/$$i.gmo" \
-	    "$(srcdir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
+	  mkdir -p "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES" ; \
+	  cp "$(top_builddir)/po/$$i.gmo" \
+	    "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
 	done
-	find $(srcdir)/vlc-bundle -type f -exec mimeset -f "{}" \;
+	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
 # Install the modules and the symlinks
