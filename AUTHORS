@@ -284,6 +284,10 @@ E: A.Lipiec@elka.pw.edu.pl
 D: Polish translation
 S: Poland
 
+N: John Paul Lorenti
+E: jpl31@columbia.edu
+D: ALSA device selection patch
+
 N: Paul Mackerras
 E: paulus@linuxcare.com.au
 D: AltiVec IDCT and motion

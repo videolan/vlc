@@ -2,10 +2,11 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.18 2002/06/01 12:31:58 sam Exp $
+ * $Id: alsa.c,v 1.19 2002/07/17 06:40:49 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
+ *          John Paul Lorenti <jpl31@columbia.edu> - Device selection
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +50,8 @@ static void aout_Close       ( aout_thread_t * );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-
+    ADD_CATEGORY_HINT( N_("Device"), NULL )
+    ADD_STRING( "alsa-device", NULL, NULL, N_("Name"), NULL )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -112,8 +114,10 @@ static void aout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
-    int i_ret;
-    char psz_alsadev[128];
+    /* Allows user to choose which ALSA device to use */
+    char  psz_alsadev[128];
+    char *psz_device, *psz_userdev;
+    int   i_ret;
 
     /* Allocate structures */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -123,28 +127,52 @@ static int aout_Open( aout_thread_t *p_aout )
         return -1;
     }
 
-    if( p_aout->i_format != AOUT_FMT_AC3 )
+    /* Read in ALSA device preferences from configuration */
+    psz_userdev = config_GetPsz( p_aout, "alsa-device" );
+
+    if( psz_userdev )
     {
-        strcpy( psz_alsadev, "default" );
+        psz_device = psz_userdev;
     }
     else
     {
-        unsigned char s[4];
-        s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
-        s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
-        s[2] = 0;
-        s[3] = IEC958_AES3_CON_FS_48000;
-        sprintf( psz_alsadev, "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
-                 s[0], s[1], s[2], s[3] );
+        /* Use the internal logic to decide on the device name */
+        if( p_aout->i_format != AOUT_FMT_AC3 )
+        {
+            psz_device = "default";
+        }
+        else
+        {
+            unsigned char s[4];
+            s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
+            s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
+            s[2] = 0;
+            s[3] = IEC958_AES3_CON_FS_48000;
+            sprintf( psz_alsadev,
+                     "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+                     s[0], s[1], s[2], s[3] );
+            psz_device = psz_alsadev;
+        }
     }
 
     /* Open device */
     i_ret = snd_pcm_open( &(p_aout->p_sys->p_alsa_handle),
-                          psz_alsadev, SND_PCM_STREAM_PLAYBACK, 0);
+                          psz_device, SND_PCM_STREAM_PLAYBACK, 0);
     if( i_ret != 0 )
     {
-        msg_Err( p_aout, "cannot open ALSA device (%s)", snd_strerror(i_ret) );
+        msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
+                         psz_device, snd_strerror(i_ret) );
+        if( psz_userdev )
+        {
+            free( psz_userdev );
+        }
+
         return -1;
+    }
+
+    if( psz_userdev )
+    {
+        free( psz_userdev );
     }
 
     return 0;
@@ -158,7 +186,6 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-
     int i_rv;
     int i_format;
 
@@ -199,7 +226,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to retrieve initial parameters" );
-        return( -1 );
+        return -1;
     }
 
     i_rv = snd_pcm_hw_params_set_access( p_aout->p_sys->p_alsa_handle, p_hw,
@@ -207,7 +234,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set interleaved stream format" );
-        return( -1 );
+        return -1;
     }
 
     i_rv = snd_pcm_hw_params_set_format( p_aout->p_sys->p_alsa_handle,
@@ -215,7 +242,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set stream sample size and word order" );
-        return( -1 );
+        return -1;
     }
 
     i_rv = snd_pcm_hw_params_set_channels( p_aout->p_sys->p_alsa_handle, p_hw,
@@ -223,7 +250,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set number of output channels" );
-        return( -1 );
+        return -1;
     }
 
     i_rv = snd_pcm_hw_params_set_rate_near( p_aout->p_sys->p_alsa_handle, p_hw,
@@ -231,7 +258,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set sample rate" );
-        return( -1 );
+        return -1;
     }
     p_aout->p_sys->rate = i_rv;
 
@@ -242,7 +269,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set buffer time" );
-        return( -1 );
+        return -1;
     }
     p_aout->p_sys->buffer_time = i_rv;
 
@@ -251,7 +278,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set period time" );
-        return( -1 );
+        return -1;
     }
     p_aout->p_sys->period_time = i_rv;
 
@@ -259,7 +286,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if (i_rv < 0)
     {
         msg_Err( p_aout, "unable to set hardware configuration" );
-        return( -1 );
+        return -1;
     }
 
     p_aout->p_sys->chunk_size = snd_pcm_hw_params_get_period_size( p_hw, 0 );
@@ -283,10 +310,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( i_rv < 0 )
     {
         msg_Err( p_aout, "unable to set software configuration" );
-        return( -1 );
+        return -1;
     }
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -353,8 +380,7 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
             break;
     }
 
-    return( snd_pcm_status_get_avail(p_status) *
-            p_aout->p_sys->bytes_per_frame );
+    return snd_pcm_status_get_avail(p_status) * p_aout->p_sys->bytes_per_frame;
 }
 
 /*****************************************************************************
