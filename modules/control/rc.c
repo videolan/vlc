@@ -174,6 +174,7 @@ vlc_module_end();
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    playlist_t *p_playlist;
     char *psz_host, *psz_unix_path;
     int i_socket = -1;
 
@@ -276,6 +277,17 @@ static int Activate( vlc_object_t *p_this )
 #else
     CONSOLE_INTRO_MSG;
 #endif
+
+    /* Force "no-view" mode */
+    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        p_playlist->status.i_view = -1;
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+    }
 
     msg_rc( _("Remote control interface initialized, `h' for help\n") );
     return VLC_SUCCESS;
