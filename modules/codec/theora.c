@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.6 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: theora.c,v 1.7 2003/09/02 22:36:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -388,8 +388,8 @@ static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     vout_DisplayPicture( p_sys->p_vout, p_pic );
 
     /* Date management */
-    p_sys->i_pts += ( 1000000 * p_sys->ti.fps_numerator /
-                      p_sys->ti.fps_denominator ); /* 1 frame per packet */
+    p_sys->i_pts += ( I64C(1000000) * p_sys->ti.fps_denominator /
+                      p_sys->ti.fps_numerator ); /* 1 frame per packet */
 
     return VLC_SUCCESS;
 }
@@ -412,8 +412,8 @@ static int SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     /* Date management */
     p_sout_buffer->i_dts = p_sout_buffer->i_pts = p_sys->i_pts;
-    p_sys->i_pts += ( 1000000 * p_sys->ti.fps_numerator /
-                      p_sys->ti.fps_denominator ); /* 1 frame per packet */
+    p_sys->i_pts += ( I64C(1000000) * p_sys->ti.fps_denominator /
+                      p_sys->ti.fps_numerator ); /* 1 frame per packet */
 
     if( p_sys->i_headers >= 3 )
         p_sout_buffer->i_length = p_sys->i_pts - p_sout_buffer->i_pts;
