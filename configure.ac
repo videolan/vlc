@@ -2464,8 +2464,6 @@ AC_CHECK_HEADERS(png.h, [
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LDFLAGS([png],[-lpng -lz])
     VLC_ADD_PLUGINS([png])
-    VLC_ADD_LDFLAGS([svcdsub],[-lpng -lz])
-    VLC_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
     AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
     [],[-lz])
   LDFLAGS="${LDFLAGS_save}"
@@ -4169,7 +4167,6 @@ AC_CONFIG_FILES([
   modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
   modules/codec/ffmpeg/Makefile
-  modules/codec/ogt/Makefile
   modules/codec/spudec/Makefile
   modules/control/Makefile
   modules/control/corba/Makefile

@@ -23,3 +23,5 @@ SOURCES_x264 = x264.c
 SOURCES_toolame = toolame.c
 SOURCES_dirac = dirac.c
 SOURCES_png = png.c
+SOURCES_svcdsub = svcdsub.c
+SOURCES_cvdsub = cvdsub.c
