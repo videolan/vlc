@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.28 2003/10/11 22:40:04 hartman Exp $
+ * $Id: sub.c,v 1.29 2003/10/12 21:53:58 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -51,7 +51,7 @@ static void sub_close( subtitle_demux_t *p_sub );
 
 static void sub_fix( subtitle_demux_t *p_sub );
 
-static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplayer", "sami", NULL };
+static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "ssa1", "ssa2-4", "vplayer", "sami", NULL };
 
 
 /*****************************************************************************
@@ -64,7 +64,7 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplaye
     "It will only work with MicroDVD subtitles."
 #define SUB_TYPE_LONGTEXT \
     "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" " \
-    "\"sami\" (nothing for autodetection, it should always work)."
+    "\"sami\" (auto for autodetection, it should always work)."
 
 vlc_module_begin();
     set_description( _("Text subtitles demux") );
@@ -76,7 +76,7 @@ vlc_module_begin();
         add_integer( "sub-delay", 0, NULL,
                      "Delay subtitles (in 1/10s)",
                      SUB_DELAY_LONGTEXT, VLC_TRUE );
-        add_string_from_list( "sub-type", NULL, ppsz_sub_type, NULL,
+        add_string_from_list( "sub-type", "auto", ppsz_sub_type, NULL,
                               "subtitles type",
                               SUB_TYPE_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, NULL );
