@@ -2488,10 +2488,13 @@ AC_ARG_ENABLE(opengl,
   [  --enable-opengl            OpenGL support (default enabled)])
 if test "${enable_opengl}" != "no" && test "${SYS}" != "beos"; then
   AC_CHECK_HEADERS(GL/gl.h, [
-      VLC_ADD_PLUGINS([opengl])
+    VLC_ADD_PLUGINS([opengl])
+    if test "${SYS}" != "mingw32"; then
       VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])
+    else
+      VLC_ADD_LDFLAGS([opengl],[-lopengl32])
+    fi
   ])
-  CPPFLAGS="${CPPFLAGS_save}"
 fi
 
 dnl
@@ -2719,7 +2722,12 @@ then
     then
       AC_CHECK_HEADERS(ddraw.h,
       [ VLC_ADD_PLUGINS([vout_directx aout_directx])
-        VLC_ADD_LDFLAGS([vout_directx],[-lgdi32]) ])
+        VLC_ADD_LDFLAGS([vout_directx],[-lgdi32])
+        dnl to be moved when dependance is removed
+        AC_CHECK_HEADERS(GL/gl.h, [
+            VLC_ADD_PLUGINS([glwin32])
+            VLC_ADD_LDFLAGS([glwin32],[-lopengl32 -lgdi32])
+        ]) ])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
@@ -3439,8 +3447,14 @@ AC_ARG_ENABLE(galaktos,
   [  --enable-galaktos       OpenGL visualisation plugin (default disabled)])
 if test "${enable_galaktos}" = "yes"
 then
+  AC_CHECK_HEADERS(GL/gl.h, [
     VLC_ADD_PLUGINS([galaktos])
-    VLC_ADD_LDFLAGS([galaktos],[-lGL -lGLU])
+    if test "${SYS}" != "mingw32"; then
+      VLC_ADD_LDFLAGS([galaktos],[-L${x_libraries} -lGL -lGLU])
+    else
+      VLC_ADD_LDFLAGS([galaktos],[-lopengl32])
+    fi
+  ])
 fi
 
 dnl
