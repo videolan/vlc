@@ -112,9 +112,9 @@ struct demux_sys_t
     ifo_handle_t *p_vmg_file;
     ifo_handle_t *p_vts_file;
 
-    unsigned int i_title;
-    unsigned int i_chapter, i_chapters;
-    unsigned int i_angle, i_angles;
+    int i_title;
+    int i_chapter, i_chapters;
+    int i_angle, i_angles;
 
     tt_srpt_t    *p_tt_srpt;
     pgc_t        *p_cur_pgc;
@@ -123,20 +123,20 @@ struct demux_sys_t
 
     int          i_ttn;
 
-    unsigned int i_pack_len;
-    unsigned int i_cur_block;
-    unsigned int i_next_vobu;
+    int i_pack_len;
+    int i_cur_block;
+    int i_next_vobu;
 
     /* Current title start/end blocks */
-    unsigned int i_title_start_block;
-    unsigned int i_title_end_block;
-    unsigned int i_title_blocks;
-    unsigned int i_title_offset;
+    int i_title_start_block;
+    int i_title_end_block;
+    int i_title_blocks;
+    int i_title_offset;
 
-    unsigned int i_title_start_cell;
-    unsigned int i_title_end_cell;
-    unsigned int i_cur_cell;
-    unsigned int i_next_cell;
+    int i_title_start_cell;
+    int i_title_end_cell;
+    int i_cur_cell;
+    int i_next_cell;
 
     /* track */
     ps_track_t  tk[PS_TK_COUNT];
@@ -651,10 +651,8 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                            int i_angle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int         pgc_id = 0;
-    int         pgn = 0;
-    int         i;
-    vlc_value_t val;
+    int pgc_id = 0, pgn = 0;
+    int i;
 
 #define p_pgc p_sys->p_cur_pgc
 #define p_vmg p_sys->p_vmg_file
@@ -940,10 +938,10 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    unsigned int i_chapter = 0;
-    unsigned int i_cell = 0;
-    unsigned int i_vobu = 0;
-    unsigned int i_sub_cell = 0;
+    int i_chapter = 0;
+    int i_cell = 0;
+    int i_vobu = 0;
+    int i_sub_cell = 0;
     int i_block;
 
 #define p_pgc p_sys->p_cur_pgc
@@ -980,7 +978,7 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
 
         i_tmp = p_vts->vts_pgcit->pgci_srp[pgc_id - 1].pgc->program_map[pgn-1];
 
-        if( i_tmp > (int)i_cell ) break;
+        if( i_tmp > i_cell ) break;
     }
 
     if( i_chapter < p_sys->i_chapters &&
@@ -991,7 +989,7 @@ static void DvdReadSeek( demux_t *p_demux, int i_block_offset )
     }
 
     /* Find vobu */
-    while( p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu] <= i_block )
+    while( (int)p_vts->vts_vobu_admap->vobu_start_sectors[i_vobu] <= i_block )
     {
         i_vobu++;
     }
