@@ -28,17 +28,27 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
+#include <vlc/vlc.h>
+#include <vlc/sout.h>
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
 
-#include <vlc/vlc.h>
+#ifdef WIN32
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   ifndef IN_MULTICAST
+#       define IN_MULTICAST(a) IN_CLASSD(a)
+#   endif
+#else
+#   include <sys/socket.h>
+#endif
 
-#include <vlc/sout.h>
 #undef DEBUG_BUFFER
 
-#include <announce.h>
-#include <network.h>
+#include "announce.h"
+#include "network.h"
 
 #define SAP_IPV4_ADDR "224.2.127.254" /* Standard port and address for SAP */
 #define SAP_PORT 9875
@@ -56,56 +66,59 @@
 
 static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
 {
-    unsigned int i_count = 0; /*pos in input string*/
-    unsigned int i_pos1  = 0; /*pos in out2 string */
+    unsigned int i_count = 0; /* pos in input string */
+    unsigned int i_pos1  = 0; /* pos in out2 string */
     unsigned int i_pos2  = 0;
-    char *psz_cur; /*store the pos of the first delim found */
+    char *psz_cur; /* store the pos of the first delim found */
 
-    /*skip spaces at the beginning*/
-    while(psz_in[i_count] == ' ' && i_count < strlen(psz_in))
+    /* Skip spaces at the beginning */
+    while( psz_in[i_count] == ' ' )
     {
         i_count++;
     }
-    if(i_count == strlen(psz_in))
-        return NULL;
 
-    /*Look for delim*/
-    while(psz_in[i_count] != delim && i_count < strlen(psz_in))
+    if( psz_in[i_count] == '\0' )
+    {
+        return NULL;
+    }
+
+    /* Look for delim */
+    while( psz_in[i_count] && psz_in[i_count] != delim )
     {
         psz_out1[i_pos1] = psz_in[i_count];
         i_count++;
         i_pos1++;
     }
     /* Mark the end of out1 */
-    psz_out1[i_pos1] = 0;
+    psz_out1[i_pos1] = '\0';
 
-    if(i_count == strlen(psz_in))
+    if( psz_in[i_count] == '\0' )
+    {
         return NULL;
+    }
 
-    /*store pos of the first delim*/
-    psz_cur = &psz_in[i_count];
+    /* store pos of the first delim */
+    psz_cur = psz_in + i_count;
 
-
-
-    /*skip all delim and all spaces*/
-    while( (psz_in[i_count] == ' ' ||
-            psz_in[i_count] == delim)
-           && i_count < strlen(psz_in))
+    /* skip all delim and all spaces */
+    while( psz_in[i_count] == ' ' || psz_in[i_count] == delim )
     {
         i_count++;
     }
 
-    if(i_count == strlen(psz_in))
+    if( psz_in[i_count] == '\0' )
+    {
         return psz_cur;
+    }
 
-    /*Store the second string*/
-    while(i_count < strlen(psz_in))
+    /* Store the second string */
+    while( psz_in[i_count] )
     {
         psz_out2[i_pos2] = psz_in[i_count];
         i_pos2++;
         i_count++;
     }
-    psz_out2[i_pos2] = 0;
+    psz_out2[i_pos2] = '\0';
 
     return psz_cur;
 }
@@ -113,22 +126,20 @@ static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
-sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
-                char * psz_url_arg,
-                char * psz_name_arg, int ip_version,
-                char * psz_v6_scope )
+sap_session_t * sout_SAPNew ( sout_instance_t *p_sout, char * psz_url_arg,
+                              char * psz_name_arg, int ip_version,
+                              char * psz_v6_scope )
 {
-    sap_session_t       *p_new; /* The SAP structure */
+    sap_session_t       *p_sap; /* The SAP structure */
     module_t            *p_network; /* Network module */
     network_socket_t    socket_desc; /* Socket descriptor */
-    char                psz_network[6]; /* IPv4 or IPv6 */
-    char                *sap_ipv6_addr=NULL; /* IPv6 built address */
+    char                *sap_ipv6_addr = NULL; /* IPv6 built address */
     char                *psz_eol; /* Used to parse IPv6 URIs */
     int                 i_port; /* Port in numerical format */
 
     /* Allocate the SAP structure */
-    p_new = (sap_session_t *) malloc( sizeof ( sap_session_t ) ) ;
-    if ( !p_new )
+    p_sap = (sap_session_t *) malloc( sizeof ( sap_session_t ) ) ;
+    if ( !p_sap )
     {
         msg_Err( p_sout, "out of memory" );
         return NULL;
@@ -136,56 +147,58 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
 
     /* Fill the information in the structure */
     if( strstr( psz_url_arg, "[" ) )
-    {      /* We have an IPv6 address. Do not use ':' as the port separator */
+    {
+        /* We have an IPv6 address. Do not use ':' as the port separator */
         psz_eol = strchr( psz_url_arg, ']' );
-        if( !psz_eol ) /* No matching ] ! Aborting */
+        if( !psz_eol )
         {
             msg_Warn( p_sout, "no matching ], unable to parse URI");
             return NULL;
         }
+
         if( !psz_eol++ )
         {
-              sprintf( p_new->psz_url, "%s", psz_url_arg );
-              sprintf( p_new->psz_port, "%s", DEFAULT_PORT );
+            sprintf( p_sap->psz_url, "%s", psz_url_arg );
+            sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
         }
         else
         {
             *psz_eol = '\0';
-            sprintf( p_new->psz_url, "%s", psz_url_arg );
+            sprintf( p_sap->psz_url, "%s", psz_url_arg );
             psz_eol++;
             if( psz_eol )
             {
-                sprintf( p_new->psz_port, "%s", psz_eol );
+                sprintf( p_sap->psz_port, "%s", psz_eol );
             }
         }
     }
     else
     {
-        split( psz_url_arg, p_new->psz_url, p_new->psz_port, ':' );
+        split( psz_url_arg, p_sap->psz_url, p_sap->psz_port, ':' );
     }
 
     /* Check if we have a port */
-    if( !strlen( p_new->psz_port ) )
+    if( !strlen( p_sap->psz_port ) )
     {
-        sprintf( p_new->psz_port, "%s", DEFAULT_PORT );
+        sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
     }
 
-    /* Make sure our port is valid and atoi it*/
-    i_port = atoi( p_new->psz_port );
+    /* Make sure our port is valid and atoi it */
+    i_port = atoi( p_sap->psz_port );
 
     if( !i_port )
     {
-        sprintf( p_new->psz_port, "%s", DEFAULT_PORT );
+        sprintf( p_sap->psz_port, "%s", DEFAULT_PORT );
     }
     else
     {
-        sprintf( p_new->psz_port, "%i", i_port );
+        sprintf( p_sap->psz_port, "%i", i_port );
     }
 
     /* The name that we send */
-    sprintf( p_new->psz_name, "%s", psz_name_arg );
+    sprintf( p_sap->psz_name, "%s", psz_name_arg );
 
-    p_new->i_ip_version = ip_version;
+    p_sap->i_ip_version = ip_version;
 
     /* Only "6" triggers IPv6. IPv4 is default */
     if( ip_version != 6 )
@@ -201,17 +214,16 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
         socket_desc.i_handle          = 0;
 
         /* Call the network module */
-        sprintf ( psz_network, "ipv4" );
         p_sout->p_private = (void*) &socket_desc;
-        if( !( p_network = module_Need( p_sout, "network", psz_network ) ) )
+        if( !( p_network = module_Need( p_sout, "network", "ipv4" ) ) )
         {
              msg_Warn( p_sout, "failed to open a connection (udp)" );
              return NULL;
         }
         module_Unneed( p_sout, p_network );
 
-        p_new->i_socket = socket_desc.i_handle;
-        if( p_new->i_socket < 0 )
+        p_sap->i_socket = socket_desc.i_handle;
+        if( p_sap->i_socket < 0 )
         {
             msg_Warn( p_sout, "unable to initialize SAP" );
             return NULL;
@@ -240,19 +252,17 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
         socket_desc.i_server_port   = SAP_PORT;
         socket_desc.i_handle        = 0;
 
-        sprintf ( psz_network, "ipv6" );
-
         /* Call the network module */
         p_sout->p_private = (void *) &socket_desc;
-        if( !( p_network = module_Need( p_sout, "network", psz_network ) ) )
+        if( !( p_network = module_Need( p_sout, "network", "ipv6" ) ) )
         {
             msg_Warn( p_sout, "failed to open a connection (udp)" );
             return NULL;
         }
         module_Unneed( p_sout, p_network );
 
-        p_new->i_socket = socket_desc.i_handle;
-        if( p_new->i_socket <= 0 )
+        p_sap->i_socket = socket_desc.i_handle;
+        if( p_sap->i_socket <= 0 )
         {
             msg_Warn( p_sout, "unable to initialize SAP" );
             return NULL;
@@ -267,26 +277,36 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout,
 
     msg_Dbg( p_sout, "SAP initialization complete" );
 
-    return(p_new);
+    return p_sap;
 }
 
 /*****************************************************************************
  * sout_SAPDelete: Deletes a SAP Session
  *****************************************************************************/
-void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_this )
+void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
 {
-    if( close( p_this->i_socket ) )
+    int i_ret;
+
+#if defined( UNDER_CE )
+    i_ret = CloseHandle( (HANDLE)p_sap->i_handle );
+#elif defined( WIN32 )
+    i_ret = closesocket( p_sap->i_handle );
+#else
+    i_ret = close( p_sap->i_handle );
+#endif
+
+    if( i_ret )
     {
         msg_Err( p_sout, "unable to close SAP socket" );
     }
 
-    free( p_this );
+    free( p_sap );
 }
 
 /*****************************************************************************
  * sout_SAPSend: Sends a SAP packet
  *****************************************************************************/
-void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
+void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_sap )
 {
     char psz_msg[1000];                     /* SDP content */
     char *psz_head;                         /* SAP header */
@@ -298,7 +318,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
     int i_ret = 0;
 
     /* We send a packet every 24 calls to the function */
-    if( p_this->i_calls++ < 24 )
+    if( p_sap->i_calls++ < 24 )
     {
         return;
     }
@@ -336,7 +356,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
                       "m=audio %s udp 14\n"
                       "c=IN IP4 %s/15\n"
                       "a=type:test\n",
-             p_this->psz_name, p_this->psz_port, p_this->psz_url );
+             p_sap->psz_name, p_sap->psz_port, p_sap->psz_url );
 
     i_msg_size = strlen( psz_msg );
     i_size = i_msg_size + i_header_size;
@@ -354,23 +374,23 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
 
     if( i_size < 1024 ) /* We mustn't send packets larger than 1024B */
     {
-        if( p_this->i_ip_version == 6 )
+        if( p_sap->i_ip_version == 6 )
         {
-            i_ret = send( p_this->i_socket, psz_send, i_size, 0 );
+            i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
         }
         else
         {
-            i_ret = send( p_this->i_socket, psz_send, i_size, 0 );
+            i_ret = send( p_sap->i_socket, psz_send, i_size, 0 );
         }
     }
 
     if( i_ret <= 0 )
     {
         msg_Warn( p_sout, "SAP send failed on socket %i (%s)",
-                          p_this->i_socket, strerror(errno) );
+                          p_sap->i_socket, strerror(errno) );
     }
 
-    p_this->i_calls = 0;
+    p_sap->i_calls = 0;
 
     /* Free what we allocated */
     free( psz_send );
