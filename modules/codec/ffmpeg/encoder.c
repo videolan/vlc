@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.22 2004/02/20 18:34:28 massiot Exp $
+ * $Id: encoder.c,v 1.23 2004/02/21 22:41:49 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -114,8 +114,8 @@ struct encoder_sys_t
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
-extern const int16_t ff_mpeg4_default_intra_matrix[];
-extern const int16_t ff_mpeg4_default_non_intra_matrix[];
+extern int16_t ff_mpeg4_default_intra_matrix[];
+extern int16_t ff_mpeg4_default_non_intra_matrix[];
 
 int E_(OpenEncoder)( vlc_object_t *p_this )
 {
@@ -260,7 +260,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             p_context->i_quant_factor = p_enc->f_i_quant_factor;
         }
 
+#if LIBAVCODEC_BUILD >= 4690
         p_context->noise_reduction = p_enc->i_noise_reduction;
+#endif
 
         if ( p_enc->b_mpeg4_matrix )
         {
@@ -287,10 +289,12 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
         }
 
+#if LIBAVCODEC_BUILD >= 4702
         if ( p_enc->i_threads >= 1 )
         {
             p_context->thread_count = p_enc->i_threads;
         }
+#endif
 
         if( p_enc->i_vtolerance > 0 )
         {
@@ -566,6 +570,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 }
             }
 
+#if LIBAVCODEC_BUILD >= 4690
             if ( frame.pts && current_date + HURRY_UP_GUARD1 > frame.pts )
             {
                 p_sys->p_context->noise_reduction = p_enc->i_noise_reduction
@@ -575,6 +580,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             {
                 p_sys->p_context->noise_reduction = p_enc->i_noise_reduction;
             }
+#endif
         }
     }
     else
@@ -585,10 +591,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;
 
-    frame.interlaced_frame = !p_pict->b_progressive;
     frame.repeat_pict = p_pict->i_nb_fields;
-
 #if LIBAVCODEC_BUILD >= 4685
+    frame.interlaced_frame = !p_pict->b_progressive;
     frame.top_field_first = p_pict->b_top_field_first;
 #endif
 
