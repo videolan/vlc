@@ -283,7 +283,7 @@ void bit_allocate (ac3dec_t * p_ac3dec)
 
 static void ba_compute_psd (bit_allocate_t * p_bit, s16 start, s16 end, s16 exps[])
 {
-    int bin,i,j,k;
+    int bin,j,k;
     s16 lastbin = 0;
 
     /* Map the exponents into dBs */
@@ -300,9 +300,8 @@ static void ba_compute_psd (bit_allocate_t * p_bit, s16 start, s16 end, s16 exps
         p_bit->bndpsd[k] = p_bit->psd[j];
         j++;
 
-        for (i = j; i < lastbin; i++) {
+        for (; j < lastbin; j++) {
             p_bit->bndpsd[k] = logadd(p_bit->bndpsd[k],p_bit->psd[j]);
-            j++;
         }
 
         k++;
