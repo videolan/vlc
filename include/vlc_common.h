@@ -873,7 +873,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #endif
 
 #ifndef HAVE_DIRENT_H
-    typedef struct DIR DIR;
+    typedef void DIR;
 #   ifndef FILENAME_MAX
 #       define FILENAME_MAX (260)
 #   endif
@@ -887,9 +887,9 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define opendir vlc_opendir
 #   define readdir vlc_readdir
 #   define closedir vlc_closedir
-    VLC_EXPORT( DIR *, vlc_opendir, ( const char * ) );
-    VLC_EXPORT( struct dirent *, vlc_readdir, ( DIR * ) );
-    VLC_EXPORT( int, vlc_closedir, ( DIR * ) );
+    VLC_EXPORT( void *, vlc_opendir, ( const char * ) );
+    VLC_EXPORT( void *, vlc_readdir, ( void * ) );
+    VLC_EXPORT( int, vlc_closedir, ( void * ) );
 #elif !defined(__PLUGIN__)
 #   define vlc_opendir  NULL
 #   define vlc_readdir  NULL
