@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.22 2003/01/25 20:15:41 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.23 2003/01/27 10:29:21 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,7 +69,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 {
     p_intf = p_interface;
     p_wrapper = p_intf->p_sys->p_wrapper;
-    p_intf->p_sys->b_dvdold = false;
+    p_intf->p_sys->b_dvdmenus = false;
     
     fPlaylistIsEmpty = !( p_wrapper->PlaylistSize() > 0 );
     

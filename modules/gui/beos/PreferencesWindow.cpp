@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.9 2003/01/25 20:15:41 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.10 2003/01/27 10:29:21 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -75,9 +75,9 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_intf,
     rect = fGeneralView->Bounds();
     rect.InsetBy( 10, 10 );
     rect.bottom = rect.top + 10;
-    fDvdOldCheck = new BCheckBox( rect, "dvdold", "Do not use DVD menus",
-                                  new BMessage( DVDOLD_CHECK ) );
-    fGeneralView->AddChild( fDvdOldCheck );
+    fDvdMenusCheck = new BCheckBox( rect, "dvdmenus", "Use DVD menus",
+                                  new BMessage( DVDMENUS_CHECK ) );
+    fGeneralView->AddChild( fDvdMenusCheck );
     
     rect.top = rect.bottom + 20;
     rect.bottom = rect.top + 30;
@@ -171,7 +171,7 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
 {
     switch ( p_message->what )
     {
-        case DVDOLD_CHECK:
+        case DVDMENUS_CHECK:
         case SLIDER_UPDATE:
         {
             ApplyChanges();
@@ -215,7 +215,7 @@ void PreferencesWindow::ReallyQuit()
  *****************************************************************************/
 void PreferencesWindow::SetDefaults()
 {
-    fDvdOldCheck->SetValue( 0 );
+    fDvdMenusCheck->SetValue( 0 );
     fPpSlider->SetValue( 0 );
     fBrightnessSlider->SetValue( 100 );
     fContrastSlider->SetValue( 100 );
@@ -228,10 +228,10 @@ void PreferencesWindow::SetDefaults()
  *****************************************************************************/
 void PreferencesWindow::ApplyChanges()
 {
-    if( fDvdOldCheck->Value() )
-        p_intf->p_sys->b_dvdold = true;
+    if( fDvdMenusCheck->Value() )
+        p_intf->p_sys->b_dvdmenus = true;
     else
-        p_intf->p_sys->b_dvdold = false;
+        p_intf->p_sys->b_dvdmenus = false;
     
     config_PutInt( p_intf, "ffmpeg-pp-q", fPpSlider->Value() );
     config_PutFloat( p_intf, "brightness",

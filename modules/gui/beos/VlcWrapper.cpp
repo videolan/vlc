@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.21 2003/01/22 01:13:22 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.22 2003/01/27 10:29:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -389,7 +389,9 @@ void VlcWrapper::OpenFiles( BList* o_files, bool replace )
  
 void VlcWrapper::OpenDisc(BString o_type, BString o_device, int i_title, int i_chapter)
 {
-    if( p_intf->p_sys->b_dvdold )
+    if( p_intf->p_sys->b_dvdmenus )
+        o_device.Prepend( "dvd:" );
+    else
         o_device.Prepend( "dvdold:" );
     playlist_Add( p_playlist, o_device.String(),
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );

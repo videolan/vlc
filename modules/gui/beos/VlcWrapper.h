@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.16 2003/01/25 20:15:41 titer Exp $
+ * $Id: VlcWrapper.h,v 1.17 2003/01/27 10:29:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -44,7 +44,7 @@ struct intf_sys_t
     int                  i_part;
     audio_volume_t       i_saved_volume;
     int                  i_channel;
-    bool                 b_dvdold;
+    bool                 b_dvdmenus;
     
     VlcWrapper *         p_wrapper;
 };
