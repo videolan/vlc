@@ -210,7 +210,7 @@ typedef struct
         float f_alpha;
         float f_beta;
         float f_gamma;
-    } band[];
+    } band[0];
 
 } eqz_config_t;
 
@@ -253,7 +253,7 @@ typedef struct
     char *psz_name;
     int  i_band;
     float f_preamp;
-    float f_amp[];
+    float f_amp[0];
 } eqz_preset_t;
 
 static const eqz_preset_t eqz_preset_flat_10b=
