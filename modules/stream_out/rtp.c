@@ -729,7 +729,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->pf_packetize = rtp_packetize_ac3;
             break;
         case VLC_FOURCC( 'H', '2', '6', '3' ):
-            id->i_payload_type = 34;  // from live.com MediaSession.cpp
+            id->i_payload_type = p_sys->i_payload_type++;
             id->i_clock_rate = 90000;
             id->psz_rtpmap = strdup( "H263-1998/90000" );
             id->pf_packetize = rtp_packetize_h263;
