@@ -35,8 +35,8 @@ and extract them into the current directory :
   tar xvzf gettext-macosx.tar.gz
 
 Use the convert-po.sh script attached :
-  setenv PATH gettext-macosx:$PATH
-  setenv DYLD_LIBRARY_PATH=gettext-macosx
+  export PATH=gettext-macosx:$PATH
+  export DYLD_LIBRARY_PATH=gettext-macosx
   ./convert-po.sh <LANG>.po
 [*]
 
@@ -68,8 +68,8 @@ tar xzf vlc-po-files.tar.gz
 cd vlc-po-files
 curl -O http://www.videolan.org/pub/videolan/devtools/gettext-macosx.tar.gz
 tar xzf gettext-macosx.tar.gz
-setenv PATH ./gettext-macosx:$PATH
-setenv DYLD_LIBRARY_PATH ./gettext-macosx
+export PATH=./gettext-macosx:$PATH
+export DYLD_LIBRARY_PATH=./gettext-macosx
 [here you copy your it.po file to the vlc-po-files folder on your Desktop]
 ./convert-po.sh it.po
 [here you copy the vlc.mo file to your
