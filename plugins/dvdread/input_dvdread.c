@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.33 2002/03/12 18:37:46 stef Exp $
+ * $Id: input_dvdread.c,v 1.34 2002/03/18 19:14:52 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -131,6 +131,11 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int DvdReadInit( input_thread_t * p_input )
 {
+    if( p_input->stream.i_method != INPUT_METHOD_DVD )
+    {
+        return -1;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
     DvdReadLauchDecoders( p_input );

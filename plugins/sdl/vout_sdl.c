@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.84 2002/03/17 17:00:38 sam Exp $
+ * $Id: vout_sdl.c,v 1.85 2002/03/18 19:14:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -154,6 +154,8 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
+    char *psz_method;
+
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
     {
         return( 1 );
@@ -165,6 +167,20 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         intf_ErrMsg( "vout error: can't create p_sys (%s)", strerror(ENOMEM) );
         return( 1 );
+    }
+
+    psz_method = config_GetPszVariable( "vout" );
+    if( psz_method )
+    {
+        while( *psz_method && *psz_method != ':' )
+        {
+            psz_method++;
+        }
+
+        if( *psz_method )
+        {
+            setenv( "SDL_VIDEODRIVER", psz_method + 1, 1 );
+        }
     }
 
     /* Initialize library */

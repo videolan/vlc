@@ -10,17 +10,10 @@ A typical way to configure vlc is:
 
 See `./configure --help' for more information.
 
-Here is a shortcut to copy-paste for a complete build:
-
-   make distclean ; ./configure --prefix=/usr --enable-gnome \
-      --enable-fb --with-glide --with-ggi --enable-esd --enable-qt
-
 If you intend to debug stuff, you may want to compile with debugging
 symbols:
 
-   make distclean ; ./configure --prefix=/usr --enable-gnome \
-      --enable-fb --with-glide --with-ggi --enable-esd --enable-qt \
-	  --enable-debug
+   make distclean ; ./configure --prefix=/usr --enable-gnome --enable-debug
 
 It is also possible to cross-compile for the Win32 platform using mingw32:
 

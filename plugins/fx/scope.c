@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.4 2002/03/02 03:51:23 sam Exp $
+ * $Id: scope.c,v 1.5 2002/03/18 19:14:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -106,6 +106,8 @@ static void aout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
+    char *psz_method;
+
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
@@ -114,10 +116,31 @@ static int aout_Open( aout_thread_t *p_aout )
         return -1;
     }
 
+    psz_method = config_GetPszVariable( "aout" );
+    if( psz_method )
+    {
+        if( !*psz_method )
+        {
+            free( psz_method );
+            return -1;
+        }
+    }
+    else
+    {
+        return -1;
+    }
+
     /* Open video output */
     p_aout->p_sys->p_vout =
         vout_CreateThread( NULL, SCOPE_WIDTH, SCOPE_HEIGHT,
                            FOURCC_I420, SCOPE_ASPECT );
+
+    if( p_aout->p_sys->p_vout == NULL )
+    {
+        intf_ErrMsg( "aout scope error: no suitable vout module" );
+        free( p_aout->p_sys );
+        return -1;
+    }
 
     /* Open audio output  */
     p_aout->p_sys->aout.i_format   = p_aout->i_format;
@@ -128,7 +151,7 @@ static int aout_Open( aout_thread_t *p_aout )
                                     (void *)&p_aout->p_sys->aout );
     if( p_aout->p_sys->aout.p_module == NULL )
     {
-        intf_ErrMsg( "aout error: no suitable aout module" );
+        intf_ErrMsg( "aout scope error: no suitable aout module" );
         vout_DestroyThread( p_aout->p_sys->p_vout, NULL );
         free( p_aout->p_sys );
         return -1;

@@ -454,6 +454,11 @@ static int VCDInit( input_thread_t * p_input )
 {
     es_descriptor_t *       p_es;
     
+    if( p_input->stream.i_method != INPUT_METHOD_VCD )
+    {
+        return -1;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
     /* Set program information. */

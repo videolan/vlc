@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.6 2002/03/15 17:17:35 sam Exp $
+ * $Id: mpeg_ts.c,v 1.7 2002/03/18 19:14:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -107,10 +107,10 @@ static int TSInit( input_thread_t * p_input )
 
     if( *p_peek != TS_SYNC_CODE )
     {
-        if( *p_input->psz_demux && strncmp( p_input->psz_demux, "ts", 3 ) )
+        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ts", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this doesn't seem like a TS stream, continuing" );
+            intf_ErrMsg( "input error: this doesn't look like a TS stream, continuing" );
         }
         else
         {
