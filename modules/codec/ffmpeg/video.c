@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.40 2003/08/13 18:39:53 gbazin Exp $
+ * $Id: video.c,v 1.41 2003/10/21 18:33:53 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -116,7 +116,12 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
         i_chroma = VLC_FOURCC('I','4','2','0');
     }
 
+#if LIBAVCODEC_BUILD >= 4687
+    i_aspect = VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
+        p_context->width / p_context->height );
+#else
     i_aspect = VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
+#endif
     if( i_aspect == 0 )
     {
         i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
