@@ -716,8 +716,45 @@ then
       fi
     fi
   ])
+  CPPFLAGS="$save_CPPFLAGS"
+fi
+
+dnl
+dnl dvdplay module: check for libdvdplay
+dnl
+AC_ARG_ENABLE(dvdplay,
+[  --enable-dvdplay        dvdplay input module (default disabled)])
+if test "x$enable_dvdplay" != "xno"
+then
+  AC_ARG_WITH(dvdplay, 
+  [    --with-dvdplay=PATH   libdvdplay headers and libraries])
+  if test "x$with_dvdplay" = x
+  then
+    test_LDFLAGS=""
+    test_CFLAGS=""
+  else
+    test_LDFLAGS="-L${with_dvdplay}/lib"
+    test_CFLAGS="-I${with_dvdplay}/include"
+  fi
+  CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
+  AC_CHECK_HEADERS(dvdplay/dvdplay.h, [
+      PLUGINS="${PLUGINS} dvdplay"
+      dvdplay_LDFLAGS="${dvdplay_LDFLAGS} ${test_LDFLAGS} -ldvdplay -ldvdread"
+      dvdplay_CFLAGS="${dvdplay_CFLAGS} ${test_CFLAGS}"
+    ],[
+    if test "x$enable_dvdplay" != x
+    then
+      if test "x$with_dvdplay" != x
+      then
+        AC_MSG_ERROR([Cannot find dvdplay/dvdplay.h in ${with_dvdplay}/include])
+      else
+        AC_MSG_ERROR([Cannot find dvdplay/dvdplay.h])
+      fi
+    fi
+  ])
   CPPFLAGS="${save_CPPFLAGS}"
 fi
+
 
 dnl
 dnl  libdvbpsi ts demux
@@ -1827,6 +1864,7 @@ AC_SUBST(arts_CFLAGS)
 AC_SUBST(chroma_i420_yuy2_mmx_CFLAGS)
 AC_SUBST(dvd_CFLAGS)
 AC_SUBST(dvdread_CFLAGS)
+AC_SUBST(dvdplay_CFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_CFLAGS)
 AC_SUBST(directx_CFLAGS)
 AC_SUBST(esd_CFLAGS)
@@ -1861,6 +1899,7 @@ AC_SUBST(directx_LDFLAGS)
 AC_SUBST(dsp_LDFLAGS)
 AC_SUBST(dvd_LDFLAGS)
 AC_SUBST(dvdread_LDFLAGS)
+AC_SUBST(dvdplay_LDFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_LDFLAGS)
 AC_SUBST(esd_LDFLAGS)
 AC_SUBST(familiar_LDFLAGS)

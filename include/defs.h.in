@@ -199,6 +199,9 @@
 /* Define if you have the <dvdcss/dvdcss.h> header file.  */
 #undef HAVE_DVDCSS_DVDCSS_H
 
+/* Define if you have the <dvdplay/dvdplay.h> header file.  */
+#undef HAVE_DVDPLAY_DVDPLAY_H
+
 /* Define if you have the <dvdread/dvd_reader.h> header file.  */
 #undef HAVE_DVDREAD_DVD_READER_H
 

@@ -34,6 +34,7 @@ PLUGINS_DIR :=	a52 \
 		dummy \
 		dvd \
 		dvdread \
+		dvdplay \
 		esd \
       familiar \
 		fb \
@@ -101,6 +102,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dummy/null \
 		dvd/dvd \
 		dvdread/dvdread \
+		dvdplay/dvdplay \
 		esd/esd \
       familiar/familiar \
 		fb/fb \
