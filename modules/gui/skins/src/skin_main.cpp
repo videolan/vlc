@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.55 2003/12/22 02:24:52 sam Exp $
+ * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -383,20 +383,26 @@ int SkinManage( intf_thread_t *p_intf )
             // Text char * for updating text controls
             char *text = new char[MSTRTIME_MAX_SIZE];
 
+            int64_t i_seconds, i_length;
+
+            i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+            i_length = var_GetTime( p_intf->p_sys->p_input, "length" ) / I64C(1000000 );
+
+            secstotimestr( psz_time, i_seconds );
+
             // Create end time text
-            input_OffsetToTime( p_intf->p_sys->p_input, &text[1],
-                                p_area->i_size - p_area->i_tell );
+            secstotimestr( &text[1], i_length - i_seconds );
             text[0] = '-';
             p_intf->p_sys->p_theme->EvtBank->Get( "left_time" )
                 ->PostTextMessage( text );
 
             // Create time text and update
-            input_OffsetToTime( p_intf->p_sys->p_input, text, p_area->i_tell );
+            secstotimestr( text, i_seconds );
             p_intf->p_sys->p_theme->EvtBank->Get( "time" )
                 ->PostTextMessage( text );
 
             // Create total time text
-            input_OffsetToTime( p_intf->p_sys->p_input, text, p_area->i_size );
+            secstotimestr( text, i_length );
             p_intf->p_sys->p_theme->EvtBank->Get( "total_time" )
                 ->PostTextMessage( text );
 

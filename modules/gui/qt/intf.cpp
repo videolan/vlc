@@ -265,12 +265,12 @@ void IntfWindow::DateDisplay( int i_range )
     if( p_intf->p_sys->p_input )
     {
         char psz_time[ MSTRTIME_MAX_SIZE ];
+        int64_t i_seconds;
 
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        p_date->setText( input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
-           ( p_intf->p_sys->p_input->stream.p_selected_area->i_size * i_range )
-               / SLIDER_MAX ) );
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+        i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+        secstotimestr( psz_time, i_seconds );
+
+        p_date->setText( psz_time );
     }
 }
 

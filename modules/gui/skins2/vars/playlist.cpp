@@ -31,6 +31,7 @@
 #include "playlist.hpp"
 #include "../utils/ustring.hpp"
 
+#define ICONV_CONST
 
 Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
 {

@@ -1230,21 +1230,17 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
         if( p_intf->p_sys->p_input )
         {
             /* Update stream date */
-#define p_area p_intf->p_sys->p_input->stream.p_selected_area
             char psz_time[ MSTRTIME_MAX_SIZE ], psz_total[ MSTRTIME_MAX_SIZE ];
             mtime_t i_seconds;
             vlc_value_t val;
 
-            var_Get( p_intf->p_sys->p_input, "length",  &val );
-            i_seconds = val.i_time / 1000000;
-            secstotimestr ( psz_total, i_seconds );
+            i_seconds = var_GetTime( p_intf->p_sys->p_input, "length" ) / I64C(1000000 );
+            secstotimestr( psz_total, i_seconds );
 
-            statusbar->SetStatusText(
-                wxU(input_OffsetToTime( p_intf->p_sys->p_input,
-                    psz_time, p_area->i_size * event.GetPosition()
-                        / SLIDER_MAX_POS )) + wxString(wxT(" / ")) +
-                        wxU(psz_total), 0 );
-#undef p_area
+            i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+            secstotimestr( psz_time, i_seconds );
+
+            statusbar->SetStatusText( wxU(psz_time)+ wxString(wxT(" / ")) + wxU(psz_total), 0 );
         }
     }
 #endif

@@ -558,13 +558,14 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj, gpointer userdata )
 
     if( p_intf->p_sys->p_input )
     {
-#define p_area p_intf->p_sys->p_input->stream.p_selected_area
         char psz_time[ MSTRTIME_MAX_SIZE ];
+        int64_t i_seconds;
+
+        i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+        secstotimestr( psz_time, i_seconds );
 
         gtk_label_set_text( GTK_LABEL( p_intf->p_sys->p_slider_label ),
-                        input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
-                                   ( p_area->i_size * p_adj->value ) / 100 ) );
-#undef p_area
+                            psz_time );
      }
 }
 

@@ -502,14 +502,12 @@ void KInterface::slotSliderChanged( int position )
     if( p_intf->p_sys->p_input != NULL )
     {
         char psz_time[ MSTRTIME_MAX_SIZE ];
+        int64_t i_seconds;
 
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+        i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
+        secstotimestr( psz_time, i_seconds );
 
-#define p_area p_intf->p_sys->p_input->stream.p_selected_area
-        statusBar()->changeItem( input_OffsetToTime( p_intf->p_sys->p_input, psz_time, ( p_area->i_size * position ) / 10000 ), ID_DATE );
-#undef p_area
-
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+        statusBar()->changeItem( psz_time, ID_DATE );
      }
 }
 
