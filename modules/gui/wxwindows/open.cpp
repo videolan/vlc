@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.3 2003/01/28 14:00:49 fenrir Exp $
+ * $Id: open.cpp,v 1.4 2003/01/28 21:18:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,7 +51,7 @@
 #include "wxwindows.h"
 
 #ifndef wxRB_SINGLE
-   #define wxRB_SINGLE 0
+#   define wxRB_SINGLE 0
 #endif
 
 /*****************************************************************************
@@ -249,23 +249,14 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_device, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    int val = 1;
     label = new wxStaticText( panel, -1, _("Title") );
-    disc_title = new wxSpinCtrl( panel, DiscTitle_Event,
-                                 wxString::Format(_("%d"), val),
-                                 wxDefaultPosition, wxDefaultSize,
-                                 wxSP_ARROW_KEYS,
-                                 1, 255, val);
+    disc_title = new wxSpinCtrl( panel, DiscTitle_Event );
 
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_title, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
     label = new wxStaticText( panel, -1, _("Chapter") );
-    disc_chapter = new wxSpinCtrl( panel, DiscChapter_Event,
-                                   wxString::Format(_("%d"), val),
-                                   wxDefaultPosition, wxDefaultSize,
-                                   wxSP_ARROW_KEYS,
-                                   1, 255, val);
+    disc_chapter = new wxSpinCtrl( panel, DiscChapter_Event );
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_chapter, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
@@ -526,7 +517,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
 
     switch( disc_type->GetSelection() )
     {
-    case 3:
+    case 2:
         psz_device = config_GetPsz( p_intf, "vcd" );
         disc_device->SetValue( psz_device ? psz_device : "" );
         break;
@@ -538,6 +529,22 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     }
 
     if( psz_device ) free( psz_device );
+
+    switch( disc_type->GetSelection() )
+    {
+    case 1:
+        disc_title->SetRange( 0, 255 );
+        disc_title->SetValue( 0 );
+        break;
+
+    default:
+        disc_title->SetRange( 1, 255 );
+        disc_title->SetValue( 1 );
+        break;
+    }
+
+    disc_chapter->SetRange( 1, 255 );
+    disc_chapter->SetValue( 1 );
 
     UpdateMRL( DISC_ACCESS );
 }
