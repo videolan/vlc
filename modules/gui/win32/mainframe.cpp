@@ -356,40 +356,18 @@ void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
 //--------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::VolumeUpActionExecute( TObject *Sender )
 {
-    aout_instance_t *p_aout;
-    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                 FIND_ANYWHERE );
-    if ( p_aout != NULL )
-    {
-        aout_VolumeUp( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeUp( p_intf, 1, NULL );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::VolumeDownActionExecute( TObject *Sender )
 {
-    aout_instance_t *p_aout;
-    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                 FIND_ANYWHERE );
-    if ( p_aout != NULL )
-    {
-        aout_VolumeDown( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeDown( p_intf, 1, NULL );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MuteActionExecute( TObject *Sender )
 {
-    aout_instance_t *p_aout;
-    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                 FIND_ANYWHERE );
-    if ( p_aout != NULL )
-    {
-        aout_VolumeMute( p_aout, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
-
-//        MenuMute->Checked = ! MenuMute->Checked;
-    }
+    aout_VolumeMute( p_intf, NULL );
+//    MenuMute->Checked = ! MenuMute->Checked;
 }
 //---------------------------------------------------------------------------
 
