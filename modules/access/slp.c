@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.12 2003/06/17 16:09:16 gbazin Exp $
+ * $Id: slp.c,v 1.13 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -184,6 +184,8 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     p_playlist_item->i_type = 0;
     p_playlist_item->i_status = 0;
     p_playlist_item->b_autodeletion = VLC_FALSE;
+    p_playlist_item->i_options = 0;
+    p_playlist_item->ppsz_options = 0;
 
     /* search the description of the stream */
     if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),

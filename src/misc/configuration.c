@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.59 2003/07/18 20:06:00 gbazin Exp $
+ * $Id: configuration.c,v 1.60 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,6 +55,60 @@
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <direct.h>
 #endif
+
+/*****************************************************************************
+ * config_GetType: get the type of a variable (bool, int, float, string)
+ *****************************************************************************
+ * This function is used to get the type of a variable from its name.
+ * Beware, this is quite slow.
+ *****************************************************************************/
+int __config_GetType( vlc_object_t *p_this, const char *psz_name )
+{
+    module_config_t *p_config;
+    int i_type;
+
+    p_config = config_FindConfig( p_this, psz_name );
+
+    /* sanity checks */
+    if( !p_config )
+    {
+        return 0;
+    }
+
+    switch( p_config->i_type )
+    {
+    case CONFIG_ITEM_BOOL:
+        i_type = VLC_VAR_BOOL;
+        break;
+
+    case CONFIG_ITEM_INTEGER:
+        i_type = VLC_VAR_INTEGER;
+        break;
+
+    case CONFIG_ITEM_FLOAT:
+        i_type = VLC_VAR_FLOAT;
+        break;
+
+    case CONFIG_ITEM_MODULE:
+    case CONFIG_ITEM_STRING:
+        i_type = VLC_VAR_STRING;
+        break;
+
+    case CONFIG_ITEM_FILE:
+        i_type = VLC_VAR_FILE;
+        break;
+
+    case CONFIG_ITEM_DIRECTORY:
+        i_type = VLC_VAR_DIRECTORY;
+        break;
+
+    default:
+        i_type = 0;
+        break;
+    }
+
+    return i_type;
+}
 
 /*****************************************************************************
  * config_GetInt: get the value of an int variable

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.233 2003/06/28 21:27:35 fenrir Exp $
+ * $Id: input.c,v 1.234 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,6 +56,9 @@ static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
+static void ParseOption     ( input_thread_t *p_input,
+                              const char *psz_option );
+
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
  *****************************************************************************
@@ -67,6 +70,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     input_info_category_t * p_info;
+    int i;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -74,6 +78,29 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     {
         msg_Err( p_parent, "out of memory" );
         return NULL;
+    }
+
+    /* Parse input options */
+    for( i = 0; i < p_item->i_options; i++ )
+    {
+        ParseOption( p_input, p_item->ppsz_options[i] );
+    }
+
+    /* Create a few object variables we'll need later */
+    if( !var_Type( p_input, "sout" ) )
+    {
+        var_Create( p_input, "sout", VLC_VAR_STRING );
+        var_Change( p_input, "sout", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_input, "sout-audio" ) )
+    {
+        var_Create( p_input, "sout-audio", VLC_VAR_BOOL );
+        var_Change( p_input, "sout-audio", VLC_VAR_INHERITVALUE, NULL, NULL );
+    }
+    if( !var_Type( p_input, "sout-video" ) )
+    {
+        var_Create( p_input, "sout-video", VLC_VAR_BOOL );
+        var_Change( p_input, "sout-video", VLC_VAR_INHERITVALUE, NULL, NULL );
     }
 
     /* Initialize thread properties */
@@ -371,6 +398,7 @@ static int InitThread( input_thread_t * p_input )
 {
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
+    vlc_value_t val;
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -518,21 +546,20 @@ static int InitThread( input_thread_t * p_input )
     }
 
     /* Initialize optional stream output. */
-    psz_parser = config_GetPsz( p_input, "sout" );
-    if ( psz_parser != NULL )
+    var_Get( p_input, "sout", &val );
+    if ( val.psz_string != NULL )
     {
-        if ( *psz_parser &&
-             (p_input->stream.p_sout = sout_NewInstance( p_input, psz_parser ))
-               == NULL )
+        if ( *val.psz_string && (p_input->stream.p_sout =
+             sout_NewInstance( p_input, val.psz_string )) == NULL )
         {
             msg_Err( p_input, "cannot start stream output instance, aborting" );
-            free( psz_parser );
+            free( val.psz_string );
             module_Unneed( p_input, p_input->p_access );
             module_Unneed( p_input, p_input->p_demux );
             return -1;
         }
 
-        free( psz_parser );
+        free( val.psz_string );
     }
 
     return 0;
@@ -609,3 +636,98 @@ static void EndThread( input_thread_t * p_input )
     p_input->b_dead = 1;
 }
 
+/*****************************************************************************
+ * ParseOption: parses the options for the input
+ *****************************************************************************
+ * This function parses the input (config) options and creates their associated
+ * object variables.
+ * Options are of the form "[no[-]]foo[=bar]" where foo is the option name and
+ * bar is the value of the option.
+ *****************************************************************************/
+static void ParseOption( input_thread_t *p_input, const char *psz_option )
+{
+    char *psz_name = (char *)psz_option;
+    char *psz_value = strchr( psz_option, '=' );
+    int  i_name_len, i_type;
+    vlc_bool_t b_isno = VLC_FALSE;
+    vlc_value_t val;
+
+    if( psz_value ) i_name_len = psz_value - psz_option;
+    else i_name_len = strlen( psz_option );
+
+    /* It's too much of an hassle to remove the ':' when we parse
+     * the cmd line :) */
+    if( i_name_len && *psz_name == ':' )
+    {
+        psz_name++;
+        i_name_len--;
+    }
+
+    if( i_name_len == 0 ) return;
+
+    psz_name = strndup( psz_name, i_name_len );
+    if( psz_value ) psz_value++;
+
+    i_type = config_GetType( p_input, psz_name );
+
+    if( !i_type && !psz_value )
+    {
+        /* check for "no-foo" or "nofoo" */
+        if( !strncmp( psz_name, "no-", 3 ) )
+        {
+            memmove( psz_name, psz_name + 3, strlen(psz_name) + 1 - 3 );
+        }
+        else if( !strncmp( psz_name, "no", 2 ) )
+        {
+            memmove( psz_name, psz_name + 2, strlen(psz_name) + 1 - 2 );
+        }
+        else goto cleanup;           /* Option doesn't exist */
+
+        b_isno = VLC_TRUE;
+        i_type = config_GetType( p_input, psz_name );
+
+        if( !i_type ) goto cleanup;  /* Option doesn't exist */
+    }
+    else if( !i_type ) goto cleanup; /* Option doesn't exist */
+
+    if( ( i_type != VLC_VAR_BOOL ) &&
+        ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
+
+    /* Create the variable in the input object.
+     * Children of the input object will be able to retreive this value
+     * thanks to the inheritance property of the object variables. */
+    var_Create( p_input, psz_name, i_type );
+
+    switch( i_type )
+    {
+    case VLC_VAR_BOOL:
+        val.b_bool = !b_isno;
+        break;
+
+    case VLC_VAR_INTEGER:
+        val.i_int = atoi( psz_value );
+        break;
+
+    case VLC_VAR_FLOAT:
+        val.f_float = atof( psz_value );
+        break;
+
+    case VLC_VAR_STRING:
+    case VLC_VAR_FILE:
+    case VLC_VAR_DIRECTORY:
+        val.psz_string = psz_value;
+        break;
+
+    default:
+        goto cleanup;
+        break;
+    }
+
+    var_Set( p_input, psz_name, val );
+
+    msg_Dbg( p_input, "set input option: %s to %s", psz_name, psz_value );
+
+  cleanup:
+    if( psz_name ) free( psz_name );
+    return;
+}

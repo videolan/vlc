@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.60 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: input_dec.c,v 1.61 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ static void             DeleteDecoderFifo( decoder_fifo_t * );
 decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
-    char           *psz_sout;
+    vlc_value_t    val;
     decoder_fifo_t *p_fifo;
     int i_priority;
 
@@ -58,22 +58,24 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
     }
 
     p_fifo->p_module = NULL;
+
     /* If we are in sout mode, search for packetizer module */
-    psz_sout = config_GetPsz( p_input, "sout" );
-    if( !p_es->b_force_decoder && psz_sout != NULL && *psz_sout != 0 )
+    var_Get( p_input, "sout", &val );
+    if( !p_es->b_force_decoder && val.psz_string && *val.psz_string )
     {
-        vlc_bool_t b_sout = VLC_TRUE;
+        free( val.psz_string );
+        val.b_bool = VLC_TRUE;
 
         if( p_es->i_cat == AUDIO_ES )
         {
-            b_sout = config_GetInt( p_input, "sout-audio" );
+            var_Get( p_input, "sout-audio", &val );
         }
         else if( p_es->i_cat == VIDEO_ES )
         {
-            b_sout = config_GetInt( p_input, "sout-video" );
+            var_Get( p_input, "sout-video", &val );
         }
 
-        if( b_sout )
+        if( val.b_bool )
         {
             p_fifo->p_module =
                 module_Need( p_fifo, "packetizer", "$packetizer" );
@@ -83,11 +85,8 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
     {
         /* default Get a suitable decoder module */
         p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
-    }
 
-    if( psz_sout )
-    {
-        free( psz_sout );
+        if( val.psz_string ) free( val.psz_string );
     }
 
     if( p_fifo->p_module == NULL )

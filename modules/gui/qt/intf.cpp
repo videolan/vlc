@@ -2,7 +2,7 @@
  * intf.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.cpp,v 1.3 2002/09/30 11:05:39 sam Exp $
+ * $Id: intf.cpp,v 1.4 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -299,7 +299,7 @@ void IntfWindow::FileOpen( void )
             return;
         }
 
-        playlist_Add( p_playlist, file.latin1(),
+        playlist_Add( p_playlist, file.latin1(), 0, 0,
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         vlc_object_release( p_playlist );
     }

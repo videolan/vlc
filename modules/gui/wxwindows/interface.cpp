@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.52 2003/07/22 15:59:06 gbazin Exp $
+ * $Id: interface.cpp,v 1.53 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -833,7 +833,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     }
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
-        playlist_Add( p_playlist, (const char *)filenames[i].mb_str(),
+        playlist_Add( p_playlist, (const char *)filenames[i].mb_str(), 0, 0,
                       PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
 
     vlc_object_release( p_playlist );

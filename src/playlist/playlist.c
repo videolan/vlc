@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.42 2003/07/17 22:54:40 gbazin Exp $
+ * $Id: playlist.c,v 1.43 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -112,24 +112,12 @@ void playlist_Destroy( playlist_t * p_playlist )
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int playlist_Add( playlist_t *p_playlist, const char * psz_target,
-                                          int i_mode, int i_pos )
+int playlist_Add( playlist_t *p_playlist, const char *psz_target,
+                  const char **ppsz_options, int i_options,
+                  int i_mode, int i_pos )
 {
-    playlist_item_t * p_item;
-
-    p_item = malloc( sizeof( playlist_item_t ) );
-    if( p_item == NULL )
-    {
-        msg_Err( p_playlist, "out of memory" );
-    }
-
-    p_item->psz_name = strdup( psz_target );
-    p_item->psz_uri  = strdup( psz_target );
-    p_item->i_type = 0;
-    p_item->i_status = 0;
-    p_item->b_autodeletion = VLC_FALSE;
-
-    return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
+    return playlist_AddName( p_playlist, psz_target, psz_target,
+                             ppsz_options, i_options, i_mode, i_pos );
 }
 
 /*****************************************************************************
@@ -138,9 +126,10 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int playlist_AddName( playlist_t *p_playlist, const char * psz_name, 
-                                          const char *psz_uri,
-                                          int i_mode, int i_pos )
+int playlist_AddName( playlist_t *p_playlist, const char *psz_name, 
+                      const char *psz_uri,
+                      const char **ppsz_options, int i_options,
+                      int i_mode, int i_pos )
 {
     playlist_item_t * p_item;
 
@@ -155,6 +144,19 @@ int playlist_AddName( playlist_t *p_playlist, const char * psz_name,
     p_item->i_type = 0;
     p_item->i_status = 0;
     p_item->b_autodeletion = VLC_FALSE;
+
+    p_item->ppsz_options = NULL;
+    p_item->i_options = i_options;
+
+    if( i_options )
+    {
+        int i;
+
+        p_item->ppsz_options = (char **)malloc( i_options * sizeof(char *) );
+        for( i = 0; i < i_options; i++ )
+            p_item->ppsz_options[i] = strdup( ppsz_options[i] );
+
+    }
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
@@ -300,6 +302,15 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         if( p_playlist->pp_items[i_pos]->psz_uri )
         {
             free( p_playlist->pp_items[i_pos]->psz_uri );
+        }
+        if( p_playlist->pp_items[i_pos]->i_options )
+        {
+            int i;
+
+            for( i = 0; i < p_playlist->pp_items[i_pos]->i_options; i++ )
+                free( p_playlist->pp_items[i_pos]->ppsz_options[i] );
+
+            free( p_playlist->pp_items[i_pos]->ppsz_options );
         }
 
         /* XXX: what if the item is still in use? */
@@ -749,7 +760,8 @@ int playlist_LoadFile( playlist_t * p_playlist, const char *psz_filename )
            if( line[strlen(line)-1] == '\r' ) line[strlen(line)-1] = (char)0;
        }
 
-       playlist_Add ( p_playlist , (char*) &line , PLAYLIST_APPEND , PLAYLIST_END );
+       playlist_Add ( p_playlist , (char *)&line ,
+                      0, 0, PLAYLIST_APPEND , PLAYLIST_END );
     }
 
     /* start playing */

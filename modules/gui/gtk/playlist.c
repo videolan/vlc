@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: playlist.c,v 1.3 2003/01/23 15:52:04 sam Exp $
+ * $Id: playlist.c,v 1.4 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -622,7 +622,7 @@ int GtkAppendList( playlist_t * p_playlist, int i_pos, GList * p_list )
                 /* ok; this is a really nasty trick to insert
                    the item where they are suppose to go but, hey
                    this works :P (btw, you are really nasty too) */
-               g_list_nth_data( p_list, i_dummy ),
+               g_list_nth_data( p_list, i_dummy ), 0, 0,
                i_dummy == 0 ? PLAYLIST_INSERT | PLAYLIST_GO : PLAYLIST_INSERT,
                i_pos == PLAYLIST_END ? PLAYLIST_END : ( i_pos + i_dummy ) );
     }

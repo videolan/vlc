@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.37 2003/07/16 15:32:40 sam Exp $
+ * $Id: http.c,v 1.38 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -341,7 +341,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                               i_code, psz_answer, psz_value );
             p_playlist->pp_items[p_playlist->i_index]->b_autodeletion
                                                                   = VLC_TRUE;
-            playlist_Add( p_playlist, psz_value,
+            playlist_Add( p_playlist, psz_value, NULL, 0,
                           PLAYLIST_INSERT | PLAYLIST_GO,
                           p_playlist->i_index + 1 );
             vlc_object_release( p_playlist );

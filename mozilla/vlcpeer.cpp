@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.5 2003/07/16 16:33:59 sam Exp $
+ * $Id: vlcpeer.cpp,v 1.6 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -71,7 +71,7 @@ NS_IMETHODIMP VlcPeer::Play()
     {
         if( !p_plugin->b_stream && p_plugin->psz_target )
         {
-            VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
+            VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target, 0, 0,
                            PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             p_plugin->b_stream = 1;
         }

@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.10 2003/06/27 10:31:02 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.11 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,6 +28,8 @@ struct playlist_item_t
 {
     char *     psz_name;
     char *     psz_uri; 
+    char **    ppsz_options;
+    int        i_options;
     int        i_type;   /* unused yet */
     int        i_status; /* unused yet */
     vlc_bool_t b_autodeletion;
@@ -76,8 +78,8 @@ void           playlist_Destroy  ( playlist_t * );
 #define playlist_Goto(p,i) playlist_Command(p,PLAYLIST_GOTO,i)
 VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
 
-VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, int, int ) );
-VLC_EXPORT( int,  playlist_AddName, (playlist_t *,const char *,const char *, int,int ) );
+VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char **, int, int, int ) );
+VLC_EXPORT( int,  playlist_AddName, (playlist_t *,const char *,const char *, const char **, int, int,int ) );
 VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );

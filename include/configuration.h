@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.27 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: configuration.h,v 1.28 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -82,6 +82,7 @@ struct module_config_t
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
+VLC_EXPORT( int,    __config_GetType,  (vlc_object_t *, const char *) );
 VLC_EXPORT( int,    __config_GetInt,   (vlc_object_t *, const char *) );
 VLC_EXPORT( void,   __config_PutInt,   (vlc_object_t *, const char *, int) );
 VLC_EXPORT( float,  __config_GetFloat, (vlc_object_t *, const char *) );
@@ -103,6 +104,7 @@ VLC_EXPORT( void, config_Duplicate, ( module_t *, module_config_t * ) );
 VLC_EXPORT( void, config_SetCallbacks, ( module_config_t *, module_config_t * ) );
 VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 
+#define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
 #define config_PutInt(a,b,c) __config_PutInt(VLC_OBJECT(a),b,c)
 #define config_GetFloat(a,b) __config_GetFloat(VLC_OBJECT(a),b)

@@ -208,7 +208,7 @@ void KInterface::slotFileOpen()
         if( p_playlist )
         {
             fileOpenRecent->addURL( url );
-            playlist_Add( p_playlist, url.path(),
+            playlist_Add( p_playlist, url.path(), 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release( p_playlist );
         }
@@ -536,7 +536,7 @@ void KInterface::slotOpenDisk()
         if( p_playlist )
         {
             // add it to playlist
-            playlist_Add( p_playlist, source.latin1(),
+            playlist_Add( p_playlist, source.latin1(), 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release( p_playlist );
         }
@@ -562,7 +562,7 @@ void KInterface::slotOpenStream()
         if( p_playlist )
         {
             // add it to playlist
-            playlist_Add( p_playlist, source.latin1(),
+            playlist_Add( p_playlist, source.latin1(), 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release( p_playlist );
         }
@@ -664,7 +664,7 @@ void KInterface::dropEvent( QDropEvent *event )
             if( !(*i).isEmpty() )
             {
                 fileOpenRecent->addURL( *i );
-                playlist_Add( p_playlist, (*i).path(),
+                playlist_Add( p_playlist, (*i).path(), 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             }
         }

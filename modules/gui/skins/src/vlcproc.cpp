@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.42 2003/07/20 20:42:23 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.43 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -414,12 +414,12 @@ void VlcProc::DropFile( unsigned int param )
     {
         if( config_GetInt( p_intf, "enqueue" ) )
         {
-            playlist_Add( p_intf->p_sys->p_playlist, FileName,
+            playlist_Add( p_intf->p_sys->p_playlist, FileName, 0, 0,
                           PLAYLIST_APPEND, PLAYLIST_END );
         }
         else
         {
-            playlist_Add( p_intf->p_sys->p_playlist, FileName,
+            playlist_Add( p_intf->p_sys->p_playlist, FileName, 0, 0,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         }
     }

@@ -2,7 +2,7 @@
  * corba.c : CORBA (ORBit) remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: corba.c,v 1.1 2003/07/07 16:59:00 sam Exp $
+ * $Id: corba.c,v 1.2 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Olivier Aubert <oaubert at lisi dot univ-lyon1 dot fr>
  *
@@ -560,7 +560,7 @@ impl_VLC_MediaControl_add_to_playlist(impl_POA_VLC_MediaControl * servant,
       return;
     }
 
-  playlist_Add (p_playlist, psz_file, PLAYLIST_REPLACE, 0);
+  playlist_Add (p_playlist, psz_file, 0, 0, PLAYLIST_REPLACE, 0);
   vlc_object_release( p_playlist );
 
   return;

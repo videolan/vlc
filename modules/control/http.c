@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.16 2003/07/21 23:53:55 fenrir Exp $
+ * $Id: http.c,v 1.17 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1399,7 +1399,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     char mrl[512];
                     uri_extract_value( p_request, "mrl", mrl, 512 );
                     uri_decode_url_encoded( mrl );
-                    playlist_Add( p_sys->p_playlist, mrl,
+                    playlist_Add( p_sys->p_playlist, mrl, NULL, 0,
                                   PLAYLIST_APPEND, PLAYLIST_END );
                     msg_Dbg( p_intf, "requested playlist add: %s", mrl );
                     break;

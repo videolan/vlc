@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.23 2003/05/05 15:21:28 sigmunau Exp $
+ * $Id: vlc.h,v 1.24 2003/07/23 01:13:47 gbazin Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,9 @@ typedef union
     void *          p_address;
     vlc_object_t *  p_object;
     vlc_list_t *    p_list;
+
     struct { int i_low, i_high; } time;
+    struct { char *psz_name; int i_object_id; } var;
 
     /* Make sure the structure is at least 64bits */
     struct { char a, b, c, d, e, f, g, h; } padding;
@@ -133,7 +135,7 @@ int     VLC_Destroy      ( int );
 int     VLC_Set          ( int, char const *, vlc_value_t );
 int     VLC_Get          ( int, char const *, vlc_value_t * );
 int     VLC_AddIntf      ( int, char const *, vlc_bool_t );
-int     VLC_AddTarget    ( int, char const *, int, int );
+int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
 
 int     VLC_Play         ( int );
 int     VLC_Pause        ( int );

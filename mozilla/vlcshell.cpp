@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.14 2003/07/16 16:33:59 sam Exp $
+ * $Id: vlcshell.cpp,v 1.15 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -479,7 +479,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         {
 #if USE_LIBVLC
             VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
-                           i_mode, PLAYLIST_END );
+                           0, 0, i_mode, PLAYLIST_END );
 #endif
             p_plugin->b_stream = VLC_TRUE;
         }
@@ -579,7 +579,7 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
 #if USE_LIBVLC
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
-    VLC_AddTarget( p_plugin->i_vlc, fname,
+    VLC_AddTarget( p_plugin->i_vlc, fname, 0, 0,
                    PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 #endif
 }

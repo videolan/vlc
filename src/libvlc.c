@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.93 2003/07/19 14:22:08 gbazin Exp $
+ * $Id: libvlc.c,v 1.94 2003/07/23 01:13:48 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -710,7 +710,9 @@ int VLC_Die( int i_object )
  * This function adds psz_target to the current playlist. If a playlist does
  * not exist, it will create one.
  *****************************************************************************/
-int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
+int VLC_AddTarget( int i_object, char const *psz_target,
+                   char const **ppsz_options, int i_options,
+                   int i_mode, int i_pos )
 {
     int i_err;
     playlist_t *p_playlist;
@@ -739,7 +741,8 @@ int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
         vlc_object_yield( p_playlist );
     }
 
-    i_err = playlist_Add( p_playlist, psz_target, i_mode, i_pos );
+    i_err = playlist_Add( p_playlist, psz_target, ppsz_options, i_options,
+                          i_mode, i_pos );
 
     vlc_object_release( p_playlist );
 
@@ -1073,26 +1076,33 @@ static void SetLanguage ( char const *psz_lang )
 /*****************************************************************************
  * GetFilenames: parse command line options which are not flags
  *****************************************************************************
- * Parse command line for input files.
+ * Parse command line for input files as well as their associated options.
+ * An option always follows its associated input and begins with a ":".
  *****************************************************************************/
 static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 {
-    int i_opt;
+    int i_opt, i_options;
 
-    /* We assume that the remaining parameters are filenames */
-    for( i_opt = i_argc - 1; i_opt > optind; i_opt-- )
+    /* We assume that the remaining parameters are filenames
+     * and their input options */
+    for( i_opt = i_argc - 1; i_opt >= optind; i_opt-- )
     {
+        i_options = 0;
+
+        /* Count the input options */
+        while( *ppsz_argv[ i_opt ] == ':' && i_opt > optind )
+        {
+            i_options++;
+            i_opt--;
+        }
+
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
         VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ i_opt ],
-                       PLAYLIST_INSERT, 0 );
-    }
-
-    /* If there is at least one target, play it */
-    if( i_argc > optind )
-    {
-        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ optind ],
-                       PLAYLIST_INSERT | PLAYLIST_GO, 0 );
+                       (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
+                                        NULL ), i_options,
+                       PLAYLIST_INSERT | (i_opt == optind ? PLAYLIST_GO : 0),
+                       0 );
     }
 
     return VLC_SUCCESS;

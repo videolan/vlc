@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.28 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: open.cpp,v 1.29 2003/07/23 01:13:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -660,7 +660,8 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     for( size_t i = 0; i < mrl.GetCount(); i++ )
     {
         playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
-		      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+		      0, 0,
+                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
     }
 
     //TogglePlayButton( PLAYING_S );
