@@ -57,6 +57,7 @@ Section "Install"
 
 	File  vlc.exe
 	File  *.txt
+	File  *.htm
 
 	File  /r share
 	File  /r plugins
@@ -64,7 +65,7 @@ Section "Install"
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" "$INSTDIR\vlc.exe" 
-	CreateShortCut "$SMPROGRAMS\VideoLAN\FAQ.lnk" "$INSTDIR\faq.htm"
+	CreateShortCut "$SMPROGRAMS\VideoLAN\FAQ.lnk" "$INSTDIR\FAQ.htm"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\Uninstall VLC.lnk" "$INSTDIR\uninstall.exe"
 	WriteUninstaller "uninstall.exe"
 

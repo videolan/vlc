@@ -2,7 +2,7 @@
  * bandlimited.c : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.c,v 1.4 2003/03/05 19:31:32 gbazin Exp $
+ * $Id: bandlimited.c,v 1.5 2003/03/05 22:37:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -128,6 +128,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    p_filter->p_sys->i_old_wing = 0;
     p_filter->pf_do_work = DoWork;
 
     /* We don't want a new buffer to be created because we're not sure we'll
@@ -167,33 +168,34 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Check if we really need to run the resampler */
     if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
     {
-        if( p_filter->b_continuity &&
+        if( //p_filter->b_continuity && /* What difference does it make ? :) */
+            p_filter->p_sys->i_old_wing &&
             p_in_buf->i_size >=
-              p_in_buf->i_nb_bytes + sizeof(float) * i_nb_channels )
+              p_in_buf->i_nb_bytes + p_filter->p_sys->i_old_wing *
+              p_filter->input.i_bytes_per_frame )
         {
-            if( p_filter->p_sys->i_old_wing )
-            {
-                /* output the whole thing with the samples from last time */
-                memmove( ((float *)(p_in_buf->p_buffer)) +
-                         i_nb_channels * p_filter->p_sys->i_old_wing,
-                         p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
-                memcpy( p_in_buf->p_buffer, p_filter->p_sys->p_buf +
-                        i_nb_channels * p_filter->p_sys->i_old_wing,
-                        p_filter->p_sys->i_old_wing *
-                        p_filter->input.i_bytes_per_frame );
+            /* output the whole thing with the samples from last time */
+            memmove( ((float *)(p_in_buf->p_buffer)) +
+                     i_nb_channels * p_filter->p_sys->i_old_wing,
+                     p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+            memcpy( p_in_buf->p_buffer, p_filter->p_sys->p_buf +
+                    i_nb_channels * p_filter->p_sys->i_old_wing,
+                    p_filter->p_sys->i_old_wing *
+                    p_filter->input.i_bytes_per_frame );
 
-                p_out_buf->i_nb_samples = p_in_buf->i_nb_samples +
-                    p_filter->p_sys->i_old_wing;
+            p_out_buf->i_nb_samples = p_in_buf->i_nb_samples +
+                p_filter->p_sys->i_old_wing;
 
-                p_out_buf->end_date =
-                    aout_DateIncrement( &p_filter->p_sys->end_date,
-                                        p_out_buf->i_nb_samples );
+            p_out_buf->start_date = aout_DateGet( &p_filter->p_sys->end_date );
+            p_out_buf->end_date =
+                aout_DateIncrement( &p_filter->p_sys->end_date,
+                                    p_out_buf->i_nb_samples );
 
-                p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
-                    p_filter->input.i_bytes_per_frame;
-            }
+            p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
+                p_filter->input.i_bytes_per_frame;
         }
         p_filter->b_continuity = VLC_FALSE;
+        p_filter->p_sys->i_old_wing = 0;
         return;
     }
 
@@ -263,7 +265,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if( p_filter->p_sys->d_old_factor == 1 )
         {
             /* Just copy the samples */
-            memcpy( p_out_buf->p_buffer, p_in, 
+            memcpy( p_out, p_in, 
                     p_filter->input.i_bytes_per_frame );          
             p_in += i_nb_channels;
             p_out += i_nb_channels;
@@ -433,8 +435,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     /* Finalize aout buffer */
     p_out_buf->i_nb_samples = i_out;
-    p_out_buf->start_date = p_in_buf->start_date;
-
+    p_out_buf->start_date = aout_DateGet( &p_filter->p_sys->end_date );
     p_out_buf->end_date = aout_DateIncrement( &p_filter->p_sys->end_date,
                                               p_out_buf->i_nb_samples );
 
