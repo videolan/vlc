@@ -42,10 +42,6 @@
 #include <cassert>
 #include <typeinfo>
 
-#ifdef HAVE_WCHAR_H
-#   include <wchar.h>
-#endif
-
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
 #include "ebml/EbmlSubHead.h"
