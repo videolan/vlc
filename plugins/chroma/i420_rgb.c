@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.2 2002/01/12 01:25:57 sam Exp $
+ * $Id: i420_rgb.c,v 1.3 2002/01/28 16:51:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -146,6 +146,9 @@ static int chroma_Init( vout_thread_t *p_vout )
                     break;
 #endif
                 case FOURCC_RV15:
+                    p_vout->chroma.pf_convert = _M( I420_RGB15 );
+                    break;
+
                 case FOURCC_RV16:
                     p_vout->chroma.pf_convert = _M( I420_RGB16 );
                     break;

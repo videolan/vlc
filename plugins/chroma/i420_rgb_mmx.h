@@ -2,7 +2,7 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: i420_rgb_mmx.h,v 1.1 2002/01/04 14:01:34 sam Exp $
+ * $Id: i420_rgb_mmx.h,v 1.2 2002/01/28 16:51:22 sam Exp $
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -37,10 +37,8 @@ UNUSED_LONGLONG(mmx_U_blue)  = 0x4093409340934093;
 UNUSED_LONGLONG(mmx_V_red)   = 0x3312331233123312;
 UNUSED_LONGLONG(mmx_V_green) = 0xe5fce5fce5fce5fc;
 
-UNUSED_LONGLONG(mmx_redmask) = 0xf8f8f8f8f8f8f8f8;
-UNUSED_LONGLONG(mmx_grnmask) = 0xfcfcfcfcfcfcfcfc;
-UNUSED_LONGLONG(mmx_grnshift)   = 0x03;
-UNUSED_LONGLONG(mmx_blueshift)  = 0x03;
+UNUSED_LONGLONG(mmx_mask_f8) = 0xf8f8f8f8f8f8f8f8;
+UNUSED_LONGLONG(mmx_mask_fc) = 0xfcfcfcfcfcfcfcfc;
 #undef UNUSED_LONGLONG
 
 #define MMX_INIT_16 "                                                       \n\
@@ -156,26 +154,62 @@ punpcklbw %%mm7, %%mm6                                                      \n\
 
 #define MMX_UNPACK_16_GRAY "                                                \n\
 movq      %%mm6, %%mm5                                                      \n\
-pand      mmx_redmask, %%mm6                                                \n\
-pand      mmx_grnmask, %%mm5                                                \n\
+pand      mmx_mask_f8, %%mm6                                                \n\
+pand      mmx_mask_fc, %%mm5                                                \n\
 movq      %%mm6, %%mm7                                                      \n\
-psrlw     mmx_blueshift, %%mm7                                              \n\
+psrlw     $3, %%mm7                                                         \n\
 pxor      %%mm3, %%mm3                                                      \n\
 movq      %%mm7, %%mm2                                                      \n\
 movq      %%mm5, %%mm0                                                      \n\
 punpcklbw %%mm3, %%mm5                                                      \n\
 punpcklbw %%mm6, %%mm7                                                      \n\
-psllw     mmx_blueshift, %%mm5                                              \n\
+psllw     $3, %%mm5                                                         \n\
 por       %%mm5, %%mm7                                                      \n\
 movq      %%mm7, (%3)                                                       \n\
 punpckhbw %%mm3, %%mm0                                                      \n\
 punpckhbw %%mm6, %%mm2                                                      \n\
-psllw     mmx_blueshift, %%mm0                                              \n\
+psllw     $3, %%mm0                                                         \n\
 movq      8(%0), %%mm6                                                      \n\
 por       %%mm0, %%mm2                                                      \n\
 movq      %%mm2, 8(%3)                                                      \n\
 "
 
+
+/*
+ * convert RGB plane to RGB 15 bits,
+ * mm0 -> B, mm1 -> R, mm2 -> G,
+ * mm4 -> GB, mm5 -> AR pixel 4-7,
+ * mm6 -> GB, mm7 -> AR pixel 0-3
+ */
+
+#define MMX_UNPACK_15 "                                                     \n\
+# mask unneeded bits off                                                    \n\
+pand      mmx_mask_f8, %%mm0    # b7b6b5b4 b3______ b7b6b5b4 b3______       \n\
+psrlw     $3,%%mm0              # ______b7 b6b5b4b3 ______b7 b6b5b4b3       \n\
+pand      mmx_mask_f8, %%mm2    # g7g6g5g4 g3______ g7g6g5g4 g3______       \n\
+pand      mmx_mask_f8, %%mm1    # r7r6r5r4 r3______ r7r6r5r4 r3______       \n\
+psrlw     $1,%%mm1              # __r7r6r5 r4r3____ __r7r6r5 r4r3____       \n\
+pxor      %%mm4, %%mm4          # zero mm4                                  \n\
+movq      %%mm0, %%mm5          # Copy B7-B0                                \n\
+movq      %%mm2, %%mm7          # Copy G7-G0                                \n\
+                                                                            \n\
+# convert rgb24 plane to rgb15 pack for pixel 0-3                           \n\
+punpcklbw %%mm4, %%mm2          # ________ ________ g7g6g5g4 g3______       \n\
+punpcklbw %%mm1, %%mm0          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
+psllw     $2,%%mm2              # ________ ____g7g6 g5g4g3__ ________       \n\
+por       %%mm2, %%mm0          # r7r6r5r4 r3__g7g6 g5g4g3b7 b6b5b4b3       \n\
+movq      8(%0), %%mm6          # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
+movq      %%mm0, (%3)           # store pixel 0-3                           \n\
+                                                                            \n\
+# convert rgb24 plane to rgb16 pack for pixel 0-3                           \n\
+punpckhbw %%mm4, %%mm7          # ________ ________ g7g6g5g4 g3______       \n\
+punpckhbw %%mm1, %%mm5          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
+psllw     $2,%%mm7              # ________ ____g7g6 g5g4g3__ ________       \n\
+movd      4(%1), %%mm0          # Load 4 Cb       __ __ __ __ u3 u2 u1 u0   \n\
+por       %%mm7, %%mm5          # r7r6r5r4 r3__g7g6 g5g4g3b7 b6b5b4b3       \n\
+movd      4(%2), %%mm1          # Load 4 Cr       __ __ __ __ v3 v2 v1 v0   \n\
+movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
+"
 
 /*
  * convert RGB plane to RGB 16 bits,
@@ -186,10 +220,10 @@ movq      %%mm2, 8(%3)                                                      \n\
 
 #define MMX_UNPACK_16 "                                                     \n\
 # mask unneeded bits off                                                    \n\
-pand      mmx_redmask, %%mm0    # b7b6b5b4 b3______ b7b6b5b4 b3______       \n\
-pand      mmx_grnmask, %%mm2    # g7g6g5g4 g3g2____ g7g6g5g4 g3g2____       \n\
-pand      mmx_redmask, %%mm1    # r7r6r5r4 r3______ r7r6r5r4 r3______       \n\
-psrlw     mmx_blueshift,%%mm0   # ______b7 b6b5b4b3 ______b7 b6b5b4b3       \n\
+pand      mmx_mask_f8, %%mm0    # b7b6b5b4 b3______ b7b6b5b4 b3______       \n\
+pand      mmx_mask_fc, %%mm2    # g7g6g5g4 g3g2____ g7g6g5g4 g3g2____       \n\
+pand      mmx_mask_f8, %%mm1    # r7r6r5r4 r3______ r7r6r5r4 r3______       \n\
+psrlw     $3,%%mm0              # ______b7 b6b5b4b3 ______b7 b6b5b4b3       \n\
 pxor      %%mm4, %%mm4          # zero mm4                                  \n\
 movq      %%mm0, %%mm5          # Copy B7-B0                                \n\
 movq      %%mm2, %%mm7          # Copy G7-G0                                \n\
@@ -197,7 +231,7 @@ movq      %%mm2, %%mm7          # Copy G7-G0                                \n\
 # convert rgb24 plane to rgb16 pack for pixel 0-3                           \n\
 punpcklbw %%mm4, %%mm2          # ________ ________ g7g6g5g4 g3g2____       \n\
 punpcklbw %%mm1, %%mm0          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
-psllw     mmx_blueshift,%%mm2   # ________ __g7g6g5 g4g3g2__ ________       \n\
+psllw     $3,%%mm2              # ________ __g7g6g5 g4g3g2__ ________       \n\
 por       %%mm2, %%mm0          # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3       \n\
 movq      8(%0), %%mm6          # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
 movq      %%mm0, (%3)           # store pixel 0-3                           \n\
@@ -205,7 +239,7 @@ movq      %%mm0, (%3)           # store pixel 0-3                           \n\
 # convert rgb24 plane to rgb16 pack for pixel 0-3                           \n\
 punpckhbw %%mm4, %%mm7          # ________ ________ g7g6g5g4 g3g2____       \n\
 punpckhbw %%mm1, %%mm5          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
-psllw     mmx_blueshift,%%mm7   # ________ __g7g6g5 g4g3g2__ ________       \n\
+psllw     $3,%%mm7              # ________ __g7g6g5 g4g3g2__ ________       \n\
 movd      4(%1), %%mm0          # Load 4 Cb       __ __ __ __ u3 u2 u1 u0   \n\
 por       %%mm7, %%mm5          # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3       \n\
 movd      4(%2), %%mm1          # Load 4 Cr       __ __ __ __ v3 v2 v1 v0   \n\

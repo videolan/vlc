@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.14 2002/01/25 17:18:37 sam Exp $
+ * $Id: xcommon.c,v 1.15 2002/01/28 16:51:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1347,6 +1347,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 #else
         case FOURCC_RV16:
+        case FOURCC_RV15:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->xoffset;
