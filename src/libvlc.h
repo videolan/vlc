@@ -335,7 +335,7 @@ static char *ppsz_align_descriptions[] =
     N_("Automatically detect a subtitle file, if no subtitle filename is " \
     "specified.")
 
-#define SUB_FUZZY_TEXT N_("Subtitle autodection fuzziness")
+#define SUB_FUZZY_TEXT N_("Subtitle autodetection fuzziness")
 #define SUB_FUZZY_LONGTEXT \
     N_("This determines how fuzzy subtitle and movie filenaming matching " \
     "will be. Options are:\n" \
