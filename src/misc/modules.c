@@ -403,7 +403,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     /* Parse the module list for capabilities and probe each of them */
     for( i_which_module = 0; i_which_module < p_all->i_count; i_which_module++ )
     {
-        module_t * p_submodule = NULL;
         int i_shortcut_bonus = 0, i_submodule;
 
         p_module = (module_t *)p_all->p_values[i_which_module].p_object;
@@ -411,25 +410,9 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* Test that this module can do what we need */
         if( strcmp( p_module->psz_capability, psz_capability ) )
         {
-            for( i_submodule = 0;
-                 i_submodule < p_module->i_children;
-                 i_submodule++ )
-            {
-                if( !strcmp( ((module_t*)p_module->pp_children[ i_submodule ])
-                                           ->psz_capability, psz_capability ) )
-                {
-                    p_submodule =
-                            (module_t*)p_module->pp_children[ i_submodule ];
-                    break;
-                }
-            }
-
-            if( p_submodule == NULL )
-            {
-                continue;
-            }
-
-            p_module = p_submodule;
+            /* Don't recurse through the sub-modules because vlc_list_find()
+             * will list them anyway. */
+            continue;
         }
 
         /* Test if we have the required CPU */

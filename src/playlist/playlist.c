@@ -355,6 +355,18 @@ static void RunThread ( playlist_t *p_playlist )
 
                 i_vout_destroyed_date = 0;
                 i_sout_destroyed_date = 0;
+
+                /* Check for autodeletion */
+                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
+                {
+                    playlist_Delete( p_playlist, p_playlist->i_index );
+                }
+
+                /* Select the next playlist item */
+                vlc_mutex_lock( &p_playlist->object_lock );
+                SkipItem( p_playlist, 1 );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+
                 continue;
             }
             /* This input is dying, let him do */
@@ -366,21 +378,9 @@ static void RunThread ( playlist_t *p_playlist )
             else if( p_playlist->p_input->b_error
                       || p_playlist->p_input->b_eof )
             {
-                /* Check for autodeletion */
-                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
-                {
-                    vlc_mutex_unlock( &p_playlist->object_lock );
-                    playlist_Delete( p_playlist, p_playlist->i_index );
-                    p_playlist->i_index++;
-                    p_playlist->i_status = PLAYLIST_RUNNING;
-                }
-                else
-                {
-                    /* Select the next playlist item */
-                    SkipItem( p_playlist, 1 );
-                    input_StopThread( p_playlist->p_input );
-                    vlc_mutex_unlock( &p_playlist->object_lock );
-                }
+                input_StopThread( p_playlist->p_input );
+
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 continue;
             }
             else if( p_playlist->p_input->i_state != INIT_S )
