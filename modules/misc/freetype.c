@@ -159,7 +159,6 @@ struct filter_sys_t
  *****************************************************************************
  * This function allocates and initializes a Clone vout method.
  *****************************************************************************/
-#define gamma_value 2.0
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -167,7 +166,6 @@ static int Create( vlc_object_t *p_this )
     char *psz_fontfile = NULL;
     int i, i_error;
     int i_fontsize = 0;
-    double gamma_inv = 1.0f / gamma_value;
     vlc_value_t val;
 
     /* Allocate structure */
@@ -182,8 +180,7 @@ static int Create( vlc_object_t *p_this )
 
     for( i = 0; i < 256; i++ )
     {
-        p_sys->pi_gamma[i] =
-            (uint8_t)( pow( (double)i / 255.0f, gamma_inv) * 255.0f );
+        p_sys->pi_gamma[i] = (uint8_t)( pow( (double)i * 255.0f, 0.5f ) );
     }
 
     var_Create( p_filter, "freetype-font", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
