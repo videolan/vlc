@@ -69,7 +69,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 #if wxUSE_UNICODE
 #   define wxU(ansi) wxString(ansi, wxConvLocal)
 #else
-#   define wxU(ansi) ansi
+#   define wxU(ansi) (ansi)
 #endif
 #define ISUTF8 0
 
@@ -77,11 +77,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 /* wxL2U (locale to unicode) is used to convert ansi strings to unicode
  * strings (wchar_t) */
-#if wxUSE_UNICODE
-#   define wxL2U(ansi) wxString(ansi, *wxConvCurrent)
-#else
-#   define wxL2U(ansi) ansi
-#endif
+#define wxL2U(ansi) wxU(ansi)
 
 #define WRAPCOUNT 80
 
