@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.4 2002/11/06 15:41:29 jobi Exp $
+ * $Id: gtk_callbacks.c,v 1.5 2002/11/12 16:02:51 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -276,11 +276,11 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
         p_area->i_part--;
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
         input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
- 
+
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
     }
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -301,7 +301,6 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
         p_area->i_part++;
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
         input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
-        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.7 2002/11/12 11:45:27 gbazin Exp $
+ * $Id: gtk.c,v 1.8 2002/11/12 16:02:51 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -114,6 +114,11 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
+    p_intf->p_sys->b_program_update = 0;
+    p_intf->p_sys->b_title_update = 0;
+    p_intf->p_sys->b_chapter_update = 0;
+    p_intf->p_sys->b_spu_update = 0;
+    p_intf->p_sys->b_audio_update = 0;
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
