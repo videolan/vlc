@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.32 2003/10/04 23:52:32 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.33 2003/10/05 09:27:46 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -342,37 +342,40 @@ void PrefsDialog::OnAdvanced( wxCommandEvent& event )
 /*****************************************************************************
  * GetCapabilityHelp: Display the help for one capability.
  *****************************************************************************/
-static char * GetCapabilityHelp( char *psz_capability)
+static char * GetCapabilityHelp( char *psz_capability, int i_type)
 {
     if( psz_capability == NULL)
         return NULL;
 
     if( !strcasecmp(psz_capability,"access") )
-        return strdup(ACCESS_HELP);
+        return i_type == 1 ? strdup(ACCESS_TITLE) : strdup(ACCESS_HELP);
     if( !strcasecmp(psz_capability,"audio filter") )
-        return strdup(AUDIO_FILTER_HELP);
+        return i_type == 1 ? strdup(AUDIO_FILTER_TITLE) :
+                            strdup(AUDIO_FILTER_HELP);
     if( !strcasecmp(psz_capability,"audio output") )
-        return strdup(AOUT_HELP);
+        return i_type == 1 ? strdup(AOUT_TITLE) : strdup(AOUT_HELP);
     if( !strcasecmp(psz_capability,"chroma") )
-        return strdup(CHROMA_HELP);
+        return i_type == 1 ? strdup(CHROMA_TITLE) : strdup(CHROMA_HELP);
     if( !strcasecmp(psz_capability,"decoder") )
-        return strdup(DECODER_HELP);
+        return i_type == 1 ? strdup(DECODER_TITLE) : strdup(DECODER_HELP);
     if( !strcasecmp(psz_capability,"demux") )
-        return strdup(DEMUX_HELP);
+        return i_type == 1 ? strdup(DEMUX_TITLE) : strdup(DEMUX_HELP);
     if( !strcasecmp(psz_capability,"interface") )
-        return strdup(INTERFACE_HELP);
+        return i_type == 1 ? strdup(INTERFACE_TITLE) : strdup(INTERFACE_HELP);
     if( !strcasecmp(psz_capability,"sout access") )
-        return strdup(SOUT_HELP);
+        return i_type == 1 ? strdup(SOUT_TITLE) : strdup(SOUT_HELP);
     if( !strcasecmp(psz_capability,"subtitle demux") )
-        return strdup(SUBTITLE_DEMUX_HELP);
+        return i_type == 1 ? strdup(SUBTITLE_DEMUX_TITLE) :
+                            strdup(SUBTITLE_DEMUX_HELP);
     if( !strcasecmp(psz_capability,"text renderer") )
-        return strdup(TEXT_HELP);
+        return i_type == 1 ? strdup(TEXT_TITLE) : strdup(TEXT_HELP);
     if( !strcasecmp(psz_capability,"video output") )
-        return strdup(VOUT_HELP);
+        return i_type == 1 ? strdup(VOUT__TITLE) : strdup(VOUT_HELP);
     if( !strcasecmp(psz_capability,"video filter") )
-        return strdup(VIDEO_FILTER_HELP);
+        return i_type == 1 ? strdup(VIDEO_FILTER_TITLE) :
+                            strdup(VIDEO_FILTER_HELP);
 
-    return strdup(UNKNOWN_HELP);
+    return i_type == 1 ? strdup(UNKNOWN_TITLE) : strdup(UNKNOWN_HELP);
 }
 
 /*****************************************************************************
@@ -411,6 +414,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     config_data->psz_section = NULL;
     config_data->i_object_id = GENERAL_ID;
     config_data->psz_help = strdup( GENERAL_HELP );
+    config_data->psz_section = strdup( GENERAL_TITLE );
     general_item = AppendItem( root_item, wxU(_("General Settings")),
                                 -1, -1, config_data );
 
@@ -464,6 +468,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     config_data->psz_section = NULL;
     config_data->i_object_id = PLUGIN_ID;
     config_data->psz_help = strdup( PLUGIN_HELP );
+    config_data->psz_section = strdup( PLUGIN_TITLE );
     plugins_item = AppendItem( root_item, wxU(_("Plugins")),
                         -1,-1,config_data );
 
@@ -511,9 +516,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         {
             /* We didn't find it, add it */
             ConfigTreeData *config_data = new ConfigTreeData;
-            config_data->psz_section = NULL;
-            config_data->psz_help = 
-                GetCapabilityHelp( p_module->psz_capability );
+            config_data->psz_section =
+                GetCapabilityHelp( p_module->psz_capability , 1 );
+            config_data->psz_help =
+                GetCapabilityHelp( p_module->psz_capability , 2 );
             config_data->i_object_id = CAPABILITY_ID;
             capability_item = AppendItem( plugins_item,
                                           wxU(p_module->psz_capability),
@@ -797,14 +803,33 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
 
     if( i_object_id == PLUGIN_ID || i_object_id == GENERAL_ID ||
-        i_object_id == CAPABILITY_ID ) 
+        i_object_id == CAPABILITY_ID )
     {
+        /* Add a head title to the panel */
+//        msg_Dbg(p_intf,"%s : %s", psz_section, psz_help) ;
+        label = new wxStaticText( this, -1,wxU(_( psz_section )));
+/*            i_object_id == CAPABILITY_ID ?
+                           GetCapabilityHelp( psz_section , 1 ):
+                            psz_section ) ) );*/
+        wxFont heading_font = label->GetFont();
+        heading_font.SetPointSize( heading_font.GetPointSize() + 5 );
+        label->SetFont( heading_font );
+        sizer->Add( label, 0, wxEXPAND | wxLEFT, 10 );
+        sizer->Add( new wxStaticLine( this, 0 ), 0,
+                    wxEXPAND | wxLEFT | wxRIGHT, 2 );
+
+        help = new wxStaticText( this, -1, wxU(_( psz_help ) ) );
+        sizer->Add( help ,0 ,wxEXPAND | wxALL, 5 );
+
+
+#if 0
         wxStaticBox *static_box = new wxStaticBox( this, -1, wxT("") );
         wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( static_box,
                                                             wxVERTICAL );
         label = new wxStaticText( this, -1, wxU(_( psz_help) ) );
         box_sizer->Add( label, 1,  wxEXPAND | wxLEFT | wxRIGHT, 5 );
         sizer->Add( box_sizer, 0, wxEXPAND | wxALL , 5 );
+#endif
         config_sizer = NULL; config_window = NULL;
     }
     else
@@ -880,7 +905,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                         0, NULL, wxCB_READONLY | wxCB_SORT );
 
                 /* build a list of available modules */
-                p_list = vlc_list_find( p_intf, 
+                p_list = vlc_list_find( p_intf,
                                         VLC_OBJECT_MODULE, FIND_ANYWHERE );
                 combo->Append( wxU(_("Default")), (void *)NULL );
                 combo->SetSelection( 0 );
@@ -1041,15 +1066,15 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 break;
             }
 
-            /* Don't add items that were not recognized */  
+            /* Don't add items that were not recognized */
             if( panel == NULL ) continue;
-  
+
             panel_sizer->Layout();
             panel->SetSizerAndFit( panel_sizer );
 
             /* Add the config data to our array so we can keep a trace of it */
             config_array.Add( config_data );
- 
+
             config_sizer->Add( panel, 0, wxEXPAND | wxALL, 2 );
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
@@ -1059,7 +1084,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         sizer->Add( config_window, 1, wxEXPAND | wxALL, 5 );
 
         /* And at last put a useful help string if available */
-        if( psz_help && psz_help[1] ) 
+        if( psz_help && psz_help[1] )
         {
             sizer->Add( new wxStaticLine( this, 0 ), 0,
                         wxEXPAND | wxLEFT | wxRIGHT, 2 );
