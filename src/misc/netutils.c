@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.32 2001/05/28 02:44:39 sam Exp $
+ * $Id: netutils.c,v 1.33 2001/05/28 02:54:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -290,9 +290,9 @@ int network_ChannelJoin( int i_channel )
     sa_server.sin_family = AF_INET;
     sa_server.sin_port   = htons( INPUT_CHANNEL_PORT_DEFAULT );
 #ifdef HAVE_ARPA_INET_H
-    if( !inet_aton( psz_server, &p_socket->sin_addr) )
+    inet_aton( INPUT_CHANNEL_SERVER_DEFAULT, &sa_server.sin_addr );
 #else
-    if( (sa_server.sin_addr.s_addr = inet_addr( INPUT_CHANNEL_SERVER_DEFAULT )) == -1 )
+    sa_server.sin_addr.s_addr = inet_addr( INPUT_CHANNEL_SERVER_DEFAULT );
 #endif
 
     /*
