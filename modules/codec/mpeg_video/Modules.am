@@ -1,4 +1,4 @@
-SOURCES_mpeg_video = \
+SOURCES_mpeg_video_old = \
 	modules/codec/mpeg_video/parser.c \
 	modules/codec/mpeg_video/parser.h \
 	modules/codec/mpeg_video/headers.c \

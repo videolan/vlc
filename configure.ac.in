@@ -786,7 +786,7 @@ esac
 
 case "${ARCH}" in
   hppa64)
-    CFLAGS_mpeg_video="${CFLAGS_mpeg_video} -ffunction-sections"
+    CFLAGS_mpeg_video_old="${CFLAGS_mpeg_video_old} -ffunction-sections"
     ;;
 esac
 
@@ -803,7 +803,7 @@ AM_CONDITIONAL(CPROF, test "${enable_gprof}" = "yes")
 dnl
 dnl  default modules
 dnl
-#BUILTINS="${BUILTINS} mpeg_video idct idctclassic motion"
+#BUILTINS="${BUILTINS} mpeg_video_old idct idctclassic motion"
 PLUGINS="${PLUGINS} dummy rc logger gestures memcpy"
 PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts avi asf aac mp4 rawdv"
 PLUGINS="${PLUGINS} spudec mpeg_audio lpcm a52 dts cinepak"

@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.21 2003/06/10 11:12:38 massiot Exp $
+ * $Id: libmpeg2.c,v 1.22 2003/06/10 23:01:40 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,7 +179,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                     break;
                 }
 
-                if( p_dec->p_pes->b_discontinuity && p_dec->p_synchro )
+                if( p_dec->p_pes->b_discontinuity && p_dec->p_synchro 
+                     && p_dec->p_info->sequence->width != (unsigned)-1 )
                 {
                     vout_SynchroReset( p_dec->p_synchro );
                     if ( p_dec->p_info->current_fbuf != NULL

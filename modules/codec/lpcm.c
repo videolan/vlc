@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.15 2003/03/31 22:39:28 massiot Exp $
+ * $Id: lpcm.c,v 1.16 2003/06/10 23:01:40 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -47,6 +47,11 @@ typedef struct dec_thread_t
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
+    /* Some filters don't handle well too small buffers (coreaudio resampler).
+     * Thus an aout buffer will be two PES packets. */
+    pes_packet_t *      p_buffered_pes;
+    data_packet_t *     p_buffered_data;
+    size_t              i_buffered_size;
 
     /*
      * Output properties
@@ -127,6 +132,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 
     /* Initialize the thread properties */
     p_dec->p_fifo = p_fifo;
+    p_dec->i_buffered_size = 0;
 
     p_dec->output_format.i_format = VLC_FOURCC('s','1','6','b');
     p_dec->p_aout = NULL;
@@ -308,6 +314,13 @@ static void DecodeFrame( dec_thread_t * p_dec )
             input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
             return;
         }
+
+        if ( p_dec->i_buffered_size )
+        {
+            input_DeletePES( p_dec->p_fifo->p_packets_mgt,
+                             p_dec->p_buffered_pes );
+            p_dec->i_buffered_size = 0;
+        }
     }
 
     if ( !aout_DateGet( &p_dec->end_date ) )
@@ -317,35 +330,62 @@ static void DecodeFrame( dec_thread_t * p_dec )
         return;
     }
 
-    p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
-            (i_size - LPCM_HEADER_LEN)
-                / p_dec->output_format.i_bytes_per_frame );
-    
-    if( p_buffer == NULL )
+    if ( p_dec->i_buffered_size != 0 )
     {
-        msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
-        p_dec->p_fifo->b_error = 1;
+        p_buffer = aout_DecNewBuffer( p_dec->p_aout, p_dec->p_aout_input,
+                (i_size - LPCM_HEADER_LEN + p_dec->i_buffered_size)
+                    / p_dec->output_format.i_bytes_per_frame );
+
+        if( p_buffer == NULL )
+        {
+            msg_Err( p_dec->p_fifo, "cannot get aout buffer" );
+            p_dec->p_fifo->b_error = 1;
+            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
+            return;
+        }
+        p_buffer->start_date = aout_DateGet( &p_dec->end_date );
+        p_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
+                (i_size - LPCM_HEADER_LEN + p_dec->i_buffered_size)
+                    / p_dec->output_format.i_bytes_per_frame );
+
+        /* Get the whole frame. */
+        p_dest = p_buffer->p_buffer;
+
+        while ( p_dec->p_buffered_data != NULL )
+        {
+            p_dec->p_fifo->p_vlc->pf_memcpy( p_dest,
+                    p_dec->p_buffered_data->p_payload_start,
+                    p_dec->p_buffered_data->p_payload_end
+                     - p_dec->p_buffered_data->p_payload_start );
+            p_dest += p_dec->p_buffered_data->p_payload_end
+                         - p_dec->p_buffered_data->p_payload_start;
+            p_dec->p_buffered_data = p_dec->p_buffered_data->p_next;
+        }
+        input_DeletePES( p_dec->p_fifo->p_packets_mgt,
+                         p_dec->p_buffered_pes );
+
+        p_dest = p_buffer->p_buffer + p_dec->i_buffered_size;
+
+        while ( p_data != NULL )
+        {
+            p_dec->p_fifo->p_vlc->pf_memcpy( p_dest, p_data->p_payload_start,
+                    p_data->p_payload_end - p_data->p_payload_start );
+            p_dest += p_data->p_payload_end - p_data->p_payload_start;
+            p_data = p_data->p_next;
+        }
         input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-        return;
-    }
-    p_buffer->start_date = aout_DateGet( &p_dec->end_date );
-    p_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
-            (i_size - LPCM_HEADER_LEN)
-                / p_dec->output_format.i_bytes_per_frame );
 
-    /* Get the whole frame. */
-    p_dest = p_buffer->p_buffer;
-    while ( p_data != NULL )
+        /* Send the buffer to the aout core. */
+        aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
+
+        p_dec->i_buffered_size = 0;
+    }
+    else
     {
-        p_dec->p_fifo->p_vlc->pf_memcpy( p_dest, p_data->p_payload_start,
-                p_data->p_payload_end - p_data->p_payload_start );
-        p_dest += p_data->p_payload_end - p_data->p_payload_start;
-        p_data = p_data->p_next;
+        p_dec->i_buffered_size = i_size - LPCM_HEADER_LEN;
+        p_dec->p_buffered_pes = p_pes;
+        p_dec->p_buffered_data = p_data;
     }
-    input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
-
-    /* Send the buffer to the aout core. */
-    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
 }
 
 /*****************************************************************************
@@ -356,6 +396,13 @@ static void EndThread( dec_thread_t * p_dec )
     if( p_dec->p_aout_input != NULL )
     {
         aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
+    }
+
+    if ( p_dec->i_buffered_size )
+    {
+        input_DeletePES( p_dec->p_fifo->p_packets_mgt,
+                         p_dec->p_buffered_pes );
+        p_dec->i_buffered_size = 0;
     }
 
     free( p_dec );
