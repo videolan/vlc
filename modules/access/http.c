@@ -33,6 +33,7 @@
 #include "vlc_playlist.h"
 #include "vlc_meta.h"
 #include "network.h"
+#include "vlc_tls.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -94,6 +95,7 @@ vlc_module_begin();
     add_shortcut( "http" );
     add_shortcut( "http4" );
     add_shortcut( "http6" );
+    add_shortcut( "https" );
     add_shortcut( "unsv" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -104,6 +106,8 @@ vlc_module_end();
 struct access_sys_t
 {
     int fd;
+    tls_session_t *p_tls;
+    v_socket_t    *p_vs;
 
     /* From uri */
     vlc_url_t url;
@@ -125,6 +129,7 @@ struct access_sys_t
     char       *psz_location;
     vlc_bool_t b_mms;
     vlc_bool_t b_icecast;
+    vlc_bool_t b_ssl;
 
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
@@ -211,6 +216,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
+    p_sys->b_ssl = VLC_FALSE;
+    p_sys->p_tls = NULL;
+    p_sys->p_vs = NULL;
     p_sys->i_icy_meta = 0;
     p_sys->psz_icy_name = NULL;
     p_sys->psz_icy_genre = NULL;
@@ -224,9 +232,17 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_access, "invalid host" );
         goto error;
     }
-    if( p_sys->url.i_port <= 0 )
+    if( !strncmp( p_access->psz_access, "https", 5 ) )
     {
-        p_sys->url.i_port = 80;
+        /* SSL over HTTP */
+        p_sys->b_ssl = VLC_TRUE;
+        if( p_sys->url.i_port <= 0 )
+            p_sys->url.i_port = 443;
+    }
+    else
+    {
+        if( p_sys->url.i_port <= 0 )
+            p_sys->url.i_port = 80;
     }
     if( !p_sys->psz_user || *p_sys->psz_user == '\0' )
     {
@@ -338,6 +354,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->psz_user ) free( p_sys->psz_user );
         if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
+        /* FIXME: cleanup SSL */
         if( p_sys->fd > 0 )
         {
             net_Close( p_sys->fd );
@@ -393,6 +410,8 @@ error:
     if( p_sys->psz_user ) free( p_sys->psz_user );
     if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
+    if( p_sys->p_tls != NULL )
+        tls_ClientDelete( p_sys->p_tls );
     if( p_sys->fd > 0 )
     {
         net_Close( p_sys->fd );
@@ -425,6 +444,8 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
 
+    if( p_sys->p_tls != NULL )
+        tls_ClientDelete( p_sys->p_tls );
     if( p_sys->fd > 0 )
     {
         net_Close( p_sys->fd );
@@ -468,7 +489,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
         if( p_sys->i_chunk <= 0 )
         {
-            char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+            char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs );
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -522,7 +543,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             i_len = i_next;
     }
 
-    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len, VLC_FALSE );
+    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, p_buffer, i_len, VLC_FALSE );
 
     if( i_read > 0 )
     {
@@ -534,7 +555,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             if( p_sys->i_chunk <= 0 )
             {
                 /* read the empty line */
-                char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+                char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs );
                 if( psz ) free( psz );
             }
         }
@@ -551,6 +572,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
+            if( p_sys->p_tls != NULL )
+            {
+                tls_ClientDelete( p_sys->p_tls );
+                p_sys->p_tls = NULL;
+                p_sys->p_vs = NULL;
+            }
             net_Close( p_sys->fd ); p_sys->fd = -1;
             if( Connect( p_access, p_access->info.i_pos ) )
             {
@@ -585,7 +612,8 @@ static int ReadICYMeta( access_t *p_access )
     char *p;
 
     /* Read meta data length */
-    i_read = net_Read( p_access, p_sys->fd, NULL, buffer, 1, VLC_TRUE );
+    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, buffer, 1,
+                       VLC_TRUE );
     if( i_read <= 0 )
         return VLC_EGENERIC;
 
@@ -596,7 +624,7 @@ static int ReadICYMeta( access_t *p_access )
     msg_Dbg( p_access, "ICY meta size=%d", buffer[0] * 16);
 
     psz_meta = malloc( buffer[0] * 16 + 1 );
-    i_read = net_Read( p_access, p_sys->fd, NULL,
+    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs,
                        psz_meta, buffer[0] * 16, VLC_TRUE );
 
     if( i_read != buffer[0] * 16 )
@@ -649,6 +677,12 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     msg_Dbg( p_access, "trying to seek to "I64Fd, i_pos );
 
+    if( p_sys->p_tls != NULL )
+    {
+        tls_ClientDelete( p_sys->p_tls );
+        p_sys->p_tls = NULL;
+        p_sys->p_vs = NULL;
+    }
     net_Close( p_sys->fd ); p_sys->fd = -1;
 
     if( Connect( p_access, i_pos ) )
@@ -823,6 +857,29 @@ static int Connect( access_t *p_access, int64_t i_tell )
         return VLC_EGENERIC;
     }
 
+    /* Initialize TLS/SSL session */
+    /* FIXME: support proxy CONNECT for HTTP/SSL */
+    if( p_sys->b_ssl == VLC_TRUE )
+    {
+        if( p_sys->b_proxy )
+        {
+            msg_Err( p_access, "HTTP/SSL through HTTP proxy not supported yet" );
+            net_Close( p_sys->fd );
+            p_sys->fd = -1;
+            return VLC_EGENERIC;
+        }
+
+        p_sys->p_tls = tls_ClientCreate( VLC_OBJECT(p_access), NULL, p_sys->fd );
+        if( p_sys->p_tls == NULL )
+        {
+            msg_Err( p_access, "cannot establish HTTP/SSL session" );
+            net_Close( p_sys->fd );
+            p_sys->fd = -1;
+            return VLC_EGENERIC;
+        }
+        p_sys->p_vs = &p_sys->p_tls->sock;
+    }
+
     return Request( p_access,i_tell );
 }
 
@@ -830,7 +887,9 @@ static int Connect( access_t *p_access, int64_t i_tell )
 static int Request( access_t *p_access, int64_t i_tell )
 {
     access_sys_t   *p_sys = p_access->p_sys;
-    char           *psz;
+    char           *psz ;
+    v_socket_t     *pvs = p_sys->p_vs;
+
     if( p_sys->b_proxy )
     {
         if( p_sys->url.psz_path )
@@ -857,25 +916,25 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
         if( p_sys->url.i_port != 80)
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                         "GET %s HTTP/1.%d\r\nHost: %s:%d\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host,
                         p_sys->url.i_port );
         }
         else
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                         "GET %s HTTP/1.%d\r\nHost: %s\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host );
         }
     }
     /* User Agent */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "User-Agent: %s\r\n",
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
     if( p_sys->i_version == 1 )
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Range: bytes="I64Fd"-\r\n", i_tell );
     }
 
@@ -890,36 +949,42 @@ static int Request( access_t *p_access, int64_t i_tell )
 
         b64 = vlc_b64_encode( buf );
 
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Authorization: Basic %s\r\n", b64 );
         free( b64 );
     }
 
     /* ICY meta data request */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "Icy-MetaData: 1\r\n" );
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
 
 
     if( p_sys->b_continuous && p_sys->i_version == 1 )
     {
-        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, NULL,
+        net_Printf( VLC_OBJECT( p_access ), p_sys->fd, pvs,
                     "Connection: keep-alive\r\n" );
     }
     else
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Connection: Close\r\n");
         p_sys->b_continuous = VLC_FALSE;
     }
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
+    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
+        if( p_sys->p_tls != NULL )
+        {
+            tls_ClientDelete( p_sys->p_tls );
+            p_sys->p_tls = NULL;
+            p_sys->p_vs = NULL;
+        }
         net_Close( p_sys->fd ); p_sys->fd = -1;
         return VLC_EGENERIC;
     }
 
     /* Read Answer */
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL ) ) == NULL )
+    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, pvs ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -961,7 +1026,7 @@ static int Request( access_t *p_access, int64_t i_tell )
 
     for( ;; )
     {
-        char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+        char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, pvs );
         char *p;
 
         if( psz == NULL )
@@ -1087,6 +1152,13 @@ static int Request( access_t *p_access, int64_t i_tell )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->p_tls != NULL )
+    {
+        tls_ClientDelete( p_sys->p_tls );
+        p_sys->p_tls = NULL;
+        p_sys->p_vs = NULL;
+    }
+
     net_Close( p_sys->fd ); p_sys->fd = -1;
     return VLC_EGENERIC;
 }

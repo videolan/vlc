@@ -24,7 +24,6 @@
 /*
  * TODO:
  * - fix FIXMEs,
- * - client side stuff,
  * - server-side client cert validation,
  * - client-side server cert validation (?).
  */
