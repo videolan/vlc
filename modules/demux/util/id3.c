@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.8 2004/03/03 11:38:14 fenrir Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -29,10 +29,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
-#include "ninput.h"
-
-#include <sys/types.h>
 
 /*****************************************************************************
  * Local prototypes

@@ -44,11 +44,8 @@ using namespace std;
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  DemuxOpen ( vlc_object_t * );
-static void DemuxClose( vlc_object_t * );
-
-static int  AccessOpen ( vlc_object_t * );
-static void AccessClose( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
@@ -58,15 +55,15 @@ static void AccessClose( vlc_object_t * );
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
     set_capability( "demux2", 50 );
-    set_callbacks( DemuxOpen, DemuxClose );
+    set_callbacks( Open, Close );
     add_shortcut( "live" );
 
     add_submodule();
-        set_description( _("RTSP/RTP describe") );
+        set_description( _("RTSP/RTP access and demux") );
         add_shortcut( "rtsp" );
         add_shortcut( "sdp" );
-        set_capability( "access", 0 );
-        set_callbacks( AccessOpen, AccessClose );
+        set_capability( "access_demux", 0 );
+        set_callbacks( Open, Close );
         add_bool( "rtsp-tcp", 0, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), VLC_TRUE );
@@ -84,187 +81,7 @@ vlc_module_end();
  */
 
 /*****************************************************************************
- * Local prototypes for access
- *****************************************************************************/
-struct access_sys_t
-{
-    int     i_sdp;
-    char    *p_sdp;
-
-    int     i_pos;
-};
-
-static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
-static ssize_t MRLRead( input_thread_t *, byte_t *, size_t );
-
-/*****************************************************************************
- * AccessOpen:
- *****************************************************************************/
-static int  AccessOpen( vlc_object_t *p_this )
-{
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    access_sys_t   *p_sys;
-
-    TaskScheduler    *scheduler = NULL;
-    UsageEnvironment *env       = NULL;
-    RTSPClient       *rtsp      = NULL;
-
-    vlc_value_t      val;
-    char             *psz_url;
-
-    if( p_input->psz_access == NULL || ( strcasecmp( p_input->psz_access, "rtsp" ) && strcasecmp( p_input->psz_access, "sdp" ) ) )
-    {
-        msg_Warn( p_input, "RTSP access discarded" );
-        return VLC_EGENERIC;
-    }
-    if( !strcasecmp( p_input->psz_access, "rtsp" ) )
-    {
-        if( ( scheduler = BasicTaskScheduler::createNew() ) == NULL )
-        {
-            msg_Err( p_input, "BasicTaskScheduler::createNew failed" );
-            return VLC_EGENERIC;
-        }
-        if( ( env = BasicUsageEnvironment::createNew(*scheduler) ) == NULL )
-        {
-            delete scheduler;
-            msg_Err( p_input, "BasicUsageEnvironment::createNew failed" );
-            return VLC_EGENERIC;
-        }
-        if( ( rtsp = RTSPClient::createNew(*env, 1/*verbose*/, "VLC Media Player" ) ) == NULL )
-        {
-            delete env;
-            delete scheduler;
-            msg_Err( p_input, "RTSPClient::createNew failed" );
-            return VLC_EGENERIC;
-        }
-
-        psz_url = (char*)malloc( strlen( p_input->psz_name ) + 8 );
-        sprintf( psz_url, "rtsp://%s", p_input->psz_name );
-
-        p_sys = (access_sys_t*)malloc( sizeof( access_sys_t ) );
-        p_sys->p_sdp = rtsp->describeURL( psz_url );
-
-        if( p_sys->p_sdp == NULL )
-        {
-            msg_Err( p_input, "describeURL failed (%s)", env->getResultMsg() );
-
-            free( psz_url );
-            delete env;
-            delete scheduler;
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-        free( psz_url );
-        p_sys->i_sdp = strlen( p_sys->p_sdp );
-        p_sys->i_pos = 0;
-
-        delete env;
-        delete scheduler;
-
-        var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-        var_Get( p_input, "rtsp-tcp", &val );
-
-        p_input->p_access_data = p_sys;
-        p_input->i_mtu = 0;
-
-        /* Set exported functions */
-        p_input->pf_read = Read;
-        p_input->pf_seek = NULL;
-        p_input->pf_set_program = input_SetProgram;
-        p_input->pf_set_area = NULL;
-        p_input->p_private = NULL;
-
-        p_input->psz_demux = "live";
-
-        /* Finished to set some variable */
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        /* FIXME that's not true but eg over tcp, server send data too fast */
-        p_input->stream.b_pace_control = val.b_bool;
-        p_input->stream.p_selected_area->i_tell = 0;
-        p_input->stream.b_seekable = 1; /* Hack to display time */
-        p_input->stream.p_selected_area->i_size = p_sys->i_sdp;
-        p_input->stream.i_method = INPUT_METHOD_NETWORK;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        /* Update default_pts to a suitable value for RTSP access */
-        var_Create( p_input, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-        var_Get( p_input, "rtsp-caching", &val );
-        p_input->i_pts_delay = val.i_int * 1000;
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        p_input->p_access_data = (access_sys_t*)0;
-        p_input->i_mtu = 0;
-        p_input->pf_read = MRLRead;
-        p_input->pf_seek = NULL;
-        p_input->pf_set_program = input_SetProgram;
-        p_input->pf_set_area = NULL;
-        p_input->p_private = NULL;
-        p_input->psz_demux = "live";
-        /* Finished to set some variable */
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.b_pace_control = VLC_TRUE;
-        p_input->stream.p_selected_area->i_tell = 0;
-        p_input->stream.b_seekable = VLC_FALSE;
-        p_input->stream.p_selected_area->i_size = strlen(p_input->psz_name);
-        p_input->stream.i_method = INPUT_METHOD_NETWORK;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        return VLC_SUCCESS;
-    }
-}
-
-/*****************************************************************************
- * AccessClose:
- *****************************************************************************/
-static void AccessClose( vlc_object_t *p_this )
-{
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    access_sys_t   *p_sys = p_input->p_access_data;
-    if( !strcasecmp( p_input->psz_access, "rtsp" ) )
-    {
-        delete[] p_sys->p_sdp;
-        free( p_sys );
-    }
-}
-
-/*****************************************************************************
- * Read:
- *****************************************************************************/
-static ssize_t Read ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
-{
-    access_sys_t   *p_sys   = p_input->p_access_data;
-    int            i_copy = __MIN( (int)i_len, p_sys->i_sdp - p_sys->i_pos );
-
-    if( i_copy > 0 )
-    {
-        memcpy( p_buffer, &p_sys->p_sdp[p_sys->i_pos], i_copy );
-        p_sys->i_pos += i_copy;
-    }
-    return i_copy;
-}
-/*****************************************************************************
- * MRLRead: read data from the mrl
- *****************************************************************************/
-static ssize_t MRLRead ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
-{
-    int i_done = (int)p_input->p_access_data;
-    int            i_copy = __MIN( (int)i_len, (int)strlen(p_input->psz_name) - i_done );
-
-    if( i_copy > 0 )
-    {
-        memcpy( p_buffer, &p_input->psz_name[i_done], i_copy );
-        i_done += i_copy;
-        p_input->p_access_data = (access_sys_t*)i_done;
-    }
-    return i_copy;
-}
-
-
-/*****************************************************************************
- * Local prototypes for demux2
+ * Local prototypes
  *****************************************************************************/
 typedef struct
 {
@@ -315,7 +132,7 @@ static int Control( demux_t *, int, va_list );
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
-static int  DemuxOpen ( vlc_object_t *p_this )
+static int  Open ( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -323,26 +140,32 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     MediaSubsessionIterator *iter;
     MediaSubsession *sub;
 
-    vlc_value_t val;
-
+    vlc_bool_t b_rtsp_tcp;
     uint8_t *p_peek;
 
     int     i_sdp;
     int     i_sdp_max;
     uint8_t *p_sdp;
 
-    /* See if it looks like a SDP
-       v, o, s fields are mandatory and in this order */
-    if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+    if( p_demux->s )
     {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
+        /* See if it looks like a SDP
+           v, o, s fields are mandatory and in this order */
+        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+        {
+            msg_Err( p_demux, "cannot peek" );
+            return VLC_EGENERIC;
+        }
+        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
+            ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
+        {
+            msg_Warn( p_demux, "SDP module discarded" );
+            return VLC_EGENERIC;
+        }
     }
-    if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
-        ( strcasecmp( p_demux->psz_access, "rtsp" ) || p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
+    else
     {
-        msg_Warn( p_demux, "SDP module discarded" );
-        return VLC_EGENERIC;
+        var_Create( p_demux, "rtsp-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     }
 
     p_demux->pf_demux  = Demux;
@@ -360,35 +183,6 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     p_sys->i_length = 0;
     p_sys->i_start = 0;
 
-    /* Gather the complete sdp file */
-    i_sdp = 0;
-    i_sdp_max = 1000;
-    p_sdp = (uint8_t*)malloc( i_sdp_max );
-    for( ;; )
-    {
-        int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
-
-        if( i_read < 0 )
-        {
-            msg_Err( p_demux, "failed to read SDP" );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-
-        i_sdp += i_read;
-
-        if( i_read < i_sdp_max - i_sdp - 1 )
-        {
-            p_sdp[i_sdp] = '\0';
-            break;
-        }
-
-        i_sdp_max += 1000;
-        p_sdp = (uint8_t*)realloc( p_sdp, i_sdp_max );
-    }
-    p_sys->p_sdp = (char*)p_sdp;
-
-    fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
@@ -400,7 +194,8 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         msg_Err( p_demux, "BasicUsageEnvironment::createNew failed" );
         goto error;
     }
-    if( !strcasecmp( p_demux->psz_access, "rtsp" ) )
+
+    if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "rtsp" ) )
     {
         char *psz_url;
         char *psz_options;
@@ -417,7 +212,56 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         if( psz_options )
             delete [] psz_options;
 
+        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url );
+        if( p_sdp == NULL )
+        {
+            msg_Err( p_demux, "describeURL failed (%s)", p_sys->env->getResultMsg() );
+
+            free( psz_url );
+            goto error;
+        }
         free( psz_url );
+
+        /* malloc-ated copy */
+        p_sys->p_sdp = strdup( (char*)p_sdp );
+        delete[] p_sdp;
+        fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
+    }
+    else if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "sdp" ) )
+    {
+        p_sys->p_sdp = strdup( p_demux->psz_path );
+    }
+    else
+    {
+        /* Gather the complete sdp file */
+        i_sdp = 0;
+        i_sdp_max = 1000;
+        p_sdp = (uint8_t*)malloc( i_sdp_max );
+        for( ;; )
+        {
+            int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
+
+            if( i_read < 0 )
+            {
+                msg_Err( p_demux, "failed to read SDP" );
+                free( p_sys );
+                return VLC_EGENERIC;
+            }
+
+            i_sdp += i_read;
+
+            if( i_read < i_sdp_max - i_sdp - 1 )
+            {
+                p_sdp[i_sdp] = '\0';
+                break;
+            }
+
+            i_sdp_max += 1000;
+            p_sdp = (uint8_t*)realloc( p_sdp, i_sdp_max );
+        }
+        p_sys->p_sdp = (char*)p_sdp;
+
+        fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
     }
     if( ( p_sys->ms = MediaSession::createNew(*p_sys->env, p_sys->p_sdp ) ) == NULL )
     {
@@ -425,8 +269,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         goto error;
     }
 
-    var_Create( p_demux, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "rtsp-tcp", &val );
+    b_rtsp_tcp = var_CreateGetBool( p_demux, "rtsp-tcp" );
 
     /* Initialise each media subsession */
     iter = new MediaSubsessionIterator( *p_sys->ms );
@@ -466,7 +309,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
-                p_sys->rtsp->setupMediaSubsession( *sub, False, val.b_bool ? True : False );
+                p_sys->rtsp->setupMediaSubsession( *sub, False, b_rtsp_tcp ? True : False );
             }
         }
     }
@@ -693,7 +536,7 @@ error:
 /*****************************************************************************
  * DemuxClose:
  *****************************************************************************/
-static void DemuxClose( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t    *p_sys = p_demux->p_sys;
@@ -775,7 +618,8 @@ static int Demux( demux_t *p_demux )
         p_sys->i_pcr = i_pcr;
 
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr );
-        if( p_sys->i_pcr_start <= 0 || p_sys->i_pcr_start > i_pcr )
+        if( p_sys->i_pcr_start <= 0 || p_sys->i_pcr_start > i_pcr ||
+            ( p_sys->i_length > 0 && i_pcr - p_sys->i_pcr_start > p_sys->i_length ) )
         {
             p_sys->i_pcr_start = i_pcr;
         }
@@ -835,6 +679,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64;
     double  *pf, f;
+    vlc_bool_t *pb;
 
     switch( i_query )
     {
@@ -890,6 +735,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
         }
+
+        /* Special for access_demux */
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_CONTROL_PACE:
+            /* TODO */
+            pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+            *pb = VLC_FALSE;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_PAUSE_STATE:
+        case DEMUX_GET_TITLE_INFO:
+        case DEMUX_SET_TITLE:
+        case DEMUX_SET_SEEKPOINT:
+            return VLC_EGENERIC;
+
+        case DEMUX_GET_PTS_DELAY:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = (int64_t)var_GetInteger( p_demux, "rtsp-caching" ) * I64C(1000);
+            return VLC_SUCCESS;
 
         default:
             return VLC_EGENERIC;
