@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.15 2002/12/06 12:54:30 sam Exp $
+ * $Id: http.c,v 1.16 2002/12/11 20:13:50 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -362,7 +362,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
     if( p_input->stream.p_selected_area->i_size )
     {
-        p_input->stream.p_selected_area->i_tell = i_tell
+        p_input->stream.p_selected_area->i_tell = i_tell;
             + (p_input->p_last_data - p_input->p_current_data);
     }
     else
@@ -707,13 +707,6 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     else if( i_ret > 0 )
     {
         ssize_t i_recv = recv( p_access_data->i_handle, p_buffer, i_len, 0 );
-
-        if( i_recv > 0 )
-        {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_input->stream.p_selected_area->i_tell += i_recv;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-        }
 
         if( i_recv < 0 )
         {
