@@ -2556,6 +2556,12 @@ static int GetAddrPort( const struct sockaddr_storage *p_ss )
 #else /* ENABLE_HTTPD */
 
 /* We just define an empty wrapper */
+httpd_host_t *httpd_TLSHostNew( vlc_object_t *a, char *b, int c,
+                                tls_server_t *d )
+{
+    msg_Err( a, "HTTP daemon support is disabled" );
+    return 0;
+}
 httpd_host_t *httpd_HostNew( vlc_object_t *a, char *b, int c )
 {
     msg_Err( a, "HTTP daemon support is disabled" );
