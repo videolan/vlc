@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.50 2003/05/31 12:24:39 titer Exp $
+ * $Id: input_ext-intf.c,v 1.51 2003/07/13 19:58:41 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,7 +71,7 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
         break;
 
     case INPUT_STATUS_FASTER:
-        if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
+        if( p_input->stream.control.i_rate * 4 <= DEFAULT_RATE )
         {
             msg_Dbg( p_input, "can not play any faster" );
         }
