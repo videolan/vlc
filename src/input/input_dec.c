@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.74 2003/11/23 03:17:39 fenrir Exp $
+ * $Id: input_dec.c,v 1.75 2003/11/23 18:21:48 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -501,6 +501,14 @@ static int DecoderThread( decoder_t * p_dec )
                     if( p_dec->p_owner->p_sout == NULL )
                     {
                         msg_Err( p_dec, "cannot create packetizer output" );
+                        p_dec->b_error = VLC_TRUE;
+
+                        while( p_sout_block )
+                        {
+                            block_t       *p_next = p_sout_block->p_next;
+                            block_Release( p_sout_block );
+                            p_sout_block = p_next;
+                        }
                         break;
                     }
                 }
@@ -561,14 +569,14 @@ static int DecoderThread( decoder_t * p_dec )
         else
         {
             msg_Err( p_dec, "unknown ES format !!" );
-            p_dec->p_fifo->b_error = 1;
+            p_dec->b_error = 1;
             break;
         }
 
         input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
     }
 
-    while( !p_dec->p_fifo->b_die )
+    while( !p_dec->p_fifo->b_die && !p_dec->b_die )
     {
         /* Trash all received PES packets */
         input_ExtractPES( p_dec->p_fifo, NULL );
@@ -668,6 +676,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         if( p_sys->p_aout_input == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
+            p_dec->b_error = VLC_TRUE;
             return NULL;
         }
         p_dec->fmt_out.audio.i_bytes_per_frame =
@@ -716,6 +725,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( p_sys->p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
+            p_dec->b_error = VLC_TRUE;
             return NULL;
         }
     }
