@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.29 2003/07/27 23:05:41 hartman Exp $
+ * $Id: playlist.m,v 1.30 2003/08/14 13:02:55 sigmunau Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -335,7 +335,7 @@ int MacVersion102 = -1;
             }
         }
         
-        playlist_AddName( p_playlist, [o_url fileSystemRepresentation], [o_name UTF8String],
+        playlist_AddExt( p_playlist, [o_name UTF8String], [o_url fileSystemRepresentation], -1, 
             (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options,
             i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item );
 

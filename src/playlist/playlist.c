@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.43 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: playlist.c,v 1.44 2003/08/14 13:02:55 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,11 +42,13 @@ static void PlayItem  ( playlist_t * );
 
 static void Poubellize ( playlist_t *, input_thread_t * );
 
-/*****************************************************************************
- * playlist_Create: create playlist
- *****************************************************************************
+/**
+ * Create playlist
+ *
  * Create a playlist structure.
- *****************************************************************************/
+ * \param p_parent the vlc object that is to be the parent of this playlist
+ * \return a pointer to the created playlist, or NULL on error
+ */
 playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist;
@@ -90,11 +92,12 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     return p_playlist;
 }
 
-/*****************************************************************************
- * playlist_Destroy: destroy the playlist
- *****************************************************************************
+/**
+ * Destroy the playlist.
+ *
  * Delete all items in the playlist and free the playlist structure.
- *****************************************************************************/
+ * \param p_playlist the playlist structure to destroy
+ */
 void playlist_Destroy( playlist_t * p_playlist )
 {
     p_playlist->b_die = 1;
@@ -106,30 +109,38 @@ void playlist_Destroy( playlist_t * p_playlist )
     vlc_object_destroy( p_playlist );
 }
 
-/*****************************************************************************
- * playlist_Add: add an item to the playlist
- *****************************************************************************
- * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
- * add it at the end regardless of the playlist current size.
- *****************************************************************************/
+/**
+ * Add an MRL to the playlist. This is a simplified version of
+ * playlist_AddExt inculded for convenince. It equals calling playlist_AddExt
+ * with psz_name == psz_target and i_duration == -1
+ */
+
 int playlist_Add( playlist_t *p_playlist, const char *psz_target,
                   const char **ppsz_options, int i_options,
                   int i_mode, int i_pos )
 {
-    return playlist_AddName( p_playlist, psz_target, psz_target,
-                             ppsz_options, i_options, i_mode, i_pos );
+    return playlist_AddExt( p_playlist, psz_target, psz_target, -1,
+                            ppsz_options, i_options, i_mode, i_pos );
 }
 
-/*****************************************************************************
- * playlist_AddName: add an item to the playlist with his name
- *****************************************************************************
- * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
- * add it at the end regardless of the playlist current size.
- *****************************************************************************/
-int playlist_AddName( playlist_t *p_playlist, const char *psz_name, 
-                      const char *psz_uri,
-                      const char **ppsz_options, int i_options,
-                      int i_mode, int i_pos )
+/**
+ * Add a MRL into the playlist.
+ *
+ * \param p_playlist the playlist to add into
+ * \param psz_target the mrl to add to the playlist
+ * \param psz_name a text giving a name or description of this item
+ * \param i_duration a hint about the duration of this item, in miliseconds, or
+ *        -1 if unknown.
+ * \param i_mode the mode used when adding
+ * \param i_pos the possition in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of it's size
+ * \return always returns 0
+*/
+int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
+                     const char * psz_name, mtime_t i_duration,
+                     const char **ppsz_options, int i_options, int i_mode,
+                     int i_pos )
 {
     playlist_item_t * p_item;
 
@@ -141,6 +152,7 @@ int playlist_AddName( playlist_t *p_playlist, const char *psz_name,
 
     p_item->psz_name = strdup( psz_name );
     p_item->psz_uri  = strdup( psz_uri );
+    p_item->i_duration = i_duration;
     p_item->i_type = 0;
     p_item->i_status = 0;
     p_item->b_autodeletion = VLC_FALSE;
@@ -161,6 +173,17 @@ int playlist_AddName( playlist_t *p_playlist, const char *psz_name,
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
 
+/**
+ * Add a playlist item into a playlist
+ *
+ * \param p_playlist the playlist to insert into
+ * \param p_item the playlist item to insert
+ * \param i_mode the mode used when adding
+ * \param i_pos the possition in the playlist where to add. If this is
+ *        PLAYLIST_END the item will be added at the end of the playlist
+ *        regardless of it's size
+ * \return always returns 0
+*/
 int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                 int i_mode, int i_pos)
 {
@@ -280,11 +303,13 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     return 0;
 }
 
-/*****************************************************************************
- * playlist_Delete: delete an item from the playlist
- *****************************************************************************
- * Delete the item in the playlist with position i_pos.
- *****************************************************************************/
+/**
+ * delete an item from a playlist.
+ *
+ * \param p_playlist the playlist to remove from.
+ * \param i_pos the position of the item to remove
+ * \return returns 0
+ */
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
     vlc_value_t     val;
@@ -335,12 +360,17 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
     return 0;
 }
 
-/*****************************************************************************
- * playlist_Move: move an item in the playlist
- *****************************************************************************
+/**
+ * Move an item in a playlist
+ *
  * Move the item in the playlist with position i_pos before the current item
  * at position i_newpos.
- *****************************************************************************/
+ * \param p_playlist the playlist to move items in
+ * \param i_pos the position of the item to move
+ * \param i_newpos the position of the item that will be behind the moved item
+ *        after the move
+ * \return returns 0
+ */
 int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
 {
     vlc_value_t     val;
@@ -400,12 +430,15 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
     return 0;
 }
 
-/*****************************************************************************
- * playlist_Command: do a playlist action
- *****************************************************************************
+/**
+ * Do a playlist action
  *
- *****************************************************************************/
-void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
+ * \param p_playlist the playlist to do the command on
+ * \param i_command the command to do
+ * \param i_arg the argument to the command. See playlist_command_t for details
+ */
+ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
+                       int i_arg )
 {
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -470,7 +503,6 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
 
     return;
 }
-
 /* Following functions are local */
 
 /*****************************************************************************
