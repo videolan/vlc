@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.20 2003/01/13 20:02:37 jlj Exp $
+ * $Id: aout.m,v 1.21 2003/01/15 00:49:49 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -173,10 +173,10 @@ static OSStatus IOCallback      ( AudioDeviceID inDevice,
 int E_(OpenAudio)( vlc_object_t * p_this )
 {
     OSStatus err;
+    vlc_value_t val;
     UInt32 i, i_param_size;
     struct aout_sys_t * p_sys;
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    vlc_value_t val;
 
     /* Allocate structure */
     p_sys = (struct aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
@@ -198,6 +198,8 @@ int E_(OpenAudio)( vlc_object_t * p_this )
 
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
+        UInt32 i_option = config_GetInt( p_aout, "macosx-adev" );
+
         var_Create( p_aout, "audio-device", VLC_VAR_STRING | 
                                             VLC_VAR_HASCHOICE );
 
@@ -205,15 +207,21 @@ int E_(OpenAudio)( vlc_object_t * p_this )
         {
             val.psz_string = p_sys->p_options[i].sz_option;
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+
+            if( i == i_option )
+            {
+                var_Set( p_aout, "audio-device", val );
+            }
         }
 
         var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
                          NULL );
-    }
-    val.b_bool = VLC_TRUE;
-    var_Set( p_aout, "intf-change", val );
 
-    /* Get selected device */
+        val.b_bool = VLC_TRUE;
+        var_Set( p_aout, "intf-change", val );
+    }
+
+    /* Get requested device */
     if( GetDevice( p_aout, &p_sys->devid ) )
     {
         msg_Err( p_aout, "GetDevice failed" );
@@ -879,9 +887,8 @@ static void FreeStream( UInt32 i_dev, aout_instance_t *p_aout,
 static int GetDevice( aout_instance_t *p_aout, AudioDeviceID *p_devid ) 
 {
     OSStatus err;
-    char *psz_tmp;
     vlc_value_t val;
-    UInt32 i_option;
+    unsigned int i_option;
 
     struct aout_dev_t * p_dev;
     struct aout_option_t * p_option;
@@ -893,16 +900,12 @@ static int GetDevice( aout_instance_t *p_aout, AudioDeviceID *p_devid )
         return( VLC_ENOVAR );
     }
 
-    psz_tmp = strchr( val.psz_string, ':' );
-    if( psz_tmp == NULL )
+    if( !sscanf( val.psz_string, "%d:", &i_option ) ||
+        p_sys->i_options <= i_option )
     {
-        msg_Err( p_aout, "audio-device value missing seperator" );
-        free( (void *)val.psz_string );
-        return( VLC_EGENERIC );
+        i_option = 0;
     }
 
-    *psz_tmp = '\0';
-    i_option = atol( val.psz_string );
     free( (void *)val.psz_string );
 
     p_option = &p_sys->p_options[i_option];
@@ -924,6 +927,8 @@ static int GetDevice( aout_instance_t *p_aout, AudioDeviceID *p_devid )
 #undef P_STREAMS
 
     msg_Dbg( p_aout, "getting device [%ld]", p_option->i_dev );
+
+    config_PutInt( p_aout, "macosx-adev", i_option );
 
     *p_devid = p_dev->devid;
 

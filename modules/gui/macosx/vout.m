@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout.m: MacOS X video output plugin
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.11 2003/01/05 16:23:57 massiot Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: vout.m,v 1.12 2003/01/15 00:49:49 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -177,19 +177,20 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     NSArray * o_screens = [NSScreen screens];
-    if ( [o_screens count] > 0 )
+    if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
     {
         int i = 1;
         vlc_value_t val;
         NSScreen * o_screen;
 
-        var_Destroy( p_vout, "video-device" );
-        var_Create( p_vout, "video-device", 
-                    VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+        int i_option = config_GetInt( p_vout, "macosx-vdev" );
+
+        var_Create( p_vout, "video-device", VLC_VAR_STRING |
+                                            VLC_VAR_HASCHOICE ); 
 
         NSEnumerator * o_enumerator = [o_screens objectEnumerator];
 
-        while ( (o_screen = [o_enumerator nextObject]) != NULL )
+        while( (o_screen = [o_enumerator nextObject]) != NULL )
         {
             char psz_temp[255];
             NSRect s_rect = [o_screen frame];
@@ -200,6 +201,11 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
             val.psz_string = psz_temp;
             var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val );
+
+            if( ( i - 1 ) == i_option )
+            {
+                var_Set( p_vout, "video-device", val );
+            }
 
             i++;
         }
@@ -1016,7 +1022,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            o_screen = [o_screens objectAtIndex: i_index - 1];
+            i_index--;
+            o_screen = [o_screens objectAtIndex: i_index];
+            config_PutInt( p_vout, "macosx-vdev", i_index );
         } 
 
         free( val.psz_string );

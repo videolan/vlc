@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.23 2003/01/13 17:11:14 ipkiss Exp $
+ * $Id: intf.m,v 1.24 2003/01/15 00:49:49 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -80,6 +80,8 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+
+    config_SaveConfigFile( p_intf, MODULE_STRING );
 
     [p_intf->p_sys->o_sendport release];
     [p_intf->p_sys->o_pool release];
