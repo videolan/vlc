@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.4 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: file.c,v 1.5 2003/04/29 15:40:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -80,7 +80,17 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
-    if( !( p_access->p_sys->p_file = fopen( p_access->psz_name, "wb" ) ) )
+    if( !p_access->psz_name )
+    {
+        msg_Err( p_access, "no file name specified" );
+        return VLC_EGENERIC;
+    }
+    if( !strcmp( p_access->psz_name, "-" ) )
+    {
+        p_access->p_sys->p_file = stdout;
+        msg_Dbg( p_access, "using stdout" );
+    }
+    else if( !( p_access->p_sys->p_file = fopen( p_access->psz_name, "wb" ) ) )
     {
         msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
         free( p_access->p_sys );
@@ -101,9 +111,12 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
 
-    if( p_access->p_sys->p_file )
+    if( strcmp( p_access->psz_name, "-" ) )
     {
-        fclose( p_access->p_sys->p_file );
+        if( p_access->p_sys->p_file )
+        {
+            fclose( p_access->p_sys->p_file );
+        }
     }
     free( p_access->p_sys );
 
@@ -139,7 +152,15 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
 
     msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
-    return( fseek( p_access->p_sys->p_file, i_pos, SEEK_SET ) );
+    if( strcmp( p_access->psz_name, "-" ) )
+    {
+        return( fseek( p_access->p_sys->p_file, i_pos, SEEK_SET ) );
+    }
+    else
+    {
+        msg_Err( p_access, "cannot seek while using stdout" );
+        return VLC_EGENERIC;
+    }
 }
 
 
