@@ -461,22 +461,23 @@ void Playlist::CreateNode( playlist_t *p_playlist, playlist_item_t *p_node,
                            wxTreeItemId parent )
 {
     long cookie;
-    wxTreeItemId node = treectrl->AppendItem( parent, p_node->input.psz_name,
-                                              -1,-1,
-                                              new PlaylistItem( p_node ) );
+    wxTreeItemId node =
+        treectrl->AppendItem( parent, wxL2U( p_node->input.psz_name ),
+                              -1,-1, new PlaylistItem( p_node ) );
     treectrl->SetItemImage( node, p_node->input.i_type );
+
     for( int i = 0; i< p_node->i_children ; i++ )
     {
         /* Append the item */
         if( p_node->pp_children[i]->i_children == -1 )
         {
-            wxTreeItemId item = treectrl->AppendItem( node,
-                                  p_node->pp_children[i]->input.psz_name,
-                                  -1,-1,
-                                  new PlaylistItem( p_node->pp_children[i]) );
+            wxTreeItemId item =
+                treectrl->AppendItem( node,
+                    wxL2U( p_node->pp_children[i]->input.psz_name ), -1,-1,
+                           new PlaylistItem( p_node->pp_children[i]) );
 
             treectrl->SetItemImage( item,
-                                    p_node->pp_children[i]->input.i_type);
+                                    p_node->pp_children[i]->input.i_type );
         }
         else
         {
