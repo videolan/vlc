@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.14 2003/06/09 12:33:16 asmax Exp $
+ * $Id: themeloader.cpp,v 1.15 2003/09/02 13:42:43 sam Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -327,7 +327,7 @@ int tar_extract_all( TAR *t, char *prefix )
     while( 1 )
     {
         len = gzread( *t, &buffer, BLOCKSIZE );
-        if(len < 0) fprintf(stderr, "%s", gzerror(*t, &err) );
+        if(len < 0) fprintf(stderr, "%s\n", gzerror(*t, &err) );
 
         /*
          * Always expect complete blocks to process
@@ -335,7 +335,7 @@ int tar_extract_all( TAR *t, char *prefix )
          */
         if( len != 0 && len != BLOCKSIZE )
         {
-            fprintf(stderr, "gzread: incomplete block read");
+            fprintf(stderr, "gzread: incomplete block read\n");
             return -1;
         }
 
@@ -375,7 +375,7 @@ int tar_extract_all( TAR *t, char *prefix )
                             *p = '/';
                             outfile = fopen( fname, "wb" );
                             if( !outfile )
-                                fprintf( stderr, "tar couldn't create %s",
+                                fprintf( stderr, "tar couldn't create %s\n",
                                          fname );
                         }
                     }
@@ -422,7 +422,7 @@ int tar_extract_all( TAR *t, char *prefix )
 
 int tar_close( TAR *t )
 {
-    if( gzclose( *t ) != Z_OK ) fprintf( stderr, "failed gzclose" );
+    if( gzclose( *t ) != Z_OK ) fprintf( stderr, "failed gzclose\n" );
     free( t );
     return 0;
 }
