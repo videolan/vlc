@@ -42,6 +42,8 @@
 #include "plugins.h"
 #include "input.h"
 
+#include "audio_output.h"
+
 #include "intf_msg.h"
 #include "interface.h"
 #include "intf_cmd.h"
@@ -263,6 +265,8 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
  *****************************************************************************/
 int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
 {
+    static int i_volbackup;
+    
     switch( i_key )
     {
     case 'Q':                                                  /* quit order */
@@ -286,14 +290,22 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         intf_SelectChannel( p_intf, i_key - '0' );
         break;
     case '+':                                                    /* volume + */
-        /* XXX?? */
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLMAX) )
+            p_main->p_aout->vol += VOLSTEP;
         break;
     case '-':                                                    /* volume - */
-        /* XXX?? */
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLSTEP) )
+            p_main->p_aout->vol -= VOLSTEP;
         break;
     case 'M':                                                 /* toggle mute */
     case 'm':
-        /* XXX?? */
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))
+        {
+            i_volbackup = p_main->p_aout->vol;
+            p_main->p_aout->vol = 0;
+        }
+        else if( (p_main->p_aout != NULL) && (!p_main->p_aout->vol))
+            p_main->p_aout->vol = i_volbackup;
         break;
     case 'g':                                                     /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )

@@ -57,11 +57,18 @@
 
 /* Default stereo mode (0 stands for mono, 1 for stereo) */
 #define AOUT_DEFAULT_STEREO     1
+/* #define AOUT_DEFAULT_STEREO     0 */
 
 /* Audio output rate, in Hz */
 #define AOUT_MIN_RATE           22050 /* XXX?? */
 #define AOUT_DEFAULT_RATE       44100
 #define AOUT_MAX_RATE           48000
+
+
+/* Volume (default 100) */
+#define VOL 100
+#define VOLSTEP 5
+#define VOLMAX 300
 
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
@@ -226,6 +233,10 @@ typedef struct aout_thread_s
     /* there might be some useful private structure, such as audio_buf_info
      * for the OSS output */
     p_aout_sys_t        p_sys;
+
+
+    /* there is the current volume */
+    int                 vol;
 
 } aout_thread_t;
 
