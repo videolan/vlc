@@ -389,7 +389,13 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {handlePopUp = id; playItem = id; searchItem = id; selectAll = id; }; 
+            ACTIONS = {
+                deleteItem = id; 
+                handlePopUp = id; 
+                playItem = id; 
+                searchItem = id; 
+                selectAll = id; 
+            }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
