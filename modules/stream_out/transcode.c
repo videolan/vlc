@@ -581,6 +581,7 @@ struct sout_stream_id_t
 
     /* Sync */
     date_t          interpolated_pts;
+    mtime_t         i_initial_pts;
 };
 
 
@@ -1695,21 +1696,30 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         if( p_sys->b_audio_sync )
         {
             mtime_t i_video_drift;
+            mtime_t i_master_drift = p_sys->i_master_drift;
+
+            if( !id->i_initial_pts ) id->i_initial_pts = p_sys->i_output_pts;
+
+            if( !i_master_drift )
+            {
+                /* No audio track ? */
+                i_master_drift = id->i_initial_pts;
+            }
 
             i_pts = date_Get( &id->interpolated_pts ) + 1;
             i_video_drift = p_sys->i_output_pts - i_pts;
             i_duplicate = 1;
 
-            if( i_video_drift < p_sys->i_master_drift - 50000 )
+            if( i_video_drift < i_master_drift - 50000 )
             {
                 msg_Dbg( p_stream, "dropping frame (%i)",
-                         (int)(i_video_drift - p_sys->i_master_drift) );
+                         (int)(i_video_drift - i_master_drift) );
                 return VLC_EGENERIC;
             }
-            else if( i_video_drift > p_sys->i_master_drift + 50000 )
+            else if( i_video_drift > i_master_drift + 50000 )
             {
                 msg_Dbg( p_stream, "adding frame (%i)",
-                         (int)(i_video_drift - p_sys->i_master_drift) );
+                         (int)(i_video_drift - i_master_drift) );
                 i_duplicate = 2;
             }
 
