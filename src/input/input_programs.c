@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.8 2000/12/20 23:24:23 reno Exp $
+ * $Id: input_programs.c,v 1.9 2000/12/21 12:38:27 massiot Exp $
  *
  * Authors:
  *
@@ -472,6 +472,9 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         break;
     }
 
-    *p_spot = p_es;
+    if( p_es->p_decoder_fifo != NULL )
+    {
+        *p_spot = p_es;
+    }
     return( 0 );
 }
