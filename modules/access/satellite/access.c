@@ -60,16 +60,74 @@ static int     SatelliteSetArea    ( input_thread_t *, input_area_t * );
 static int     SatelliteSetProgram ( input_thread_t *, pgrm_descriptor_t * );
 static void    SatelliteSeek       ( input_thread_t *, off_t );
 
+typedef struct demux_handle_t
+{
+    int i_pid;
+    int i_handle;
+    int i_type;
+} demux_handle_t;
+
+#define PAT_TYPE 1
+#define PMT_TYPE 2
+#define ES_TYPE 3
+
+#define MAX_DEMUX 8 
+
+typedef struct thread_sat_data_t
+{
+    int i_handle;
+    demux_handle_t p_demux_handles[MAX_DEMUX];
+} thread_sat_data_t;
+
+static void AllocateDemux( input_thread_t * p_input, int i_pid,
+                           int i_type )
+{
+    thread_sat_data_t * p_satellite = (thread_sat_data_t *)p_input->p_access_data;
+    int                 i_demux;
+    int                 i;
+    i_demux = config_GetInt( p_input, "dvb-dmx" );
+
+    /* Find first free slot */
+    for ( i = 0; i < MAX_DEMUX; i++ )
+    {
+        if ( !p_satellite->p_demux_handles[i].i_type )
+        {
+            if (ioctl_SetDMXFilter( i_demux, i_pid, &p_satellite->p_demux_handles[i].i_handle, 3) < 0)
+            {
+                msg_Warn(p_input, "ioctl_SetDMXFilter failed (%d)", i_pid);
+                break;
+            }
+            p_satellite->p_demux_handles[i].i_type = i_type;
+            p_satellite->p_demux_handles[i].i_pid = i_pid;
+            break;
+        }
+    }
+}
+
+static void CloseProgram( input_thread_t * p_input )
+{
+    thread_sat_data_t * p_satellite = (thread_sat_data_t *)p_input->p_access_data;
+    int i;
+
+    for ( i = 1; i < MAX_DEMUX; i++ )
+    {
+        if ( p_satellite->p_demux_handles[i].i_type )
+        {
+            ioctl_UnsetDMXFilter( p_satellite->p_demux_handles[i].i_handle );
+            p_satellite->p_demux_handles[i].i_type = 0;
+        }
+    }
+}
+
 /*****************************************************************************
  * Open: open the dvr device
  *****************************************************************************/
 int E_(Open) ( vlc_object_t *p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
-    input_socket_t *    p_satellite;
+    thread_sat_data_t * p_satellite;
     char *              psz_parser;
     char *              psz_next;
-    int                 i_fd = 0;
     int                 i_freq = 0;
     int                 i_srate = 0;
     vlc_bool_t          b_pol = 0;
@@ -194,13 +252,14 @@ int E_(Open) ( vlc_object_t *p_this )
 
 
     /* Initialise structure */
-    p_satellite = malloc( sizeof( input_socket_t ) );
+    p_satellite = malloc( sizeof( thread_sat_data_t ) );
 
     if( p_satellite == NULL )
     {
         msg_Err( p_input, "out of memory" );
         return -1;
     }
+    memset( p_satellite, 0, sizeof( thread_sat_data_t ) );
 
     p_input->p_access_data = (void *)p_satellite;
 
@@ -283,14 +342,7 @@ int E_(Open) ( vlc_object_t *p_this )
     } /* i_freq */
 
     msg_Dbg( p_input, "setting filter on PAT" );
-
-    if ( ioctl_SetDMXFilter( i_demux, 0, &i_fd, 3 ) < 0 )
-    {
-        msg_Err( p_input, "an error occured when setting filter on PAT" );
-        close( p_satellite->i_handle );
-        free( p_satellite );
-        return -1;
-    }
+    AllocateDemux( p_input, 0, PAT_TYPE );
 
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
@@ -320,26 +372,12 @@ int E_(Open) ( vlc_object_t *p_this )
 void E_(Close) ( vlc_object_t *p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
-    input_socket_t *    p_satellite;
-    unsigned int        i_es_index;
+    thread_sat_data_t * p_satellite = (thread_sat_data_t *)p_input->p_access_data;
 
-    if ( p_input->stream.p_selected_program )
-    {
-        for ( i_es_index = 1 ;
-                i_es_index < p_input->stream.p_selected_program->
-                    i_es_number ;
-                i_es_index ++ )
-        {
-#define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_dec )
-            {
-                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
-            }
-#undef p_es
-        }
-    }
+    msg_Dbg( p_input, "unsetting filters on all pids" );
+    CloseProgram( p_input );
+    close( p_satellite->p_demux_handles[0].i_handle );
 
-    p_satellite = (input_socket_t *)p_input;
     close( p_satellite->i_handle );
 }
 
@@ -349,10 +387,8 @@ void E_(Close) ( vlc_object_t *p_this )
 static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
                               size_t i_len )
 {
-    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+    thread_sat_data_t * p_satellite = (thread_sat_data_t *)p_input->p_access_data;
     ssize_t i_ret;
-    int i_program = config_GetInt( p_input, "program" );
-    int i_demux = config_GetInt( p_input, "dvb-dmx" );
 
     unsigned int i;
 
@@ -360,25 +396,25 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
     /* This is kludgy and consumes way too much CPU power - the access
      * module should have a callback from the demux when a new program
      * is encountered. --Meuuh */
-    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    if ( !p_satellite->p_demux_handles[1].i_type )
     {
-        /* Only set a filter on the selected program : some boards
-         * (read: Dreambox) only have 8 filters, so you don't want to
-         * spend them on unwanted PMTs. --Meuuh */
-        if ( (!i_program || p_input->stream.pp_programs[i]->i_number == i_program) && p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
+        int i_program = config_GetInt( p_input, "program" );
+
+        for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
         {
-            msg_Dbg( p_input, "setting filter on PMT pid %d",
-                     p_input->stream.pp_programs[i]->pp_es[0]->i_id );
-            if (ioctl_SetDMXFilter( i_demux, p_input->stream.pp_programs[i]->pp_es[0]->i_id,
-                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
-                       3 ) < 0)
+            /* Only set a filter on the selected program : some boards
+             * (read: Dreambox) only have 8 filters, so you don't want to
+             * spend them on unwanted PMTs. --Meuuh */
+            if ( (!i_program || p_input->stream.pp_programs[i]->i_number == i_program) )
             {
-                msg_Err(p_input, "ioctl_SetDMXFilter failed");
+                msg_Dbg( p_input, "setting filter on PMT pid %d",
+                         p_input->stream.pp_programs[i]->pp_es[0]->i_id );
+                AllocateDemux( p_input, p_input->stream.pp_programs[i]->pp_es[0]->i_id, PMT_TYPE );
             }
         }
     }
 
-    i_ret = read( p_access_data->i_handle, p_buffer, i_len );
+    i_ret = read( p_satellite->i_handle, p_buffer, i_len );
  
     if( i_ret < 0 )
     {
@@ -410,11 +446,10 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 {
     unsigned int i_es_index;
     vlc_value_t val;
-    int i_demux = config_GetInt( p_input, "dvb-dmx" );
 
     if ( p_input->stream.p_selected_program )
     {
-        for ( i_es_index = 1 ; /* 0 should be the PMT */
+        for ( i_es_index = 0 ; /* 0 should be the PMT */
                 i_es_index < p_input->stream.p_selected_program->
                     i_es_number ;
                 i_es_index ++ )
@@ -424,54 +459,41 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             {
                 input_UnselectES( p_input , p_es );
             }
-            if ( p_es->i_demux_fd )
-            {
-                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
-                p_es->i_demux_fd = 0;
-            }
 #undef p_es
         }
     }
+
+    msg_Dbg( p_input, "unsetting filters on all pids" );
+    CloseProgram( p_input );
+    msg_Dbg( p_input, "setting filter on PMT pid %d",
+             p_new_prg->pp_es[0]->i_id );
+    AllocateDemux( p_input, p_new_prg->pp_es[0]->i_id, PMT_TYPE );
 
     for ( i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
 #define p_es p_new_prg->pp_es[i_es_index]
         switch( p_es->i_cat )
         {
-            case MPEG1_VIDEO_ES:
-            case MPEG2_VIDEO_ES:
-            case MPEG2_MOTO_VIDEO_ES:
+            case VIDEO_ES:
                 msg_Dbg(p_input, "setting filter on video ES 0x%x",
                         p_es->i_id);
-                /* First set the filter. This may seem a little odd, but
+                /* Always set the filter. This may seem a little odd, but
                  * it allows you to stream the video with demuxstream
                  * without having a decoder or a stream output behind.
                  * The result is you'll sometimes filter a PID which you
                  * don't really want, but in the most common cases it
                  * should be OK. --Meuuh */
-                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 1) < 0)
-                {
-                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
-                }
-                else
-                {
-                    input_SelectES( p_input , p_es );
-                }
+                AllocateDemux( p_input, p_es->i_id, ES_TYPE );
+                input_SelectES( p_input , p_es );
                 break;
 
-            case MPEG1_AUDIO_ES:
-            case MPEG2_AUDIO_ES:
+            case AUDIO_ES:
                 msg_Dbg(p_input, "setting filter on audio ES 0x%x",
                         p_es->i_id);
-                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 3) < 0)
-                {
-                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
-                }
-                else
-                {
-                    input_SelectES( p_input , p_es );
-                }
+                AllocateDemux( p_input, p_es->i_id, ES_TYPE );
+                input_SelectES( p_input , p_es );
                 break;
+
             default:
                 /* Do not select private streams. This is to avoid the
                  * limit of 8 filters on the Dreambox and possibly on
@@ -483,14 +505,8 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                 msg_Dbg(p_input, "setting filter on misc (0x%x) ES 0x%x",
                         p_es->i_cat,
                         p_es->i_id);
-                if (ioctl_SetDMXFilter( i_demux, p_es->i_id, &p_es->i_demux_fd, 3) < 0)
-                {
-                    msg_Dbg(p_input, "ioctl_SetDMXFilter failed");
-                }
-                else
-                {
-                    input_SelectES( p_input , p_es );
-                }
+                AllocateDemux( p_input, p_es->i_id, ES_TYPE );
+                input_SelectES( p_input , p_es );
 #endif
                 break;
 #undef p_es
