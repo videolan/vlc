@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.15 2002/07/16 21:29:10 sam Exp $
+ * $Id: libvlc.c,v 1.16 2002/07/18 01:00:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -186,7 +186,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!CREATED)\n" );
         return VLC_ESTATUS;
     }
 
@@ -480,12 +480,6 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         config_PutInt( p_vlc, "network-channel", VLC_FALSE );
     }
 
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_STOPPED;
-
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
     /*
      * Initialize playlist and get commandline files
      */
@@ -493,18 +487,22 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( !p_playlist )
     {
         msg_Err( p_vlc, "playlist initialization failed" );
+        if( p_vlc->p_memcpy_module != NULL )
+        {
+            module_Unneed( p_vlc->p_memcpy_module );
+        }
         module_EndBank( p_vlc );
         msg_Destroy( p_vlc );
         return VLC_EGENERIC;
     }
 
+    /* Update the handle status */
+    p_vlc->i_status = VLC_STATUS_STOPPED;
+
     /*
      * Get input filenames given as commandline arguments
      */
     GetFilenames( p_vlc, i_argc, ppsz_argv );
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
-/* XXX XXX XXX XXX XXX XXX XXX XXX */
 
     return VLC_SUCCESS;
 }
@@ -522,7 +520,7 @@ vlc_error_t vlc_run( vlc_t *p_vlc )
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
         return VLC_ESTATUS;
     }
 
@@ -550,7 +548,7 @@ vlc_error_t vlc_add_intf( vlc_t *p_vlc, const char *psz_module,
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!RUNNING)\n" );
         return VLC_ESTATUS;
     }
 
@@ -583,6 +581,7 @@ vlc_error_t vlc_add_intf( vlc_t *p_vlc, const char *psz_module,
     err = intf_RunThread( p_intf );
     if( err )
     {
+        vlc_object_detach_all( p_intf );
         intf_Destroy( p_intf );
         return err;
     }
@@ -606,7 +605,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!RUNNING)\n" );
         return VLC_ESTATUS;
     }
 
@@ -673,7 +672,7 @@ vlc_error_t vlc_end( vlc_t *p_vlc )
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
         return VLC_ESTATUS;
     }
 
@@ -728,7 +727,7 @@ vlc_error_t vlc_destroy( vlc_t *p_vlc )
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!CREATED)\n" );
         return VLC_ESTATUS;
     }
 
@@ -802,7 +801,7 @@ vlc_error_t vlc_add_target( vlc_t *p_vlc, const char *psz_target,
     if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
                      && p_vlc->i_status != VLC_STATUS_RUNNING ) )
     {
-        fprintf( stderr, "error: invalid status\n" );
+        fprintf( stderr, "error: invalid status (!STOPPED&&!RUNNING)\n" );
         return VLC_ESTATUS;
     }
 

@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.4 2002/07/11 18:44:12 sam Exp $
+ * $Id: vlc.c,v 1.5 2002/07/18 01:00:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -75,14 +75,8 @@ int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
     //vlc_add_intf( p_vlc, "kde", VLC_FALSE );
     vlc_add_intf( p_vlc, "rc", VLC_FALSE );
 
-    /* Add a blocking interface */
+    /* Add a blocking interface and keep the return value */
     err = vlc_add_intf( p_vlc, NULL, VLC_TRUE );
-    if( err != VLC_SUCCESS )
-    {
-        vlc_end( p_vlc );
-        vlc_destroy( p_vlc );
-        return err;
-    }
 
     /* Finish the interface */
     vlc_stop( p_vlc );
@@ -93,6 +87,6 @@ int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
     /* Destroy the vlc structure */
     vlc_destroy( p_vlc );
 
-    return 0;
+    return err;
 }
 
