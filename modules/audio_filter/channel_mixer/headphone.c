@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.2 2003/02/11 11:16:04 massiot Exp $
+ * $Id: headphone.c,v 1.3 2003/02/11 17:20:44 babal Exp $
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -209,6 +209,14 @@ static int Init ( aout_filter_t * p_filter , struct aout_filter_sys_t * p_data
         i_next_atomic_operation += 2;
         i_source_channel_offset++;
     }
+    if ( i_physical_channels & AOUT_CHAN_REARCENTER )
+    {
+        ComputeChannelOperations ( p_data , i_rate
+                , i_next_atomic_operation , i_source_channel_offset
+                , 0 , -d_z , 1.5 / i_nb_channels );
+        i_next_atomic_operation += 2;
+        i_source_channel_offset++;
+    }
     if ( i_physical_channels & AOUT_CHAN_CENTER )
     {
         ComputeChannelOperations ( p_data , i_rate
@@ -222,6 +230,22 @@ static int Init ( aout_filter_t * p_filter , struct aout_filter_sys_t * p_data
         ComputeChannelOperations ( p_data , i_rate
                 , i_next_atomic_operation , i_source_channel_offset
                 , 0 , d_z_rear , 5.0 / i_nb_channels );
+        i_next_atomic_operation += 2;
+        i_source_channel_offset++;
+    }
+    if ( i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+    {
+        ComputeChannelOperations ( p_data , i_rate
+                , i_next_atomic_operation , i_source_channel_offset
+                , -d_x , 0 , 1.5 / i_nb_channels );
+        i_next_atomic_operation += 2;
+        i_source_channel_offset++;
+    }
+    if ( i_physical_channels & AOUT_CHAN_MIDDLERIGHT )
+    {
+        ComputeChannelOperations ( p_data , i_rate
+                , i_next_atomic_operation , i_source_channel_offset
+                , d_x , 0 , 1.5 / i_nb_channels );
         i_next_atomic_operation += 2;
         i_source_channel_offset++;
     }
@@ -260,8 +284,6 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     if ( p_filter->output.i_physical_channels != ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT )
-          || (p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-          || (p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_rate != p_filter->output.i_rate
           || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
