@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.85 2001/08/09 20:16:17 jlj Exp $
+ * $Id: input_dvd.c,v 1.86 2001/09/30 01:26:44 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -382,6 +382,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     es_descriptor_t *    p_es;
     u16                  i_id;
     int                  i_vts_title;
+    int                  i_audio_nb = 0;
+    int                  i_spu_nb = 0;
     int                  i_audio;
     int                  i_spu;
     int                  i;
@@ -550,6 +552,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             /* audio channel is active if first byte is 0x80 */
             if( audio_status.i_available )
             {
+                i_audio_nb++;
+
                 switch( vts.manager_inf.p_audio_attr[i-1].i_coding_mode )
                 {
                 case 0x00:              /* AC3 */
@@ -617,6 +621,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
             if( spu_status.i_available )
             {
+                i_spu_nb++;
+
                 /*  there are several streams for one spu */
                 if(  vts.manager_inf.video_attr.i_ratio )
                 {
@@ -657,14 +663,35 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             /* For audio: first one if none or a not existing one specified */
             i_audio = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
-            if( i_audio < 0 || i_audio > vts.manager_inf.i_audio_nb )
+            if( i_audio < 0 || i_audio > i_audio_nb )
             {
                 main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
                 i_audio = 1;
             }
-            if( i_audio > 0 && vts.manager_inf.i_audio_nb > 0 )
+            if( i_audio > 0 && i_audio_nb > 0 )
             {
-                input_SelectES( p_input, p_input->stream.pp_es[i_audio] );
+                if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) ||
+                    ( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) ==
+                      REQUESTED_AC3 ) )
+                {
+                    int     i_ac3 = i_audio;
+                    while( ( p_input->stream.pp_es[i_ac3]->i_type !=
+                             AC3_AUDIO_ES ) && ( i_ac3 <=
+                             vts.manager_inf.i_audio_nb ) )
+                    {
+                        i_ac3++;
+                    }
+                    if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+                    {
+                        input_SelectES( p_input,
+                                        p_input->stream.pp_es[i_ac3] );
+                    }
+                }
+                else
+                {
+                    input_SelectES( p_input,
+                                    p_input->stream.pp_es[i_audio] );
+                }
             }
         }
 
@@ -672,12 +699,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             /* for spu, default is none */
             i_spu = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
-            if( i_spu < 0 || i_spu > vts.manager_inf.i_spu_nb )
+            if( i_spu < 0 || i_spu > i_spu_nb )
             {
                 main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
                 i_spu = 0;
             }
-            if( i_spu > 0 && vts.manager_inf.i_spu_nb > 0 )
+            if( i_spu > 0 && i_spu_nb > 0 )
             {
                 i_spu += vts.manager_inf.i_audio_nb;
                 input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
