@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.69 2003/12/07 19:06:21 jpsaman Exp $
+ * $Id: playlist.c,v 1.70 2003/12/13 17:16:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -344,14 +344,14 @@ static void RunThread ( playlist_t *p_playlist )
                 {
                     vlc_mutex_unlock( &p_playlist->object_lock );
                     playlist_Delete( p_playlist, p_playlist->i_index );
-                    vlc_mutex_lock( &p_playlist->object_lock );
                 }
-
-                /* Select the next playlist item */
-                SkipItem( p_playlist, 1 );
-
-                input_StopThread( p_playlist->p_input );
-                vlc_mutex_unlock( &p_playlist->object_lock );
+                else
+                {
+                    /* Select the next playlist item */
+                    SkipItem( p_playlist, 1 );
+                    input_StopThread( p_playlist->p_input );
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                }
 
                 val.b_bool = VLC_TRUE;
                 var_Set( p_playlist, "intf-change", val );

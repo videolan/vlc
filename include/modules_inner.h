@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.40 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: modules_inner.h,v 1.41 2003/12/13 17:16:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -92,7 +92,7 @@
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         int i_shortcut = 1, i_config = -1;                                    \
-        module_config_t p_config[ 130 ];                                      \
+        module_config_t *p_config = NULL;                                     \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
         p_module->b_unloadable = VLC_TRUE;                                    \
@@ -112,11 +112,13 @@
 #define vlc_module_end( )                                                     \
             p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         }                                                                     \
+        if( p_config )                                                        \
         {                                                                     \
-            static module_config_t tmp = { CONFIG_HINT_END };                 \
-            p_config[ ++i_config ] = tmp;                                     \
+            p_config[ ++i_config ] = (module_config_t){ CONFIG_HINT_END };    \
+            config_Duplicate( p_module, p_config );                           \
+            free( p_config );                                                 \
         }                                                                     \
-        config_Duplicate( p_module, p_config );                               \
+        else config_Duplicate(p_module, &(module_config_t){CONFIG_HINT_END}); \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
             return VLC_EGENERIC;                                              \
