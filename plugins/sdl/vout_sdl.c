@@ -73,6 +73,7 @@ static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
 int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
+    SDL_Overlay * screen;
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -88,6 +89,20 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
         intf_ErrMsg( "error: can't initialize SDL display\n" );
         free( p_vout->p_sys );
         return( 1 );
+    }
+    
+    
+    screen = SDL_CreateYUVOverlay( 
+                10, 
+                10, 
+                SDL_IYUV_OVERLAY, 
+                p_vout->p_sys->p_display 
+                );
+    intf_ErrMsg("[YUV acceleration] : %d",screen->hw_overlay);
+    if(screen->hw_overlay) 
+    {
+        //hw_acceleration !
+        p_vout->b_need_render = 0;
     }
     return( 0 );
 }
@@ -156,32 +171,56 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
 {
     SDL_Overlay * screen;
     SDL_Rect    disp;
-    if(1)
-    {
+    if(p_vout->b_need_render)
+    {  
         /* Change display frame */
         if( p_vout->p_sys->b_must_acquire )
         {
             
             SDL_Flip( p_vout->p_sys->p_display );
             
-            /* Swap buffers and change write frame */
+            //Swap buffers and change write frame
             SDL_LockSurface ( p_vout->p_sys->p_display );
         }
-    } 
-    else 
-    {
+     } else {
+        
         /*
          * p_vout->yuv.p_buffer contains the YUV buffer to render 
          */
         
-        screen = SDL_CreateYUVOverlay( p_vout->i_width, p_vout->i_height , SDL_IYUV_OVERLAY, p_vout->p_sys->p_display );
-        screen->pixels = p_vout->yuv.p_buffer;
+        screen = SDL_CreateYUVOverlay( 
+                    p_vout->p_rendered_pic->i_width, 
+                    p_vout->p_rendered_pic->i_height, 
+                    SDL_IYUV_OVERLAY, 
+                    p_vout->p_sys->p_display 
+                    );
+         
+        SDL_LockYUVOverlay(screen);
+        //* screen->pixels = calloc( p_vout->i_width * p_vout->i_height * 3, 1);
+        //*screen->pixels =  p_vout->yuv.p_buffer;
+        /*    *screen->pixels = malloc( p_vout->i_width * p_vout->i_height * 3 );
+        memcpy( *screen->pixels, p_vout->p_rendered_pic->p_y,  p_vout->i_width * p_vout->i_height );
+        memcpy( *screen->pixels +  p_vout->i_width * p_vout->i_height, 
+                p_vout->p_rendered_pic->p_u,  
+                p_vout->i_width * p_vout->i_height );
+        memcpy( *screen->pixels +  p_vout->i_width * p_vout->i_height * 2,
+                p_vout->p_rendered_pic->p_v,
+                p_vout->i_width * p_vout->i_height ); */
+        
+
+        //    *screen->pixels =  p_vout->p_rendered_pic->p_y;
+        *screen->pixels =  p_vout->p_rendered_pic->p_data;
+        
         disp.x = 0;
         disp.y = 0;
         disp.w = p_vout->i_width;
         disp.h = p_vout->i_height;
+        SDL_UnlockYUVOverlay(screen);
+        
         SDL_DisplayYUVOverlay( screen , &disp );
-    }        
+        //    free(* screen -> pixels);
+        SDL_FreeYUVOverlay(screen);
+     }
 }
 
 /* following functions are local */

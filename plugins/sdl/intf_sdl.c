@@ -73,7 +73,8 @@ typedef struct vout_sys_s
 /* local prototype */
 void    intf_SDL_Keymap( intf_thread_t * p_intf );
 void intf_SDL_Fullscreen(intf_thread_t * p_intf);
-   
+void intf_SDL_YUVSwitch(intf_thread_t * p_intf);
+  
 
 /*****************************************************************************
  * intf_SDLCreate: initialize and create SDL interface
@@ -159,7 +160,9 @@ void intf_SDLManage( intf_thread_t *p_intf )
                     case SDLK_f:
                         intf_SDL_Fullscreen(p_intf);
                         break;
-                       
+                    case SDLK_y:
+                        intf_SDL_YUVSwitch(p_intf);
+                        break; 
                   default :
                         if( intf_ProcessKey( p_intf, (char ) i_key ) )
                         {
@@ -179,6 +182,12 @@ void intf_SDLManage( intf_thread_t *p_intf )
     }
 }
 
+void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
+{
+    p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
+    intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
+
+}
 void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
     SDL_Rect    clipping_rect;
