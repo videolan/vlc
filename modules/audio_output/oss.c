@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.44 2003/01/13 14:51:25 massiot Exp $
+ * $Id: oss.c,v 1.45 2003/01/14 22:44:29 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,6 +51,11 @@
 #   include <sys/soundcard.h>
 #elif defined( HAVE_MACHINE_SOUNDCARD_H )
 #   include <machine/soundcard.h>
+#endif
+
+/* AFMT_AC3 is really IEC61937 / IEC60958, mpeg/ac3/dts over spdif */
+#ifndef AFMT_AC3
+#   define AFMT_AC3        0x00000400                   /* Dolby Digital AC3 */
 #endif
 
 /*****************************************************************************
@@ -207,11 +212,11 @@ static void Probe( aout_instance_t * p_aout )
 
     /* Test for mono. */
     i_nb_channels = 1;
-    if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) >= 0  
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) >= 0
          && i_nb_channels == 1 )
     {
         val.psz_string = N_("Mono");
-        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );        
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
     }
 
 
@@ -595,7 +600,7 @@ static int OSSThread( aout_instance_t * p_aout )
                     msleep( delay / 2 );
                 }
             }
-            
+
             while( !p_aout->b_die && ! ( p_buffer =
                 aout_OutputNextBuffer( p_aout, next_date, VLC_TRUE ) ) )
             {
