@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.18 2002/04/15 23:04:08 massiot Exp $
+ * $Id: vpar_headers.c,v 1.19 2002/05/17 18:12:59 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -279,6 +279,9 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
 
     case SEQUENCE_END_CODE:
         intf_WarnMsg(3, "vpar warning: sequence end code received");
+
+        ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
+
         return 1;
         break;
 
@@ -423,7 +426,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     /* check whether the input gives a particular aspect ratio */
     if( p_vpar->p_config->p_demux_data
-         && *(int*)(p_vpar->p_config->p_demux_data) )
+         && ( *(int*)(p_vpar->p_config->p_demux_data) & 0x7 ) )
     {
         i_aspect = *(int*)(p_vpar->p_config->p_demux_data);
     }
