@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.41 2003/12/11 20:08:48 zorglub Exp $
+ * $Id: sap.c,v 1.42 2003/12/11 20:40:37 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -334,6 +334,7 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t    *p_sys  = p_intf->p_sys;
+    int i;
 
     if( p_sys->fd[0] > 0 )
     {
@@ -342,6 +343,15 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->fd[1] > 0 )
     {
         close( p_sys->fd[1] );
+    }
+
+    for( i = 0 ; i< p_sys->i_announces ; i++ )
+    {
+        if( p_sys->pp_announces[i]->psz_name )
+           free( p_sys->pp_announces[i]->psz_name );
+        if( p_sys->pp_announces[i]->psz_uri )
+           free( p_sys->pp_announces[i]->psz_uri );
+        free( p_sys->pp_announces[i] );
     }
 
     free( p_sys );
