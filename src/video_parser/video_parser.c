@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.85 2001/05/06 04:32:03 sam Exp $
+ * $Id: video_parser.c,v 1.86 2001/05/30 17:03:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -178,7 +178,7 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     p_vpar->pf_sparse_idct  = f.pf_sparse_idct;
     p_vpar->pf_idct         = f.pf_idct;
     p_vpar->pf_norm_scan    = f.pf_norm_scan;
-    p_vpar->pf_vdec_init    = f.pf_vdec_init;
+    p_vpar->pf_decode_init  = f.pf_decode_init;
     p_vpar->pf_decode_mb_c  = f.pf_decode_mb_c;
     p_vpar->pf_decode_mb_bw = f.pf_decode_mb_bw;
 #undef f

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.24 2001/05/15 16:19:42 sam Exp $
+ * $Id: modules.h,v 1.25 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -178,7 +178,7 @@ typedef struct function_list_s
                                          dctelem_t *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
 
-            void ( * pf_vdec_init )    ( struct vdec_thread_s * );
+            void ( * pf_decode_init )  ( struct vdec_thread_s * );
             void ( * pf_decode_mb_c )  ( struct vdec_thread_s *,
                                          struct macroblock_s * );
             void ( * pf_decode_mb_bw ) ( struct vdec_thread_s *,
@@ -313,10 +313,11 @@ typedef struct module_s
     struct module_s *   next;                                 /* Next module */
     struct module_s *   prev;                             /* Previous module */
 
-    module_config_t *   p_config;    /* Module configuration structure table */
+    module_config_t         *p_config;     /* Module configuration structure */
+    struct module_symbols_s *p_symbols;
 
-    u32                     i_capabilities;               /* Capability list */
-    p_module_functions_t    p_functions;             /* Capability functions */
+    u32                      i_capabilities;              /* Capability list */
+    p_module_functions_t     p_functions;            /* Capability functions */
 
 } module_t;
 

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.17 2001/05/25 13:20:09 sam Exp $
+ * $Id: vout_xvideo.c,v 1.18 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -60,7 +60,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -75,6 +74,8 @@
 #include "stream_control.h"                 /* needed by input_ext-intf.h... */
 #include "input_ext-intf.h"
 
+#include "modules.h"
+#include "modules_export.h"
 
 #define GUID_YUV12_PLANAR 0x32315659
 
@@ -664,7 +665,7 @@ static int XVideoUpdateImgSizeIfRequired( vout_thread_t *p_vout )
             (p_vout->p_sys->p_xvimage->data_size) /
             (p_vout->p_sys->p_xvimage->height);
 
-        /* vout_SetBuffers( p_vout, p_vout->p_sys->p_xvimage->data ); */
+        /* p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_xvimage->data ); */
     }
 
     return( 0 );

@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.7 2001/03/21 13:42:33 sam Exp $
+ * $Id: intf_dummy.c,v 1.8 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,7 @@
 #include "modules.h"
 
 #include "main.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.2 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_es.c,v 1.3 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: 
  *
@@ -60,6 +60,7 @@
 #include "debug.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -85,8 +86,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = ESProbe;
     input.pf_init             = ESInit;
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
+    input.pf_open             = NULL; /* Set in ESInit */
+    input.pf_close            = NULL;
     input.pf_end              = ESEnd;
     input.pf_set_area         = NULL;
     input.pf_read             = ESRead;
@@ -146,7 +147,8 @@ static void ESInit( input_thread_t * p_input )
     }
     p_input->p_plugin_data = (void *)p_method;
 
-    /* XXX */
+    p_input->pf_open  = p_input->pf_file_open;
+    p_input->pf_close = p_input->pf_file_close;
 }
 
 /*****************************************************************************

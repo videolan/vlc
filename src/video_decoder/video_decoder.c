@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.49 2001/05/06 04:32:02 sam Exp $
+ * $Id: video_decoder.c,v 1.50 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -153,11 +153,11 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
 
-    p_vdec->pf_vdec_init    = p_vdec->p_vpar->pf_vdec_init;
+    p_vdec->pf_decode_init  = p_vdec->p_vpar->pf_decode_init;
     p_vdec->pf_decode_mb_c  = p_vdec->p_vpar->pf_decode_mb_c;
     p_vdec->pf_decode_mb_bw = p_vdec->p_vpar->pf_decode_mb_bw;
 
-    p_vdec->pf_vdec_init( p_vdec );
+    p_vdec->pf_decode_init( p_vdec );
 
 #ifdef VDEC_SMP
     /* Re-nice ourself */

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.10 2001/03/21 13:42:33 sam Exp $
+ * $Id: aout_dummy.c,v 1.11 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,6 +40,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * vout_dummy_t: dummy video output method descriptor

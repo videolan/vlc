@@ -2,7 +2,7 @@
  * intf_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.h,v 1.3 2001/05/15 01:01:44 stef Exp $
+ * $Id: intf_playlist.h,v 1.4 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,4 +78,5 @@ void         intf_PlaylistNext     ( playlist_t * p_playlist );
 void         intf_PlaylistPrev     ( playlist_t * p_playlist );
 void         intf_PlaylistDestroy  ( playlist_t * p_playlist );
 void         intf_PlaylistJumpto   ( playlist_t * p_playlist , int i_pos);
+void         intf_UrlDecode        ( char * );
 

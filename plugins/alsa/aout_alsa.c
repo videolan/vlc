@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.15 2001/05/11 01:03:14 henri Exp $
+ * $Id: aout_alsa.c,v 1.16 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -50,6 +50,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 typedef struct alsa_device_s
 {

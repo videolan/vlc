@@ -43,7 +43,7 @@ include ../../Makefile.modules
 
 $(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
 $(PLUGIN_IDCTALTIVEC): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -faltivec -c -o $@ $<
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -faltivec -c -o $@ $<
 
 $(BUILTIN_IDCT): BUILTIN_IDCT_%.o: .dep/%.d
 $(BUILTIN_IDCT): BUILTIN_IDCT_%.o: %.c
@@ -69,35 +69,35 @@ $(BUILTIN_IDCTALTIVEC): BUILTIN_IDCTALTIVEC_%.o: %.c
 # Real targets
 #
 
-../../lib/idct.so: $(PLUGIN_IDCT) $(PLUGIN_IDCTCOMMON)
+../../lib/idct.so: $(PLUGIN_IDCT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/idct.a: $(BUILTIN_IDCT)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC) $(PLUGIN_IDCTCOMMON)
+../../lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/idctclassic.a: $(BUILTIN_IDCTCLASSIC)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTCOMMON)
+../../lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/idctmmx.a: $(BUILTIN_IDCTMMX)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON)
+../../lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_MMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/idctmmxext.a: $(BUILTIN_IDCTMMXEXT)
 	ar r $@ $^
 	$(RANLIB) $@
 
-../../lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON)
+../../lib/idctaltivec.so: $(PLUGIN_IDCTALTIVEC) $(PLUGIN_IDCTCOMMON) $(PLUGIN_VDECBLOCK_C)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_IDCTALTIVEC)
 
 ../../lib/idctaltivec.a: $(BUILTIN_IDCTALTIVEC)

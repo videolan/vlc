@@ -2,7 +2,7 @@
  * vout_ggi.c: GGI video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_ggi.c,v 1.9 2001/04/06 09:15:47 sam Exp $
+ * $Id: vout_ggi.c,v 1.10 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -50,6 +50,8 @@
 #include "interface.h"
 
 #include "main.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * vout_sys_t: video output GGI method descriptor
@@ -225,7 +227,7 @@ int vout_Manage( vout_thread_t *p_vout )
                     case 'Q':
                     case GIIUC_Escape:
                         /* FIXME pass message ! */
-                        p_main->p_intf->b_die = 1;
+                        //p_main->p_intf->b_die = 1;
                         break;
 
                     default:
@@ -239,7 +241,7 @@ int vout_Manage( vout_thread_t *p_vout )
                 {
                     case GII_PBUTTON_RIGHT:
                         /* FIXME: need locking ! */
-                        p_main->p_intf->b_menu_change = 1;
+                        //p_main->p_intf->b_menu_change = 1;
                         break;
                 }
                 break;
@@ -423,7 +425,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     /* FIXME: set palette in 8bpp */
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_b[ 0 ]->write, p_b[ 1 ]->write );
+    p_vout->pf_setbuffers( p_vout, p_b[ 0 ]->write, p_b[ 1 ]->write );
 
     return( 0 );
 #undef p_b

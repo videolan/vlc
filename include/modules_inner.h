@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.6 2001/03/21 13:42:33 sam Exp $
+ * $Id: modules_inner.h,v 1.7 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,18 +56,82 @@
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef BUILTIN
+
 #   define _M( function ) CONCATENATE( MODULE_NAME, function )
-#   define MODULE_INIT \
-      int CONCATENATE( MODULE_NAME, InitModule )      ( module_t *p_module )
-#   define MODULE_ACTIVATE \
-      int CONCATENATE( MODULE_NAME, ActivateModule )  ( module_t *p_module )
-#   define MODULE_DEACTIVATE \
-      int CONCATENATE( MODULE_NAME, DeactivateModule )( module_t *p_module )
+
+#   define MODULE_INIT_START \
+        int CONCATENATE( MODULE_NAME, InitModule ) ( module_t *p_module ) \
+        { \
+            p_module->psz_name = MODULE_STRING; \
+            p_module->psz_version = VERSION;
+
+#   define MODULE_INIT_STOP \
+            return( 0 ); \
+        }
+
+#   define MODULE_ACTIVATE_START \
+        int CONCATENATE( MODULE_NAME, ActivateModule ) ( module_t *p_module ) \
+        { \
+            p_module->p_functions = \
+              ( module_functions_t * )malloc( sizeof( module_functions_t ) ); \
+            if( p_module->p_functions == NULL ) \
+            { \
+                return( -1 ); \
+            } \
+            p_module->p_config = p_config;
+
+#   define MODULE_ACTIVATE_STOP \
+            return( 0 ); \
+        }
+
+#   define MODULE_DEACTIVATE_START \
+        int CONCATENATE( MODULE_NAME, DeactivateModule )( module_t *p_module ) \
+        { \
+            free( p_module->p_functions );
+
+#   define MODULE_DEACTIVATE_STOP \
+            return( 0 ); \
+        }
+
 #else
+
 #   define _M( function )    function
-#   define MODULE_INIT       int InitModule       ( module_t *p_module )
-#   define MODULE_ACTIVATE   int ActivateModule   ( module_t *p_module )
-#   define MODULE_DEACTIVATE int DeactivateModule ( module_t *p_module )
+
+#   define MODULE_INIT_START \
+        int InitModule      ( module_t *p_module ) \
+        { \
+            p_module->psz_name = MODULE_STRING; \
+            p_module->psz_version = VERSION;
+
+#   define MODULE_INIT_STOP \
+            return( 0 ); \
+        }
+
+#   define MODULE_ACTIVATE_START \
+        int ActivateModule  ( module_t *p_module ) \
+        { \
+            p_module->p_functions = \
+              ( module_functions_t * )malloc( sizeof( module_functions_t ) ); \
+            if( p_module->p_functions == NULL ) \
+            { \
+                return( -1 ); \
+            } \
+            p_module->p_config = p_config; \
+            p_symbols = p_module->p_symbols;
+
+#   define MODULE_ACTIVATE_STOP \
+            return( 0 ); \
+        }
+
+#   define MODULE_DEACTIVATE_START \
+        int DeactivateModule( module_t *p_module ) \
+        { \
+            free( p_module->p_functions );
+
+#   define MODULE_DEACTIVATE_STOP \
+            return( 0 ); \
+        }
+
 #endif
 
 /* Now the real stuff */
@@ -76,11 +140,18 @@
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *****************************************************************************/
-#define MODULE_CONFIG_START \
-static module_config_t p_config[] = { \
-    { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
+#ifdef BUILTIN
+#   define MODULE_CONFIG_START \
+        static module_config_t p_config[] = { \
+            { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
+#else
+#   define MODULE_CONFIG_START \
+        module_symbols_t* p_symbols; \
+        static module_config_t p_config[] = { \
+        { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
+#endif
 
-#define MODULE_CONFIG_END \
+#define MODULE_CONFIG_STOP \
     { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL } \
 };
 
@@ -106,4 +177,5 @@ static module_config_t p_config[] = { \
     { MODULE_CONFIG_ITEM_SCALE, text, name, p_getlist, p_update },
 #define ADD_SPIN( text, name, p_getlist, p_update ) \
     { MODULE_CONFIG_ITEM_SPIN, text, name, p_getlist, p_update },
+
 

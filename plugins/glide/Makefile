@@ -20,7 +20,7 @@ include ../../Makefile.modules
 
 $(PLUGIN_GLIDE): %.o: .dep/%.d
 $(PLUGIN_GLIDE): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
 $(BUILTIN_GLIDE): BUILTIN_%.o: .dep/%.d
 $(BUILTIN_GLIDE): BUILTIN_%.o: %.c

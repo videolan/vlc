@@ -20,7 +20,7 @@ include ../../Makefile.modules
 
 $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
 	grep -q Q_OBJECT $< && $(MOC) -i $< -o $@ || true
 

@@ -2,7 +2,7 @@
  * vdec_block_mmx.c: Macroblock copy functions in MMX assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_mmx.c,v 1.1 2001/05/06 04:32:02 sam Exp $
+ * $Id: vdec_block_mmx.c,v 1.2 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -58,9 +58,9 @@
 #include "vdec_block.h"
 
 /*****************************************************************************
- * vdec_Init: initialize video decoder thread
+ * vdec_InitDecode: initialize video decoder thread
  *****************************************************************************/
-void _M( vdec_Init ) ( vdec_thread_t *p_vdec )
+void _M( vdec_InitDecode ) ( vdec_thread_t *p_vdec )
 {
     ;
 }

@@ -109,13 +109,6 @@ void foo() { int meuh; ntohl(meuh); }],,
  AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
-dnl Check for -rdynamic flag
-CFLAGS="${CFLAGS} -rdynamic -Wall -Werror"
-AC_MSG_CHECKING([if \$CC miserably fails with the -rdynamic flag])
-AC_TRY_COMPILE([],,
- LCFLAGS="${LCFLAGS} -rdynamic"
- AC_MSG_RESULT(no), AC_MSG_RESULT(yes))
-
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
 
@@ -412,9 +405,9 @@ AC_ARG_WITH(glide,
       PLUGINS="${PLUGINS} glide";
       if test "x$withval" != "xyes";
       then
-        LIB_GLIDE="-l"$withval
+        LIB_GLIDE="-l"$withval" -lm"
       else
-        LIB_GLIDE="-lglide2x"
+        LIB_GLIDE="-lglide2x -lm"
       fi
     fi ])
 

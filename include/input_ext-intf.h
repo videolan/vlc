@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.37 2001/05/19 00:39:29 stef Exp $
+ * $Id: input_ext-intf.h,v 1.38 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -293,6 +293,14 @@ typedef struct input_thread_s
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
     void                 (* pf_seek)( struct input_thread_s *, off_t );
+
+    /* Special callback functions */
+    void                 (* pf_file_open )     ( struct input_thread_s * );
+    void                 (* pf_file_close )    ( struct input_thread_s * );
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+    void                 (* pf_network_open )  ( struct input_thread_s * );
+    void                 (* pf_network_close ) ( struct input_thread_s * );
+#endif
 
     i_p_config_t            i_p_config;              /* plugin configuration */
     char *                  p_source;

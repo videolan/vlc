@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.18 2001/05/06 04:32:02 sam Exp $
+ * $Id: main.h,v 1.19 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -33,7 +33,7 @@
  * should only be used by interface thread.
  *****************************************************************************/
 
-typedef struct
+typedef struct main_s
 {
     /* Global properties */
     int                    i_argc;           /* command line arguments count */

@@ -2,7 +2,7 @@
  * tests.h: several test functions needed by the plugins
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: tests.h,v 1.10 2001/05/14 15:58:03 reno Exp $
+ * $Id: tests.h,v 1.11 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,8 +34,7 @@
 /*****************************************************************************
  * TestVersion: tests if the given string equals the current version
  *****************************************************************************/
-int TestVersion  ( char * psz_version );
-int TestProgram  ( char * psz_program );
-int TestMethod   ( char * psz_var, char * psz_method );
-int TestCPU      ( int i_capabilities );
+int TestProgram  ( char * );
+int TestMethod   ( char *, char * );
+int TestCPU      ( int );
 

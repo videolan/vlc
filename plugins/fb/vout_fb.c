@@ -2,7 +2,7 @@
  * vout_fb.c: framebuffer video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_fb.c,v 1.12 2001/05/07 03:14:09 stef Exp $
+ * $Id: vout_fb.c,v 1.13 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,6 +56,8 @@
 
 #include "intf_msg.h"
 #include "main.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
@@ -563,13 +565,13 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     /* Set and initialize buffers */
     if( p_vout->p_sys->b_pan )
     {
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_video,
                                  p_vout->p_sys->p_video
                                   + p_vout->p_sys->i_page_size );
     }
     else
     {
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_video,
                                  p_vout->p_sys->p_video );
     }
     
@@ -608,6 +610,7 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void FBSwitchDisplay(int i_signal)
 {
+#if 0
     vout_thread_t *p_vout;
 
     vlc_mutex_lock( &p_vout_bank->lock );
@@ -635,6 +638,7 @@ static void FBSwitchDisplay(int i_signal)
     }
 
     vlc_mutex_unlock( &p_vout_bank->lock );
+#endif
 }
 
 /*****************************************************************************

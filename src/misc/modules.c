@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.30 2001/05/07 03:14:09 stef Exp $
+ * $Id: modules.c,v 1.31 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -56,15 +56,34 @@
 
 #include "common.h"
 #include "threads.h"
-
-#include "intf_msg.h"
+#include "mtime.h"
+#include "tests.h"
+#include "netutils.h"
 #include "modules.h"
+
+#include "stream_control.h"
+#include "input_ext-intf.h"
+
+#include "video.h"
+#include "video_output.h"
+
+#include "audio_output.h"
+
+#include "interface.h"
+#include "intf_msg.h"
+#include "intf_playlist.h"
+
 #ifdef HAVE_DYNAMIC_PLUGINS
 #   include "modules_core.h"
 #endif
 #include "modules_builtin.h"
+#include "modules_export.h"
 
-/* Local prototypes */
+#include "main.h"
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static int AllocatePluginModule ( char * );
 #endif
@@ -78,6 +97,8 @@ static int UnlockModule ( module_t * );
 static int HideModule   ( module_t * );
 static int CallSymbol   ( module_t *, char * );
 #endif
+
+static module_symbols_t symbols;
 
 /*****************************************************************************
  * module_InitBank: create the module bank.
@@ -104,6 +125,11 @@ void module_InitBank( void )
 
     p_module_bank->first = NULL;
     vlc_mutex_init( &p_module_bank->lock );
+
+    /*
+     * Store the symbols to be exported
+     */
+    STORE_SYMBOLS( &symbols );
 
     /*
      * Check all the built-in modules
@@ -422,6 +448,7 @@ static int AllocatePluginModule( char * psz_filename )
     /* We need to fill these since they may be needed by CallSymbol() */
     p_module->is.plugin.psz_filename = psz_filename;
     p_module->is.plugin.handle = handle;
+    p_module->p_symbols = &symbols;
 
     /* Initialize the module : fill p_module->psz_name, etc. */
     if( CallSymbol( p_module, "InitModule" ) != 0 )
@@ -834,13 +861,12 @@ static int HideModule( module_t * p_module )
  *****************************************************************************/
 static int CallSymbol( module_t * p_module, char * psz_name )
 {
-    typedef int ( symbol_t ) ( module_t * p_module );
-    symbol_t * p_symbol;
+    int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
-    p_symbol = module_getsymbol( p_module->is.plugin.handle, psz_name );
+    pf_symbol = module_getsymbol( p_module->is.plugin.handle, psz_name );
 
-    if( !p_symbol )
+    if( pf_symbol == NULL )
     {
         /* We couldn't load the symbol */
         intf_WarnMsg( 1, "module warning: "
@@ -851,7 +877,7 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     }
 
     /* We can now try to call the symbol */
-    if( p_symbol( p_module ) != 0 )
+    if( pf_symbol( p_module ) != 0 )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */

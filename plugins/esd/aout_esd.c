@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_esd.c,v 1.12 2001/05/25 04:23:37 sam Exp $
+ * $Id: aout_esd.c,v 1.13 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,6 +56,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: esd audio output method descriptor

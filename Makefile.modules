@@ -59,7 +59,7 @@ $(CPP_DEP): %.dpp: FORCE
 
 $(PLUGIN_C): %.o: .dep/%.d
 $(PLUGIN_C): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -c -o $@ $<
 
 $(BUILTIN_C): BUILTIN_%.o: .dep/%.d
 $(BUILTIN_C): BUILTIN_%.o: %.c
@@ -67,7 +67,7 @@ $(BUILTIN_C): BUILTIN_%.o: %.c
 
 $(PLUGIN_CPP): %.o: .dep/%.dpp
 $(PLUGIN_CPP): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -DPLUGIN $(PCFLAGS) -c -o $@ $<
 
 $(BUILTIN_CPP): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_CPP): BUILTIN_%.o: %.cpp

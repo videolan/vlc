@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.4 2001/05/30 05:19:03 stef Exp $
+ * $Id: gtk_preferences.c,v 1.5 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -52,6 +52,8 @@
 #include "intf_gtk.h"
 
 #include "main.h"
+
+#include "modules_export.h"
 
 /****************************************************************************
  * GtkPreferencesShow: display interface window after initialization

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.21 2001/05/30 05:19:03 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.22 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -55,6 +55,8 @@
 
 #include "main.h"
 #include "netutils.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * Callbacks

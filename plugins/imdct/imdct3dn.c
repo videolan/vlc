@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct3dn.c,v 1.2 2001/05/28 02:38:48 sam Exp $
+ * $Id: imdct3dn.c,v 1.3 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -54,64 +54,20 @@ static int  imdct_Probe       ( probedata_t *p_data );
 MODULE_CONFIG_START
 ADD_WINDOW( "Configuration for IMDCT module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
-MODULE_CONFIG_END
+MODULE_CONFIG_STOP
 
-/*****************************************************************************
- * InitModule: get the module structure and configuration.
- *****************************************************************************
- * We have to fill psz_name, psz_longname and psz_version. These variables
- * will be strdup()ed later by the main application because the module can
- * be unloaded later to save memory, and we want to be able to access this
- * data even after the module has been unloaded.
- *****************************************************************************/
-MODULE_INIT
-{
-    p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "3D Now! AC3 IMDCT module";
-    p_module->psz_version = VERSION;
-
+MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_IMDCT;
+    p_module->psz_longname = "3D Now! AC3 IMDCT module";
+MODULE_INIT_STOP
 
-    return( 0 );
-}
-
-/*****************************************************************************
- * ActivateModule: set the module to an usable state.
- *****************************************************************************
- * This function fills the capability functions and the configuration
- * structure. Once ActivateModule() has been called, the i_usage can
- * be set to 0 and calls to NeedModule() be made to increment it. To unload
- * the module, one has to wait until i_usage == 0 and call DeactivateModule().
- *****************************************************************************/
-MODULE_ACTIVATE
-{
-    p_module->p_functions = malloc( sizeof( module_functions_t ) );
-    if( p_module->p_functions == NULL )
-    {
-        return( -1 );
-    }
-
+MODULE_ACTIVATE_START
     imdct_getfunctions( &p_module->p_functions->imdct );
+MODULE_ACTIVATE_STOP
 
-    p_module->p_config = p_config;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * DeactivateModule: make sure the module can be unloaded.
- *****************************************************************************
- * This function must only be called when i_usage == 0. If it successfully
- * returns, i_usage can be set to -1 and the module unloaded. Be careful to
- * lock usage_lock during the whole process.
- *****************************************************************************/
-MODULE_DEACTIVATE
-{
-    free( p_module->p_functions );
-
-    return( 0 );
-}
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
 
 /* Following functions are local */
 

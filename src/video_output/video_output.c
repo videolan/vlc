@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.128 2001/05/08 20:38:25 sam Exp $
+ * $Id: video_output.c,v 1.129 2001/05/30 17:03:13 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -67,6 +67,7 @@ static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
 static void     Print             ( vout_thread_t *p_vout, int i_x, int i_y,
                                     int i_h_align, int i_v_align,
                                     unsigned char *psz_text );
+static void     SetBuffers        ( vout_thread_t *p_vout, void *, void * );
 static void     SetBufferArea     ( vout_thread_t *p_vout, int i_x, int i_y,
                                     int i_w, int i_h );
 static void     SetBufferPicture  ( vout_thread_t *p_vout, picture_t *p_pic );
@@ -154,9 +155,12 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->pf_setpalette = f.pf_setpalette;
 #undef f
 
+    /* Initialize callbacks */
+    p_vout->pf_setbuffers       = SetBuffers;
+
     if( p_vout->pf_setpalette == NULL )
     {
-        p_vout->pf_setpalette = SetPalette;
+        p_vout->pf_setpalette   = SetPalette;
     }
 
     /* Initialize thread properties - thread id and locks will be initialized
@@ -823,37 +827,6 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * vout_SetBuffers: set buffers adresses
- *****************************************************************************
- * This function is called by system drivers to set buffers video memory
- * adresses.
- *****************************************************************************/
-void vout_SetBuffers( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 )
-{
-    /* No picture previously */
-    p_vout->p_buffer[0].i_pic_x =         0;
-    p_vout->p_buffer[0].i_pic_y =         0;
-    p_vout->p_buffer[0].i_pic_width =     0;
-    p_vout->p_buffer[0].i_pic_height =    0;
-    p_vout->p_buffer[1].i_pic_x =         0;
-    p_vout->p_buffer[1].i_pic_y =         0;
-    p_vout->p_buffer[1].i_pic_width =     0;
-    p_vout->p_buffer[1].i_pic_height =    0;
-
-    /* The first area covers all the screen */
-    p_vout->p_buffer[0].i_areas =                 1;
-    p_vout->p_buffer[0].pi_area_begin[0] =        0;
-    p_vout->p_buffer[0].pi_area_end[0] =          p_vout->i_height - 1;
-    p_vout->p_buffer[1].i_areas =                 1;
-    p_vout->p_buffer[1].pi_area_begin[0] =        0;
-    p_vout->p_buffer[1].pi_area_end[0] =          p_vout->i_height - 1;
-
-    /* Set adresses */
-    p_vout->p_buffer[0].p_data = p_buf1;
-    p_vout->p_buffer[1].p_data = p_buf2;
-}
-
-/*****************************************************************************
  * vout_Pixel2RGB: return red, green and blue from pixel value
  *****************************************************************************
  * Return color values, in 0-255 range, of the decomposition of a pixel. This
@@ -1443,6 +1416,37 @@ void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_h_align, int i_v_alig
                     p_vout->i_white_pixel, 0, 0,
                     0, psz_text, 100 );
     }
+}
+
+/*****************************************************************************
+ * SetBuffers: set buffers adresses
+ *****************************************************************************
+ * This function is called by system drivers to set buffers video memory
+ * adresses.
+ *****************************************************************************/
+static void SetBuffers( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 )
+{
+    /* No picture previously */
+    p_vout->p_buffer[0].i_pic_x =         0;
+    p_vout->p_buffer[0].i_pic_y =         0;
+    p_vout->p_buffer[0].i_pic_width =     0;
+    p_vout->p_buffer[0].i_pic_height =    0;
+    p_vout->p_buffer[1].i_pic_x =         0;
+    p_vout->p_buffer[1].i_pic_y =         0;
+    p_vout->p_buffer[1].i_pic_width =     0;
+    p_vout->p_buffer[1].i_pic_height =    0;
+
+    /* The first area covers all the screen */
+    p_vout->p_buffer[0].i_areas =                 1;
+    p_vout->p_buffer[0].pi_area_begin[0] =        0;
+    p_vout->p_buffer[0].pi_area_end[0] =          p_vout->i_height - 1;
+    p_vout->p_buffer[1].i_areas =                 1;
+    p_vout->p_buffer[1].pi_area_begin[0] =        0;
+    p_vout->p_buffer[1].pi_area_end[0] =          p_vout->i_height - 1;
+
+    /* Set adresses */
+    p_vout->p_buffer[0].p_data = p_buf1;
+    p_vout->p_buffer[1].p_data = p_buf2;
 }
 
 /*****************************************************************************

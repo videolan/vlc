@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.52 2001/05/25 13:20:09 sam Exp $
+ * $Id: vout_sdl.c,v 1.53 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -46,7 +46,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -57,6 +56,9 @@
 #include "keystrokes.h"
 #include "main.h"
 #include "netutils.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * FIXME: this file is ...                                                   *
@@ -683,8 +685,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
         /* FIXME: palette in 8bpp ?? */
         /* Set and initialize buffers */
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
-                                 p_vout->p_sys->p_sdl_buf[ 1 ] );
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
+                                       p_vout->p_sys->p_sdl_buf[ 1 ] );
     }
     else
     {
@@ -696,8 +698,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         p_vout->i_height =          p_vout->p_sys->p_display->h;
         p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
 
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
-                                 p_vout->p_sys->p_sdl_buf[ 1 ] );
+        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
+                                       p_vout->p_sys->p_sdl_buf[ 1 ] );
     }
 
     p_vout->p_sys->b_reopen_display = 0;

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.7 2001/03/21 13:42:33 sam Exp $
+ * $Id: vout_dummy.c,v 1.8 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,6 +45,7 @@
 #include "intf_msg.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16
@@ -140,7 +141,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
+    p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_video,
                      p_vout->p_sys->p_video + p_vout->p_sys->i_page_size );
 
     return( 0 );

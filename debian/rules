@@ -17,14 +17,14 @@ build-stamp:
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
 		--enable-gnome --enable-gtk --enable-fb --with-glide \
-		--with-ggi --with-sdl --enable-esd \
+		--with-ggi --with-sdl --enable-esd --enable-alsa \
 		--enable-qt --disable-ppro ; \
 	else \
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
 		--enable-gnome --enable-gtk --enable-fb \
-		--with-ggi --with-sdl --enable-esd \
+		--with-ggi --with-sdl --enable-esd --enable-alsa \
 		--enable-qt ; \
 	fi
 
@@ -50,7 +50,7 @@ install: build
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
 	# make symlinks for packages
-	aliases="ggi gtk gnome esd sdl qt" ; \
+	aliases="ggi gtk gnome esd sdl qt alsa" ; \
 	if [ $(DEB_BUILD_ARCH) = i386 ]; then aliases=$$aliases" glide" ; fi ; \
 	for alias in `echo $$aliases` ; do \
 		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
@@ -123,10 +123,10 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	#dh_installcron
-#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-qt doc/vlc.1
+#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt doc/vlc.1
 	#dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-qt
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt
 	dh_link
 	dh_strip
 	dh_compress
@@ -147,3 +147,4 @@ binary-arch: build install
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
+

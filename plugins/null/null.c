@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: null.c,v 1.6 2001/03/21 13:42:34 sam Exp $
+ * $Id: null.c,v 1.7 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,55 +56,18 @@ ADD_WINDOW( "Configuration for null module" )
     ADD_PANE( "Second pane" )
         ADD_FRAME( "Frame" )
             ADD_COMMENT( "There is nothing in this frame." )
-MODULE_CONFIG_END
+MODULE_CONFIG_STOP
 
-/*****************************************************************************
- * InitModule: get the module structure and configuration.
- *****************************************************************************
- * We have to fill psz_name, psz_longname and psz_version. These variables
- * will be strdup()ed later by the main application because the module can
- * be unloaded later to save memory, and we want to be able to access this
- * data even after the module has been unloaded.
- *****************************************************************************/
-MODULE_INIT
-{
-    p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "the Null module that does nothing";
-    p_module->psz_version = VERSION;
-
+MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL;
+    p_module->psz_longname = "the Null module that does nothing";
+MODULE_INIT_STOP
 
-    return( 0 );
-}
-
-/*****************************************************************************
- * ActivateModule: set the module to an usable state.
- *****************************************************************************
- * This function fills the capability functions and the configuration
- * structure. Once ActivateModule() has been called, the i_usage can
- * be set to 0 and calls to NeedModule() be made to increment it. To unload
- * the module, one has to wait until i_usage == 0 and call DeactivateModule().
- *****************************************************************************/
-MODULE_ACTIVATE
-{
+MODULE_ACTIVATE_START
     /* Since the Null module can't do anything, there is no need to
      * fill the p_functions structure. */
-    p_module->p_functions = NULL;
-    p_module->p_config = p_config;
+MODULE_ACTIVATE_STOP
 
-    return( 0 );
-}
-
-/*****************************************************************************
- * DeactivateModule: make sure the module can be unloaded.
- *****************************************************************************
- * This function must only be called when i_usage == 0. If it successfully
- * returns, i_usage can be set to -1 and the module unloaded. Be careful to
- * lock usage_lock during the whole process.
- *****************************************************************************/
-MODULE_DEACTIVATE
-{
-    /* We didn't allocate p_functions - so we don't have to free it */
-    return( 0 );
-}
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
 

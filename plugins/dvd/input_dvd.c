@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.60 2001/05/19 00:39:30 stef Exp $
+ * $Id: input_dvd.c,v 1.61 2001/05/30 17:03:12 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -110,8 +110,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = DVDProbe;
     input.pf_init             = DVDInit;
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
+    input.pf_open             = NULL; /* Set in DVDInit */
+    input.pf_close            = NULL;
     input.pf_end              = DVDEnd;
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
@@ -191,6 +191,10 @@ static void DVDInit( input_thread_t * p_input )
 
     p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
+
+    /* Set callback */
+    p_input->pf_open  = p_input->pf_file_open;
+    p_input->pf_close = p_input->pf_file_close;
 
     p_dvd->i_fd = p_input->i_handle;
 

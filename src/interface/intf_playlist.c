@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.6 2001/05/15 14:49:48 stef Exp $
+ * $Id: intf_playlist.c,v 1.7 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -272,6 +272,40 @@ void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
     vlc_mutex_unlock( &p_playlist->change_lock );
 }   
 
+/* URL-decode a file: URL path, return NULL if it's not what we expect */
+void intf_UrlDecode( char *encoded_path )
+{
+    char *tmp = NULL, *cur = NULL, *ext = NULL;
+    int realchar;
+
+    if( !encoded_path || *encoded_path == '\0' )
+    {
+        return;
+    }
+    
+    cur = encoded_path ;
+    
+    tmp = calloc(strlen(encoded_path) + 1,  sizeof(char) );
+    
+    while ( ( ext = strchr(cur, '%') ) != NULL)
+    {
+        strncat(tmp, cur, (ext - cur) / sizeof(char));
+        ext++;
+
+        if (!sscanf(ext, "%2x", &realchar))
+        {
+            free(tmp);
+            return;
+        }
+
+        tmp[strlen(tmp)] = (char)realchar;
+        
+        cur = ext + 2;
+    }
+
+    strcat(tmp, cur);
+    strcpy(encoded_path,tmp);
+}
 
 /*****************************************************************************
  * Following functions are local

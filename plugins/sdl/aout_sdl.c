@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_sdl.c,v 1.12 2001/04/28 03:36:25 sam Exp $
+ * $Id: aout_sdl.c,v 1.13 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -52,6 +52,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor

@@ -27,19 +27,19 @@ include ../../Makefile.modules
 
 $(PLUGIN_GTKCOMMON): %.o: .dep/%.d
 $(PLUGIN_GTKCOMMON): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -DPLUGIN -c -o $@ $<
 
 $(PLUGIN_GTK): %.o: .dep/%.d
 $(PLUGIN_GTK): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -DMODULE_NAME=gtk -c -o $@ $<
-
-$(PLUGIN_GNOME): %.o: .dep/%.d
-$(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_GTK) -DPLUGIN -DMODULE_NAME=gtk -c -o $@ $<
 
 $(BUILTIN_GTK): BUILTIN_GTK_%.o: .dep/%.d
 $(BUILTIN_GTK): BUILTIN_GTK_%.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_GTK) -DBUILTIN -DMODULE_NAME=gtk -c -o $@ $<
+
+$(PLUGIN_GNOME): %.o: .dep/%.d
+$(PLUGIN_GNOME): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -DPLUGIN -DMODULE_NAME=gnome `gnome-config --cflags gtk gnomeui` -c -o $@ $<
 
 $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: .dep/%.d
 $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
@@ -64,3 +64,4 @@ $(BUILTIN_GNOME): BUILTIN_GNOME_%.o: %.c
 ../../lib/gnome.a: $(BUILTIN_GNOME)
 	ar r $@ $^
 	$(RANLIB) $@
+

@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.36 2001/05/30 05:19:03 stef Exp $
+ * $Id: audio_output.h,v 1.37 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -26,7 +26,7 @@
  *****************************************************************************
  * This global variable is accessed by any function using the audio output.
  *****************************************************************************/
-typedef struct
+typedef struct aout_bank_s
 {
     /* Array to all the audio outputs */
     struct aout_thread_s *pp_aout[ AOUT_MAX_THREADS ];

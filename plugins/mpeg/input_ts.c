@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.20 2001/05/28 04:23:52 sam Exp $
+ * $Id: input_ts.c,v 1.21 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -223,14 +223,14 @@ void TSFakeOpen( input_thread_t * p_input )
     if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
     {
         /* If the user specified "ts:" he wants a network stream */
-        p_input->pf_open = input_NetworkOpen;
-        p_input->pf_close = input_NetworkClose;
+        p_input->pf_open  = p_input->pf_network_open;
+        p_input->pf_close = p_input->pf_network_close;
     }
     else
 #endif
     {
-        p_input->pf_open = input_FileOpen;
-        p_input->pf_close = input_FileClose;
+        p_input->pf_open  = p_input->pf_file_open;
+        p_input->pf_close = p_input->pf_file_close;
     }
 
     p_input->pf_open( p_input );

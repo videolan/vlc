@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.25 2001/04/29 17:03:20 sam Exp $
+ * $Id: vout_beos.cpp,v 1.26 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -459,7 +459,8 @@ int vout_Init( vout_thread_t *p_vout )
     	{
 	    if(p_win->bitmap[0] != NULL)
 	    	{
-		    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+		    p_vout->pf_setbuffers( p_vout,
+                         (byte_t *)p_win->bitmap[0]->Bits(),
     	                 (byte_t *)p_win->bitmap[0]->Bits());
 	    	delete p_win->bitmap[0];
 	    	p_win->bitmap[0] = NULL;
@@ -469,13 +470,15 @@ int vout_Init( vout_thread_t *p_vout )
    		{
 	    if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
 	    	{
-	    	vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+	    	p_vout->pf_setbuffers( p_vout,
+                         (byte_t *)p_win->bitmap[0]->Bits(),
    	                 (byte_t *)p_win->bitmap[1]->Bits());
    	        }
     	}*/
 	    if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
 	    	{
-	    	vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+	    	p_vout->pf_setbuffers( p_vout,
+                         (byte_t *)p_win->bitmap[0]->Bits(),
    	                 (byte_t *)p_win->bitmap[1]->Bits());
    	        }
     
@@ -540,7 +543,8 @@ if( (p_vout->i_width  != p_vout->p_sys->i_width) ||
 					B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|B_OVERLAY_TRANSFER_CHANNEL);
 			p_win->view->SetViewColor(key);
 			p_win->Unlock();
-		    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+		    p_vout->pf_setbuffers( p_vout,
+                                 (byte_t *)p_win->bitmap[0]->Bits(),
 	   	                 (byte_t *)p_win->bitmap[0]->Bits());
 	   	    delete p_win->bitmap[0];
 	   	    }

@@ -256,7 +256,7 @@ static int CreateDisplay( vout_thread_t *p_vout )
 
 //FIXME - if I ever dispose of the Gworlds and recreate them, i'll have a new address
 //and I'll need to tell vout about them...  dunno what problems vout might have if we just updateGworld  
-    vout_SetBuffers( p_vout, hPixmapBaseAddr0, hPixmapBaseAddr1 );
+    p_vout->pf_setbuffers( p_vout, hPixmapBaseAddr0, hPixmapBaseAddr1 );
 
     return 0;
 }

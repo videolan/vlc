@@ -213,20 +213,6 @@ LCFLAGS += @LCFLAGS@ $(LIB)
 LCFLAGS += -Wall
 #LCFLAGS += -s
 
-ifeq ($(SYS),beos)
-LCFLAGS += -Xlinker -soname=_APP_
-else
-ifneq (,$(findstring qnx,$(SYS)))
-LCFLAGS += -Xlinker -export-dynamic
-else
-ifneq (,$(findstring darwin,$(SYS)))
-LCFLAGS += -dyn
-else
-LCFLAGS += --export-dynamic
-endif
-endif
-endif
-
 #
 # Debugging and profiling support
 #

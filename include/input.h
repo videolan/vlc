@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.36 2001/04/25 10:22:32 massiot Exp $
+ * $Id: input.h,v 1.37 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,20 +44,6 @@ void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s *,
                                                       boolean_t ),
                       void * p_callback_arg );
 void NextDataPacket ( struct bit_stream_s * );
-
-/*****************************************************************************
- * Prototypes from input.c to open files
- *****************************************************************************/
-void input_FileOpen ( struct input_thread_s * );
-void input_FileClose( struct input_thread_s * );
-
-/*****************************************************************************
- * Prototypes from input.c to open a network socket 
- *****************************************************************************/
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-void input_NetworkOpen ( struct input_thread_s * );
-void input_NetworkClose( struct input_thread_s * );
-#endif
 
 /*****************************************************************************
  * Prototypes from input_programs.c

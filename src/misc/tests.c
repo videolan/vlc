@@ -3,7 +3,7 @@
  * Functions are prototyped in tests.h.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: tests.c,v 1.6 2001/04/06 09:15:48 sam Exp $
+ * $Id: tests.c,v 1.7 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *
@@ -36,14 +36,6 @@
 #include "tests.h"
 
 #include "main.h"
-
-/*****************************************************************************
- * TestVersion: tests if the given string equals the current version
- *****************************************************************************/
-int TestVersion( char * psz_version )
-{
-    return( !strcmp( psz_version, VERSION ) );
-}
 
 /*****************************************************************************
  * TestProgram: tests if the given string equals the program name

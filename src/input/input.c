@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.112 2001/05/30 05:19:03 stef Exp $
+ * $Id: input.c,v 1.113 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -90,6 +90,11 @@ static void ErrorThread     ( input_thread_t *p_input );
 static void DestroyThread   ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
+static void FileOpen        ( input_thread_t *p_input );
+static void FileClose       ( input_thread_t *p_input );
+static void NetworkOpen     ( input_thread_t *p_input );
+static void NetworkClose    ( input_thread_t *p_input );
+
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
  *****************************************************************************
@@ -148,6 +153,14 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_bw = 0;
+
+    /* Setup callbacks */
+    p_input->pf_file_open     = FileOpen;
+    p_input->pf_file_close    = FileClose;
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+    p_input->pf_network_open  = NetworkOpen;
+    p_input->pf_network_close = NetworkClose;
+#endif
 
     /* Create thread and set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
@@ -459,9 +472,9 @@ static void DestroyThread( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * input_FileOpen : open a file descriptor
+ * FileOpen : open a file descriptor
  *****************************************************************************/
-void input_FileOpen( input_thread_t * p_input )
+static void FileOpen( input_thread_t * p_input )
 {
     struct stat         stat_info;
     int                 i_stat;
@@ -547,9 +560,9 @@ void input_FileOpen( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * input_FileClose : close a file descriptor
+ * FileClose : close a file descriptor
  *****************************************************************************/
-void input_FileClose( input_thread_t * p_input )
+static void FileClose( input_thread_t * p_input )
 {
     intf_WarnMsg( 1, "input: closing file `%s'", p_input->p_source );
     close( p_input->i_handle );
@@ -560,9 +573,9 @@ void input_FileClose( input_thread_t * p_input )
 
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 /*****************************************************************************
- * input_NetworkOpen : open a network socket 
+ * NetworkOpen : open a network socket 
  *****************************************************************************/
-void input_NetworkOpen( input_thread_t * p_input )
+static void NetworkOpen( input_thread_t * p_input )
 {
     char                *psz_server = NULL;
     char                *psz_broadcast = NULL;
@@ -766,9 +779,9 @@ void input_NetworkOpen( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * input_NetworkClose : close a network socket
+ * NetworkClose : close a network socket
  *****************************************************************************/
-void input_NetworkClose( input_thread_t * p_input )
+static void NetworkClose( input_thread_t * p_input )
 {
     close( p_input->i_handle );
 

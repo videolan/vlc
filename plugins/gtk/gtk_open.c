@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.3 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_open.c,v 1.4 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -52,6 +52,8 @@
 #include "intf_gtk.h"
 
 #include "main.h"
+
+#include "modules_export.h"
 
 /*****************************************************************************
  * Fileopen callbacks

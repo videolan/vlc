@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.25 2001/05/25 13:20:09 sam Exp $
+ * $Id: vout_x11.c,v 1.26 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -68,6 +67,9 @@
 #include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "main.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * vout_sys_t: video output X11 method descriptor
@@ -312,8 +314,8 @@ static int vout_Init( vout_thread_t *p_vout )
 
     /* Set bytes per line and initialize buffers */
     p_vout->i_bytes_per_line = p_vout->p_sys->p_ximage[0]->bytes_per_line;
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_ximage[ 0 ]->data,
-                     p_vout->p_sys->p_ximage[ 1 ]->data );
+    p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_ximage[ 0 ]->data,
+                                   p_vout->p_sys->p_ximage[ 1 ]->data );
 
     /* Set date for autohiding cursor */
     p_vout->p_sys->i_lastmoved = mdate();

@@ -39,8 +39,7 @@ INTERFACE =	src/interface/main.o \
 		src/interface/interface.o \
 		src/interface/intf_msg.o \
 		src/interface/intf_playlist.o \
-		src/interface/intf_channels.o \
-		src/interface/intf_urldecode.o \
+		src/interface/intf_channels.o
 
 INPUT =		src/input/input.o \
 		src/input/input_ext-dec.o \
@@ -328,7 +327,7 @@ $(CPP_OBJ): %.o: %.cpp
 # Main application target
 #
 vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(LCFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(LCFLAGS) $(LIB)
 ifeq ($(SYS),beos)
 	rm -f ./lib/_APP_
 	ln -s ../vlc ./lib/_APP_

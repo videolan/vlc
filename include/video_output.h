@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.60 2001/05/06 18:32:30 stef Exp $
+ * $Id: video_output.h,v 1.61 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -29,7 +29,7 @@
  *****************************************************************************
  * This global variable is accessed by any function using the video output.
  *****************************************************************************/
-typedef struct
+typedef struct vout_bank_s
 {
     /* Array to all the video outputs */
     struct vout_thread_s *pp_vout[ VOUT_MAX_THREADS ];
@@ -195,14 +195,15 @@ typedef struct vout_thread_s
 
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
-    int              ( *pf_create )     ( struct vout_thread_s * );
-    int              ( *pf_init )       ( struct vout_thread_s * );
-    void             ( *pf_end )        ( struct vout_thread_s * );
-    void             ( *pf_destroy )    ( struct vout_thread_s * );
-    int              ( *pf_manage )     ( struct vout_thread_s * );
-    void             ( *pf_display )    ( struct vout_thread_s * );
-    void             ( *pf_setpalette ) ( struct vout_thread_s *, u16 *red,
-                                          u16 *green, u16 *blue, u16 *transp );
+    int  ( *pf_create )     ( struct vout_thread_s * );
+    int  ( *pf_init )       ( struct vout_thread_s * );
+    void ( *pf_end )        ( struct vout_thread_s * );
+    void ( *pf_destroy )    ( struct vout_thread_s * );
+    int  ( *pf_manage )     ( struct vout_thread_s * );
+    void ( *pf_display )    ( struct vout_thread_s * );
+    void ( *pf_setpalette ) ( struct vout_thread_s *, u16 *red,
+                              u16 *green, u16 *blue, u16 *transp );
+    void ( *pf_setbuffers ) ( struct vout_thread_s *, void *, void * );
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */
@@ -295,6 +296,4 @@ void            vout_UnlinkPicture  ( vout_thread_t *p_vout, picture_t *p_pic );
 subpicture_t *  vout_CreateSubPicture   ( vout_thread_t *p_vout, int i_type, int i_size );
 void            vout_DestroySubPicture  ( vout_thread_t *p_vout, subpicture_t *p_subpic );
 void            vout_DisplaySubPicture  ( vout_thread_t *p_vout, subpicture_t *p_subpic );
-
-void            vout_SetBuffers         ( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 );
 

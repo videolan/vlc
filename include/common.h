@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.31 2001/04/28 03:36:25 sam Exp $
+ * $Id: common.h,v 1.32 2001/05/30 17:03:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -135,6 +135,7 @@ typedef struct video_parser_s *         p_video_parser_t;
 /* Misc */
 struct macroblock_s;
 struct data_packet_s;
+struct es_descriptor_s;
 
 /*****************************************************************************
  * Macros and inline functions

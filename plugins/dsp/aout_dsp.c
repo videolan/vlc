@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_dsp.c,v 1.12 2001/03/21 13:42:33 sam Exp $
+ * $Id: aout_dsp.c,v 1.13 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -66,6 +66,7 @@
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor

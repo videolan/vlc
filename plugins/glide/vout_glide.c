@@ -2,7 +2,7 @@
  * vout_glide.c: 3dfx video output display method for 3dfx cards
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_glide.c,v 1.6 2001/03/21 13:42:34 sam Exp $
+ * $Id: vout_glide.c,v 1.7 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -53,6 +52,9 @@
 #include "interface.h"
 
 #include "main.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #define GLIDE_WIDTH 800
 #define GLIDE_HEIGHT 600
@@ -320,8 +322,8 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     grBufferClear( 0, 0, 0 );
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer_info.lfbPtr,
-                     p_front_buffer_info.lfbPtr );
+    p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_buffer_info.lfbPtr,
+                                   p_front_buffer_info.lfbPtr );
 
     return( 0 );
 }

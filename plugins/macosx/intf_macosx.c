@@ -49,8 +49,10 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "modules.h"
 #include "main.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #include "macosx_common.h"
 

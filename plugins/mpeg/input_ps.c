@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.24 2001/05/23 17:47:34 stef Exp $
+ * $Id: input_ps.c,v 1.25 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -88,8 +88,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = PSProbe;
     input.pf_init             = PSInit;
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
+    input.pf_open             = NULL; /* Set in PSInit */
+    input.pf_close            = NULL;
     input.pf_end              = PSEnd;
     input.pf_set_area         = NULL;
     input.pf_read             = PSRead;
@@ -166,6 +166,10 @@ static void PSInit( input_thread_t * p_input )
         return;
     }
     p_input->p_method_data = (void *)p_packet_cache;
+
+    /* Set callback */
+    p_input->pf_open  = p_input->pf_file_open;
+    p_input->pf_close = p_input->pf_file_close;
 
     /* Initialize packet cache mutex */
     vlc_mutex_init( &p_packet_cache->lock );

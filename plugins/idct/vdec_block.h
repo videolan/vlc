@@ -2,7 +2,7 @@
  * vdec_block_h: Macroblock copy functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block.h,v 1.1 2001/05/06 04:32:02 sam Exp $
+ * $Id: vdec_block.h,v 1.2 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,7 +24,7 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void _M( vdec_Init ) ( struct vdec_thread_s *p_vdec );
+void _M( vdec_InitDecode )         ( struct vdec_thread_s *p_vdec );
 void _M( vdec_DecodeMacroblockC )  ( struct vdec_thread_s *p_vdec,
                                      struct macroblock_s * p_mb );
 void _M( vdec_DecodeMacroblockBW ) ( struct vdec_thread_s *p_vdec,

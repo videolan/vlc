@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.33 2001/05/28 02:54:09 sam Exp $
+ * $Id: netutils.c,v 1.34 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -458,7 +458,7 @@ static int GetMacAddress( int i_socket, char *psz_mac )
 
     return( i_ret );
 
-#elif
+#else
     return( -1);
 
 #endif

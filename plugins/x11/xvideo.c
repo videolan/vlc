@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: xvideo.c,v 1.2 2001/04/28 03:36:25 sam Exp $
+ * $Id: xvideo.c,v 1.3 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *      
@@ -40,14 +40,7 @@
 #include "video_output.h"
 
 #include "modules.h"
-
-/*****************************************************************************
- * Building configuration tree
- *****************************************************************************/
-MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for xvideo module" )
-    ADD_COMMENT( "For now, the xvideo module cannot be configured" )
-MODULE_CONFIG_END
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -55,59 +48,23 @@ MODULE_CONFIG_END
 void _M( vout_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
- * InitModule: get the module structure and configuration.
- *****************************************************************************
- * We have to fill psz_name, psz_longname and psz_version. These variables
- * will be strdup()ed later by the main application because the module can
- * be unloaded later to save memory, and we want to be able to access this
- * data even after the module has been unloaded.
+ * Building configuration tree
  *****************************************************************************/
-MODULE_INIT
-{
-    p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "XVideo extension module";
-    p_module->psz_version = VERSION;
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for xvideo module" )
+    ADD_COMMENT( "For now, the xvideo module cannot be configured" )
+MODULE_CONFIG_STOP
 
+MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_VOUT;
+    p_module->psz_longname = "XVideo extension module";
+MODULE_INIT_STOP
 
-    return( 0 );
-}
-
-/*****************************************************************************
- * ActivateModule: set the module to an usable state.
- *****************************************************************************
- * This function fills the capability functions and the configuration
- * structure. Once ActivateModule() has been called, the i_usage can
- * be set to 0 and calls to NeedModule() be made to increment it. To unload
- * the module, one has to wait until i_usage == 0 and call DeactivateModule().
- *****************************************************************************/
-MODULE_ACTIVATE
-{
-    p_module->p_functions = malloc( sizeof( module_functions_t ) );
-    if( p_module->p_functions == NULL )
-    {
-        return( -1 );
-    }
-
+MODULE_ACTIVATE_START
     _M( vout_getfunctions )( &p_module->p_functions->vout );
+MODULE_ACTIVATE_STOP
 
-    p_module->p_config = p_config;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * DeactivateModule: make sure the module can be unloaded.
- *****************************************************************************
- * This function must only be called when i_usage == 0. If it successfully
- * returns, i_usage can be set to -1 and the module unloaded. Be careful to
- * lock usage_lock during the whole process.
- *****************************************************************************/
-MODULE_DEACTIVATE
-{
-    free( p_module->p_functions );
-
-    return( 0 );
-}
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
 

@@ -2,7 +2,7 @@
  * vout_mga.c: MGA video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_mga.c,v 1.7 2001/03/21 13:42:34 sam Exp $
+ * $Id: vout_mga.c,v 1.8 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -187,7 +187,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
+    p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_video,
                      p_vout->p_sys->p_video + p_vout->p_sys->i_page_size );
 
     return( 0 );

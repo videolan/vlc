@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.14 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_playlist.c,v 1.15 2001/05/30 17:03:12 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -49,7 +49,6 @@
 #include "interface.h"
 #include "intf_playlist.h"
 #include "intf_msg.h"
-#include "intf_urldecode.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
@@ -57,8 +56,9 @@
 #include "gtk_playlist.h"
 #include "intf_gtk.h"
 
-
 #include "main.h"
+
+#include "modules_export.h"
 
 /****************************************************************************
  * Playlist window management
@@ -430,7 +430,7 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
      */
     if( i_info == DROP_ACCEPT_TEXT_URI_LIST )
     {
-        urldecode_path( p_string );
+        intf_UrlDecode( p_string );
     }
     
     /* this cuts string into single file drops */
