@@ -16,6 +16,7 @@ Codecs:
  * H264 encoder, demuxer and packetizer.
  * Packetizer interfaces between demux and codec when needed
    (allows using ffmpeg plugin to decode MPEG streams and better aac decoding).
+ * Support for Theora alpha3 (both decoding and encoding).
 
 Input:
  * --start-time <sec> and --stop-time <sec> to start and stop playing a 
@@ -63,6 +64,7 @@ Interfaces:
  * wxWindows
     - New design and set of icons.
     - Ability to embed video output.
+    - Support for hotkeys.
  * Mac OS X
     - Support for 'groups' and playlist item properties.
     - Better hotkeys handling.
