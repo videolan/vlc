@@ -763,7 +763,8 @@ then
     then
       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
         [ PLUGINS="${PLUGINS} dvd"
-          LDFLAGS_dvd="${LDFLAGS_dvd} -ldvdcss" ],
+          LDFLAGS_dvd="${LDFLAGS_dvd} -ldvdcss"
+          LDFLAGS_dvdcss="${LDFLAGS_dvdcss} -ldvdcss" ],
         [ AC_MSG_WARN([libdvdcss is no longer provided with vlc; please get libdvdcss from http://www.videolan.org/libdvdcss/ and build it. Then either use --with-dvdcss=<path/where/libdvdcss/was/installed> for dynamic linking (recommended under Unix) or --with-dvdcss-tree=<path/where/libdvdcss/was/built> for static linking (recommended under BeOS, Windows, MacOS X). Alternatively you can use --disable-dvd to disable the DVD plugin.])
           AC_MSG_ERROR([cannot find libdvdcss headers]) ])
     else
@@ -781,6 +782,7 @@ then
         AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
         BUILTINS="${BUILTINS} dvd"
         LDFLAGS_dvd="${LDFLAGS_dvd} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
+        LDFLAGS_dvdcss="${LDFLAGS_dvdcss} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
         CPPFLAGS_dvd="${CPPFLAGS_dvd} -I${real_dvdcss_tree}/src"
       else
         dnl  The given libdvdcss wasn't built
@@ -803,6 +805,7 @@ then
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvd"
       LDFLAGS_dvd="${LDFLAGS_dvd} -L${with_dvdcss}/lib -ldvdcss"
+      LDFLAGS_dvdcss="${LDFLAGS_dvdcss} -L${with_dvdcss}/lib -ldvdcss"
       CPPFLAGS_dvd="${CPPFLAGS_dvd} -I${with_dvdcss}/include"
     else
       dnl  No libdvdcss could be found, sorry
@@ -835,7 +838,7 @@ then
      AC_TRY_COMPILE([#include <dvdread/dvd_reader.h>],
         [int foo() { return DVD_VIDEO_LB_LEN; }],[
           PLUGINS="${PLUGINS} dvdread"
-          LDFLAGS_dvdread="${LDFLAGS_dvdread} ${LDFLAGS_test} -ldvdread"
+          LDFLAGS_dvdread="${LDFLAGS_dvdread} ${LDFLAGS_test} -ldvdread ${LDFLAGS_dvdcss}"
           CPPFLAGS_dvdread="${CPPFLAGS_dvdread} ${CPPFLAGS_test}"
         ],[
           if test "x${enable_dvdread}" != "x"
@@ -877,7 +880,7 @@ then
   CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
   AC_CHECK_HEADERS(dvdplay/dvdplay.h, [
       PLUGINS="${PLUGINS} dvdplay"
-      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_test} -ldvdplay -ldvdread"
+      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_test} -ldvdplay -ldvdread ${LDFLAGS_dvdcss}"
       CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_test}"
     ],[
     if test "x${enable_dvdplay}" != x

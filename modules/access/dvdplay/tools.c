@@ -2,7 +2,7 @@
  * tools.c: tools for dvd plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: tools.c,v 1.2 2002/10/23 21:54:33 gbazin Exp $
+ * $Id: tools.c,v 1.3 2002/10/28 16:26:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -100,21 +100,30 @@ char * dvdplay_ParseCL( input_thread_t * p_input,
         if( !psz_source ) return NULL;
     }
 
-    if( stat( psz_source, &stat_info ) == -1 )
+#ifdef WIN32
+    if( psz_source[0] && psz_source[1] == ':' && psz_source[2] == '\0' )
     {
-        msg_Err( p_input, "cannot stat() source `%s' (%s)",
-                     psz_source, strerror(errno));
-        free( psz_source );
-        return NULL;
+        /* Don't try to stat the file */
     }
-    if( !S_ISBLK(stat_info.st_mode) &&
-        !S_ISCHR(stat_info.st_mode) &&
-        !S_ISDIR(stat_info.st_mode) )
+    else
+#endif
     {
-        msg_Dbg( p_input, "plugin discarded"
-                         " (not a valid source)" );
-        free( psz_source );
-        return NULL;
+        if( stat( psz_source, &stat_info ) == -1 )
+        {
+            msg_Warn( p_input, "cannot stat() source `%s' (%s)",
+                               psz_source, strerror(errno) );
+            free( psz_source );
+            return NULL;
+        }
+
+        if( !S_ISBLK(stat_info.st_mode) &&
+            !S_ISCHR(stat_info.st_mode) &&
+            !S_ISDIR(stat_info.st_mode) )
+        {
+            msg_Dbg( p_input, "plugin discarded (not a valid source)" );
+            free( psz_source );
+            return NULL;
+        }
     }
     
     msg_Dbg( p_input, "dvdroot=%s title=%d chapter=%d angle=%d",
