@@ -276,6 +276,11 @@ static int ProcessHeaders( decoder_t *p_dec )
     /* Set output properties */
     p_dec->fmt_out.video.i_width = p_sys->ti.width;
     p_dec->fmt_out.video.i_height = p_sys->ti.height;
+    if( p_sys->ti.frame_width && p_sys->ti.frame_height )
+    {
+        p_dec->fmt_out.video.i_width = p_sys->ti.frame_width;
+        p_dec->fmt_out.video.i_height = p_sys->ti.frame_height;
+    }
 
     if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
     {
@@ -504,7 +509,7 @@ static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
 
         p_src += (i_src_yoffset * i_src_stride + i_src_yoffset);
 
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
             p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += i_src_stride;
@@ -530,10 +535,7 @@ struct encoder_sys_t
     theora_comment   tc;                            /* theora comment header */
     theora_state     td;                   /* theora bitstream user comments */
 
-    /*
-     * Common properties
-     */
-    mtime_t i_pts;
+    int i_width, i_height;
 };
 
 /*****************************************************************************
@@ -551,15 +553,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') &&
         !p_enc->b_force )
     {
-        return VLC_EGENERIC;
-    }
-
-    if( p_enc->fmt_in.video.i_width % 16 ||
-        p_enc->fmt_in.video.i_height % 16 )
-    {
-        msg_Err( p_enc, "Theora video encoding requires dimensions which are "
-                 "multiples of 16. Which is not the case here (%dx%d).",
-                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height );
         return VLC_EGENERIC;
     }
 
@@ -586,10 +579,26 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_sys->ti.width = p_enc->fmt_in.video.i_width;
     p_sys->ti.height = p_enc->fmt_in.video.i_height;
+
+    if( p_sys->ti.width % 16 || p_sys->ti.height % 16 )
+    {
+        /* Pictures from the transcoder should always have a pitch
+         * which is a multiple of 16 */
+        p_sys->ti.width = (p_sys->ti.width + 15) >> 4 << 4;
+        p_sys->ti.height = (p_sys->ti.height + 15) >> 4 << 4;
+
+        msg_Dbg( p_enc, "padding video from %dx%d to %dx%d",
+                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height,
+                 p_sys->ti.width, p_sys->ti.height );
+    }
+
     p_sys->ti.frame_width = p_enc->fmt_in.video.i_width;
     p_sys->ti.frame_height = p_enc->fmt_in.video.i_height;
     p_sys->ti.offset_x = 0 /*frame_x_offset*/;
     p_sys->ti.offset_y = 0/*frame_y_offset*/;
+
+    p_sys->i_width = p_sys->ti.width;
+    p_sys->i_height = p_sys->ti.height;
 
     if( !p_enc->fmt_in.video.i_frame_rate ||
         !p_enc->fmt_in.video.i_frame_rate_base )
@@ -667,16 +676,70 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     ogg_packet oggpacket;
     block_t *p_block;
     yuv_buffer yuv;
+    int i;
+
+    /* Sanity check */
+    if( p_pict->p[0].i_pitch < (int)p_sys->i_width ||
+        p_pict->p[0].i_lines < (int)p_sys->i_height )
+    {
+        msg_Warn( p_enc, "frame is smaller than encoding size"
+                  "(%ix%i->%ix%i) -> dropping frame",
+                  p_pict->p[0].i_pitch, p_pict->p[0].i_lines,
+                  p_sys->i_width, p_sys->i_height );
+        return NULL;
+    }
+
+    /* Fill padding */
+    if( p_pict->p[0].i_visible_pitch < (int)p_sys->i_width )
+    {
+        for( i = 0; i < p_sys->i_height; i++ )
+        {
+            memset( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch +
+                    p_pict->p[0].i_visible_pitch,
+                    *( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch +
+                       p_pict->p[0].i_visible_pitch - 1 ),
+                    p_sys->i_width - p_pict->p[0].i_visible_pitch );
+        }
+        for( i = 0; i < p_sys->i_height / 2; i++ )
+        {
+            memset( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch +
+                    p_pict->p[1].i_visible_pitch,
+                    *( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch +
+                       p_pict->p[1].i_visible_pitch - 1 ),
+                    p_sys->i_width / 2 - p_pict->p[1].i_visible_pitch );
+            memset( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch +
+                    p_pict->p[2].i_visible_pitch,
+                    *( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch +
+                       p_pict->p[2].i_visible_pitch - 1 ),
+                    p_sys->i_width / 2 - p_pict->p[2].i_visible_pitch );
+        }
+    }
+
+    if( p_pict->p[0].i_visible_lines < (int)p_sys->i_height )
+    {
+        for( i = p_pict->p[0].i_visible_lines; i < p_sys->i_height; i++ )
+        {
+            memset( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch, 0,
+                    p_sys->i_width );
+        }
+        for( i = p_pict->p[1].i_visible_lines; i < p_sys->i_height / 2; i++ )
+        {
+            memset( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch, 0x80,
+                    p_sys->i_width / 2 );
+            memset( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch, 0x80,
+                    p_sys->i_width / 2 );
+        }
+    }
 
     /* Theora is a one-frame-in, one-frame-out system. Submit a frame
      * for compression and pull out the packet. */
 
-    yuv.y_width  = p_pict->p[0].i_visible_pitch;
-    yuv.y_height = p_pict->p[0].i_lines;
+    yuv.y_width  = p_sys->i_width;
+    yuv.y_height = p_sys->i_height;
     yuv.y_stride = p_pict->p[0].i_pitch;
 
-    yuv.uv_width  = p_pict->p[1].i_visible_pitch;
-    yuv.uv_height = p_pict->p[1].i_lines;
+    yuv.uv_width  = p_sys->i_width / 2;
+    yuv.uv_height = p_sys->i_height / 2;
     yuv.uv_stride = p_pict->p[1].i_pitch;
 
     yuv.y = p_pict->p[0].p_pixels;

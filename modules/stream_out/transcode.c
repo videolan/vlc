@@ -1218,6 +1218,12 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.video.i_height / (double)i_height * i_width;
     }
 
+    /* Make sure the size is at least a multiple of 2 */
+    id->p_encoder->fmt_out.video.i_width =
+        (id->p_encoder->fmt_out.video.i_width + 1) >> 1 << 1;
+    id->p_encoder->fmt_out.video.i_height =
+        (id->p_encoder->fmt_out.video.i_height + 1) >> 1 << 1;
+
     id->p_encoder->fmt_in.video.i_width =
         id->p_encoder->fmt_out.video.i_width;
     id->p_encoder->fmt_in.video.i_height =
