@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.4 2002/11/11 22:27:01 gbazin Exp $
+ * $Id: linear.c,v 1.5 2002/11/15 00:41:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -70,7 +70,10 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_channels != p_filter->output.i_channels
+          || p_filter->input.i_physical_channels
+              != p_filter->output.i_physical_channels
+          || p_filter->input.i_original_channels
+              != p_filter->output.i_original_channels
           || p_filter->input.i_format != VLC_FOURCC('f','l','3','2') )
     {
         return VLC_EGENERIC;
@@ -83,8 +86,8 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
-    p_filter->p_sys->p_prev_sample = malloc( p_filter->input.i_channels
-			 	 	     * sizeof(int32_t) );
+    p_filter->p_sys->p_prev_sample = malloc(
+        p_filter->input.i_physical_channels * sizeof(int32_t) );
     if( p_filter->p_sys->p_prev_sample == NULL )
     {
         msg_Err( p_filter, "out of memory" );

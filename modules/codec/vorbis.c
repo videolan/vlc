@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.5 2002/11/14 22:38:47 massiot Exp $
+ * $Id: vorbis.c,v 1.6 2002/11/15 00:41:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -79,7 +79,8 @@ static int pi_channels_maps[6] =
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
@@ -184,7 +185,9 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     vorbis_block_init( &p_dec->vd, &p_dec->vb );
 
     p_dec->output_format.i_format = VLC_FOURCC('f','l','3','2');
-    p_dec->output_format.i_channels = pi_channels_maps[p_dec->vi.channels];
+    p_dec->output_format.i_physical_channels =
+        p_dec->output_format.i_original_channels =
+            pi_channels_maps[p_dec->vi.channels];
     p_dec->output_format.i_rate = p_dec->vi.rate;
 
     aout_DateInit( &p_dec->end_date, p_dec->vi.rate );
