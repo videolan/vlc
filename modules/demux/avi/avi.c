@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.66 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: avi.c,v 1.67 2003/11/16 00:08:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -593,9 +593,6 @@ static int Demux_Seekable( input_thread_t *p_input )
             return( 1 );
         }
 
-        /* Set the track to use */
-        tk = p_sys->track[i_track];
-
         if( i_pos == -1 )
         {
             /* no valid index, we will parse directly the stream
@@ -648,6 +645,7 @@ static int Demux_Seekable( input_thread_t *p_input )
                     AVI_IndexAddEntry( p_sys, avi_pk.i_stream, &index );
 
                     i_track = avi_pk.i_stream;
+                    tk = p_sys->track[i_track];
                     /* do we will read this data ? */
                     if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -25*1000 )
                     {
@@ -670,6 +668,9 @@ static int Demux_Seekable( input_thread_t *p_input )
         {
             stream_Seek( p_input->s, i_pos );
         }
+
+        /* Set the track to use */
+        tk = p_sys->track[i_track];
 
         /* read thoses data */
         if( tk->i_samplesize )
