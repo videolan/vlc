@@ -405,6 +405,22 @@ static char *ppsz_align_descriptions[] =
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
+#define SOCKS_SERVER_TEXT N_("SOCKS server")
+#define SOCKS_SERVER_LONGTEXT N_( \
+    "Allow you to specify a SOCKS server to use. It must be of the form " \
+    "address:port . It will be used for all TCP connections" )
+
+#define SOCKS_USER_TEXT N_("SOCKS user name")
+#define SOCKS_USER_LONGTEXT N_("Allows you to modify the user name that will " \
+    "be used for the connection to the SOCKS server.")
+
+#define SOCKS_PASS_TEXT N_("SOCKS password")
+#define SOCKS_PASS_LONGTEXT N_("Allows you to modify the password that will " \
+    "be used for the connection to the SOCKS server.")
+
+
+
+
 #define META_TITLE_TEXT N_("Title metadata")
 #define META_TITLE_LONGTEXT N_( \
      "Allows you to specify a \"title\" metadata for an input.")
@@ -931,6 +947,14 @@ vlc_module_begin();
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
         change_short('4');
+
+    add_string( "socks", NULL, NULL,
+                 SOCKS_SERVER_TEXT, SOCKS_SERVER_LONGTEXT, VLC_TRUE );
+    add_string( "socks-user", NULL, NULL,
+                 SOCKS_USER_TEXT, SOCKS_USER_LONGTEXT, VLC_TRUE );
+    add_string( "socks-pwd", NULL, NULL,
+                 SOCKS_PASS_TEXT, SOCKS_PASS_LONGTEXT, VLC_TRUE );
+
 
     add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
                 META_TITLE_LONGTEXT, VLC_TRUE );
