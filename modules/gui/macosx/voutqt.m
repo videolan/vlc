@@ -260,7 +260,6 @@ void E_(CloseVideoQT) ( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     [p_vout->p_sys->o_window close];
-    [p_vout->p_sys->o_window release];
 
     /* Clean Up Quicktime environment */
     ExitMovies();

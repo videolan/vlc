@@ -203,6 +203,14 @@ Pref. elements are broken (hotkeys and int with string desc.).
 Status: Todo
 
 Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Mac OS X
+Description: OS X bookmarks window
+We miss a bookmarks window like the wxwidget one.
+Status: Todo
+
+Task
 Difficulty: Hard
 Urgency: Critical
 Platform: OSX
@@ -222,42 +230,33 @@ Description: Stream text subtitles
  Find a a way to stream text subtitles, in TS and in RTP.
   - Find an existing norm
   - Implement it
-(40% done) needs to be tested and validated
-Status: Assigned to fenrir
+<br />Needs testing and validating
+Status: 65% (fenrir)
 
 Task
-Difficulty: Easy
-Urgency: Normal
-Platform: any
-Description: Fix up text subtitles
-Currently the subtitle dialog boxes are out of date and not really useable. Also we need more files to test and verify the current support. Other issues should mostly be dealt with after the vout systems are improved. For SSA support positioning and color needs to be added for instance.
-Status: Todo
-
-Task
-Difficulty: Hard
-Urgency: Normal
-Platform: any
-Description: Rework spu decoder
- The spu decoder needs some serious work
-  - Split/merge for dvd menu highlighting
-  - Downscaling for divx/mkv etc
-  - .sub/.idx support
-Status: todo
-
-Task
-Difficulty: Hard
+Difficulty: Medium
 Urgency: Normal
 Platform: any
 Description: RTSP server
 Full implementation of a RTSP server.
-Status: fenrir has some code
+Status: 80%
 
 Task
-Difficulty: Hard
+Difficulty: Medium
+Urgency: Normal
+Platform: any
+Description: Add VoD module for VLM
+Add a VoD module for VLM, so that we can create a RTSP server that can
+provide unicast RTSP sessions upon contacting the VoD module. See the following
+<a href="http://via.ecp.fr/via/ml/streaming/200408/msg00082.html">mail</a>.
+Status: Todo
+
+Task
+Difficulty: Easy
 Urgency: Wishlist
 Platform: any
-Description: Picture filters
-picture per picture chained filter system that also works on output streams
+Description: More Picture filters
+There are several picture filters (blend, scale), but we can use more
 Status: Todo
 
 Task
@@ -278,9 +277,11 @@ Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
-Description: SPU redesign
-- centralized scaling support
-(also look at ogt/cvd sub work)
+Description: Subtitle work
+- scaling support (mostly for Vobsub with avi/mkv)
+- better SSA support with postioning, colors etc.
+- VobSub tracks support
+- Fix subtitles dialogs
 Status: Todo
 
 Task
@@ -289,14 +290,6 @@ Urgency: Wishlist
 Platform: Mac OS X
 Description: skins2
 Port VLC skins to Objective C++ and OSX. Also requires the intf to be a dialog handler.
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Wishlist
-Platform: Mac OS X
-Description: Equalizer Graphic control
-Now that VLC has an equalizer, we need a way to control it easily from the GUI.
 Status: Todo
 
 Task
@@ -316,6 +309,7 @@ Urgency: Wishlist
 Platform: any
 Description: Full H323 Videoconferencing
 VLC isn't really suited for this yet, because it introduces quite large latencies. This should be fixed before the H323 can ever come close to working in VLC.
+We also will need SIP support.
 Status: Todo
 
 Task
