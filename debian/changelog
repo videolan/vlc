@@ -1,3 +1,10 @@
+vlc (0.5.3-3) unstable; urgency=low
+
+  * Built-in modules were linked twice in the mozilla plugin; removed the
+    non-PIC ones (Closes: #194384).
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 23 May 2003 11:15:19 +0200
+
 vlc (0.5.3-2) unstable; urgency=low
 
   * Changed the libvlc0-dev section to libdevel.

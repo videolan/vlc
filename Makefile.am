@@ -88,7 +88,7 @@ CFLAGS_builtin_pic = $(CFLAGS_builtin) $(CFLAGS_pic)
 CXXFLAGS_builtin_pic = $(CXXFLAGS_builtin) $(CXXFLAGS_pic)
 OBJCFLAGS_builtin_pic = $(OBJCFLAGS_builtin) $(OBJCFLAGS_pic)
 LDFLAGS_builtin_pic = $(LDFLAGS_builtin) $(LDFLAGS_pic)
-L_builtin_pic = $(L_builtin) $(L_pic)
+L_builtin_pic =
 
 # On Linux and Solaris, activate 64-bit off_t (by default under BSD)
 CPPFLAGS_default += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
