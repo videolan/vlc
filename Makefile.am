@@ -517,6 +517,7 @@ VLC.app: vlc
 	for i in $(srcdir)/share/http/admin/* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin/`basename $${i}` ; \
 	done ; \
+	$(INSTALL) -m 644 $(srcdir)/share/http/admin/.access $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin/.access
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
