@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.19 2002/03/02 03:51:23 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.20 2002/03/02 03:53:54 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -321,7 +321,7 @@ typedef struct input_socket_s
 #ifndef PLUGIN
 void input_FDClose( struct input_thread_s * );
 ssize_t input_FDRead( input_thread_t *, byte_t *, size_t );
-int input_FDNetworkRead( input_thread_t *, byte_t *, size_t );
+ssize_t input_FDNetworkRead( input_thread_t *, byte_t *, size_t );
 void input_FDSeek( struct input_thread_s *, off_t );
 #else
 #   define input_FDClose p_symbols->input_FDClose

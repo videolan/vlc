@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.1 2002/03/01 00:33:18 massiot Exp $
+ * $Id: input_ext-plugins.c,v 1.2 2002/03/02 03:53:55 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
@@ -52,6 +51,20 @@
 #       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
 #   endif
 #endif
+
+#ifdef WIN32
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#   include <netdb.h>                                         /* hostent ... */
+#   include <sys/socket.h>
+#   include <netinet/in.h>
+#   ifdef HAVE_ARPA_INET_H
+#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
+#   endif
+#endif
+
+
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

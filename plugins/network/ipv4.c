@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.2 2002/03/01 01:59:18 xav Exp $
+ * $Id: ipv4.c,v 1.3 2002/03/02 03:53:55 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
@@ -225,7 +224,7 @@ static int OpenUDP( network_socket_t * p_socket )
     
 /* Check if this is a multicast socket */
 
-    if (IN_MULTICAST( ntohl(psz_bind_address) ) )
+    if (IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
 	    psz_bind_win32 = NULL ;
     }
