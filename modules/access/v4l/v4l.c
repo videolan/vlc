@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.29 2003/11/09 15:29:41 gbazin Exp $
+ * $Id: v4l.c,v 1.30 2003/11/15 23:21:35 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -41,8 +41,23 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <errno.h>
-
 #include <fcntl.h>
+
+/* From GStreamer's v4l plugin:
+ * Because of some really cool feature in video4linux1, also known as
+ * 'not including sys/types.h and sys/time.h', we had to include it
+ * ourselves. In all their intelligence, these people decided to fix
+ * this in the next version (video4linux2) in such a cool way that it
+ * breaks all compilations of old stuff...
+ * The real problem is actually that linux/time.h doesn't use proper
+ * macro checks before defining types like struct timeval. The proper
+ * fix here is to either fuck the kernel header (which is what we do
+ * by defining _LINUX_TIME_H, an innocent little hack) or by fixing it
+ * upstream, which I'll consider doing later on. If you get compiler
+ * errors here, check your linux/time.h && sys/time.h header setup.
+*/
+#define _LINUX_TIME_H
+
 #include <linux/videodev.h>
 #include "videodev_mjpeg.h"
 
