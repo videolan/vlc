@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.9 2001/12/27 01:49:34 massiot Exp $
+ * $Id: ac3_adec.c,v 1.10 2001/12/30 05:38:44 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -60,21 +60,20 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int      ac3_adec_Probe      ( probedata_t * );
-static int      ac3_adec_Run         ( decoder_config_t * );
-static int      ac3_adec_Init        (ac3dec_thread_t * p_adec);
-static void     ac3_adec_ErrorThread (ac3dec_thread_t * p_adec);
-static void     ac3_adec_EndThread   (ac3dec_thread_t * p_adec);
-static void     BitstreamCallback    ( bit_stream_t *p_bit_stream,
-                                              boolean_t b_new_pes );
+static int  decoder_Probe     ( probedata_t * );
+static int  decoder_Run       ( decoder_config_t * );
+static int  InitThread        ( ac3dec_thread_t * p_adec );
+static void EndThread         ( ac3dec_thread_t * p_adec );
+static void BitstreamCallback ( bit_stream_t *p_bit_stream,
+                                boolean_t b_new_pes );
 
 /*****************************************************************************
  * Capabilities
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = ac3_adec_Probe;
-    p_function_list->functions.dec.pf_run = ac3_adec_Run;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -99,20 +98,20 @@ MODULE_DEACTIVATE_STOP
 
 
 /*****************************************************************************
- * ac3_adec_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int ac3_adec_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     return ( p_data->i_type == AC3_AUDIO_ES ) ? 50 : 0;
 }
 
 /*****************************************************************************
- * ac3_adec_Run: this function is called just after the thread is created
+ * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int ac3_adec_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3thread;
     int sync;
@@ -125,7 +124,8 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     if( p_ac3thread == NULL )
     {
         intf_ErrMsg ( "ac3_adec error: not enough memory "
-                      "for ac3_adec_Run() to allocate p_ac3thread" );
+                      "for decoder_Run() to allocate p_ac3thread" );
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
    
@@ -133,9 +133,10 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
      * Initialize the thread properties
      */
     p_ac3thread->p_config = p_config;
-    if( ac3_adec_Init( p_ac3thread ) )
+    if( InitThread( p_ac3thread ) )
     {
         intf_ErrMsg( "ac3_adec error: could not initialize thread" );
+        DecoderError( p_config->p_decoder_fifo );
         free( p_ac3thread );
         return( -1 );
     }
@@ -211,11 +212,11 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     /* If b_error is set, the ac3 decoder thread enters the error loop */
     if (p_ac3thread->p_fifo->b_error)
     {
-        ac3_adec_ErrorThread (p_ac3thread);
+        DecoderError( p_ac3thread->p_fifo );
     }
 
     /* End of the ac3 decoder thread */
-    ac3_adec_EndThread (p_ac3thread);
+    EndThread (p_ac3thread);
 
     free( p_ac3thread );
 
@@ -224,9 +225,9 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
 
 
 /*****************************************************************************
- * ac3_adec_Init: initialize data before entering main loop
+ * InitThread: initialize data before entering main loop
  *****************************************************************************/
-static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
+static int InitThread( ac3dec_thread_t * p_ac3thread )
 {
     /*
      * Thread properties 
@@ -372,35 +373,9 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
 
 
 /*****************************************************************************
- * ac3_adec_ErrorThread : ac3 decoder's RunThread() error loop
+ * EndThread : ac3 decoder thread destruction
  *****************************************************************************/
-static void ac3_adec_ErrorThread (ac3dec_thread_t * p_ac3thread)
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_ac3thread->p_fifo->data_lock);
-
-    /* Wait until a `die' order is sent */
-    while (!p_ac3thread->p_fifo->b_die)
-    {
-        /* Trash all received PES packets */
-        p_ac3thread->p_fifo->pf_delete_pes(
-                        p_ac3thread->p_fifo->p_packets_mgt,
-                        p_ac3thread->p_fifo->p_first );
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_ac3thread->p_fifo->data_wait,
-                       &p_ac3thread->p_fifo->data_lock);
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_ac3thread->p_fifo->data_lock);
-}
-
-/*****************************************************************************
- * ac3_adec_EndThread : ac3 decoder thread destruction
- *****************************************************************************/
-static void ac3_adec_EndThread (ac3dec_thread_t * p_ac3thread)
+static void EndThread (ac3dec_thread_t * p_ac3thread)
 {
     intf_DbgMsg ("ac3dec debug: destroying ac3 decoder thread %p", p_ac3thread);
 

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.4 2001/12/27 01:49:34 massiot Exp $
+ * $Id: spu_decoder.c,v 1.5 2001/12/30 05:38:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,11 +59,10 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  spudec_Probe         ( probedata_t * );
-static int  spudec_Run           ( decoder_config_t * );
-static int  spudec_Init          ( spudec_thread_t * );
-static void spudec_ErrorThread   ( spudec_thread_t * );
-static void spudec_EndThread     ( spudec_thread_t * );
+static int  decoder_Probe ( probedata_t * );
+static int  decoder_Run   ( decoder_config_t * );
+static int  InitThread    ( spudec_thread_t * );
+static void EndThread     ( spudec_thread_t * );
 
 static int  SyncPacket           ( spudec_thread_t * );
 static void ParsePacket          ( spudec_thread_t * );
@@ -75,8 +74,8 @@ static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
  *****************************************************************************/
 void _M( spudec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = spudec_Probe;
-    p_function_list->functions.dec.pf_run = spudec_Run;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -100,12 +99,12 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * spudec_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int spudec_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == DVD_SPU_ES )
         return( 50 );
@@ -114,9 +113,9 @@ static int spudec_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * spudec_Run: this function is called just after the thread is created
+ * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int spudec_Run( decoder_config_t * p_config )
+static int decoder_Run( decoder_config_t * p_config )
 {
     spudec_thread_t *     p_spudec;
    
@@ -129,6 +128,7 @@ static int spudec_Run( decoder_config_t * p_config )
     {
         intf_ErrMsg( "spudec error: not enough memory "
                      "for spudec_CreateThread() to create the new thread" );
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
     
@@ -142,7 +142,7 @@ static int spudec_Run( decoder_config_t * p_config )
     /*
      * Initialize thread and free configuration
      */
-    p_spudec->p_fifo->b_error = spudec_Init( p_spudec );
+    p_spudec->p_fifo->b_error = InitThread( p_spudec );
 
     /*
      * Main loop - it is not executed if an error occured during
@@ -161,11 +161,11 @@ static int spudec_Run( decoder_config_t * p_config )
      */
     if( p_spudec->p_fifo->b_error )
     {
-        spudec_ErrorThread( p_spudec );
+        DecoderError( p_spudec->p_fifo );
     }
 
     /* End of thread */
-    spudec_EndThread( p_spudec );
+    EndThread( p_spudec );
 
     if( p_spudec->p_fifo->b_error )
     {
@@ -179,13 +179,13 @@ static int spudec_Run( decoder_config_t * p_config )
 /* following functions are local */
 
 /*****************************************************************************
- * spudec_Init: initialize spu decoder thread
+ * InitThread: initialize spu decoder thread
  *****************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
  *****************************************************************************/
-static int spudec_Init( spudec_thread_t *p_spudec )
+static int InitThread( spudec_thread_t *p_spudec )
 {
     int i_retry = 0;
 
@@ -220,42 +220,12 @@ static int spudec_Init( spudec_thread_t *p_spudec )
 }
 
 /*****************************************************************************
- * spudec_ErrorThread: spudec_Run() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void spudec_ErrorThread( spudec_thread_t *p_spudec )
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock( &p_spudec->p_fifo->data_lock );
-
-    /* Wait until a `die' order is sent */
-    while( !p_spudec->p_fifo->b_die )
-    {
-        /* Trash all received PES packets */
-        p_spudec->p_fifo->pf_delete_pes(
-                        p_spudec->p_fifo->p_packets_mgt,
-                        p_spudec->p_fifo->p_first );
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_spudec->p_fifo->data_wait,
-                       &p_spudec->p_fifo->data_lock );
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_spudec->p_fifo->data_lock );
-}
-
-/*****************************************************************************
- * spudec_EndThread: thread destruction
+ * EndThread: thread destruction
  *****************************************************************************
  * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
-static void spudec_EndThread( spudec_thread_t *p_spudec )
+static void EndThread( spudec_thread_t *p_spudec )
 {
     free( p_spudec );
 }

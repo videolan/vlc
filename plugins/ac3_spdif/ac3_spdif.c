@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.8 2001/12/27 01:49:34 massiot Exp $
+ * $Id: ac3_spdif.c,v 1.9 2001/12/30 05:38:44 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -61,20 +61,19 @@
 /****************************************************************************
  * Local Prototypes
  ****************************************************************************/
-static int  ac3_spdif_Probe       ( probedata_t * );
-static int  ac3_spdif_Run         ( decoder_config_t * );
-static int  ac3_spdif_Init        ( ac3_spdif_thread_t * );
-static void ac3_spdif_ErrorThread ( ac3_spdif_thread_t * );
-static void ac3_spdif_EndThread   ( ac3_spdif_thread_t * );
-static void BitstreamCallback( bit_stream_t *, boolean_t );
+static int  decoder_Probe     ( probedata_t * );
+static int  decoder_Run       ( decoder_config_t * );
+static int  InitThread        ( ac3_spdif_thread_t * );
+static void EndThread         ( ac3_spdif_thread_t * );
+static void BitstreamCallback ( bit_stream_t *, boolean_t );
 
 /*****************************************************************************
  * Capabilities
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = ac3_spdif_Probe;
-    p_function_list->functions.dec.pf_run = ac3_spdif_Run;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -98,12 +97,12 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * ac3_spdif_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int ac3_spdif_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && 
         p_data->i_type == AC3_AUDIO_ES )
@@ -114,11 +113,11 @@ static int ac3_spdif_Probe( probedata_t *p_data )
 
 
 /****************************************************************************
- * ac3_spdif_Run: the whole thing
+ * decoder_Run: the whole thing
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static int ac3_spdif_Run( decoder_config_t * p_config )
+static int decoder_Run( decoder_config_t * p_config )
 {
     ac3_spdif_thread_t *   p_spdif;
     mtime_t     i_frame_time;
@@ -135,14 +134,17 @@ static int ac3_spdif_Run( decoder_config_t * p_config )
     {
         intf_ErrMsg ( "spdif error: not enough memory "
                       "for spdif_CreateThread() to create the new thread");
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
   
     p_spdif->p_config = p_config; 
     
-    if (ac3_spdif_Init( p_spdif ) )
+    if (InitThread( p_spdif ) )
     {
         intf_ErrMsg( "spdif error: could not initialize thread" );
+        DecoderError( p_config->p_decoder_fifo );
+        free( p_spdif );
         return( -1 );
     }
 
@@ -213,19 +215,19 @@ static int ac3_spdif_Run( decoder_config_t * p_config )
     /* If b_error is set, the ac3 spdif thread enters the error loop */
     if( p_spdif->p_fifo->b_error )
     {
-        ac3_spdif_ErrorThread( p_spdif );
+        DecoderError( p_spdif->p_fifo );
     }
 
     /* End of the ac3 decoder thread */
-    ac3_spdif_EndThread( p_spdif );
+    EndThread( p_spdif );
     
     return( 0 );
 }
 
 /****************************************************************************
- * ac3_spdif_Init: initialize thread data and create output fifo
+ * InitThread: initialize thread data and create output fifo
  ****************************************************************************/
-static int ac3_spdif_Init( ac3_spdif_thread_t * p_spdif )
+static int InitThread( ac3_spdif_thread_t * p_spdif )
 {
     boolean_t b_sync = 0;
 
@@ -301,37 +303,10 @@ static int ac3_spdif_Init( ac3_spdif_thread_t * p_spdif )
     return( 0 );
 }
 
-
 /*****************************************************************************
- * ac3_spdif_ErrorThread : ac3 spdif's RunThread() error loop
+ * EndThread : ac3 spdif thread destruction
  *****************************************************************************/
-static void ac3_spdif_ErrorThread( ac3_spdif_thread_t * p_spdif )
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_spdif->p_fifo->data_lock);
-
-    /* Wait until a `die' order is sent */
-    while( !p_spdif->p_fifo->b_die )
-    {
-        /* Trash all received PES packets */
-        p_spdif->p_fifo->pf_delete_pes(
-                        p_spdif->p_fifo->p_packets_mgt,
-                        p_spdif->p_fifo->p_first );
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_spdif->p_fifo->data_wait,
-                       &p_spdif->p_fifo->data_lock );
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_spdif->p_fifo->data_lock );
-}
-
-/*****************************************************************************
- * ac3_spdif_EndThread : ac3 spdif thread destruction
- *****************************************************************************/
-static void ac3_spdif_EndThread( ac3_spdif_thread_t * p_spdif )
+static void EndThread( ac3_spdif_thread_t * p_spdif )
 {
     intf_DbgMsg( "spdif debug: destroying thread %p", p_spdif );
 

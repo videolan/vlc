@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.8 2001/12/27 01:49:34 massiot Exp $
+ * $Id: video_parser.c,v 1.9 2001/12/30 05:38:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -64,20 +64,19 @@
 /*
  * Local prototypes
  */
-static int      mpeg_vdec_Probe         ( probedata_t * );
-static int      mpeg_vdec_Run           ( decoder_config_t * );
-static int      mpeg_vdec_Init          ( vpar_thread_t * );
-static void     mpeg_vdec_ErrorThread   ( vpar_thread_t * );
-static void     mpeg_vdec_EndThread     ( vpar_thread_t * );
-static void     BitstreamCallback       ( bit_stream_t *, boolean_t );
+static int      decoder_Probe     ( probedata_t * );
+static int      decoder_Run       ( decoder_config_t * );
+static int      InitThread        ( vpar_thread_t * );
+static void     EndThread         ( vpar_thread_t * );
+static void     BitstreamCallback ( bit_stream_t *, boolean_t );
 
 /*****************************************************************************
  * Capabilities
  *****************************************************************************/
 void _M( vdec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = mpeg_vdec_Probe;
-    p_function_list->functions.dec.pf_run = mpeg_vdec_Run;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -102,12 +101,12 @@ MODULE_DEACTIVATE_STOP
 
 
 /*****************************************************************************
- * mpeg_vdec_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int mpeg_vdec_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == MPEG1_VIDEO_ES || p_data->i_type == MPEG2_VIDEO_ES )
         return( 50 );
@@ -116,9 +115,9 @@ static int mpeg_vdec_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * mpeg_vdec_Run: this function is called just after the thread is created
+ * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int mpeg_vdec_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_config_t * p_config )
 {
     vpar_thread_t *     p_vpar;
     boolean_t           b_error;
@@ -130,6 +129,7 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
     {
         intf_ErrMsg( "vpar error: not enough memory "
                      "for vpar_CreateThread() to create the new thread");
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
 
@@ -143,7 +143,7 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
     /*
      * Initialize thread
      */
-    p_vpar->p_fifo->b_error = mpeg_vdec_Init( p_vpar );
+    p_vpar->p_fifo->b_error = InitThread( p_vpar );
      
     /*
      * Main loop - it is not executed if an error occured during
@@ -172,11 +172,11 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
      */
     if( ( b_error = p_vpar->p_fifo->b_error ) )
     {
-        mpeg_vdec_ErrorThread( p_vpar );
+        DecoderError( p_vpar->p_fifo );
     }
 
     /* End of thread */
-    mpeg_vdec_EndThread( p_vpar );
+    EndThread( p_vpar );
 
     if( b_error )
     {
@@ -188,13 +188,13 @@ static int mpeg_vdec_Run ( decoder_config_t * p_config )
 } 
 
 /*****************************************************************************
- * mpeg_vdec_Init: initialize vpar output thread
+ * InitThread: initialize vpar output thread
  *****************************************************************************
- * This function is called from mpeg_vdec_Run and performs the second step 
+ * This function is called from decoder_Run and performs the second step 
  * of the initialization. It returns 0 on success. Note that the thread's 
  * flag are not modified inside this function.
  *****************************************************************************/
-static int mpeg_vdec_Init( vpar_thread_t *p_vpar )
+static int InitThread( vpar_thread_t *p_vpar )
 {
     /*
      * Choose the best motion compensation module
@@ -277,46 +277,17 @@ static int mpeg_vdec_Init( vpar_thread_t *p_vpar )
     vpar_InitPool( p_vpar );
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vpar debug: mpeg_vdec_Init(%p) succeeded", p_vpar);
+    intf_DbgMsg("vpar debug: InitThread(%p) succeeded", p_vpar);
     return( 0 );
 }
 
 /*****************************************************************************
- * mpeg_vdec_ErrorThread: RunThread() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void mpeg_vdec_ErrorThread( vpar_thread_t *p_vpar )
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock( &p_vpar->p_fifo->data_lock );
-
-    /* Wait until a `die' order is sent */
-    while( !p_vpar->p_fifo->b_die )
-    {
-        /* Trash all received PES packets */
-        p_vpar->p_fifo->pf_delete_pes(
-                        p_vpar->p_fifo->p_packets_mgt,
-                        p_vpar->p_fifo->p_first );
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_vpar->p_fifo->data_wait, &p_vpar->p_fifo->data_lock );
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_vpar->p_fifo->data_lock );
-}
-
-/*****************************************************************************
- * mpeg_vdec_EndThread: thread destruction
+ * EndThread: thread destruction
  *****************************************************************************
  * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
-static void mpeg_vdec_EndThread( vpar_thread_t *p_vpar )
+static void EndThread( vpar_thread_t *p_vpar )
 {
     intf_DbgMsg("vpar debug: destroying video parser thread %p", p_vpar);
 
