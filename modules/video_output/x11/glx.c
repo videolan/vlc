@@ -207,7 +207,10 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     if (!glXQueryVersion( p_display, &i_maj, &i_min ) )
     {
         msg_Err( p_this, "glXQueryVersion failed" );
-        XCloseDisplay( p_display );
+        if( p_display != NULL )
+        {
+            XCloseDisplay( p_display );
+        }
         return VLC_EGENERIC;
     }
     if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
