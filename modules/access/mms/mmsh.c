@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.5 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: mmsh.c,v 1.6 2003/08/26 00:51:19 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,7 +31,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -100,7 +99,7 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     chunk_t         ck;
 
     /* init p_sys */
-    p_sys = malloc( sizeof( access_sys_t ) );
+    p_input->p_access_data = p_sys = malloc( sizeof( access_sys_t ) );
     p_sys->i_proto = MMS_PROTO_HTTP;
 
     p_sys->p_socket = NULL;
@@ -113,6 +112,7 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     p_sys->i_packet_used = 0;
     p_sys->i_packet_length = 0;
     p_sys->i_pos = 0;
+    p_sys->i_request_context = 1;
     E_( GenerateGuid )( &p_sys->guid );
 
     /* open a tcp connection */
@@ -128,23 +128,23 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
         p_sys->p_url->i_port = 80;
     }
 
-    p_sys->p_socket = NetOpenTCP( p_input, p_sys->p_url );
-    if( !p_sys->p_socket )
+    if( ( p_sys->p_socket = NetOpenTCP( p_input, p_sys->p_url ) ) == NULL )
     {
         msg_Err( p_input, "cannot connect" );
         goto exit_error;
     }
-    p_sys->i_request_context = 1;
 
     /* *** send first request *** */
     p = &p_sys->buffer[0];
     p += sprintf( p, "GET %s HTTP/1.0\r\n", p_sys->p_url->psz_path );
     p += sprintf( p,"Accept: */*\r\n" );
     p += sprintf( p, "User-Agent: NSPlayer/4.1.0.3856\r\n" );
-    p += sprintf( p, "Host: %s:%d\r\n", p_sys->p_url->psz_host, p_sys->p_url->i_port );
-    p += sprintf( p, "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=%d,max-duration=0\r\n", p_sys->i_request_context++ );
-    //p += sprintf( p, "Pragma: xClientGUID={c77e7400-738a-11d2-9add-0020af0a3278}\r\n" );
-    p += sprintf( p, "Pragma: xClientGUID={"GUID_FMT"}\r\n", GUID_PRINT( p_sys->guid ) );
+    p += sprintf( p, "Host: %s:%d\r\n",
+                  p_sys->p_url->psz_host, p_sys->p_url->i_port );
+    p += sprintf( p, "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=%d,max-duration=0\r\n",
+                  p_sys->i_request_context++ );
+    p += sprintf( p, "Pragma: xClientGUID={"GUID_FMT"}\r\n",
+                  GUID_PRINT( p_sys->guid ) );
     p += sprintf( p, "Connection: Close\r\n\r\n" );
     NetWrite( p_input, p_sys->p_socket, p_sys->buffer,  p - p_sys->buffer );
 
@@ -155,6 +155,7 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
         goto exit_error;
     }
     NetClose( p_input, p_sys->p_socket );
+    p_sys->p_socket = NULL;
 
     p_ans = http_answer_parse( p_sys->buffer, p_sys->i_buffer );
     if( !p_ans )
@@ -165,13 +166,15 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
 
     if( p_ans->i_error >= 400 )
     {
-        msg_Err( p_input, "error %d (server return=`%s')", p_ans->i_error, p_ans->psz_answer );
+        msg_Err( p_input, "error %d (server return=`%s')",
+                 p_ans->i_error, p_ans->psz_answer );
         http_answer_free( p_ans );
         goto exit_error;
     }
     else if( p_ans->i_error >= 300 )
     {
-        msg_Err( p_input, "FIXME redirec unsuported %d (server return=`%s')", p_ans->i_error, p_ans->psz_answer );
+        msg_Err( p_input, "FIXME redirect unsuported %d (server return=`%s')",
+                 p_ans->i_error, p_ans->psz_answer );
         http_answer_free( p_ans );
         goto exit_error;
     }
@@ -183,8 +186,11 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     }
 
     /* now get features */
-    /* FIXME FIXME test Content-Type to see if it's a plain stream or an asx FIXME */
-    for( p_field = p_ans->p_fields; p_field != NULL; p_field = http_field_find( p_field->p_next, "Pragma" ) )
+    /* FIXME FIXME test Content-Type to see if it's a plain stream or an
+     * asx FIXME */
+    for( p_field = p_ans->p_fields;
+         p_field != NULL;
+         p_field = http_field_find( p_field->p_next, "Pragma" ) )
     {
         if( !strncasecmp( p_field->psz_value, "features", 8 ) )
         {
@@ -200,7 +206,8 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
             }
             else
             {
-                msg_Warn( p_input, "unknow stream types (%s)", p_field->psz_value );
+                msg_Warn( p_input, "unknow stream types (%s)",
+                          p_field->psz_value );
                 p_sys->b_broadcast = VLC_FALSE;
             }
         }
@@ -251,7 +258,9 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
      *        and bitrate mutual exclusion(optional) */
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
-    msg_Dbg( p_input, "packet count=%lld packet size=%d",p_sys->asfh.i_data_packets_count, p_sys->asfh.i_min_data_packet_size );
+    msg_Dbg( p_input, "packet count=%lld packet size=%d",
+             p_sys->asfh.i_data_packets_count,
+             p_sys->asfh.i_min_data_packet_size );
 
     E_( asf_StreamSelect)( &p_sys->asfh,
                            config_GetInt( p_input, "mms-maxbitrate" ),
@@ -259,7 +268,7 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
                            config_GetInt( p_input, "audio" ),
                            config_GetInt( p_input, "video" ) );
 
-    if( mmsh_start( p_input, p_sys, 0 ) )
+    if( mmsh_start( p_input, 0 ) )
     {
         msg_Err( p_input, "cannot start stream" );
         goto exit_error;
@@ -294,7 +303,6 @@ int  E_( MMSHOpen )  ( input_thread_t *p_input )
     /* Update default_pts to a suitable value for ftp access */
     p_input->i_pts_delay = config_GetInt( p_input, "mms-caching" ) * 1000;
 
-    p_input->p_access_data = p_sys;
 
     return( VLC_SUCCESS );
 
@@ -318,20 +326,23 @@ void E_( MMSHClose ) ( input_thread_t *p_input )
 
     msg_Dbg( p_input, "stopping stream" );
 
-    mmsh_stop( p_input, p_sys );
+    mmsh_stop( p_input );
 
     free( p_sys );
 }
 
-static int mmsh_get_packet( input_thread_t * p_input, access_sys_t *p_sys, chunk_t *p_ck )
+static int mmsh_get_packet( input_thread_t * p_input,
+                            chunk_t *p_ck )
 {
+    access_sys_t *p_sys = p_input->p_access_data;
+
     int i_mov = p_sys->i_buffer - p_sys->i_buffer_pos;
 
     if( p_sys->i_buffer_pos > BUFFER_SIZE / 2 )
     {
         if( i_mov > 0 )
         {
-            memmove( &p_sys->buffer[0], 
+            memmove( &p_sys->buffer[0],
                      &p_sys->buffer[p_sys->i_buffer_pos],
                      i_mov );
         }
@@ -346,7 +357,8 @@ static int mmsh_get_packet( input_thread_t * p_input, access_sys_t *p_sys, chunk
         return VLC_EGENERIC;
     }
 
-    chunk_parse( p_ck, &p_sys->buffer[p_sys->i_buffer_pos], p_sys->i_buffer - p_sys->i_buffer_pos );
+    chunk_parse( p_ck, &p_sys->buffer[p_sys->i_buffer_pos],
+                 p_sys->i_buffer - p_sys->i_buffer_pos );
 
     if( p_ck->i_type == 0x4524 )   // Transfer complete
     {
@@ -366,10 +378,12 @@ static int mmsh_get_packet( input_thread_t * p_input, access_sys_t *p_sys, chunk
             msg_Warn( p_input, "cannot fill buffer" );
             return VLC_EGENERIC;
         }
-        chunk_parse( p_ck, &p_sys->buffer[p_sys->i_buffer_pos], p_sys->i_buffer - p_sys->i_buffer_pos );
+        chunk_parse( p_ck, &p_sys->buffer[p_sys->i_buffer_pos],
+                     p_sys->i_buffer - p_sys->i_buffer_pos );
     }
 
-    if( p_sys->i_packet_sequence != 0 && p_ck->i_sequence != p_sys->i_packet_sequence )
+    if( p_sys->i_packet_sequence != 0 &&
+        p_ck->i_sequence != p_sys->i_packet_sequence )
     {
         msg_Warn( p_input, "packet lost ?" );
     }
@@ -402,12 +416,12 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    mmsh_stop( p_input, p_sys );
-    mmsh_start( p_input, p_sys, i_packet * p_sys->asfh.i_min_data_packet_size );
+    mmsh_stop( p_input );
+    mmsh_start( p_input, i_packet * p_sys->asfh.i_min_data_packet_size );
 
     for( ;; )
     {
-        if( mmsh_get_packet( p_input, p_sys, &ck ) )
+        if( mmsh_get_packet( p_input, &ck ) )
         {
             break;
         }
@@ -443,7 +457,8 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
     {
         if( p_sys->i_packet_used < p_sys->i_packet_length )
         {
-            i_copy = __MIN( p_sys->i_packet_length - p_sys->i_packet_used, i_len - i_data );
+            i_copy = __MIN( p_sys->i_packet_length - p_sys->i_packet_used,
+                            i_len - i_data );
 
             memcpy( &p_buffer[i_data],
                     &p_sys->p_packet[p_sys->i_packet_used],
@@ -455,7 +470,8 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
         else if( p_sys->i_pos + i_data > p_sys->i_header &&
                  (int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size )
         {
-            i_copy = __MIN( p_sys->asfh.i_min_data_packet_size - p_sys->i_packet_used, i_len - i_data );
+            i_copy = __MIN( p_sys->asfh.i_min_data_packet_size - p_sys->i_packet_used,
+                            i_len - i_data );
 
             memset( &p_buffer[i_data], 0, i_copy );
 
@@ -467,20 +483,17 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
             chunk_t ck;
             /* get a new packet */
             /* fill enought data (>12) */
-            msg_Dbg( p_input, "waiting data (buffer = %d bytes", p_sys->i_buffer );
+            msg_Dbg( p_input, "waiting data (buffer = %d bytes)",
+                     p_sys->i_buffer );
 
-            if( mmsh_get_packet( p_input, p_sys, &ck ) )
+            if( mmsh_get_packet( p_input, &ck ) )
             {
                 return 0;
             }
-
-            //fprintf( stderr, "type=0x%x size=%d sequence=%d unknown=%d size2=%d data=%d\n",
-            //         ck.i_type, ck.i_size, ck.i_sequence, ck.i_unknown, ck.i_size2, ck.i_data );
         }
     }
 
     p_sys->i_pos += i_data;
-
 
     return( i_data );
 }
@@ -492,8 +505,10 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
 /****************************************************************************/
 /****************************************************************************/
 
-static int mmsh_start( input_thread_t *p_input, access_sys_t *p_sys, off_t i_pos )
+static int mmsh_start( input_thread_t *p_input,
+                       off_t i_pos )
 {
+    access_sys_t *p_sys = p_input->p_access_data;
     uint8_t *p;
     int i_streams = 0;
     int i;
@@ -501,7 +516,12 @@ static int mmsh_start( input_thread_t *p_input, access_sys_t *p_sys, off_t i_pos
 
     msg_Dbg( p_input, "starting stream" );
 
-    p_sys->p_socket = NetOpenTCP( p_input, p_sys->p_url );
+    if( ( p_sys->p_socket = NetOpenTCP( p_input, p_sys->p_url ) ) == NULL )
+    {
+        /* should not occur */
+        msg_Err( p_input, "cannot connect to the server" );
+        return VLC_EGENERIC;
+    }
 
     for( i = 1; i < 128; i++ )
     {
@@ -521,19 +541,23 @@ static int mmsh_start( input_thread_t *p_input, access_sys_t *p_sys, off_t i_pos
     p += sprintf( p, "GET %s HTTP/1.0\r\n", p_sys->p_url->psz_path );
     p += sprintf( p,"Accept: */*\r\n" );
     p += sprintf( p, "User-Agent: NSPlayer/4.1.0.3856\r\n" );
-    p += sprintf( p, "Host: %s:%d\r\n", p_sys->p_url->psz_host, p_sys->p_url->i_port );
+    p += sprintf( p, "Host: %s:%d\r\n",
+                  p_sys->p_url->psz_host, p_sys->p_url->i_port );
     if( p_sys->b_broadcast )
     {
-        p += sprintf( p, "Pragma: no-cache,rate=1.000000,request-context=%d\r\n", p_sys->i_request_context++ );
+        p += sprintf( p,"Pragma: no-cache,rate=1.000000,request-context=%d\r\n",
+                      p_sys->i_request_context++ );
     }
     else
     {
         p += sprintf( p, "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=%u:%u,request-context=%d,max-duration=0\r\n",
-                         (uint32_t)((i_pos >> 32)&0xffffffff), (uint32_t)(i_pos&0xffffffff), p_sys->i_request_context++ );
+                         (uint32_t)((i_pos >> 32)&0xffffffff),
+                         (uint32_t)(i_pos&0xffffffff),
+                         p_sys->i_request_context++ );
     }
     p += sprintf( p, "Pragma: xPlayStrm=1\r\n" );
-    //p += sprintf( p, "Pragma: xClientGUID={c77e7400-738a-11d2-9add-0020af0a3278}\r\n" );
-    p += sprintf( p, "Pragma: xClientGUID={"GUID_FMT"}\r\n", GUID_PRINT( p_sys->guid ) );
+    p += sprintf( p, "Pragma: xClientGUID={"GUID_FMT"}\r\n",
+                  GUID_PRINT( p_sys->guid ) );
     p += sprintf( p, "Pragma: stream-switch-count=%d\r\n", i_streams );
     p += sprintf( p, "Pragma: stream-switch-entry=" );
     for( i = 0; i < i_streams; i++ )
@@ -607,7 +631,8 @@ static int mmsh_start( input_thread_t *p_input, access_sys_t *p_sys, off_t i_pos
 
     if( p_ans->i_error < 200 || p_ans->i_error >= 300 )
     {
-        msg_Err( p_input, "error %d (server return=`%s')", p_ans->i_error, p_ans->psz_answer );
+        msg_Err( p_input, "error %d (server return=`%s')",
+                 p_ans->i_error, p_ans->psz_answer );
         http_answer_free( p_ans );
         return VLC_EGENERIC;
     }
@@ -626,10 +651,13 @@ static int mmsh_start( input_thread_t *p_input, access_sys_t *p_sys, off_t i_pos
     return VLC_SUCCESS;
 }
 
-static void mmsh_stop( input_thread_t *p_input, access_sys_t *p_sys )
+static void mmsh_stop( input_thread_t *p_input )
 {
+    access_sys_t *p_sys = p_input->p_access_data;
+
     msg_Dbg( p_input, "closing stream" );
     NetClose( p_input, p_sys->p_socket );
+    p_sys->p_socket = NULL;
 }
 
 static ssize_t NetFill( input_thread_t *p_input,
@@ -643,14 +671,13 @@ static ssize_t NetFill( input_thread_t *p_input,
     {
         return 0;
     }
-    
 
     for( ;; )
     {
         int i_read;
 
-        i_read =
-            NetRead( p_input, p_sys->p_socket, &p_sys->buffer[p_sys->i_buffer], i_size );
+        i_read = NetRead( p_input, p_sys->p_socket,
+                          &p_sys->buffer[p_sys->i_buffer], i_size );
 
         if( i_read == 0 )
         {
@@ -875,15 +902,29 @@ static http_answer_t *http_answer_parse( uint8_t *p_data, int i_data )
 {
     http_answer_t *ans = malloc( sizeof( http_answer_t ) );
     http_field_t  **pp_last;
-    char          buffer[1024];
+    char          *p, *end;
 
-    if( sscanf( p_data, "HTTP/1.%d %d %s", &ans-> i_version, &ans->i_error, buffer ) < 3 )
+    if( strncmp( p_data, "HTTP/1.", 7 ) )
     {
         free( ans );
         return NULL;
     }
-    ans->psz_answer = strdup( buffer );
-    fprintf( stderr, "version=%d error=%d answer=%s\n", ans-> i_version, ans->i_error, ans->psz_answer );
+    ans->i_version = atoi( &p_data[7] );
+    ans->i_error   = strtol( p_data + 8, &p, 0 );
+    while( *p == ' ' )
+    {
+        p++;
+    }
+    if( ( ( end = strchr( p, '\r' ) ) == NULL )&&
+        ( ( end = strchr( p, '\n' ) ) == NULL ) )
+    {
+        end = &p_data[i_data];
+    }
+
+    ans->psz_answer = strndup( p, end - p );
+
+    fprintf( stderr, "version=%d error=%d answer=%s\n",
+             ans->i_version, ans->i_error, ans->psz_answer );
     ans->p_fields = NULL;
     ans->i_body   = 0;
     ans->p_body   = 0;
@@ -923,7 +964,8 @@ static http_answer_t *http_answer_parse( uint8_t *p_data, int i_data )
             *pp_last = p_field;
             pp_last = &p_field->p_next;
 
-            fprintf( stderr, "field name=`%s' value=`%s'\n", p_field->psz_name, p_field->psz_value );
+            fprintf( stderr, "field name=`%s' value=`%s'\n",
+                     p_field->psz_name, p_field->psz_value );
         }
     }
 
@@ -974,25 +1016,6 @@ static http_field_t *http_field_find( http_field_t *p_field, char *psz_name )
 
     return NULL;
 }
-#if 0
-static char *http_field_get_value( http_answer_t *ans, char *psz_name )
-{
-    http_field_t  *p_field = ans->p_fields;
-
-    while( p_field )
-    {
-        if( !strcasecmp( p_field->psz_name, psz_name ) )
-        {
-            return p_field->psz_value;
-        }
-
-        p_field = p_field->p_next;
-    }
-
-    return NULL;
-}
-#endif
-
 
 static int chunk_parse( chunk_t *ck, uint8_t *p_data, int i_data )
 {
@@ -1010,10 +1033,6 @@ static int chunk_parse( chunk_t *ck, uint8_t *p_data, int i_data )
     ck->p_data      = p_data + 12;
     ck->i_data      = __MIN( i_data - 12, ck->i_size2 - 8 );
 
-#if 0
-    fprintf( stderr, "type=0x%x size=%d sequence=%d unknown=%d size2=%d data=%d\n",
-             ck->i_type, ck->i_size, ck->i_sequence, ck->i_unknown, ck->i_size2, ck->i_data );
-#endif
     return VLC_SUCCESS;
 }
 
