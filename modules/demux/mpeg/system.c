@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.20 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: system.c,v 1.21 2003/11/24 03:30:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -464,12 +464,9 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 {
 #define p_pes (p_es->p_pes)
 
-    /* If we lost data, insert a NULL data packet (philosophy : 0 is quite
-     * often an escape sequence in decoders, so that should make them wait
-     * for the next start code). */
-    if( b_packet_lost  && !((es_ts_data_t*)p_es->p_demux_data)->b_dvbsub)
+    if( b_packet_lost && p_pes != NULL )
     {
-        input_NullPacket( p_input, p_es );
+        p_pes->b_discontinuity = 1;
     }
 
     if( b_unit_start && p_pes != NULL )

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.77 2003/11/24 02:35:50 fenrir Exp $
+ * $Id: input_dec.c,v 1.78 2003/11/24 03:30:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -39,6 +39,8 @@
 
 #include "codecs.h"
 
+static void input_NullPacket( input_thread_t *, es_descriptor_t * );
+
 static decoder_t * CreateDecoder( input_thread_t *, es_descriptor_t *, int );
 static int         DecoderThread( decoder_t * );
 static void        DeleteDecoder( decoder_t * );
@@ -68,6 +70,9 @@ struct decoder_owner_sys_t
 
     /* fifo */
     block_fifo_t *p_fifo;
+
+    /* */
+    input_buffers_t *p_method_data;
 };
 
 
@@ -247,6 +252,8 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
             block_FifoPut( p_dec->p_owner->p_fifo, p_block );
         }
     }
+
+    input_DeletePES( p_dec->p_owner->p_method_data, p_pes );
 }
 /*****************************************************************************
  * input_DecodeBlock
@@ -261,45 +268,17 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
  *****************************************************************************/
-void input_NullPacket( input_thread_t * p_input,
-                       es_descriptor_t * p_es )
+static void input_NullPacket( input_thread_t * p_input,
+                              es_descriptor_t * p_es )
 {
-    data_packet_t *             p_pad_data;
-    pes_packet_t *              p_pes;
+    block_t *p_block = block_New( p_input, PADDING_PACKET_SIZE );
 
-    if( (p_pad_data = input_NewPacketForce( p_input->p_method_data,
-                    PADDING_PACKET_SIZE)) == NULL )
+    if( p_block )
     {
-        msg_Err( p_input, "no new packet" );
-        p_input->b_error = 1;
-        return;
-    }
+        memset( p_block->p_buffer, 0, PADDING_PACKET_SIZE );
+        p_block->b_discontinuity = 1;
 
-    memset( p_pad_data->p_payload_start, 0, PADDING_PACKET_SIZE );
-    p_pad_data->b_discard_payload = 1;
-    p_pes = p_es->p_pes;
-
-    if( p_pes != NULL )
-    {
-        p_pes->b_discontinuity = 1;
-        p_pes->p_last->p_next = p_pad_data;
-        p_pes->p_last = p_pad_data;
-        p_pes->i_nb_data++;
-    }
-    else
-    {
-        if( (p_pes = input_NewPES( p_input->p_method_data )) == NULL )
-        {
-            msg_Err( p_input, "no PES packet" );
-            p_input->b_error = 1;
-            return;
-        }
-
-        p_pes->i_rate = p_input->stream.control.i_rate;
-        p_pes->p_first = p_pes->p_last = p_pad_data;
-        p_pes->i_nb_data = 1;
-        p_pes->b_discontinuity = 1;
-        input_DecodePES( p_es->p_dec, p_pes );
+        block_FifoPut( p_es->p_dec->p_owner->p_fifo, p_block );
     }
 }
 
@@ -450,6 +429,7 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
+    p_dec->p_owner->p_method_data = p_input->p_method_data;
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;

@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.37 2003/08/13 13:54:02 jpsaman Exp $
+ * $Id: input_ext-plugins.c,v 1.38 2003/11/24 03:30:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -158,13 +158,12 @@ void input_BuffersEnd( input_thread_t * p_input, input_buffers_t * p_buffers )
  * input_NewBuffer: return a pointer to a data buffer of the appropriate size
  *****************************************************************************/
 static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
-                                         size_t i_size,
-                                         vlc_bool_t b_forced )
+                                         size_t i_size )
 {
     data_buffer_t * p_buf;
 
     /* Safety check */
-    if( !b_forced && p_buffers->i_allocated > INPUT_MAX_ALLOCATION )
+    if( p_buffers->i_allocated > INPUT_MAX_ALLOCATION )
     {
         return NULL;
     }
@@ -214,7 +213,7 @@ data_buffer_t * input_NewBuffer( input_buffers_t * p_buffers, size_t i_size )
     data_buffer_t * p_buf;
 
     vlc_mutex_lock( &p_buffers->lock );
-    p_buf = NewBuffer( p_buffers, i_size, VLC_FALSE );
+    p_buf = NewBuffer( p_buffers, i_size );
     vlc_mutex_unlock( &p_buffers->lock );
 
     return p_buf;
@@ -305,13 +304,12 @@ data_packet_t * input_ShareBuffer( input_buffers_t * p_buffers,
  * input_NewPacket: allocate a packet along with a buffer
  *****************************************************************************/
 static inline data_packet_t * NewPacket( input_buffers_t * p_buffers,
-                                         size_t i_size,
-                                         vlc_bool_t b_forced )
+                                         size_t i_size )
 {
     data_buffer_t * p_buf;
     data_packet_t * p_data;
 
-    p_buf = NewBuffer( p_buffers, i_size, b_forced );
+    p_buf = NewBuffer( p_buffers, i_size );
 
     if( p_buf == NULL )
     {
@@ -331,18 +329,7 @@ data_packet_t * input_NewPacket( input_buffers_t * p_buffers, size_t i_size )
     data_packet_t * p_data;
 
     vlc_mutex_lock( &p_buffers->lock );
-    p_data = NewPacket( p_buffers, i_size, VLC_FALSE );
-    vlc_mutex_unlock( &p_buffers->lock );
-
-    return p_data;
-}
-
-data_packet_t * input_NewPacketForce( input_buffers_t * p_buffers, size_t i_size )
-{
-    data_packet_t * p_data;
-
-    vlc_mutex_lock( &p_buffers->lock );
-    p_data = NewPacket( p_buffers, i_size, VLC_TRUE);
+    p_data = NewPacket( p_buffers, i_size );
     vlc_mutex_unlock( &p_buffers->lock );
 
     return p_data;
@@ -491,7 +478,7 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
     while( p_buf == NULL )
     {
         p_buf = NewBuffer( p_input->p_method_data,
-                           i_remains + p_input->i_bufsize, VLC_FALSE );
+                           i_remains + p_input->i_bufsize );
         if( p_buf == NULL )
         {
             vlc_mutex_unlock( &p_input->p_method_data->lock );

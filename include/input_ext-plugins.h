@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.43 2003/11/24 00:39:00 fenrir Exp $
+ * $Id: input_ext-plugins.h,v 1.44 2003/11/24 03:30:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,7 +63,6 @@ void input_DecodeBlock( decoder_t *, block_t * );
 
 void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );
-VLC_EXPORT( void, input_NullPacket, ( input_thread_t *, es_descriptor_t * ) );
 
 /*****************************************************************************
  * Prototypes from input_clock.c
@@ -98,9 +97,6 @@ VLC_EXPORT( ssize_t, input_SplitBuffer, ( input_thread_t *, data_packet_t **, si
 VLC_EXPORT( int, input_AccessInit,      ( input_thread_t * ) );
 VLC_EXPORT( void, input_AccessReinit,   ( input_thread_t * ) );
 VLC_EXPORT( void, input_AccessEnd,      ( input_thread_t * ) );
-
-/* no need to export this one */
-data_packet_t *input_NewPacketForce( input_buffers_t *, size_t );
 
 /*
  * Optional standard file descriptor operations (input_ext-plugins.h)
