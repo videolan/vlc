@@ -91,10 +91,10 @@ vlc_module_begin();
     set_description( _("HTTP remote control interface") );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
-        add_string ( "http-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
-        add_string ( "http-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
-        add_string ( "http-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   VLC_TRUE );
-        add_string ( "http-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
+        add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   VLC_TRUE );
+        add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  VLC_TRUE );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -232,13 +232,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_vlm      = NULL;
 
     /* TODO: avoid possible code duplication in other modules */
-    psz_cert = config_GetPsz( p_intf, "http-cert" );
+    psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
     {
         const char *psz_pem;
         msg_Dbg( p_intf, "enablind TLS for HTTP interface (cert file: %s)",
                  psz_cert );
-        psz_pem = config_GetPsz( p_intf, "http-key" );
+        psz_pem = config_GetPsz( p_intf, "http-intf-key" );
         if ( psz_pem == NULL )
             psz_pem = psz_cert;
 
@@ -250,7 +250,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        psz_pem = config_GetPsz( p_intf, "http-ca" );
+        psz_pem = config_GetPsz( p_intf, "http-intf-ca" );
         if ( ( psz_pem != NULL) && tls_ServerAddCA( p_tls, psz_pem ) )
         {
             msg_Err( p_intf, "TLS CA error" );
@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        psz_pem = config_GetPsz( p_intf, "http-crl" );
+        psz_pem = config_GetPsz( p_intf, "http-intf-crl" );
         if ( ( psz_pem != NULL) && tls_ServerAddCRL( p_tls, psz_pem ) )
         {
             msg_Err( p_intf, "TLS CRL error" );
