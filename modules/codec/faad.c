@@ -327,7 +327,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( j == MAX_CHANNEL_POSITIONS )
             {
-                msg_Warn( p_dec, "unknow channel ordering" );
+                msg_Warn( p_dec, "unknown channel ordering" );
                 block_Release( p_block );
                 return NULL;
             }
