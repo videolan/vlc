@@ -133,4 +133,5 @@ DIST_http = \
 	http/admin/index.html \
 	http/admin/browse.html \
 	http/admin/.access \
+	http/style.css \
 	$(NULL)

@@ -110,6 +110,11 @@ pop them backs. It's used with the little RPN evaluator.
     - url_param : 1 if url_value isn't empty else 0
     - version   : the VLC version
     - copyright : the VLC copyright
+    - stream_position : current position of the VLC in the stream (percentage)
+    - stream_time : current position of the VLC in the stream (in seconds)
+    - stream_length : total length of the current stream (in seconds)
+    - volume : current volume level
+    - stream_state : current state of the VLC (playing, paused, stop)
 
  Variables could have fields, just use . to access them.
   Ex: var.field, var.field.subfield, ...
@@ -171,6 +176,8 @@ You have access to :
  * string:
     strcat          : push the result of 'ST(1)ST(2)'
     strcmp          : compare ST(1) and ST(2), push -1, 0, or 1
+    strncmp         : compare the ST(3) first characters of ST(1) and ST(2),
+                      push -1, 0, or 1
     strlen          : push the length of ST(1)
  * stack manipulation
     dup             : duplicate ST(1) on the stack
@@ -199,22 +206,38 @@ commands will work.
 
 Url commands are :
 
-  | Name      | argument     |
-  -----------------------------------------------------------------
-  | play      | item(integer)| Play the specified item
-  | stop      |              | Stop
-  | pause     |              | Pause
-  | next      |              | Go to the next playlist element
-  | previous  |              | Got to the previous playlist element
-  | add       | mrl(string)  | Add a mrl to the playlist
-  | delete    | item(integer)| Deletes an (list of) element of the playlist
-  | empty     |              | Empty the playlist
-  | close     | id(hexa)     | Close a specific connection
-  | shutdown  |              | Quit vlc
+  | Name       | arguments    |
+  -------------------------------------------------------------------------------
+  | play       | item(integer)| Play the specified item
+  | stop       |              | Stop
+  | pause      |              | Pause
+  | next       |              | Go to the next playlist element
+  | previous   |              | Got to the previous playlist element
+  | fullscreen |              | toggle fullscreen
+  | volume     | value(string)| set volume level (absolute or relative)
+  | seek       | seek_value   | c.f. notes
+  | add        | mrl(string)  | Add a mrl to the playlist (with its options)
+  | delete     | item(integer)| Deletes an (list of) element of the playlist
+  | keep       | item(integer)| Deletes all but (list of) element of the playlist
+  | sort       | type,order   | c.f. notes
+  | empty      |              | Empty the playlist
+  | close      | id(hexa)     | Close a specific connection
+  | shutdown   |              | Quit vlc
 
 For example, you  can restrict the execution of the  shutdown command to
 protected pages (through a .access) using the control macro in all pages
 unprotected.
+
+Notes:
+ Seek: The seek command is used to seek in current playing stream. the
+seek_value argument is a string which represents a relative or absolute
+position in the stream: a percentage, or a time.
+For examples "+12min 42sec", "01:13:43", "-12%", "42%", or
+"1 hour 12 minutes" are valid argument values.
+ Sort: sorts the playlist by type (string), and with the order (integer).
+If order is "0", it is normal order. Otherwise it is reverse order. The
+type can be "title", "group", "author".
+
 
  2. Macro "get"
  --------------
@@ -285,7 +308,7 @@ variable will be displayed (instead of it name).
           a set of integer. The stack element should be a string like:
            first:last[:step][,first2:last2[:step2][,...]
            Ex: 1:5:2,6:8:1 will be expanded into 1,3,5,6,7,8
-           
+
         - "directory" : take the first  element of the stack as the base
           directory and construct a set of filename and directly in it.
            Each element has the following fields:
@@ -331,7 +354,7 @@ variable will be displayed (instead of it name).
             - ip :
             - url:
             - status: HTTP error code.
-      
+
         - the name of a foreach variable if it's a set of set of value.
           Ex :
             <vlc id="foreach" param1="cat" param2="informations" />

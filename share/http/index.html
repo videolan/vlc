@@ -20,13 +20,12 @@
     <div class="section">
      <table class="add">
       <tr>
-       <td colspan="1">Current State: <vlc id="value" param1="stream_state" /></td>
-       <td colspan="0" align="right"><a href="info.html">Information</a> <a href="admin/">Administration</a></td>
+       <td nowrap="1">Current State: <vlc id="value" param1="stream_state" /></td>
+       <td align="right"><a href="info.html">Information</a> <a href="admin/">Administration</a></td>
       </tr>
-      <tr><td> </td></tr>
       <tr>
        <form method="get" action="">
-        <td colspan="5">
+        <td nowrap="1">
          <input type="submit" name="control" value="stop" />
          <input type="submit" name="control" value="pause" />
          <input type="submit" name="control" value="previous" />
@@ -35,15 +34,30 @@
         </td>
        </form>
        <form>
-        <td colspan="0" align="right">
+        <td align="right" nowrap="1">
          Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set">
         </td>
        </form>
       </tr>
       <tr>
-       <form>
-        <td colspan="8"><input type="submit" name="seek_value" value="-1min"><input type="text" name="seek_value" size="12"><input type="hidden" name="control" value="seek"><input type="submit" name="seek_value" value="+1min"> ( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )</td>
-       </form>
+       <td colspan="2">
+        <table>
+         <tr>
+          <form>
+           <td><input type="submit" name="seek_value" value="-1min"><input type="hidden" name="control" value="seek"></td>
+          </form>
+          <form>
+           <td><input type="text" name="seek_value" size="14"><input type="hidden" name="control" value="seek"></td>
+          </form>
+          <form>
+           <td><input type="submit" name="seek_value" value="+1min"><input type="hidden" name="control" value="seek"></td>
+          </form>
+           <td>
+            ( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )
+           </td>
+         </tr>
+        </table>
+       </td>
       </tr>
      </table>
     </div>
@@ -62,44 +76,45 @@
       </table>
      </form>
     </div>
-  
-    <div class="sectitle">VLC Playlist</div>
-    <div class="section"> 
 
-    <form method="get" action="">
-     <table>
-        <vlc id="foreach" param1="pl" param2="playlist" />
-          <tr class="<vlc id="if" param1="2 pl.index % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
-          <td>
-           <input type=checkbox name="item" value="<vlc id="value" param1="pl.index" />">
-           <vlc id="if" param1="pl.current" />
-                <b>
-            <vlc id="end" />
-            <a href="?control=play&item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>            <vlc id="if" param1="pl.current" />
-                </b>
-            <vlc id="end" />
-	   </td></tr>
-        <vlc id="end" />
-     </table>
-     <td><input type="submit" name="control" value="delete" /></td>
-     <td><input type="submit" name="control" value="keep" /></td>
-    </form>
-    <tr>
-     <td>
-      <form>
-       <input type="submit" name="control" value="sort" /> by
-       <select name="type">
-        <option value="title">title
-        <option value="group">group
-        <option value="author">author
-       </select> with
-       <select name="order">
-        <option value="0">normal order
-        <option value="1">reverse order
-       </select>
-      </form>
-     </td>
-    </tr>
+    <div class="sectitle">VLC Playlist</div>
+     <div class="section"> 
+      <tr>
+       <td>
+        <form>
+         <input type="submit" name="control" value="sort" /> by
+         <select name="type">
+          <option value="title">title
+          <option value="group">group
+          <option value="author">author
+         </select> with
+         <select name="order">
+          <option value="0">normal order
+          <option value="1">reverse order
+         </select>
+        </form>
+       </td>
+      </tr>
+      <form method="get" action="">
+      <table>
+       <vlc id="foreach" param1="pl" param2="playlist" />
+        <tr class="<vlc id="if" param1="2 pl.index % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+         <td>
+          <input type=checkbox name="item" value="<vlc id="value" param1="pl.index" />">
+          <vlc id="if" param1="pl.current" />
+               <b>
+           <vlc id="end" />
+           <a href="?control=play&item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>
+          <vlc id="if" param1="pl.current" />
+               </b>
+          <vlc id="end" />
+         </td>
+        </tr>
+       <vlc id="end" />
+      </table>
+      <td><input type="submit" name="control" value="delete" /></td>
+      <td><input type="submit" name="control" value="keep" /></td>
+     </form>
     </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>

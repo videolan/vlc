@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.31 2003/11/09 05:22:56 garf Exp $
+ * $Id: http.c,v 1.32 2003/11/12 02:43:33 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -123,6 +123,10 @@ static int  http_get( httpd_file_callback_args_t *p_args,
 static char *uri_extract_value( char *psz_uri, char *psz_name,
                                 char *psz_value, int i_value_max );
 static void uri_decode_url_encoded( char *psz );
+
+static char *Find_end_MRL( char *psz );
+
+static playlist_item_t * parse_MRL( char *psz );
 
 /*****************************************************************************
  *
@@ -1627,7 +1631,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                             case TIME_REL_FOR:
                             {
                                 var_Get( p_sys->p_input, "time", &val );
-                                if( (uint64_t)( i_value ) * 1000 + val.i_time <= i_length )
+                                if( (uint64_t)( i_value ) * 1000000 + val.i_time <= i_length )
                                 {
                                     val.i_time = ((uint64_t)( i_value ) * 1000000) + val.i_time;
                                 } else
@@ -1741,11 +1745,22 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 case MVLC_ADD:
                 {
                     char mrl[512];
+                    playlist_item_t * p_item;
+
                     uri_extract_value( p_request, "mrl", mrl, 512 );
                     uri_decode_url_encoded( mrl );
-                    playlist_Add( p_sys->p_playlist, mrl, NULL, 0,
-                                  PLAYLIST_APPEND, PLAYLIST_END );
-                    msg_Dbg( p_intf, "requested playlist add: %s", mrl );
+                    p_item = parse_MRL( mrl );
+
+                    if( p_item == NULL )
+                    {
+                        msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
+                    } else
+                    {
+                        playlist_AddItem( p_sys->p_playlist , p_item ,
+                                          PLAYLIST_APPEND, PLAYLIST_END );
+                        msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                    }
+
                     break;
                 }
                 case MVLC_DEL:
@@ -2297,9 +2312,9 @@ static int  http_get( httpd_file_callback_args_t *p_args,
             var_Get( p_sys->p_input, "position", &val);
             sprintf( position, "%d" , (int)((val.f_float) * 100.0));
             var_Get( p_sys->p_input, "time", &val);
-            sprintf( time, "%d" , (int)(val.i_time / 1000) );
+            sprintf( time, "%d" , (int)(val.i_time / 1000000) );
             var_Get( p_sys->p_input, "length", &val);
-            sprintf( length, "%d" , (int)(val.i_time / 1000) );
+            sprintf( length, "%d" , (int)(val.i_time / 1000000) );
 
             var_Get( p_sys->p_input, "state", &val );
             if( val.i_int == PLAYING_S )
@@ -2667,6 +2682,16 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
             free( s1 );
             free( s2 );
         }
+        else if( !strcmp( s, "strncmp" ) )
+        {
+            char *s1 = SSPop( st );
+            char *s2 = SSPop( st );
+            int n = SSPopN( st, vars );
+
+            SSPushN( st, strncmp( s1, s2 , n ) );
+            free( s1 );
+            free( s2 );
+        }
         else if( !strcmp( s, "strlen" ) )
         {
             char *str = SSPop( st );
@@ -2734,5 +2759,215 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         {
             SSPush( st, s );
         }
+    }
+}
+
+/**********************************************************************
+ * Find_end_MRL: Find the end of the sentence :
+ * this function parses the string psz and find the end of the item
+ * and/or option with detecting the " and ' problems.
+ * returns NULL if an error is detected, otherwise, returns a pointer
+ * of the end of the sentence (after the last character)
+ **********************************************************************/
+static char *Find_end_MRL( char *psz )
+{
+    char *s_sent = psz;
+
+    switch( *s_sent )
+    {
+        case '\"':
+        {
+            s_sent++;
+
+            while( ( *s_sent != '\"' ) && ( *s_sent != '\0' ) )
+            {
+                if( *s_sent == '\'' )
+                {
+                    s_sent = Find_end_MRL( s_sent );
+
+                    if( s_sent == NULL )
+                    {
+                        return NULL;
+                    }
+                } else
+                {
+                    s_sent++;
+                }
+            }
+
+            if( *s_sent == '\"' )
+            {
+                s_sent++;
+                return s_sent;
+            } else  /* *s_sent == '\0' , which means the number of " is incorrect */
+            {
+                return NULL;
+            }
+            break;
+        }
+        case '\'':
+        {
+            s_sent++;
+
+            while( ( *s_sent != '\'' ) && ( *s_sent != '\0' ) )
+            {
+                if( *s_sent == '\"' )
+                {
+                    s_sent = Find_end_MRL( s_sent );
+
+                    if( s_sent == NULL )
+                    {
+                        return NULL;
+                    }
+                } else
+                {
+                    s_sent++;
+                }
+            }
+
+            if( *s_sent == '\'' )
+            {
+                s_sent++;
+                return s_sent;
+            } else  /* *s_sent == '\0' , which means the number of ' is incorrect */
+            {
+                return NULL;
+            }
+            break;
+        }
+        default: /* now we can look for spaces */
+        {
+            while( ( *s_sent != ' ' ) && ( *s_sent != '\0' ) )
+            {
+                if( ( *s_sent == '\'' ) || ( *s_sent == '\"' ) )
+                {
+                    s_sent = Find_end_MRL( s_sent );
+                } else
+                {
+                    s_sent++;
+                }
+            }
+            return s_sent;
+        }
+    }
+}
+
+/**********************************************************************
+ * parse_MRL: parse the MRL, find the mrl string and the options,
+ * create an item with all informations in it, and return the item.
+ * return NULL if there is an error.
+ **********************************************************************/
+playlist_item_t * parse_MRL( char *psz )
+{
+    char **ppsz_options = NULL;
+    char *mrl;
+    char *s_mrl = psz;
+    int i_error = 0;
+    char *s_temp;
+    int i = 0;
+    int i_options = 0;
+    playlist_item_t * p_item;
+
+    /* In case there is spaces before the mrl */
+    while( ( *s_mrl == ' ' ) && ( *s_mrl != '\0' ) )
+    {
+        s_mrl++;
+    }
+
+    /* extract the mrl */
+    s_temp = Find_end_MRL( s_mrl );
+
+    if( s_temp == NULL )
+    {
+        return NULL;
+    }
+
+    /* if the mrl is between " or ', we must remove them */
+    if( (*s_mrl == '\'') || (*s_mrl == '\"') )
+    {
+        mrl = (char *)malloc( (s_temp - s_mrl - 1) * sizeof( char ) );
+        strncpy( mrl , (s_mrl + 1) , s_temp - s_mrl - 2 );
+        mrl[ s_temp - s_mrl - 2 ] = '\0';
+    } else
+    {
+        mrl = (char *)malloc( (s_temp - s_mrl + 1) * sizeof( char ) );
+        strncpy( mrl , s_mrl , s_temp - s_mrl );
+        mrl[ s_temp - s_mrl ] = '\0';
+    }
+
+    s_mrl = s_temp;
+
+    /* now we can take care of the options */
+    while( (*s_mrl != '\0') && (i_error == 0) )
+    {
+        switch( *s_mrl )
+        {
+            case ' ':
+            {
+                s_mrl++;
+                break;
+            }
+            case ':': /* an option */
+            {
+                s_temp = Find_end_MRL( s_mrl );
+
+                if( s_temp == NULL )
+                {
+                    i_error = 1;
+                } else
+                {
+                    i_options++;
+                    ppsz_options = (char **)realloc( ppsz_options , i_options * sizeof(char *) );
+                    ppsz_options[ i_options - 1 ] = (char *)malloc( (s_temp - s_mrl + 1) * sizeof( char ) );
+
+                    strncpy( ppsz_options[ i_options - 1 ] , s_mrl , s_temp - s_mrl );
+                    /* don't forget to finish the string with a '\0' */
+                    (ppsz_options[ i_options - 1 ])[ s_temp - s_mrl ] = '\0';
+
+                    s_mrl = s_temp;
+                }
+                break;
+            }
+            default:
+            {
+                i_error = 1;
+                break;
+            }
+        }
+    }
+
+    if( i_error != 0 )
+    {
+        free( mrl );
+        for( i = 0 ; i < i_options ; i++ )
+        {
+            free( ppsz_options[i] );
+        }
+        free( ppsz_options );
+        return NULL;
+    } else
+    {
+        /* now create an item */
+        p_item = malloc( sizeof( playlist_item_t ) );
+
+        p_item->psz_name   = mrl;
+        p_item->psz_uri    = mrl;
+        p_item->psz_author = strdup( "" );
+        p_item->i_duration = -1;
+        p_item->i_type = 0;
+        p_item->i_status = 0;
+        p_item->b_autodeletion = VLC_FALSE;
+        p_item->b_enabled = VLC_TRUE;
+        p_item->i_group = PLAYLIST_TYPE_MANUAL;
+
+        p_item->ppsz_options = NULL;
+        p_item->i_options = i_options;
+
+        if( i_options )
+        {
+            p_item->ppsz_options = ppsz_options;
+        }
+
+        return p_item;
     }
 }
