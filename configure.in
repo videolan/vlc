@@ -246,7 +246,9 @@ if test x$enable_gtk != xno; then
 fi
 AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
-if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
+if test x$enable_x11 != xno; then
+  AC_CHECK_HEADERS(X11/Xlib.h, [PLUGINS=${PLUGINS}"x11 "])
+fi
 AC_ARG_ENABLE(xvideo,
   [  --enable-xvideo         XVideo interface support (default disabled)],
   [if test x$enable_xvideo = xyes; then PLUGINS=${PLUGINS}"xvideo "; fi])
