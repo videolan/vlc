@@ -33,16 +33,20 @@
 #include <utility>
 
 
+class GenericFont;
 class Anchor;
+class Tooltip;
 
 
 /// Window manager for skin windows
 class WindowManager: public SkinObject
 {
     public:
-        WindowManager( intf_thread_t *pIntf ):
-            SkinObject( pIntf ), m_isOnTop( false ), m_magnet( 0 ) {}
-        virtual ~WindowManager() {}
+        /// Constructor
+        WindowManager( intf_thread_t *pIntf);
+
+        /// Destructor
+        virtual ~WindowManager();
 
         /// Add a window to the list of known windows. Necessary if you want
         /// your window to be movable...
@@ -89,6 +93,15 @@ class WindowManager: public SkinObject
         /// Set the alpha value of the moving windows
         void setMoveAlphaValue( int moveAlpha ) { m_moveAlpha = moveAlpha; }
 
+        /// Create the tooltip window
+        void createTooltip( const GenericFont &rTipFont );
+
+        /// Show the tooltip window
+        void showTooltip();
+
+        /// Hide the tooltip window
+        void hideTooltip();
+
     private:
         /// Some useful typedefs for lazy people like me
         typedef set<GenericWindow*> WinSet_t;
@@ -100,25 +113,21 @@ class WindowManager: public SkinObject
         /// m_dep[c], it doesn't mean that a is in m_dep[c] (in fact, it
         /// would be extremely rare...)
         map<GenericWindow*, WinSet_t> m_dependencies;
-
         /// Store all the windows
         WinSet_t m_allWindows;
-
         /// Store the moving windows; this set is updated at every start of
         /// move.
         WinSet_t m_movingWindows;
-
         /// Indicate whether the windows are currently on top
         bool m_isOnTop;
-
         /// Magnetism of the screen edges (= scope of action)
         int m_magnet;
-
         /// Alpha value of the static windows
         int m_alpha;
-
         /// Alpha value of the moving windows
         int m_moveAlpha;
+        /// Tooltip
+        Tooltip *m_pTooltip;
 
         /// Recursively build a set of windows anchored to the one given.
         void buildDependSet( WinSet_t &rWinSet, GenericWindow *pWindow );

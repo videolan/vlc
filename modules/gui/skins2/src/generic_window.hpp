@@ -34,7 +34,6 @@ class Anchor;
 class OSWindow;
 class OSGraphics;
 class GenericLayout;
-class Tooltip;
 class CtrlGeneric;
 class EvtGeneric;
 class EvtFocus;
@@ -44,7 +43,6 @@ class EvtMouse;
 class EvtKey;
 class EvtRefresh;
 class EvtScroll;
-class GenericFont;
 class WindowManager;
 
 
@@ -54,7 +52,6 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
     public:
         GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
                        WindowManager &rWindowManager,
-                       const GenericFont &rTipFont,
                        bool dragDrop, bool playOnDrop );
         virtual ~GenericWindow();
 
@@ -141,10 +138,6 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         CtrlGeneric *m_pFocusControl;
         /// List of the anchors of this window
         list<Anchor*> m_anchorList;
-        /// Font for the tooltip
-        GenericFont *m_pFont;
-        /// Tooltip
-        Tooltip *m_pTooltip;
         /// Variable for the visibility of the window
         VarBoolImpl m_varVisible;
 

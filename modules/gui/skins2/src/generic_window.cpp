@@ -28,8 +28,6 @@
 #include "os_window.hpp"
 #include "os_factory.hpp"
 #include "theme.hpp"
-#include "ft2_font.hpp"
-#include "tooltip.hpp"
 #include "dialogs.hpp"
 #include "var_manager.hpp"
 #include "../commands/cmd_on_top.hpp"
@@ -51,7 +49,6 @@
 
 GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
                               WindowManager &rWindowManager,
-                              const GenericFont &rTipFont,
                               bool dragDrop, bool playOnDrop ):
     SkinObject( pIntf ), m_rWindowManager( rWindowManager ),
     m_left( left ), m_top( top ), m_width( 0 ), m_height( 0 ),
@@ -67,9 +64,6 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
     // Create an OSWindow to handle OS specific processing
     m_pOsWindow = pOsFactory->createOSWindow( *this, dragDrop, playOnDrop );
 
-    // Create the tooltip window
-    m_pTooltip = new Tooltip( getIntf(), rTipFont, 500 );
-
     // Observe the visibility variable
     m_varVisible.addObserver( this );
 }
@@ -81,10 +75,6 @@ GenericWindow::~GenericWindow()
     // Unregister from the window manager
     m_rWindowManager.unregisterWindow( *this );
 
-    if( m_pTooltip )
-    {
-        delete m_pTooltip;
-    }
     if( m_pOsWindow )
     {
         delete m_pOsWindow;
@@ -140,7 +130,7 @@ void GenericWindow::processEvent( EvtLeave &rEvtLeave )
 
     if( !m_pCapturingControl )
     {
-        m_pTooltip->hide();
+        m_rWindowManager.hideTooltip();
     }
 }
 
@@ -419,14 +409,14 @@ void GenericWindow::onControlRelease( const CtrlGeneric &rCtrl )
         m_pLastHitControl->handleEvent( evt );
 
         // Show the tooltip
-        m_pTooltip->hide();
+        m_rWindowManager.hideTooltip();
         UString tipText = m_pLastHitControl->getTooltipText();
         if( tipText.length() > 0 )
         {
             // Set the tooltip text variable
             VarManager *pVarManager = VarManager::instance( getIntf() );
             pVarManager->getTooltipText().set( tipText );
-            m_pTooltip->show();
+            m_rWindowManager.showTooltip();
         }
     }
 }
@@ -533,14 +523,14 @@ CtrlGeneric *GenericWindow::findHitControl( int xPos, int yPos )
             if( !m_pCapturingControl )
             {
                 // Show the tooltip
-                m_pTooltip->hide();
+                m_rWindowManager.hideTooltip();
                 UString tipText = pNewHitControl->getTooltipText();
                 if( tipText.length() > 0 )
                 {
                     // Set the tooltip text variable
                     VarManager *pVarManager = VarManager::instance( getIntf() );
                     pVarManager->getTooltipText().set( tipText );
-                    m_pTooltip->show();
+                    m_rWindowManager.showTooltip();
                 }
             }
         }

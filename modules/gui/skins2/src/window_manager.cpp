@@ -26,7 +26,20 @@
 #include "generic_window.hpp"
 #include "os_factory.hpp"
 #include "anchor.hpp"
+#include "tooltip.hpp"
 #include "../utils/position.hpp"
+
+
+WindowManager::WindowManager( intf_thread_t *pIntf ):
+    SkinObject( pIntf ), m_isOnTop( false ), m_magnet( 0 ), m_pTooltip( NULL )
+{
+}
+
+
+WindowManager::~WindowManager()
+{
+    delete m_pTooltip;
+}
 
 
 void WindowManager::registerWindow( GenericWindow &rWindow )
@@ -307,3 +320,33 @@ void WindowManager::checkAnchors( GenericWindow *pWindow,
 }
 
 
+void WindowManager::createTooltip( const GenericFont &rTipFont )
+{
+    // Create the tooltip window
+    if( !m_pTooltip )
+    {
+        m_pTooltip = new Tooltip( getIntf(), rTipFont, 500 );
+    }
+    else
+    {
+        msg_Warn( getIntf(), "Tooltip already created!");
+    }
+}
+
+
+void WindowManager::showTooltip()
+{
+    if( m_pTooltip )
+    {
+        m_pTooltip->show();
+    }
+}
+
+
+void WindowManager::hideTooltip()
+{
+    if( m_pTooltip )
+    {
+        m_pTooltip->hide();
+    }
+}

@@ -110,9 +110,14 @@ Theme *Builder::build()
 
 void Builder::addTheme( const BuilderData::Theme &rData )
 {
-    m_pTheme->getWindowManager().setMagnetValue( rData.m_magnet );
-    m_pTheme->getWindowManager().setAlphaValue( rData.m_alpha );
-    m_pTheme->getWindowManager().setMoveAlphaValue( rData.m_moveAlpha );
+    WindowManager &rManager = m_pTheme->getWindowManager();
+    rManager.setMagnetValue( rData.m_magnet );
+    rManager.setAlphaValue( rData.m_alpha );
+    rManager.setMoveAlphaValue( rData.m_moveAlpha );
+    // XXX:  font to fix
+    GenericFont *pFont = new FT2Font( getIntf(), "FreeSans.ttf", 12 );
+    pFont->init();
+    rManager.createTooltip( *pFont );
 }
 
 
@@ -135,12 +140,9 @@ void Builder::addFont( const BuilderData::Font &rData )
 
 void Builder::addWindow( const BuilderData::Window &rData )
 {
-    // XXX:  font to fix
-    GenericFont *pFont = new FT2Font( getIntf(), "FreeSans.ttf", 12 );
-    pFont->init();
     GenericWindow *pWin =
         new GenericWindow( getIntf(), rData.m_xPos, rData.m_yPos,
-                           m_pTheme->getWindowManager(), *pFont,
+                           m_pTheme->getWindowManager(),
                            rData.m_dragDrop, rData.m_playOnDrop );
 
     m_pTheme->m_windows[rData.m_id] = GenericWindowPtr( pWin );
