@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2001 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,9 +54,10 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    mtime_t          i_pts;
     mtime_t          i_previous_pts;
     mtime_t          i_current_pts;
+    mtime_t          i_previous_dts;
+    mtime_t          i_current_dts;
     int              i_current_rate;
     picture_t *      p_picture_to_destroy;
     vlc_bool_t       b_garbage_pic;
@@ -126,9 +127,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_mpeg2dec = NULL;
     p_sys->p_synchro  = NULL;
     p_sys->p_info     = NULL;
-    p_sys->i_pts      = mdate() + DEFAULT_PTS_DELAY;
     p_sys->i_current_pts  = 0;
     p_sys->i_previous_pts = 0;
+    p_sys->i_current_dts  = 0;
+    p_sys->i_previous_dts = 0;
     p_sys->p_picture_to_destroy = NULL;
     p_sys->b_garbage_pic = 0;
     p_sys->b_slice_i  = 0;
@@ -240,17 +242,22 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
             }
 
+#ifdef PIC_FLAG_PTS
             if( p_block->i_pts )
             {
-#ifdef PIC_FLAG_PTS
                 mpeg2_pts( p_sys->p_mpeg2dec, (uint32_t)p_block->i_pts );
 
 #else /* New interface */
+            if( p_block->i_pts || p_block->i_dts )
+            {
                 mpeg2_tag_picture( p_sys->p_mpeg2dec,
-                                   (uint32_t)p_block->i_pts, 0/*dts*/ );
+                                   (uint32_t)p_block->i_pts,
+                                   (uint32_t)p_block->i_dts );
 #endif
                 p_sys->i_previous_pts = p_sys->i_current_pts;
                 p_sys->i_current_pts = p_block->i_pts;
+                p_sys->i_previous_dts = p_sys->i_current_dts;
+                p_sys->i_current_dts = p_block->i_dts;
             }
 
             p_sys->i_current_rate = p_block->i_rate;
@@ -369,7 +376,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_PICTURE:
         {
             uint8_t *buf[3];
-            mtime_t i_pts;
+            mtime_t i_pts, i_dts;
             buf[0] = buf[1] = buf[2] = NULL;
 
             if ( p_sys->b_after_sequence_header &&
@@ -391,14 +398,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 ( ( p_sys->p_info->current_picture->pts ==
                     (uint32_t)p_sys->i_current_pts ) ?
                   p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
-
-#else /* New interface */
-
-            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
-                ( ( p_sys->p_info->current_picture->tag ==
-                    (uint32_t)p_sys->i_current_pts ) ?
-                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
-#endif
+            i_dts = 0;
 
             /* Hack to handle demuxers which only have DTS timestamps */
             if( !i_pts && !p_block->i_pts && p_block->i_dts > 0 )
@@ -413,10 +413,22 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_block->i_pts = p_block->i_dts = 0;
             /* End hack */
 
+#else /* New interface */
+
+            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
+                ( ( p_sys->p_info->current_picture->tag ==
+                    (uint32_t)p_sys->i_current_pts ) ?
+                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+            i_dts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
+                ( ( p_sys->p_info->current_picture->tag2 ==
+                    (uint32_t)p_sys->i_current_dts ) ?
+                  p_sys->i_current_dts : p_sys->i_previous_dts ) : 0;
+#endif
+
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
-                p_sys->p_info->current_picture->nb_fields, i_pts,
-                0, p_sys->i_current_rate );
+                p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
+                p_sys->i_current_rate );
 
             if ( !(p_sys->b_slice_i
                    && ((p_sys->p_info->current_picture->flags
