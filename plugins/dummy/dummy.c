@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.22 2002/06/11 09:44:21 gbazin Exp $
+ * $Id: dummy.c,v 1.23 2002/07/23 20:15:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,6 +37,7 @@ void _M( demux_getfunctions ) ( function_list_t * p_function_list );
 void _M( aout_getfunctions )  ( function_list_t * p_function_list );
 void _M( vout_getfunctions )  ( function_list_t * p_function_list );
 void _M( intf_getfunctions )  ( function_list_t * p_function_list );
+void _M( dec_getfunctions )   ( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -57,11 +58,12 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("dummy functions module") )
     /* Capability score set to 0 because we don't want to be spawned
      * unless explicitly requested to */
-    ADD_CAPABILITY( AOUT, 0 )
-    ADD_CAPABILITY( VOUT, 0 )
     ADD_CAPABILITY( INTF, 0 )
     ADD_CAPABILITY( ACCESS, 0 )
     ADD_CAPABILITY( DEMUX, 0 )
+    ADD_CAPABILITY( DECODER, 0 )
+    ADD_CAPABILITY( AOUT, 0 )
+    ADD_CAPABILITY( VOUT, 0 )
     ADD_SHORTCUT( "vlc" )
 MODULE_INIT_STOP
 
@@ -72,6 +74,7 @@ MODULE_ACTIVATE_START
     _M( aout_getfunctions )( &p_module->p_functions->aout );
     _M( vout_getfunctions )( &p_module->p_functions->vout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );
+    _M( dec_getfunctions )( &p_module->p_functions->dec );
 MODULE_ACTIVATE_STOP
 
 
