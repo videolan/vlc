@@ -55,6 +55,7 @@ include/vlc_spu.h
 include/vlc_stream.h
 include/vlc_threads.h
 include/vlc_threads_funcs.h
+include/vlc_tls.h
 include/vlc_video.h
 include/vlc_vlm.h
 include/vlc_vod.h
@@ -104,6 +105,7 @@ src/misc/mtime.c
 src/misc/net.c
 src/misc/objects.c
 src/misc/threads.c
+src/misc/tls.c
 src/misc/variables.c
 src/misc/vlm.c
 src/misc/win32_specific.c
@@ -711,6 +713,7 @@ modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
 modules/misc/freetype.c
+modules/misc/gnutls.c
 modules/misc/gtk_main.c
 modules/misc/logger.c
 modules/misc/memcpy/fastmemcpy.h

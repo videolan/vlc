@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-03 00:50+0100\n"
+"POT-Creation-Date: 2004-11-10 16:03+0100\n"
 "PO-Revision-Date: 2004-05-02 17:45+0200\n"
 "Last-Translator: Carlo Calabrò\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -147,9 +147,10 @@ msgid "Stream output access modules settings"
 msgstr "Impostazioni di trasmissione in uscita (stream output)"
 
 #: include/vlc_help.h:96
+#, fuzzy
 msgid ""
-"In this section you can set the caching value for the UDP stream output "
-"access module."
+"In this section you can set the caching value for the stream output access "
+"modules."
 msgstr ""
 "In questa sezione è possibile regolare il valore della cache per la "
 "trasmissione UDP in uscita (modulo stream output)."
@@ -315,7 +316,7 @@ msgstr "Impostazione"
 msgid "URL"
 msgstr "URL"
 
-#: include/vlc_meta.h:38 src/input/es_out.c:1117 src/libvlc.h:73
+#: include/vlc_meta.h:38 src/input/es_out.c:1134 src/libvlc.h:73
 #: modules/gui/beos/InterfaceWindow.cpp:259
 msgid "Language"
 msgstr "Lingua"
@@ -414,7 +415,7 @@ msgid "Visualizations"
 msgstr "Visualizzazioni"
 
 #: src/audio_output/input.c:108 src/audio_output/input.c:154
-#: src/input/es_out.c:298 src/video_output/video_output.c:404
+#: src/input/es_out.c:299 src/video_output/video_output.c:404
 #: modules/codec/ffmpeg/postprocess.c:94
 msgid "Disable"
 msgstr "Disabilita"
@@ -452,7 +453,7 @@ msgstr "Canali audio"
 #: src/audio_output/output.c:105 src/audio_output/output.c:140
 #: modules/audio_output/alsa.c:178 modules/audio_output/alsa.c:209
 #: modules/audio_output/directx.c:447 modules/audio_output/oss.c:202
-#: modules/audio_output/portaudio.c:353 modules/audio_output/sdl.c:181
+#: modules/audio_output/portaudio.c:381 modules/audio_output/sdl.c:181
 #: modules/audio_output/sdl.c:198 modules/audio_output/waveout.c:392
 msgid "Stereo"
 msgstr "Stereo"
@@ -537,28 +538,29 @@ msgstr "%s: l'opzione `-W %s' non accetta argomenti\n"
 msgid "Bookmark %i"
 msgstr "Segnalibro %i"
 
-#: src/input/es_out.c:310 src/input/es_out.c:311 modules/access/cdda.c:161
+#: src/input/es_out.c:319 src/input/es_out.c:320 src/input/es_out.c:326
+#: src/input/es_out.c:327 modules/access/cdda.c:161
 #: modules/access/cdda/info.c:672 modules/access/cdda/info.c:689
 #, c-format
 msgid "Track %i"
 msgstr "Traccia %i"
 
-#: src/input/es_out.c:1112
+#: src/input/es_out.c:1129
 #, c-format
 msgid "Stream %d"
 msgstr "Diffusione %d"
 
-#: src/input/es_out.c:1114 modules/gui/wxwindows/wizard.cpp:807
+#: src/input/es_out.c:1131 modules/gui/wxwindows/wizard.cpp:807
 #: modules/gui/wxwindows/wizard.cpp:843
 msgid "Codec"
 msgstr "Codifica"
 
-#: src/input/es_out.c:1125 src/input/es_out.c:1147 src/input/es_out.c:1164
+#: src/input/es_out.c:1142 src/input/es_out.c:1164 src/input/es_out.c:1181
 #: modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "Tipo"
 
-#: src/input/es_out.c:1125 src/libvlc.h:806
+#: src/input/es_out.c:1142 src/libvlc.h:806
 #: modules/gui/beos/InterfaceWindow.cpp:263
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:457 modules/gui/macosx/output.m:170
@@ -567,36 +569,36 @@ msgstr "Tipo"
 msgid "Audio"
 msgstr "Audio"
 
-#: src/input/es_out.c:1128 modules/gui/gtk/gnome_interface.c:148
+#: src/input/es_out.c:1145 modules/gui/gtk/gnome_interface.c:148
 #: modules/gui/gtk/gnome_interface.c:931 modules/gui/gtk/gtk_interface.c:481
 #: modules/gui/gtk/gtk_interface.c:1282 modules/gui/macosx/output.m:176
 #: modules/gui/wxwindows/streamout.cpp:774
 msgid "Channels"
 msgstr "Canali"
 
-#: src/input/es_out.c:1132
+#: src/input/es_out.c:1149
 msgid "Sample rate"
 msgstr "Campionamento"
 
-#: src/input/es_out.c:1133
+#: src/input/es_out.c:1150
 #, c-format
 msgid "%d Hz"
 msgstr "%d Hz"
 
-#: src/input/es_out.c:1137
+#: src/input/es_out.c:1154
 msgid "Bits per sample"
 msgstr "Bit per campione"
 
-#: src/input/es_out.c:1141 modules/access/pvr/pvr.c:73
+#: src/input/es_out.c:1158 modules/access/pvr/pvr.c:73
 msgid "Bitrate"
 msgstr "Bitrate"
 
-#: src/input/es_out.c:1142
+#: src/input/es_out.c:1159
 #, c-format
 msgid "%d kb/s"
 msgstr "%d kb/s"
 
-#: src/input/es_out.c:1147 src/libvlc.h:832
+#: src/input/es_out.c:1164 src/libvlc.h:832
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:470 modules/gui/macosx/output.m:160
 #: modules/gui/wxwindows/extrapanel.cpp:176
@@ -604,15 +606,15 @@ msgstr "%d kb/s"
 msgid "Video"
 msgstr "Video"
 
-#: src/input/es_out.c:1151
+#: src/input/es_out.c:1168
 msgid "Resolution"
 msgstr "Risoluzione"
 
-#: src/input/es_out.c:1157
+#: src/input/es_out.c:1174
 msgid "Display resolution"
 msgstr "Risoluzione video"
 
-#: src/input/es_out.c:1164 modules/gui/gtk/gnome_interface.c:1972
+#: src/input/es_out.c:1181 modules/gui/gtk/gnome_interface.c:1972
 #: modules/gui/gtk/gtk_interface.c:2287
 msgid "Subtitle"
 msgstr "Sottotitolo"
@@ -723,8 +725,8 @@ msgstr "Cambia interfaccia"
 msgid "Add Interface"
 msgstr "Aggiungi interfaccia"
 
-#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1629
-#: src/misc/modules.c:1919
+#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1630
+#: src/misc/modules.c:1920
 msgid "C"
 msgstr "it"
 
@@ -1103,8 +1105,9 @@ msgstr ""
 msgid ""
 "These options allow you to modify the behavior of the video output "
 "subsystem. You can for example enable video filters (deinterlacing, image "
-"adjusting, etc.). Enable these filters here and configure them in the \"video "
-"filters\" modules section. You can also set many miscellaneous video options."
+"adjusting, etc.). Enable these filters here and configure them in the "
+"\"video filters\" modules section. You can also set many miscellaneous video "
+"options."
 msgstr ""
 "Queste opzioni permettono di modificare il comportamento dell'uscita video. "
 "Per esempio, è possibile attivare dei filtri video come il "
@@ -1408,7 +1411,7 @@ msgstr "Scegli il programma"
 
 #: src/libvlc.h:286
 #, fuzzy
-msgid "Choose the programs to select by giving a comma-separated list ofSIDs."
+msgid "Choose the programs to select by giving a comma-separated list of SIDs."
 msgstr ""
 "Scelta del programma da selezionare tramite l'impostazione del Service ID."
 
@@ -3427,8 +3430,8 @@ msgstr ""
 #: modules/access/cdda/cdda.c:56
 msgid ""
 "Allows you to specify how many CD blocks to get on a single CD read. "
-"Generally on newer/faster CDs, this increases throughput at the expense of "
-"a little more memory usage and initial delay. SCSI-MMC limitations generally "
+"Generally on newer/faster CDs, this increases throughput at the expense of a "
+"little more memory usage and initial delay. SCSI-MMC limitations generally "
 "don't allow for more than 25 blocks per access."
 msgstr ""
 "Permette di specificare quanti blocchi leggere da un CD. In generale, sui CD "
@@ -4735,37 +4738,72 @@ msgstr "Aggiungere alla fine del file, se esiste, anzichè sostituirlo."
 msgid "File stream output"
 msgstr "Trasmissione in uscita file"
 
-#: modules/access_output/http.c:46
+#: modules/access_output/http.c:48
 msgid "Username"
 msgstr "Utente"
 
-#: modules/access_output/http.c:47
+#: modules/access_output/http.c:49
 msgid ""
 "Allows you to give a user name that will be requested to access the stream."
 msgstr ""
 "Permette di specificare il nome utente da utilizzare per accedere alla "
 "trasmissione."
 
-#: modules/access_output/http.c:49
+#: modules/access_output/http.c:51
 msgid "Password"
 msgstr "Password"
 
-#: modules/access_output/http.c:50
+#: modules/access_output/http.c:52
 msgid ""
 "Allows you to give a password that will be requested to access the stream."
 msgstr ""
 "Permette di specificare la password da utilizzare per accedere alle "
 "trasmissione."
 
-#: modules/access_output/http.c:52
+#: modules/access_output/http.c:54
 msgid "Mime"
 msgstr "Mime"
 
-#: modules/access_output/http.c:53
+#: modules/access_output/http.c:55
 msgid "Allows you to give the mime returned by the server."
 msgstr "Permette di specificare il MIME utilizzato dal server."
 
-#: modules/access_output/http.c:56
+#: modules/access_output/http.c:56 modules/control/http.c:81
+#, fuzzy
+msgid "Certificate file"
+msgstr "Usa un file di sottotitoli"
+
+#: modules/access_output/http.c:57
+msgid "HTTP/SSL stream output x509 PEM certificate file"
+msgstr ""
+
+#: modules/access_output/http.c:58 modules/control/http.c:83
+msgid "Private key file"
+msgstr ""
+
+#: modules/access_output/http.c:59
+msgid "HTTP/SSL stream output x509 PEM private key file"
+msgstr ""
+
+#: modules/access_output/http.c:60 modules/control/http.c:85
+#, fuzzy
+msgid "Root CA file"
+msgstr "Scelta file"
+
+#: modules/access_output/http.c:61
+msgid "HTTP/SSL stream output x509 PEM trusted root CA certificates file"
+msgstr ""
+
+#: modules/access_output/http.c:62 modules/control/http.c:87
+#, fuzzy
+msgid "CRL file"
+msgstr "file PLS"
+
+#: modules/access_output/http.c:63
+msgid "HTTP/SSL stream output Certificates Revocation List file"
+msgstr ""
+
+#: modules/access_output/http.c:66
 msgid "HTTP stream output"
 msgstr "Trasmissione in uscita HTTP"
 
@@ -5145,27 +5183,27 @@ msgstr "Periferica ALSA"
 
 #: modules/audio_output/alsa.c:118 modules/audio_output/coreaudio.c:217
 #: modules/audio_output/directx.c:383 modules/audio_output/oss.c:129
-#: modules/audio_output/portaudio.c:339 modules/audio_output/sdl.c:176
+#: modules/audio_output/portaudio.c:367 modules/audio_output/sdl.c:176
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:343
 #: modules/gui/macosx/intf.m:465 modules/gui/macosx/intf.m:466
 msgid "Audio Device"
 msgstr "Periferica Audio"
 
 #: modules/audio_output/alsa.c:172 modules/audio_output/directx.c:460
-#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:345
+#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:373
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:405
 msgid "Mono"
 msgstr "Mono"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:433
-#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:364
+#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:392
 #: modules/audio_output/waveout.c:377
 msgid "2 Front 2 Rear"
 msgstr "2 Anteriori 2 Posteriori"
 
 #: modules/audio_output/alsa.c:191 modules/audio_output/directx.c:397
-#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:380
+#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:408
 #: modules/audio_output/waveout.c:358
 msgid "5.1"
 msgstr "5.1"
@@ -5197,7 +5235,7 @@ msgstr "Uscita CoreAudio"
 msgid "DirectX audio output"
 msgstr "Uscita audio DirectX"
 
-#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:372
+#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:400
 msgid "3 Front 2 Rear"
 msgstr "3 Anteriori 2 Posteriori"
 
@@ -5277,16 +5315,16 @@ msgstr "Uscita audio Linux OSS"
 msgid "OSS DSP device"
 msgstr "Periferica DSP OSS"
 
-#: modules/audio_output/portaudio.c:79
+#: modules/audio_output/portaudio.c:90
 #, fuzzy
 msgid "Output device"
 msgstr "File in uscita"
 
-#: modules/audio_output/portaudio.c:80
+#: modules/audio_output/portaudio.c:91
 msgid "Portaudio identifier for the output device"
 msgstr ""
 
-#: modules/audio_output/portaudio.c:83
+#: modules/audio_output/portaudio.c:94
 #, fuzzy
 msgid "PORTAUDIO audio output"
 msgstr "Uscita audio ALSA"
@@ -6270,19 +6308,35 @@ msgstr "Traccia sottotitoli: %s"
 msgid "N/A"
 msgstr "N/A"
 
-#: modules/control/http.c:75 modules/misc/rtsp.c:46
+#: modules/control/http.c:76 modules/misc/rtsp.c:46
 msgid "Host address"
 msgstr "Indirizzo host"
 
-#: modules/control/http.c:77
+#: modules/control/http.c:78
 msgid "You can set the address and port the http interface will bind to."
 msgstr "Indirizzo e porta sulla quale aprire l'interfaccia http."
 
-#: modules/control/http.c:78 modules/control/http.c:79
+#: modules/control/http.c:79 modules/control/http.c:80
 msgid "Source directory"
 msgstr "Directory sorgente"
 
 #: modules/control/http.c:82
+msgid "HTTP interface x509 PEM certificate file (enables SSL)"
+msgstr ""
+
+#: modules/control/http.c:84
+msgid "HTTP interface x509 PEM private key file"
+msgstr ""
+
+#: modules/control/http.c:86
+msgid "HTTP interface x509 PEM trusted root CA certificates file"
+msgstr ""
+
+#: modules/control/http.c:88
+msgid "HTTP interace Certificates Revocation List file"
+msgstr ""
+
+#: modules/control/http.c:91
 msgid "HTTP remote control interface"
 msgstr "Interfaccia di controllo a distanza HTTP"
 
@@ -6470,37 +6524,37 @@ msgstr ""
 msgid "Windows Service interface"
 msgstr "Interfaccia del Windows Service"
 
-#: modules/control/rc.c:123 modules/control/rtci.c:127
+#: modules/control/rc.c:127 modules/control/rtci.c:127
 msgid "Show stream position"
 msgstr "Mostra posizione sorgente"
 
-#: modules/control/rc.c:124 modules/control/rtci.c:128
+#: modules/control/rc.c:128 modules/control/rtci.c:128
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
 "Mostra ogni tanto la posizione attuale (in secondi) nel flusso sorgente."
 
-#: modules/control/rc.c:127 modules/control/rtci.c:131
+#: modules/control/rc.c:131 modules/control/rtci.c:131
 msgid "Fake TTY"
 msgstr "Pseudo-TTY"
 
-#: modules/control/rc.c:128
+#: modules/control/rc.c:132
 msgid "Force the rc module to use stdin as if it was a TTY."
 msgstr "Forza il modulo rc ad utilizzare stdin, come se fosse una TTY."
 
-#: modules/control/rc.c:130 modules/control/rtci.c:134
+#: modules/control/rc.c:134 modules/control/rtci.c:134
 msgid "UNIX socket command input"
 msgstr "Ingresso comandi da socket Unix"
 
-#: modules/control/rc.c:131 modules/control/rtci.c:135
+#: modules/control/rc.c:135 modules/control/rtci.c:135
 msgid "Accept commands over a Unix socket rather than stdin."
 msgstr "Accetta comandi provenienti da un socket Unix anzichè da stdin."
 
-#: modules/control/rc.c:134 modules/control/rtci.c:138
+#: modules/control/rc.c:138 modules/control/rtci.c:138
 msgid "TCP command input"
 msgstr "Ingresso comandi da TCP"
 
-#: modules/control/rc.c:135 modules/control/rtci.c:139
+#: modules/control/rc.c:139 modules/control/rtci.c:139
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
@@ -6508,20 +6562,20 @@ msgstr ""
 "Accetta comandi provenienti da un socket TCP anzichè da stdin. Si possono "
 "specificare l'indirizzo e la porta su cui il socket ascolta."
 
-#: modules/control/rc.c:137 modules/control/rtci.c:141
+#: modules/control/rc.c:141 modules/control/rtci.c:141
 msgid "Extended help"
 msgstr "Aiuto dettagliato"
 
-#: modules/control/rc.c:138 modules/control/rtci.c:142
+#: modules/control/rc.c:142 modules/control/rtci.c:142
 msgid "List additional commands."
 msgstr "Elenca comandi addizionali"
 
-#: modules/control/rc.c:142 modules/control/rtci.c:146
+#: modules/control/rc.c:146 modules/control/rtci.c:146
 #: modules/misc/dummy/dummy.c:49
 msgid "Do not open a DOS command box interface"
 msgstr "Non aprire una finestra di comando DOS"
 
-#: modules/control/rc.c:144
+#: modules/control/rc.c:148
 msgid ""
 "By default the rc interface plugin will start a DOS command box. Enabling "
 "the quiet mode will not bring this command box but can also be pretty "
@@ -6531,228 +6585,139 @@ msgstr ""
 "DOS. Il modo silenzioso elimina questa finestra, ma può risultare fastidioso "
 "quando si vuole chiudere VLC e non ci sono finestre video aperte."
 
-#: modules/control/rc.c:151
+#: modules/control/rc.c:155
 msgid "Remote control interface"
 msgstr "Interfaccia comando a distanza"
 
-#: modules/control/rc.c:277
-#, c-format
+#: modules/control/rc.c:281
 msgid "Remote control interface initialized, `h' for help\n"
 msgstr ""
 "Interfaccia comando a distanza inizializzata, `h' per un menu d'aiuto\n"
 
-#: modules/control/rc.c:475 modules/control/rc.c:490
-#: modules/control/rtci.c:476 modules/control/rtci.c:491
-#, c-format
-msgid "%s: returned %i (%s)\n"
-msgstr "%s: valore di ritorno %i (%s)\n"
-
-#: modules/control/rc.c:524 modules/control/rtci.c:525
-#, c-format
-msgid "+----[ end of stream info ]\n"
-msgstr "+----[ fine info stream ]\n"
-
-#: modules/control/rc.c:529 modules/control/rtci.c:530
-#, c-format
-msgid "no input\n"
-msgstr "Ingresso assente\n"
-
-#: modules/control/rc.c:606 modules/control/rtci.c:607
-#, c-format
+#: modules/control/rc.c:610 modules/control/rtci.c:607
 msgid "+----[ Remote control commands ]\n"
 msgstr "+----[ Comandi interfaccia rc ]\n"
 
-#: modules/control/rc.c:608 modules/control/rtci.c:609
-#, c-format
+#: modules/control/rc.c:612 modules/control/rtci.c:609
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
 msgstr "| add XYZ  . . . . . . . . . . . . . . aggiunge XYZ alla playlist\n"
 
-#: modules/control/rc.c:609 modules/control/rtci.c:610
-#, c-format
+#: modules/control/rc.c:613 modules/control/rtci.c:610
 msgid "| playlist . . .  show items currently in playlist\n"
 msgstr "| playlist . . . . .  mostra gli elementi correnti della playlist\n"
 
-#: modules/control/rc.c:610 modules/control/rtci.c:611
-#, c-format
+#: modules/control/rc.c:614 modules/control/rtci.c:611
 msgid "| play . . . . . . . . . . . . . . . . play stream\n"
 msgstr "| play . . . . . . . . . . . . . . . . . . . . . . . .  riproduce\n"
 
-#: modules/control/rc.c:611 modules/control/rtci.c:612
-#, c-format
+#: modules/control/rc.c:615 modules/control/rtci.c:612
 msgid "| stop . . . . . . . . . . . . . . . . stop stream\n"
 msgstr "| stop . . . . . . . . . . . . . . . . . . . . . . . . interrompe\n"
 
-#: modules/control/rc.c:612 modules/control/rtci.c:613
-#, c-format
+#: modules/control/rc.c:616 modules/control/rtci.c:613
 msgid "| next . . . . . . . . . . . .  next playlist item\n"
 msgstr "| next . . . . . . . . . . . . . . . . . . .  elemento successivo\n"
 
-#: modules/control/rc.c:613 modules/control/rtci.c:614
-#, c-format
+#: modules/control/rc.c:617 modules/control/rtci.c:614
 msgid "| prev . . . . . . . . . .  previous playlist item\n"
 msgstr "| prev . . . . . . . . . . . . . . . . . . .  elemento precedente\n"
 
-#: modules/control/rc.c:614 modules/control/rtci.c:615
-#, c-format
+#: modules/control/rc.c:618 modules/control/rtci.c:615
 msgid "| title [X]  . . . . set/get title in current item\n"
 msgstr "| title [X]  . . . . sceglie/mostra titolo nell'elemento corrente\n"
 
-#: modules/control/rc.c:615 modules/control/rtci.c:616
-#, c-format
+#: modules/control/rc.c:619 modules/control/rtci.c:616
 msgid "| title_n  . . . . . .  next title in current item\n"
 msgstr "| title_n  . . . . . . . titolo successivo nell'elemento corrente\n"
 
-#: modules/control/rc.c:616 modules/control/rtci.c:617
-#, c-format
+#: modules/control/rc.c:620 modules/control/rtci.c:617
 msgid "| title_p  . . . .  previous title in current item\n"
 msgstr "| title_p  . . . . . . . titolo precedente nell'elemento corrente\n"
 
-#: modules/control/rc.c:617 modules/control/rtci.c:618
-#, c-format
+#: modules/control/rc.c:621 modules/control/rtci.c:618
 msgid "| chapter [X]  . . set/get chapter in current item\n"
 msgstr "| chapter [X]  . . sceglie/mostra capitolo nell'elemento corrente\n"
 
-#: modules/control/rc.c:618 modules/control/rtci.c:619
-#, c-format
+#: modules/control/rc.c:622 modules/control/rtci.c:619
 msgid "| chapter_n  . . . .  next chapter in current item\n"
 msgstr "| chapter_n  . . . . . capitolo successivo nell'elemento corrente\n"
 
-#: modules/control/rc.c:619 modules/control/rtci.c:620
-#, c-format
+#: modules/control/rc.c:623 modules/control/rtci.c:620
 msgid "| chapter_p  . .  previous chapter in current item\n"
 msgstr "| chapter_p  . . . . . capitolo precedente nell'elemento corrente\n"
 
-#: modules/control/rc.c:621 modules/control/rtci.c:622
-#, c-format
+#: modules/control/rc.c:625 modules/control/rtci.c:622
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
 msgstr "| seek X . . . . . . spostamento in secondi, ad esempio `seek 12'\n"
 
-#: modules/control/rc.c:622 modules/control/rtci.c:623
-#, c-format
+#: modules/control/rc.c:626 modules/control/rtci.c:623
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
 msgstr "| pause  . . . . . . . . . . . . . . . . . . . . . . . . .  pausa\n"
 
-#: modules/control/rc.c:623 modules/control/rtci.c:624
-#, c-format
+#: modules/control/rc.c:627 modules/control/rtci.c:624
 msgid "| f  . . . . . . . . . . . . . . toggle fullscreen\n"
 msgstr "| f  . . . . . . . . . . . . . . . . . . . . . . . schermo intero\n"
 
-#: modules/control/rc.c:624 modules/control/rtci.c:625
-#, c-format
+#: modules/control/rc.c:628 modules/control/rtci.c:625
 msgid "| info . . .  information about the current stream\n"
 msgstr "| info . . . . . . . . . . .  informazioni sull'elemento corrente\n"
 
-#: modules/control/rc.c:626 modules/control/rtci.c:627
-#, c-format
+#: modules/control/rc.c:630 modules/control/rtci.c:627
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
 msgstr "| volume [X] . . . . . . . . . . . . mostra/modifica volume audio\n"
 
-#: modules/control/rc.c:627 modules/control/rtci.c:628
-#, c-format
+#: modules/control/rc.c:631 modules/control/rtci.c:628
 msgid "| volup [X]  . . . . .  raise audio volume X steps\n"
 msgstr "| volup [X]  . . . . . . . . . . . . .  aumenta volume di X passi\n"
 
-#: modules/control/rc.c:628 modules/control/rtci.c:629
-#, c-format
+#: modules/control/rc.c:632 modules/control/rtci.c:629
 msgid "| voldown [X]  . . . .  lower audio volume X steps\n"
 msgstr "| voldown [X]  . . . . . . . . . . . diminuisce volume di X passi\n"
 
-#: modules/control/rc.c:629 modules/control/rtci.c:630
-#, c-format
+#: modules/control/rc.c:633 modules/control/rtci.c:630
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
 msgstr "| adev [X] . . . . . . . . . . .  sceglie/mostra periferica audio\n"
 
-#: modules/control/rc.c:630 modules/control/rtci.c:631
-#, c-format
+#: modules/control/rc.c:634 modules/control/rtci.c:631
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
 msgstr "| achan [X] . . . . . . . . . . . . . sceglie/mostra canali audio\n"
 
-#: modules/control/rc.c:634 modules/control/rtci.c:635
-#, c-format
+#: modules/control/rc.c:638 modules/control/rtci.c:635
 msgid "| marq-marquee STRING  . . overlay STRING in video\n"
 msgstr "| marq-marquee STRINGA  . .  sovrappone STRINGA sul video\n"
 
-#: modules/control/rc.c:635 modules/control/rtci.c:636
-#, c-format
+#: modules/control/rc.c:639 modules/control/rtci.c:636
 msgid "| marq-x X . . . . . .offset of marquee, from left\n"
 msgstr "| marq-x X . . . . . . posizione del testo, da sinistra\n"
 
-#: modules/control/rc.c:636 modules/control/rtci.c:637
-#, c-format
+#: modules/control/rc.c:640 modules/control/rtci.c:637
 msgid "| marq-y Y . . . . . . offset of marquee, from top\n"
 msgstr "| marq-y Y . . . . . . posizione del testo, dall'alto\n"
 
-#: modules/control/rc.c:637 modules/control/rtci.c:638
-#, c-format
+#: modules/control/rc.c:641 modules/control/rtci.c:638
 msgid "| marq-timeout T. . . . .timeout of marquee, in ms\n"
 msgstr "| marq-timeout T. . . . . timeout del testo, in ms\n"
 
-#: modules/control/rc.c:640 modules/control/rtci.c:641
-#, c-format
+#: modules/control/rc.c:644 modules/control/rtci.c:641
 msgid "| help . . . . . . . . . . . . . this help message\n"
 msgstr "| help . . . . . . . . . . . . .  stampa questo messaggio d'aiuto\n"
 
-#: modules/control/rc.c:641 modules/control/rtci.c:642
-#, c-format
+#: modules/control/rc.c:645 modules/control/rtci.c:642
 msgid "| logout . . . . . .exit (if in socket connection)\n"
 msgstr "| logout . . . . . .uscita (se connesso ad un socket)\n"
 
-#: modules/control/rc.c:642 modules/control/rtci.c:643
-#, c-format
+#: modules/control/rc.c:646 modules/control/rtci.c:643
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
 msgstr "| quit . . . . . . . . . . . . . . . . . . . . . . . . chiude vlc\n"
 
-#: modules/control/rc.c:644 modules/control/rtci.c:645
-#, c-format
+#: modules/control/rc.c:648 modules/control/rtci.c:645
 msgid "+----[ end of help ]\n"
 msgstr "+----[ fine dell'aiuto ]\n"
 
-#: modules/control/rc.c:652 modules/control/rtci.c:653
+#: modules/control/rc.c:656 modules/control/rtci.c:653
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
 msgstr "comando `%s' sconosciuto, digitare `help' per una guida rapida\n"
-
-#: modules/control/rc.c:729 modules/control/rtci.c:730
-#, c-format
-msgid "Currently playing chapter %d/%d\n"
-msgstr "Attualmente in riproduzione: capitolo %d/%d\n"
-
-#: modules/control/rc.c:769 modules/control/rtci.c:770
-#, c-format
-msgid "Currently playing title %d/%d\n"
-msgstr "Attualmente in riproduzione: titolo %d/%d\n"
-
-#: modules/control/rc.c:826 modules/control/rtci.c:827
-#, c-format
-msgid "trying to add %s to playlist\n"
-msgstr "aggiunta di %s alla playlist\n"
-
-#: modules/control/rc.c:841 modules/control/rtci.c:842
-#, c-format
-msgid "| no entries\n"
-msgstr "| nessun elemento\n"
-
-#: modules/control/rc.c:850 modules/control/rc.c:915
-#: modules/control/rtci.c:851 modules/control/rtci.c:916
-#, c-format
-msgid "unknown command!\n"
-msgstr "comando sconosciuto!\n"
-
-#: modules/control/rc.c:961 modules/control/rtci.c:962
-#, c-format
-msgid "Volume must be in the range %d-%d\n"
-msgstr "Il volume deve essere compreso nell'intervallo %d-%d\n"
-
-#: modules/control/rc.c:977 modules/control/rc.c:1009
-#: modules/control/rtci.c:978 modules/control/rtci.c:1010
-#, c-format
-msgid "Volume is %d\n"
-msgstr "Il volume è %d\n"
-
-#: modules/control/rc.c:1071 modules/control/rtci.c:1072
-#, c-format
-msgid "+----[ end of %s ]\n"
-msgstr "+----[ fine di %s ]\n"
 
 #: modules/control/rtci.c:132
 msgid "Force the rtci module to use stdin as if it was a TTY."
@@ -6772,7 +6737,6 @@ msgid "Real time control interface"
 msgstr "Interfaccia di controllo in tempo reale"
 
 #: modules/control/rtci.c:278
-#, c-format
 msgid "Real time control interface initialized, `h' for help\n"
 msgstr ""
 "Interfaccia di controllo in tempo reale inizializzata, `h' per un menu "
@@ -9941,7 +9905,7 @@ msgstr ""
 "Abilita l'equalizzatore. E' possibile modificare manualmente le bande oppure "
 "usare un modello predefinito (menu Audio -> Equalizzatore)."
 
-#: modules/gui/wxwindows/extrapanel.cpp:912
+#: modules/gui/wxwindows/extrapanel.cpp:930
 msgid ""
 "Select the video effects filters to apply. You must restart the stream for "
 "these settings to take effect.\n"
@@ -9958,12 +9922,12 @@ msgstr ""
 "Per specificare l'ordine in cui applicare i filtri, è necessario introdurre "
 "a mano una lista di filtri (Preferenze / Generali / Video)."
 
-#: modules/gui/wxwindows/extrapanel.cpp:922
+#: modules/gui/wxwindows/extrapanel.cpp:940
 #: modules/gui/wxwindows/wizard.cpp:505
 msgid "More information"
 msgstr "Ulteriori informazioni"
 
-#: modules/gui/wxwindows/extrapanel.cpp:1125
+#: modules/gui/wxwindows/extrapanel.cpp:1143
 msgid "Extended controls"
 msgstr "Controlli supplementari"
 
@@ -10698,10 +10662,11 @@ msgid "Uh Oh! Unable to find playlist !"
 msgstr "Oops, non riesco a trovare la playlist!"
 
 #: modules/gui/wxwindows/wizard.cpp:115
+#, fuzzy
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
 "incoming stream (for example, a file or a disc, but not an UDP network "
-"stream.\n"
+"stream.)\n"
 "Enter the starting and ending times (in seconds)"
 msgstr ""
 "Utilizzare per leggere soltanto una parte della sorgente. E' necessario "
@@ -11016,6 +10981,20 @@ msgstr "Più grande"
 msgid "freetype2 font renderer"
 msgstr "Generatore di caratteri freetype2"
 
+#: modules/misc/gnutls.c:54
+msgid "Diffie-Hellman prime bits"
+msgstr ""
+
+#: modules/misc/gnutls.c:56
+msgid ""
+"Allows you to modify the Diffie-Hellman prime's number of bits(used for TLS "
+"or SSL-based server-side encryption)."
+msgstr ""
+
+#: modules/misc/gnutls.c:60
+msgid "GnuTLS TLS encryption layer"
+msgstr ""
+
 #: modules/misc/gtk_main.c:60
 msgid "Gtk+ GUI helper"
 msgstr "Aiuto interfaccia Gtk+"
@@ -11265,7 +11244,7 @@ msgstr ""
 msgid "MP4/MOV muxer"
 msgstr "Muxer MP4/MOV"
 
-#: modules/mux/mpeg/ps.c:43 modules/mux/mpeg/ts.c:107
+#: modules/mux/mpeg/ps.c:43 modules/mux/mpeg/ts.c:113
 msgid "DTS delay (ms)"
 msgstr "Ritardo DTS (ms)"
 
@@ -11377,7 +11356,19 @@ msgstr ""
 "Permette di specificare l'intervallo in cui inviare i PCR (Program Clock "
 "Reference). Il valore dovrebbe essere inferiore a 100ms (predefinito a 30)."
 
-#: modules/mux/mpeg/ts.c:108
+#: modules/mux/mpeg/ts.c:107
+msgid "Minimum B (deprecated)"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:108 modules/mux/mpeg/ts.c:111
+msgid "This setting is deprecated and not used anymore"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:110
+msgid "Maximum B (deprecated)"
+msgstr ""
+
+#: modules/mux/mpeg/ts.c:114
 msgid ""
 "This option will delay the DTS (decoding time stamps) and PTS (presentation "
 "timestamps) of the data in the stream, compared to the PCRs. This allows for "
@@ -11388,19 +11379,19 @@ msgstr ""
 "ai PCR. Questo permette di ottenere un buffer all'interno del ciclo di "
 "decodifica."
 
-#: modules/mux/mpeg/ts.c:113
+#: modules/mux/mpeg/ts.c:119
 msgid "Crypt audio"
 msgstr "Crittazione audio"
 
-#: modules/mux/mpeg/ts.c:114
+#: modules/mux/mpeg/ts.c:120
 msgid "Crypt audio using CSA"
 msgstr "Crittazione CSA dell'audio"
 
-#: modules/mux/mpeg/ts.c:116
+#: modules/mux/mpeg/ts.c:122
 msgid "CSA Key"
 msgstr "Chiave CSA"
 
-#: modules/mux/mpeg/ts.c:117
+#: modules/mux/mpeg/ts.c:123
 msgid ""
 "Defines the CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
@@ -11408,7 +11399,7 @@ msgstr ""
 "Definisce la chiave di crittazione CSA. Deve essere una stringa di sedici "
 "caratteri (8 byte esadecimali)."
 
-#: modules/mux/mpeg/ts.c:123
+#: modules/mux/mpeg/ts.c:129
 msgid "TS muxer (libdvbpsi)"
 msgstr "Muxer TS (libdvbpsi)"
 
@@ -11658,30 +11649,40 @@ msgid "Name of the session that will be announced with SAP or SLP"
 msgstr "Nome della sessione da annunciare via SAP o SLP"
 
 #: modules/stream_out/standard.c:59
+#, fuzzy
+msgid "Session groupname"
+msgstr "Nome della sessione"
+
+#: modules/stream_out/standard.c:61
+#, fuzzy
+msgid "Name of the group that will be announced for the session"
+msgstr "Nome della sessione da annunciare via SAP o SLP"
+
+#: modules/stream_out/standard.c:63
 msgid "SAP announcing"
 msgstr "Annunci SAP"
 
-#: modules/stream_out/standard.c:60
+#: modules/stream_out/standard.c:64
 msgid "Announce this session with SAP"
 msgstr "Annuncia questa sessione con SAP"
 
-#: modules/stream_out/standard.c:62
+#: modules/stream_out/standard.c:66
 msgid "SAP IPv6 announcing"
 msgstr "Annunci SAP IPv6"
 
-#: modules/stream_out/standard.c:63
+#: modules/stream_out/standard.c:67
 msgid "Use IPv6 to announce this session with SAP"
 msgstr "Utilizzare IPv6 per l'annuncio SAP di questa sessione"
 
-#: modules/stream_out/standard.c:65
+#: modules/stream_out/standard.c:69
 msgid "SLP announcing"
 msgstr "Annunci SLP"
 
-#: modules/stream_out/standard.c:66
+#: modules/stream_out/standard.c:70
 msgid "Announce this session with SLP"
 msgstr "Annuncia questa sessione con SLP"
 
-#: modules/stream_out/standard.c:74
+#: modules/stream_out/standard.c:78
 msgid "Standard stream output"
 msgstr "Trasmissione in uscita standard"
 
@@ -11978,7 +11979,7 @@ msgstr "Imposta la gamma dell'immagine, tra 0.01 e 10. Predefinita a 1"
 msgid "Image properties filter"
 msgstr "Filtro proprietà immagine"
 
-#: modules/video_filter/blend.c:66
+#: modules/video_filter/blend.c:67
 msgid "Video pictures blending"
 msgstr "Miscela immagini video"
 
@@ -12749,6 +12750,39 @@ msgstr "Tipo di carattere utilizzato per visualizzare i testi nell'uscita xosd"
 #: modules/visualization/xosd.c:80
 msgid "XOSD interface"
 msgstr "Interfaccia XOSD"
+
+#~ msgid "%s: returned %i (%s)\n"
+#~ msgstr "%s: valore di ritorno %i (%s)\n"
+
+#~ msgid "+----[ end of stream info ]\n"
+#~ msgstr "+----[ fine info stream ]\n"
+
+#~ msgid "no input\n"
+#~ msgstr "Ingresso assente\n"
+
+#~ msgid "Currently playing chapter %d/%d\n"
+#~ msgstr "Attualmente in riproduzione: capitolo %d/%d\n"
+
+#~ msgid "Currently playing title %d/%d\n"
+#~ msgstr "Attualmente in riproduzione: titolo %d/%d\n"
+
+#~ msgid "trying to add %s to playlist\n"
+#~ msgstr "aggiunta di %s alla playlist\n"
+
+#~ msgid "| no entries\n"
+#~ msgstr "| nessun elemento\n"
+
+#~ msgid "unknown command!\n"
+#~ msgstr "comando sconosciuto!\n"
+
+#~ msgid "Volume must be in the range %d-%d\n"
+#~ msgstr "Il volume deve essere compreso nell'intervallo %d-%d\n"
+
+#~ msgid "Volume is %d\n"
+#~ msgstr "Il volume è %d\n"
+
+#~ msgid "+----[ end of %s ]\n"
+#~ msgstr "+----[ fine di %s ]\n"
 
 #~ msgid "Extended Data"
 #~ msgstr "Informazioni dettagliate"
