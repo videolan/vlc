@@ -307,13 +307,13 @@ int     VLC_Pause( int );
 int             VLC_Stop( int );
 
 /**
- * Stop the playlist
+ * Tell if VLC is playing
  *
- * If an item is currently playing then stop it.
- * Set the playlist to a stopped state.
+ * If an item is currently playing, it returns
+ * VLC_TRUE, else VLC_FALSE
  *
  * \param i_object a vlc object id
- * \return VLC_SUCCESS on success
+ * \return VLC_TRUE or VLC_FALSE
  */
 vlc_bool_t      VLC_IsPlaying( int );
 

@@ -5,10 +5,29 @@
 
 interface VlcIntf : nsISupports
 {
+    /* Basic playback control */
     void play();
     void pause();
     void stop();
-
+ 
+    /* Audio/Video control */
     void fullscreen();
+    void set_volume( in PRInt64 i_volume );
+    PRInt64 get_volume();
+    void mute();
+
+    /* Playlist management */
+    void clear_playlist();
+    void add_item( in string psz_name);
+    void next();
+    void previous();
+ 
+    /* Status accessors */
+    PRBool isplaying();
+    PRInt64 get_length();
+    PRInt64 get_position();
+    PRInt64 get_time();
+
+    void seek( in PRInt64 i_secs, in PRInt64 b_relative);
 };
 

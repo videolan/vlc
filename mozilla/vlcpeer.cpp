@@ -110,7 +110,7 @@ NS_IMETHODIMP VlcPeer::Stop()
 {
     if( p_plugin )
     {
-        VLC_CleanUp( p_plugin->i_vlc );
+        VLC_Stop( p_plugin->i_vlc );
         p_plugin->b_stream = 0;
     }
     return NS_OK;
@@ -128,3 +128,114 @@ NS_IMETHODIMP VlcPeer::Fullscreen()
     return NS_OK;
 }
 
+
+/* Playlist control */
+NS_IMETHODIMP VlcPeer::Clear_playlist()
+{
+    if( p_plugin )
+    {
+        VLC_PlaylistClear( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Add_item( const char *psz_item )
+{
+     if( p_plugin )
+     {
+          VLC_AddTarget( p_plugin->i_vlc, psz_item, NULL, 0,
+                         PLAYLIST_APPEND, PLAYLIST_END);
+     }
+     return NS_OK;
+}
+
+
+NS_IMETHODIMP VlcPeer::Isplaying( PRBool *b_playing )
+{
+    if( p_plugin->i_vlc )
+    {
+        *b_playing = VLC_IsPlaying( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_position( PRInt64 *i_position )
+{
+    if( p_plugin->i_vlc )
+    {
+        *i_position = VLC_PositionGet( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_time( PRInt64 *i_time )
+{
+    if( p_plugin->i_vlc )
+    {
+        *i_time = VLC_TimeGet( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_length( PRInt64 *i_length )
+{
+    if( p_plugin->i_vlc )
+    {
+        *i_length = VLC_LengthGet( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Seek( PRInt64 i_secs, PRInt64 b_relative )
+{
+    if( p_plugin->i_vlc )
+    {
+        VLC_TimeSet( p_plugin->i_vlc, i_secs, b_relative );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Next()
+{
+    if( p_plugin->i_vlc )
+    {
+        VLC_PlaylistNext( p_plugin->i_vlc);
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Previous()
+{
+    if( p_plugin->i_vlc )
+    {
+        VLC_PlaylistPrev( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Set_volume( PRInt64 i_volume )
+{
+    if( p_plugin->i_vlc )
+    {
+        VLC_VolumeSet( p_plugin->i_vlc, i_volume );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Get_volume( PRInt64 *i_volume )
+{
+    if( p_plugin->i_vlc )
+    {
+        *i_volume = VLC_VolumeGet( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}
+
+NS_IMETHODIMP VlcPeer::Mute()
+{
+    if( p_plugin->i_vlc )
+    {
+        VLC_VolumeMute( p_plugin->i_vlc );
+    }
+    return NS_OK;
+}

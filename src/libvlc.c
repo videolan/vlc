@@ -1556,7 +1556,7 @@ int VLC_PlaylistClear( int i_object )
  */
 int VLC_VolumeSet( int i_object, int i_volume )
 {
-    audio_volume_t i_vol;
+    audio_volume_t i_vol = 0;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
@@ -1565,7 +1565,7 @@ int VLC_VolumeSet( int i_object, int i_volume )
         return VLC_ENOOBJ;
     }
 
-    if( 0 >= i_volume && i_volume <= 200 )
+    if( i_volume >= 0 && i_volume <= 200 )
     {
         i_vol = i_volume * AOUT_VOLUME_MAX / 200;
         aout_VolumeSet( p_vlc, i_vol );
