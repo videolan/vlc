@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.18 2003/05/15 22:27:37 massiot Exp $
+ * $Id: spudec.c,v 1.19 2003/06/12 22:27:35 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,7 +50,7 @@ static vout_thread_t *FindVout( spudec_thread_t * );
     "When the subtitles are coded in text form then, you can choose " \
     "which font will be used to display them.")
 
-#define DEFAULT_FONT "font-eutopiabold36.rle"
+#define DEFAULT_FONT "font-eutopiabold21.rle"
 
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
