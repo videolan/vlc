@@ -1620,16 +1620,23 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
                 avpicture_fill( (AVPicture*)id->p_ff_pic_tmp2, buf,
                                 id->i_inter_pixfmt,
-                                id->f_dst.video.i_width, id->f_dst.video.i_height );
+                                id->f_dst.video.i_width,
+                                id->f_dst.video.i_height );
 
                 id->p_vresample =
                     img_resample_full_init( id->f_dst.video.i_width,
                                             id->f_dst.video.i_height,
-                                            id->ff_dec_c->width, id->ff_dec_c->height,
+                                            id->ff_dec_c->width,
+                                            id->ff_dec_c->height,
                                             p_stream->p_sys->i_crop_top,
                                             p_stream->p_sys->i_crop_bottom,
                                             p_stream->p_sys->i_crop_left,
-                                            p_stream->p_sys->i_crop_right );
+                                            p_stream->p_sys->i_crop_right
+#if LIBAVCODEC_BUILD >= 4708
+                                            ,0, 0, 0, 0 );
+#else
+                                          );
+#endif
             }
 
             img_resample( id->p_vresample, (AVPicture*)id->p_ff_pic_tmp2,
