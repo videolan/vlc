@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.3 2003/03/20 21:45:01 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.4 2003/03/25 23:06:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,6 +34,12 @@
 
 #include <mpeg2dec/mpeg2.h>
 
+/* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
+#define AR_SQUARE_PICTURE       1                           /* square pixels */
+#define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
+#define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
+#define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
+
 /*****************************************************************************
  * dec_thread_t : libmpeg2 decoder thread descriptor
  *****************************************************************************/
@@ -53,6 +59,7 @@ typedef struct dec_thread_t
     mtime_t          i_pts;
     mtime_t          i_previous_pts;
     mtime_t          i_current_pts;
+    mtime_t          i_period_remainder;
 
     /*
      * Output properties
@@ -122,6 +129,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->i_pts      = mdate() + DEFAULT_PTS_DELAY;
     p_dec->i_current_pts  = 0;
     p_dec->i_previous_pts = 0;
+    p_dec->i_period_remainder = 0;
 
     /* Initialize decoder */
     p_dec->p_mpeg2dec = mpeg2_init();
@@ -175,10 +183,39 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         case STATE_SEQUENCE:
             /* Initialize video output */
-            i_aspect = ((uint64_t)p_dec->p_info->sequence->width) *
-                p_dec->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
-                p_dec->p_info->sequence->height /
-                p_dec->p_info->sequence->pixel_height;
+
+            /* Check whether the input gives a particular aspect ratio */
+            if( p_dec->p_fifo->p_demux_data
+                && ( *(int*)(p_dec->p_fifo->p_demux_data) & 0x7 ) )
+            {
+                i_aspect = *(int*)(p_dec->p_fifo->p_demux_data);
+                switch( i_aspect )
+                {
+                case AR_3_4_PICTURE:
+                    i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
+                    break;
+                case AR_16_9_PICTURE:
+                    i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
+                    break;
+                case AR_221_1_PICTURE:
+                    i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
+                    break;
+                case AR_SQUARE_PICTURE:
+                default:
+                    i_aspect = VOUT_ASPECT_FACTOR *
+                                   p_dec->p_info->sequence->width /
+                                   p_dec->p_info->sequence->height;
+                    break;
+                }
+            }
+            else
+            {
+                /* Use the value provided in the MPEG sequence header */
+                i_aspect = ((uint64_t)p_dec->p_info->sequence->width) *
+                    p_dec->p_info->sequence->pixel_width * VOUT_ASPECT_FACTOR /
+                    p_dec->p_info->sequence->height /
+                    p_dec->p_info->sequence->pixel_height;
+            }
 
             i_chroma = VLC_FOURCC('Y','V','1','2');
 
@@ -232,7 +269,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 }
                 else
                 {
-                    p_dec->i_pts += (p_dec->p_info->sequence->frame_period/27);
+                    p_dec->i_pts += ( (p_dec->p_info->sequence->frame_period +
+                                       p_dec->i_period_remainder) / 27 );
+                    p_dec->i_period_remainder =
+                        p_dec->p_info->sequence->frame_period +
+                        p_dec->i_period_remainder -
+                        ( p_dec->p_info->sequence->frame_period +
+                          p_dec->i_period_remainder ) / 27 * 27;
                 }
                 vout_DatePicture( p_dec->p_vout, p_pic, p_dec->i_pts );
 
