@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.11 2003/12/10 20:56:09 yoann Exp $
+ * $Id: hotkeys.c,v 1.12 2003/12/11 01:36:12 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -214,6 +214,21 @@ static void Run( intf_thread_t *p_intf )
             aout_VolumeDown( p_intf, 1, &i_newvol );
             sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
             vout_OSDMessage( VLC_OBJECT(p_intf), string );
+        }
+        else if( i_action == ACTIONID_VOL_MUTE )
+        {
+            audio_volume_t i_newvol = -1;
+            aout_VolumeMute( p_intf, &i_newvol );
+            if( i_newvol == 0 )
+            {
+                vout_OSDMessage( VLC_OBJECT(p_intf), "Mute" );
+            }
+            else
+            {
+                char string[9];
+                sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
+                vout_OSDMessage( VLC_OBJECT(p_intf), string );
+            }
         }
         else if( i_action == ACTIONID_FULLSCREEN )
         {

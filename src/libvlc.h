@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.116 2003/12/10 17:19:05 yoann Exp $
+ * $Id: libvlc.h,v 1.117 2003/12/11 01:36:12 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -580,6 +580,8 @@ static char *ppsz_language_text[] =
 #define VOL_UP_KEY_LONGTEXT N_("Select the key to turn up audio volume")
 #define VOL_DOWN_KEY_TEXT N_("Volume down")
 #define VOL_DOWN_KEY_LONGTEXT N_("Select the key to turn down audio volume")
+#define VOL_MUTE_KEY_TEXT N_("Mute")
+#define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume")
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
@@ -817,6 +819,7 @@ vlc_module_begin();
     add_key( "key-quit", KEY_MODIFIER_COMMAND|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
@@ -842,6 +845,7 @@ vlc_module_begin();
     add_key( "key-quit", KEY_MODIFIER_CTRL|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-mute", 'm', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */
@@ -900,6 +904,7 @@ static struct hotkey p_hotkeys[] =
     { "key-fullscreen", ACTIONID_FULLSCREEN, 0 },
     { "key-vol-up", ACTIONID_VOL_UP, 0 },
     { "key-vol-down", ACTIONID_VOL_DOWN, 0 },
+    { "key-vol-mute", ACTIONID_VOL_MUTE, 0 },
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0 },

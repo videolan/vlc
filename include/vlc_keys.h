@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.10 2003/12/10 17:19:05 yoann Exp $
+ * $Id: vlc_keys.h,v 1.11 2003/12/11 01:36:12 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -199,3 +199,4 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_JUMP_BACKWARD_5MIN    22
 #define ACTIONID_JUMP_FORWARD_5MIN     23
 #define ACTIONID_POSITION              24 
+#define ACTIONID_VOL_MUTE              25 
