@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.3 2002/08/19 08:19:31 gbazin Exp $
+ * $Id: xcommon.c,v 1.4 2002/09/10 12:15:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -142,7 +142,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     /* Open display, unsing the "display" config variable or the DISPLAY
@@ -157,7 +157,7 @@ int E_(Activate) ( vlc_object_t *p_this )
                          XDisplayName( psz_display ) );
         free( p_vout->p_sys );
         if( psz_display ) free( psz_display );
-        return( 1 );
+        return VLC_EGENERIC;
     }
     if( psz_display ) free( psz_display );
 
@@ -197,12 +197,12 @@ int E_(Activate) ( vlc_object_t *p_this )
     if( p_vout->p_sys->i_xvport < 0 )
     {
         /* If a specific chroma format was requested, then we don't try to
-         * be cleverer than the user. He knows pretty well what he wants. */
+         * be cleverer than the user. He knew pretty well what he wanted. */
         if( b_chroma )
         {
             XCloseDisplay( p_vout->p_sys->p_display );
             free( p_vout->p_sys );
-            return 1;
+            return VLC_EGENERIC;
         }
 
         /* It failed, but it's not completely lost ! We try to open an
@@ -223,7 +223,7 @@ int E_(Activate) ( vlc_object_t *p_this )
             {
                 XCloseDisplay( p_vout->p_sys->p_display );
                 free( p_vout->p_sys );
-                return 1;
+                return VLC_EGENERIC;
             }
         }
     }
@@ -246,7 +246,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         DestroyCursor( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Open and initialize device. */
@@ -257,7 +257,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         DestroyWindow( p_vout, &p_vout->p_sys->original_window );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Disable screen saver */
@@ -267,7 +267,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     p_vout->p_sys->b_altfullscreen = 0;
     p_vout->p_sys->i_time_button_last_pressed = 0;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -364,7 +364,7 @@ static int InitVideo( vout_thread_t *p_vout )
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_screen_depth );
-            return( 0 );
+            return VLC_SUCCESS;
     }
 
     vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
@@ -406,7 +406,7 @@ static int InitVideo( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
  /*****************************************************************************
@@ -849,7 +849,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( i_drawable == -1 )
     {
-        p_vout->p_sys->b_createwindow = 1;
+        p_win->b_owned = VLC_TRUE;
 
         /* Create the window and set hints - the window must receive
          * ConfigureNotify events, and until it is displayed, Expose and
@@ -885,7 +885,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     }
     else
     {
-        p_vout->p_sys->b_createwindow = 0;
+        p_win->b_owned = VLC_FALSE;
         p_win->base_window = i_drawable;
 
         XChangeWindowAttributes( p_vout->p_sys->p_display,
@@ -910,7 +910,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                            p_win->base_window,
                            GCGraphicsExposures, &xgcvalues );
 
-    if( p_vout->p_sys->b_createwindow )
+    if( p_win->b_owned )
     {
         /* Send orders to server, and wait until window is displayed - three
          * events must be received: a MapNotify event, an Expose event allowing
@@ -961,7 +961,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                   PointerMotionMask );
 
 #ifdef MODULE_NAME_IS_x11
-    if( p_vout->p_sys->b_createwindow &&
+    if( p_win->b_owned &&
          XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
         /* Allocate a new palette */
@@ -1014,7 +1014,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
      * receive data */
     p_vout->p_sys->p_win = p_win;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1028,9 +1028,13 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XSync( p_vout->p_sys->p_display, False );
 
     XDestroyWindow( p_vout->p_sys->p_display, p_win->video_window );
-    XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
     XFreeGC( p_vout->p_sys->p_display, p_win->gc );
-    XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
+
+    if( p_win->b_owned )
+    {
+        XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
+        XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
+    }
 }
 
 /*****************************************************************************
@@ -1304,9 +1308,11 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         p_vout->p_sys->b_altfullscreen =
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
 
-        if( p_vout->p_sys->b_createwindow )
+        if( p_vout->p_sys->p_win->b_owned )
+        {
             XUnmapWindow( p_vout->p_sys->p_display,
                           p_vout->p_sys->p_win->base_window);
+        }
 
         p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
@@ -1371,7 +1377,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
         p_vout->p_sys->p_win = &p_vout->p_sys->original_window;
 
-        if( p_vout->p_sys->b_createwindow )
+        if( p_vout->p_sys->p_win->b_owned )
         {
             XMapWindow( p_vout->p_sys->p_display,
                         p_vout->p_sys->p_win->base_window);
@@ -1382,12 +1388,19 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * window has already been mapped because the XMapWindow() request
      * has not necessarily been sent directly to our window (remember,
      * the call is first redirected to the window manager) */
-    do
+    if( p_vout->p_sys->p_win->b_owned )
     {
-        XWindowEvent( p_vout->p_sys->p_display,
-                      p_vout->p_sys->p_win->base_window,
-                      StructureNotifyMask, &xevent );
-    } while( xevent.type != MapNotify );
+        do
+        {
+            XWindowEvent( p_vout->p_sys->p_display,
+                          p_vout->p_sys->p_win->base_window,
+                          StructureNotifyMask, &xevent );
+        } while( xevent.type != MapNotify );
+    }
+    else
+    {
+        XSync( p_vout->p_sys->p_display, False );
+    }
 
     /* Becareful, this can generate a BadMatch error if the window is not
      * already mapped by the server (see above) */
@@ -1546,15 +1559,15 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 
         case XvBadExtension:
             msg_Warn( p_vout, "XvBadExtension" );
-            return( -1 );
+            return -1;
 
         case XvBadAlloc:
             msg_Warn( p_vout, "XvBadAlloc" );
-            return( -1 );
+            return -1;
 
         default:
             msg_Warn( p_vout, "XvQueryExtension failed" );
-            return( -1 );
+            return -1;
     }
 
     switch( XvQueryAdaptors( p_vout->p_sys->p_display,
@@ -1566,15 +1579,15 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 
         case XvBadExtension:
             msg_Warn( p_vout, "XvBadExtension for XvQueryAdaptors" );
-            return( -1 );
+            return -1;
 
         case XvBadAlloc:
             msg_Warn( p_vout, "XvBadAlloc for XvQueryAdaptors" );
-            return( -1 );
+            return -1;
 
         default:
             msg_Warn( p_vout, "XvQueryAdaptors failed" );
-            return( -1 );
+            return -1;
     }
 
     i_selected_port = -1;
@@ -1725,7 +1738,7 @@ static int XVideoGetPort( vout_thread_t *p_vout,
         }
     }
 
-    return( i_selected_port );
+    return i_selected_port;
 }
 
 /*****************************************************************************
@@ -1809,7 +1822,7 @@ static int InitDisplay( vout_thread_t *p_vout )
         if( p_xvisual == NULL )
         {
             msg_Err( p_vout, "no PseudoColor visual available" );
-            return( 1 );
+            return VLC_EGENERIC;
         }
         p_vout->p_sys->i_bytes_per_pixel = 1;
         p_vout->output.pf_setpalette = SetPalette;
@@ -1829,7 +1842,7 @@ static int InitDisplay( vout_thread_t *p_vout )
         if( p_xvisual == NULL )
         {
             msg_Err( p_vout, "no TrueColor visual available" );
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         p_vout->output.i_rmask = p_xvisual->red_mask;
@@ -1862,7 +1875,7 @@ static int InitDisplay( vout_thread_t *p_vout )
     XFree( p_xvisual );
 #endif
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 #ifdef HAVE_SYS_SHM_H
@@ -1891,7 +1904,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     if( p_image == NULL )
     {
         msg_Err( p_vout, "image creation failed" );
-        return( NULL );
+        return NULL;
     }
 
     /* Allocate shared memory segment - 0776 set the access permission
@@ -1902,7 +1915,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         msg_Err( p_vout, "cannot allocate shared image data (%s)",
                          strerror( errno ) );
         IMAGE_FREE( p_image );
-        return( NULL );
+        return NULL;
     }
 
     /* Attach shared memory segment to process (read/write) */
@@ -1913,7 +1926,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
                          strerror(errno));
         IMAGE_FREE( p_image );
         shmctl( p_shm->shmid, IPC_RMID, 0 );
-        return( NULL );
+        return NULL;
     }
 
     /* Read-only data. We won't be using XShmGetImage */
@@ -1926,7 +1939,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         IMAGE_FREE( p_image );
         shmctl( p_shm->shmid, IPC_RMID, 0 );
         shmdt( p_shm->shmaddr );
-        return( NULL );
+        return NULL;
     }
 
     /* Send image to X server. This instruction is required, since having
@@ -1940,7 +1953,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     shmctl( p_shm->shmid, IPC_RMID, 0 );
 #endif
 
-    return( p_image );
+    return p_image;
 }
 #endif
 
@@ -1970,7 +1983,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     if( !p_data )
     {
         msg_Err( p_vout, "out of memory" );
-        return( NULL );
+        return NULL;
     }
 
 #ifdef MODULE_NAME_IS_x11
@@ -2002,7 +2015,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     {
         msg_Err( p_vout, "XCreateImage() failed" );
         free( p_data );
-        return( NULL );
+        return NULL;
     }
 
     return p_image;
