@@ -1,25 +1,26 @@
 #include "int_types.h"
 #include "ac3_decoder.h"
-#include "ac3_bit_allocate.h"
+#include "ac3_internal.h"
 
 /*
-static inline s16 logadd(s16 a,s16  b);
-static s16 calc_lowcomp(s16 a,s16 b0,s16 b1,s16 bin);
-static inline u16 min(s16 a,s16 b);
-static inline u16 max(s16 a,s16 b);
+static inline s16 logadd (s16 a, s16  b);
+static s16 calc_lowcomp (s16 a, s16 b0, s16 b1, s16 bin);
+static inline u16 min (s16 a, s16 b);
+static inline u16 max (s16 a, s16 b);
 */
 
-static void ba_compute_psd(s16 start, s16 end, s16 exps[],
-                s16 psd[], s16 bndpsd[]);
+static void ba_compute_psd (s16 start, s16 end, s16 exps[],
+			    s16 psd[], s16 bndpsd[]);
 
-static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
-                s16 fastleak, s16 slowleak, s16 is_lfe, s16 bndpsd[],
-                s16 excite[]);
-static void ba_compute_mask(s16 start, s16 end, u16 fscod,
-                u16 deltbae, u16 deltnseg, u16 deltoffst[], u16 deltba[],
-                u16 deltlen[], s16 excite[], s16 mask[]);
-static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
-                s16 psd[], s16 mask[], s16 bap[]);
+static void ba_compute_excitation (s16 start, s16 end, s16 fgain,
+				   s16 fastleak, s16 slowleak, s16 is_lfe,
+				   s16 bndpsd[], s16 excite[]);
+static void ba_compute_mask (s16 start, s16 end, u16 fscod,
+			     u16 deltbae, u16 deltnseg, u16 deltoffst[],
+			     u16 deltba[], u16 deltlen[], s16 excite[],
+			     s16 mask[]);
+static void ba_compute_bap (s16 start, s16 end, s16 snroffset,
+			    s16 psd[], s16 mask[], s16 bap[]);
 
 /* Misc LUTs for bit allocation process */
 
@@ -30,7 +31,6 @@ static s16 dbpbtab[]  = { 0x000, 0x700, 0x900, 0xb00 };
 
 static u16 floortab[] = { 0x2f0, 0x2b0, 0x270, 0x230, 0x1f0, 0x170, 0x0f0, 0xf800 };
 static s16 fastgain[] = { 0x080, 0x100, 0x180, 0x200, 0x280, 0x300, 0x380, 0x400  };
-
 
 static s16 bndtab[] = {  0,  1,  2,   3,   4,   5,   6,   7,   8,   9,
 			10, 11, 12,  13,  14,  15,  16,  17,  18,  19,
@@ -136,53 +136,46 @@ static s16 bndpsd[256];
 static s16 excite[256];
 static s16 mask[256];
 
-static __inline__ u16 max( s16 a, s16 b )
+static __inline__ u16 max (s16 a, s16 b)
 {
-    return( a > b ? a : b );
+    return (a > b ? a : b);
 }
 
-static __inline__ u16 min( s16 a, s16 b )
+static __inline__ u16 min (s16 a, s16 b)
 {
-    return( a < b ? a : b );
+    return (a < b ? a : b);
 }
 
-static __inline__ s16 logadd( s16 a, s16 b )
+static __inline__ s16 logadd (s16 a, s16 b)
 {
     s16 c;
 
-    if ( (c = a - b) >= 0 )
-    {
-        return( a + latab[min(((c) >> 1), 255)] );
-    }
-    else
-    {
-        return( b + latab[min(((-c) >> 1), 255)] );
+    if ((c = a - b) >= 0) {
+        return (a + latab[min(((c) >> 1), 255)]);
+    } else {
+        return (b + latab[min(((-c) >> 1), 255)]);
     }
 }
 
-static __inline__ s16 calc_lowcomp( s16 a, s16 b0, s16 b1, s16 bin )
+static __inline__ s16 calc_lowcomp (s16 a, s16 b0, s16 b1, s16 bin)
 {
-    if (bin < 7)
-    {
+    if (bin < 7) {
         if ((b0 + 256) == b1)
             a = 384;
         else if (b0 > b1)
             a = max(0, a - 64);
-    }
-    else if (bin < 20)
-    {
+    } else if (bin < 20) {
         if ((b0 + 256) == b1)
             a = 320;
         else if (b0 > b1)
             a = max(0, a - 64) ;
-    }
-    else
+    } else
         a = max(0, a - 128);
 
-    return(a);
+    return a;
 }
 
-void bit_allocate( ac3dec_t * p_ac3dec )
+void bit_allocate (ac3dec_t * p_ac3dec)
 {
     u16 i;
     s16 fgain;
@@ -195,10 +188,10 @@ void bit_allocate( ac3dec_t * p_ac3dec )
     /* Only perform bit_allocation if the exponents have changed or we
      * have new sideband information */
     if (p_ac3dec->audblk.chexpstr[0]  == 0 && p_ac3dec->audblk.chexpstr[1] == 0 &&
-            p_ac3dec->audblk.chexpstr[2]  == 0 && p_ac3dec->audblk.chexpstr[3] == 0 &&
-            p_ac3dec->audblk.chexpstr[4]  == 0 && p_ac3dec->audblk.cplexpstr   == 0 &&
-            p_ac3dec->audblk.lfeexpstr    == 0 && p_ac3dec->audblk.baie        == 0 &&
-            p_ac3dec->audblk.snroffste    == 0 && p_ac3dec->audblk.deltbaie    == 0)
+	p_ac3dec->audblk.chexpstr[2]  == 0 && p_ac3dec->audblk.chexpstr[3] == 0 &&
+	p_ac3dec->audblk.chexpstr[4]  == 0 && p_ac3dec->audblk.cplexpstr   == 0 &&
+	p_ac3dec->audblk.lfeexpstr    == 0 && p_ac3dec->audblk.baie        == 0 &&
+	p_ac3dec->audblk.snroffste    == 0 && p_ac3dec->audblk.deltbaie    == 0)
         return;
 
     /* Do some setup before we do the bit alloc */
@@ -209,19 +202,17 @@ void bit_allocate( ac3dec_t * p_ac3dec )
     floor = floortab[p_ac3dec->audblk.floorcod];
 
     /* if all the SNR offset constants are zero then the whole block is zero */
-    if(!p_ac3dec->audblk.csnroffst    && !p_ac3dec->audblk.fsnroffst[0] &&
-         !p_ac3dec->audblk.fsnroffst[1] && !p_ac3dec->audblk.fsnroffst[2] &&
-         !p_ac3dec->audblk.fsnroffst[3] && !p_ac3dec->audblk.fsnroffst[4] &&
-         !p_ac3dec->audblk.cplfsnroffst && !p_ac3dec->audblk.lfefsnroffst)
-    {
+    if (!p_ac3dec->audblk.csnroffst    && !p_ac3dec->audblk.fsnroffst[0] &&
+	!p_ac3dec->audblk.fsnroffst[1] && !p_ac3dec->audblk.fsnroffst[2] &&
+	!p_ac3dec->audblk.fsnroffst[3] && !p_ac3dec->audblk.fsnroffst[4] &&
+	!p_ac3dec->audblk.cplfsnroffst && !p_ac3dec->audblk.lfefsnroffst) {
         memset(p_ac3dec->audblk.fbw_bap,0,sizeof(u16) * 256 * 5);
         memset(p_ac3dec->audblk.cpl_bap,0,sizeof(u16) * 256);
         memset(p_ac3dec->audblk.lfe_bap,0,sizeof(u16) * 7);
         return;
     }
 
-    for(i = 0; i < p_ac3dec->bsi.nfchans; i++)
-    {
+    for (i = 0; i < p_ac3dec->bsi.nfchans; i++) {
         start = 0;
         end = p_ac3dec->audblk.endmant[i] ;
         fgain = fastgain[p_ac3dec->audblk.fgaincod[i]];
@@ -229,17 +220,23 @@ void bit_allocate( ac3dec_t * p_ac3dec )
         fastleak = 0;
         slowleak = 0;
 
-        ba_compute_psd(start, end, p_ac3dec->audblk.fbw_exp[i], psd, bndpsd);
+        ba_compute_psd (start, end, p_ac3dec->audblk.fbw_exp[i], psd, bndpsd);
 
-        ba_compute_excitation(start, end , fgain, fastleak, slowleak, 0, bndpsd, excite);
+        ba_compute_excitation (start, end , fgain, fastleak, slowleak, 0,
+			       bndpsd, excite);
 
-        ba_compute_mask(start, end, p_ac3dec->syncinfo.fscod, p_ac3dec->audblk.deltbae[i], p_ac3dec->audblk.deltnseg[i], p_ac3dec->audblk.deltoffst[i], p_ac3dec->audblk.deltba[i], p_ac3dec->audblk.deltlen[i], excite, mask);
+        ba_compute_mask (start, end, p_ac3dec->syncinfo.fscod,
+			 p_ac3dec->audblk.deltbae[i],
+			 p_ac3dec->audblk.deltnseg[i],
+			 p_ac3dec->audblk.deltoffst[i],
+			 p_ac3dec->audblk.deltba[i],
+			 p_ac3dec->audblk.deltlen[i], excite, mask);
 
-        ba_compute_bap(start, end, snroffset, psd, mask, p_ac3dec->audblk.fbw_bap[i]);
+        ba_compute_bap (start, end, snroffset, psd, mask,
+			p_ac3dec->audblk.fbw_bap[i]);
     }
 
-    if(p_ac3dec->audblk.cplinu)
-    {
+    if (p_ac3dec->audblk.cplinu) {
         start = p_ac3dec->audblk.cplstrtmant;
         end = p_ac3dec->audblk.cplendmant;
         fgain = fastgain[p_ac3dec->audblk.cplfgaincod];
@@ -247,17 +244,23 @@ void bit_allocate( ac3dec_t * p_ac3dec )
         fastleak = (p_ac3dec->audblk.cplfleak << 8) + 768;
         slowleak = (p_ac3dec->audblk.cplsleak << 8) + 768;
 
-        ba_compute_psd(start, end, p_ac3dec->audblk.cpl_exp, psd, bndpsd);
+        ba_compute_psd (start, end, p_ac3dec->audblk.cpl_exp, psd, bndpsd);
 
-        ba_compute_excitation(start, end , fgain, fastleak, slowleak, 0, bndpsd, excite);
+        ba_compute_excitation (start, end , fgain, fastleak, slowleak, 0,
+			       bndpsd, excite);
 
-        ba_compute_mask(start, end, p_ac3dec->syncinfo.fscod, p_ac3dec->audblk.cpldeltbae, p_ac3dec->audblk.cpldeltnseg, p_ac3dec->audblk.cpldeltoffst, p_ac3dec->audblk.cpldeltba, p_ac3dec->audblk.cpldeltlen, excite, mask);
+        ba_compute_mask (start, end, p_ac3dec->syncinfo.fscod,
+			 p_ac3dec->audblk.cpldeltbae,
+			 p_ac3dec->audblk.cpldeltnseg,
+			 p_ac3dec->audblk.cpldeltoffst,
+			 p_ac3dec->audblk.cpldeltba,
+			 p_ac3dec->audblk.cpldeltlen, excite, mask);
 
-        ba_compute_bap(start, end, snroffset, psd, mask, p_ac3dec->audblk.cpl_bap);
+        ba_compute_bap (start, end, snroffset, psd, mask,
+			p_ac3dec->audblk.cpl_bap);
     }
 
-    if(p_ac3dec->bsi.lfeon)
-    {
+    if (p_ac3dec->bsi.lfeon) {
         start = 0;
         end = 7;
         fgain = fastgain[p_ac3dec->audblk.lfefgaincod];
@@ -265,26 +268,28 @@ void bit_allocate( ac3dec_t * p_ac3dec )
         fastleak = 0;
         slowleak = 0;
 
-        ba_compute_psd(start, end, p_ac3dec->audblk.lfe_exp, psd, bndpsd);
+        ba_compute_psd (start, end, p_ac3dec->audblk.lfe_exp, psd, bndpsd);
 
-        ba_compute_excitation(start, end , fgain, fastleak, slowleak, 1, bndpsd, excite);
+        ba_compute_excitation (start, end , fgain, fastleak, slowleak, 1,
+			       bndpsd, excite);
 
-        ba_compute_mask(start, end, p_ac3dec->syncinfo.fscod, 2, 0, 0, 0, 0, excite, mask);
+        ba_compute_mask (start, end, p_ac3dec->syncinfo.fscod, 2, 0, 0, 0, 0,
+			 excite, mask);
 
-        ba_compute_bap(start, end, snroffset, psd, mask, p_ac3dec->audblk.lfe_bap);
+        ba_compute_bap (start, end, snroffset, psd, mask,
+			p_ac3dec->audblk.lfe_bap);
     }
 }
 
 
-static void ba_compute_psd(s16 start, s16 end, s16 exps[],
-        s16 psd[], s16 bndpsd[])
+static void ba_compute_psd (s16 start, s16 end, s16 exps[], s16 psd[],
+			    s16 bndpsd[])
 {
     int bin,i,j,k;
     s16 lastbin = 0;
 
     /* Map the exponents into dBs */
-    for (bin=start; bin<end; bin++)
-    {
+    for (bin=start; bin<end; bin++) {
         psd[bin] = (3072 - (exps[bin] << 7));
     }
 
@@ -292,14 +297,12 @@ static void ba_compute_psd(s16 start, s16 end, s16 exps[],
     j = start;
     k = masktab[start];
 
-    do
-    {
+    do {
         lastbin = min(bndtab[k] + bndsz[k], end);
         bndpsd[k] = psd[j];
         j++;
 
-        for (i = j; i < lastbin; i++)
-        {
+        for (i = j; i < lastbin; i++) {
             bndpsd[k] = logadd(bndpsd[k], psd[j]);
             j++;
         }
@@ -308,9 +311,9 @@ static void ba_compute_psd(s16 start, s16 end, s16 exps[],
     } while (end > lastbin);
 }
 
-static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
-        s16 fastleak, s16 slowleak, s16 is_lfe, s16 bndpsd[],
-        s16 excite[])
+static void ba_compute_excitation (s16 start, s16 end,s16 fgain, s16 fastleak,
+				   s16 slowleak, s16 is_lfe, s16 bndpsd[],
+				   s16 excite[])
 {
     int bin;
     s16 bndstrt;
@@ -322,8 +325,7 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
     bndstrt = masktab[start];
     bndend = masktab[end - 1] + 1;
 
-    if (bndstrt == 0) /* For fbw and lfe channels */
-    {
+    if (bndstrt == 0) { /* For fbw and lfe channels */
         lowcomp = calc_lowcomp(lowcomp, bndpsd[0], bndpsd[1], 0);
         excite[0] = bndpsd[0] - fgain - lowcomp;
         lowcomp = calc_lowcomp(lowcomp, bndpsd[1], bndpsd[2], 1);
@@ -331,43 +333,36 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
         begin = 7 ;
 
         /* Note: Do not call calc_lowcomp() for the last band of the lfe channel, (bin = 6) */
-        for (bin = 2; bin < 7; bin++)
-        {
+        for (bin = 2; bin < 7; bin++) {
             if (!(is_lfe && (bin == 6)))
-                lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
-                fastleak = bndpsd[bin] - fgain;
-                slowleak = bndpsd[bin] - sgain;
-                excite[bin] = fastleak - lowcomp;
+                lowcomp = calc_lowcomp (lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
+	    fastleak = bndpsd[bin] - fgain;
+	    slowleak = bndpsd[bin] - sgain;
+	    excite[bin] = fastleak - lowcomp;
 
-            if (!(is_lfe && (bin == 6)))
-            {
-                if (bndpsd[bin] <= bndpsd[bin+1])
-                {
+            if (!(is_lfe && (bin == 6))) {
+                if (bndpsd[bin] <= bndpsd[bin+1]) {
                     begin = bin + 1 ;
                     break;
                 }
             }
         }
 
-        for (bin = begin; bin < min(bndend, 22); bin++)
-        {
+        for (bin = begin; bin < min(bndend, 22); bin++) {
             if (!(is_lfe && (bin == 6)))
-                lowcomp = calc_lowcomp(lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
-                fastleak -= fdecay ;
-                fastleak = max(fastleak, bndpsd[bin] - fgain);
-                slowleak -= sdecay ;
-                slowleak = max(slowleak, bndpsd[bin] - sgain);
-                excite[bin] = max(fastleak - lowcomp, slowleak);
+                lowcomp = calc_lowcomp (lowcomp, bndpsd[bin], bndpsd[bin+1], bin);
+	    fastleak -= fdecay ;
+	    fastleak = max(fastleak, bndpsd[bin] - fgain);
+	    slowleak -= sdecay ;
+	    slowleak = max(slowleak, bndpsd[bin] - sgain);
+	    excite[bin] = max(fastleak - lowcomp, slowleak);
         }
         begin = 22;
-    }
-    else /* For coupling channel */
-    {
+    } else { /* For coupling channel */
         begin = bndstrt;
     }
 
-    for (bin = begin; bin < bndend; bin++)
-    {
+    for (bin = begin; bin < bndend; bin++) {
         fastleak -= fdecay;
         fastleak = max(fastleak, bndpsd[bin] - fgain);
         slowleak -= sdecay;
@@ -376,9 +371,9 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
     }
 }
 
-static void ba_compute_mask(s16 start, s16 end, u16 fscod,
-        u16 deltbae, u16 deltnseg, u16 deltoffst[], u16 deltba[],
-        u16 deltlen[], s16 excite[], s16 mask[])
+static void ba_compute_mask (s16 start, s16 end, u16 fscod, u16 deltbae,
+			     u16 deltnseg, u16 deltoffst[], u16 deltba[],
+			     u16 deltlen[], s16 excite[], s16 mask[])
 {
     int bin,k;
     s16 bndstrt;
@@ -389,43 +384,35 @@ static void ba_compute_mask(s16 start, s16 end, u16 fscod,
     bndend = masktab[end - 1] + 1;
 
     /* Compute the masking curve */
-    for (bin = bndstrt; bin < bndend; bin++)
-    {
-        if (bndpsd[bin] < dbknee)
-        {
+    for (bin = bndstrt; bin < bndend; bin++) {
+        if (bndpsd[bin] < dbknee) {
             excite[bin] += ((dbknee - bndpsd[bin]) >> 2);
         }
         mask[bin] = max(excite[bin], hth[fscod][bin]);
     }
 
     /* Perform delta bit modulation if necessary */
-    if ((deltbae == DELTA_BIT_REUSE) || (deltbae == DELTA_BIT_NEW))
-    {
+    if ((deltbae == DELTA_BIT_REUSE) || (deltbae == DELTA_BIT_NEW)) {
         s16 band = 0;
         s16 seg = 0;
 
-        for (seg = 0; seg < deltnseg+1; seg++)
-        {
+        for (seg = 0; seg < deltnseg+1; seg++) {
             band += deltoffst[seg];
-            if (deltba[seg] >= 4)
-            {
+            if (deltba[seg] >= 4) {
                 delta = (deltba[seg] - 3) << 7;
-            }
-            else
-            {
+            } else {
                 delta = (deltba[seg] - 4) << 7;
             }
-            for (k = 0; k < deltlen[seg]; k++)
-            {
-                            mask[band] += delta;
-                            band++;
+            for (k = 0; k < deltlen[seg]; k++) {
+		mask[band] += delta;
+		band++;
             }
         }
     }
 }
 
-static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
-        s16 psd[], s16 mask[], s16 bap[])
+static void ba_compute_bap (s16 start, s16 end, s16 snroffset, s16 psd[],
+			    s16 mask[], s16 bap[])
 {
     int i,j,k;
     s16 lastbin = 0;
@@ -435,8 +422,7 @@ static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
     i = start;
     j = masktab[start];
 
-    do
-    {
+    do {
         lastbin = min(bndtab[j] + bndsz[j], end);
         mask[j] -= snroffset;
         mask[j] -= floor;
@@ -446,8 +432,7 @@ static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
 
         mask[j] &= 0x1fe0;
         mask[j] += floor;
-        for (k = i; k < lastbin; k++)
-        {
+        for (k = i; k < lastbin; k++) {
             address = (psd[i] - mask[j]) >> 5;
             address = min(63, max(0, address));
             bap[i] = baptab[address];

@@ -1074,8 +1074,10 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     break;
 
                 case AC3_AUDIO_ES:
+#if 0
                     /* we skip 4 bytes at the beginning of the AC3 payload */
                     p_ts->i_payload_start += 4;
+#endif
                     p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                     break;
 

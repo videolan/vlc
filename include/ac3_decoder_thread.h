@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ac3_decoder.h : ac3 decoder thread interface
+ * ac3_decoder_thread.h : ac3 decoder thread interface
  * (c)1999 VideoLAN
  *****************************************************************************/
 
@@ -21,6 +21,7 @@ typedef struct ac3dec_thread_s
     decoder_fifo_t      fifo;                  /* stores the PES stream data */
     input_thread_t *    p_input;
     ts_packet_t *       p_ts;
+    int			sync_ptr;	/* sync ptr from ac3 magic header */
 
     /*
      * Decoder properties
