@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.25 2003/05/21 15:54:08 gbazin Exp $
+ * $Id: waveout.c,v 1.26 2003/07/11 23:14:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -35,7 +35,7 @@
 #include <mmsystem.h>
 
 #define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
-#define FRAMES_NUM 4
+#define FRAMES_NUM 8
 
 /*****************************************************************************
  * Useful macros
@@ -104,6 +104,16 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
 
+/*****************************************************************************
+ * notification_thread_t: waveOut event thread
+ *****************************************************************************/
+typedef struct notification_thread_t
+{
+    VLC_COMMON_MEMBERS
+    aout_instance_t *p_aout;
+
+} notification_thread_t;
+
 /* local functions */
 static void Probe        ( aout_instance_t * );
 static int OpenWaveOut   ( aout_instance_t *, int, int, int, int, vlc_bool_t );
@@ -113,6 +123,7 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t * );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
+static void WaveOutThread( notification_thread_t * );
 
 static void InterleaveFloat32( float *, int *, int );
 static void InterleaveS16( int16_t *, int *, int );
@@ -139,6 +150,9 @@ struct aout_sys_t
     WAVEFORMATEXTENSIBLE waveformat;                         /* audio format */
 
     WAVEHDR waveheader[FRAMES_NUM];
+
+    notification_thread_t *p_notif;                      /* WaveOutThread id */
+    HANDLE event;
 
     int i_buffer_size;
 
@@ -284,6 +298,20 @@ static int Open( vlc_object_t *p_this )
     memset( p_aout->output.p_sys->p_silence_buffer, 0,
             p_aout->output.p_sys->i_buffer_size );
 
+    /* Now we need to setup our waveOut play notification structure */
+    p_aout->output.p_sys->p_notif =
+        vlc_object_create( p_aout, sizeof(notification_thread_t) );
+    p_aout->output.p_sys->p_notif->p_aout = p_aout;
+    p_aout->output.p_sys->event = CreateEvent( NULL, FALSE, FALSE, NULL );
+
+    /* Then launch the notification thread */
+    if( vlc_thread_create( p_aout->output.p_sys->p_notif,
+                           "waveOut Notification Thread", WaveOutThread,
+                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create WaveOutThread" );
+    }
+
     /* We need to kick off the playback in order to have the callback properly
      * working */
     for( i = 0; i < FRAMES_NUM; i++ )
@@ -412,7 +440,7 @@ static void Probe( aout_instance_t * p_aout )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
+static void Play( aout_instance_t *_p_aout )
 {
 }
 
@@ -425,6 +453,11 @@ static void Close( vlc_object_t *p_this )
 
     /* Before calling waveOutClose we must reset the device */
     p_aout->b_die = VLC_TRUE;
+
+    /* wake up the audio thread */
+    SetEvent( p_aout->output.p_sys->event );
+    vlc_thread_join( p_aout->output.p_sys->p_notif );
+    CloseHandle( p_aout->output.p_sys->event );
 
     /* Wait for the waveout buffers to be freed */
     while( VLC_TRUE )
@@ -690,8 +723,6 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 {
     aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
     WAVEHDR *p_waveheader = (WAVEHDR *)dwParam1;
-    aout_buffer_t *p_buffer = NULL;
-    vlc_bool_t b_sleek;
     int i, i_queued_frames = 0;
 
     if( uMsg != WOM_DONE ) return;
@@ -703,9 +734,6 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     if( p_aout->b_die ) return;
 
-    /* We don't want any resampling when using S/PDIF */
-    b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
-
     /* Find out the current latency */
     for( i = 0; i < FRAMES_NUM; i++ )
     {
@@ -716,44 +744,9 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
         }
     }
 
-    /* Try to fill in as many frame buffers as possible */
-    for( i = 0; i < FRAMES_NUM; i++ )
-    {
-        /* Check if frame buf is available */
-        if( p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE )
-        {
-            /* Take into account the latency */
-            p_buffer = aout_OutputNextBuffer( p_aout,
-                mdate() + 1000000 * i_queued_frames /
-                    p_aout->output.output.i_rate * p_aout->output.i_nb_samples,
-                b_sleek );
-
-            if( !p_buffer && i_queued_frames )
-            {
-                /* We aren't late so no need to play a blank sample */
-                return;
-            }
-
-            /* Do the channel reordering here */
-            if( p_buffer && p_aout->output.p_sys->b_chan_reorder )
-            {
-                if( p_aout->output.output.i_format ==
-                        VLC_FOURCC('s','1','6','l') )
-                    InterleaveS16( (int16_t *)p_buffer->p_buffer,
-                        p_aout->output.p_sys->pi_chan_table,
-                        aout_FormatNbChannels( &p_aout->output.output ) );
-                else
-                    InterleaveFloat32( (float *)p_buffer->p_buffer,
-                        p_aout->output.p_sys->pi_chan_table,
-                        aout_FormatNbChannels( &p_aout->output.output ) );
-            }
-
-            PlayWaveOut( p_aout, h_waveout,
-                         &p_aout->output.p_sys->waveheader[i] , p_buffer );
-
-            i_queued_frames++;
-        }
-    }
+    /* Don't wake up the thread too much */
+    if( i_queued_frames < FRAMES_NUM / 2 )
+        SetEvent( p_aout->output.p_sys->event );
 }
 
 /*****************************************************************************
@@ -792,5 +785,79 @@ static void InterleaveS16( int16_t *p_buf, int *pi_chan_table,
 
         memcpy( &p_buf[i*i_nb_channels], p_tmp,
                 i_nb_channels * sizeof(int16_t) );
+    }
+}
+
+/*****************************************************************************
+ * WaveOutThread: this thread will capture play notification events. 
+ *****************************************************************************
+ * We use this thread to feed new audio samples to the sound card because
+ * we are not authorized to use waveOutWrite() directly in the waveout
+ * callback.
+ *****************************************************************************/
+static void WaveOutThread( notification_thread_t *p_notif )
+{
+    aout_instance_t *p_aout = p_notif->p_aout;
+    aout_buffer_t *p_buffer = NULL;
+    vlc_bool_t b_sleek;
+    int i, i_queued_frames;
+
+    /* We don't want any resampling when using S/PDIF */
+    b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
+
+    while( 1 )
+    {
+        WaitForSingleObject( p_aout->output.p_sys->event, INFINITE );
+        if( p_aout->b_die ) return;
+
+        /* Find out the current latency */
+        i_queued_frames = 0;
+        for( i = 0; i < FRAMES_NUM; i++ )
+        {
+            /* Check if frame buf is available */
+            if( !(p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE) )
+            {
+                i_queued_frames++;
+            }
+        }
+
+        /* Try to fill in as many frame buffers as possible */
+        for( i = 0; i < FRAMES_NUM; i++ )
+        {
+            /* Check if frame buf is available */
+            if( p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE )
+            {
+                /* Take into account the latency */
+                p_buffer = aout_OutputNextBuffer( p_aout,
+                    mdate() + 1000000 * i_queued_frames /
+                    p_aout->output.output.i_rate * p_aout->output.i_nb_samples,
+                    b_sleek );
+
+                if( !p_buffer && i_queued_frames )
+                {
+                    /* We aren't late so no need to play a blank sample */
+                    break;
+                }
+
+                /* Do the channel reordering here */
+                if( p_buffer && p_aout->output.p_sys->b_chan_reorder )
+                {
+                    if( p_aout->output.output.i_format ==
+                            VLC_FOURCC('s','1','6','l') )
+                        InterleaveS16( (int16_t *)p_buffer->p_buffer,
+                            p_aout->output.p_sys->pi_chan_table,
+                            aout_FormatNbChannels( &p_aout->output.output ) );
+                    else
+                        InterleaveFloat32( (float *)p_buffer->p_buffer,
+                            p_aout->output.p_sys->pi_chan_table,
+                            aout_FormatNbChannels( &p_aout->output.output ) );
+                }
+
+                PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
+                             &p_aout->output.p_sys->waveheader[i] , p_buffer );
+
+                i_queued_frames++;
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.21 2003/06/11 18:20:38 gbazin Exp $
+ * $Id: directx.c,v 1.22 2003/07/11 23:14:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,7 +39,7 @@
 #include <dsound.h>
 
 #define FRAME_SIZE 2048              /* The size is in samples, not in bytes */
-#define FRAMES_NUM 4
+#define FRAMES_NUM 8
 
 /* frame buffer status */
 #define FRAME_QUEUED 0
@@ -711,7 +711,8 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
                     | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
-                    | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
+                    | DSBCAPS_GLOBALFOCUS       /* Allows background playing */
+                    | DSBCAPS_LOCHARDWARE;      /* Needed for 5.1 on emu101k */
     dsbdesc.dwBufferBytes = FRAMES_NUM * i_bytes_per_frame;   /* buffer size */
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&waveformat;
 
@@ -719,7 +720,15 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
                    p_aout->output.p_sys->p_dsobject, &dsbdesc,
                    &p_aout->output.p_sys->p_dsbuffer, NULL) )
     {
-        return VLC_EGENERIC;
+        /* Try without DSBCAPS_LOCHARDWARE */
+        dsbdesc.dwFlags &= ~DSBCAPS_LOCHARDWARE;
+        if FAILED( IDirectSound_CreateSoundBuffer(
+                   p_aout->output.p_sys->p_dsobject, &dsbdesc,
+                   &p_aout->output.p_sys->p_dsbuffer, NULL) )
+        {
+            return VLC_EGENERIC;
+        }
+        if( !b_probe ) msg_Dbg( p_aout, "couldn't use hardware sound buffer" );
     }
 
     /* Stop here if we were just probing */
@@ -782,7 +791,10 @@ static int CreateDSBufferPCM( aout_instance_t *p_aout, int *i_format,
                               int i_channels, int i_nb_channels, int i_rate,
                               vlc_bool_t b_probe )
 {
-    if( CreateDSBuffer( p_aout, VLC_FOURCC('f','l','3','2'),
+    /* Float32 audio samples are not supported for 5.1 output on the emu101k */
+
+    if( i_nb_channels > 2 ||
+        CreateDSBuffer( p_aout, VLC_FOURCC('f','l','3','2'),
                         i_channels, i_nb_channels, i_rate,
                         FRAME_SIZE * 4 * i_nb_channels, b_probe )
         != VLC_SUCCESS )

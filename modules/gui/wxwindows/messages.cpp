@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.10 2003/07/10 11:15:18 adn Exp $
+ * $Id: messages.cpp,v 1.11 2003/07/11 23:14:03 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -85,7 +85,6 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    b_verbose = VLC_FALSE;
     SetIcon( *p_intf->p_sys->p_icon );
     save_log_dialog = NULL;
 
@@ -117,6 +116,8 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the Verbose checkbox */
     wxCheckBox *verbose_checkbox =
         new wxCheckBox( messages_panel, Verbose_Event, wxU(_("Verbose")) );
+    b_verbose = p_intf->p_libvlc->i_verbose > 0;
+    verbose_checkbox->SetValue( b_verbose );
 
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
