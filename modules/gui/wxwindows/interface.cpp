@@ -578,8 +578,14 @@ void Interface::SetupHotkeys()
     /* Setup the hotkeys as accelerators */
     for( int i = 0; i < i_hotkeys; i++ )
     {
-        p_entries[i].Set( ConvertHotkeyModifiers( p_hotkeys[i].i_key ),
-                          ConvertHotkey( p_hotkeys[i].i_key ),
+        int i_mod = ConvertHotkeyModifiers( p_hotkeys[i].i_key );
+        int i_key = ConvertHotkey( p_hotkeys[i].i_key );
+
+#ifdef WIN32
+        if( i_mod ) i_key = toupper(i_key);
+#endif
+
+        p_entries[i].Set( i_mod, i_key,
                           p_intf->p_sys->i_first_hotkey_event + i );
     }
 
