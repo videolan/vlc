@@ -2,7 +2,7 @@
  * idct.c : C IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idct.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: idct.c,v 1.2 2002/11/20 13:37:35 sam Exp $
  *
  * Author: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -58,10 +58,10 @@ static void NormScan( u8 ppi_scan[2][64] )
  *****************************************************************************/
 static inline void IDCT( dctelem_t * p_block )
 {
-    s32 tmp0, tmp1, tmp2, tmp3;
-    s32 tmp10, tmp11, tmp12, tmp13;
-    s32 z1, z2, z3, z4, z5;
-    s32 d0, d1, d2, d3, d4, d5, d6, d7;
+    int32_t tmp0, tmp1, tmp2, tmp3;
+    int32_t tmp10, tmp11, tmp12, tmp13;
+    int32_t z1, z2, z3, z4, z5;
+    int32_t d0, d1, d2, d3, d4, d5, d6, d7;
     dctelem_t * dataptr;
     int rowctr;
 

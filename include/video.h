@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.59 2002/11/19 20:45:08 gbazin Exp $
+ * $Id: video.h,v 1.60 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -95,10 +95,10 @@ struct picture_heap_t
 
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
-    int          i_width;                                   /* picture width */
-    int          i_height;                                 /* picture height */
+    unsigned int i_width;                                   /* picture width */
+    unsigned int i_height;                                 /* picture height */
     vlc_fourcc_t i_chroma;                                 /* picture chroma */
-    int          i_aspect;                                   /* aspect ratio */
+    unsigned int i_aspect;                                   /* aspect ratio */
 
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */

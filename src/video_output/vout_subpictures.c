@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.17 2002/11/10 18:04:24 sam Exp $
+ * $Id: vout_subpictures.c,v 1.18 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,8 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
     if( i_margin >= 0 )
     {
-        if( p_subpic->i_height + i_margin <= p_vout->output.i_height )
+        if( p_subpic->i_height + (unsigned int)i_margin
+                                                 <= p_vout->output.i_height )
         {
             p_subpic->i_y = p_vout->output.i_height
                              - i_margin - p_subpic->i_height;

@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.5 2002/08/30 22:22:24 massiot Exp $
+ * $Id: ps.c,v 1.6 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,12 +26,9 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
-#include <sys/types.h>
 
 #include "system.h"
 

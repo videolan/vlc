@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: i420_rgb16.c,v 1.2 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
@@ -59,9 +58,10 @@ void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_u   = p_src->U_PIXELS;
     u8  *p_v   = p_src->V_PIXELS;
 
-    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
-    int         i_vscale;                           /* vertical scaling type */
-    int         i_x, i_y;                 /* horizontal and vertical indexes */
+    vlc_bool_t   b_hscale;                        /* horizontal scaling type */
+    int          i_vscale;                          /* vertical scaling type */
+    unsigned int i_x, i_y;                /* horizontal and vertical indexes */
+
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
@@ -188,8 +188,9 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
-    int         i_vscale;                           /* vertical scaling type */
-    int         i_x, i_y;                 /* horizontal and vertical indexes */
+    unsigned int i_vscale;                          /* vertical scaling type */
+    unsigned int i_x, i_y;                /* horizontal and vertical indexes */
+
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
@@ -316,8 +317,9 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
-    int         i_vscale;                           /* vertical scaling type */
-    int         i_x, i_y;                 /* horizontal and vertical indexes */
+    unsigned int i_vscale;                          /* vertical scaling type */
+    unsigned int i_x, i_y;                /* horizontal and vertical indexes */
+
     int         i_right_margin;
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.6 2002/10/28 22:23:23 gbazin Exp $
+ * $Id: parser.c,v 1.7 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -34,9 +34,6 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
 #endif
-
-#include <errno.h>
-#include <string.h>
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>

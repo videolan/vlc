@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.31 2002/11/19 20:45:09 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.32 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -357,8 +357,10 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
  * This function will be accessed by plugins. It calculates the relative
  * position of the output window and the image window.
  *****************************************************************************/
-void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
-                        int *pi_x, int *pi_y, int *pi_width, int *pi_height )
+void vout_PlacePicture( vout_thread_t *p_vout,
+                        unsigned int i_width, unsigned int i_height,
+                        unsigned int *pi_x, unsigned int *pi_y,
+                        unsigned int *pi_width, unsigned int *pi_height )
 {
     if( (i_width <= 0) || (i_height <=0) )
     {

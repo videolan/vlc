@@ -334,7 +334,7 @@
 #define HAVE_STRUCT_TIMESPEC 1
 
 /* Define to 1 if you have the `swab' function. */
-#define HAVE_SWAB 1
+/* #define HAVE_SWAB 1 */
 
 /* Define to 1 if you have the <sys/int_types.h> header file. */
 /* #undef HAVE_SYS_INT_TYPES_H */

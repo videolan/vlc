@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.6 2002/10/20 12:23:48 massiot Exp $
+ * $Id: system.c,v 1.7 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -30,7 +30,6 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
-#include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.4 2002/10/23 22:05:22 massiot Exp $
+ * $Id: headers.c,v 1.5 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -207,7 +207,7 @@ static inline void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
 /*****************************************************************************
  * ChromaToFourCC: Return a FourCC value used by the video output.
  *****************************************************************************/
-static inline u64 ChromaToFourCC( int i_chroma )
+static inline vlc_fourcc_t ChromaToFourCC( int i_chroma )
 {
     switch( i_chroma )
     {

@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.4 2002/08/29 23:53:22 massiot Exp $
+ * $Id: decoder.c,v 1.5 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -27,12 +27,14 @@
  *****************************************************************************/
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
-#include <errno.h>                                                  /* errno */
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                               /* errno */
+#endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
 #endif
@@ -123,7 +125,11 @@ void vdec_InitThread( vdec_thread_t * p_vdec )
     if( 0 )
 #endif
     {
+#ifdef HAVE_ERRNO_H
         msg_Warn( p_vdec, "couldn't nice() (%s)", strerror(errno) );
+#else
+        msg_Warn( p_vdec, "couldn't nice()" );
+#endif
     }
 
     p_vdec->p_idct_data = NULL;

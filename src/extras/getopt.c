@@ -30,6 +30,9 @@
 #define _NO_PROTO
 #endif
 
+/* Overkill. */
+#include <vlc/vlc.h>
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif

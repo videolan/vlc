@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.86 2002/11/11 14:39:11 sam Exp $
+ * $Id: video_output.h,v 1.87 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -142,7 +142,7 @@ struct vout_thread_t
  * Prototypes
  *****************************************************************************/
 #define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, uint32_t, int ) );
+VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, unsigned int, unsigned int, uint32_t, unsigned int ) );
 VLC_EXPORT( void,              vout_DestroyThread,  ( vout_thread_t * ) );
 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
@@ -154,7 +154,7 @@ VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *, mtime_t ) );
 VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, int, int, int *, int *, int *, int * ) );
+VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
 

@@ -2,7 +2,7 @@
  * vlc.c: the vlc player, WinCE version
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc.c,v 1.2 2002/11/13 20:51:04 sam Exp $
+ * $Id: vlc.c,v 1.3 2002/11/20 13:37:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,8 +52,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPTSTR lpCmdLine, int nCmdShow )
 {
     int    i_ret;
-    int    i_argc = 2;
-    char * ppsz_argv[] = { lpCmdLine, "-vv", NULL };
+    int    i_argc = 5;
+    char * ppsz_argv[] = { lpCmdLine, "-vv", "--intf", "dummy", "shovel.mpeg", NULL };
     HWND   window;
     MSG    message;
 

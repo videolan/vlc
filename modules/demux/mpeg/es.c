@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: es.c,v 1.2 2002/11/20 13:37:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,12 +26,9 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
-#include <sys/types.h>
 
 /*****************************************************************************
  * Constants
