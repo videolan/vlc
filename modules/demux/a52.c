@@ -2,7 +2,7 @@
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.2 2004/02/13 22:10:00 gbazin Exp $
+ * $Id: a52.c,v 1.3 2004/02/13 22:14:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -75,12 +75,14 @@ int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
     if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&
         p_peek[4] < 0x60 /* bsid < 12 */ )
     {
+        *p_big_endian = VLC_FALSE;
         return VLC_SUCCESS;
     }
     /* Big endian version of the bitstream */
     else if( p_peek[0] == 0x0b && p_peek[1] == 0x77 &&
              p_peek[5] < 0x60 /* bsid < 12 */ )
     {
+        *p_big_endian = VLC_TRUE;
         return VLC_SUCCESS;
     }
 
