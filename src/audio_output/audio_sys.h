@@ -30,3 +30,13 @@ long aout_DspSysGetBufInfo      ( aout_thread_t *p_aout, long l_buffer_info );
 void aout_DspSysPlaySamples     ( aout_thread_t *p_aout, byte_t *buffer, int i_size );
 void aout_DspSysClose           ( aout_thread_t *p_aout );
 #endif
+#ifdef AUDIO_ESD
+int  aout_EsdSysOpen            ( aout_thread_t *p_aout );
+int  aout_EsdSysReset           ( aout_thread_t *p_aout );
+int  aout_EsdSysSetFormat       ( aout_thread_t *p_aout );
+int  aout_EsdSysSetChannels     ( aout_thread_t *p_aout );
+int  aout_EsdSysSetRate         ( aout_thread_t *p_aout );
+long aout_EsdSysGetBufInfo      ( aout_thread_t *p_aout, long l_buffer_info );
+void aout_EsdSysPlaySamples     ( aout_thread_t *p_aout, byte_t *buffer, int i_size );
+void aout_EsdSysClose           ( aout_thread_t *p_aout );
+#endif

@@ -98,6 +98,19 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         p_aout->p_sys_close =          aout_DspSysClose;
     }
 #endif
+#ifdef AUDIO_ESD
+    else if( !strcmp(psz_method, "esd") )
+    {
+        p_aout->p_sys_open =           aout_EsdSysOpen;
+        p_aout->p_sys_reset =          aout_EsdSysReset;
+        p_aout->p_sys_setformat =      aout_EsdSysSetFormat;
+        p_aout->p_sys_setchannels =    aout_EsdSysSetChannels;
+        p_aout->p_sys_setrate =        aout_EsdSysSetRate;
+        p_aout->p_sys_getbufinfo =     aout_EsdSysGetBufInfo;
+        p_aout->p_sys_playsamples =    aout_EsdSysPlaySamples;
+        p_aout->p_sys_close =          aout_EsdSysClose;
+    }
+#endif
     else
     {
         intf_ErrMsg( "error: requested audio output method not available\n" );
@@ -277,7 +290,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
     /* Before launching the thread, we try to predict the date of the first
      * audio unit in the first output buffer */
-    p_aout->date = mdate();
+    p_aout->date = mdate() - 1000000;
 
     /* Launch the thread */
     if ( vlc_thread_create( &p_aout->thread_id, "audio output", (vlc_thread_func_t)aout_thread, p_aout ) )
@@ -1094,7 +1107,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
         }
 
         l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(s16) << (p_aout->b_stereo) == 4 */
+        p_aout->date = -1000000 + mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(s16) << (p_aout->b_stereo) == 4 */
         p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
         if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
         {

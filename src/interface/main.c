@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/soundcard.h>                                 /* audio_output.h */
-
 #include "config.h"
 #include "common.h"
 #include "mtime.h"

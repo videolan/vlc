@@ -16,7 +16,7 @@ SHELL=/bin/sh
 # Audio output settings
 AUDIO = dsp
 # Not yet supported
-#AUDIO += esd
+AUDIO += esd
 # Fallback method that should always work
 AUDIO += dummy
 
@@ -118,15 +118,17 @@ LIB += -lpthread
 LIB += -lm
 
 ifneq (,$(findstring x11,$(video)))
-LIB += -L/usr/X11R6/lib
-LIB += -lX11
-LIB += -lXext 
+LIB += -L/usr/X11R6/lib -lX11 -lXext 
 endif
 ifneq (,$(findstring ggi,$(video)))
 LIB += -lggi
 endif
 ifneq (,$(findstring glide,$(video)))
 LIB += -lglide2x
+endif
+
+ifneq (,$(findstring esd,$(audio)))
+LIB += -lesd -laudiofile
 endif
 
 #

@@ -216,7 +216,11 @@ typedef struct aout_thread_s
 #ifdef AUDIO_DSP
 #define AOUT_DEFAULT_METHOD "dsp"
 #else
+#ifdef AUDIO_ESD
+#define AOUT_DEFAULT_METHOD "esd"
+#else
 #define AOUT_DEFAULT_METHOD "dummy"
+#endif
 #endif
 
 /* Those are from <linux/soundcard.h> but are needed because of formats
