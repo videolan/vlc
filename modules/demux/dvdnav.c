@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.3 2004/01/18 16:02:40 gbazin Exp $
+ * $Id: dvdnav.c,v 1.4 2004/01/18 23:52:02 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -571,6 +571,7 @@ static int DemuxDemux( demux_t *p_demux )
     }
     case DVDNAV_VTS_CHANGE:
     {
+        int i;
         dvdnav_vts_change_event_t *event = (dvdnav_vts_change_event_t*)packet;
         msg_Dbg( p_demux, "DVDNAV_VTS_CHANGE" );
         msg_Dbg( p_demux, "     - vtsN=%d", event->new_vtsN );
@@ -579,11 +580,27 @@ static int DemuxDemux( demux_t *p_demux )
         /* dvdnav_get_video_aspect / dvdnav_get_video_scale_permission */
         /* TODO check if we alsways have VTS and CELL */
         p_sys->i_aspect = dvdnav_get_video_aspect( p_sys->dvdnav );
+
+        /* reset PCR */
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+        for( i = 0; i < PS_TK_COUNT; i++ )
+        {
+            ps_track_t *tk = &p_sys->tk[i];
+            if( tk->b_seen && tk->es )
+            {
+                es_out_Del( p_demux->out, tk->es );
+            }
+            tk->b_seen = VLC_FALSE;
+        }
+
+        p_sys->i_audio = 0;
+        p_sys->i_spu   = 0;
+
         break;
     }
     case DVDNAV_CELL_CHANGE:
     {
-        int i;
         dvdnav_cell_change_event_t *event =
             (dvdnav_cell_change_event_t*)packet;
         msg_Dbg( p_demux, "DVDNAV_CELL_CHANGE" );
@@ -596,22 +613,6 @@ static int DemuxDemux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - pg_start=%lld", event->pg_start );
         /* Do we need to check for audio/spu stream here ? */
 
-        /* reset PCR */
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-
-        /* Delete all es */
-        /* XXX we should avoid that sometime */
-        for( i = 0; i < PS_TK_COUNT; i++ )
-        {
-            ps_track_t *tk = &p_sys->tk[i];
-            if( tk->b_seen && tk->es )
-            {
-                es_out_Del( p_demux->out, tk->es );
-            }
-            tk->b_seen = VLC_FALSE;
-        }
-        p_sys->i_audio = 0;
-        p_sys->i_spu   = 0;
         break;
     }
     case DVDNAV_NAV_PACKET:
@@ -645,13 +646,14 @@ static int DemuxDemux( demux_t *p_demux )
         {
             vlc_mutex_t *p_mutex = val.p_address;
             dvdnav_highlight_area_t hl;
+
+            vlc_mutex_lock( p_mutex );
             if( i_button > 0 )
             {
                 pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
 
                 dvdnav_get_highlight_area( pci, i_button, 1, &hl );
 
-                vlc_mutex_lock( p_mutex );
                 val.i_int = hl.sx; var_Set( p_sys->p_input, "x-start", val );
                 val.i_int = hl.ex; var_Set( p_sys->p_input, "x-end", val );
                 val.i_int = hl.sy; var_Set( p_sys->p_input, "y-start", val );

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.85 2004/01/18 05:14:39 fenrir Exp $
+ * $Id: input_dec.c,v 1.86 2004/01/18 23:52:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -767,7 +767,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
     /* Get a new picture */
     while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
     {
-        int i_pic;
+        int i_pic, i_ready_pic = 0;
 
         if( p_dec->b_die || p_dec->b_error )
         {
@@ -779,8 +779,11 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
              i_pic++ )
         {
+            if( p_pic->i_status == READY_PICTURE && i_ready_pic++ > 0 ) break;
+
             if( p_pic->i_status != DISPLAYED_PICTURE &&
-                p_pic->i_status != RESERVED_PICTURE ) break;
+                p_pic->i_status != RESERVED_PICTURE &&
+                p_pic->i_status != READY_PICTURE ) break;
 
             if( !p_pic->i_refcount ) break;
         }
