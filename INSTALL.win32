@@ -32,7 +32,7 @@ If you want to build VLC from sources, you can do it in several ways:
   are not as much tested so expect more difficulties with them).
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
-  (MSYS is a minimal build environnement to compile Unixish projects under
+  (MSYS is a minimal build environment to compile Unixish projects under
   windoze. It provides all the common Unix tools like sh, gmake...)
   Please note that the gettext utilities are not included in the default
   MSYS/MINGW packages so you won't be able to build VLC with i18n support.
