@@ -344,11 +344,11 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                       GCL_HCURSOR, (LONG)LoadCursor(NULL, IDC_ARROW) );
         /* Store a p_vout pointer into the window local storage (for later
          * use in DirectXEventProc). */
-        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
+        SetWindowLongPtr( p_vout->p_sys->hwnd, GWLP_USERDATA, (LONG_PTR)p_vout );
 
         p_vout->p_sys->pf_wndproc =
-               (WNDPROC)SetWindowLong( p_vout->p_sys->hwnd,
-                                       GWL_WNDPROC, (LONG)DirectXEventProc );
+            (WNDPROC)SetWindowLong( p_vout->p_sys->hwnd, GWLP_WNDPROC,
+                                    (LONG_PTR)DirectXEventProc );
 
         /* Blam! Erase everything that might have been there. */
         InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
@@ -470,9 +470,9 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
         PostMessage( p_vout->p_sys->hvideownd, WM_VLC_DESTROY_VIDEO_WIN, 0, 0);
 
         /* We don't want our windowproc to be called anymore */
-        SetWindowLong( p_vout->p_sys->hwnd,
-                       GWL_WNDPROC, (LONG)p_vout->p_sys->pf_wndproc );
-        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)NULL );
+        SetWindowLongPtr( p_vout->p_sys->hwnd,
+                          GWLP_WNDPROC, (LONG_PTR)p_vout->p_sys->pf_wndproc );
+        SetWindowLongPtr( p_vout->p_sys->hwnd, GWLP_USERDATA, 0 );
 
         /* Blam! Erase everything that might have been there. */
         InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
@@ -656,11 +656,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
         /* Store p_vout for future use */
         p_vout = (vout_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
-        SetWindowLong( hwnd, GWL_USERDATA, (LONG)p_vout );
+        SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_vout );
     }
     else
     {
-        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
+        p_vout = (vout_thread_t *)GetWindowLongPtr( hwnd, GWLP_USERDATA );
     }
 
     if( !p_vout )
@@ -741,13 +741,13 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         else
         {
             msg_Dbg( p_vout, "Created video sub-window" );
-            SetWindowLong( p_vout->p_sys->hvideownd,
-                           GWL_WNDPROC, (LONG)DirectXVideoEventProc );
+            SetWindowLongPtr( p_vout->p_sys->hvideownd,
+                              GWLP_WNDPROC, (LONG_PTR)DirectXVideoEventProc );
             /* Store the previous window proc of _this_ window with the video
              * window so we can use it in DirectXVideoEventProc to pass
              * messages to the creator of _this_ window */
-            SetWindowLong( p_vout->p_sys->hvideownd,
-                           GWL_USERDATA, (LONG)p_vout->p_sys->pf_wndproc );
+            SetWindowLongPtr( p_vout->p_sys->hvideownd, GWLP_USERDATA,
+                              (LONG_PTR)p_vout->p_sys->pf_wndproc );
         }
         break;
 
@@ -765,13 +765,14 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
          * infinite loop.
          * We can detect this by resetting GWL_USERDATA before calling
          * the parent's windowproc. */
-        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)NULL );
+        SetWindowLongPtr( p_vout->p_sys->hwnd, GWLP_USERDATA, 0 );
 
         /* Call next window proc in chain */
         i_ret = CallWindowProc( p_vout->p_sys->pf_wndproc, hwnd, message,
                                 wParam, lParam );
 
-        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
+        SetWindowLongPtr( p_vout->p_sys->hwnd, GWLP_USERDATA,
+                          (LONG_PTR)p_vout );
         return i_ret;
     }
     else
@@ -817,13 +818,22 @@ static long FAR PASCAL DirectXVideoEventProc( HWND hwnd, UINT message,
          * the parent window ourself DirectXEventThread will process these
          * and they will never make it here.
          * Note that we fake the hwnd to be our parent in order to prevent
-         * confusion in the creator's window proc. */   
-        pf_parentwndproc = (WNDPROC)GetWindowLong( hwnd, GWL_USERDATA );
+         * confusion in the creator's window proc. */
+        pf_parentwndproc = (WNDPROC)GetWindowLongPtr( hwnd, GWLP_USERDATA );
 
         if( pf_parentwndproc )
         {
-            return CallWindowProc( pf_parentwndproc, GetParent( hwnd ),
-                                   message, wParam, lParam );
+            LRESULT i_ret;
+            LONG_PTR p_backup;
+
+            pf_parentwndproc = (WNDPROC)GetWindowLongPtr( hwnd, GWLP_USERDATA);
+
+            p_backup = SetWindowLongPtr( GetParent( hwnd ), GWLP_USERDATA, 0 );
+            i_ret = CallWindowProc( pf_parentwndproc, GetParent( hwnd ),
+                                    message, wParam, lParam );
+            SetWindowLongPtr( GetParent( hwnd ), GWLP_USERDATA, p_backup );
+
+            return i_ret;
         }
         break;
     }
