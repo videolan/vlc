@@ -698,6 +698,7 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
                     << ( 1 - p_vpar->picture.b_frame_structure ));
 
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
+        vlc_mutex_init( &p_vpar->picture.p_picture->lock_deccount );
         memset( p_vpar->picture.pp_mb, 0, MAX_MB );
 memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
