@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.7 2003/06/05 21:22:28 gbazin Exp $
+ * $Id: messages.cpp,v 1.8 2003/07/09 09:30:23 adn Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -66,6 +66,7 @@ BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, Messages::OnClose)
     EVT_CHECKBOX(Verbose_Event, Messages::OnVerbose)
+    EVT_BUTTON(wxID_CLEAR, Messages::OnClear)
 
     /* Special events : we don't want to destroy the window when the user
      * clicks on (X) */
@@ -101,6 +102,10 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxButton *ok_button = new wxButton( messages_panel, wxID_OK, wxU(_("OK")));
     ok_button->SetDefault();
 
+    /* Create the Clear button */
+    wxButton *clear_button = new wxButton( messages_panel, wxID_CLEAR, wxU(_("Clear")));
+    clear_button->SetDefault();
+
     /* Create the Verbose checkbox */
     wxCheckBox *verbose_checkbox =
         new wxCheckBox( messages_panel, Verbose_Event, wxU(_("Verbose")) );
@@ -108,6 +113,7 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
     buttons_sizer->Add( ok_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
+    buttons_sizer->Add( clear_button, 0, wxEXPAND |wxALIGN_LEFT| wxALL, 5 );
     buttons_sizer->Add( new wxPanel( this, -1 ), 1, wxALL, 5 );
     buttons_sizer->Add( verbose_checkbox, 0, wxEXPAND |wxALIGN_RIGHT | wxALL, 5 );
     buttons_sizer->Layout();
@@ -187,6 +193,11 @@ void Messages::UpdateLog()
 void Messages::OnClose( wxCommandEvent& WXUNUSED(event) )
 {
     Hide();
+}
+
+void Messages::OnClear( wxCommandEvent& WXUNUSED(event) )
+{
+    (*textctrl).Clear();
 }
 
 void Messages::OnVerbose( wxCommandEvent& event )
