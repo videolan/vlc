@@ -106,7 +106,6 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
 {
     dvd_reader_t *dvd;
 
-    fprintf(stderr, "libdvdread: opening %s as folder\n", path_root );
     dvd = (dvd_reader_t *) malloc( sizeof( dvd_reader_t ) );
     if( !dvd ) return 0;
     dvd->isImageFile = 0;
@@ -289,7 +288,6 @@ dvd_reader_t *DVDOpen( const char *path )
                     break;
                 }
             }
-            fprintf(stderr, "libdvdread: mounted device %p\n", me );
             fclose( mntfile );
         }
 #endif
@@ -308,7 +306,6 @@ dvd_reader_t *DVDOpen( const char *path )
         /**
          * Otherwise, we now try to open the directory tree instead.
          */
-        fprintf( stderr, "libdvdread: Using normal filesystem access.\n" );
         return DVDOpenPath( path );
     }
 
@@ -338,7 +335,6 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
     start = UDFFindFile( dvd, filename, &len );
     if( !start ) return 0;
 
-    fprintf( stderr, "libdvdread: opening %s as image\n", filename );
     dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
     if( !dvd_file ) return 0;
     dvd_file->dvd = dvd;
@@ -420,7 +416,6 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     /* Get the full path of the file. */
     if( !findDVDFile( dvd, filename, full_path ) ) return 0;
 
-    fprintf( stderr, "libdvdread: opening %s as file\n", full_path );
     dev = pf_dvd_open( full_path );
     if( dev == NULL ) return 0;
 
@@ -451,7 +446,6 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
     uint32_t start, len;
     dvd_file_t *dvd_file;
 
-    fprintf( stderr, "libdvdread: opening VOB as image\n" );
     if( title == 0 ) {
         sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
     } else {
@@ -496,7 +490,6 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
     dvd_file_t *dvd_file;
     int i;
 
-    fprintf( stderr, "libdvdread: opening VOB as file\n" );
     dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
     if( !dvd_file ) return 0;
     dvd_file->dvd = dvd;
@@ -532,7 +525,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
         }
         dvd_file->title_sizes[ 0 ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
         dvd_file->title_devs[ 0 ] = dev;
-        pf_dvd_title( dvd_file->title_devs[0], 0 );
+        pf_dvd_seek( dvd_file->title_devs[0], 0, DVDCSS_SEEK_KEY );
         dvd_file->filesize = dvd_file->title_sizes[ 0 ];
 
     } else {
@@ -550,7 +543,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
 
             dvd_file->title_sizes[ i ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
             dvd_file->title_devs[ i ] = pf_dvd_open( full_path );
-            pf_dvd_title( dvd_file->title_devs[i], 0 );
+            pf_dvd_seek( dvd_file->title_devs[i], 0, DVDCSS_SEEK_KEY );
             dvd_file->filesize += dvd_file->title_sizes[ i ];
         }
         if( !(dvd_file->title_sizes[ 0 ]) ) {

@@ -3,7 +3,7 @@
  */
 
 /* Copyright (C) 2001 VideoLAN
- * $Id: dvd_setup.h,v 1.1 2002/01/23 03:15:31 stef Exp $
+ * $Id: dvd_setup.h,v 1.2 2002/01/23 03:56:51 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,7 +52,6 @@ typedef struct dvdcss_s* dvd_handle;
  */
 dvd_handle (*pf_dvd_open)  ( char * );
 int        (*pf_dvd_close) ( dvd_handle );
-int        (*pf_dvd_title) ( dvd_handle, int );
 int        (*pf_dvd_seek)  ( dvd_handle, int, int );
 int        (*pf_dvd_read)  ( dvd_handle, void *, int, int );
 int        (*pf_dvd_readv) ( dvd_handle, void *, int, int );

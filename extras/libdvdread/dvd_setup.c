@@ -5,7 +5,7 @@
 
 /**
  * Copyright (C) 2001 VideoLAN
- * $Id: dvd_setup.c,v 1.1 2002/01/23 03:15:31 stef Exp $
+ * $Id: dvd_setup.c,v 1.2 2002/01/23 03:56:51 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,14 +87,6 @@ static int dvd_seek ( dvd_handle dev, int i_blocks, int i_flags )
 }
 
 /**
- * dvd_title: crack the current title key if needed.
- */
-static int dvd_title ( dvd_handle dev, int i_block )
-{
-    return 0;
-}
-
-/**
  * dvd_read: read data from the device.
  */
 static int dvd_read ( dvd_handle dev, void *p_buffer,
@@ -150,16 +142,14 @@ void DVDSetupRead( void )
     {
         pf_dvd_open = dlsym( dvdcss_library, "dvdcss_open" );
         pf_dvd_close = dlsym( dvdcss_library, "dvdcss_close" );
-        pf_dvd_title = dlsym( dvdcss_library, "dvdcss_title" );
         pf_dvd_seek = dlsym( dvdcss_library, "dvdcss_seek" );
         pf_dvd_read = dlsym( dvdcss_library, "dvdcss_read" );
         pf_dvd_readv = dlsym( dvdcss_library, "dvdcss_readv" );
         pf_dvd_error = dlsym( dvdcss_library, "dvdcss_error" );
 
         if( pf_dvd_open == NULL || pf_dvd_close == NULL
-             || pf_dvd_title == NULL || pf_dvd_seek == NULL
-             || pf_dvd_read == NULL || pf_dvd_readv == NULL
-             || pf_dvd_error == NULL )
+             || pf_dvd_seek == NULL || pf_dvd_read == NULL
+             || pf_dvd_readv == NULL || pf_dvd_error == NULL )
         {
             fprintf( stderr,  "libdvdread: Missing symbols in libdvdcss.so.1, "
                               "this shouldn't happen !" );
@@ -182,7 +172,6 @@ void DVDSetupRead( void )
         /* Replacement functions */
         pf_dvd_open = dvd_open;
         pf_dvd_close = dvd_close;
-        pf_dvd_title = dvd_title;
         pf_dvd_seek = dvd_seek;
         pf_dvd_read = dvd_read;
         pf_dvd_readv = dvd_readv;
@@ -194,7 +183,6 @@ void DVDSetupRead( void )
 {   
     pf_dvd_open = dvdcss_open;
     pf_dvd_close = dvdcss_close;
-    pf_dvd_title = dvdcss_title;
     pf_dvd_seek = dvdcss_seek;
     pf_dvd_read = dvdcss_read;
     pf_dvd_readv = dvdcss_readv;
