@@ -673,6 +673,17 @@ if BUILD_MOZILLA
 	cp $(top_builddir)/mozilla/vlcintf.xpt  $(top_builddir)/vlc-${VERSION}/mozilla/ ;
 endif
 
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/activex"
+if BUILD_ACTIVEX
+	cp $(top_builddir)/activex/README.TXT  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(top_builddir)/activex/test.html  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
+
+	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(top_builddir)/activex/*.reg $(top_builddir)/vlc-${VERSION}/activex/ ;
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
+endif
+
 package-win32-base-exe:
 # Create package
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
