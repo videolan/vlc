@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.22 2003/04/24 20:49:54 fenrir Exp $
+ * $Id: libmp4.c,v 1.23 2003/04/25 21:47:25 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,9 +44,6 @@
 #define MP4_BOX_HEADERSIZE( p_box ) \
   ( 8 + ( p_box->i_shortsize == 1 ? 8 : 0 ) \
       + ( p_box->i_type == FOURCC_uuid ? 16 : 0 ) )
-
-#define MP4_BOX_DESCEND( p_box ) \
-    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) )
 
 #define MP4_GET1BYTE( dst ) \
     dst = *p_peek; p_peek++; i_read--
@@ -94,7 +91,7 @@
     { \
         return( 0 ); \
     } \
-    if( !MP4_ReadStream( p_stream, p_peek, i_read ) )\
+    if( MP4_ReadStream( p_stream, p_peek, i_read ) )\
     { \
         free( p_buff ); \
         return( 0 ); \
@@ -227,7 +224,6 @@ off_t MP4_TellAbsolute( input_thread_t *p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     i_pos= p_input->stream.p_selected_area->i_tell;
-//            ( p_input->p_last_data - p_input->p_current_data  );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -235,22 +231,69 @@ off_t MP4_TellAbsolute( input_thread_t *p_input )
 }
 
 int MP4_SeekAbsolute( input_thread_t *p_input,
-                       off_t i_pos)
+                      off_t i_pos)
 {
     off_t i_filepos;
 
-    if( i_pos >= p_input->stream.p_selected_area->i_size )
+    //msg_Warn( p_input, "seek to %lld/%lld", i_pos, p_input->stream.p_selected_area->i_size  );
+
+    if( p_input->stream.p_selected_area->i_size > 0 &&
+        i_pos >= p_input->stream.p_selected_area->i_size )
     {
-        return( 0 );
+        msg_Warn( p_input, "seek:after end of file" );
+        return VLC_EGENERIC;
     }
 
     i_filepos = MP4_TellAbsolute( p_input );
-    if( i_pos != i_filepos )
+
+    if( i_filepos == i_pos )
+    {
+        return VLC_SUCCESS;
+    }
+
+    if( p_input->stream.b_seekable &&
+        ( p_input->stream.i_method == INPUT_METHOD_FILE ||
+          i_pos - i_filepos < 0 ||
+          i_pos - i_filepos > 1024 ) )
     {
         input_AccessReinit( p_input );
         p_input->pf_seek( p_input, i_pos );
+        return VLC_SUCCESS;
     }
-    return( 1 );
+    else if( i_pos - i_filepos > 0 )
+    {
+        data_packet_t   *p_data;
+        int             i_skip = i_pos - i_filepos;
+
+        msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
+
+        while (i_skip > 0 )
+        {
+            int i_read;
+
+            i_read = input_SplitBuffer( p_input, &p_data, 
+                                        __MIN( 4096, i_skip ) );
+            if( i_read < 0 )
+            {
+                msg_Warn( p_input, "seek:cannot read" );
+                return VLC_EGENERIC;
+            }
+            i_skip -= i_read;
+
+            input_DeletePacket( p_input->p_method_data, p_data );
+            if( i_read == 0 && i_skip > 0 )
+            {
+                msg_Warn( p_input, "seek:cannot read" );
+                return VLC_EGENERIC;
+            }
+        }
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        msg_Warn( p_input, "seek:failed" );
+        return VLC_EGENERIC;
+    }
 }
 
 /* return 1 if success, 0 if fail */
@@ -263,7 +306,7 @@ int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 
     if( !i_size )
     {
-        return( 1 );
+        return( VLC_SUCCESS );
     }
 
     do
@@ -271,7 +314,7 @@ int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
         i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
         if( i_read <= 0 )
         {
-            return( 0 );
+            return( VLC_EGENERIC );
         }
         memcpy( p_buff, p_data->p_payload_start, i_read );
         input_DeletePacket( p_input->p_method_data, p_data );
@@ -281,7 +324,7 @@ int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 
     } while( i_size );
 
-    return( 1 );
+    return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
@@ -357,13 +400,13 @@ int MP4_ReadStream( MP4_Stream_t *p_stream, uint8_t *p_buff, int i_size )
     {
         if( i_size > p_stream->i_stop - p_stream->i_start )
         {
-            return( 0 );
+            return( VLC_EGENERIC );
         }
         memcpy( p_buff,
                 p_stream->p_buffer + p_stream->i_start,
                 i_size );
         p_stream->i_start += i_size;
-        return( 1 );
+        return( VLC_SUCCESS );
     }
     else
     {
@@ -385,6 +428,16 @@ int MP4_PeekStream( MP4_Stream_t *p_stream, uint8_t **pp_peek, int i_size )
     }
     else
     {
+
+        if( p_stream->p_input->stream.p_selected_area->i_size > 0 )
+        {
+            int64_t i_max =
+                p_stream->p_input->stream.p_selected_area->i_size - MP4_TellAbsolute( p_stream->p_input );
+            if( i_size > i_max )
+            {
+                i_size = i_max;
+            }
+        }
         return( input_Peek( p_stream->p_input, pp_peek, i_size ) );
     }
 }
@@ -416,11 +469,11 @@ int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos)
         if( i_pos < p_stream->i_stop )
         {
             p_stream->i_start = i_pos;
-            return( 1 );
+            return( VLC_SUCCESS );
         }
         else
         {
-            return( 0 );
+            return( VLC_EGENERIC );
         }
     }
     else
@@ -441,7 +494,7 @@ int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos)
  *****************************************************************************/
 int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    int i_read;
+    int      i_read;
     uint8_t  *p_peek;
 
     if( ( ( i_read = MP4_PeekStream( p_stream, &p_peek, 32 ) ) < 8 ) )
@@ -524,7 +577,7 @@ int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             return( 0 ); /* out of bound */
         }
     }
-    return( MP4_SeekStream( p_stream, p_box->i_size + p_box->i_pos ) );
+    return( MP4_SeekStream( p_stream, p_box->i_size + p_box->i_pos ) ? 0 : 1 );
 }
 /*****************************************************************************
  * MP4_MP4_GotoBox : Go to this particular box
@@ -533,7 +586,7 @@ int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
  *****************************************************************************/
 int MP4_GotoBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    return( MP4_SeekStream( p_stream, p_box->i_pos ) );
+    return( MP4_SeekStream( p_stream, p_box->i_pos ) ? 0 : 1 );
 }
 
 
@@ -586,7 +639,6 @@ int MP4_ReadBoxContainerRaw( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 
 int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 {
-
     if( p_container->i_size <= (size_t)MP4_BOX_HEADERSIZE(p_container ) + 8 )
     {
         /* container is empty, 8 stand for the first header in this box */
@@ -594,7 +646,7 @@ int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
     }
 
     /* enter box */
-    MP4_BOX_DESCEND( p_container );
+    MP4_SeekStream( p_stream, p_container->i_pos + MP4_BOX_HEADERSIZE( p_container ) );
 
     return( MP4_ReadBoxContainerRaw( p_stream, p_container ) );
 }
@@ -780,30 +832,6 @@ int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
-
-int MP4_ReadBox_tref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
-{
-
-    if( p_box->i_size < (size_t)MP4_BOX_HEADERSIZE(p_box ) + 8 )
-    {
-        /* container is empty, 8 stand for the first header in this box */
-        return( 1 );
-    }
-
-    if( !MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) ) )
-    {
-        return( 0 );
-    }
-
-    MP4_ReadBoxContainerRaw( p_stream, p_box );
-
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "Read Box: \"tref\" " );
-
-#endif
-    return( 1 );
-}
-
 
 
 int MP4_ReadBox_mdhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1229,13 +1257,6 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_qt_revision_level );
     MP4_GET4BYTES( p_box->data.p_sample_soun->i_qt_vendor );
 
-#if 0
-    for( i = 0; i < 2 ; i++ )
-    {
-        MP4_GET4BYTES( p_box->data.p_sample_soun->i_reserved2[i] );
-    }
-#endif
-
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_channelcount );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_samplesize );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_predefined );
@@ -1283,46 +1304,6 @@ int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-#if 0
-int MP4_ReadBox_sample_mp4a( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
-{
-    unsigned int i;
-
-    MP4_READBOX_ENTER( MP4_Box_data_sample_mp4a_t );
-
-    for( i = 0; i < 6 ; i++ )
-    {
-        MP4_GET1BYTE( p_box->data.p_sample_mp4a->i_reserved1[i] );
-    }
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_data_reference_index );
-
-    for( i = 0; i < 2 ; i++ )
-    {
-        MP4_GET4BYTES( p_box->data.p_sample_mp4a->i_reserved2[i] );
-    }
-
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_channelcount );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_samplesize );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_predefined );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_reserved3 );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_sampleratehi );
-    MP4_GET2BYTES( p_box->data.p_sample_mp4a->i_sampleratelo );
-
-    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
-    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
-
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "Read Box: \"mp4a\" in stsd channel %d sample size %d sampl rate %f",
-                      p_box->data.p_sample_mp4a->i_channelcount,
-                      p_box->data.p_sample_mp4a->i_samplesize,
-                      (float)p_box->data.p_sample_mp4a->i_sampleratehi +
-                        (float)p_box->data.p_sample_mp4a->i_sampleratelo / 65536 );
-
-#endif
-    MP4_READBOX_EXIT( 1 );
-}
-#endif
 
 int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -2074,13 +2055,13 @@ static struct
     { FOURCC_hnti,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_rmra,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_rmda,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_tref,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
 
     /* specific box */
     { FOURCC_ftyp,  MP4_ReadBox_ftyp,       MP4_FreeBox_ftyp },
     { FOURCC_cmov,  MP4_ReadBox_cmov,       MP4_FreeBox_Common },
     { FOURCC_mvhd,  MP4_ReadBox_mvhd,       MP4_FreeBox_Common },
     { FOURCC_tkhd,  MP4_ReadBox_tkhd,       MP4_FreeBox_Common },
-    { FOURCC_tref,  MP4_ReadBox_tref,       MP4_FreeBox_Common },
     { FOURCC_mdhd,  MP4_ReadBox_mdhd,       MP4_FreeBox_Common },
     { FOURCC_hdlr,  MP4_ReadBox_hdlr,       MP4_FreeBox_hdlr },
     { FOURCC_vmhd,  MP4_ReadBox_vmhd,       MP4_FreeBox_Common },
@@ -2226,12 +2207,9 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
            (MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box );
     }
 
-    if( !MP4_GotoBox( p_stream, p_box ) )
-    {
-        return( 0 );
-    }
     return( i_result );
 }
+
 #if 0
 /*****************************************************************************
  * MP4_CountBox: given a box, count how many child have the requested type

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.25 2003/04/24 14:39:53 fenrir Exp $
+ * $Id: mp4.c,v 1.26 2003/04/25 21:47:25 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,11 @@
 static int    MP4Init    ( vlc_object_t * );
 static void __MP4End     ( vlc_object_t * );
 static int    MP4Demux   ( input_thread_t * );
+
+static int    MP4DemuxRef( input_thread_t *p_input )
+{
+    return 0;
+}
 
 /* New input could have something like that... */
 static int   MP4Seek     ( input_thread_t *, mtime_t );
@@ -118,7 +123,7 @@ static int MP4Init( vlc_object_t * p_this )
     if( !p_input->stream.b_seekable )
     {
         msg_Warn( p_input, "MP4 plugin discarded (unseekable)" );
-        return( -1 );
+        return( VLC_EGENERIC );
 
     }
     /* Initialize access plug-in structures. */
@@ -134,7 +139,7 @@ static int MP4Init( vlc_object_t * p_this )
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_input, "MP4 plugin discarded (cannot peek)" );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
 
 
@@ -151,7 +156,7 @@ static int MP4Init( vlc_object_t * p_this )
             break;
          default:
             msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
-            return( -1 );
+            return( VLC_EGENERIC );
     }
 
     /* create our structure that will contains all data */
@@ -159,7 +164,7 @@ static int MP4Init( vlc_object_t * p_this )
                 p_demux = malloc( sizeof( demux_sys_t ) ) ) )
     {
         msg_Err( p_input, "out of memory" );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
     p_input->p_demux_data = p_demux;
@@ -169,7 +174,7 @@ static int MP4Init( vlc_object_t * p_this )
     if( !MP4_BoxGetRoot( p_input, &p_demux->box_root ) )
     {
         msg_Warn( p_input, "MP4 plugin discarded (not a valid file)" );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
 
     MP4_BoxDumpStructure( p_input, &p_demux->box_root );
@@ -219,6 +224,7 @@ static int MP4Init( vlc_object_t * p_this )
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
+            //p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
             for( i = 0; i < i_count; i++ )
             {
                 MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
@@ -250,14 +256,14 @@ static int MP4Init( vlc_object_t * p_this )
                     else
                     {
                         /* msg dbg relative ? */
-                        char *psz_absolute = alloca( strlen( p_input->psz_name ) + strlen( psz_ref ) + 1);
-                        char *end = strrchr( p_input->psz_name, '/' );
+                        char *psz_absolute = alloca( strlen( p_input->psz_source ) + strlen( psz_ref ) + 1);
+                        char *end = strrchr( p_input->psz_source, '/' );
 
                         if( end )
                         {
-                            int i_len = end + 1 - p_input->psz_name;
+                            int i_len = end + 1 - p_input->psz_source;
 
-                            strncpy( psz_absolute, p_input->psz_name, i_len);
+                            strncpy( psz_absolute, p_input->psz_source, i_len);
                             psz_absolute[i_len] = '\0';
                         }
                         else
@@ -287,13 +293,15 @@ static int MP4Init( vlc_object_t * p_this )
         if( !p_rmra )
         {
             msg_Err( p_input, "cannot find /moov/mvhd" );
+            MP4End( p_input );
+            return VLC_EGENERIC;
         }
         else
         {
             msg_Warn( p_input, "cannot find /moov/mvhd (pure ref file)" );
+            p_input->pf_demux = MP4DemuxRef;
+            return VLC_SUCCESS;
         }
-        MP4End( p_input );
-        return( -1 );
     }
     else
     {
@@ -306,7 +314,7 @@ static int MP4Init( vlc_object_t * p_this )
     {
         msg_Err( p_input, "cannot find any /moov/trak" );
         MP4End( p_input );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
     msg_Dbg( p_input, "find %d track%c",
                         p_demux->i_tracks,
@@ -319,7 +327,7 @@ static int MP4Init( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
         MP4End( p_input );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
     /* Needed to create program _before_ MP4_TrackCreate */
     if( input_AddProgram( p_input, 0, 0) == NULL )
@@ -327,7 +335,7 @@ static int MP4Init( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
         MP4End( p_input );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     /* XXX beurk and beurk, see MP4Demux and MP4Seek */
@@ -406,8 +414,7 @@ static int MP4Init( vlc_object_t * p_this )
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( 0 );
-
+    return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
@@ -545,7 +552,7 @@ static int MP4Demux( input_thread_t *p_input )
                 //msg_Dbg( p_input, "stream %d size=%6d pos=%8lld",  i_track, i_size, i_pos );
 
                 /* go,go go ! */
-                if( ! MP4_SeekAbsolute( p_input, i_pos ) )
+                if( MP4_SeekAbsolute( p_input, i_pos ) )
                 {
                     msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
                     MP4_TrackUnselect( p_input, &track );
@@ -573,7 +580,7 @@ static int MP4Demux( input_thread_t *p_input )
                 p_pes->i_pes_size = i_size;
                 if( i_size > 0 )
                 {
-                    if( !MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
+                    if( MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
                     {
                         input_DeletePES( p_input->p_method_data, p_pes );
 
