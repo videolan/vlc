@@ -425,6 +425,26 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
     return NULL;
 }
 
+/**
+ * Search an item by its input_item_t
+ *
+ * \param p_playlist the playlist
+ * \param p_item the input_item_t to find
+ * \return the item, or NULL on failure
+ */
+playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
+                                        input_item_t *p_item )
+{
+    int i;
+    for( i =  0 ; i < p_playlist->i_size ; i++ )
+    {
+        if( &p_playlist->pp_items[i]->input == p_item )
+        {
+            return p_playlist->pp_items[i];
+        }
+    }
+    return NULL;
+}
 
 
 

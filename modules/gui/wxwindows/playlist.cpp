@@ -65,6 +65,7 @@ enum
 {
     /* menu items */
     AddFile_Event = 1,
+    AddDir_Event,
     AddMRL_Event,
     Close_Event,
     Open_Event,
@@ -123,6 +124,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Menu events */
     EVT_MENU(AddFile_Event, Playlist::OnAddFile)
+    EVT_MENU(AddDir_Event, Playlist::OnAddDir)
     EVT_MENU(AddMRL_Event, Playlist::OnAddMRL)
     EVT_MENU(Close_Event, Playlist::OnClose)
     EVT_MENU(Open_Event, Playlist::OnOpen)
@@ -226,7 +228,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Manage" menu */
     wxMenu *manage_menu = new wxMenu;
-    manage_menu->Append( AddFile_Event, wxU(_("&Simple Add...")) );
+    manage_menu->Append( AddFile_Event, wxU(_("&Simple Add File...")) );
+    manage_menu->Append( AddDir_Event, wxU(_("Add &Directory...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
     manage_menu->AppendSeparator();
     manage_menu->Append( MenuDummy_Event, wxU(_("Services discovery")),
@@ -851,6 +854,12 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 void Playlist::OnAddFile( wxCommandEvent& WXUNUSED(event) )
 {
     p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE, 0, 0 );
+
+}
+
+void Playlist::OnAddDir( wxCommandEvent& WXUNUSED(event) )
+{
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_DIRECTORY, 0, 0 );
 
 }
 

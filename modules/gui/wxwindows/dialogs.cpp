@@ -60,6 +60,7 @@ private:
 
     void OnOpenFileGeneric( wxCommandEvent& event );
     void OnOpenFileSimple( wxCommandEvent& event );
+    void OnOpenDirectory( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnOpenDisc( wxCommandEvent& event );
     void OnOpenNet( wxCommandEvent& event );
@@ -80,6 +81,7 @@ public:
     /* Secondary windows */
     OpenDialog          *p_open_dialog;
     wxFileDialog        *p_file_dialog;
+    wxDirDialog         *p_dir_dialog;
     Playlist            *p_playlist_dialog;
     Messages            *p_messages_dialog;
     FileInfo            *p_fileinfo_dialog;
@@ -105,6 +107,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnOpenFileSimple)
     EVT_COMMAND(INTF_DIALOG_FILE_GENERIC, wxEVT_DIALOG,
                 DialogsProvider::OnOpenFileGeneric)
+    EVT_COMMAND(INTF_DIALOG_DIRECTORY, wxEVT_DIALOG,
+                DialogsProvider::OnOpenDirectory)
 
     EVT_COMMAND(INTF_DIALOG_PLAYLIST, wxEVT_DIALOG,
                 DialogsProvider::OnPlaylist)
@@ -360,6 +364,37 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
                 playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
                               (const char *)paths[i].mb_str(),
                               PLAYLIST_APPEND, PLAYLIST_END );
+    }
+
+    vlc_object_release( p_playlist );
+}
+
+void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if( p_dir_dialog == NULL )
+        p_dir_dialog = new wxDirDialog( NULL );
+
+    if( p_dir_dialog && p_dir_dialog->ShowModal() == wxID_OK )
+    {
+        playlist_item_t *p_item;
+        wxString path = p_dir_dialog->GetPath();
+
+        int i_id = playlist_Add( p_playlist, (const char *)path.mb_str(),
+                                             (const char *)path.mb_str(),
+                                             PLAYLIST_APPEND, PLAYLIST_END );
+        p_item = playlist_ItemGetById( p_playlist, i_id );
+        if( p_item )
+        {
+            input_CreateThread( p_intf, &p_item->input );
+        }
     }
 
     vlc_object_release( p_playlist );

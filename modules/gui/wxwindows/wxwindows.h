@@ -326,6 +326,7 @@ private:
     void OnAbout( wxCommandEvent& event );
 
     void OnOpenFileSimple( wxCommandEvent& event );
+    void OnOpenDir( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnOpenDisc( wxCommandEvent& event );
     void OnOpenNet( wxCommandEvent& event );
@@ -791,6 +792,7 @@ private:
 
     /* Menu Handlers */
     void OnAddFile( wxCommandEvent& event );
+    void OnAddDir( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnSearch( wxCommandEvent& event );

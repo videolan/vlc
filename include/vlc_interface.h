@@ -142,6 +142,8 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_CAPTURE     5
 #define INTF_DIALOG_SAT         6
 
+#define INTF_DIALOG_DIRECTORY   7
+
 #define INTF_DIALOG_STREAMWIZARD 8
 #define INTF_DIALOG_WIZARD 9
 

@@ -194,6 +194,15 @@ struct playlist_t
     /*@}*/
 };
 
+/* Helper to add an item */
+struct playlist_add_t
+{
+    playlist_item_t *p_parent;
+    playlist_item_t *p_item;
+    int i_view;
+    int i_position;
+};
+
 #define SORT_ID 0
 #define SORT_TITLE 1
 #define SORT_AUTHOR 2
@@ -296,6 +305,7 @@ VLC_EXPORT( void, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByPos, (playlist_t *, int) );
 VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *,int ) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t * ) );
 
 /* Info functions */
 VLC_EXPORT( char * , playlist_GetInfo, ( playlist_t * , int, const char *, const char *) );
