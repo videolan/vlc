@@ -409,6 +409,58 @@ void __fastcall TPanelInteger::UpdateChanges()
 
 
 /****************************************************************************
+ * Panel for float management
+ ****************************************************************************/
+__fastcall TPanelFloat::TPanelFloat( TComponent* Owner,
+            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+{
+#define MAX_FLOAT_CHARS 20
+    /* init description label */
+    AnsiString Text = AnsiString( p_config->psz_text ) + ":";
+    Label = CreateLabel( this,
+            LIBWIN32_PREFSIZE_LEFT,
+            LIBWIN32_PREFSIZE_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_LABEL_HEIGHT,
+            Text.c_str(), true );
+
+    /* init edit */
+    char *psz_value = (char *)malloc( MAX_FLOAT_CHARS );
+    snprintf( psz_value, MAX_FLOAT_CHARS, "%f", p_config->f_value );
+    /* we use the spinedit size, to be similar with the integers */
+    Edit = CreateEdit( this,
+            LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_SPINEDIT_WIDTH,
+            LIBWIN32_PREFSIZE_SPINEDIT_WIDTH,
+            LIBWIN32_PREFSIZE_VPAD,
+            LIBWIN32_PREFSIZE_SPINEDIT_HEIGHT,
+            psz_value );
+    free( psz_value );
+    Edit->Hint = p_config->psz_longtext;
+    Edit->ShowHint = true;
+
+    /* vertical alignement and panel height */
+    if ( Edit->Height > Label->Height )
+    {
+        Label->Top += ( Edit->Height - Label->Height ) / 2;
+        Height = Edit->Top + Edit->Height + LIBWIN32_PREFSIZE_VPAD;
+    }
+    else
+    {
+        Edit->Top += ( Label->Height - Edit->Height ) / 2;
+        Height = Label->Top + Label->Height + LIBWIN32_PREFSIZE_VPAD;
+    }
+
+#undef MAX_FLOAT_CHARS
+};
+//---------------------------------------------------------------------------
+void __fastcall TPanelFloat::UpdateChanges()
+{
+    /* Warning: we're casting from double to float */
+    p_config->f_value = atof( Edit->Text.c_str() );
+}
+
+
+/****************************************************************************
  * Panel for boolean management
  ****************************************************************************/
 __fastcall TPanelBool::TPanelBool( TComponent* Owner,
@@ -483,6 +535,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TPanelPlugin       *PanelPlugin;
     TPanelString       *PanelString;
     TPanelInteger      *PanelInteger;
+    TPanelFloat        *PanelFloat;
     TPanelBool         *PanelBool;
 
     /* Look for the selected module */
@@ -591,12 +644,23 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
 
+        case CONFIG_ITEM_FLOAT:
+
+            /* add new panel for the config option */
+            PanelFloat = new TPanelFloat( this, p_item );
+            PanelFloat->Parent = ScrollBox;
+
+            break;
+
         case CONFIG_ITEM_BOOL:
 
             /* add new panel for the config option */
             PanelBool = new TPanelBool( this, p_item );
             PanelBool->Parent = ScrollBox;
 
+            break;
+        default:
+            msg_Warn( p_intf, "unknown config type" );
             break;
         }
 
@@ -681,8 +745,13 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
             break;
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intf, p_config->psz_name,
-                           p_config->i_value );
+            config_PutInt( p_intf, p_config->psz_name, p_config->i_value );
+            break;
+        case CONFIG_ITEM_FLOAT:
+            config_PutFloat( p_intf, p_config->psz_name, p_config->f_value );
+            break;
+        default:
+            msg_Warn( p_intf, "unknown config type" );
             break;
     }
 }

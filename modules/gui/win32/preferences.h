@@ -67,7 +67,7 @@ class TPanelPref : public TPanel
 public:
     __fastcall TPanelPref( TComponent* Owner, module_config_t *p_config_arg );
     module_config_t *p_config;
-    virtual void __fastcall UpdateChanges();
+    virtual void __fastcall UpdateChanges() = 0;
     TCleanCheckListBox * __fastcall CreateCleanCheckListBox( TWinControl *Parent,
             int Left, int Width, int Top, int Height );
     TButton * __fastcall CreateButton( TWinControl *Parent,
@@ -93,7 +93,7 @@ public:
     TButton *ButtonConfig;
     TLabel *Label;
     module_t *ModuleSelected;
-    void __fastcall UpdateChanges();
+    virtual void __fastcall UpdateChanges();
     void __fastcall CheckListBoxClick( TObject *Sender );
     void __fastcall CheckListBoxClickCheck( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
@@ -107,7 +107,7 @@ public:
     __fastcall TPanelString( TComponent* Owner, module_config_t *p_config );
     TLabel *Label;
     TEdit *Edit;
-    void __fastcall UpdateChanges();
+    virtual void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TPanelInteger : public TPanelPref
@@ -116,7 +116,16 @@ public:
     __fastcall TPanelInteger( TComponent* Owner, module_config_t *p_config );
     TLabel *Label;
     TCSpinEdit *SpinEdit;
-    void __fastcall UpdateChanges();
+    virtual void __fastcall UpdateChanges();
+};
+//---------------------------------------------------------------------------
+class TPanelFloat : public TPanelPref
+{
+public:
+    __fastcall TPanelFloat( TComponent* Owner, module_config_t *p_config );
+    TLabel *Label;
+    TEdit *Edit;
+    virtual void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TPanelBool : public TPanelPref
@@ -124,7 +133,7 @@ class TPanelBool : public TPanelPref
 public:
     __fastcall TPanelBool( TComponent* Owner, module_config_t *p_config );
     TCheckBox *CheckBox;
-    void __fastcall UpdateChanges();
+    virtual void __fastcall UpdateChanges();
 };
 //---------------------------------------------------------------------------
 class TPreferencesDlg : public TForm
