@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.2 2001/07/18 14:21:00 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.3 2001/11/11 01:32:03 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -156,12 +156,17 @@ typedef struct netlist_s
     struct iovec *          p_free_iovec;
     
     /* FIFO size */
+    unsigned int            i_nb_iovec;
     unsigned int            i_nb_pes;
     unsigned int            i_nb_data;
 
     /* Index */
+    unsigned int            i_iovec_start, i_iovec_end;
     unsigned int            i_data_start, i_data_end;
     unsigned int            i_pes_start, i_pes_end;
+
+    /* Reference counters for iovec */
+    unsigned int *          pi_refcount;
 
     /* Number of blocs read once by readv */
     unsigned int            i_read_once;
@@ -171,17 +176,23 @@ typedef struct netlist_s
  * Prototypes
  *****************************************************************************/
 int                     input_NetlistInit( struct input_thread_s *,
-                                           int i_nb_data, int i_nb_pes,
+                                           int i_nb_iovec,
+                                           int i_nb_data,
+                                           int i_nb_pes,
                                            size_t i_buffer_size,
                                            int i_read_once );
 
-struct iovec * input_NetlistGetiovec( void * p_method_data );
-void input_NetlistMviovec( void * , size_t, struct data_packet_s **);
+struct iovec * 	        input_NetlistGetiovec( void * p_method_data );
+void                    input_NetlistMviovec( void * , int,
+                                              struct data_packet_s **);
+struct data_packet_s *  input_NetlistNewPtr( void * );
 struct data_packet_s *  input_NetlistNewPacket( void *, size_t );
 struct pes_packet_s *   input_NetlistNewPES( void * );
-void            input_NetlistDeletePacket( void *, struct data_packet_s * );
-void            input_NetlistDeletePES( void *, struct pes_packet_s * );
-void            input_NetlistEnd( struct input_thread_s * );
+void                    input_NetlistDeletePacket( void *,
+                                                   struct data_packet_s * );
+void                    input_NetlistDeletePES( void *,
+                                                struct pes_packet_s * );
+void                    input_NetlistEnd( struct input_thread_s * );
 
 
 /*

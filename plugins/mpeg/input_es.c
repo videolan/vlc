@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.11 2001/10/02 17:04:42 massiot Exp $
+ * $Id: input_es.c,v 1.12 2001/11/11 01:32:03 stef Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -145,7 +145,7 @@ static void ESInit( input_thread_t * p_input )
     p_input->p_method_data = NULL;
 
     /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_PES, ES_PACKET_SIZE,
+    if( input_NetlistInit( p_input, NB_DATA, NB_DATA, NB_PES, ES_PACKET_SIZE,
                            INPUT_READ_ONCE ) )
     {
         intf_ErrMsg( "ES input : Could not initialize netlist" );

@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.35 2001/10/22 02:33:54 xav Exp $
+ * $Id: input_ts.c,v 1.36 2001/11/11 01:32:03 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -185,7 +185,7 @@ static void TSInit( input_thread_t * p_input )
 
 
     /* Initialize netlist */
-    if( input_NetlistInit( p_input, NB_DATA, NB_PES, TS_PACKET_SIZE,
+    if( input_NetlistInit( p_input, NB_DATA, NB_DATA, NB_PES, TS_PACKET_SIZE,
                 INPUT_READ_ONCE ) )
     {
         intf_ErrMsg( "TS input : Could not initialize netlist" );

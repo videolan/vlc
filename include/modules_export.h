@@ -121,11 +121,12 @@ typedef struct module_symbols_s
                                            mtime_t );
 
     int ( * input_NetlistInit )          ( struct input_thread_s *,
-                                           int, int, size_t, int );
+                                           int, int, int, size_t, int );
     struct iovec * ( * input_NetlistGetiovec ) ( void * p_method_data );
-    void ( * input_NetlistMviovec )      ( void * , size_t,
+    void ( * input_NetlistMviovec )      ( void * , int,
                                            struct data_packet_s **);
     struct data_packet_s * ( * input_NetlistNewPacket ) ( void *, size_t );
+    struct data_packet_s * ( * input_NetlistNewPtr ) ( void * );
     struct pes_packet_s * ( * input_NetlistNewPES ) ( void * );
     void ( * input_NetlistDeletePacket ) ( void *, struct data_packet_s * );
     void ( * input_NetlistDeletePES )    ( void *, struct pes_packet_s * );
@@ -192,6 +193,7 @@ typedef struct module_symbols_s
     (p_symbols)->input_NetlistGetiovec = input_NetlistGetiovec; \
     (p_symbols)->input_NetlistMviovec = input_NetlistMviovec; \
     (p_symbols)->input_NetlistNewPacket = input_NetlistNewPacket; \
+    (p_symbols)->input_NetlistNewPtr = input_NetlistNewPtr; \
     (p_symbols)->input_NetlistNewPES = input_NetlistNewPES; \
     (p_symbols)->input_NetlistDeletePacket = input_NetlistDeletePacket; \
     (p_symbols)->input_NetlistDeletePES = input_NetlistDeletePES; \
