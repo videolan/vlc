@@ -126,6 +126,7 @@ DIST_skins2 = \
 	skins2/default/reduce.png \
 	skins2/default/reduce_disabled.png \
 	skins2/default/reduce_onclick.png \
+	skins2/default/reduce_mouseover.png \
 	skins2/default/resize.png \
 	skins2/default/rev.png \
 	skins2/default/rev_disabled.png \
