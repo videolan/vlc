@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.48 2004/01/22 00:17:22 sigmunau Exp $
+ * $Id: sap.c,v 1.49 2004/01/22 00:24:45 hartman Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -95,7 +95,7 @@
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
 #define SAP_SCOPE_LONGTEXT N_( \
        "Sets the scope for IPv6 announces (default is 8)")
-#define SAP_TIMEOUT_TEXT N_("SAP timeout \(seconds\)")
+#define SAP_TIMEOUT_TEXT N_("SAP timeout (seconds)")
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Sets the time before SAP items get deleted if no new announce" \
        "is received")
