@@ -464,11 +464,14 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Ourumov44> i'd like see satellite by my pc with vlc
-<Ourumov44> can i?
-<Meuuh> do you have a satellite dish and a dvb-s card ?
-<Ourumov44> no
-<Meuuh> then no
-
-  -- #videolan - let's emulate satellite dishes in software
+*** Meuuh has changed the topic on channel #videolan to "NO, we do not know
+    how to access Italian pay TVs, so don't ask"
+*** [MaDog] (MaDog@host41-156.pool80180.interbusiness.it) has joined channel
+    #videolan
+<[MaDog]> c'è qualcuno ?????????
+<Meuuh> read the topic
+<[MaDog]> :)
+<[MaDog]> xcuse me
+*** Signoff: [MaDog] (Client Quit)
+  -- #videolan
 %
