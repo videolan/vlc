@@ -2,7 +2,7 @@
  * MessagesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.h,v 1.1 2003/01/25 20:15:41 titer Exp $
+ * $Id: MessagesWindow.h,v 1.2 2003/01/26 08:28:20 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -32,6 +32,7 @@ class MessagesWindow : public BWindow
                              MessagesWindow( intf_thread_t * p_intf,
                                              BRect frame, const char * name );
         virtual              ~MessagesWindow();
+        virtual void         FrameResized( float, float );
         virtual bool         QuitRequested();
         
         void                 ReallyQuit();

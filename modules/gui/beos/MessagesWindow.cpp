@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.1 2003/01/25 20:15:41 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.2 2003/01/26 08:28:20 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -23,6 +23,7 @@
 
 /* BeOS headers */
 #include <InterfaceKit.h>
+#include <SupportKit.h>
 
 /* VLC headers */
 #include <vlc/vlc.h>
@@ -43,18 +44,18 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
 	this->p_intf = p_intf;
 	p_sub = p_intf->p_sys->p_sub;
 	
-	BRect rect, rect2;
+	BRect rect, textRect;
 	
 	rect = Bounds();
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	rect2 = rect;
-	rect2.InsetBy( 5, 5 );
-	fMessagesView = new BTextView( rect, "messages", rect2,
+	textRect = rect;
+	textRect.InsetBy( 5, 5 );
+	fMessagesView = new BTextView( rect, "messages", textRect,
 	                               B_FOLLOW_ALL, B_WILL_DRAW );
 	fMessagesView->MakeEditable( false );
+	fMessagesView->SetStylable( true );
 	fScrollView = new BScrollView( "scrollview", fMessagesView, B_WILL_DRAW,
-	                               B_FOLLOW_ALL, true, true );
+	                               B_FOLLOW_ALL, false, true );
 	fScrollBar = fScrollView->ScrollBar( B_VERTICAL );
 	AddChild( fScrollView );
 	
@@ -68,6 +69,16 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
  *****************************************************************************/
 MessagesWindow::~MessagesWindow()
 {
+}
+
+/*****************************************************************************
+ * MessagesWindow::FrameResized
+ *****************************************************************************/
+void MessagesWindow::FrameResized( float, float )
+{
+    BRect rect = fMessagesView->Bounds();
+    rect.InsetBy( 5, 5 );
+    fMessagesView->SetTextRect( rect );
 }
 
 /*****************************************************************************
@@ -93,7 +104,13 @@ void MessagesWindow::ReallyQuit()
  *****************************************************************************/
 void MessagesWindow::UpdateMessages()
 {
-    int i_start;
+    int i_start, oldLength;
+    char * psz_module_type = NULL;
+    rgb_color red = { 200, 0, 0 };
+    rgb_color gray = { 150, 150, 150 };
+    rgb_color green = { 0, 150, 0 };
+    rgb_color orange = { 230, 180, 00 };
+    rgb_color color;
     
     vlc_mutex_lock( p_sub->p_lock );
     int i_stop = *p_sub->pi_stop;
@@ -105,34 +122,44 @@ void MessagesWindow::UpdateMessages()
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
-            /* Append all messages to log window */
-            /* textctrl->SetDefaultStyle( *dbg_attr );
-            (*textctrl) << p_sub->p_msg[i_start].psz_module; */
-
-            /* switch( p_sub->p_msg[i_start].i_type )
-            {
-            case VLC_MSG_INFO:
-                (*textctrl) << ": ";
-                textctrl->SetDefaultStyle( *info_attr );
-                break;
-            case VLC_MSG_ERR:
-                (*textctrl) << " error: ";
-                textctrl->SetDefaultStyle( *err_attr );
-                break;
-            case VLC_MSG_WARN:
-                (*textctrl) << " warning: ";
-                textctrl->SetDefaultStyle( *warn_attr );
-                break;
-            case VLC_MSG_DBG:
-            default:
-                (*textctrl) << " debug: ";
-                break;
-            } */
-
             /* Add message */
+            switch( p_sub->p_msg[i_start].i_type )
+            {
+                case VLC_MSG_INFO: color = green; break;
+                case VLC_MSG_WARN: color = orange; break;
+                case VLC_MSG_ERR: color = red; break;
+                case VLC_MSG_DBG: color = gray; break;
+            }
+            
+            switch( p_sub->p_msg[i_start].i_object_type )
+            {
+                case VLC_OBJECT_ROOT: psz_module_type = "root"; break;
+                case VLC_OBJECT_VLC: psz_module_type = "vlc"; break;
+                case VLC_OBJECT_MODULE: psz_module_type = "module"; break;
+                case VLC_OBJECT_INTF: psz_module_type = "interface"; break;
+                case VLC_OBJECT_PLAYLIST: psz_module_type = "playlist"; break;
+                case VLC_OBJECT_ITEM: psz_module_type = "item"; break;
+                case VLC_OBJECT_INPUT: psz_module_type = "input"; break;
+                case VLC_OBJECT_DECODER: psz_module_type = "decoder"; break;
+                case VLC_OBJECT_VOUT: psz_module_type = "video output"; break;
+                case VLC_OBJECT_AOUT: psz_module_type = "audio output"; break;
+                case VLC_OBJECT_SOUT: psz_module_type = "stream output"; break;
+            }
+            
             fMessagesView->LockLooper();
-            fMessagesView->Insert( p_sub->p_msg[i_start].psz_msg );
-            fMessagesView->Insert( "\n" );
+            oldLength = fMessagesView->TextLength();
+            BString string;
+            string.Append( p_sub->p_msg[i_start].psz_module );
+            string.Append( " " );
+            string.Append( psz_module_type );
+            string.Append( " : " );
+            string.Append( p_sub->p_msg[i_start].psz_msg );
+            string.Append( "\n" );
+            fMessagesView->Insert( string.String() );
+            fMessagesView->SetFontAndColor( oldLength,
+                                            fMessagesView->TextLength(),
+                                            NULL, 0, &color );
+            fMessagesView->Draw( fMessagesView->Bounds() );
             fMessagesView->UnlockLooper();
             
             /* Scroll at the end */
