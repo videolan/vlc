@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.9 2003/06/19 18:22:05 gbazin Exp $
+ * $Id: udp.c,v 1.10 2003/06/19 18:45:06 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -379,24 +379,14 @@ static void ThreadWrite( vlc_object_t *p_this )
     /* Get the i_pts_delay value */
     i_pts_delay = config_GetInt( p_this, "udp-sout-caching" ) * 1000;
 
-    while( !p_thread->b_die && p_thread->p_fifo->i_depth < 5 )
-    {
-        msleep( 10000 );
-    }
-    if( p_thread->b_die )
-    {
-        return;
-    }
-    p_buffer = sout_FifoShow( p_thread->p_fifo );
+    p_buffer = sout_FifoGet( p_thread->p_fifo );
+    if( p_thread->b_die ) return;
+
     i_date = mdate() + i_pts_delay - p_buffer->i_dts;
 
     while( 1 )
     {
         mtime_t i_wait;
-
-        p_buffer = sout_FifoGet( p_thread->p_fifo );
-
-        if( p_thread->b_die ) return;
 
         i_wait = i_date + p_buffer->i_dts;
 
@@ -413,5 +403,8 @@ static void ThreadWrite( vlc_object_t *p_this )
         send( p_thread->i_handle, p_buffer->p_buffer, p_buffer->i_size, 0 );
 
         sout_BufferDelete( p_sout, p_buffer );
+
+        p_buffer = sout_FifoGet( p_thread->p_fifo );
+        if( p_thread->b_die ) return;
     }
 }
