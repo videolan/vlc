@@ -21,7 +21,7 @@
 #define IFO_TYPES_H_INCLUDED
 
 #include <inttypes.h>
-#include <dvdread/dvd_reader.h>
+#include "dvd_reader.h"
 
 
 #undef ATTRIBUTE_PACKED
