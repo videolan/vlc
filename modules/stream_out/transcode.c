@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.74 2004/02/12 23:51:15 gbazin Exp $
+ * $Id: transcode.c,v 1.75 2004/02/18 13:21:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -833,37 +833,29 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                 int16_t *sin = (int16_t*)p_buffer;
                 int i_used = __MIN( id->i_buffer, i_buffer );
                 int i_samples = i_used / 2;
-                int b_invert_indianness;
 
+                /* first copy */
+                memcpy( sout, sin, i_used );
+
+#ifdef WORDS_BIGENDIAN
                 if( id->f_src.i_codec == VLC_FOURCC( 's', '1', '6', 'l' ) )
-#ifdef WORDS_BIGENDIAN
-                    b_invert_indianness = 1;
 #else
-                    b_invert_indianness = 0;
+                if( id->f_src.i_codec == VLC_FOURCC( 's', '1', '6', 'b' ) )
 #endif
-                else
-#ifdef WORDS_BIGENDIAN
-                    b_invert_indianness = 0;
-#else
-                    b_invert_indianness = 1;
-#endif
-
-                if( b_invert_indianness )
                 {
+                    uint8_t *dat = (uint8_t*)sout;
+
                     while( i_samples > 0 )
                     {
-                        uint8_t tmp[2];
+                        uint8_t tmp;
+                        tmp    = dat[0];
+                        dat[0] = dat[1];
+                        dat[1] = tmp;
 
-                        tmp[1] = *sin++;
-                        tmp[0] = *sin++;
-                        *sout++ = *(int16_t*)tmp;
+                        dat += 2;
+
                         i_samples--;
                     }
-                }
-                else
-                {
-                    memcpy( sout, sin, i_used );
-                    sout += i_samples;
                 }
 
                 i_buffer -= i_used;
