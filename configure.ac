@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.82 2003/10/04 11:17:04 sam Exp $
+dnl $Id: configure.ac,v 1.83 2003/10/04 11:59:59 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -349,10 +349,10 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  AX_ADD_LDFLAGS([imdct adjust distort a52tofloat32],[-lm])
+  AX_ADD_LDFLAGS([adjust distort a52tofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode imdct imdct3dn imdctsse i420_rgb faad],[-lm])
+  AX_ADD_LDFLAGS([ffmpeg stream_out_transcode i420_rgb faad],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   AX_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
@@ -826,12 +826,6 @@ case "${target_cpu}" in
     ;;
 esac
 
-case "${ARCH}" in
-  hppa64)
-    AX_ADD_CFLAGS([mpeg_video_old],[-ffunction-sections])
-    ;;
-esac
-
 dnl
 dnl  Enable profiling
 dnl
@@ -845,7 +839,6 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-#AX_ADD_BUILTINS([mpeg_video_old idct idctclassic motion])
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy])
 AX_ADD_PLUGINS([es mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
 AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak])
@@ -3375,16 +3368,9 @@ AC_OUTPUT([
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
-  modules/codec/a52old/Makefile
-  modules/codec/a52old/downmix/Makefile
-  modules/codec/a52old/imdct/Makefile
   modules/codec/faad/Makefile
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
-  modules/codec/mpeg_audio/Makefile
-  modules/codec/mpeg_video/Makefile
-  modules/codec/mpeg_video/idct/Makefile
-  modules/codec/mpeg_video/motion/Makefile
   modules/codec/spudec/Makefile
   modules/control/Makefile
   modules/control/corba/Makefile

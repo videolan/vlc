@@ -1,5 +1,0 @@
-SOURCES_motion = motion.c
-SOURCES_motionmmx = motionmmx.c
-SOURCES_motionmmxext = motionmmxext.c
-SOURCES_motion3dnow = motion3dnow.c
-SOURCES_motionaltivec = motionaltivec.c
