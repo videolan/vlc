@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.7 2003/02/16 09:50:22 fenrir Exp $
+ * $Id: adpcm.c,v 1.8 2003/02/16 11:18:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,7 +42,7 @@
 #define ADPCM_IMA_WAV   2
 #define ADPCM_MS        3
 #define ADPCM_DK3       4
-#define ADPCM_DK4       4
+#define ADPCM_DK4       5
 
 typedef struct adec_thread_s
 {
@@ -81,6 +81,7 @@ static void EndThread      ( adec_thread_t * );
 static void DecodeAdpcmMs( adec_thread_t *, aout_buffer_t * );
 static void DecodeAdpcmImaWav( adec_thread_t *, aout_buffer_t * );
 static void DecodeAdpcmDk4( adec_thread_t *, aout_buffer_t * );
+static void DecodeAdpcmDk3( adec_thread_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -157,7 +158,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('m','s',0x00,0x02): /* MS ADPCM */
         case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
         case VLC_FOURCC('m','s',0x00,0x61): /* Duck DK4 ADPCM */
-//        case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
+        case VLC_FOURCC('m','s',0x00,0x62): /* Duck DK3 ADPCM */
 
             p_fifo->pf_run = RunDecoder;
             return VLC_SUCCESS;
@@ -215,11 +216,11 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
 #define FREE( p ) if( p ) free( p ); p = NULL
 #define GetWLE( p ) \
-    ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
+    ( *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) )
 
 #define GetDWLE( p ) \
-    (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
-        ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
+    (  *(uint8_t*)(p) + ( *((uint8_t*)(p)+1) << 8 ) + \
+        ( *((uint8_t*)(p)+2) << 16 ) + ( *((uint8_t*)(p)+3) << 24 ) )
 
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
@@ -269,7 +270,7 @@ static int InitThread( adec_thread_t * p_adec )
             p_adec->i_block = 1024; // XXX FIXME
         }
         msg_Err( p_adec->p_fifo,
-                 "block size undefined, using %d default", 
+                 "block size undefined, using %d default",
                  p_adec->i_block );
     }
     p_adec->p_block = NULL;
@@ -295,25 +296,30 @@ static int InitThread( adec_thread_t * p_adec )
                2 * ( p_adec->i_block - 4 * p_adec->p_wf->nChannels ) /
                p_adec->p_wf->nChannels + 1;
             break;
+        case ADPCM_DK3:
+            p_adec->p_wf->nChannels = 2;
+            p_adec->i_samplesperblock = ( 4 * ( p_adec->i_block - 16 ) + 2 )/ 3;
+            break;
         default:
-            p_adec->i_samplesperblock = 0;
+            msg_Err( p_adec->p_fifo, "unknown adpcm variant" );
+            return( -1 );
     }
 
     msg_Dbg( p_adec->p_fifo,
              "format: samplerate:%dHz channels:%d bits/sample:%d blockalign:%d samplesperblock %d",
              p_adec->p_wf->nSamplesPerSec,
              p_adec->p_wf->nChannels,
-             p_adec->p_wf->wBitsPerSample, 
+             p_adec->p_wf->wBitsPerSample,
              p_adec->p_wf->nBlockAlign,
              p_adec->i_samplesperblock );
-    
+
     //p_adec->output_format.i_format = VLC_FOURCC('s','1','6','l');
     /* FIXME good way ? */
     p_adec->output_format.i_format = AOUT_FMT_S16_NE;
     p_adec->output_format.i_rate = p_adec->p_wf->nSamplesPerSec;
 
 
-    p_adec->output_format.i_physical_channels = 
+    p_adec->output_format.i_physical_channels =
         p_adec->output_format.i_original_channels =
             pi_channels_maps[p_adec->p_wf->nChannels];
     p_adec->p_aout = NULL;
@@ -454,6 +460,8 @@ static void DecodeThread( adec_thread_t *p_adec )
                 break;
             case ADPCM_DK4:
                 DecodeAdpcmDk4( p_adec, p_aout_buffer );
+            case ADPCM_DK3:
+                DecodeAdpcmDk3( p_adec, p_aout_buffer );
             default:
                 break;
         }
@@ -513,7 +521,7 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
 
     i_snibble = i_nibble - ( i_nibble&0x08 ? 0x10 : 0 );
 
-    i_predictor = ( p_channel->i_sample1 * p_channel->i_coeff1 + 
+    i_predictor = ( p_channel->i_sample1 * p_channel->i_coeff1 +
                     p_channel->i_sample2 * p_channel->i_coeff2 ) / 256 +
                   i_snibble * p_channel->i_idelta;
 
@@ -522,7 +530,7 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
     p_channel->i_sample2 = p_channel->i_sample1;
     p_channel->i_sample1 = i_predictor;
 
-    p_channel->i_idelta = ( i_adaptation_table[i_nibble] * 
+    p_channel->i_idelta = ( i_adaptation_table[i_nibble] *
                             p_channel->i_idelta ) / 256;
     if( p_channel->i_idelta < 16 )
     {
@@ -531,7 +539,7 @@ static int AdpcmMsExpandNibble(adpcm_ms_channel_t *p_channel,
     return( i_predictor );
 }
 
-static void DecodeAdpcmMs( adec_thread_t *p_adec,  
+static void DecodeAdpcmMs( adec_thread_t *p_adec,
                            aout_buffer_t *p_aout_buffer)
 {
     uint8_t            *p_buffer;
@@ -595,7 +603,7 @@ static void DecodeAdpcmMs( adec_thread_t *p_adec,
         *p_sample = AdpcmMsExpandNibble( &channel[0], (*p_buffer) >> 4);
         p_sample++;
 
-        *p_sample = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0], 
+        *p_sample = AdpcmMsExpandNibble( &channel[b_stereo ? 1 : 0],
                                          (*p_buffer)&0x0f);
         p_sample++;
     }
@@ -664,15 +672,15 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
     p_sample = (int16_t*)p_aout_buffer->p_buffer;
     if( b_stereo )
     {
-        for( i_nibbles = 2 * (p_adec->i_block - 8); 
-             i_nibbles > 0; 
+        for( i_nibbles = 2 * (p_adec->i_block - 8);
+             i_nibbles > 0;
              i_nibbles -= 16 )
         {
             int i;
 
             for( i = 0; i < 4; i++ )
             {
-                p_sample[i * 4] = 
+                p_sample[i * 4] =
                     AdpcmImaWavExpandNibble(&channel[0],p_buffer[i]&0x0f);
                 p_sample[i * 4 + 2] =
                     AdpcmImaWavExpandNibble(&channel[0],p_buffer[i] >> 4);
@@ -681,7 +689,7 @@ static void DecodeAdpcmImaWav( adec_thread_t *p_adec,
 
             for( i = 0; i < 4; i++ )
             {
-                p_sample[i * 4 + 1] = 
+                p_sample[i * 4 + 1] =
                     AdpcmImaWavExpandNibble(&channel[1],p_buffer[i]&0x0f);
                 p_sample[i * 4 + 3] =
                     AdpcmImaWavExpandNibble(&channel[1],p_buffer[i] >> 4);
@@ -757,3 +765,80 @@ static void DecodeAdpcmDk4( adec_thread_t *p_adec,
         p_buffer++;
     }
 }
+
+/*
+ * Dk3
+ */
+
+static void DecodeAdpcmDk3( adec_thread_t *p_adec,
+                               aout_buffer_t *p_aout_buffer)
+{
+    uint8_t                 *p_buffer, *p_end;
+    adpcm_ima_wav_channel_t sum;
+    adpcm_ima_wav_channel_t diff;
+    uint16_t                *p_sample;
+    int                     i_diff_value;
+
+    p_buffer = p_adec->p_block;
+    p_end    = p_buffer + p_adec->i_block;
+
+    p_buffer += 10;
+    GetWord( sum.i_predictor );
+    GetWord( diff.i_predictor );
+    GetByte( sum.i_step_index );
+    GetByte( diff.i_step_index );
+
+    p_sample = (int16_t*)p_aout_buffer->p_buffer;
+    i_diff_value = diff.i_predictor;
+    /* we process 6 nibbles at once */
+    //for( i_group = 0; i_group < ( p_adec->i_block -16 ) / 3; i_group++ )
+    while( p_buffer + 1 <= p_end )
+    {
+        /* first 3 nibbles */
+        AdpcmImaWavExpandNibble( &sum,
+                                 (*p_buffer)&0x0f);
+
+        AdpcmImaWavExpandNibble( &diff,
+                                 (*p_buffer) >> 4 );
+
+        i_diff_value = ( i_diff_value + diff.i_predictor ) / 2;
+
+        *p_sample++ = sum.i_predictor + i_diff_value;
+        *p_sample++ = sum.i_predictor - i_diff_value;
+
+        p_buffer++;
+
+        AdpcmImaWavExpandNibble( &sum,
+                                 (*p_buffer)&0x0f);
+
+        *p_sample++ = sum.i_predictor + i_diff_value;
+        *p_sample++ = sum.i_predictor - i_diff_value;
+
+        /* now last 3 nibbles */
+        AdpcmImaWavExpandNibble( &sum,
+                                 (*p_buffer)>>4);
+        p_buffer++;
+        if( p_buffer < p_end )
+        {
+            AdpcmImaWavExpandNibble( &diff,
+                                     (*p_buffer)&0x0f );
+
+            i_diff_value = ( i_diff_value + diff.i_predictor ) / 2;
+
+            *p_sample++ = sum.i_predictor + i_diff_value;
+            *p_sample++ = sum.i_predictor - i_diff_value;
+
+            AdpcmImaWavExpandNibble( &sum,
+                                     (*p_buffer)>>4);
+            p_buffer++;
+
+            *p_sample++ = sum.i_predictor + i_diff_value;
+            *p_sample++ = sum.i_predictor - i_diff_value;
+        }
+
+    }
+
+}
+
+
+
