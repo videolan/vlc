@@ -381,6 +381,7 @@ public:
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
         ,cluster(NULL)
+        ,i_start_pos(0)
         ,b_cues(VLC_FALSE)
         ,i_index(0)
         ,i_index_max(1024)
@@ -463,6 +464,7 @@ public:
     int64_t                 i_tags_position;
 
     KaxCluster              *cluster;
+    int64_t                 i_start_pos;
     KaxSegmentUID           segment_uid;
     KaxPrevUID              prev_segment_uid;
     KaxNextUID              next_segment_uid;
@@ -759,15 +761,15 @@ static int Open( vlc_object_t * p_this )
         p_segment->b_cues = VLC_FALSE;
     }
 
+    /* add information */
+    InformationCreate( p_demux );
+
     if ( !p_segment->Select( 0 ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
     }
     
-    /* add information */
-    InformationCreate( p_demux );
-
     return VLC_SUCCESS;
 
 error:
@@ -1530,6 +1532,9 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
     sys.i_start_pts = i_start_time;
     ep->Reset();
 
+    // reset the stream reading to the first cluster of the segment used
+    es.I_O().setFilePointer( i_start_pos );
+
     return true;
 }
 
@@ -1989,12 +1994,16 @@ int EbmlParser::GetLevel( void )
 
 void EbmlParser::Reset( void )
 {
-    delete m_el[mi_level];
-    m_el[mi_level] = NULL;
-    mi_level = 1;
+    while ( mi_level > 0)
+    {
+        delete m_el[mi_level];
+        m_el[mi_level] = NULL;
+        mi_level--;
+    }
+    mi_user_level = mi_level = 1;
 #if LIBEBML_VERSION >= 0x000704
     // a little faster and cleaner
-    m_es->I_O().setFilePointer( static_cast<EbmlMaster*>(m_el[0])->GetDataStart() );
+    m_es->I_O().setFilePointer( static_cast<KaxSegment*>(m_el[0])->GetGlobalPosition(0) );
 #else
     m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
 #endif
@@ -3466,6 +3475,8 @@ bool matroska_segment_t::Preload( )
             msg_Dbg( &sys.demuxer, "|   + Cluster" );
 
             cluster = (KaxCluster*)el;
+
+            i_start_pos = cluster->GetElementPosition();
 
             ep->Down();
             /* stop parsing the stream */
