@@ -8771,7 +8771,7 @@ msgstr "Mostrar Todo"
 
 #: modules/gui/macosx/intf.m:420
 msgid "Quit VLC"
-msgstr "Quitar VLC"
+msgstr "Salir de VLC"
 
 #: modules/gui/macosx/intf.m:422
 msgid "1:File"
