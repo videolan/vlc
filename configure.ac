@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.18 2003/07/01 15:06:36 sam Exp $
+dnl $Id: configure.ac,v 1.19 2003/07/01 17:14:58 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -717,6 +717,16 @@ AC_CACHE_CHECK([__attribute__ ((format ())) support with function pointers],
         CFLAGS="${CFLAGS_save}"])
 if test "${ac_cv_c_attribute_format}" != "no"; then
     AC_DEFINE(HAVE_ATTRIBUTE_FORMAT, 1, Support for __attribute__((format())) with function pointers)
+fi
+
+dnl Check for __attribute__(())
+AC_CACHE_CHECK([for __attribute__((packed))],
+  [ac_cv_c_attribute_packed],
+  [ac_cv_c_attribute_packed=no
+   AC_TRY_COMPILE(, [struct __attribute__((__packed__)) foo { int a; } b;],
+                    [ac_cv_c_attribute_packed=yes])])
+if test "${ac_cv_c_attribute_packed}" = "no"; then
+  AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
 fi
 
 dnl

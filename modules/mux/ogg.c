@@ -2,7 +2,7 @@
  * ogg.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.7 2003/06/29 20:58:16 gbazin Exp $
+ * $Id: ogg.c,v 1.8 2003/07/01 17:14:58 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -69,20 +69,29 @@ vlc_module_end();
 
 #define PACKET_IS_SYNCPOINT      0x08
 
-typedef struct __attribute__((__packed__))
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
     int32_t i_width;
     int32_t i_height;
 } ogg_stream_header_video_t;
 
-typedef struct __attribute__((__packed__))
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
     int16_t i_channels;
     int16_t i_block_align;
     int32_t i_avgbytespersec;
 } ogg_stream_header_audio_t;
 
-typedef struct __attribute__((__packed__))
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
     uint8_t i_packet_type;
 

@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.3 2002/12/03 17:00:15 fenrir Exp $
+ * $Id: codecs.h,v 1.4 2003/07/01 17:14:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,7 +28,11 @@
 
 #ifndef _WAVEFORMATEX_
 #define _WAVEFORMATEX_
-typedef struct __attribute__((__packed__)) _WAVEFORMATEX {
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+_WAVEFORMATEX {
     uint16_t   wFormatTag;
     uint16_t   nChannels;
     uint32_t   nSamplesPerSec;
@@ -41,7 +45,10 @@ typedef struct __attribute__((__packed__)) _WAVEFORMATEX {
 
 #if !defined(_BITMAPINFOHEADER_) && !defined(WIN32)
 #define _BITMAPINFOHEADER_
-typedef struct __attribute__((__packed__))
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
     uint32_t   biSize;
     uint32_t   biWidth;
