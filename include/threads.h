@@ -1,12 +1,11 @@
 /*****************************************************************************
- * threads.h : thread implementation for VideoLAN client
- * This header is supposed to provide a portable threads implementation.
- * Currently, it is a wrapper to either the POSIX pthreads library, or
- * the Mach cthreads (for the GNU/Hurd).
+ * threads.h : threads implementation for the VideoLAN client
+ * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
+ *          Samuel Hocevar <sam@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +23,15 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
-
-#ifdef SYS_GNU
+#if defined(HAVE_PTHREAD_H)            /* pthreads (Linux & BSD for example) */
+#include <pthread.h>
+#elif defined(HAVE_CTHREADS_H)                                    /* GNUMach */
 #include <cthreads.h>
-#endif
-
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
-#endif
-
-#if defined(SYS_LINUX) || defined(SYS_BSD)
-#include <pthread.h>
+#else
+#error no threads available on your system !
 #endif
 
 /*****************************************************************************
@@ -46,8 +42,8 @@
  * value is used as a shared flag to represent the status of the thread.
  *****************************************************************************/
 
-/* Void status - this value can be used to be sure, in an array of recorded
- * threads, that no operation is currently in progress on the concerned thread */
+/* Void status - this value can be used to make sure no operation is currently
+ * in progress on the concerned thread in an array of recorded threads */
 #define THREAD_NOP          0                            /* nothing happened */
 
 /* Creation status */
@@ -68,12 +64,13 @@
  * Types definition
  *****************************************************************************/
 
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
 
 typedef cthread_t        vlc_thread_t;
 
 /* those structs are the ones defined in /include/cthreads.h but we need
- *  * to handle *foo where foo is a mutex_t */
+ * to handle (*foo) where foo is a (mutex_t) while they handle (foo) where
+ * foo is a (mutex_t*) */
 typedef struct s_mutex {
     spin_lock_t held;
     spin_lock_t lock;
@@ -88,9 +85,7 @@ typedef struct s_condition {
     struct cond_imp *implications;
 } vlc_cond_t;
 
-#endif /* SYS_GNU */
-
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 
 typedef thread_id vlc_thread_t;
 
@@ -111,15 +106,13 @@ typedef struct
     volatile int32  ns;
 } vlc_cond_t;
 
-#endif /* SYS_BEOS */
-
-#if defined(SYS_LINUX) || defined(SYS_BSD)
+#elif defined(HAVE_PTHREAD_H)
 
 typedef pthread_t        vlc_thread_t;
 typedef pthread_mutex_t  vlc_mutex_t;
 typedef pthread_cond_t   vlc_cond_t;
 
-#endif /* SYS_LINUX || SYS_BSD */
+#endif
 
 typedef void *(*vlc_thread_func_t)(void *p_data);
 
@@ -152,18 +145,17 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
                                          char *psz_name, vlc_thread_func_t func,
                                          void *p_data)
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     *p_thread = spawn_thread( (thread_func)func, psz_name, B_NORMAL_PRIORITY, p_data );
     return resume_thread( *p_thread );
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)
+#elif defined(HAVE_PTHREAD_H)
     return pthread_create( p_thread, NULL, func, p_data );
+
 #endif
 }
 
@@ -172,17 +164,16 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
  *****************************************************************************/
 static __inline__ void vlc_thread_exit( void )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     int result;
     cthread_exit( &result );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     exit_thread( 0 );
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     pthread_exit( 0 );
+
 #endif
 }
 
@@ -191,21 +182,20 @@ static __inline__ void vlc_thread_exit( void )
  *****************************************************************************/
 static __inline__ void vlc_thread_join( vlc_thread_t thread )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     cthread_join( thread );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     int32 exit_value;	
     wait_for_thread( thread, &exit_value );
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     pthread_join( thread, NULL );
+
 #endif
 }
 
-#ifdef SYS_BEOS
+#if defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 /* lazy_init_mutex */
 static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
 {
@@ -226,12 +216,11 @@ static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
  *****************************************************************************/
 static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     mutex_init( p_mutex );
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     // check the arguments and whether it's already been initialized
     if( !p_mutex ) return B_BAD_VALUE;
     if( p_mutex->init == 9999 ) return EALREADY;
@@ -240,10 +229,10 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     p_mutex->owner = -1;
     p_mutex->init = 9999;
     return B_OK;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_mutex_init( p_mutex, NULL );
+
 #endif
 }
 
@@ -252,12 +241,11 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     mutex_lock( p_mutex );
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
     if( !p_mutex ) return B_BAD_VALUE;
@@ -267,10 +255,10 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
     err = acquire_sem( p_mutex->lock );
     if( !err ) p_mutex->owner = find_thread( NULL );
     return err;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_mutex_lock( p_mutex );
+
 #endif
 }
 
@@ -279,12 +267,11 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     mutex_unlock( p_mutex );
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if(! p_mutex) return B_BAD_VALUE;
     if( p_mutex->init < 2000 ) return B_NO_INIT;
     lazy_init_mutex( p_mutex );
@@ -293,14 +280,14 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     p_mutex->owner = -1;
     release_sem( p_mutex->lock );
     return B_OK;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_mutex_unlock( p_mutex );
+
 #endif
 }
 
-#ifdef SYS_BEOS
+#if defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 /* lazy_init_cond */
 static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
 {
@@ -321,7 +308,7 @@ static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     /* condition_init() */
     spin_lock_init( &p_condvar->lock );
     cthread_queue_init( &p_condvar->queue );
@@ -329,9 +316,8 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
     p_condvar->implications = 0;
 
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( !p_condvar ) return B_BAD_VALUE;
     if( p_condvar->init == 9999 ) return EALREADY;
 
@@ -341,10 +327,10 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
     p_condvar->ns = p_condvar->nw = 0;
     p_condvar->init = 9999;
     return B_OK;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_cond_init( p_condvar, NULL );
+
 #endif
 }
 
@@ -353,16 +339,15 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     /* condition_signal() */
     if ( p_condvar->queue.head || p_condvar->implications )
     {
         cond_signal( (condition_t)p_condvar );
     }
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err = B_OK;
 
     if( !p_condvar ) return B_BAD_VALUE;
@@ -384,10 +369,10 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
         release_sem( p_condvar->signalSem );
     }
     return err;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_cond_signal( p_condvar );
+
 #endif
 }
 
@@ -396,12 +381,11 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
-#ifdef SYS_GNU
+#if defined(HAVE_CTHREADS_H)
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
     return( 0 );
-#endif
 
-#ifdef SYS_BEOS
+#elif defined(HAVE_KERNEL_SHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
     if( !p_condvar ) return B_BAD_VALUE;
@@ -429,9 +413,9 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     while( vlc_mutex_lock(p_mutex) == B_INTERRUPTED)
         { err = B_INTERRUPTED; }
     return err;
-#endif
 
-#if defined(SYS_LINUX) || defined(SYS_BSD)	
+#elif defined(HAVE_PTHREAD_H)
     return pthread_cond_wait( p_condvar, p_mutex );
+
 #endif
 }

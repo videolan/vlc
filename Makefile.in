@@ -69,10 +69,6 @@ DEBUG=0
 # Configuration pre-processing
 ################################################################################
 
-# Program version and codename - may only be changed by the project leader
-PROGRAM_VERSION = 0.1.99
-PROGRAM_CODENAME = Onatopp
-
 # audio and video options
 AUDIO := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
 VIDEO := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
@@ -95,8 +91,8 @@ PROGRAM_BUILD = `date` $(USER)
 DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
 DEFINE += -DSYS_$(SYS)
 DEFINE += -DPLUGIN_PATH="\"$(PREFIX)/lib/videolan/vlc\""
-DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
-DEFINE += -DPROGRAM_CODENAME="\"$(PROGRAM_CODENAME)\""
+DEFINE += -DPROGRAM_VERSION="\"@VLC_VERSION@\""
+DEFINE += -DPROGRAM_CODENAME="\"@VLC_CODENAME@\""
 DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
 ifeq ($(DEBUG),1)
