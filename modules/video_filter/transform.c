@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: transform.c,v 1.12 2003/05/15 22:27:37 massiot Exp $
+ * $Id: transform.c,v 1.13 2003/08/22 13:38:03 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -351,7 +351,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             }
             break;
 
-        case TRANSFORM_MODE_VFLIP:
+        case TRANSFORM_MODE_HFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
@@ -370,7 +370,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             }
             break;
 
-        case TRANSFORM_MODE_HFLIP:
+        case TRANSFORM_MODE_VFLIP:
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
