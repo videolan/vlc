@@ -1,3 +1,5 @@
+<chapter id="faq"><title id="tfaq">FAQ of the VideoLAN Client</title>
+
 <qandaset><title>FAQ of the VideoLAN Client</title>
 
 <qandadiv><title>Using the VideoLAN Client</title>
@@ -8,7 +10,7 @@
 interface. In case of trouble, you may want to use the command line.
 For instance, provided your DVD device is /dev/dvd:
 
-<screen><prompt>%</prompt><userinput>vlc dvd:/dev/dvd</userinput></screen>
+<screen><prompt>% </prompt><userinput>vlc dvd:/dev/dvd</userinput></screen>
 
 </para></answer></qandaentry>
 
@@ -40,66 +42,61 @@ devices support full screen.
 <qandaentry>
 <question><para>How do I use vlc if I do not want to install Gnome and
 all this #@!£% *$@&§% !@# bloat?</para></question>
-<answer><para>You can run:
-
-    vlc --intf dummy myfile.mpg
-
-Most commands are available from the command line, see vlc --help for
-more information.
-
-</para></answer></qandaentry>
+<answer><para>You can run:</para>
+<screen><prompt>% </prompt><userinput> vlc --intf dummy myfile.mpg</userinput>
+</screen>
+<para>Most commands are available from the command line, see <command>vlc
+--help</command> for more information.</para>
+</answer></qandaentry>
 
 <qandaentry>
-<question><para>VLC eats my buffer cache, how to I use raw device?</para></question>
-<answer><para>If you do not know what is a raw device, do not even read this answer :-).
+<question><para>VLC eats my buffer cache, how can I use raw device?</para></question>
+<answer><para>If you do not know what is a raw device, do not even read this answer :-).</para><para>
 There is an experimental support for raw devices in libdvdcss. It needs
 that you set up a raw device pointing to your DVD device (under Linux,
 use the "raw" utility). Then pass the raw device as second argument, for
-instance:
-
-<screen><prompt>%</prompt><userinput>vlc dvd:/dev/dvd@/dev/raw0</userinput></screen>
-
-</para></answer></qandaentry>
+instance:</para>
+<screen><prompt>% </prompt><userinput>vlc dvd:/dev/dvd@/dev/raw0</userinput></screen>
+</answer></qandaentry>
 
 <qandaentry>
 <question><para>How do I use VLC as a client for VLS/VLMS streaming?</para></question>
 <answer><para>First you must set up a VLS or VLMS stream. Please refer to the
-documentation of these programs. Then start VLC:
+documentation of these programs. Then start VLC:</para>
 
-<screen><prompt>%</prompt><userinput>vlc udp:</userinput></screen>
+<screen><prompt>% </prompt><userinput>vlc udp:</userinput></screen>
 
-You should not need any option. If you are paranoid and want to control
-everything, here is the exact syntax:
+<para>You should not need any option. If you are paranoid and want to control
+everything, here is the exact syntax:</para>
 
-<screen><prompt>%</prompt><userinput>vlc udp:[&lt;server&gt;[:&lt;server port&gt;]][@[&lt;bind address&gt;][:&lt;bind port&gt;]]</userinput></screen>
+<screen><prompt>% </prompt><userinput>vlc udp:[&lt;server&gt;[:&lt;server port&gt;]][@[&lt;bind address&gt;][:&lt;bind port&gt;]]</userinput></screen>
 
-</para></answer></qandaentry>
+</answer></qandaentry>
 
 <qandaentry>
 <question><para>How do I uninstall / reinstall VLC?</para></question>
-<answer><para>Why would you want to? ;)
-
+<answer><para>Why would you want to? ;)</para>
+<para>
 If you are using a source distribution of VLC, for example a tarball or
 the CVS, then you have probably used "make install" to install the
 compiled VLC. To remove it just "make uninstall". If you want to
 install a newer version than the currently installed one, you should
 first uninstall the first one. If you deleted the original source tree,
 a "make uninstall" in the newer tree should still work.
-
+</para><para>
 For binary packages, remove old packages first and install the new ones
 (normally this should be handled automagically by your sytem).
-
 </para></answer></qandaentry>
 
 <qandaentry>
 <question><para>Debian: what should I put in my sources.list for videolan?</para></question>
-<answer><para>
+<answer>
 <programlisting>
 deb     http://www.videolan.org/pub/videolan/debian $(ARCH)/
 deb-src http://www.videolan.org/pub/videolan/debian sources/
 </programlisting>
 
-</para></answer></qandaentry>
+</answer></qandaentry>
 
 <qandaentry>
 <question><para>How can I save my VLC configuration?</para></question>
@@ -153,13 +150,12 @@ Here are a few things to check for:
 <itemizedlist>
 <listitem><para>Did you install the libdvdcss package?</para></listitem>
 
-<listitem><para>Do you have write access to your DVD device? For instance:
-<command>chmod 666 /dev/hdc</command> </para></listitem>
+<listitem><para>Do you have write access to your DVD device? For instance, under Unix, <command>chmod 666 /dev/hdc</command> </para></listitem>
 
-<listitem><para>Does your kernel log contain line about your DVD device?</para></listitem>
+<listitem><para>Under Unix, does your kernel log contain line about your DVD device?</para></listitem>
 
-<listitem><para>Do you have a link from /dev/dvd to your real DVD device? For instance</para>
-<screen><prompt>%</prompt><userinput>ln -s hdc /dev/dvd</userinput></screen></listitem>
+<listitem><para>Under Unix, do you have a link from /dev/dvd to your real DVD device? For instance</para>
+<screen><prompt>% </prompt><userinput>ln -s hdc /dev/dvd</userinput></screen></listitem>
 </itemizedlist>
 
 </para></answer></qandaentry>
@@ -172,24 +168,22 @@ Here are a few things to check for:
 <question><para>The video runs but the picture is distorted</para></question>
 <answer><para>There is probably a problem with the output layer. There are several
 ways of troubleshooting it. First, try with another output plugin, for
-instance:
+instance:</para>
 
 <screen>
-<prompt>%</prompt><userinput>vlc --vout sdl</userinput>
-<prompt>%</prompt><userinput>vlc --vout x11</userinput>
+<prompt>% </prompt><userinput>vlc --vout sdl</userinput>
+<prompt>% </prompt><userinput>vlc --vout x11</userinput>
 </screen>
 
-Second, change your screen depth and/or definition. It quite often helps.
-Lastly, have a look at your XFree86 video driver (nVidia for instance
+<para>Second, change your screen depth and/or definition. It quite often helps.
+Lastly, if running Unix, have a look at your XFree86 video driver (nVidia for instance
 releases optimized drivers for its boards).
-
 </para></answer></qandaentry>
 
 <qandaentry>
 <question><para>Video is choppy</para></question>
-<answer><para>Your system is too slow to decode all pictures. It might be that your
-CPU basically is not fast enough. It can also be that the subsystem is
-misconfigured/misdriven, this happens for example under Redhat. Here are
+<answer><para>Your system is too slow to decode all pictures. It might be that your CPU basically is not fast enough. It can also be that the subsystem is
+misconfigured/misdriven, this happens for example under Redhat Linux. Here are
 some elements to improve speed:
 </para>
 
@@ -206,7 +200,7 @@ and check the <emphasis>DMA</emphasis> checkbox</para></listitem>
 <listitem><para>Upgrade to the latest driver for your
 video board</para>
 <para>If you are running Linux, you can additionnaly upgrade to the latest XFree86 version ; if supported, check that the xvideo plug-in is effectively used with</para>
-<screen><prompt>%</prompt><userinput>vlc -vvvv</userinput></screen>
+<screen><prompt>% </prompt><userinput>vlc -vvvv</userinput></screen>
 </listitem>
 
 <listitem><para>Kill other applications running...</para></listitem>
@@ -222,8 +216,7 @@ video board</para>
 <qandaentry>
 <question><para>Audio and video are out of sync</para></question>
 <answer><para>This is not normal. Try using another output plugin (for instance <command>--aout dsp</command>),
-kill esd or artsd if they are running. This is a known problem and
-is being investigated.
+kill <emphasis>esd</emphasis> or <emphasis>artsd</emphasis> if they are running. This is a known problem and is being investigated.
 
 </para></answer></qandaentry>
 
@@ -254,7 +247,7 @@ terminal or in the Messages window).
 </para></answer></qandaentry>
 
 <qandaentry>
-<question><para>I can only play a DVD as root</para></question>
+<question><para>Under Unices, i can only play a DVD as root</para></question>
 <answer><para>Check that as user you have write access to your DVD drive / device.
 
 </para></answer></qandaentry>
@@ -271,10 +264,10 @@ in the videolan subfolder of your <filename>Application Data</filename> director
 <answer><para>If you change the default interface module in the preferences menu to a non
 GUI module (ie. to a command line interface) and then save the configuration,
 the only way to get VLC to show a GUI again is to run it directly from the
-command line.
-For instance on Windows, you need to open a dos command box, go to the
+command line.</para><para>
+For instance on Windows, you need to open a Command Line console, go to the
 directory where you installed VLC (usually
-<filename>c:\Program Files\VideoLAN\VideoLAN Client</filename>) and then type <command>vlc --intf win32</command>
+<filename>C:\Program Files\VideoLAN\VideoLAN Client</filename>) and then type <command>vlc --intf win32</command>
 You will then be able to modify the configuration again and save it.
 
 </para></answer></qandaentry>
@@ -285,7 +278,7 @@ You will then be able to modify the configuration again and save it.
 usage regarding A/52 sound, and the new behavior is incompatible with the
 previous one. VLS version 0.4.0 and later now fixes this problem. If, for
 any reason, you wish to keep VLS 0.3.3, you can still read those streams by
-launching VLC (0.4.5 or later) with --vls-backwards-compat.
+launching VLC (0.4.5 or later) with <command>--vls-backwards-compat</command>.
 
 </para></answer></qandaentry>
 
@@ -320,8 +313,7 @@ information on them.
 
 <qandaentry>
 <question><para>When moving the focus to another window, VLC network input stops working properly!</para></question>
-<answer><para>This is a known problem with Win 95-class systems. Upgrade to an NT-class
-system.
+<answer><para>This is a known problem with Win 95-class systems (ie, Windows 95/98/Me). Upgrade to an NT-class system (ie, Windows NT/2000 or XP).
 </para></answer></qandaentry>
 
 </qandadiv>
@@ -334,19 +326,16 @@ system.
 feel like you could write it, we would of course welcome it. Currently,
 the developers are more interested in supporting the latest Operating
 Systems and completing the functionalities.
-
 </para></answer></qandaentry>
 
 <qandaentry>
 <question><para>Does VLC have dxr2 / dxr3 cards support?</para></question>
 <answer><para>This support is currently being developed.
-
 </para></answer></qandaentry>
 
 <qandaentry>
 <question><para>Does VLC support RTP?</para></question>
 <answer><para>Yes. Just use vlc rtp:@&lt;mcast addr&gt;:&lt;local port&gt;.
-
 </para></answer></qandaentry>
 
 <qandaentry>
@@ -354,7 +343,6 @@ Systems and completing the functionalities.
 <answer><para>VLC uses libdvdcss to read all DVD, disregarding their zone. All regions
 are supported without any constraint. However, libdvdcss might not be
 legal in your country.
-
 </para></answer></qandaentry>
 
 <qandaentry>
@@ -374,12 +362,12 @@ screen capture of the video displayed by vlc.
 <qandaentry>
 <question><para>May I use the VideoLAN logo?</para></question>
 <answer><para>You may freely use the VideoLAN logo using the following copyright:
-
+<emphasis>
   Copyright (c) 1996-2002 VideoLAN. This logo or a modified version
   may be used or modified by anyone to refer to the VideoLAN project
   or any product developed by the VideoLAN team, but does not indicate
   endorsement by the project.
-
+</emphasis>
 </para></answer></qandaentry>
 
 <qandaentry>
@@ -391,25 +379,26 @@ COPYING in our products.
 The easiest way to conform to the GPL is to accompany the product you
 want to distribute with its sources. For example, if you plan to
 distribute the 0.4.6 binary version you should include:
-
+</para>
+<programlisting>
    http://www.videolan.org/pub/videolan/vlc/0.4.6/vlc-0.4.6.tar.gz
    http://www.videolan.org/pub/videolan/vlc/0.4.6/contrib/
-
+</programlisting><para>
 You do not need to bother explaining where the sources are, but the
 sources have to share the same media as the products.
-
+</para><para>
 They are other ways to comply with the GPL, but this should be the
 simplest because it does not rely on a contract.
-
+</para><para>
 There is one additional issue you need to take care of. The VLC
 binary from our website can also read encrypted DVDs with the help of
 the libdvdcss library. Its use is controversial in a few countries
 such as the United States because of a law called the DMCA. If you are
 unsure about the legality of using and distributing this library in
 your country, please consult your lawyer.
-
 </para></answer></qandaentry>
 </qandadiv>
+
 <qandadiv><title>Miscellaneous</title>
 
 <qandaentry>
@@ -431,3 +420,4 @@ more time than we can afford.
 
 </qandadiv>
 </qandaset>
+</chapter>
