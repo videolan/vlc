@@ -59,7 +59,7 @@ typedef union
     vlc_object_t *  p_object;
     vlc_list_t *    p_list;
 
-#if (defined( WIN32 ) && !defined( __MINGW32__ )) || defined( UNDER_CE )
+#if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( __MINGW32__ )
     signed __int64   i_time;
 # else
     signed long long i_time;
