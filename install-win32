@@ -66,6 +66,7 @@ Section "Install"
 	File  /r plugins
 	File  /r locale
 	File  /r skins
+	File  /r skins2
 	File  /r http
 	File  /r mozilla
 

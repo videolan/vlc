@@ -595,6 +595,10 @@ package-win32-base:
 	for i in $(srcdir)/doc/skins/*.txt; do \
 	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
 	done
+	mkdir -p $(srcdir)/vlc-${VERSION}/skins2/default
+	for i in $(srcdir)/modules/gui/skins2/theme/*.*; do \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/default/ || true ; \
+	done
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
 	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
