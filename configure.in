@@ -609,18 +609,25 @@ AC_ARG_ENABLE(sdl,
   [  --disable-sdl           SDL support (default enabled)])
 if test "x$enable_sdl" != "xno"
 then
-  AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no)
+  SDL_PATH=$PATH
+  AC_ARG_WITH(sdl-config-path,
+    [  --with-sdl-config-path=path sdl-config path (default search in \$PATH)],
+    [ if test "x$withval" != "xno"
+      then
+        SDL_PATH=$withval:$PATH
+      fi ])
+  AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, $SDL_PATH)
   SDL_CONFIG=${SDL12_CONFIG}
   SDL_HEADER="SDL12/SDL.h"
   if test x${SDL_CONFIG} = xno
   then
-    AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no)
+    AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no, $SDL_PATH)
     SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
   fi
   if test x${SDL_CONFIG} = xno
   then
-    AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
+    AC_PATH_PROG(SDL_CONFIG, sdl-config, no, $SDL_PATH)
     SDL_HEADER="SDL/SDL.h"
   fi
   if test x${SDL_CONFIG} != xno
