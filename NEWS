@@ -1,10 +1,10 @@
-$Id: NEWS,v 1.84 2004/02/22 00:15:33 gbazin Exp $
+$Id: NEWS,v 1.85 2004/02/29 19:12:00 gbazin Exp $
 Changes between 0.7.0 and 0.7.1:
 ---------------------------------
 
 Core support:
  * Fixed a nasty bug that causes preferences not to be saved some times.
- * IGMPv3 support for VLC under Windows XP
+ * IGMPv3 support for VLC under Windows XP and Linux.
 
 Codecs:
  * Brand new DTS Coherent Acoustics audio decoder based on libdts
@@ -26,6 +26,7 @@ Input:
  * Support for DTS and A52/AC3 wav files.
  * Support for DTS and A52/AC3 audio CD.
  * New and experimental DVD input plugin with menus support (using libdvdnav).
+ * Added back DV audio support in raw DV demuxer.
 
 Stream output:
  * MP4/MOV muxer improvements (fast-start, aac in mov, etc...).
