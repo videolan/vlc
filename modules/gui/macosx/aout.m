@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.25 2003/03/14 00:06:02 massiot Exp $
+ * $Id: aout.m,v 1.26 2003/03/14 01:08:38 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -54,10 +54,7 @@
 enum AudioDeviceClass
 {
     AudioDeviceClassA52     = 1 << 0,
-    AudioDeviceClassPCM2    = 1 << 1,
-    AudioDeviceClassPCM4    = 1 << 2,
-    AudioDeviceClassPCM6    = 1 << 3, 
-    AudioDeviceClassPCM8    = 1 << 4
+    AudioDeviceClassPCM     = 1 << 1
 };
 
 static struct aout_class_t
@@ -85,29 +82,36 @@ aout_classes[] =
 
     {
         kAudioFormatLinearPCM, 
+        1, 
+        AudioDeviceClassPCM, 
+        "Mono PCM"
+    },
+
+    {
+        kAudioFormatLinearPCM, 
         2, 
-        AudioDeviceClassPCM2, 
+        AudioDeviceClassPCM, 
         "Stereo PCM"
     },
 
     {
         kAudioFormatLinearPCM,
         4,
-        AudioDeviceClassPCM4,
+        AudioDeviceClassPCM,
         "4 Channel PCM"
     },
 
     {
         kAudioFormatLinearPCM, 
         6, 
-        AudioDeviceClassPCM6, 
+        AudioDeviceClassPCM, 
         "6 Channel PCM"
     },
 
     {
         kAudioFormatLinearPCM,
         8,
-        AudioDeviceClassPCM8,
+        AudioDeviceClassPCM,
         "8 Channel PCM"
     }
 }; 
@@ -1127,8 +1131,10 @@ static int InitDevice( aout_instance_t * p_aout )
 
     for( i = 0; i < I_STREAMS; i++ )
     {
-        if( P_STREAMS[i].mFormatID == 
+        if( P_STREAMS[i].mFormatID ==
             aout_classes[p_option->i_cdx].mFormatID &&
+            P_STREAMS[i].mChannelsPerFrame ==
+            aout_classes[p_option->i_cdx].mChannelsPerFrame &&
             P_STREAMS[i].mSampleRate == p_aout->output.output.i_rate )  
         {
             b_found = VLC_TRUE;
