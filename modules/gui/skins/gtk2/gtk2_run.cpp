@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.17 2003/04/21 02:50:49 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.18 2003/04/21 03:37:40 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -197,6 +197,17 @@ void GTK2Proc( GdkEvent *event, gpointer data )
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// REFRESH TIMER CALLBACK
+//---------------------------------------------------------------------------
+gboolean RefreshTimer( gpointer data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)data;
+    SkinManage( p_intf );
+    return true;
+}
+//---------------------------------------------------------------------------
+
 
 //---------------------------------------------------------------------------
 // Implementation of Instance class
@@ -226,25 +237,12 @@ bool Instance::OnInit()
     p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
     
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-    vlc_cond_signal( &p_intf->p_sys->init_cond );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
-    
+    // Add timer
+    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
+
     return TRUE;
 }
 
-
-
-//---------------------------------------------------------------------------
-// REFRESH TIMER CALLBACK
-//---------------------------------------------------------------------------
-gboolean RefreshTimer( gpointer data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)data;
-    SkinManage( p_intf );
-    return true;
-}
-//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
@@ -260,12 +258,10 @@ void OSRun( intf_thread_t *p_intf )
 
     wxTheApp = new Instance( p_intf, callbackobj );
 
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+/*    vlc_mutex_lock( &p_intf->p_sys->init_lock );
     vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );*/
  
-    // Add timer
-    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
     
     wxEntry( 1, p_args );
     
