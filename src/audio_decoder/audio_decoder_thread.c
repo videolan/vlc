@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_decoder.c: MPEG1 Layer I-II audio decoder thread
+ * audio_decoder_thread.c: MPEG1 Layer I-II audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -56,7 +56,6 @@
 
 #include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 
-#include "audio_constants.h"
 #include "audio_decoder.h"
 #include "audio_decoder_thread.h"
 #include "audio_math.h"                                    /* DCT32(), PCM() */

@@ -29,478 +29,855 @@
  */
 
 #include "int_types.h"
-#include "audio_constants.h"
+//#include "audio_constants.h"
 #include "audio_decoder.h"
 #include "audio_math.h"                                    /* DCT32(), PCM() */
 #include "audio_bit_stream.h"
 
 #define NULL ((void *)0)
 
-/*****************************************************************************
- * adec_Layer`L'_`M': decodes an mpeg 1, layer `L', mode `M', audio frame
- *****************************************************************************
- * These functions decode the audio frame which has already its header loaded
- * in the i_header member of the audio decoder thread structure and its first
- * byte of data described by the bit stream structure of the audio decoder
- * thread (there is no bit available in the bit buffer yet)
- *****************************************************************************/
-
-/*****************************************************************************
- * adec_Layer1_Mono
- *****************************************************************************/
-static __inline__ int adec_Layer1_Mono (audiodec_t * p_adec)
-{
-    p_adec->bit_stream.buffer = 0;
-    p_adec->bit_stream.i_available = 0;
-    return (0);
-}
-
-/*****************************************************************************
- * adec_Layer1_Stereo
- *****************************************************************************/
-static __inline__ int adec_Layer1_Stereo (audiodec_t * p_adec)
-{
-    p_adec->bit_stream.buffer = 0;
-    p_adec->bit_stream.i_available = 0;
-    return (0);
-}
-
-/*****************************************************************************
- * adec_Layer2_Mono
- *****************************************************************************/
-static __inline__ int adec_Layer2_Mono (audiodec_t * p_adec)
-{
-    p_adec->bit_stream.buffer = 0;
-    p_adec->bit_stream.i_available = 0;
-    return (0);
-}
-
-/*****************************************************************************
- * adec_Layer2_Stereo
- *****************************************************************************/
-static __inline__ int adec_Layer2_Stereo (audiodec_t * p_adec, s16 * buffer)
-{
-    typedef struct requantization_s
-    {
-        u8                              i_bits_per_codeword;
-        const float *                   pf_ungroup;
-        float                           f_slope;
-        float                           f_offset;
-    } requantization_t;
-
-    static const float                  pf_scalefactor[64] = ADEC_SCALE_FACTOR;
-
-    static u32                          i_header;
-    static int                          i_sampling_frequency, i_mode, i_bound;
-    static int                          pi_allocation_0[32], pi_allocation_1[32]; /* see ISO/IEC 11172-3 2.4.1.6 */
-    int                                 i_sb, i_nbal;
-    float                               f_scalefactor_0, f_scalefactor_1;
-
-    static const u8                     ppi_bitrate_per_channel_index[4][15] = ADEC_LAYER2_BITRATE_PER_CHANNEL_INDEX;
-    static const u8                     ppi_sblimit[3][11] = ADEC_LAYER2_SBLIMIT;
-    static const u8                     ppi_nbal[2][32] = ADEC_LAYER2_NBAL;
-
-    static const float                  pf_ungroup3[3*3*3 * 3] = ADEC_LAYER2_UNGROUP3;
-    static const float                  pf_ungroup5[5*5*5 * 3] = ADEC_LAYER2_UNGROUP5;
-    static const float                  pf_ungroup9[9*9*9 * 3] = ADEC_LAYER2_UNGROUP9;
-
-    static const requantization_t       p_requantization_cd[16] = ADEC_LAYER2_REQUANTIZATION_CD;
-    static const requantization_t       p_requantization_ab1[16] = ADEC_LAYER2_REQUANTIZATION_AB1;
-    static const requantization_t       p_requantization_ab2[16] = ADEC_LAYER2_REQUANTIZATION_AB2;
-    static const requantization_t       p_requantization_ab3[16] = ADEC_LAYER2_REQUANTIZATION_AB3;
-    static const requantization_t       p_requantization_ab4[16] = ADEC_LAYER2_REQUANTIZATION_AB4;
-    static const requantization_t *     pp_requantization_ab[30] = ADEC_LAYER2_REQUANTIZATION_AB;
-
-    static int                          i_sblimit, i_bitrate_per_channel_index;
-    static int                          pi_scfsi_0[30], pi_scfsi_1[30];
-    static const u8 *                   pi_nbal;
-    static float                        ppf_sample_0[3][32], ppf_sample_1[3][32];
-    static const requantization_t *     pp_requantization_0[30];
-    static const requantization_t *     pp_requantization_1[30];
-    static requantization_t             requantization;
-    static const float *                pf_ungroup;
-
-    static float                        pf_scalefactor_0_0[30], pf_scalefactor_0_1[30], pf_scalefactor_0_2[30];
-    static float                        pf_scalefactor_1_0[30], pf_scalefactor_1_1[30], pf_scalefactor_1_2[30];
-
-    int                                 i_2nbal, i_gr;
-    float                               f_dummy;
-
-    s16 *                               p_s16;
-
-    int                                 i_need = 0, i_dump = 0;
-#if 0
-    static const int                    pi_framesize[512] = ADEC_FRAME_SIZE;
-#endif
-
-    /* Read the audio frame header and flush the bit buffer */
-    i_header = p_adec->header;
-    /* Read the sampling frequency (see ISO/IEC 11172-3 2.4.2.3) */
-    i_sampling_frequency = (int)((i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK)
-        >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT);
-    /* Read the mode (see ISO/IEC 11172-3 2.4.2.3) */
-    i_mode = (int)((i_header & ADEC_HEADER_MODE_MASK) >> ADEC_HEADER_MODE_SHIFT);
-    /* If a CRC can be found in the frame, get rid of it */
-    if ((i_header & ADEC_HEADER_PROTECTION_BIT_MASK) == 0)
-    {
-        NeedBits (&p_adec->bit_stream, 16);
-        DumpBits (&p_adec->bit_stream, 16);
-    }
-
-    /* Find out the bitrate per channel index */
-    i_bitrate_per_channel_index = (int)ppi_bitrate_per_channel_index[i_mode]
-        [(i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT];
-    /* Find out the number of subbands */
-    i_sblimit = (int)ppi_sblimit[i_sampling_frequency][i_bitrate_per_channel_index];
-    /* Check if the frame is valid or not */
-    if (i_sblimit == 0)
-    {
-        return (0);                                 /* the frame is invalid */
-    }
-    /* Find out the number of bits allocated */
-    pi_nbal = ppi_nbal[ (i_bitrate_per_channel_index <= 2) ? 0 : 1 ];
-
-    /* Find out the `bound' subband (see ISO/IEC 11172-3 2.4.2.3) */
-    if (i_mode == 1)
-    {
-        i_bound = (int)(((i_header & ADEC_HEADER_MODE_EXTENSION_MASK) >> (ADEC_HEADER_MODE_EXTENSION_SHIFT - 2)) + 4);
-        if (i_bound > i_sblimit)
-        {
-            i_bound = i_sblimit;
-        }
-    }
-    else
-    {
-        i_bound = i_sblimit;
-    }
-
-    /* Read the allocation information (see ISO/IEC 11172-3 2.4.1.6) */
-    for (i_sb = 0; i_sb < i_bound; i_sb++)
-    {
-        i_2nbal = 2 * (i_nbal = (int)pi_nbal[ i_sb ]);
-        NeedBits (&p_adec->bit_stream, i_2nbal);
-        i_need += i_2nbal;
-        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
-        p_adec->bit_stream.buffer <<= i_nbal;
-        pi_allocation_1[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
-        p_adec->bit_stream.buffer <<= i_nbal;
-        p_adec->bit_stream.i_available -= i_2nbal;
-        i_dump += i_2nbal;
-    }
-    for (; i_sb < i_sblimit; i_sb++)
-    {
-        i_nbal = (int)pi_nbal[ i_sb ];
-        NeedBits (&p_adec->bit_stream, i_nbal);
-        i_need += i_nbal;
-        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
-        DumpBits (&p_adec->bit_stream, i_nbal);
-        i_dump += i_nbal;
-    }
-
-#define MACRO(p_requantization) \
-    for (i_sb = 0; i_sb < i_bound; i_sb++) \
-    { \
-        if (pi_allocation_0[i_sb]) \
-        { \
-            pp_requantization_0[i_sb] = &((p_requantization)[pi_allocation_0[i_sb]]); \
-            NeedBits (&p_adec->bit_stream, 2); \
-            i_need += 2; \
-            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
-            DumpBits (&p_adec->bit_stream, 2); \
-            i_dump += 2; \
-        } \
-        else \
-        { \
-            ppf_sample_0[0][i_sb] = .0; \
-            ppf_sample_0[1][i_sb] = .0; \
-            ppf_sample_0[2][i_sb] = .0; \
-        } \
-\
-        if (pi_allocation_1[i_sb]) \
-        { \
-            pp_requantization_1[i_sb] = &((p_requantization)[pi_allocation_1[i_sb]]); \
-            NeedBits (&p_adec->bit_stream, 2); \
-            i_need += 2; \
-            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
-            DumpBits (&p_adec->bit_stream, 2); \
-            i_dump += 2; \
-        } \
-        else \
-        { \
-            ppf_sample_1[0][i_sb] = .0; \
-            ppf_sample_1[1][i_sb] = .0; \
-            ppf_sample_1[2][i_sb] = .0; \
-        } \
-    } \
-\
-    for (; i_sb < i_sblimit; i_sb++) \
-    { \
-        if (pi_allocation_0[i_sb]) \
-        { \
-            pp_requantization_0[i_sb] = &((p_requantization)[pi_allocation_0[i_sb]]); \
-            NeedBits (&p_adec->bit_stream, 4); \
-            i_need += 4; \
-            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
-            p_adec->bit_stream.buffer <<= 2; \
-            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
-            p_adec->bit_stream.buffer <<= 2; \
-            p_adec->bit_stream.i_available -= 4; \
-            i_dump += 4; \
-        } \
-        else \
-        { \
-            ppf_sample_0[0][i_sb] = .0; \
-            ppf_sample_0[1][i_sb] = .0; \
-            ppf_sample_0[2][i_sb] = .0; \
-            ppf_sample_1[0][i_sb] = .0; \
-            ppf_sample_1[1][i_sb] = .0; \
-            ppf_sample_1[2][i_sb] = .0; \
-        } \
-    }
-/* #define MACRO */
-
-    if (i_bitrate_per_channel_index <= 2)
-    {
-        MACRO (p_requantization_cd)
-    }
-    else
-    {
-        MACRO (pp_requantization_ab[i_sb])
-    }
-
-#define SWITCH(pi_scfsi,pf_scalefactor_0,pf_scalefactor_1,pf_scalefactor_2) \
-    switch ((pi_scfsi)[i_sb]) \
-    { \
-        case 0: \
-            NeedBits (&p_adec->bit_stream, (3*6)); \
-            i_need += 18; \
-           (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-           (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-           (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-            p_adec->bit_stream.i_available -= (3*6); \
-            i_dump += 18; \
-            break; \
-\
-        case 1: \
-            NeedBits (&p_adec->bit_stream, (2*6)); \
-            i_need += 12; \
-           (pf_scalefactor_0)[i_sb] = \
-               (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-           (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-            p_adec->bit_stream.i_available -= (2*6); \
-            i_dump += 12; \
-            break; \
-\
-        case 2: \
-            NeedBits (&p_adec->bit_stream, (1*6)); \
-            i_need += 6; \
-           (pf_scalefactor_0)[i_sb] = \
-               (pf_scalefactor_1)[i_sb] = \
-               (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            DumpBits (&p_adec->bit_stream, (1*6)); \
-            i_dump += 6; \
-            break; \
-\
-        case 3: \
-            NeedBits (&p_adec->bit_stream, (2*6)); \
-            i_need += 12; \
-           (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-           (pf_scalefactor_1)[i_sb] = \
-               (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.buffer <<= 6; \
-            p_adec->bit_stream.i_available -= (2*6); \
-            i_dump += 12; \
-            break; \
-    }
-/* #define SWITCH */
-
-    for (i_sb = 0; i_sb < i_bound; i_sb++)
-    {
-        if (pi_allocation_0[i_sb])
-        {
-            SWITCH (pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2)
-        }
-        if (pi_allocation_1[i_sb])
-        {
-            SWITCH (pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2)
-        }
-    }
-    for (; i_sb < i_sblimit; i_sb++)
-    {
-        if (pi_allocation_0[i_sb])
-        {
-            SWITCH (pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2)
-            SWITCH (pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2)
-        }
-    }
-    for (; i_sb < 32; i_sb++)
-    {
-        ppf_sample_0[0][i_sb] = .0;
-        ppf_sample_0[1][i_sb] = .0;
-        ppf_sample_0[2][i_sb] = .0;
-        ppf_sample_1[0][i_sb] = .0;
-        ppf_sample_1[1][i_sb] = .0;
-        ppf_sample_1[2][i_sb] = .0;
-    }
-
-#define GROUPTEST(pp_requantization,ppf_sample,pf_sf) \
-    requantization = *((pp_requantization)[i_sb]); \
-    if (requantization.pf_ungroup == NULL) \
-    { \
-        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_need += requantization.i_bits_per_codeword; \
-       (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * (requantization.f_slope * \
-           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_dump += requantization.i_bits_per_codeword; \
-\
-        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_need += requantization.i_bits_per_codeword; \
-       (ppf_sample)[1][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
-           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_dump += requantization.i_bits_per_codeword; \
-\
-        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_need += requantization.i_bits_per_codeword; \
-       (ppf_sample)[2][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
-           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_dump += requantization.i_bits_per_codeword; \
-    } \
-    else \
-    { \
-        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_need += requantization.i_bits_per_codeword; \
-        pf_ungroup = requantization.pf_ungroup + 3 * \
-           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)); \
-        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-        i_dump += requantization.i_bits_per_codeword; \
-       (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * pf_ungroup[0]; \
-       (ppf_sample)[1][i_sb] = f_scalefactor_0 * pf_ungroup[1]; \
-       (ppf_sample)[2][i_sb] = f_scalefactor_0 * pf_ungroup[2]; \
-    }
-/* #define GROUPTEST */
-
-#define READ_SAMPLE_L2S(pf_scalefactor_0,pf_scalefactor_1,i_grlimit) \
-    for (; i_gr < (i_grlimit); i_gr++) \
-    { \
-        for (i_sb = 0; i_sb < i_bound; i_sb++) \
-        { \
-            if (pi_allocation_0[i_sb]) \
-            { \
-                GROUPTEST (pp_requantization_0, ppf_sample_0, (pf_scalefactor_0)) \
-            } \
-            if (pi_allocation_1[i_sb]) \
-            { \
-                GROUPTEST (pp_requantization_1, ppf_sample_1, (pf_scalefactor_1)) \
-            } \
-        } \
-        for (; i_sb < i_sblimit; i_sb++) \
-        { \
-            if (pi_allocation_0[i_sb]) \
-            { \
-                requantization = *(pp_requantization_0[i_sb]); \
-                if (requantization.pf_ungroup == NULL) \
-                { \
-                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_need += requantization.i_bits_per_codeword; \
-                    ppf_sample_0[0][i_sb] = (f_scalefactor_0 = (pf_scalefactor_0)[i_sb]) * \
-                       (requantization.f_slope * (f_dummy = \
-                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
-                        requantization.f_offset); \
-                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_dump += requantization.i_bits_per_codeword; \
-                    ppf_sample_1[0][i_sb] = (f_scalefactor_1 = (pf_scalefactor_1)[i_sb]) * \
-                       (requantization.f_slope * f_dummy + requantization.f_offset); \
-\
-                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_need += requantization.i_bits_per_codeword; \
-                    ppf_sample_0[1][i_sb] = f_scalefactor_0 * \
-                       (requantization.f_slope * (f_dummy = \
-                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
-                        requantization.f_offset); \
-                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_dump += requantization.i_bits_per_codeword; \
-                    ppf_sample_1[1][i_sb] = f_scalefactor_1 * \
-                       (requantization.f_slope * f_dummy + requantization.f_offset); \
-\
-                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_need += requantization.i_bits_per_codeword; \
-                    ppf_sample_0[2][i_sb] = f_scalefactor_0 * \
-                       (requantization.f_slope * (f_dummy = \
-                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
-                        requantization.f_offset); \
-                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_dump += requantization.i_bits_per_codeword; \
-                    ppf_sample_1[2][i_sb] = f_scalefactor_1 * \
-                       (requantization.f_slope * f_dummy + requantization.f_offset); \
-                } \
-                else \
-                { \
-                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_need += requantization.i_bits_per_codeword; \
-                    pf_ungroup = requantization.pf_ungroup + 3 * \
-                       (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)); \
-                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
-                    i_dump += requantization.i_bits_per_codeword; \
-\
-                    ppf_sample_0[0][i_sb] = (f_scalefactor_0 = (pf_scalefactor_0)[i_sb]) * pf_ungroup[0]; \
-                    ppf_sample_0[1][i_sb] = f_scalefactor_0 * pf_ungroup[1]; \
-                    ppf_sample_0[2][i_sb] = f_scalefactor_0 * pf_ungroup[2]; \
-\
-                    ppf_sample_1[0][i_sb] = (f_scalefactor_1 = (pf_scalefactor_1)[i_sb]) * pf_ungroup[0]; \
-                    ppf_sample_1[1][i_sb] = f_scalefactor_1 * pf_ungroup[1]; \
-                    ppf_sample_1[2][i_sb] = f_scalefactor_1 * pf_ungroup[2]; \
-                } \
-            } \
-        } \
-\
-        DCT32 (ppf_sample_0[0], &p_adec->bank_0); \
-        PCM (&p_adec->bank_0, &p_s16, 2); \
-        p_s16 -= 63; \
-\
-        DCT32 (ppf_sample_1[0], &p_adec->bank_1); \
-        PCM (&p_adec->bank_1, &p_s16, 2); \
-        p_s16 -= 1; \
-\
-        DCT32 (ppf_sample_0[1], &p_adec->bank_0); \
-        PCM (&p_adec->bank_0, &p_s16, 2); \
-        p_s16 -= 63; \
-\
-        DCT32 (ppf_sample_1[1], &p_adec->bank_1); \
-        PCM (&p_adec->bank_1, &p_s16, 2); \
-        p_s16 -= 1; \
-\
-        DCT32 (ppf_sample_0[2], &p_adec->bank_0); \
-        PCM (&p_adec->bank_0, &p_s16, 2); \
-        p_s16 -= 63; \
-\
-        DCT32 (ppf_sample_1[2], &p_adec->bank_1); \
-        PCM (&p_adec->bank_1, &p_s16, 2); \
-        p_s16 -= 1; \
-    }
-/* #define READ_SAMPLE_L2S */
-
-    i_gr = 0;
-    p_s16 = buffer;
-
-    READ_SAMPLE_L2S (pf_scalefactor_0_0, pf_scalefactor_1_0, 4)
-    READ_SAMPLE_L2S (pf_scalefactor_0_1, pf_scalefactor_1_1, 8)
-    READ_SAMPLE_L2S (pf_scalefactor_0_2, pf_scalefactor_1_2, 12)
-
-    p_adec->bit_stream.buffer = 0;
-    p_adec->bit_stream.i_available = 0;
-    return (6);
-}
-
 /**** wkn ****/
+
+static float adec_scalefactor_table[64] = {	/* 2 ^ (1 - i/3) */
+    2.0000000000000000, 1.5874010519681994, 1.2599210498948732,
+    1.0000000000000000, 0.7937005259840998, 0.6299605249474366,
+    0.5000000000000000, 0.3968502629920499, 0.3149802624737183,
+    0.2500000000000000, 0.1984251314960249, 0.1574901312368591,
+    0.1250000000000000, 0.0992125657480125, 0.0787450656184296,
+    0.0625000000000000, 0.0496062828740062, 0.0393725328092148,
+    0.0312500000000000, 0.0248031414370031, 0.0196862664046074,
+    0.0156250000000000, 0.0124015707185016, 0.0098431332023037,
+    0.0078125000000000, 0.0062007853592508, 0.0049215666011518,
+    0.0039062500000000, 0.0031003926796254, 0.0024607833005759,
+    0.0019531250000000, 0.0015501963398127, 0.0012303916502880,
+    0.0009765625000000, 0.0007750981699063, 0.0006151958251440,
+    0.0004882812500000, 0.0003875490849532, 0.0003075979125720,
+    0.0002441406250000, 0.0001937745424766, 0.0001537989562860,
+    0.0001220703125000, 0.0000968872712383, 0.0000768994781430,
+    0.0000610351562500, 0.0000484436356191, 0.0000384497390715,
+    0.0000305175781250, 0.0000242218178096, 0.0000192248695357,
+    0.0000152587890625, 0.0000121109089048, 0.0000096124347679,
+    0.0000076293945312, 0.0000060554544524, 0.0000048062173839,
+    0.0000038146972656, 0.0000030277272262, 0.0000024031086920,
+    0.0000019073486328, 0.0000015138636131, 0.0000012015543460,
+    0.0000009536743164 /* last element is not in the standard... invalid ??? */
+};
+
+static float adec_slope_table[15] = {
+    0.6666666666666666, 0.2857142857142857, 0.1333333333333333,
+    0.0645161290322581, 0.0317460317460317, 0.0157480314960630,
+    0.0078431372549020, 0.0039138943248532, 0.0019550342130987,
+    0.0009770395701026, 0.0004884004884005, 0.0002441704309608,
+    0.0001220777635354, 0.0000610370189520, 0.0000305180437934
+};
+
+static float adec_offset_table[15] = {
+    -0.6666666666666666, -0.8571428571428571, -0.9333333333333333,
+    -0.9677419354838710, -0.9841269841269841, -0.9921259842519685,
+    -0.9960784313725490, -0.9980430528375733, -0.9990224828934506,
+    -0.9995114802149487, -0.9997557997557998, -0.9998779147845196,
+    -0.9999389611182323, -0.9999694814905240, -0.9999847409781033
+};
+
+static u8 adec_layer1_allocation_table[15] = {
+    0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+};
+
+static int adec_bound_table[4] = {4, 8, 12, 16};
+
+static int adec_layer1_mono (audiodec_t * p_adec, s16 * buffer)
+{
+    u8 allocation[32];
+    float slope[32];
+    float offset[32];
+    float sample[32];
+
+    int sb;
+    int s;
+
+    /* parse allocation */
+
+    for (sb = 0; sb < 32; sb += 2) {
+	u8 tmp;
+	tmp = GetByte (&p_adec->bit_stream);
+	if ((tmp >> 4) > 14)
+	    return 1;
+	allocation[sb] = adec_layer1_allocation_table [tmp >> 4];
+	if ((tmp & 15) > 14)
+	    return 1;
+	allocation[sb+1] = adec_layer1_allocation_table [tmp & 15];
+    }
+
+    /* parse scalefactors */
+
+    for (sb = 0; sb < 32; sb++) {
+	if (allocation[sb]) {
+	    int index;
+	    float scalefactor;
+
+	    NeedBits (&p_adec->bit_stream, 6);
+	    index = p_adec->bit_stream.buffer >> (32 - 6);
+	    DumpBits (&p_adec->bit_stream, 6);
+
+	    scalefactor = adec_scalefactor_table[index];
+
+	    slope[sb] = adec_slope_table[allocation[sb]-2] * scalefactor;
+	    offset[sb] = adec_offset_table[allocation[sb]-2] * scalefactor;
+	}
+    }
+
+    /* parse samples */
+
+    for (s = 0; s < 12; s++) {
+	s16 * XXX_buf;
+
+	for (sb = 0; sb < 32; sb++) {
+	    if (!allocation[sb]) {
+		sample[sb] = 0;
+	    } else {
+		int code;
+
+		NeedBits (&p_adec->bit_stream, allocation[sb]);
+		code = p_adec->bit_stream.buffer >> (32 - allocation[sb]);
+		DumpBits (&p_adec->bit_stream, allocation[sb]);
+
+		sample[sb] = slope[sb] * code + offset[sb];
+	    }
+	}
+
+	DCT32 (sample, &p_adec->bank_0);
+	XXX_buf = buffer;
+	PCM (&p_adec->bank_0, &XXX_buf, 1);
+	buffer += 32;
+    }
+
+    return 0;
+}
+
+static int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
+{
+    u8 allocation_0[32], allocation_1[32];
+    float slope_0[32], slope_1[32];
+    float offset_0[32], offset_1[32];
+    float sample_0[32], sample_1[32];
+
+    int bound;
+    int sb;
+    int s;
+
+    /* calculate bound */
+
+    bound = 32;
+    if ((p_adec->header & 0xc0) == 0x40) {	/* intensity stereo */
+	int index;
+	index = (p_adec->header >> 4) & 3;
+	bound = adec_bound_table[index];
+    }
+
+    /* parse allocation */
+
+    for (sb = 0; sb < bound; sb++) {
+	u8 tmp;
+	tmp = GetByte (&p_adec->bit_stream);
+	if ((tmp >> 4) > 14)
+	    return 1;
+	allocation_0[sb] = adec_layer1_allocation_table [tmp >> 4];
+	if ((tmp & 15) > 14)
+	    return 1;
+	allocation_1[sb] = adec_layer1_allocation_table [tmp & 15];
+    }
+    for (; sb < 32; sb += 2) {
+	u8 tmp;
+	tmp = GetByte (&p_adec->bit_stream);
+	if ((tmp >> 4) > 14)
+	    return 1;
+	allocation_0[sb] = allocation_1[sb] = adec_layer1_allocation_table [tmp >> 4];
+	if ((tmp & 15) > 14)
+	    return 1;
+	allocation_0[sb+1] = allocation_1[sb+1] = adec_layer1_allocation_table [tmp & 15];
+    }
+
+    /* parse scalefactors */
+
+    for (sb = 0; sb < 32; sb++) {
+	if (allocation_0[sb]) {
+	    int index;
+	    float scalefactor;
+
+	    NeedBits (&p_adec->bit_stream, 6);
+	    index = p_adec->bit_stream.buffer >> (32 - 6);
+	    DumpBits (&p_adec->bit_stream, 6);
+
+	    scalefactor = adec_scalefactor_table[index];
+
+	    slope_0[sb] = adec_slope_table[allocation_0[sb]-2] * scalefactor;
+	    offset_0[sb] = adec_offset_table[allocation_0[sb]-2] * scalefactor;
+	}
+	if (allocation_1[sb]) {
+	    int index;
+	    float scalefactor;
+
+	    NeedBits (&p_adec->bit_stream, 6);
+	    index = p_adec->bit_stream.buffer >> (32 - 6);
+	    DumpBits (&p_adec->bit_stream, 6);
+
+	    scalefactor = adec_scalefactor_table[index];
+
+	    slope_1[sb] = adec_slope_table[allocation_1[sb]-2] * scalefactor;
+	    offset_1[sb] = adec_offset_table[allocation_1[sb]-2] * scalefactor;
+	}
+    }
+
+    /* parse samples */
+
+    for (s = 0; s < 12; s++) {
+	s16 * XXX_buf;
+
+	for (sb = 0; sb < bound; sb++) {
+	    if (!allocation_0[sb])
+		sample_0[sb] = 0;
+	    else {
+		int code;
+
+		NeedBits (&p_adec->bit_stream, allocation_0[sb]);
+		code = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
+		DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+
+		sample_0[sb] = slope_0[sb] * code + offset_0[sb];
+	    }
+	    if (!allocation_1[sb])
+		sample_1[sb] = 0;
+	    else {
+		int code;
+
+		NeedBits (&p_adec->bit_stream, allocation_1[sb]);
+		code = p_adec->bit_stream.buffer >> (32 - allocation_1[sb]);
+		DumpBits (&p_adec->bit_stream, allocation_1[sb]);
+
+		sample_1[sb] = slope_1[sb] * code + offset_1[sb];
+	    }
+	}
+	for (; sb < 32; sb++) {
+	    if (!allocation_0[sb]) {
+		sample_0[sb] = 0;
+		sample_1[sb] = 0;
+	    } else {
+		int sample;
+
+		NeedBits (&p_adec->bit_stream, allocation_0[sb]);
+		sample = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
+		DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+
+		sample_0[sb] = slope_0[sb] * sample + offset_0[sb];
+		sample_1[sb] = slope_1[sb] * sample + offset_1[sb];
+	    }
+	}
+
+	DCT32 (sample_0, &p_adec->bank_0);
+	XXX_buf = buffer;
+	PCM (&p_adec->bank_0, &XXX_buf, 2);
+	DCT32 (sample_1, &p_adec->bank_1);
+	XXX_buf = buffer+1;
+	PCM (&p_adec->bank_1, &XXX_buf, 2);
+	buffer += 64;
+    }
+
+    return 0;
+}
+
+typedef struct {
+    s8 nbal[32];
+    u8 * alloc[32];
+} alloc_table_t;
+
+#define L3 -1
+#define L5 -2
+#define L9 -3
+
+static void adec_layer2_get_table (u32 header, u8 freq_table[15],
+				   alloc_table_t ** alloc, int * sblimit)
+{
+    static s8 table_ab0[16] = {
+	0, L3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+    };
+    static s8 table_ab3[16] = {
+	0, L3, L5, 3, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16
+    };
+    static s8 table_ab11[8] = {
+	0, L3, L5, 3, L9, 4, 5, 16
+    };
+    static s8 table_ab23[8] = {
+	0, L3, L5, 16
+    };
+    static alloc_table_t mpeg1_ab = {
+	{4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,0,0},
+	{table_ab0,  table_ab0,  table_ab0,  table_ab3,
+	 table_ab3,  table_ab3,  table_ab3,  table_ab3,
+	 table_ab3,  table_ab3,  table_ab3,  table_ab11,
+	 table_ab11, table_ab11, table_ab11, table_ab11,
+	 table_ab11, table_ab11, table_ab11, table_ab11,
+	 table_ab11, table_ab11, table_ab11, table_ab23,
+	 table_ab23, table_ab23, table_ab23, table_ab23,
+	 table_ab23, table_ab23, NULL, NULL}
+    };
+
+    static s8 table_cd[16] = {
+	0, L3, L5, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+    };
+    static alloc_table_t mpeg1_cd = {
+	{4,4,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{table_cd, table_cd, table_cd, table_cd,
+	 table_cd, table_cd, table_cd, table_cd,
+	 table_cd, table_cd, table_cd, table_cd,
+	 NULL, NULL, NULL, NULL,
+	 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
+    };
+
+    static s8 table_0[16] = {
+	0, L3, L5, 3, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    };
+    static s8 table_4[8] = {
+	0, L3, L5, L9, 4, 5, 6, 7
+    };
+    static alloc_table_t mpeg2 = {
+	{4,4,4,4,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0},
+	{table_0, table_0, table_0, table_0,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, table_4, table_4,
+	 table_4, table_4, NULL, NULL}
+    };
+
+    static alloc_table_t * alloc_table [4] = {
+	&mpeg2, &mpeg1_cd, &mpeg1_ab, &mpeg1_ab
+    };
+    static int sblimit_table[12] = {
+	30, 8, 27, 30, 30, 8, 27, 27, 30, 12, 27, 30
+    };
+
+    int index;
+
+    if (!(header & 0x80000))
+	index = 0;			/* mpeg2 */
+    else {
+	index = (header >> 12) & 15;	/* mpeg1, bitrate */
+	index = freq_table [index];
+    }
+
+    *alloc = alloc_table[index];
+    index |= (header >> 8) & 12;
+    *sblimit = sblimit_table[index];
+}
+
+static int adec_layer2_mono (audiodec_t * p_adec, s16 * buffer)
+{
+    return 1;
+}
+
+static int adec_layer2_stereo (audiodec_t * p_adec, s16 * buffer)
+{
+    static u8 freq_table[15] = {3, 0, 0, 0, 1, 0, 1, 2, 2, 2, 3, 3, 3, 3, 3};
+    static float L3_table[3] = {-2/3.0, 0, 2/3.0};
+    static float L5_table[5] = {-4/5.0, -2/5.0, 0, 2/5.0, 4/5.0};
+    static float L9_table[9] = {-8/9.0, -6/9.0, -4/9.0, -2/9.0, 0,
+				2/9.0, 4/9.0, 6/9.0, 8/9.0};
+
+    s8 allocation_0[32], allocation_1[32];
+    u8 scfsi_0[32], scfsi_1[32];
+    float slope_0[3][32], slope_1[3][32];
+    float offset_0[3][32], offset_1[3][32];
+    float sample_0[3][32], sample_1[3][32];
+    alloc_table_t * alloc_table;
+
+    int sblimit;
+    int bound;
+    int sb;
+    int gr0, gr1;
+    int s;
+
+    /* get the right allocation table */
+
+    adec_layer2_get_table (p_adec->header, freq_table, &alloc_table, &sblimit);
+
+    /* calculate bound */
+
+    bound = sblimit;
+    if ((p_adec->header & 0xc0) == 0x40) {	/* intensity stereo */
+	int index;
+	index = (p_adec->header >> 4) & 3;
+	if (adec_bound_table[index] < sblimit)
+	    bound = adec_bound_table[index];
+    }
+
+    /* parse allocation */
+
+    for (sb = 0; sb < bound; sb++) {
+	int index;
+
+	NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+	index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
+	DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+
+	allocation_0[sb] = alloc_table->alloc[sb][index];
+
+	NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+	index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
+	DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+
+	allocation_1[sb] = alloc_table->alloc[sb][index];
+    }
+    for (; sb < sblimit; sb++) {
+	int index;
+
+	NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+	index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
+	DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
+
+	allocation_0[sb] = allocation_1[sb] = alloc_table->alloc[sb][index];
+    }
+
+    /* parse scfsi */
+
+    for (sb = 0; sb < sblimit; sb++) {
+	if (allocation_0[sb]) {
+	    NeedBits (&p_adec->bit_stream, 2);
+	    scfsi_0[sb] = p_adec->bit_stream.buffer >> (32 - 2);
+	    DumpBits (&p_adec->bit_stream, 2);
+	}
+	if (allocation_1[sb]) {
+	    NeedBits (&p_adec->bit_stream, 2);
+	    scfsi_1[sb] = p_adec->bit_stream.buffer >> (32 - 2);
+	    DumpBits (&p_adec->bit_stream, 2);
+	}
+    }
+
+    /* parse scalefactors */
+
+    for (sb = 0; sb < sblimit; sb++) {
+	if (allocation_0[sb]) {
+	    int index_0, index_1, index_2;
+
+	    switch (scfsi_0[sb]) {
+	    case 0:
+		NeedBits (&p_adec->bit_stream, 18);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		index_2 = (p_adec->bit_stream.buffer >> (32 - 18)) & 63;
+		DumpBits (&p_adec->bit_stream, 18);
+
+		if (allocation_0[sb] < 0) {
+		    slope_0[0][sb] = adec_scalefactor_table[index_0];
+		    slope_0[1][sb] = adec_scalefactor_table[index_1];
+		    slope_0[2][sb] = adec_scalefactor_table[index_2];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_0[sb]-2];
+		    offset = adec_offset_table[allocation_0[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_0[0][sb] = slope * scalefactor;
+		    offset_0[0][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_0[1][sb] = slope * scalefactor;
+		    offset_0[1][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_2];
+		    slope_0[2][sb] = slope * scalefactor;
+		    offset_0[2][sb] = offset * scalefactor;
+		}
+		break;
+	    case 1:
+		NeedBits (&p_adec->bit_stream, 12);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		DumpBits (&p_adec->bit_stream, 12);
+
+		if (allocation_0[sb] < 0) {
+		    slope_0[0][sb] = slope_0[1][sb] =
+			adec_scalefactor_table[index_0];
+		    slope_0[2][sb] = adec_scalefactor_table[index_1];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_0[sb]-2];
+		    offset = adec_offset_table[allocation_0[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_0[0][sb] = slope_0[1][sb] = slope * scalefactor;
+		    offset_0[0][sb] = offset_0[1][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_0[2][sb] = slope * scalefactor;
+		    offset_0[2][sb] = offset * scalefactor;
+		}
+		break;
+	    case 2:
+		NeedBits (&p_adec->bit_stream, 6);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		DumpBits (&p_adec->bit_stream, 6);
+
+		if (allocation_0[sb] < 0) {
+		    slope_0[0][sb] = slope_0[1][sb] = slope_0[2][sb] =
+			adec_scalefactor_table[index_0];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_0[sb]-2];
+		    offset = adec_offset_table[allocation_0[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_0[0][sb] = slope_0[1][sb] = slope_0[2][sb] =
+			slope * scalefactor;
+		    offset_0[0][sb] = offset_0[1][sb] = offset_0[2][sb] =
+			offset * scalefactor;
+		}
+		break;
+	    case 3:
+		NeedBits (&p_adec->bit_stream, 12);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		DumpBits (&p_adec->bit_stream, 12);
+
+		if (allocation_0[sb] < 0) {
+		    slope_0[0][sb] = adec_scalefactor_table[index_0];
+		    slope_0[1][sb] = slope_0[2][sb] =
+			adec_scalefactor_table[index_1];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_0[sb]-2];
+		    offset = adec_offset_table[allocation_0[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_0[0][sb] = slope * scalefactor;
+		    offset_0[0][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_0[1][sb] = slope_0[2][sb] = slope * scalefactor;
+		    offset_0[1][sb] = offset_0[2][sb] = offset * scalefactor;
+		}
+		break;
+	    }
+	}
+	if (allocation_1[sb]) {
+	    int index_0, index_1, index_2;
+
+	    switch (scfsi_1[sb]) {
+	    case 0:
+		NeedBits (&p_adec->bit_stream, 18);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		index_2 = (p_adec->bit_stream.buffer >> (32 - 18)) & 63;
+		DumpBits (&p_adec->bit_stream, 18);
+
+		if (allocation_1[sb] < 0) {
+		    slope_1[0][sb] = adec_scalefactor_table[index_0];
+		    slope_1[1][sb] = adec_scalefactor_table[index_1];
+		    slope_1[2][sb] = adec_scalefactor_table[index_2];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_1[sb]-2];
+		    offset = adec_offset_table[allocation_1[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_1[0][sb] = slope * scalefactor;
+		    offset_1[0][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_1[1][sb] = slope * scalefactor;
+		    offset_1[1][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_2];
+		    slope_1[2][sb] = slope * scalefactor;
+		    offset_1[2][sb] = offset * scalefactor;
+		}
+		break;
+	    case 1:
+		NeedBits (&p_adec->bit_stream, 12);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		DumpBits (&p_adec->bit_stream, 12);
+
+		if (allocation_1[sb] < 0) {
+		    slope_1[0][sb] = slope_1[1][sb] =
+			adec_scalefactor_table[index_0];
+		    slope_1[2][sb] = adec_scalefactor_table[index_1];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_1[sb]-2];
+		    offset = adec_offset_table[allocation_1[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_1[0][sb] = slope_1[1][sb] = slope * scalefactor;
+		    offset_1[0][sb] = offset_1[1][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_1[2][sb] = slope * scalefactor;
+		    offset_1[2][sb] = offset * scalefactor;
+		}
+		break;
+	    case 2:
+		NeedBits (&p_adec->bit_stream, 6);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		DumpBits (&p_adec->bit_stream, 6);
+
+		if (allocation_1[sb] < 0) {
+		    slope_1[0][sb] = slope_1[1][sb] = slope_1[2][sb] =
+			adec_scalefactor_table[index_0];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_1[sb]-2];
+		    offset = adec_offset_table[allocation_1[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_1[0][sb] = slope_1[1][sb] = slope_1[2][sb] =
+			slope * scalefactor;
+		    offset_1[0][sb] = offset_1[1][sb] = offset_1[2][sb] =
+			offset * scalefactor;
+		}
+		break;
+	    case 3:
+		NeedBits (&p_adec->bit_stream, 12);
+		index_0 = p_adec->bit_stream.buffer >> (32 - 6);
+		index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
+		DumpBits (&p_adec->bit_stream, 12);
+
+		if (allocation_1[sb] < 0) {
+		    slope_1[0][sb] = adec_scalefactor_table[index_0];
+		    slope_1[1][sb] = slope_1[2][sb] =
+			adec_scalefactor_table[index_1];
+		} else {
+		    float scalefactor;
+		    float slope, offset;
+
+		    slope = adec_slope_table[allocation_1[sb]-2];
+		    offset = adec_offset_table[allocation_1[sb]-2];
+
+		    scalefactor = adec_scalefactor_table[index_0];
+		    slope_1[0][sb] = slope * scalefactor;
+		    offset_1[0][sb] = offset * scalefactor;
+
+		    scalefactor = adec_scalefactor_table[index_1];
+		    slope_1[1][sb] = slope_1[2][sb] = slope * scalefactor;
+		    offset_1[1][sb] = offset_1[2][sb] = offset * scalefactor;
+		}
+		break;
+	    }
+	}
+    }
+
+    /* parse samples */
+
+    for (gr0 = 0; gr0 < 3; gr0++)
+	for (gr1 = 0; gr1 < 4; gr1++) {
+	    s16 * XXX_buf;
+
+	    for (sb = 0; sb < bound; sb++) {
+		int code;
+
+		switch (allocation_0[sb]) {
+		case 0:
+		    sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
+		    break;
+		case L3:
+		    NeedBits (&p_adec->bit_stream, 5);
+		    code = p_adec->bit_stream.buffer >> (32 - 5);
+		    DumpBits (&p_adec->bit_stream, 5);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L3_table[code];
+
+		    break;
+		case L5:
+		    NeedBits (&p_adec->bit_stream, 7);
+		    code = p_adec->bit_stream.buffer >> (32 - 7);
+		    DumpBits (&p_adec->bit_stream, 7);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L5_table[code];
+
+		    break;
+		case L9:
+		    NeedBits (&p_adec->bit_stream, 10);
+		    code = p_adec->bit_stream.buffer >> (32 - 10);
+		    DumpBits (&p_adec->bit_stream, 10);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L9_table[code];
+
+		    break;
+		default:
+		    for (s = 0; s < 3; s++) {
+			NeedBits (&p_adec->bit_stream, allocation_0[sb]);
+			code = (p_adec->bit_stream.buffer >>
+				(32 - allocation_0[sb]));
+			DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+
+			sample_0[s][sb] =
+			    slope_0[gr0][sb] * code + offset_0[gr0][sb];
+		    }
+		}
+		switch (allocation_1[sb]) {
+		case 0:
+		    sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
+		    break;
+		case L3:
+		    NeedBits (&p_adec->bit_stream, 5);
+		    code = p_adec->bit_stream.buffer >> (32 - 5);
+		    DumpBits (&p_adec->bit_stream, 5);
+
+		    sample_1[0][sb] = slope_1[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_1[1][sb] = slope_1[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_1[2][sb] = slope_1[gr0][sb] * L3_table[code];
+
+		    break;
+		case L5:
+		    NeedBits (&p_adec->bit_stream, 7);
+		    code = p_adec->bit_stream.buffer >> (32 - 7);
+		    DumpBits (&p_adec->bit_stream, 7);
+
+		    sample_1[0][sb] = slope_1[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_1[1][sb] = slope_1[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_1[2][sb] = slope_1[gr0][sb] * L5_table[code];
+
+		    break;
+		case L9:
+		    NeedBits (&p_adec->bit_stream, 10);
+		    code = p_adec->bit_stream.buffer >> (32 - 10);
+		    DumpBits (&p_adec->bit_stream, 10);
+
+		    sample_1[0][sb] = slope_1[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_1[1][sb] = slope_1[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_1[2][sb] = slope_1[gr0][sb] * L9_table[code];
+
+		    break;
+		default:
+		    for (s = 0; s < 3; s++) {
+			NeedBits (&p_adec->bit_stream, allocation_1[sb]);
+			code = (p_adec->bit_stream.buffer >>
+				(32 - allocation_1[sb]));
+			DumpBits (&p_adec->bit_stream, allocation_1[sb]);
+
+			sample_1[s][sb] =
+			    slope_1[gr0][sb] * code + offset_1[gr0][sb];
+		    }
+		}
+	    }
+	    for (; sb < sblimit; sb++) {
+		int code;
+
+		switch (allocation_0[sb]) {
+		case 0:
+		    sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
+		    sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
+		    break;
+		case L3:
+		    NeedBits (&p_adec->bit_stream, 5);
+		    code = p_adec->bit_stream.buffer >> (32 - 5);
+		    DumpBits (&p_adec->bit_stream, 5);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L3_table[code % 3];
+		    sample_1[0][sb] = slope_1[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L3_table[code % 3];
+		    sample_1[1][sb] = slope_1[gr0][sb] * L3_table[code % 3];
+		    code /= 3;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L3_table[code];
+		    sample_1[2][sb] = slope_1[gr0][sb] * L3_table[code];
+
+		    break;
+		case L5:
+		    NeedBits (&p_adec->bit_stream, 7);
+		    code = p_adec->bit_stream.buffer >> (32 - 7);
+		    DumpBits (&p_adec->bit_stream, 7);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L5_table[code % 5];
+		    sample_1[0][sb] = slope_1[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L5_table[code % 5];
+		    sample_1[1][sb] = slope_1[gr0][sb] * L5_table[code % 5];
+		    code /= 5;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L5_table[code];
+		    sample_1[2][sb] = slope_1[gr0][sb] * L5_table[code];
+
+		    break;
+		case L9:
+		    NeedBits (&p_adec->bit_stream, 10);
+		    code = p_adec->bit_stream.buffer >> (32 - 10);
+		    DumpBits (&p_adec->bit_stream, 10);
+
+		    sample_0[0][sb] = slope_0[gr0][sb] * L9_table[code % 9];
+		    sample_1[0][sb] = slope_1[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_0[1][sb] = slope_0[gr0][sb] * L9_table[code % 9];
+		    sample_1[1][sb] = slope_1[gr0][sb] * L9_table[code % 9];
+		    code /= 9;
+		    sample_0[2][sb] = slope_0[gr0][sb] * L9_table[code];
+		    sample_1[2][sb] = slope_1[gr0][sb] * L9_table[code];
+
+		    break;
+		default:
+		    for (s = 0; s < 3; s++) {
+			NeedBits (&p_adec->bit_stream, allocation_0[sb]);
+			code = (p_adec->bit_stream.buffer >>
+				(32 - allocation_0[sb]));
+			DumpBits (&p_adec->bit_stream, allocation_0[sb]);
+
+			sample_0[s][sb] =
+			    slope_0[gr0][sb] * code + offset_0[gr0][sb];
+			sample_1[s][sb] =
+			    slope_1[gr0][sb] * code + offset_1[gr0][sb];
+		    }
+		}
+	    }
+	    for (; sb < 32; sb++) {
+		sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
+		sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
+	    }
+	    for (s = 0; s < 3; s++) {
+		DCT32 (sample_0[s], &p_adec->bank_0);
+		XXX_buf = buffer;
+		PCM (&p_adec->bank_0, &XXX_buf, 2);
+		DCT32 (sample_1[s], &p_adec->bank_1);
+		XXX_buf = buffer+1;
+		PCM (&p_adec->bank_1, &XXX_buf, 2);
+		buffer += 64;
+	    }
+	}
+
+    return 0;
+}
 
 int adec_init (audiodec_t * p_adec)
 {
@@ -526,56 +903,64 @@ int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info)
     static int mpeg2_layer2_bit_rate[15] = {
 	0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160
     };
+    static int * bit_rate_table[8] = {
+	NULL, NULL, mpeg2_layer2_bit_rate, mpeg2_layer1_bit_rate,
+	NULL, NULL, mpeg1_layer2_bit_rate, mpeg1_layer1_bit_rate
+    };
+
     u32 header;
     int index;
-    int * bit_rate_table;
+    int * bit_rates;
     int sample_rate;
     int bit_rate;
     int frame_size;
 
     p_adec->bit_stream.total_bytes_read = 0;
+
     header = GetByte (&p_adec->bit_stream) << 24;
     header |= GetByte (&p_adec->bit_stream) << 16;
     header |= GetByte (&p_adec->bit_stream) << 8;
     header |= GetByte (&p_adec->bit_stream);
-
     p_adec->header = header;
 
     /* basic header check : sync word, no emphasis */
     if ((header & 0xfff00003) != 0xfff00000)
 	return 1;
 
-    index = (header >> 10) & 3;		/* sample rate index */
-    if (index > 2)
-	return 1;
-    sample_rate = mpeg1_sample_rate[index];
+    /* calculate bit rate */
 
-    switch ((header >> 17) & 7) {
-    case 2:	/* mpeg 2, layer 2 */
-	sample_rate >>= 1;		/* half sample rate for mpeg2 */
-	bit_rate_table = mpeg2_layer2_bit_rate;
-	break;
-    case 3:	/* mpeg 2, layer 1 */
-	sample_rate >>= 1;		/* half sample rate for mpeg2 */
-	bit_rate_table = mpeg2_layer1_bit_rate;
-	break;
-    case 6:	/* mpeg1, layer 2 */
-	bit_rate_table = mpeg1_layer2_bit_rate;
-	break;
-    case 7:	/* mpeg1, layer 1 */
-	bit_rate_table = mpeg1_layer1_bit_rate;
-	break;
-    default:	/* invalid layer */
-	return 1;
-    }
+    index = (header >> 17) & 7;		/* mpeg ID + layer */
+    bit_rates = bit_rate_table[index];
+    if (bit_rate_table == NULL)
+	return 1;			/* invalid layer */
 
     index = (header >> 12) & 15;	/* bit rate index */
     if (index > 14)
 	return 1;
-    bit_rate = bit_rate_table[index];
+    bit_rate = bit_rates[index];
 
-    p_sync_info->sample_rate = sample_rate;
-    p_sync_info->bit_rate = bit_rate;
+    /* mpeg 1 layer 2 : check that bitrate per channel is valid */
+
+    if (bit_rates == mpeg1_layer2_bit_rate) {
+	if ((header & 0xc0) == 0xc0) {	/* mono */
+	    if (index > 10)
+		return 1;		/* invalid bitrate per channel */
+	} else {			/* stereo */
+	    if ((1 << index) & 0x2e)
+		return 1;		/* invalid bitrate per channel */
+	}
+    }
+
+    /* calculate sample rate */
+
+    index = (header >> 10) & 3;		/* sample rate index */
+    if (index > 2)
+	return 1;
+    sample_rate = mpeg1_sample_rate[index];
+    if (!(header & 0x80000))
+	sample_rate >>= 1;		/* half sample rate for mpeg2 */
+
+    /* calculate frame length */
 
     if ((header & 0x60000) == 0x60000) {	/* layer 1 */
 	frame_size = 48000 * bit_rate / sample_rate;
@@ -587,6 +972,8 @@ int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info)
 	    frame_size ++;
     }
 
+    p_sync_info->sample_rate = sample_rate;
+    p_sync_info->bit_rate = bit_rate;
     p_sync_info->frame_size = frame_size;
     p_adec->frame_size = frame_size;
 
@@ -595,15 +982,53 @@ int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info)
 
 int adec_decode_frame (audiodec_t * p_adec, s16 * buffer)
 {
+    if (!(p_adec->header & 0x10000)) {		/* error check, skip it */
+	GetByte (&p_adec->bit_stream);
+	GetByte (&p_adec->bit_stream);
+    }
+
+    /* parse audio data */
+
     p_adec->bit_stream.i_available = 0;
 
-    adec_Layer2_Stereo (p_adec, buffer);
+    switch ((p_adec->header >> 17) & 3) {
+    case 2:	/* layer 2 */
+	if ((p_adec->header & 0xc0) == 0xc0) {
+	    if (adec_layer2_mono (p_adec, buffer))
+		return 1;
+	} else {
+	    if (adec_layer2_stereo (p_adec, buffer))
+		return 1;
+	}
+	break;
+    case 3:	/* layer 1 */
+	if ((p_adec->header & 0xc0) == 0xc0) {
+	    if (adec_layer1_mono (p_adec, buffer))
+		return 1;
+	} else {
+	    if (adec_layer1_stereo (p_adec, buffer))
+		return 1;
+	}
+	break;
+    }
+
+    /* skip ancillary data */
+
+    if ((p_adec->header & 0xf000) == 0)		/* free bitrate format */
+	return 0;
+
+    /* XXX rewrite the byte counting system to reduce overhead */
+
+#if 0
+    printf ("skip %d\n",
+	    p_adec->frame_size - p_adec->bit_stream.total_bytes_read);
+#endif
 
     if (p_adec->bit_stream.total_bytes_read > p_adec->frame_size)
-	return 1;
+	return 1;				/* overrun */
 
     while (p_adec->bit_stream.total_bytes_read < p_adec->frame_size)
-	GetByte (&p_adec->bit_stream);
+	GetByte (&p_adec->bit_stream);		/* skip ancillary data */
 
     return 0;
 }

@@ -313,7 +313,7 @@ void DCT32(float *x, adec_bank_t *b)
 void PCM(adec_bank_t *b, s16 **pcm, int jump)
 {
     /* scale factor */
-#define F 32768
+#define F -32768
     /* These values are not in the same order as in Annex 3-B.3 of the ISO/IEC
        DIS 11172-3 */
     static const float c[512] = {
