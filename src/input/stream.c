@@ -1102,6 +1102,8 @@ static void AStreamPrebufferStream( stream_t *s )
 
     int64_t i_first = 0;
     int64_t i_start;
+    int64_t i_prebuffer = (s->p_sys->p_access->info.i_title > 1 ||
+                           s->p_sys->p_access->info.i_seekpoint > 1) ? STREAM_CACHE_PREBUFFER_SIZE : STREAM_CACHE_TRACK_SIZE / 3;
 
     msg_Dbg( s, "pre buffering" );
     i_start = mdate();
@@ -1112,7 +1114,7 @@ static void AStreamPrebufferStream( stream_t *s )
         int64_t i_date = mdate();
         int i_read;
 
-        if( s->b_die || tk->i_end >= STREAM_CACHE_PREBUFFER_SIZE ||
+        if( s->b_die || tk->i_end >= i_prebuffer ||
             (i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date) )
         {
             int64_t i_byterate;
