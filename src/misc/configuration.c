@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.64 2003/08/23 14:38:50 lool Exp $
+ * $Id: configuration.c,v 1.65 2003/09/24 21:31:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -640,23 +640,34 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     FILE *file;
     char line[1024];
     char *p_index, *psz_option_name, *psz_option_value;
-    char *psz_filename, *psz_homedir;
+    char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
 
-    psz_homedir = p_this->p_vlc->psz_homedir;
-    if( !psz_homedir )
+    psz_configfile = p_this->p_vlc->psz_configfile;
+    if( !psz_configfile || !psz_configfile )
     {
-        msg_Err( p_this, "psz_homedir is null" );
-        return -1;
+        psz_homedir = p_this->p_vlc->psz_homedir;
+        if( !psz_homedir )
+        {
+            msg_Err( p_this, "psz_homedir is null" );
+            return -1;
+        }
+        psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
+                                       strlen(psz_homedir) );
+        if( psz_filename )
+            sprintf( psz_filename, "%s/" CONFIG_DIR "/" CONFIG_FILE,
+                     psz_homedir );
     }
-    psz_filename = (char *)malloc( strlen("/" CONFIG_DIR "/" CONFIG_FILE) +
-                                   strlen(psz_homedir) + 1 );
+    else
+    {
+        psz_filename = strdup( psz_configfile );
+    }
+
     if( !psz_filename )
     {
         msg_Err( p_this, "out of memory" );
         return -1;
     }
-    sprintf( psz_filename, "%s/" CONFIG_DIR "/" CONFIG_FILE, psz_homedir );
 
     msg_Dbg( p_this, "opening config file %s", psz_filename );
 
@@ -838,60 +849,77 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     int i_sizebuf = 0;
     char *p_bigbuffer, *p_index;
     vlc_bool_t b_backup;
-    char *psz_filename, *psz_homedir;
+    char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
 
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_vlc->config_lock );
 
-    psz_homedir = p_this->p_vlc->psz_homedir;
-    if( !psz_homedir )
+    psz_configfile = p_this->p_vlc->psz_configfile;
+    if( !psz_configfile || !psz_configfile )
     {
-        msg_Err( p_this, "psz_homedir is null" );
-        vlc_mutex_unlock( &p_this->p_vlc->config_lock );
-        return -1;
-    }
-    psz_filename = (char *)malloc( strlen("/" CONFIG_DIR "/" CONFIG_FILE) +
-                                   strlen(psz_homedir) + 1 );
-    if( !psz_filename )
-    {
-        msg_Err( p_this, "out of memory" );
-        vlc_mutex_unlock( &p_this->p_vlc->config_lock );
-        return -1;
-    }
-    sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+        psz_homedir = p_this->p_vlc->psz_homedir;
+        if( !psz_homedir )
+        {
+            msg_Err( p_this, "psz_homedir is null" );
+            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            return -1;
+        }
+        psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/" CONFIG_FILE) +
+                                       strlen(psz_homedir) );
+
+        if( psz_filename )
+            sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            return -1;
+        }
 
 #if defined( UNDER_CE )
-    {
-        wchar_t psz_new[ MAX_PATH ];
-        MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_new, MAX_PATH );
-        if( CreateDirectory( psz_new, NULL ) )
         {
-            msg_Err( p_this, "could not create %s", psz_filename );
+            wchar_t psz_new[ MAX_PATH ];
+            MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_new,
+                                 MAX_PATH );
+            if( CreateDirectory( psz_new, NULL ) )
+            {
+                msg_Err( p_this, "could not create %s", psz_filename );
+            }
         }
-    }
 
 #elif defined( HAVE_ERRNO_H )
 #   if defined( WIN32 )
-    if( mkdir( psz_filename ) && errno != EEXIST )
+        if( mkdir( psz_filename ) && errno != EEXIST )
 #   else
-    if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
+        if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
 #   endif
-    {
-        msg_Err( p_this, "could not create %s (%s)",
-                         psz_filename, strerror(errno) );
-    }
+        {
+            msg_Err( p_this, "could not create %s (%s)",
+                             psz_filename, strerror(errno) );
+        }
 
 #else
-    if( mkdir( psz_filename ) )
-    {
-        msg_Err( p_this, "could not create %s", psz_filename );
-    }
+        if( mkdir( psz_filename ) )
+        {
+            msg_Err( p_this, "could not create %s", psz_filename );
+        }
 
 #endif
 
-    strcat( psz_filename, "/" CONFIG_FILE );
-
+        strcat( psz_filename, "/" CONFIG_FILE );
+    }
+    else
+    {
+        psz_filename = strdup( psz_configfile );
+        if( !psz_filename )
+        {
+            msg_Err( p_this, "out of memory" );
+            vlc_mutex_unlock( &p_this->p_vlc->config_lock );
+            return -1;
+        }
+    }
 
     msg_Dbg( p_this, "opening config file %s", psz_filename );
 
@@ -1486,7 +1514,6 @@ char *config_GetHomeDir( void )
 }
 
 
-
 static int ConfigStringToKey( char *psz_key )
 {
     int i_key = 0;
@@ -1494,9 +1521,10 @@ static int ConfigStringToKey( char *psz_key )
     char *psz_parser = strchr( psz_key, '-' );
     while( psz_parser && psz_parser != psz_key )
     {
-        for ( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
+        for( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
         {
-            if ( !strncasecmp( modifiers[i].psz_key_string, psz_key, strlen( modifiers[i].psz_key_string ) ) )
+            if( !strncasecmp( modifiers[i].psz_key_string, psz_key,
+                              strlen( modifiers[i].psz_key_string ) ) )
             {
                 i_key |= modifiers[i].i_key_code;
             }
@@ -1504,9 +1532,9 @@ static int ConfigStringToKey( char *psz_key )
         psz_key = psz_parser + 1;
         psz_parser = strchr( psz_key, '-' );
     }
-    for ( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t ); i++ )
+    for( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t ); i++ )
     {
-        if ( !strcasecmp( keys[i].psz_key_string, psz_key ) )
+        if( !strcasecmp( keys[i].psz_key_string, psz_key ) )
         {
             i_key |= keys[i].i_key_code;
             break;
@@ -1515,32 +1543,30 @@ static int ConfigStringToKey( char *psz_key )
     return i_key;
 }
 
-
 static char *ConfigKeyToString( int i_key )
 {
     char *psz_key = malloc( 100 );
     char *p;
     size_t index;
+
     if ( !psz_key )
     {
         return NULL;
     }
     *psz_key = '\0';
     p = psz_key;
-    for( index = 0;
-         index < (sizeof(modifiers) / sizeof(key_descriptor_t));
+    for( index = 0; index < (sizeof(modifiers) / sizeof(key_descriptor_t));
          index++ )
     {
-        if ( i_key & modifiers[index].i_key_code )
+        if( i_key & modifiers[index].i_key_code )
         {
             p += sprintf( p, "%s-", modifiers[index].psz_key_string );
         }
     }
-    for( index = 0;
-         index < (sizeof(keys) / sizeof( key_descriptor_t));
+    for( index = 0; index < (sizeof(keys) / sizeof( key_descriptor_t));
          index++)
     {
-        if ( (int)( i_key & ~KEY_MODIFIER ) == keys[index].i_key_code )
+        if( (int)( i_key & ~KEY_MODIFIER ) == keys[index].i_key_code )
         {
             p += sprintf( p, "%s", keys[index].psz_key_string );
             break;
@@ -1548,4 +1574,3 @@ static char *ConfigKeyToString( int i_key )
     }
     return psz_key;
 }
-

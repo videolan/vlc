@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.95 2003/08/14 12:38:04 garf Exp $
+ * $Id: libvlc.c,v 1.96 2003/09/24 21:31:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -315,6 +315,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         b_exit = VLC_TRUE;
     }
 
+    /* Set the config file stuff */
+    p_vlc->psz_homedir = config_GetHomeDir();
+    p_vlc->psz_configfile = config_GetPsz( p_vlc, "config" );
+
     /* Hack: remove the help module here */
     vlc_object_detach( p_help_module );
     /* End hack */
@@ -334,7 +338,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
     /* This ain't really nice to have to reload the config here but it seems
      * the only way to do it. */
-    p_vlc->psz_homedir = config_GetHomeDir();
     config_LoadConfigFile( p_vlc, "main" );
     config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
 
@@ -400,14 +403,32 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         b_exit = VLC_TRUE;
     }
 
+    /* Check for config file options */
+    if( config_GetInt( p_vlc, "reset-config" ) )
+    {
+        vlc_object_detach( p_help_module );
+        config_ResetAll( p_vlc );
+        config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
+        config_SaveConfigFile( p_vlc, NULL );
+        vlc_object_attach( p_help_module, libvlc.p_module_bank );
+    }
+    if( config_GetInt( p_vlc, "save-config" ) )
+    {
+        vlc_object_detach( p_help_module );
+        config_LoadConfigFile( p_vlc, NULL );
+        config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
+        config_SaveConfigFile( p_vlc, NULL );
+        vlc_object_attach( p_help_module, libvlc.p_module_bank );
+    }
+
     /* Hack: remove the help module here */
     vlc_object_detach( p_help_module );
-    config_Free( p_help_module );
-    vlc_object_destroy( p_help_module );
     /* End hack */
 
     if( b_exit )
     {
+        config_Free( p_help_module );
+        vlc_object_destroy( p_help_module );
         /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
@@ -416,8 +437,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Override default configuration with config file settings
      */
-    p_vlc->psz_homedir = config_GetHomeDir();
     config_LoadConfigFile( p_vlc, NULL );
+
+    /* Hack: insert the help module here */
+    vlc_object_attach( p_help_module, libvlc.p_module_bank );
+    /* End hack */
 
     /*
      * Override configuration with command line settings
@@ -431,10 +455,19 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
                  "that they are valid.\nPress the RETURN key to continue..." );
         getchar();
 #endif
+        vlc_object_detach( p_help_module );
+        config_Free( p_help_module );
+        vlc_object_destroy( p_help_module );
         /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
+
+    /* Hack: remove the help module here */
+    vlc_object_detach( p_help_module );
+    config_Free( p_help_module );
+    vlc_object_destroy( p_help_module );
+    /* End hack */
 
     /*
      * System specific configuration
@@ -661,6 +694,12 @@ int VLC_Destroy( int i_object )
     {
         free( p_vlc->psz_homedir );
         p_vlc->psz_homedir = NULL;
+    }
+
+    if( p_vlc->psz_configfile )
+    {
+        free( p_vlc->psz_configfile );
+        p_vlc->psz_configfile = NULL;
     }
 
     /*

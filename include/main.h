@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.54 2003/05/21 15:40:03 hartman Exp $
+ * $Id: main.h,v 1.55 2003/09/24 21:31:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -81,6 +81,7 @@ struct vlc_t
     int                    i_argc;           /* command line arguments count */
     char **                ppsz_argv;              /* command line arguments */
     char *                 psz_homedir;             /* user's home directory */
+    char *                 psz_configfile;        /* location of config file */
 
     /* Generic settings */
     mtime_t                i_desync;   /* relative desync of the audio ouput */

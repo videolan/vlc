@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.29 2003/09/22 21:07:35 gbazin Exp $
+ * $Id: preferences.cpp,v 1.30 2003/09/24 21:31:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -312,6 +312,7 @@ void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
 {
     prefs_tree->ApplyChanges();
     config_SaveConfigFile( p_intf, NULL );
+    this->Hide();
 }
 
 void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
@@ -552,6 +553,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 #ifndef WIN32 /* Workaround a bug in win32 implementation */
     SelectItem( GetFirstChild( root_item, cookie ) );
 #endif
+
+    Expand( general_item );
 }
 
 PrefsTreeCtrl::~PrefsTreeCtrl()
@@ -564,9 +567,9 @@ void PrefsTreeCtrl::ApplyChanges()
     ConfigTreeData *config_data;
 
     /* Apply changes to the main module */
-    wxTreeItemId item = GetFirstChild( root_item, cookie );
+    wxTreeItemId item = GetFirstChild( general_item, cookie );
     for( size_t i_child_index = 0;
-         i_child_index < GetChildrenCount( root_item, FALSE );
+         i_child_index < GetChildrenCount( general_item, FALSE );
          i_child_index++ )
     {
         config_data = (ConfigTreeData *)GetItemData( item );
@@ -575,7 +578,7 @@ void PrefsTreeCtrl::ApplyChanges()
             config_data->panel->ApplyChanges();
         }
 
-        item = GetNextChild( root_item, cookie );
+        item = GetNextChild( general_item, cookie );
     }
 
     /* Apply changes to the plugins */
@@ -616,9 +619,9 @@ void PrefsTreeCtrl::CleanChanges()
     }
 
     /* Clean changes for the main module */
-    wxTreeItemId item = GetFirstChild( root_item, cookie );
+    wxTreeItemId item = GetFirstChild( general_item, cookie );
     for( size_t i_child_index = 0;
-         i_child_index < GetChildrenCount( root_item, FALSE );
+         i_child_index < GetChildrenCount( general_item, FALSE );
          i_child_index++ )
     {
         config_data = (ConfigTreeData *)GetItemData( item );
@@ -628,7 +631,7 @@ void PrefsTreeCtrl::CleanChanges()
             config_data->panel = NULL;
         }
 
-        item = GetNextChild( root_item, cookie );
+        item = GetNextChild( general_item, cookie );
     }
 
     /* Clean changes for the plugins */
@@ -802,7 +805,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         label = new wxStaticText( this, -1, wxU(_( psz_help) ) );
         box_sizer->Add( label, 1,  wxEXPAND | wxLEFT | wxRIGHT, 5 );
         sizer->Add( box_sizer, 0, wxEXPAND | wxALL , 5 );
-    }   
+        config_sizer = NULL; config_window = NULL;
+    }
     else
     {
         /* Get a pointer to the module */

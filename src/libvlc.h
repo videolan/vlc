@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.88 2003/09/22 14:40:12 zorglub Exp $
+ * $Id: libvlc.h,v 1.89 2003/09/24 21:31:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -725,20 +725,23 @@ vlc_module_end();
 
 static module_config_t p_help_config[] =
 {
-    { CONFIG_ITEM_BOOL, NULL, "help", 'h', N_("print help"),
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
-    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H', N_("print detailed help"),
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+    { CONFIG_ITEM_BOOL, NULL, "help", 'h',
+      N_("print help (can be combined with --advanced)") },
+    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H',
+      N_("print detailed help (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "list", 'l',
-                              N_("print a list of available modules"),
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
-    { CONFIG_ITEM_STRING, NULL, "module", 'p', N_("print help on module"),
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      N_("print a list of available modules") },
+    { CONFIG_ITEM_STRING, NULL, "module", 'p',
+      N_("print help on module (can be combined with --advanced)") },
+    { CONFIG_ITEM_BOOL, NULL, "save-config", '\0',
+      N_("save the current command line options in the config") },
+    { CONFIG_ITEM_BOOL, NULL, "reset-config", '\0',
+      N_("reset the current config to the default values") },
+    { CONFIG_ITEM_STRING, NULL, "config", '\0',
+      N_("use alternate config file") },
     { CONFIG_ITEM_BOOL, NULL, "version", '\0',
-                              N_("print version information"),
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
-    { CONFIG_HINT_END, NULL, NULL, '\0', NULL,
-      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE }
+      N_("print version information") },
+    { CONFIG_HINT_END, NULL, NULL, '\0', NULL }
 };
 
 /*****************************************************************************
