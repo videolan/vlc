@@ -94,7 +94,11 @@ static int SendEvents( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define EFFECT_TEXT N_("Effect")
+#define SPEED_TEXT N_( "OpenGL cube rotation speed" )
+#define SPEED_LONGTEXT N_( "If the OpenGL cube effect is enabled, this " \
+                           "controls its rotation speed." )
+
+#define EFFECT_TEXT N_("Select effect")
 #define EFFECT_LONGTEXT N_( \
     "Allows you to select different visual effects.")
 
@@ -111,8 +115,9 @@ vlc_module_begin();
     set_capability( "video output", 20 );
 #endif
     add_shortcut( "opengl" );
+    add_float( "opengl-cube-speed", 2.0, NULL, SPEED_TEXT,
+                    SPEED_LONGTEXT, VLC_FALSE );
     set_callbacks( CreateVout, DestroyVout );
-
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_TRUE );
         change_string_list( ppsz_effects, ppsz_effects_text, 0 );
@@ -135,6 +140,8 @@ struct vout_sys_t
     GLuint      p_textures[2];
 
     int         i_effect;
+
+    float       f_speed;
 };
 
 /*****************************************************************************
@@ -195,6 +202,8 @@ static int CreateVout( vlc_object_t *p_this )
         vlc_object_destroy( p_sys->p_vout );
         return VLC_ENOOBJ;
     }
+
+    p_sys->f_speed = var_CreateGetFloat( p_vout, "opengl-cube-speed" );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -495,7 +504,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        glRotatef( 1.0, 0.3, 0.5, 0.7 );
+        glRotatef( 0.5 * p_sys->f_speed , 0.3, 0.5, 0.7 );
 
         glEnable( VLCGL_TARGET );
         glBegin( GL_QUADS );

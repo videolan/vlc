@@ -68,7 +68,7 @@ Urgency: Normal
 Platform: any
 Description: Dual window in embed mode
 Windows taskbar reports two windows in the video embed mode.
-Status: Assigned to gibalou
+Status: Done
 
 Task
 Difficulty: Guru
@@ -93,7 +93,7 @@ Urgency: Wishlist
 Platform: any
 Description: Full blown OSD system 
  In the line of freevo etc.
-Status: Todo
+Status: Assigned to thedj, jpsaman and yoann
 
 Task
 Difficulty: Medium
@@ -127,7 +127,6 @@ Todo:<br />
    - **  Fix MP4, LIVE.COM<br />
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
-   - **  Add Directory<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
    - *** Fix search<br />
@@ -239,6 +238,16 @@ Status: Todo
 Task
 Difficulty: Hard
 Urgency: Normal
+Platform: Any
+Description: Rework of the preferences
+ * New information in preferences for a rework of how preferences are sorted in interfaces
+ * New widget types
+ See http://www.via.ecp.fr/via/ml/vlc-devel/200409/msg00409.html
+Status: Assigned to zorglub
+
+Task
+Difficulty: Hard
+Urgency: Normal
 Platform: Mac OS X
 Description: New OS X preferences
  New preferences for Mac OS X. Current not suited for Mac Users and several
@@ -270,10 +279,8 @@ Difficulty: Hard
 Urgency: Normal
 Platform: any
 Description: Stream text subtitles
- Find a a way to stream text subtitles, in TS and in RTP.
-  - Find an existing norm
-  - Implement it
-<br />Needs testing and validating
+ Find a a way to stream text subtitles, in TS and in RTP.<br />
+ Needs testing and validating
 Status: 65% (fenrir)
 
 Task
