@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.11 2002/10/03 17:01:59 gbazin Exp $
+$Id: FAQ,v 1.12 2002/10/11 23:44:25 massiot Exp $
 
 1. Using VLC
 
@@ -71,8 +71,8 @@ For binary packages, remove old packages first and install the new ones
 
 1.9 Debian: what should I put in my sources.list for videolan ?
 -------------------------------------------------------------
-deb     ftp://ftp.videolan.org/pub/videolan/ debian/
-deb-src ftp://ftp.videolan.org/pub/videolan/ debian/
+deb     ftp://ftp.videolan.org/pub/videolan/debian $(ARCH)/
+deb-src ftp://ftp.videolan.org/pub/videolan/debian sources/
 
 1.10 How can I save my VLC configuration ?
 ----------------------------------------
@@ -89,17 +89,6 @@ you are running:
 
 - Unices (linux, etc...): "~/.videolan/vlcrc"
 - Windows: "Application Data\videolan\vlcrc"
-
-1.12 I don't have access to the GUI anymore
--------------------------------------------
-If you change the default interface module in the preferences menu to a non
-GUI module (ie. to a command line interface) and then save the configuration,
-the only way to get VLC to show a GUI again is to run it directly from the
-command line.
-For instance on Windows, you need to open a dos command box, go to the
-directory where you installed VLC (usually
-c:\Program Files\VideoLAN\VideoLAN Client) and then type "vlc --intf win32"
-You will then be able to modify the configuration again and save it.
 
 
 2. Troubleshooting
@@ -187,6 +176,26 @@ Check that as user you have write access to your DVD drive / device.
 Under unices, remove your ~/.videolan/vlcrc; for Windows, remove vlcrc
 in the videolan subfolder of your "Application Data" directory.
 
+2.14 I don't have access to the GUI anymore
+-------------------------------------------
+If you change the default interface module in the preferences menu to a non
+GUI module (ie. to a command line interface) and then save the configuration,
+the only way to get VLC to show a GUI again is to run it directly from the
+command line.
+For instance on Windows, you need to open a dos command box, go to the
+directory where you installed VLC (usually
+c:\Program Files\VideoLAN\VideoLAN Client) and then type "vlc --intf win32"
+You will then be able to modify the configuration again and save it.
+
+2.15 I have just upgraded to VLC 0.4.5, and now I don't have any sound
+with the streams coming from the VLS !
+---------------------------------------------------------------------------
+This is a known problem. VLC 0.4.5 and later are now compliant to general
+usage regarding A/52 sound, and the new behavior is incompatible with the
+previous one. VLS version 0.4.0 and later now fixes this problem. If, for
+a reason or another, you wish to keep VLS 0.3.3, you can still read those
+streams if you launch VLC (0.4.5 or later) with --vls-backwards-compat.
+
 
 3. Ports and features
 
@@ -223,4 +232,4 @@ This support is currently being developed.
 
 3.3.3 Does VLC support RTP ?
 --------------------------
-No, but this is planned.
+Yes. Just use vlc rtp:@<mcast addr>:<local port>.
