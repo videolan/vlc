@@ -1,173 +1,199 @@
-/*
- * Defines the languages codes and abbreviations according to ISO 639-[12].
- * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5 tarball.
- * It has been partially completed with native language name.
+/*****************************************************************************
+ * iso_lang.h: languages codes and abbreviations
+ *****************************************************************************
+ * Copyright (C) 1998-2003 VideoLAN
+ * $Id: iso-639_def.h,v 1.2 2003/12/22 14:23:14 sam Exp $
  *
- * Format is: ("English name", 639-1-code, 639-2/T-code, 639-2/B-code)
- * If you find something missing or wrong contact <bug-glibc@gnu.org>
- */
+ * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5
+ * tarball. It has been partially completed with native language names.
+ * Authors: Stéphane Borel <stef@via.ecp.fr>
+ *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
 
-DEFINE_LANGUAGE_CODE ("Afar", "", aa, aar, aar)
-DEFINE_LANGUAGE_CODE ("Abkhazian", "", ab, abk, abk)
-DEFINE_LANGUAGE_CODE ("Afrikaans", "", af, afr, afr)
-DEFINE_LANGUAGE_CODE ("Albanian", "", sq, sqi, alb)
-DEFINE_LANGUAGE_CODE ("Amharic", "", am, amh, amh)
-DEFINE_LANGUAGE_CODE ("Arabic", "", ar, ara, ara)
-DEFINE_LANGUAGE_CODE ("Armenian", "", hy, hye, arm)
-DEFINE_LANGUAGE_CODE ("Assamese", "", as, asm, asm)
-DEFINE_LANGUAGE_CODE ("Avestan", "", ae, ave, ave)
-DEFINE_LANGUAGE_CODE ("Aymara", "", ay, aym, aym)
-DEFINE_LANGUAGE_CODE ("Azerbaijani", "", az, aze, aze)
-DEFINE_LANGUAGE_CODE ("Bashkir", "", ba, bak, bak)
-DEFINE_LANGUAGE_CODE ("Basque", "", eu, eus, baq)
-DEFINE_LANGUAGE_CODE ("Belarusian", "", be, bel, bel)
-DEFINE_LANGUAGE_CODE ("Bengali", "", bn, ben, ben)
-DEFINE_LANGUAGE_CODE ("Bihari", "", bh, bih, bih)
-DEFINE_LANGUAGE_CODE ("Bislama", "", bi, bis, bis)
-DEFINE_LANGUAGE_CODE ("Bosnian", "", bs, bos, bos)
-DEFINE_LANGUAGE_CODE ("Breton", "", br, bre, bre)
-DEFINE_LANGUAGE_CODE ("Bulgarian", "", bg, bul, bul)
-DEFINE_LANGUAGE_CODE ("Burmese", "", my, mya, bur)
-DEFINE_LANGUAGE_CODE ("Catalan", "", ca, cat, cat)
-DEFINE_LANGUAGE_CODE ("Chamorro", "", ch, cha, cha)
-DEFINE_LANGUAGE_CODE ("Chechen", "", ce, che, che)
-DEFINE_LANGUAGE_CODE ("Chinese", "", zh, zho, chi)
-DEFINE_LANGUAGE_CODE ("Church Slavic", "", cu, chu, chu)
-DEFINE_LANGUAGE_CODE ("Chuvash", "", cv, chv, chv)
-DEFINE_LANGUAGE_CODE ("Cornish", "", kw, cor, cor)
-DEFINE_LANGUAGE_CODE ("Corsican", "", co, cos, cos)
-DEFINE_LANGUAGE_CODE ("Czech", "", cs, ces, cze)
-DEFINE_LANGUAGE_CODE ("Danish", "Dansk", da, dan, dan)
-DEFINE_LANGUAGE_CODE ("Dutch", "Nederlands", nl, nld, dut)
-DEFINE_LANGUAGE_CODE ("Dzongkha", "", dz, dzo, dzo)
-DEFINE_LANGUAGE_CODE ("English", "English", en, eng, eng)
-DEFINE_LANGUAGE_CODE ("Esperanto", "", eo, epo, epo)
-DEFINE_LANGUAGE_CODE ("Estonian", "", et, est, est)
-DEFINE_LANGUAGE_CODE ("Faroese", "", fo, fao, fao)
-DEFINE_LANGUAGE_CODE ("Fijian", "", fj, fij, fij)
-DEFINE_LANGUAGE_CODE ("Finnish", "Suomi", fi, fin, fin)
-DEFINE_LANGUAGE_CODE ("French", "Francais", fr, fra, fre)
-DEFINE_LANGUAGE_CODE ("Frisian", "", fy, fry, fry)
-DEFINE_LANGUAGE_CODE ("Georgian", "", ka, kat, geo)
-DEFINE_LANGUAGE_CODE ("German", "Deutsch", de, deu, ger)
-DEFINE_LANGUAGE_CODE ("Gaelic (Scots)", "", gd, gla, gla)
-DEFINE_LANGUAGE_CODE ("Irish", "", ga, gle, gle)
-DEFINE_LANGUAGE_CODE ("Gallegan", "", gl, glg, glg)
-DEFINE_LANGUAGE_CODE ("Manx", "", gv, glv, glv)
-DEFINE_LANGUAGE_CODE ("Greek, Modern ()", "", el, gre, ell)
-DEFINE_LANGUAGE_CODE ("Guarani", "", gn, grn, grn)
-DEFINE_LANGUAGE_CODE ("Gujarati", "", gu, guj, guj)
-DEFINE_LANGUAGE_CODE ("Hebrew", "", he, heb, heb)
-DEFINE_LANGUAGE_CODE ("Herero", "", hz, her, her)
-DEFINE_LANGUAGE_CODE ("Hindi", "", hi, hin, hin)
-DEFINE_LANGUAGE_CODE ("Hiri Motu", "", ho, hmo, hmo)
-DEFINE_LANGUAGE_CODE ("Hungarian", "Magyar", hu, hun, hun)
-DEFINE_LANGUAGE_CODE ("Icelandic", "Islenska", is, isl, ice)
-DEFINE_LANGUAGE_CODE ("Inuktitut", "", iu, iku, iku)
-DEFINE_LANGUAGE_CODE ("Interlingue", "", ie, ile, ile)
-DEFINE_LANGUAGE_CODE ("Interlingua", "", ia, ina, ina)
-DEFINE_LANGUAGE_CODE ("Indonesian", "", id, ind, ind)
-DEFINE_LANGUAGE_CODE ("Inupiaq", "", ik, ipk, ipk)
-DEFINE_LANGUAGE_CODE ("Italian", "Italiano", it, ita, ita)
-DEFINE_LANGUAGE_CODE ("Javanese", "", jv, jaw, jav)
-DEFINE_LANGUAGE_CODE ("Japanese", "", ja, jpn, jpn)
-DEFINE_LANGUAGE_CODE ("Kalaallisut (Greenlandic)", "", kl, kal, kal)
-DEFINE_LANGUAGE_CODE ("Kannada", "", kn, kan, kan)
-DEFINE_LANGUAGE_CODE ("Kashmiri", "", ks, kas, kas)
-DEFINE_LANGUAGE_CODE ("Kazakh", "", kk, kaz, kaz)
-DEFINE_LANGUAGE_CODE ("Khmer", "", km, khm, khm)
-DEFINE_LANGUAGE_CODE ("Kikuyu", "", ki, kik, kik)
-DEFINE_LANGUAGE_CODE ("Kinyarwanda", "", rw, kin, kin)
-DEFINE_LANGUAGE_CODE ("Kirghiz", "", ky, kir, kir)
-DEFINE_LANGUAGE_CODE ("Komi", "", kv, kom, kom)
-DEFINE_LANGUAGE_CODE ("Korean", "", ko, kor, kor)
-DEFINE_LANGUAGE_CODE ("Kuanyama", "", kj, kua, kua)
-DEFINE_LANGUAGE_CODE ("Kurdish", "", ku, kur, kur)
-DEFINE_LANGUAGE_CODE ("Lao", "", lo, lao, lao)
-DEFINE_LANGUAGE_CODE ("Latin", "", la, lat, lat)
-DEFINE_LANGUAGE_CODE ("Latvian", "", lv, lav, lav)
-DEFINE_LANGUAGE_CODE ("Lingala", "", ln, lin, lin)
-DEFINE_LANGUAGE_CODE ("Lithuanian", "", lt, lit, lit)
-DEFINE_LANGUAGE_CODE ("Letzeburgesch", "", lb, ltz, ltz)
-DEFINE_LANGUAGE_CODE ("Macedonian", "", mk, mkd, mac)
-DEFINE_LANGUAGE_CODE ("Marshall", "", mh, mah, mah)
-DEFINE_LANGUAGE_CODE ("Malayalam", "", ml, mal, mal)
-DEFINE_LANGUAGE_CODE ("Maori", "", mi, mri, mao)
-DEFINE_LANGUAGE_CODE ("Marathi", "", mr, mar, mar)
-DEFINE_LANGUAGE_CODE ("Malay", "", ms, msa, may)
-DEFINE_LANGUAGE_CODE ("Malagasy", "", mg, mlg, mlg)
-DEFINE_LANGUAGE_CODE ("Maltese", "", mt, mlt, mlt)
-DEFINE_LANGUAGE_CODE ("Moldavian", "", mo, mol, mol)
-DEFINE_LANGUAGE_CODE ("Mongolian", "", mn, mon, mon)
-DEFINE_LANGUAGE_CODE ("Nauru", "", na, nau, nau)
-DEFINE_LANGUAGE_CODE ("Navajo", "", nv, nav, nav)
-DEFINE_LANGUAGE_CODE ("Ndebele, South", "", nr, nbl, nbl)
-DEFINE_LANGUAGE_CODE ("Ndebele, North", "", nd, nde, nde)
-DEFINE_LANGUAGE_CODE ("Ndonga", "", ng, ndo, ndo)
-DEFINE_LANGUAGE_CODE ("Nepali", "", ne, nep, nep)
-DEFINE_LANGUAGE_CODE ("Norwegian", "Norsk", no, nor, nor)
-DEFINE_LANGUAGE_CODE ("Norwegian Nynorsk", "", nn, nno, nno)
-DEFINE_LANGUAGE_CODE ("Norwegian Bokmål", "", nb, nob, nob)
-DEFINE_LANGUAGE_CODE ("Chichewa; Nyanja", "", ny, nya, nya)
-DEFINE_LANGUAGE_CODE ("Occitan (post 1500); Provençal", "", oc, oci, oci)
-DEFINE_LANGUAGE_CODE ("Oriya", "", or, ori, ori)
-DEFINE_LANGUAGE_CODE ("Oromo", "", om, orm, orm)
-DEFINE_LANGUAGE_CODE ("Ossetian; Ossetic", "", os, oss, oss)
-DEFINE_LANGUAGE_CODE ("Panjabi", "", pa, pan, pan)
-DEFINE_LANGUAGE_CODE ("Persian", "", fa, fas, per)
-DEFINE_LANGUAGE_CODE ("Pali", "", pi, pli, pli)
-DEFINE_LANGUAGE_CODE ("Polish", "", pl, pol, pol)
-DEFINE_LANGUAGE_CODE ("Portuguese", "Portugues", pt, por, por)
-DEFINE_LANGUAGE_CODE ("Pushto", "", ps, pus, pus)
-DEFINE_LANGUAGE_CODE ("Quechua", "", qu, que, que)
-DEFINE_LANGUAGE_CODE ("Raeto-Romance", "", rm, roh, roh)
-DEFINE_LANGUAGE_CODE ("Romanian", "", ro, ron, rum)
-DEFINE_LANGUAGE_CODE ("Rundi", "", rn, run, run)
-DEFINE_LANGUAGE_CODE ("Russian", "", ru, rus, rus)
-DEFINE_LANGUAGE_CODE ("Sango", "", sg, sag, sag)
-DEFINE_LANGUAGE_CODE ("Sanskrit", "", sa, san, san)
-DEFINE_LANGUAGE_CODE ("Serbian", "", sr, srp, scc)
-DEFINE_LANGUAGE_CODE ("Croatian", "Hrvatski", hr, hrv, scr)
-DEFINE_LANGUAGE_CODE ("Sinhalese", "", si, sin, sin)
-DEFINE_LANGUAGE_CODE ("Slovak", "", sk, slk, slo)
-DEFINE_LANGUAGE_CODE ("Slovenian", "", sl, slv, slv)
-DEFINE_LANGUAGE_CODE ("Northern Sami", "", se, sme, sme)
-DEFINE_LANGUAGE_CODE ("Samoan", "", sm, smo, smo)
-DEFINE_LANGUAGE_CODE ("Shona", "", sn, sna, sna)
-DEFINE_LANGUAGE_CODE ("Sindhi", "", sd, snd, snd)
-DEFINE_LANGUAGE_CODE ("Somali", "", so, som, som)
-DEFINE_LANGUAGE_CODE ("Sotho, Southern", "", st, sot, sot)
-DEFINE_LANGUAGE_CODE ("Spanish", "Espanol", es, spa, spa)
-DEFINE_LANGUAGE_CODE ("Sardinian", "", sc, srd, srd)
-DEFINE_LANGUAGE_CODE ("Swati", "", ss, ssw, ssw)
-DEFINE_LANGUAGE_CODE ("Sundanese", "", su, sun, sun)
-DEFINE_LANGUAGE_CODE ("Swahili", "", sw, swa, swa)
-DEFINE_LANGUAGE_CODE ("Swedish", "Svenska", sv, swe, swe)
-DEFINE_LANGUAGE_CODE ("Tahitian", "", ty, tah, tah)
-DEFINE_LANGUAGE_CODE ("Tamil", "", ta, tam, tam)
-DEFINE_LANGUAGE_CODE ("Tatar", "", tt, tat, tat)
-DEFINE_LANGUAGE_CODE ("Telugu", "", te, tel, tel)
-DEFINE_LANGUAGE_CODE ("Tajik", "", tg, tgk, tgk)
-DEFINE_LANGUAGE_CODE ("Tagalog", "", tl, tgl, tgl)
-DEFINE_LANGUAGE_CODE ("Thai", "", th, tha, tha)
-DEFINE_LANGUAGE_CODE ("Tibetan", "", bo, bod, tib)
-DEFINE_LANGUAGE_CODE ("Tigrinya", "", ti, tir, tir)
-DEFINE_LANGUAGE_CODE ("Tonga (Tonga Islands)", "", to, ton, ton)
-DEFINE_LANGUAGE_CODE ("Tswana", "", tn, tsn, tsn)
-DEFINE_LANGUAGE_CODE ("Tsonga", "", ts, tso, tso)
-DEFINE_LANGUAGE_CODE ("Turkish", "", tr, tur, tur)
-DEFINE_LANGUAGE_CODE ("Turkmen", "", tk, tuk, tuk)
-DEFINE_LANGUAGE_CODE ("Twi", "", tw, twi, twi)
-DEFINE_LANGUAGE_CODE ("Uighur", "", ug, uig, uig)
-DEFINE_LANGUAGE_CODE ("Ukrainian", "", uk, ukr, ukr)
-DEFINE_LANGUAGE_CODE ("Urdu", "", ur, urd, urd)
-DEFINE_LANGUAGE_CODE ("Uzbek", "", uz, uzb, uzb)
-DEFINE_LANGUAGE_CODE ("Vietnamese", "", vi, vie, vie)
-DEFINE_LANGUAGE_CODE ("Volapük", "", vo, vol, vol)
-DEFINE_LANGUAGE_CODE ("Welsh", "", cy, cym, wel)
-DEFINE_LANGUAGE_CODE ("Wolof", "", wo, wol, wol)
-DEFINE_LANGUAGE_CODE ("Xhosa", "", xh, xho, xho)
-DEFINE_LANGUAGE_CODE ("Yiddish", "", yi, yid, yid)
-DEFINE_LANGUAGE_CODE ("Yoruba", "", yo, yor, yor)
-DEFINE_LANGUAGE_CODE ("Zhuang", "", za, zha, zha)
-DEFINE_LANGUAGE_CODE ("Zulu", "", zu, zul, zul)
+/* Define the languages codes and abbreviations according to ISO 639-[12].
+ * Format is:( "English name", 639-1-code, 639-2/T-code, 639-2/B-code)
+ * If you find something missing or wrong contact <bug-glibc@gnu.org> */
+
+static const iso639_lang_t p_languages[] =
+{
+    { "Afar",           "",            "aa", "aar", "aar" },
+    { "Abkhazian",      "",            "ab", "abk", "abk" },
+    { "Afrikaans",      "",            "af", "afr", "afr" },
+    { "Albanian",       "",            "sq", "sqi", "alb" },
+    { "Amharic",        "",            "am", "amh", "amh" },
+    { "Arabic",         "",            "ar", "ara", "ara" },
+    { "Armenian",       "",            "hy", "hye", "arm" },
+    { "Assamese",       "",            "as", "asm", "asm" },
+    { "Avestan",        "",            "ae", "ave", "ave" },
+    { "Aymara",         "",            "ay", "aym", "aym" },
+    { "Azerbaijani",    "",            "az", "aze", "aze" },
+    { "Bashkir",        "",            "ba", "bak", "bak" },
+    { "Basque",         "",            "eu", "eus", "baq" },
+    { "Belarusian",     "",            "be", "bel", "bel" },
+    { "Bengali",        "",            "bn", "ben", "ben" },
+    { "Bihari",         "",            "bh", "bih", "bih" },
+    { "Bislama",        "",            "bi", "bis", "bis" },
+    { "Bosnian",        "",            "bs", "bos", "bos" },
+    { "Breton",         "",            "br", "bre", "bre" },
+    { "Bulgarian",      "",            "bg", "bul", "bul" },
+    { "Burmese",        "",            "my", "mya", "bur" },
+    { "Catalan",        "",            "ca", "cat", "cat" },
+    { "Chamorro",       "",            "ch", "cha", "cha" },
+    { "Chechen",        "",            "ce", "che", "che" },
+    { "Chinese",        "",            "zh", "zho", "chi" },
+    { "Church Slavic",  "",            "cu", "chu", "chu" },
+    { "Chuvash",        "",            "cv", "chv", "chv" },
+    { "Cornish",        "",            "kw", "cor", "cor" },
+    { "Corsican",       "",            "co", "cos", "cos" },
+    { "Czech",          "",            "cs", "ces", "cze" },
+    { "Danish",         "Dansk",       "da", "dan", "dan" },
+    { "Dutch",          "Nederlands",  "nl", "nld", "dut" },
+    { "Dzongkha",       "",            "dz", "dzo", "dzo" },
+    { "English",        "English",     "en", "eng", "eng" },
+    { "Esperanto",      "",            "eo", "epo", "epo" },
+    { "Estonian",       "",            "et", "est", "est" },
+    { "Faroese",        "",            "fo", "fao", "fao" },
+    { "Fijian",         "",            "fj", "fij", "fij" },
+    { "Finnish",        "Suomi",       "fi", "fin", "fin" },
+    { "French",         "Francais",    "fr", "fra", "fre" },
+    { "Frisian",        "",            "fy", "fry", "fry" },
+    { "Georgian",       "",            "ka", "kat", "geo" },
+    { "German",         "Deutsch",     "de", "deu", "ger" },
+    { "Gaelic (Scots)", "",            "gd", "gla", "gla" },
+    { "Irish",          "",            "ga", "gle", "gle" },
+    { "Gallegan",       "",            "gl", "glg", "glg" },
+    { "Manx",           "",            "gv", "glv", "glv" },
+    { "Greek, Modern ()", "",          "el", "gre", "ell" },
+    { "Guarani",        "",            "gn", "grn", "grn" },
+    { "Gujarati",       "",            "gu", "guj", "guj" },
+    { "Hebrew",         "",            "he", "heb", "heb" },
+    { "Herero",         "",            "hz", "her", "her" },
+    { "Hindi",          "",            "hi", "hin", "hin" },
+    { "Hiri Motu",      "",            "ho", "hmo", "hmo" },
+    { "Hungarian",      "Magyar",      "hu", "hun", "hun" },
+    { "Icelandic",      "Islenska",    "is", "isl", "ice" },
+    { "Inuktitut",      "",            "iu", "iku", "iku" },
+    { "Interlingue",    "",            "ie", "ile", "ile" },
+    { "Interlingua",    "",            "ia", "ina", "ina" },
+    { "Indonesian",     "",            "id", "ind", "ind" },
+    { "Inupiaq",        "",            "ik", "ipk", "ipk" },
+    { "Italian",        "Italiano",    "it", "ita", "ita" },
+    { "Javanese",       "",            "jv", "jaw", "jav" },
+    { "Japanese",       "",            "ja", "jpn", "jpn" },
+    { "Kalaallisut (Greenlandic)", "", "kl", "kal", "kal" },
+    { "Kannada",        "",            "kn", "kan", "kan" },
+    { "Kashmiri",       "",            "ks", "kas", "kas" },
+    { "Kazakh",         "",            "kk", "kaz", "kaz" },
+    { "Khmer",          "",            "km", "khm", "khm" },
+    { "Kikuyu",         "",            "ki", "kik", "kik" },
+    { "Kinyarwanda",    "",            "rw", "kin", "kin" },
+    { "Kirghiz",        "",            "ky", "kir", "kir" },
+    { "Komi",           "",            "kv", "kom", "kom" },
+    { "Korean",         "",            "ko", "kor", "kor" },
+    { "Kuanyama",       "",            "kj", "kua", "kua" },
+    { "Kurdish",        "",            "ku", "kur", "kur" },
+    { "Lao",            "",            "lo", "lao", "lao" },
+    { "Latin",          "",            "la", "lat", "lat" },
+    { "Latvian",        "",            "lv", "lav", "lav" },
+    { "Lingala",        "",            "ln", "lin", "lin" },
+    { "Lithuanian",     "",            "lt", "lit", "lit" },
+    { "Letzeburgesch",  "",            "lb", "ltz", "ltz" },
+    { "Macedonian",     "",            "mk", "mkd", "mac" },
+    { "Marshall",       "",            "mh", "mah", "mah" },
+    { "Malayalam",      "",            "ml", "mal", "mal" },
+    { "Maori",          "",            "mi", "mri", "mao" },
+    { "Marathi",        "",            "mr", "mar", "mar" },
+    { "Malay",          "",            "ms", "msa", "may" },
+    { "Malagasy",       "",            "mg", "mlg", "mlg" },
+    { "Maltese",        "",            "mt", "mlt", "mlt" },
+    { "Moldavian",      "",            "mo", "mol", "mol" },
+    { "Mongolian",      "",            "mn", "mon", "mon" },
+    { "Nauru",          "",            "na", "nau", "nau" },
+    { "Navajo",         "",            "nv", "nav", "nav" },
+    { "Ndebele, South", "",            "nr", "nbl", "nbl" },
+    { "Ndebele, North", "",            "nd", "nde", "nde" },
+    { "Ndonga",         "",            "ng", "ndo", "ndo" },
+    { "Nepali",         "",            "ne", "nep", "nep" },
+    { "Norwegian",      "Norsk",       "no", "nor", "nor" },
+    { "Norwegian Nynorsk", "",         "nn", "nno", "nno" },
+    { "Norwegian Bokmål", "",          "nb", "nob", "nob" },
+    { "Chichewa; Nyanja", "",          "ny", "nya", "nya" },
+    { "Occitan (post 1500); Provençal", "", "oc", "oci", "oci" },
+    { "Oriya",          "",            "or", "ori", "ori" },
+    { "Oromo",          "",            "om", "orm", "orm" },
+    { "Ossetian; Ossetic", "",         "os", "oss", "oss" },
+    { "Panjabi",        "",            "pa", "pan", "pan" },
+    { "Persian",        "",            "fa", "fas", "per" },
+    { "Pali",           "",            "pi", "pli", "pli" },
+    { "Polish",         "",            "pl", "pol", "pol" },
+    { "Portuguese",     "Portugues",   "pt", "por", "por" },
+    { "Pushto",         "",            "ps", "pus", "pus" },
+    { "Quechua",        "",            "qu", "que", "que" },
+    { "Raeto-Romance",  "",            "rm", "roh", "roh" },
+    { "Romanian",       "",            "ro", "ron", "rum" },
+    { "Rundi",          "",            "rn", "run", "run" },
+    { "Russian",        "",            "ru", "rus", "rus" },
+    { "Sango",          "",            "sg", "sag", "sag" },
+    { "Sanskrit",       "",            "sa", "san", "san" },
+    { "Serbian",        "",            "sr", "srp", "scc" },
+    { "Croatian",       "Hrvatski",    "hr", "hrv", "scr" },
+    { "Sinhalese",      "",            "si", "sin", "sin" },
+    { "Slovak",         "",            "sk", "slk", "slo" },
+    { "Slovenian",      "",            "sl", "slv", "slv" },
+    { "Northern Sami",  "",            "se", "sme", "sme" },
+    { "Samoan",         "",            "sm", "smo", "smo" },
+    { "Shona",          "",            "sn", "sna", "sna" },
+    { "Sindhi",         "",            "sd", "snd", "snd" },
+    { "Somali",         "",            "so", "som", "som" },
+    { "Sotho, Southern", "",           "st", "sot", "sot" },
+    { "Spanish",        "Espanol",     "es", "spa", "spa" },
+    { "Sardinian",      "",            "sc", "srd", "srd" },
+    { "Swati",          "",            "ss", "ssw", "ssw" },
+    { "Sundanese",      "",            "su", "sun", "sun" },
+    { "Swahili",        "",            "sw", "swa", "swa" },
+    { "Swedish",        "Svenska",     "sv", "swe", "swe" },
+    { "Tahitian",       "",            "ty", "tah", "tah" },
+    { "Tamil",          "",            "ta", "tam", "tam" },
+    { "Tatar",          "",            "tt", "tat", "tat" },
+    { "Telugu",         "",            "te", "tel", "tel" },
+    { "Tajik",          "",            "tg", "tgk", "tgk" },
+    { "Tagalog",        "",            "tl", "tgl", "tgl" },
+    { "Thai",           "",            "th", "tha", "tha" },
+    { "Tibetan",        "",            "bo", "bod", "tib" },
+    { "Tigrinya",       "",            "ti", "tir", "tir" },
+    { "Tonga (Tonga Islands)", "",     "to", "ton", "ton" },
+    { "Tswana",         "",            "tn", "tsn", "tsn" },
+    { "Tsonga",         "",            "ts", "tso", "tso" },
+    { "Turkish",        "",            "tr", "tur", "tur" },
+    { "Turkmen",        "",            "tk", "tuk", "tuk" },
+    { "Twi",            "",            "tw", "twi", "twi" },
+    { "Uighur",         "",            "ug", "uig", "uig" },
+    { "Ukrainian",      "",            "uk", "ukr", "ukr" },
+    { "Urdu",           "",            "ur", "urd", "urd" },
+    { "Uzbek",          "",            "uz", "uzb", "uzb" },
+    { "Vietnamese",     "",            "vi", "vie", "vie" },
+    { "Volapük",        "",            "vo", "vol", "vol" },
+    { "Welsh",          "",            "cy", "cym", "wel" },
+    { "Wolof",          "",            "wo", "wol", "wol" },
+    { "Xhosa",          "",            "xh", "xho", "xho" },
+    { "Yiddish",        "",            "yi", "yid", "yid" },
+    { "Yoruba",         "",            "yo", "yor", "yor" },
+    { "Zhuang",         "",            "za", "zha", "zha" },
+    { "Zulu",           "",            "zu", "zul", "zul" },
+    { NULL, NULL, NULL, NULL, NULL }
+};
+
