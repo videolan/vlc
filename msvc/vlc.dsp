@@ -90,15 +90,6 @@ LINK32=link.exe
 # Begin Source File
 SOURCE="..\src\vlc.c"
 # End Source File
-# Begin Source File
-SOURCE="..\extras\GNUgetopt\getopt.c"
-# End Source File
-# Begin Source File
-SOURCE="..\extras\GNUgetopt\getopt.h"
-# End Source File
-# Begin Source File
-SOURCE="..\extras\GNUgetopt\getopt1.c"
-# End Source File
 # End Group
 # Begin Group "libvlc"
 # Begin Source File
@@ -112,404 +103,500 @@ SOURCE="..\src\libvlc.h"
 # Begin Group "audio_output"
 # Begin Source File
 SOURCE="..\src\audio_output\common.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\dec.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\filters.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\input.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\mixer.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\output.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\audio_output\intf.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\audio_output"
-# PROP Output_Dir "Release\src\audio_output"
+# PROP Intermediate_Dir "Release\audio_output"
+# PROP Output_Dir "Release\audio_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\audio_output"
-# PROP Output_Dir "Debug\src\audio_output"
+# PROP Intermediate_Dir "Debug\audio_output"
+# PROP Output_Dir "Debug\audio_output"
+!ENDIF
+# End Source File
+# End Group
+# Begin Group "extras"
+# Begin Source File
+SOURCE="..\src\extras\strndup.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\dirent.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\dirent.h"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\getopt.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\getopt.h"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\getopt1.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "input"
 # Begin Source File
 SOURCE="..\src\input\input.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_ext-plugins.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_ext-dec.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_ext-intf.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_dec.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_programs.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_clock.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\input\input_info.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\input"
-# PROP Output_Dir "Release\src\input"
+# PROP Intermediate_Dir "Release\input"
+# PROP Output_Dir "Release\input"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\input"
-# PROP Output_Dir "Debug\src\input"
+# PROP Intermediate_Dir "Debug\input"
+# PROP Output_Dir "Debug\input"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "interface"
 # Begin Source File
 SOURCE="..\src\interface\interface.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\interface"
-# PROP Output_Dir "Release\src\interface"
+# PROP Intermediate_Dir "Release\interface"
+# PROP Output_Dir "Release\interface"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\interface"
-# PROP Output_Dir "Debug\src\interface"
+# PROP Intermediate_Dir "Debug\interface"
+# PROP Output_Dir "Debug\interface"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\interface\intf_eject.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\interface"
-# PROP Output_Dir "Release\src\interface"
+# PROP Intermediate_Dir "Release\interface"
+# PROP Output_Dir "Release\interface"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\interface"
-# PROP Output_Dir "Debug\src\interface"
+# PROP Intermediate_Dir "Debug\interface"
+# PROP Output_Dir "Debug\interface"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "misc"
 # Begin Source File
 SOURCE="..\src\misc\mtime.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\modules.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\threads.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\cpu.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\configuration.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\netutils.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\iso_lang.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\iso-639.def"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\messages.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\objects.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\variables.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\error.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
-!ENDIF
-# End Source File
-# Begin Source File
-SOURCE="..\src\misc\extras.c"
-!IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
-!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\misc\win32_specific.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\misc"
-# PROP Output_Dir "Release\src\misc"
+# PROP Intermediate_Dir "Release\misc"
+# PROP Output_Dir "Release\misc"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\misc"
-# PROP Output_Dir "Debug\src\misc"
+# PROP Intermediate_Dir "Debug\misc"
+# PROP Output_Dir "Debug\misc"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "playlist"
 # Begin Source File
 SOURCE="..\src\playlist\playlist.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\playlist"
-# PROP Output_Dir "Release\src\playlist"
+# PROP Intermediate_Dir "Release\playlist"
+# PROP Output_Dir "Release\playlist"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\playlist"
-# PROP Output_Dir "Debug\src\playlist"
+# PROP Intermediate_Dir "Debug\playlist"
+# PROP Output_Dir "Debug\playlist"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "stream_output"
 # Begin Source File
 SOURCE="..\src\stream_output\stream_output.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\stream_output"
-# PROP Output_Dir "Release\src\stream_output"
+# PROP Intermediate_Dir "Release\stream_output"
+# PROP Output_Dir "Release\stream_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\stream_output"
-# PROP Output_Dir "Debug\src\stream_output"
+# PROP Intermediate_Dir "Debug\stream_output"
+# PROP Output_Dir "Debug\stream_output"
 !ENDIF
 # End Source File
 # End Group
 # Begin Group "video_output"
 # Begin Source File
 SOURCE="..\src\video_output\video_output.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\video_output\vout_pictures.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\video_output\vout_pictures.h"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\video_output\video_text.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\video_output\video_text.h"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # Begin Source File
 SOURCE="..\src\video_output\vout_subpictures.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\src\video_output"
-# PROP Output_Dir "Release\src\video_output"
+# PROP Intermediate_Dir "Release\video_output"
+# PROP Output_Dir "Release\video_output"
 !ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\src\video_output"
-# PROP Output_Dir "Debug\src\video_output"
+# PROP Intermediate_Dir "Debug\video_output"
+# PROP Output_Dir "Debug\video_output"
 !ENDIF
 # End Source File
 # End Group
