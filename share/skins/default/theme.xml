@@ -146,7 +146,7 @@
         <ButtonControl x="55"  y="3" up="del1"  down="del2"  onclick="Del" onmouseover="showDel"  onmouseout="hideDel"  tooltiptext="Remove items"/>
         <ButtonControl x="81"  y="3" up="prefs1"  down="prefs2"  onclick="show_prefs" onmouseover="showPrefs"  onmouseout="hidePrefs"  tooltiptext="Show preferences"/>
       </ControlGroup>
-      <PlayListControl id="playlist" width="180" selcolor="#C0D0E0" font="playlist1" playfont="playlist2" abs="9,9" ord="35,115">
+      <PlayListControl id="playlist" width="180" selcolor="#C0D0E0" font="playlist1" playfont="playlist2" abs="9,9" ord="35,150">
         <SliderControl x="201" up="slider1" down="slider2" abs="0,0" ord="36,149"/>
       </PlayListControl>
 

@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.11 2003/05/31 23:23:59 ipkiss Exp $
+ * $Id: playlist.cpp,v 1.12 2003/06/08 15:22:03 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -215,13 +215,12 @@ bool ControlPlayList::ProcessEvent( Event *evt )
         case PLAYLIST_ID_DEL:
             if( (GenericControl *)evt->GetParam1() == this )
             {
-                vlc_mutex_lock( &PlayList->object_lock );
                 for( int i = PlayList->i_size - 1; i >= 0; i-- )
                 {
                     if( Select[i] && i != PlayList->i_index )
                         playlist_Delete( PlayList, i );
                 }
-                vlc_mutex_unlock( &PlayList->object_lock );
+                RefreshList();
                 RefreshAll();
             }
             break;
@@ -236,7 +235,7 @@ void ControlPlayList::RefreshList()
     if( NumOfItems != PlayList->i_size )
     {
         if( NumOfItems > 0 )
-            delete Select;
+            delete[] Select;
         NumOfItems = PlayList->i_size;
         if( PlayList->i_size > 0 )
         {

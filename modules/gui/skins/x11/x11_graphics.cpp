@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.6 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.7 2003/06/08 15:22:03 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -74,12 +74,7 @@ X11Graphics::X11Graphics( intf_thread_t *p_intf, int w, int h,
     }
 
     // Set the background color to black
-    XGCValues gcVal;
-    gcVal.foreground = 0;
-    XLOCK;
-    XChangeGC( display, Gc, GCForeground,  &gcVal );
-    XFillRectangle( display, Image, Gc, 0, 0, w, h );    
-    XUNLOCK;
+    DrawRect( 0, 0, w, h, 0 );
 }
 //---------------------------------------------------------------------------
 X11Graphics::~X11Graphics()
@@ -100,8 +95,12 @@ void X11Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 //---------------------------------------------------------------------------
 void X11Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
-/*    gdk_rgb_gc_set_foreground( Gc, color );
-    gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);*/
+    XGCValues gcVal;
+    gcVal.foreground = color;
+    XLOCK;
+    XChangeGC( display, Gc, GCForeground,  &gcVal );
+    XFillRectangle( display, Image, Gc, x, y, w, h );    
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Graphics::SetClipRegion( SkinRegion *rgn )
