@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.106 2001/06/27 06:29:59 gbazin Exp $
+ * $Id: main.c,v 1.107 2001/07/16 22:00:45 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -860,9 +860,9 @@ static void Usage( int i_fashion )
     /* Interface parameters */
     intf_MsgImm( "\nInterface parameters:"
         "\n  " INTF_METHOD_VAR "=<method name>        \tinterface method"
-        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>      \tinitialization script"
+        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>              \tinitialization script"
         "\n  " INTF_CHANNELS_VAR "=<filename>         \tchannels list"
-        "\n  " INTF_STDOUT_VAR "=<filename>       \tredirect console stdout" );
+        "\n  " INTF_STDOUT_VAR "=<filename>           \tredirect console stdout" );
 
     /* Audio parameters */
     intf_MsgImm( "\nAudio parameters:"

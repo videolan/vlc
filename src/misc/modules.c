@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.38 2001/07/11 02:01:05 sam Exp $
+ * $Id: modules.c,v 1.39 2001/07/16 22:00:45 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -141,6 +141,9 @@ void module_InitBank( void )
      * Store the symbols to be exported
      */
     STORE_SYMBOLS( &symbols );
+#ifdef TRACE
+    STORE_TRACE_SYMBOLS( &symbols );
+#endif
 
     /*
      * Check all the built-in modules

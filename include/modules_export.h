@@ -42,6 +42,10 @@ typedef struct module_symbols_s
     void ( * intf_ErrMsg )     ( char *, ... );
     void ( * intf_WarnMsg )    ( int, char *, ... );
     void ( * intf_WarnMsgImm ) ( int, char *, ... );
+#ifdef TRACE
+    void ( * intf_DbgMsg )     ( char *, char *, int, char *, ... );
+    void ( * intf_DbgMsgImm )  ( char *, char *, int, char *, ... );
+#endif
 
     int  ( * intf_PlaylistAdd )     ( struct playlist_s *, int, const char* );
     int  ( * intf_PlaylistDelete )  ( struct playlist_s *, int );
@@ -181,6 +185,10 @@ typedef struct module_symbols_s
     (p_symbols)->input_NetlistDeletePES = input_NetlistDeletePES; \
     (p_symbols)->input_NetlistEnd = input_NetlistEnd;
     
+#define STORE_TRACE_SYMBOLS( p_symbols ) \
+    (p_symbols)->intf_DbgMsg = _intf_DbgMsg; \
+    (p_symbols)->intf_DbgMsgImm = _intf_DbgMsgImm;
+
 #ifdef PLUGIN
 extern module_symbols_t* p_symbols;
 
@@ -204,6 +212,16 @@ extern module_symbols_t* p_symbols;
 #   define intf_ErrMsg p_symbols->intf_ErrMsg
 #   define intf_WarnMsg p_symbols->intf_WarnMsg
 #   define intf_WarnMsgImm p_symbols->intf_WarnMsgImm
+#ifdef TRACE
+#   undef  intf_DbgMsg
+#   undef  intf_DbgMsgImm
+#   define intf_DbgMsg( format, args... ) \
+    p_symbols->intf_DbgMsg( __FILE__, __FUNCTION__, \
+                            __LINE__, format, ## args )
+#   define intf_DbgMsgImm( format, args... ) \
+    p_symbols->intf_DbgMsgImm( __FILE__, __FUNCTION__, \
+                               __LINE__, format, ## args )
+#endif
 
 #   define intf_PlaylistAdd(a,b,c) p_symbols->intf_PlaylistAdd(a,b,c)
 #   define intf_PlaylistDelete(a,b) p_symbols->intf_PlaylistDelete(a,b)
