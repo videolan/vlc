@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.27 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_sdl.c,v 1.28 2002/05/31 21:37:42 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -133,7 +133,11 @@ static int aout_Open( aout_thread_t *p_aout )
     /* TODO: write conversion beetween AOUT_FORMAT_DEFAULT
      * AND AUDIO* from SDL. */
     desired.freq       = p_aout->i_rate;
+#ifdef WORDS_BIGENDIAN
+    desired.format     = AUDIO_S16MSB;                     /* stereo 16 bits */
+#else
     desired.format     = AUDIO_S16LSB;                     /* stereo 16 bits */
+#endif
     desired.channels   = p_aout->i_channels;
     desired.callback   = aout_SDLCallback;
     desired.userdata   = p_aout->p_sys;
@@ -173,7 +177,11 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     /*i_format = p_aout->i_format;*/
     desired.freq       = p_aout->i_rate;             /* Set the output rate */
+#ifdef WORDS_BIGENDIAN
+    desired.format     = AUDIO_S16MSB;                    /* stereo 16 bits */
+#else
     desired.format     = AUDIO_S16LSB;                    /* stereo 16 bits */
+#endif
     desired.channels   = p_aout->i_channels;
     desired.callback   = aout_SDLCallback;
     desired.userdata   = p_aout->p_sys;
