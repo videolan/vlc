@@ -66,6 +66,7 @@
     #include <A4Stuff.h>
 #endif
 
+#include "nscore.h"
 #include "jri.h"
 #include "npapi.h"
 

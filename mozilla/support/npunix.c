@@ -32,12 +32,16 @@
  *----------------------------------------------------------------------
  * PLUGIN DEVELOPERS:
  *  YOU WILL NOT NEED TO EDIT THIS FILE.
+ * TO NETSCAPE DEVELOPERS:
+ *  OF COURSE I WILL NEED TO EDIT THIS FILE, YOU BORKED IT ALL AROUND YOU
+ *  IGNORANT FOOLS -- sam
  *----------------------------------------------------------------------
  */
 
 #define XP_UNIX 1
 
 #include <stdio.h>
+#include "nscore.h"
 #include "npapi.h"
 #include "npupp.h"
 
@@ -367,7 +371,7 @@ NP_GetMIMEDescription(void)
  *    that the navigator needs.
  */
 NPError
-NP_GetValue(NPP future, NPPVariable variable, void *value)
+NP_GetValue(void *future, NPPVariable variable, void *value)
 {
     return NPP_GetValue(future, variable, value);
 }
