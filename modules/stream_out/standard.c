@@ -1,8 +1,8 @@
 /*****************************************************************************
- * standard.c
+ * standard.c: standard stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.17 2004/01/15 23:40:44 gbazin Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: standard.c,v 1.18 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -48,7 +48,7 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Standard stream") );
+    set_description( _("Standard stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "standard" );
     add_shortcut( "std" );
@@ -308,7 +308,6 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-
 static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;

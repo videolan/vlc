@@ -1,8 +1,8 @@
 /*****************************************************************************
- * transcode.c
+ * transcode.c: transcoding stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.71 2004/01/19 18:24:11 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: transcode.c,v 1.72 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -76,7 +76,7 @@ static int pi_channels_maps[6] =
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Transcode stream") );
+    set_description( _("Transcode stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );

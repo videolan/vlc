@@ -1,12 +1,12 @@
 /*****************************************************************************
- * transrate.c
+ * transrate.c: MPEG2 video transrating module
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
  * Copyright (C) 2003 Freebox S.A.
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: transrate.c,v 1.5 2003/11/29 18:36:13 massiot Exp $
+ * $Id: transrate.c,v 1.6 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -58,7 +58,7 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, sout_b
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Transrate stream") );
+    set_description( _("MPEG2 video transrating stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transrate" );
     set_callbacks( Open, Close );

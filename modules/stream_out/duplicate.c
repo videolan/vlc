@@ -1,8 +1,8 @@
 /*****************************************************************************
- * duplicate.c
+ * duplicate.c: duplicate stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.11 2004/01/19 18:15:55 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: duplicate.c,v 1.12 2004/01/25 14:34:25 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -45,13 +45,12 @@ static int               Send( sout_stream_t *, sout_stream_id_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Duplicate stream") );
+    set_description( _("Duplicate stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "duplicate" );
     add_shortcut( "dup" );
     set_callbacks( Open, Close );
 vlc_module_end();
-
 
 struct sout_stream_sys_t
 {
@@ -134,7 +133,6 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-
 static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
@@ -456,5 +454,3 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
     }
     return VLC_TRUE;
 }
-
-

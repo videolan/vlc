@@ -1,8 +1,8 @@
 /*****************************************************************************
- * rtp.c
+ * rtp.c: rtp stream output module
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: rtp.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: rtp.c,v 1.8 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,7 +40,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("RTP stream") );
+    set_description( _("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );
     set_callbacks( Open, Close );
@@ -51,8 +51,8 @@ vlc_module_end();
  *****************************************************************************/
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
-
+static int               Send( sout_stream_t *, sout_stream_id_t *,
+                               sout_buffer_t* );
 
 struct sout_stream_sys_t
 {
@@ -90,7 +90,9 @@ struct sout_stream_sys_t
     sout_stream_id_t **es;
 };
 
-typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
+typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
+                                    sout_buffer_t * );
+
 struct sout_stream_id_t
 {
     /* rtp field */
@@ -138,7 +140,8 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->i_port = atoi( val );
     }
-    if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' || p_sys->i_port <= 0 )
+    if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' ||
+        p_sys->i_port <= 0 )
     {
         msg_Err( p_stream, "invalid/missing dst or port" );
         free( p_sys );
@@ -199,7 +202,7 @@ static int Open( vlc_object_t *p_this )
             sprintf( access, "udp{raw}" );
         }
         sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
-        if( ( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) == NULL )
+        if( !( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) )
         {
             msg_Err( p_stream, "cannot create the access out for %s://%s",
                      access, url );
@@ -214,7 +217,8 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* the access out grabber TODO export it as sout_AccessOutGrabberNew */
-        p_grab = p_sys->p_grab = vlc_object_create( p_sout, sizeof( sout_access_out_t ) );
+        p_grab = p_sys->p_grab =
+            vlc_object_create( p_sout, sizeof( sout_access_out_t ) );
         p_grab->p_module    = NULL;
         p_grab->p_sout      = p_sout;
         p_grab->psz_access  = strdup( "grab" );
@@ -225,7 +229,7 @@ static int Open( vlc_object_t *p_this )
         p_grab->pf_write    = AccessOutGrabberWrite;
 
         /* the muxer */
-        if( ( p_sys->p_mux = sout_MuxNew( p_sout, val, p_sys->p_grab ) ) == NULL )
+        if( !( p_sys->p_mux = sout_MuxNew( p_sout, val, p_sys->p_grab ) ) )
         {
             msg_Err( p_stream, "cannot create the muxer (%s)", val );
             sout_AccessOutDelete( p_sys->p_grab );
@@ -233,10 +237,13 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        p_sout->i_preheader = __MAX( p_sout->i_preheader, p_sys->p_mux->i_preheader );
+        p_sout->i_preheader = __MAX( p_sout->i_preheader,
+                                     p_sys->p_mux->i_preheader );
 
         /* create the SDP only once */
-        p_sys->psz_sdp = malloc( 200 + 20 + 10 + strlen( p_sys->psz_destination ) + 10 + 10 + 10 + 10 + strlen( psz_rtpmap ) );
+        p_sys->psz_sdp =
+            malloc( 200 + 20 + 10 + strlen( p_sys->psz_destination ) +
+                    10 + 10 + 10 + 10 + strlen( psz_rtpmap ) );
         sprintf( p_sys->psz_sdp,
                  "v=0\n"
                  "o=- "I64Fd" %d IN IP4 127.0.0.1\n"
@@ -274,20 +281,20 @@ static int Open( vlc_object_t *p_this )
         vlc_UrlParse( &url, val, 0 );
         if( url.psz_protocol && !strcmp( url.psz_protocol, "http" ) )
         {
-            if( ( p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_stream), VLC_TRUE ) ) )
+            if( ( p_sys->p_httpd =
+                  httpd_Find( VLC_OBJECT(p_stream), VLC_TRUE ) ) )
             {
-                p_sys->p_httpd_host = p_sys->p_httpd->pf_register_host( p_sys->p_httpd,
-                                                                        url.psz_host,
-                                                                        url.i_port );
+                p_sys->p_httpd_host =
+                    p_sys->p_httpd->pf_register_host( p_sys->p_httpd,
+                                                      url.psz_host,
+                                                      url.i_port );
                 if( p_sys->p_httpd_host )
                 {
                     p_sys->p_httpd_file =
                         p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
-                                                          url.psz_path ? url.psz_path : "/",
-                                                          "application/sdp",
-                                                          NULL, NULL,
-                                                          HttpCallback, HttpCallback,
-                                                          (void*)p_sys );
+                            url.psz_path ? url.psz_path : "/",
+                            "application/sdp", NULL, NULL,
+                            HttpCallback, HttpCallback, (void*)p_sys );
                 }
             }
             if( p_sys->p_httpd_file == NULL )
@@ -297,7 +304,8 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            msg_Warn( p_stream, "unknow protocol for SDP (%s)", url.psz_protocol );
+            msg_Warn( p_stream, "unknow protocol for SDP (%s)",
+                      url.psz_protocol );
         }
         vlc_UrlClean( &url );
     }
@@ -336,11 +344,13 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->p_httpd_file )
     {
-        p_sys->p_httpd->pf_unregister_file( p_sys->p_httpd, p_sys->p_httpd_file );
+        p_sys->p_httpd->pf_unregister_file( p_sys->p_httpd,
+                                            p_sys->p_httpd_file );
     }
     if( p_sys->p_httpd_host )
     {
-        p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd, p_sys->p_httpd_host );
+        p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd,
+                                            p_sys->p_httpd_host );
     }
     if( p_sys->p_httpd )
     {
@@ -353,7 +363,6 @@ static void Close( vlc_object_t * p_this )
     }
     free( p_sys );
 }
-
 
 /*****************************************************************************
  * SDPGenerate
@@ -389,9 +398,11 @@ static void SDPGenerate( sout_stream_t *p_stream )
 
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\n", p_sys->i_sdp_id, p_sys->i_sdp_version );
+    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\n",
+                  p_sys->i_sdp_id, p_sys->i_sdp_version );
     p += sprintf( p, "s=NONE\n" );
-    p += sprintf( p, "c=IN IP4 %s/%d\n", p_sys->psz_destination, p_sys->i_ttl );
+    p += sprintf( p, "c=IN IP4 %s/%d\n", p_sys->psz_destination,
+                  p_sys->i_ttl );
 
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -413,11 +424,13 @@ static void SDPGenerate( sout_stream_t *p_stream )
         }
         if( id->psz_rtpmap )
         {
-            p += sprintf( p, "a=rtpmap:%d %s\n", id->i_payload_type, id->psz_rtpmap );
+            p += sprintf( p, "a=rtpmap:%d %s\n", id->i_payload_type,
+                          id->psz_rtpmap );
         }
         if( id->psz_fmtp )
         {
-            p += sprintf( p, "a=fmtp:%d %s\n", id->i_payload_type, id->psz_fmtp );
+            p += sprintf( p, "a=fmtp:%d %s\n", id->i_payload_type,
+                          id->psz_fmtp );
         }
     }
 
@@ -434,7 +447,6 @@ static void SDPGenerate( sout_stream_t *p_stream )
 /*****************************************************************************
  *
  *****************************************************************************/
-
 static int rtp_packetize_l16  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 static int rtp_packetize_l8   ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 static int rtp_packetize_mpa  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
@@ -456,7 +468,7 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
     s[2*i_data] = '\0';
 }
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_instance_t   *p_sout = p_stream->p_sout;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -516,7 +528,8 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
             {
                 id->i_payload_type = 11;
             }
-            else if( p_fmt->audio.i_channels == 2 && p_fmt->audio.i_rate == 44100 )
+            else if( p_fmt->audio.i_channels == 2 &&
+                     p_fmt->audio.i_rate == 44100 )
             {
                 id->i_payload_type = 10;
             }
@@ -525,14 +538,16 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
                 id->i_payload_type = p_sys->i_payload_type++;
             }
             id->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
-            sprintf( id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+            sprintf( id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
+                     p_fmt->audio.i_channels );
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l16;
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             id->i_payload_type = p_sys->i_payload_type++;
             id->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
-            sprintf( id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+            sprintf( id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
+                     p_fmt->audio.i_channels );
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
@@ -583,13 +598,15 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
             id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
             sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
             sprintf( id->psz_fmtp,
-                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; config=%s; "
-                     "SizeLength=13; IndexLength=3; IndexDeltaLength=3; Profile=1;", hexa );
+                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
+                     "config=%s; SizeLength=13; IndexLength=3; "
+                     "IndexDeltaLength=3; Profile=1;", hexa );
             break;
         }
 
         default:
-            msg_Err( p_stream, "cannot add this stream (unsupported codec:%4.4s)", (char*)&p_fmt->i_codec );
+            msg_Err( p_stream, "cannot add this stream (unsupported "
+                     "codec:%4.4s)", (char*)&p_fmt->i_codec );
             free( id );
             return NULL;
     }
@@ -623,7 +640,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
     return id;
 }
 
-static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -650,7 +667,8 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *p_buffer )
+static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+                 sout_buffer_t *p_buffer )
 {
     sout_buffer_t *p_next;
 
@@ -696,7 +714,8 @@ static int  HttpCallback( httpd_file_callback_args_t *p_args,
     return VLC_SUCCESS;
 }
 
-static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream, sout_buffer_t *p_buffer )
+static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
+                                        sout_buffer_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -707,7 +726,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream, sout_buffer_t *
     unsigned int    i_data  = p_buffer->i_size;
     unsigned int    i_max   = p_sys->i_mtu - 12;
 
-    int      i_packet = ( p_buffer->i_size + i_max - 1 ) / i_max;
+    int i_packet = ( p_buffer->i_size + i_max - 1 ) / i_max;
 
     while( i_data > 0 )
     {
@@ -760,7 +779,8 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream, sout_buffer_t *
     return VLC_SUCCESS;
 }
 
-static int AccessOutGrabberWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+static int AccessOutGrabberWrite( sout_access_out_t *p_access,
+                                  sout_buffer_t *p_buffer )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_access->p_sys;
 
@@ -781,9 +801,10 @@ static int AccessOutGrabberWrite( sout_access_out_t *p_access, sout_buffer_t *p_
 }
 
 
-static void rtp_packetize_common( sout_stream_id_t *id, sout_buffer_t *out, int b_marker, int64_t i_pts )
+static void rtp_packetize_common( sout_stream_id_t *id, sout_buffer_t *out,
+                                  int b_marker, int64_t i_pts )
 {
-    uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / (int64_t)1000000;
+    uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / I64C(1000000);
 
     out->p_buffer[0] = 0x80;
     out->p_buffer[1] = (b_marker?0x80:0x00)|id->i_payload_type;
@@ -803,7 +824,8 @@ static void rtp_packetize_common( sout_stream_id_t *id, sout_buffer_t *out, int 
     id->i_sequence++;
 }
 
-static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
+                              sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 4; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -841,7 +863,8 @@ static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id, sou
 }
 
 /* rfc2250 */
-static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
+                              sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 4; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -887,7 +910,8 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id, sou
                 i_temporal_ref = ( p[1] << 2) |((p[2]>>6)&0x03);
                 i_picture_coding_type = (p[2] >> 3)&0x07;
 
-                if( i_rest > 4 && ( i_picture_coding_type == 2 || i_picture_coding_type == 3 ) )
+                if( i_rest > 4 && ( i_picture_coding_type == 2 ||
+                                    i_picture_coding_type == 3 ) )
                 {
                     i_ffc = (p[3] >> 2)&0x01;
                     i_bfc = ((p[3]&0x03) << 1)|((p[4]>>7)&0x01);
@@ -908,7 +932,8 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id, sou
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 16 + i_payload );
+        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout,
+                                             16 + i_payload );
         uint32_t      h = ( i_temporal_ref << 16 )|
                           ( b_sequence_start << 13 )|
                           ( b_start_slice << 12 )|
@@ -939,7 +964,8 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id, sou
 
     return VLC_SUCCESS;
 }
-static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
+                              sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 2; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -975,7 +1001,8 @@ static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id, sou
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
+                                sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -990,7 +1017,8 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id, s
         sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
 
         /* rtp common header */
-        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0), (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_size   = 12 + i_payload;
@@ -1006,7 +1034,8 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id, s
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
+                              sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -1021,7 +1050,8 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id, sou
         sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
 
         /* rtp common header */
-        rtp_packetize_common( id, out, 0, (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        rtp_packetize_common( id, out, 0,
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_size   = 12 + i_payload;
@@ -1038,7 +1068,8 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id, sou
     return VLC_SUCCESS;
 }
 
-static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
+                             sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -1053,7 +1084,8 @@ static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id, sout
         sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
 
         /* rtp common header */
-        rtp_packetize_common( id, out, 0, (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        rtp_packetize_common( id, out, 0,
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_size   = 12 + i_payload;
@@ -1069,7 +1101,8 @@ static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id, sout
 
     return VLC_SUCCESS;
 }
-static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *in )
+static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
+                               sout_buffer_t *in )
 {
     int     i_max   = id->i_mtu - 16; /* payload max in one packet */
     int     i_count = ( in->i_size + i_max - 1 ) / i_max;
@@ -1084,7 +1117,8 @@ static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id, so
         sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 16 + i_payload );
 
         /* rtp common header */
-        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0), (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         /* AU headers */
         /* AU headers length (bits) */
         out->p_buffer[12] = 0;

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * display.c
+ * display.c: display stream output module
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.11 2003/12/10 23:51:05 gbazin Exp $
+ * $Id: display.c,v 1.12 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -47,7 +47,7 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Display stream") );
+    set_description( _("Display stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "display" );
     set_callbacks( Open, Close );
@@ -108,7 +108,6 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-
 static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
@@ -123,7 +122,6 @@ struct sout_stream_id_t
 {
     es_descriptor_t *p_es;
 };
-
 
 static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * es.c
+ * es.c: Elementary stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: es.c,v 1.4 2003/11/21 15:32:08 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: es.c,v 1.5 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -46,9 +46,8 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("ES stream") );
+    set_description( _("Elementary stream output") );
     set_capability( "sout stream", 50 );
-    add_shortcut( "es" );
     add_shortcut( "es" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -92,14 +91,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_access_audio = sout_cfg_find_value( p_stream->p_cfg, "access_audio" );
     p_sys->psz_access_video = sout_cfg_find_value( p_stream->p_cfg, "access_video" );
 
+    p_sys->psz_mux       = sout_cfg_find_value( p_stream->p_cfg, "mux" );
+    p_sys->psz_mux_audio = sout_cfg_find_value( p_stream->p_cfg, "mux_audio" );
+    p_sys->psz_mux_video = sout_cfg_find_value( p_stream->p_cfg, "mux_video" );
 
-    p_sys->psz_mux          = sout_cfg_find_value( p_stream->p_cfg, "mux" );
-    p_sys->psz_mux_audio    = sout_cfg_find_value( p_stream->p_cfg, "mux_audio" );
-    p_sys->psz_mux_video    = sout_cfg_find_value( p_stream->p_cfg, "mux_video" );
-
-    p_sys->psz_url         = sout_cfg_find_value( p_stream->p_cfg, "url" );
-    p_sys->psz_url_audio   = sout_cfg_find_value( p_stream->p_cfg, "url_audio" );
-    p_sys->psz_url_video   = sout_cfg_find_value( p_stream->p_cfg, "url_video" );
+    p_sys->psz_url       = sout_cfg_find_value( p_stream->p_cfg, "url" );
+    p_sys->psz_url_audio = sout_cfg_find_value( p_stream->p_cfg, "url_audio" );
+    p_sys->psz_url_video = sout_cfg_find_value( p_stream->p_cfg, "url_video" );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -128,7 +126,8 @@ struct sout_stream_id_t
     sout_mux_t   *p_mux;
 };
 
-static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count, char *psz_access, char *psz_mux )
+static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
+                            char *psz_access, char *psz_mux )
 {
     char *psz_url, *p;
 
@@ -186,7 +185,7 @@ static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count, c
     return( psz_url );
 }
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
@@ -227,14 +226,16 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
         psz_mux = p_sys->psz_mux;
     }
 
-    /* *** get url (%d expanded as a codec count, %c expanded as codec fcc ) *** */
+    /* Get url (%d expanded as a codec count, %c expanded as codec fcc ) */
     if( p_fmt->i_cat == AUDIO_ES && p_sys->psz_url_audio )
     {
-        psz_url = es_print_url( p_sys->psz_url_audio, p_fmt->i_codec, p_sys->i_count_audio, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url_audio, p_fmt->i_codec,
+                                p_sys->i_count_audio, psz_access, psz_mux );
     }
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->psz_url_video )
     {
-        psz_url = es_print_url( p_sys->psz_url_video, p_fmt->i_codec, p_sys->i_count_video, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url_video, p_fmt->i_codec,
+                                p_sys->i_count_video, psz_access, psz_mux );
     }
     else
     {
@@ -252,7 +253,8 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
             i_count = p_sys->i_count;
         }
 
-        psz_url = es_print_url( p_sys->psz_url, p_fmt->i_codec, i_count, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url, p_fmt->i_codec,
+                                i_count, psz_access, psz_mux );
     }
 
     p_sys->i_count++;
@@ -306,7 +308,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt
     return id;
 }
 
-static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
+static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_access_out_t *p_access = id->p_mux->p_access;
 
@@ -317,7 +319,8 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
     return VLC_SUCCESS;
 }
 
-static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_buffer_t *p_buffer )
+static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
+                 sout_buffer_t *p_buffer )
 {
     sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 

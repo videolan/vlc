@@ -1,8 +1,8 @@
 /*****************************************************************************
- * gather.c
+ * gather.c: gathering stream output module
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: gather.c,v 1.2 2003/11/21 15:32:08 fenrir Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: gather.c,v 1.3 2004/01/25 14:34:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Gather stream") );
+    set_description( _("Gathering stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "gather" );
     set_callbacks( Open, Close );
@@ -48,7 +48,8 @@ vlc_module_end();
  *****************************************************************************/
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *,
+                               sout_buffer_t* );
 
 struct sout_stream_id_t
 {
@@ -74,8 +75,8 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
 
-    p_stream->p_sys     = p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    p_sys->p_out        = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
+    p_stream->p_sys = p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    p_sys->p_out    = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
     if( p_sys->p_out == NULL )
     {
         free( p_sys );
@@ -192,4 +193,3 @@ static int Send( sout_stream_t *p_stream,
 
     return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
 }
-
