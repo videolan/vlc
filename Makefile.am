@@ -462,7 +462,15 @@ DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f $(srcdir)/vlc$(EXEEXT)
+if HAVE_BEOS
+	$(CXXLINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
+else
+if HAVE_DARWIN
+	$(CXXLINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
+else
 	$(LINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
+endif
+endif
 
 if HAVE_BEOS
 	xres -o $@ $(srcdir)/share/vlc_beos.rsrc
