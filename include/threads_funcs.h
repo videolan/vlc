@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads_funcs.h,v 1.1 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: threads_funcs.h,v 1.2 2002/04/29 23:57:38 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -704,13 +704,8 @@ static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
-#ifdef DEBUG
-#   define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
+#define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
         _vlc_thread_create( __FILE__, __LINE__, P_THREAD, PSZ_NAME, FUNC, P_DATA )
-#else
-#   define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
-        _vlc_thread_create( "(unknown)", 0, P_THREAD, PSZ_NAME, FUNC, P_DATA )
-#endif
 
 static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
                                           vlc_thread_t *p_thread,

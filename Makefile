@@ -474,7 +474,7 @@ gnome-vlc gvlc kvlc qvlc: vlc
 vlc.app: vlc plugins
 ifneq (,$(findstring darwin,$(SYS)))
 	rm -Rf vlc.app
-	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t'
+	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t' | grep -v "^$$"
 	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
 	$(INSTALL) -d vlc.app/Contents/MacOS/share
 	$(INSTALL) -d vlc.app/Contents/MacOS/plugins
