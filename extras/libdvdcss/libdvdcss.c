@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.3 2001/06/14 02:47:44 sam Exp $
+ * $Id: libdvdcss.c,v 1.4 2001/07/07 21:10:58 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,12 +64,12 @@ static int _dvdcss_readv ( dvdcss_handle, struct iovec *p_iovec, int i_blocks );
  * Local prototypes, win32 specific
  *****************************************************************************/
 #if defined( WIN32 )
-static int _win32_readv  ( int i_fd, struct iovec *p_iovec, int i_blocks );
-static int _win32_aopen  ( char c_drive, dvdcss_handle dvdcss );
-static int _win32_aclose ( int i_fd );
-static int _win32_aseek  ( int i_fd, off_t i_pos, int i_method );
-static int _win32_aread  ( int i_fd, void *p_data, int i_len );
-static int _win32_areadv ( int i_fd, struct iovec *p_iovec, int i_blocks );
+static int _win32_dvdcss_readv  ( int i_fd, struct iovec *p_iovec,
+                                  int i_num_buffers );
+static int _win32_dvdcss_aopen  ( char c_drive, dvdcss_handle dvdcss );
+static int _win32_dvdcss_aclose ( int i_fd );
+static int _win32_dvdcss_aseek  ( int i_fd, int i_blocks, int i_method );
+static int _win32_dvdcss_aread  ( int i_fd, void *p_data, int i_blocks );
 #endif
 
 /*****************************************************************************
@@ -302,7 +302,7 @@ static int _dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
     }
     else
     {
-        dvdcss->i_fd = _win32_aopen( psz_target[0], dvdcss );
+        dvdcss->i_fd = _win32_dvdcss_aopen( psz_target[0], dvdcss );
         if( dvdcss->i_fd == -1 )
         {
             _dvdcss_error( dvdcss, "failed opening device" );
@@ -333,7 +333,7 @@ static int _dvdcss_close ( dvdcss_handle dvdcss )
     }
     else
     {
-        _win32_aclose( dvdcss->i_fd );
+        _win32_dvdcss_aclose( dvdcss->i_fd );
     }
 #else
     close( dvdcss->i_fd );
@@ -344,128 +344,136 @@ static int _dvdcss_close ( dvdcss_handle dvdcss )
 
 static int _dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 {
-    off_t i_read;
 
 #if defined( WIN32 )
     if( WIN2K )
     {
-        i_read = SetFilePointer( (HANDLE) dvdcss->i_fd,
-                             (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE,
-                             NULL, FILE_BEGIN );
+        LARGE_INTEGER li_read;
+
+#ifndef INVALID_SET_FILE_POINTER
+#define INVALID_SET_FILE_POINTER ((DWORD)-1)
+#endif
+
+        li_read.QuadPart = (LONGLONG)i_blocks * DVDCSS_BLOCK_SIZE;
+
+        li_read.LowPart = SetFilePointer( (HANDLE) dvdcss->i_fd,
+                                          li_read.LowPart,
+                                          &li_read.HighPart, FILE_BEGIN );
+        if( (li_read.LowPart == INVALID_SET_FILE_POINTER)
+            && GetLastError() != NO_ERROR)
+        {
+            li_read.QuadPart = -DVDCSS_BLOCK_SIZE;
+        }
+
+        li_read.QuadPart /= DVDCSS_BLOCK_SIZE;
+        return (int)li_read.QuadPart;
     }
     else
     {
-        i_read = _win32_aseek( dvdcss->i_fd,
-                    (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE, SEEK_SET );
+        return ( _win32_dvdcss_aseek( dvdcss->i_fd, i_blocks, SEEK_SET ) );
     }
 #else
+    off_t i_read;
+
     i_read = lseek( dvdcss->i_fd,
                     (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE, SEEK_SET );
 
+    return i_read / DVDCSS_BLOCK_SIZE;
 #endif
 
-    return i_read / DVDCSS_BLOCK_SIZE;
 }
 
 static int _dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer, int i_blocks )
 {
-    off_t i_read;
+    int i_read;
 
 #if defined( WIN32 ) 
     if( WIN2K )
     {
-        if( ReadFile( (HANDLE) dvdcss->i_fd, p_buffer,
-                  (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE,
-                  &i_read, NULL ) == -1 )
+        if( !ReadFile( (HANDLE) dvdcss->i_fd, p_buffer,
+                  i_blocks * DVDCSS_BLOCK_SIZE,
+                  (LPDWORD)&i_read, NULL ) )
         {
-            return 0;
+            i_read = -DVDCSS_BLOCK_SIZE;
         }
+        return i_read / DVDCSS_BLOCK_SIZE;
     }
     else
     {
-        i_read = _win32_aread( dvdcss->i_fd, p_buffer,
-                   (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE );
+        i_read = _win32_dvdcss_aread( dvdcss->i_fd, p_buffer, i_blocks );
+        return i_read;
     }
 
 #else   
-    i_read = read( dvdcss->i_fd, p_buffer,
-                   (off_t)i_blocks * (off_t)DVDCSS_BLOCK_SIZE );
-
+    i_read = read( dvdcss->i_fd, p_buffer, (size_t)i_blocks * DVDCSS_BLOCK_SIZE );
+    return i_read / DVDCSS_BLOCK_SIZE;
 #endif
 
-    return i_read / DVDCSS_BLOCK_SIZE;
 }
 
 static int _dvdcss_readv ( dvdcss_handle dvdcss, struct iovec *p_iovec, int i_blocks )
 {
-    off_t i_read;
+    int i_read;
 
 #if defined( WIN32 )
-    if( WIN2K )
-    {
-        i_read = _win32_readv( dvdcss->i_fd, p_iovec, i_blocks );
-    }
-    else
-    {
-        i_read = _win32_areadv( dvdcss->i_fd, p_iovec, i_blocks );
-    }
+    i_read = _win32_dvdcss_readv( dvdcss->i_fd, p_iovec, i_blocks );
+    return i_read;
 #else
     i_read = readv( dvdcss->i_fd, p_iovec, i_blocks );
-#endif
-
     return i_read / DVDCSS_BLOCK_SIZE;
+#endif
 }
 
 #if defined( WIN32 )
 
 /*****************************************************************************
- * _win32_readv: vectored read using ReadFile instead of read
+ * _win32_dvdcss_readv: vectored read using ReadFile for Win2K and
+ *                      _win32_dvdcss_aread for win9x
  *****************************************************************************/
-static int _win32_readv( int i_fd, struct iovec *p_iovec, int i_blocks )
+static int _win32_dvdcss_readv( int i_fd, struct iovec *p_iovec,
+                                int i_num_buffers )
 {
     int i_index, i_len, i_total = 0;
     char *p_base;
+    int i_blocks;
 
-    for( i_index = i_blocks; i_index; i_index-- )
+    for( i_index = i_num_buffers; i_index; i_index-- )
     {
-        unsigned long i_bytes;
 
         i_len  = p_iovec->iov_len;
         p_base = p_iovec->iov_base;
 
-        /* Loop is unrolled one time to spare the (i_bytes < 0) test */
         if( i_len > 0 )
         {
-            if( !ReadFile( (HANDLE) i_fd, p_base, i_len, &i_bytes, NULL ) )
+            if( WIN2K )
             {
-                i_bytes = -1;
+                unsigned long int i_bytes;
+                if( !ReadFile( (HANDLE) i_fd, p_base, i_len, &i_bytes, NULL ) )
+                {
+                    return -1;
+                    /* One of the reads failed, too bad.
+                       We won't even bother returning the reads that went well,
+                       and like in the posix spec the file postition is left
+                       unspecified after a failure */
+                }
+                i_blocks = i_bytes / DVDCSS_BLOCK_SIZE;
+            }
+            else  /* Win9x */
+            {
+                i_blocks = _win32_dvdcss_aread( i_fd, p_base, i_len );
+                if( i_blocks < 0 )
+                {
+                    return -1;  /* idem */
+                }
             }
 
-            if( ( i_total == 0 ) && ( i_bytes < 0 ) )
+            if( i_blocks != (i_len / DVDCSS_BLOCK_SIZE) )
             {
-                return -1;
-            }
-
-            if( i_bytes <= 0 )
-            {
+                /* we reached the end of the file */
                 return i_total;
             }
 
-            i_len   -= i_bytes;
-            i_total += i_bytes;
-            p_base  += i_bytes;
-
-            while( i_len > 0 )
-            {
-                if( !ReadFile( (HANDLE) i_fd, p_base, i_len, &i_bytes, NULL ) )
-                {
-                    return i_total;
-                }
-
-                i_len   -= i_bytes;
-                i_total += i_bytes;
-                p_base  += i_bytes;
-            }
+            i_total += i_blocks;
         }
 
         p_iovec++;
@@ -475,9 +483,10 @@ static int _win32_readv( int i_fd, struct iovec *p_iovec, int i_blocks )
 }
 
 /*****************************************************************************
- * _win32_aopen: open dvd drive (load aspi and init w32_aspidev structure)
+ * _win32_dvdcss_aopen: open dvd drive (load aspi and init w32_aspidev
+ *                      structure)
  *****************************************************************************/
-static int _win32_aopen( char c_drive, dvdcss_handle dvdcss )
+static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
 {
     HMODULE hASPI;
     DWORD dwSupportInfo;
@@ -533,7 +542,7 @@ static int _win32_aopen( char c_drive, dvdcss_handle dvdcss )
         return -1;
     }
 
-    fd->i_pos = 0;
+    fd->i_blocks = 0;
     fd->hASPI = (long) hASPI;
     fd->lpSendCommand = lpSendCommand;
 
@@ -577,9 +586,10 @@ static int _win32_aopen( char c_drive, dvdcss_handle dvdcss )
 }
 
 /*****************************************************************************
- * _win32_aclose: close dvd drive (unload aspi and free w32_aspidev structure)
+ * _win32_dvdcss_aclose: close dvd drive (unload aspi and free w32_aspidev
+ *                       structure)
  *****************************************************************************/
-static int _win32_aclose( int i_fd )
+static int _win32_dvdcss_aclose( int i_fd )
 {
     struct w32_aspidev *fd = (struct w32_aspidev *) i_fd;
 
@@ -590,61 +600,50 @@ static int _win32_aclose( int i_fd )
 }
 
 /*****************************************************************************
- * _win32_aseek: aspi version of lseek
+ * _win32_dvdcss_aseek: aspi version of _dvdcss_seek
+ * 
+ * returns the number of blocks read.
  *****************************************************************************/
-static int _win32_aseek( int i_fd, off_t i_pos, int i_method )
+static int _win32_dvdcss_aseek( int i_fd, int i_blocks, int i_method )
 {
-    int i_oldpos;
-    char sz_buf[ 2048 ];
+    int i_old_blocks;
+    char sz_buf[ DVDCSS_BLOCK_SIZE ];
     struct w32_aspidev *fd = (struct w32_aspidev *) i_fd;
     
-    i_oldpos = fd->i_pos;
-    fd->i_pos = i_pos;
+    i_old_blocks = fd->i_blocks;
+    fd->i_blocks = i_blocks;
 
-    if( _win32_aread( i_fd, sz_buf, sizeof(sz_buf) ) == -1 )
+    if( _win32_dvdcss_aread( i_fd, sz_buf, 1 ) == -1 )
     {
-        fd->i_pos = i_oldpos;
+        fd->i_blocks = i_old_blocks;
         return -1;
     }
 
-    fd->i_pos -= sizeof(sz_buf);
+    (fd->i_blocks)--;
 
-    return fd->i_pos;
+    return fd->i_blocks;
 }
 
 /*****************************************************************************
- * _win32_aread: aspi version of read
+ * _win32_dvdcss_aread: aspi version of _dvdcss_read
+ *
+ * returns the number of blocks read.
  *****************************************************************************/
-static int _win32_aread( int i_fd, void *p_data, int i_len )
+static int _win32_dvdcss_aread( int i_fd, void *p_data, int i_blocks )
 {
     HANDLE hEvent;
-    char *p_buf = NULL;
     DWORD dwStart, dwLen;
     struct SRB_ExecSCSICmd ssc;
     struct w32_aspidev *fd = (struct w32_aspidev *) i_fd;
 
     memset( &ssc, 0, sizeof( ssc ) );
 
-    dwStart = fd->i_pos / 2048;
-    dwLen = ( i_len % 2048 ? ( i_len / 2048 ) + 1 : ( i_len / 2048 ) ) + 
-            (int)( fd->i_pos % 2048 ? 1 : 0 );
-
-    if( fd->i_pos % 2048 || i_len % 2048 )
-    {
-        p_buf = malloc( dwLen * 2048 );
-        if( p_buf == NULL )
-        {
-            return -1;
-        }
-    }
+    dwStart = fd->i_blocks;
+    dwLen = i_blocks;
 
     hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
     if( hEvent == NULL )
     {
-        if( p_buf != NULL )
-        {
-            free( p_buf );
-        }
         return -1;
     }
 
@@ -655,8 +654,8 @@ static int _win32_aread( int i_fd, void *p_data, int i_len )
     ssc.SRB_SenseLen    = SENSE_LEN;
     ssc.SRB_PostProc    = (LPVOID) hEvent;
 
-    ssc.SRB_BufLen      = dwLen * 2048;
-    ssc.SRB_BufPointer  = p_buf ? p_buf : p_data;
+    ssc.SRB_BufLen      = dwLen * DVDCSS_BLOCK_SIZE;
+    ssc.SRB_BufPointer  = p_data;
     ssc.SRB_CDBLen      = 12;
 
     ssc.CDBByte[0]      = 0xA8; /* RAW */
@@ -675,75 +674,14 @@ static int _win32_aread( int i_fd, void *p_data, int i_len )
 
     CloseHandle( hEvent );
 
-    if( p_buf != NULL )
-    {
-        memcpy( p_data, p_buf + ( fd->i_pos - ( dwStart * 2048 ) ), i_len );
-        free( p_buf );
-    }
-
     if(ssc.SRB_Status != SS_COMP)
     {
-		return -1;
-    }
-	
-    fd->i_pos += i_len;
-
-    return i_len;
-}
-
-/*****************************************************************************
- * _win32_areadv: aspi version of readv
- *****************************************************************************/
-static int _win32_areadv( int i_fd, struct iovec *p_iovec, int i_blocks )
-{
-    int i_index, i_len, i_total = 0;
-    char *p_base;
-
-    for( i_index = i_blocks; i_index; i_index-- )
-    {
-        register signed int i_bytes;
-
-        i_len  = p_iovec->iov_len;
-        p_base = p_iovec->iov_base;
-
-        /* Loop is unrolled one time to spare the (i_bytes < 0) test */
-        if( i_len > 0 )
-        {
-            i_bytes = _win32_aread( i_fd, p_base, i_len );
-
-            if( ( i_total == 0 ) && ( i_bytes < 0 ) )
-            {
                 return -1;
-            }
-
-            if( i_bytes <= 0 )
-            {
-                return i_total;
-            }
-
-            i_len   -= i_bytes;
-            i_total += i_bytes;
-            p_base  += i_bytes;
-
-            while( i_len > 0 )
-            {
-                i_bytes = _win32_aread( i_fd, p_base, i_len );
-                
-                if( i_bytes <= 0 )
-                {
-                    return i_total;
-                }
-
-                i_len   -= i_bytes;
-                i_total += i_bytes;
-                p_base  += i_bytes;
-            }
-        }
-
-        p_iovec++;
     }
+        
+    fd->i_blocks += i_blocks;
 
-    return i_total;
+    return i_blocks;
 }
 
 #endif

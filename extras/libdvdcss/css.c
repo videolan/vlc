@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.3 2001/06/29 11:34:28 stef Exp $
+ * $Id: css.c,v 1.4 2001/07/07 21:10:58 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,12 +36,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( WIN32 )
-#   include <io.h>
-#endif
 
 #include <string.h>
 
@@ -321,7 +315,7 @@ int CSSGetKey( dvdcss_handle dvdcss )
      */
     u8          pi_buf[0x800];
     dvd_key_t   pi_key;
-    off_t       i_pos;
+    int         i_pos;
     boolean_t   b_encrypted;
     boolean_t   b_stop_scanning;
     int         i_blocks_read;
@@ -338,7 +332,7 @@ int CSSGetKey( dvdcss_handle dvdcss )
     b_stop_scanning = 0;
 
     /* Position of the title on the disc */
-    i_pos = (off_t)dvdcss->css.i_title_pos;
+    i_pos = dvdcss->css.i_title_pos;
 
     do {
     i_pos = dvdcss_seek( dvdcss, i_pos );

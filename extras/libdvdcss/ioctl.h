@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.4 2001/06/25 11:34:08 sam Exp $
+ * $Id: ioctl.h,v 1.5 2001/07/07 21:10:58 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -192,10 +192,10 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT
 
 struct w32_aspidev
 {
-    long hASPI;
+    long  hASPI;
     short i_sid;
-    off_t i_pos;
-    long (*lpSendCommand)( void* );
+    int   i_blocks;
+    long  (*lpSendCommand)( void* );
 };
 
 #pragma pack(1)
