@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.43 2001/11/12 22:42:56 sam Exp $
+ * $Id: netutils.c,v 1.44 2001/11/12 23:56:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -292,6 +292,16 @@ int network_ChannelJoin( int i_channel )
     {
         intf_ErrMsg( "network error: unable to create vlcs socket (%s)",
                      strerror( errno ) );
+        return -1;
+    }
+
+    i_dummy = 1;
+    if( setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR,
+                    (void *) &i_dummy, sizeof( i_dummy ) ) == -1 )
+    {
+        intf_ErrMsg( "network error: can't SO_REUSEADDR vlcs socket (%s)",
+                     strerror(errno));
+        close( i_fd );
         return -1;
     }
 
