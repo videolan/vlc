@@ -34,7 +34,6 @@ typedef struct thread_dvd_data_s
     int                     i_fd;               // File descriptor of device
     boolean_t               b_encrypted;        // CSS encryption
     int                     i_read_once;        // NB of bytes read by DVDRead
-    int                     i_title;            // Current Title
 
     int                     i_start_byte;
     int                     i_start_cell;

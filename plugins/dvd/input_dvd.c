@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.13 2001/02/18 01:42:05 stef Exp $
+ * $Id: input_dvd.c,v 1.14 2001/02/19 03:12:26 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -74,6 +74,165 @@
 #include "modules.h"
 
 /*****************************************************************************
+ * Local tables
+ *****************************************************************************/
+static struct
+{
+	char    p_code[3];
+    char    p_lang_long[20];
+} lang_tbl[] =
+    {
+
+    /* The ISO 639 language codes.
+     * Language names with * prefix are not spelled in their own language 
+     */
+    	{"  ", "Not Specified"},
+    	{"aa", "*Afar"},
+    	{"ab", "*Abkhazian"},
+    	{"af", "*Afrikaans"},
+    	{"am", "*Amharic"},
+    	{"ar", "*Arabic"},
+    	{"as", "*Assamese"},
+    	{"ay", "*Aymara"},
+    	{"az", "*Azerbaijani"},
+    	{"ba", "*Bashkir"},
+    	{"be", "*Byelorussian"},
+    	{"bg", "*Bulgarian"},
+    	{"bh", "*Bihari"},
+    	{"bi", "*Bislama"},
+    	{"bn", "*Bengali; Bangla"},
+    	{"bo", "*Tibetan"},
+    	{"br", "*Breton"},
+    	{"ca", "*Catalan"},
+    	{"co", "*Corsican"},
+    	{"cs", "*Czech(Ceske)"},
+    	{"cy", "*Welsh"},
+    	{"da", "Dansk"},
+    	{"de", "Deutsch"},
+    	{"dz", "*Bhutani"},
+    	{"el", "*Greek"},
+    	{"en", "English"},
+    	{"eo", "*Esperanto"},
+    	{"es", "Espanol"},
+    	{"et", "*Estonian"},
+    	{"eu", "*Basque"},
+    	{"fa", "*Persian"},
+    	{"fi", "Suomi"},
+    	{"fj", "*Fiji"},
+    	{"fo", "*Faroese"},
+    	{"fr", "Francais"},
+    	{"fy", "*Frisian"},
+    	{"ga", "*Irish"},
+    	{"gd", "*Scots Gaelic"},
+    	{"gl", "*Galician"},
+    	{"gn", "*Guarani"},
+    	{"gu", "*Gujarati"},
+    	{"ha", "*Hausa"},
+    	{"he", "*Hebrew"},				// formerly iw
+    	{"hi", "*Hindi"},
+    	{"hr", "Hrvatski"},				// Croatian
+    	{"hu", "Magyar"},
+    	{"hy", "*Armenian"},
+    	{"ia", "*Interlingua"},
+    	{"id", "*Indonesian"},				// formerly in
+    	{"ie", "*Interlingue"},
+    	{"ik", "*Inupiak"},
+    	{"in", "*Indonesian"},				// replaced by id
+    	{"is", "Islenska"},
+    	{"it", "Italiano"},
+    	{"iu", "*Inuktitut"},
+    	{"iw", "*Hebrew"},				// replaced by he
+    	{"ja", "*Japanese"},
+    	{"ji", "*Yiddish"},				// replaced by yi
+    	{"jw", "*Javanese"},
+    	{"ka", "*Georgian"},
+    	{"kk", "*Kazakh"},
+    	{"kl", "*Greenlandic"},
+    	{"km", "*Cambodian"},
+    	{"kn", "*Kannada"},
+    	{"ko", "*Korean"},
+    	{"ks", "*Kashmiri"},
+    	{"ku", "*Kurdish"},
+    	{"ky", "*Kirghiz"},
+    	{"la", "*Latin"},
+    	{"ln", "*Lingala"},
+    	{"lo", "*Laothian"},
+    	{"lt", "*Lithuanian"},
+    	{"lv", "*Latvian, Lettish"},
+    	{"mg", "*Malagasy"},
+    	{"mi", "*Maori"},
+    	{"mk", "*Macedonian"},
+    	{"ml", "*Malayalam"},
+    	{"mn", "*Mongolian"},
+    	{"mo", "*Moldavian"},
+    	{"mr", "*Marathi"},
+    	{"ms", "*Malay"},
+    	{"mt", "*Maltese"},
+    	{"my", "*Burmese"},
+    	{"na", "*Nauru"},
+    	{"ne", "*Nepali"},
+    	{"nl", "Nederlands"},
+    	{"no", "Norsk"},
+    	{"oc", "*Occitan"},
+    	{"om", "*(Afan) Oromo"},
+    	{"or", "*Oriya"},
+    	{"pa", "*Punjabi"},
+    	{"pl", "*Polish"},
+    	{"ps", "*Pashto, Pushto"},
+    	{"pt", "Portugues"},
+    	{"qu", "*Quechua"},
+    	{"rm", "*Rhaeto-Romance"},
+    	{"rn", "*Kirundi"},
+    	{"ro", "*Romanian"},
+    	{"ru", "*Russian"},
+    	{"rw", "*Kinyarwanda"},
+    	{"sa", "*Sanskrit"},
+    	{"sd", "*Sindhi"},
+    	{"sg", "*Sangho"},
+    	{"sh", "*Serbo-Croatian"},
+    	{"si", "*Sinhalese"},
+    	{"sk", "*Slovak"},
+    	{"sl", "*Slovenian"},
+    	{"sm", "*Samoan"},
+    	{"sn", "*Shona"},
+    	{"so", "*Somali"},
+    	{"sq", "*Albanian"},
+    	{"sr", "*Serbian"},
+    	{"ss", "*Siswati"},
+    	{"st", "*Sesotho"},
+    	{"su", "*Sundanese"},
+    	{"sv", "Svenska"},
+    	{"sw", "*Swahili"},
+    	{"ta", "*Tamil"},
+    	{"te", "*Telugu"},
+    	{"tg", "*Tajik"},
+    	{"th", "*Thai"},
+    	{"ti", "*Tigrinya"},
+    	{"tk", "*Turkmen"},
+    	{"tl", "*Tagalog"},
+    	{"tn", "*Setswana"},
+    	{"to", "*Tonga"},
+    	{"tr", "*Turkish"},
+    	{"ts", "*Tsonga"},
+    	{"tt", "*Tatar"},
+    	{"tw", "*Twi"},
+    	{"ug", "*Uighur"},
+    	{"uk", "*Ukrainian"},
+    	{"ur", "*Urdu"},
+    	{"uz", "*Uzbek"},
+    	{"vi", "*Vietnamese"},
+    	{"vo", "*Volapuk"},
+    	{"wo", "*Wolof"},
+    	{"xh", "*Xhosa"},
+    	{"yi", "*Yiddish"},				// formerly ji
+    	{"yo", "*Yoruba"},
+    	{"za", "*Zhuang"},
+    	{"zh", "*Chinese"},
+    	{"zu", "*Zulu"},
+    	{"\0", ""}
+    };
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  DVDProbe    ( probedata_t *p_data );
@@ -105,6 +264,25 @@ void input_getfunctions( function_list_t * p_function_list )
     input.pf_rewind           = DVDRewind;
     input.pf_seek             = DVDSeek;
 #undef input
+}
+
+/*
+ * Local tools to decode some data in ifo
+ */
+
+/*****************************************************************************
+ * Language: gives the long language name from the two-letters ISO-639 code
+ *****************************************************************************/
+static char * Language( char * p_code )
+{
+    int     i = 0;
+
+    while( !memcmp( lang_tbl[i].p_code, p_code, 2 ) && lang_tbl[i].p_lang_long )
+    {
+        i++;
+    }
+
+    return lang_tbl[i].p_lang_long;
 }
 
 /*
@@ -160,147 +338,50 @@ static int DVDCheckCSS( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * DVDSetRegion: initialize input data for title x, chapter y. It should
- * be called for each user navigation request.
+ * DVDSetRegion: initialize input data for title x, chapter y.
+ * It should be called for each user navigation request, and to change
+ * audio or sub-picture streams.
+ * ---
+ * Take care that i_title and i_chapter start from 0.
  *****************************************************************************/
-static int DVDSetRegion( int i_title, int i_chapter )
-{
-    return 0;
-}
-
-
-/*****************************************************************************
- * DVDInit: initializes DVD structures
- *****************************************************************************/
-static void DVDInit( input_thread_t * p_input )
+static int DVDSetRegionParameters( input_thread_t * p_input,
+                                   int i_title, int i_chapter,
+                                   int i_audio, int i_spu )
 {
     thread_dvd_data_t *  p_method;
     off_t                i_start;
     off_t                i_size;
-    int                  i_cell, i_cell_1, i_start_cell, i_end_cell;
+    pgc_t *              p_pgc;
+    int                  i_start_cell;
+    int                  i_end_cell;
+    int                  i_index;
+    int                  i_cell;
+    
 
-    if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
+    p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
 
-    p_input->p_plugin_data = (void *)p_method;
-    p_input->p_method_data = NULL;
+    /* Set selected title start and size */
+    p_input->stream.i_title = i_title;
 
-    p_method->i_fd = p_input->i_handle;
-    /* FIXME: read several packets once */
-    p_method->i_read_once = 1; 
-    p_method->b_encrypted = DVDCheckCSS( p_input );
+    p_pgc = &p_method->ifo.p_vts[i_title].pgci_ti.p_srp[0].pgc;
 
-    lseek( p_input->i_handle, 0, SEEK_SET );
+    /* Find cell index in Program chain */
+    i_index = p_pgc->prg_map.pi_entry_cell[i_chapter] - 1;
 
-    /* Reading structures initialisation */
-    input_NetlistInit( p_input, 4096, 4096, DVD_LB_SIZE,
-                       p_method->i_read_once ); 
-
-    /* Ifo initialisation */
-    p_method->ifo = IfoInit( p_input->i_handle );
-
-    /* FIXME: kludge */
-    p_method->i_title = p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb;
-
-    /* CSS initialisation */
-    if( p_method->b_encrypted )
-    {
-
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-        p_method->css = CSSInit( p_input->i_handle );
-
-        if( ( p_input->b_error = p_method->css.b_error ) )
-        {
-            intf_ErrMsg( "CSS fatal error" );
-            return;
-        }
-#else
-        intf_ErrMsg( "Unscrambling not supported" );
-        p_input->b_error = 1;
-        return;
-#endif
-    }
-
-    /* Ifo structures reading */
-    IfoRead( &(p_method->ifo) );
-    intf_WarnMsg( 3, "Ifo: Initialized" );
-
-    /* CSS title keys decryption */
-    if( p_method->b_encrypted )
-    {
-
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-        int   i;
-
-        p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
-
-        if( (p_method->css.p_title_key =
-            malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
-        {
-            intf_ErrMsg( "Out of memory" );
-            p_input->b_error = 1;
-            return;
-        }
-
-        for( i=0 ; i<p_method->css.i_title_nb ; i++ )
-        {
-            p_method->css.p_title_key[i].i =
-                p_method->ifo.p_vts[i].i_pos +
-                p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector * DVD_LB_SIZE;
-        }
-
-        CSSGetKeys( &(p_method->css) );
-
-        intf_WarnMsg( 3, "CSS: initialized" );
-#else
-        intf_ErrMsg( "Unscrambling not supported" );
-        p_input->b_error = 1;
-        return;
-#endif
-    }
-
-    /* FIXME: Kludge beginning and end of the stream in vts_01_1.vob */
-
-    /* Determines which vob contains the movie */
+    /* Search for cell_index in cell adress_table */
     i_cell = 0;
-    i_cell_1 = 0;
-    i_start_cell = 0;
-    i_end_cell = 0;
-
-    /* Loop on the number of vobs */
-    while( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell].i_vob_id <=
-           p_method->ifo.p_vts[p_method->i_title].c_adt.i_vob_nb )
+    while( p_pgc->p_cell_pos_inf[i_index].i_vob_id >
+           p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_cell].i_vob_id )
     {
-        i_cell_1 = i_cell;
-
-        /* Loop to find the number of cells in the vob */
-        do
-        {
-            i_cell++;
-            if( i_cell >= p_method->ifo.p_vts[p_method->i_title].c_adt.i_cell_nb )
-            {
-                break;
-            }
-        }
-        while( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell-1].i_cell_id <
-               p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell].i_cell_id );
-
-
-        if( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell-1].i_cell_id >
-            p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_end_cell].i_cell_id )
-        {
-            i_start_cell = i_cell_1;
-            i_end_cell = i_cell - 1;
-        }
+        i_cell++;
     }
-
-    /* The preceding does not work with all DVD, so we give the
-     * last cell of the title as end */
-    i_end_cell = p_method->ifo.p_vts[p_method->i_title].c_adt.i_cell_nb - 1;
+    while( p_pgc->p_cell_pos_inf[i_index].i_cell_id >
+           p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_cell].i_cell_id )
+    {
+        i_cell++;
+    }
+    i_start_cell = i_cell;
+    i_end_cell = i_start_cell + p_pgc->i_cell_nb - 1;
 
     intf_WarnMsg( 2, "DVD: Start cell: %d End Cell: %d",
                                             i_start_cell, i_end_cell );
@@ -309,24 +390,19 @@ static void DVDInit( input_thread_t * p_input )
     p_method->i_end_cell = i_end_cell;
 
     /* start is : beginning of vts + offset to vobs + offset to vob x */
-    i_start = p_method->ifo.p_vts[p_method->i_title].i_pos + DVD_LB_SIZE *
-            ( p_method->ifo.p_vts[p_method->i_title].mat.i_tt_vobs_ssector +
-              p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_start_cell].i_ssector );
+    i_start = p_method->ifo.p_vts[i_title].i_pos + DVD_LB_SIZE *
+            ( p_method->ifo.p_vts[i_title].mat.i_tt_vobs_ssector +
+              p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_start_cell].i_ssector );
     p_method->i_start_byte = i_start;
                                                     
     i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
     intf_WarnMsg( 3, "DVD: VOBstart at: %lld", i_start );
 
     i_size = (off_t)
-        ( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_end_cell].i_esector -
-          p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
+        ( p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_end_cell].i_esector -
+          p_method->ifo.p_vts[i_title].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
         *DVD_LB_SIZE;
     intf_WarnMsg( 3, "DVD: stream size: %lld", i_size );
-
-
-    /* Initialize ES structures */
-    input_InitStream( p_input, sizeof( stream_ps_data_t ) );
-    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
     if( p_input->stream.b_seekable )
     {
@@ -467,7 +543,115 @@ static void DVDInit( input_thread_t * p_input )
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
+  
 
+    return 0;
+}
+
+/*****************************************************************************
+ * DVDInit: initializes DVD structures
+ *****************************************************************************/
+static void DVDInit( input_thread_t * p_input )
+{
+    thread_dvd_data_t *  p_method;
+
+    if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
+    {
+        intf_ErrMsg( "Out of memory" );
+        p_input->b_error = 1;
+        return;
+    }
+
+    p_input->p_plugin_data = (void *)p_method;
+    p_input->p_method_data = NULL;
+
+    p_method->i_fd = p_input->i_handle;
+    /* FIXME: read several packets once */
+    p_method->i_read_once = 1; 
+    p_method->b_encrypted = DVDCheckCSS( p_input );
+
+    lseek( p_input->i_handle, 0, SEEK_SET );
+
+    /* Reading structures initialisation */
+    input_NetlistInit( p_input, 4096, 4096, DVD_LB_SIZE,
+                       p_method->i_read_once ); 
+
+    /* Ifo initialisation */
+    p_method->ifo = IfoInit( p_input->i_handle );
+
+    /* CSS initialisation */
+    if( p_method->b_encrypted )
+    {
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+        p_method->css = CSSInit( p_input->i_handle );
+
+        if( ( p_input->b_error = p_method->css.b_error ) )
+        {
+            intf_ErrMsg( "CSS fatal error" );
+            return;
+        }
+#else
+        intf_ErrMsg( "Unscrambling not supported" );
+        p_input->b_error = 1;
+        return;
+#endif
+    }
+
+    /* Ifo structures reading */
+    IfoRead( &(p_method->ifo) );
+    intf_WarnMsg( 3, "Ifo: Initialized" );
+
+    /* CSS title keys decryption */
+    if( p_method->b_encrypted )
+    {
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+        int   i;
+
+        p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+
+        if( (p_method->css.p_title_key =
+            malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
+        {
+            intf_ErrMsg( "Out of memory" );
+            p_input->b_error = 1;
+            return;
+        }
+
+        for( i=0 ; i<p_method->css.i_title_nb ; i++ )
+        {
+            p_method->css.p_title_key[i].i =
+                p_method->ifo.p_vts[i].i_pos +
+                p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector * DVD_LB_SIZE;
+        }
+
+        CSSGetKeys( &(p_method->css) );
+
+        intf_WarnMsg( 3, "CSS: initialized" );
+#else
+        intf_ErrMsg( "Unscrambling not supported" );
+        p_input->b_error = 1;
+        return;
+#endif
+    }
+
+    /* Initialize ES structures */
+    input_InitStream( p_input, sizeof( stream_ps_data_t ) );
+    input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+
+    /* Set stream data */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* By default, set all parameters to 0 */
+    /* FIXME: wrong kludge to get title nb */
+    DVDSetRegionParameters( p_input, 
+                            p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb - 1,
+                            0, 0, 0 );
+
+    return;
 }
 
 /*****************************************************************************
@@ -522,7 +706,7 @@ static int DVDRead( input_thread_t * p_input,
         for( i=0 ; i<p_method->i_read_once ; i++ )
         {
             CSSDescrambleSector(
-                        p_method->css.p_title_key[p_method->i_title].key, 
+                        p_method->css.p_title_key[p_input->stream.i_title].key, 
                         p_vec[i].iov_base );
             ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
         }

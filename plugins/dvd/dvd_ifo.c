@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.9 2001/02/18 01:42:05 stef Exp $
+ * $Id: dvd_ifo.c,v 1.10 2001/02/19 03:12:26 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -345,7 +345,7 @@ static pgc_t ReadPGC( ifo_t* p_ifo )
         p_ifo->i_pos = lseek( p_ifo->i_fd, i_start
                             + pgc.i_cell_pos_inf_sbyte, SEEK_SET );
         pgc.p_cell_pos_inf = malloc( pgc.i_cell_nb *sizeof(cell_pos_inf_t) );
-        if( pgc.p_cell_play_inf == NULL )
+        if( pgc.p_cell_pos_inf == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             p_ifo->b_error = 1;

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.20 2001/02/16 06:37:09 sam Exp $
+ * $Id: input_ext-intf.h,v 1.21 2001/02/19 03:12:26 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -153,6 +153,16 @@ typedef struct stream_descriptor_s
                                                  * (in arbitrary units) */
     off_t                   i_seek;         /* next requested location (changed
                                              * by the interface thread */
+
+    /* For DVD streams: */
+    int                     i_title_nb;
+    int *                   pi_chapter;  /* Number of chapter for each title */
+    char **                 ppsz_audio;  /* Audio language names */
+    char **                 ppsz_spu;    /* Sub-pictures names */
+    int                     i_title;     /* selected title */
+    int                     i_chapter;   /* selected chapter */
+    int                     i_audio;     /* selected audio stream */
+    int                     i_spu;       /* selected spu */
 
     /* New status and rate requested by the interface */
     int                     i_new_status, i_new_rate;
