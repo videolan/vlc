@@ -3409,7 +3409,7 @@ fi
 rm -f conftest*
 
 
-PLUGINS=${PLUGINS}"yuv idct idctclassic motion ";
+PLUGINS=${PLUGINS}"ps ts dvd yuv idct idctclassic motion ";
 
 ARCH=${host_cpu}
 # Check whether --enable-ppro or --disable-ppro was given.

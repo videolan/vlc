@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.31 2001/02/08 01:34:42 stef Exp $
+ * $Id: mpeg_system.c,v 1.32 2001/02/08 04:43:28 sam Exp $
  *
  * Authors: 
  *
@@ -134,7 +134,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             != PES_HEADER_SIZE )
     {
         intf_WarnMsg( 3, "PES packet too short to have a header" );
-        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+        p_input->pf_delete_pes( p_input->p_method_data, p_pes );
         p_pes = NULL;
         return;
     }
@@ -148,7 +148,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     {
         /* packet_start_code_prefix != 0x000001 */
         intf_ErrMsg( "PES packet doesn't start with 0x000001 : data loss" );
-        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+        p_input->pf_delete_pes( p_input->p_method_data, p_pes );
         p_pes = NULL;
     }
     else
@@ -194,8 +194,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 {
                     intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-2 header" );
-                    p_input->p_plugin->pf_delete_pes( p_input->p_method_data,
-                                                      p_pes );
+                    p_input->pf_delete_pes( p_input->p_method_data,
+                                            p_pes );
                     p_pes = NULL;
                     return;
                 }
@@ -211,9 +211,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-2 header" );
-                        p_input->p_plugin->pf_delete_pes(
-                                                      p_input->p_method_data,
-                                                      p_pes );
+                        p_input->pf_delete_pes( p_input->p_method_data,
+                                                p_pes );
                         p_pes = NULL;
                         return;
                     }
@@ -228,9 +227,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         {
                             intf_WarnMsg( 3,
                               "PES packet too short to have a MPEG-2 header" );
-                            p_input->p_plugin->pf_delete_pes(
-                                    p_input->p_method_data,
-                                    p_pes );
+                            p_input->pf_delete_pes( p_input->p_method_data,
+                                                    p_pes );
                             p_pes = NULL;
                             return;
                         }
@@ -260,7 +258,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-1 header" );
-                        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                        p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
                         return;
                     }
@@ -268,7 +266,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 if( i_pes_header_size == 22 )
                 {
                     intf_ErrMsg( "Too much MPEG-1 stuffing" );
-                    p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                    p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                     p_pes = NULL;
                     return;
                 }
@@ -284,7 +282,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-1 header" );
-                        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                        p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
                         return;
                     }
@@ -304,8 +302,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         intf_WarnMsg( 3,
                             "PES packet too short to have a MPEG-1 header" );
-                        p_input->p_plugin->pf_delete_pes(
-                                            p_input->p_method_data, p_pes );
+                        p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
                         return;
                     }
@@ -322,8 +319,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         {
                             intf_WarnMsg( 3,
                               "PES packet too short to have a MPEG-1 header" );
-                            p_input->p_plugin->pf_delete_pes(
-                                    p_input->p_method_data, p_pes );
+                            p_input->pf_delete_pes( p_input->p_method_data,
+                                                    p_pes );
                             p_pes = NULL;
                             return;
                         }
@@ -363,8 +360,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             if( (p_data = p_data->p_next) == NULL )
             {
                 intf_ErrMsg( "PES header bigger than payload" );
-                p_input->p_plugin->pf_delete_pes( p_input->p_method_data,
-                                                  p_pes );
+                p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                 p_pes = NULL;
                 return;
             }
@@ -375,7 +371,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( i_payload_size < i_pes_header_size )
         {
             intf_ErrMsg( "PES header bigger than payload" );
-            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+            p_input->pf_delete_pes( p_input->p_method_data, p_pes );
             p_pes = NULL;
             return;
         }
@@ -391,7 +387,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             intf_ErrMsg("No fifo to receive PES %p (who wrote this damn code ?)",
                         p_pes);
-            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+            p_input->pf_delete_pes( p_input->p_method_data, p_pes );
         }
         p_pes = NULL;
     }
@@ -431,7 +427,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
     if( !b_unit_start && p_pes == NULL )
     {
         /* Random access... */
-        p_input->p_plugin->pf_delete_packet( p_input->p_method_data, p_data );
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
     }
     else
     {
@@ -442,7 +438,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
              * packet. This is also here that we can synchronize with the
              * stream if we lost packets or if the decoder has just
              * started. */
-            if( (p_pes = p_input->p_plugin->pf_new_pes( p_input->p_method_data ) ) == NULL )
+            if( (p_pes = p_input->pf_new_pes( p_input->p_method_data ) ) == NULL )
             {
                 intf_ErrMsg("Out of memory");
                 p_input->b_error = 1;
@@ -859,7 +855,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
-        p_input->p_plugin->pf_delete_packet( p_input->p_method_data, p_data );
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
 #ifdef STATS
         p_input->c_packets_trashed++;
 #endif
@@ -1051,7 +1047,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
     {
-        p_input->p_plugin->pf_delete_packet( p_input, p_data );
+        p_input->pf_delete_packet( p_input, p_data );
 #ifdef STATS
         p_input->c_packets_trashed++;
 #endif

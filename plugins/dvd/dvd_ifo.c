@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.7 2001/02/08 01:34:41 stef Exp $
+ * $Id: dvd_ifo.c,v 1.1 2001/02/08 04:43:27 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *

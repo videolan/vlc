@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.3 2001/01/05 18:46:44 massiot Exp $
+ * $Id: input_ts.c,v 1.1 2001/02/08 04:43:27 sam Exp $
  *
  * Authors: 
  *
@@ -34,6 +34,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
+#include "modules.h"
 
 #include "intf_msg.h"
 
@@ -49,17 +51,45 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  TSProbe     ( struct input_thread_s * );
+static int  TSProbe     ( probedata_t * );
 static int  TSRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
 static void TSInit      ( struct input_thread_s * );
 static void TSEnd       ( struct input_thread_s * );
 
 /*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void input_getfunctions( function_list_t * p_function_list )
+{
+#define input p_function_list->functions.input
+    p_function_list->pf_probe = TSProbe;
+    input.pf_init             = TSInit;
+    input.pf_open             = input_FileOpen;
+    input.pf_close            = input_FileClose;
+    input.pf_end              = TSEnd;
+    input.pf_read             = TSRead;
+    input.pf_demux            = input_DemuxTS;
+    input.pf_new_packet       = input_NetlistNewPacket;
+    input.pf_new_pes          = input_NetlistNewPES;
+    input.pf_delete_packet    = input_NetlistDeletePacket;
+    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_rewind           = NULL;
+    input.pf_seek             = NULL;
+#undef input
+}
+
+/*****************************************************************************
  * TSProbe: verifies that the stream is a TS stream
  *****************************************************************************/
-static int TSProbe( input_thread_t * p_input )
+static int TSProbe( probedata_t * p_data )
 {
+    if( TestMethod( INPUT_METHOD_VAR, "ts" ) )
+    {
+        return( 999 );
+    }
+
     /* verify that the first byte is 0x47 */
     return 1;
 }
@@ -90,28 +120,5 @@ static int TSRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
     return -1;
-}
-
-/*****************************************************************************
- * TSKludge: fakes a TS plugin (FIXME)
- *****************************************************************************/
-input_capabilities_t * TSKludge( void )
-{
-    input_capabilities_t *  p_plugin;
-
-    p_plugin = (input_capabilities_t *)malloc( sizeof(input_capabilities_t) );
-    p_plugin->pf_probe = TSProbe;
-    p_plugin->pf_init = TSInit;
-    p_plugin->pf_end = TSEnd;
-    p_plugin->pf_read = TSRead;
-    p_plugin->pf_demux = input_DemuxTS; /* FIXME: use i_p_config_t ! */
-    p_plugin->pf_new_packet = input_NetlistNewPacket;
-    p_plugin->pf_new_pes = input_NetlistNewPES;
-    p_plugin->pf_delete_packet = input_NetlistDeletePacket;
-    p_plugin->pf_delete_pes = input_NetlistDeletePES;
-    p_plugin->pf_rewind = NULL;
-    p_plugin->pf_seek = NULL;
-
-    return( p_plugin );
 }
 

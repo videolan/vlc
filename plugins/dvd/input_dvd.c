@@ -1,10 +1,10 @@
 /*****************************************************************************
- * input_ps.c: PS demux and packet management
+ * input_dvd.c: DVD reading
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.22 2001/02/07 15:32:26 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input_dvd.c,v 1.1 2001/02/08 04:43:27 sam Exp $
  *
- * Authors: 
+ * Author: Stéphane Borel <stef@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,31 @@
  *****************************************************************************/
 #include "defs.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <netinet/in.h>
+
+#include <fcntl.h>
+#include <sys/types.h>
+
 #include <string.h>
 #include <errno.h>
+#include <malloc.h>
+
+#include <sys/ioctl.h>
+#ifdef HAVE_SYS_DVDIO_H
+# include <sys/dvdio.h>
+#endif
+#ifdef LINUX_DVD
+# include <linux/cdrom.h>
+#endif
 
 #include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "intf_msg.h"
 
@@ -44,23 +61,56 @@
 #include "input_ext-dec.h"
 
 #include "input.h"
-
-#include "input_ps.h"
+#include "dvd_ifo.h"
+#include "dvd_css.h"
+#include "input_dvd.h"
 #include "mpeg_system.h"
 
 #include "debug.h"
 
+#include "modules.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  PSProbe     ( struct input_thread_s * );
-static int  PSRead      ( struct input_thread_s *,
+static int  DVDProbe    ( probedata_t *p_data );
+static int  DVDCheckCSS ( struct input_thread_s * );
+static int  DVDRead     ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
-static void PSInit      ( struct input_thread_s * );
-static void PSEnd       ( struct input_thread_s * );
+static void DVDInit     ( struct input_thread_s * );
+static void DVDOpen     ( struct input_thread_s * );
+static void DVDClose    ( struct input_thread_s * );
+static void DVDEnd      ( struct input_thread_s * );
+/* FIXME : DVDSeek should be on 64 bits ? Is it possible in input ? */
+static int  DVDSeek     ( struct input_thread_s *, off_t );
+static int  DVDRewind   ( struct input_thread_s * );
 static struct data_packet_s * NewPacket ( void *, size_t );
+static pes_packet_t * NewPES( void * p_garbage );
 static void DeletePacket( void *, struct data_packet_s * );
 static void DeletePES   ( void *, struct pes_packet_s * );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void input_getfunctions( function_list_t * p_function_list )
+{
+#define input p_function_list->functions.input
+    p_function_list->pf_probe = DVDProbe;
+    input.pf_init             = DVDInit;
+    input.pf_open             = DVDOpen;
+    input.pf_close            = DVDClose;
+    input.pf_end              = DVDEnd;
+    input.pf_read             = DVDRead;
+    input.pf_demux            = input_DemuxPS;
+    input.pf_new_packet       = NewPacket;
+    input.pf_new_pes          = NewPES;
+    input.pf_delete_packet    = DeletePacket;
+    input.pf_delete_pes       = DeletePES;
+    input.pf_rewind           = NULL;
+    input.pf_seek             = NULL;
+#undef input
+}
 
 /*
  * Data reading functions
@@ -69,22 +119,48 @@ static void DeletePES   ( void *, struct pes_packet_s * );
 /*****************************************************************************
  * PSProbe: verifies that the stream is a PS stream
  *****************************************************************************/
-static int PSProbe( input_thread_t * p_input )
+static int DVDProbe( probedata_t *p_data )
 {
-    /* verify that the first three bytes are 0x000001, or unscramble and
-     * re-do. */
-    return 1;
+    if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
+    {
+        return( 999 );
+    }
+
+    return 5;
 }
 
 /*****************************************************************************
- * PSInit: initializes PS structures
+ * DVDCheckCSS: check the stream
  *****************************************************************************/
-static void PSInit( input_thread_t * p_input )
+static int DVDCheckCSS( input_thread_t * p_input )
 {
-    thread_ps_data_t *  p_method;
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    dvd_struct dvd;
 
-    if( (p_method =
-         (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) )) == NULL )
+    dvd.type = DVD_STRUCT_COPYRIGHT;
+    dvd.copyright.layer_num = 0;
+
+    if( ioctl( p_input->i_handle, DVD_READ_STRUCT, &dvd ) < 0 )
+    {
+        intf_ErrMsg( "DVD ioctl error" );
+        return -1;
+    }
+
+    return dvd.copyright.cpst;
+#else
+    return 0;
+#endif
+}
+
+/*****************************************************************************
+ * DVDInit: initializes DVD structures
+ *****************************************************************************/
+static void DVDInit( input_thread_t * p_input )
+{
+    thread_dvd_data_t *  p_method;
+    off64_t              i_start;
+
+    if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
@@ -94,16 +170,50 @@ static void PSInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_method;
     p_input->p_method_data = NULL;
 
-    /* Re-open the socket as a buffered FILE stream */
-    if( (p_method->stream = fdopen( p_input->i_handle, "r" )) == NULL )
-    {
-        intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
-        p_input->b_error = 1;
-        return;
-    }
-    fseek( p_method->stream, 0, SEEK_SET );
+    p_method->i_fd = p_input->i_handle;
 
-    /* FIXME : detect if InitStream failed */
+
+    lseek64( p_input->i_handle, 0, SEEK_SET );
+
+    /* Ifo initialisation */
+    p_method->ifo = IfoInit( p_input->i_handle );
+    IfoRead( &(p_method->ifo) );
+    intf_Msg( "Ifo: Initialized" );
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    /* CSS authentication and keys */
+    if( ( p_method->b_encrypted = DVDCheckCSS( p_input ) ) )
+    {
+        int   i;
+
+        p_method->css = CSSInit( p_input->i_handle );
+        p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
+        if( (p_method->css.p_title_key =
+             malloc( p_method->css.i_title_nb *
+                     sizeof(p_method->css.p_title_key) ) ) == NULL )
+        {
+            intf_ErrMsg( "Out of memory" );
+            p_input->b_error = 1;
+            return;
+        }
+        for( i=0 ; i<p_method->css.i_title_nb ; i++ )
+        {
+            p_method->css.p_title_key[i].i =
+                    p_method->ifo.p_vts[i].i_pos +
+                    p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+        }
+        CSSGetKeys( &(p_method->css) );
+        intf_Msg( "CSS: Initialized" );
+    }
+#endif
+
+    i_start = p_method->ifo.p_vts[0].i_pos +
+              p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+
+    i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
+    intf_Msg( "VOB start at : %lld", (long long)i_start );
+
+#if 1
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
@@ -122,7 +232,7 @@ static void PSInit( input_thread_t * p_input )
             int                 i_result, i;
             data_packet_t *     pp_packets[INPUT_READ_ONCE];
 
-            i_result = PSRead( p_input, pp_packets );
+            i_result = DVDRead( p_input, pp_packets );
             if( i_result == 1 )
             {
                 /* EOF */
@@ -150,7 +260,7 @@ static void PSInit( input_thread_t * p_input )
                 break;
             }
         }
-        fseek( p_method->stream, 0, SEEK_SET );
+        lseek64( p_input->i_handle, i_start, SEEK_SET );
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.i_tell = 0;
         if( p_demux_data->b_has_PSM )
@@ -228,6 +338,7 @@ static void PSInit( input_thread_t * p_input )
     }
     else
     {
+#endif
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
@@ -236,9 +347,46 @@ static void PSInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * PSEnd: frees unused data
+ * DVDOpen : open the dvd device
  *****************************************************************************/
-static void PSEnd( input_thread_t * p_input )
+static void DVDOpen( input_thread_t * p_input )
+{
+    intf_Msg( "input: opening DVD %s", p_input->p_source );
+
+    p_input->i_handle = open( p_input->p_source,
+                              O_RDONLY | O_NONBLOCK | O_LARGEFILE );
+
+    if( p_input->i_handle == -1 )
+    {
+        intf_ErrMsg( "input error: cannot open device (%s)", strerror(errno) );
+        p_input->b_error = 1;
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.b_pace_control = 1;
+    p_input->stream.b_seekable = 1;
+    p_input->stream.i_size = 0;
+    p_input->stream.i_tell = 0;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+}
+
+/*****************************************************************************
+ * DVDClose : close a file descriptor
+ *****************************************************************************/
+static void DVDClose( input_thread_t * p_input )
+{
+    close( p_input->i_handle );
+
+    return;
+}
+
+/*****************************************************************************
+ * DVDEnd: frees unused data
+ *****************************************************************************/
+static void DVDEnd( input_thread_t * p_input )
 {
     free( p_input->stream.p_demux_data );
     free( p_input->p_plugin_data );
@@ -250,45 +398,63 @@ static void PSEnd( input_thread_t * p_input )
 static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
                                 size_t i_len )
 {
-    thread_ps_data_t *  p_method;
-    int                 i_error;
+    // FIXME : aie aie ugly kludge for testing purposes :)
+    static byte_t       p_tmp[2048];
 
-    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
-    while( fread( p_buffer, i_len, 1, p_method->stream ) != 1 )
+
+    thread_dvd_data_t * p_method;
+    int                 i_nb;
+    off64_t             i_pos;
+
+    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
+    i_pos = lseek64( p_input->i_handle, 0, SEEK_CUR );
+    if( !p_method->b_encrypted )
     {
-        if( feof( p_method->stream ) )
-        {
+        i_nb = read( p_input->i_handle, p_buffer, i_len );
+    }
+    else
+    {
+        lseek64( p_input->i_handle, i_pos & ~0x7FF, SEEK_SET );
+        i_nb = read( p_input->i_handle, p_tmp, 0x800 );
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+        CSSDescrambleSector( p_method->css.p_title_key[0].key, p_tmp );
+#endif
+        memcpy( p_buffer, p_tmp + (i_pos & 0x7FF ), i_len );
+    }
+    switch( i_nb )
+    {
+        case 0:
+            /* End of File */
             return( 1 );
-        }
-
-        if( (i_error = ferror( p_method->stream )) )
-        {
-            intf_ErrMsg( "Read failed (%s)", strerror(i_error) );
+        case -1:
+            intf_ErrMsg( "DVD: Read failed (%s)", strerror(errno) );
             return( -1 );
-        }
+        default:
+            break;
     }
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_tell += i_len;
+    p_input->stream.i_tell = 
+                lseek64( p_input->i_handle, i_pos+i_len, SEEK_SET );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     return( 0 );
 }
 
 /*****************************************************************************
- * PSRead: reads data packets
+ * DVDRead: reads data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 if everything went well, and 1 in case of
  * EOF.
  *****************************************************************************/
-static int PSRead( input_thread_t * p_input,
+static int DVDRead( input_thread_t * p_input,
                    data_packet_t * pp_packets[INPUT_READ_ONCE] )
 {
     byte_t              p_header[6];
     data_packet_t *     p_data;
     size_t              i_packet_size;
     int                 i_packet, i_error;
-    thread_ps_data_t *  p_method;
+    thread_dvd_data_t * p_method;
 
-    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
+    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
 
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
@@ -304,7 +470,8 @@ static int PSRead( input_thread_t * p_input,
             /* This is not the startcode of a packet. Read the stream
              * until we find one. */
             u32         i_startcode = U32_AT(p_header);
-            int         i_dummy;
+            int         i_nb;
+            byte_t      i_dummy;
 
             if( i_startcode )
             {
@@ -317,7 +484,7 @@ static int PSRead( input_thread_t * p_input,
             while( (i_startcode & 0xFFFFFF00) != 0x100L )
             {
                 i_startcode <<= 8;
-                if( (i_dummy = getc( p_method->stream )) != EOF )
+                if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
                 {
                     i_startcode |= i_dummy;
                 }
@@ -326,6 +493,7 @@ static int PSRead( input_thread_t * p_input,
                     return( 1 );
                 }
             }
+
             /* Packet found. */
             *(u32 *)p_header = U32_AT(&i_startcode);
             if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
@@ -398,6 +566,24 @@ static int PSRead( input_thread_t * p_input,
     return( 0 );
 }
 
+
+/*****************************************************************************
+ * DVDRewind : reads a stream backward
+ *****************************************************************************/
+static int DVDRewind( input_thread_t * p_input )
+{
+    return( -1 );
+}
+
+/*****************************************************************************
+ * DVDSeek : Goes to a given position on the stream ; this one is used by the 
+ * input and translate chronological position from input to logical postion
+ * on the device
+ *****************************************************************************/
+static int DVDSeek( input_thread_t * p_input, off_t i_off )
+{
+    return( -1 );
+}
 
 /*
  * Packet management utilities
@@ -495,25 +681,3 @@ static void DeletePES( void * p_garbage, pes_packet_t * p_pes )
     free( p_pes );
 }
 
-/*****************************************************************************
- * PSKludge: fakes a PS plugin (FIXME)
- *****************************************************************************/
-input_capabilities_t * PSKludge( void )
-{
-    input_capabilities_t *  p_plugin;
-
-    p_plugin = (input_capabilities_t *)malloc( sizeof(input_capabilities_t) );
-    p_plugin->pf_probe = PSProbe;
-    p_plugin->pf_init = PSInit;
-    p_plugin->pf_end = PSEnd;
-    p_plugin->pf_read = PSRead;
-    p_plugin->pf_demux = input_DemuxPS; /* FIXME: use i_p_config_t ! */
-    p_plugin->pf_new_packet = NewPacket;
-    p_plugin->pf_new_pes = NewPES;
-    p_plugin->pf_delete_packet = DeletePacket;
-    p_plugin->pf_delete_pes = DeletePES;
-    p_plugin->pf_rewind = NULL;
-    p_plugin->pf_seek = NULL;
-
-    return( p_plugin );
-}

@@ -38,7 +38,6 @@
 #include "mtime.h"
 #include "plugins.h"
 #include "modules.h"
-#include "playlist.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -49,6 +48,7 @@
 #include "interface.h"
 #include "intf_cmd.h"
 #include "intf_console.h"
+#include "intf_plst.h"
 #include "keystrokes.h"
 
 #include "video.h"
@@ -159,6 +159,7 @@ intf_thread_t* intf_Create( void )
         free( p_intf );
         return( NULL );
     }
+
     if( p_intf->p_sys_create( p_intf ) )
     {
         intf_ErrMsg("intf error: cannot create interface");
@@ -178,71 +179,10 @@ intf_thread_t* intf_Create( void )
  *****************************************************************************/
 void intf_Run( intf_thread_t *p_intf )
 {
-    char * psz_server = main_GetPszVariable( INPUT_SERVER_VAR, NULL );
-    input_config_t *    p_input_config;
-
     /* Flush messages before spawning input */
     intf_FlushMsg();
 
-    /* If a server was specified */
-    if( psz_server )
-    {
-        if( (p_input_config =
-              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
-        {
-            intf_ErrMsg( "intf error: cannot create input_config_t" );
-        }
-        else
-        {
-            p_input_config->i_method = INPUT_METHOD_UCAST;
-            p_input_config->p_source = psz_server;
-            p_input_config->p_default_aout = p_main->p_aout;
-            p_input_config->p_default_vout = p_intf->p_vout;
-
-            p_intf->p_input = input_CreateThread( p_input_config, NULL );
-        }
-    }
-    /* DVD mode */
-    else if( p_main->b_dvd )
-    {
-        if( (p_input_config =
-              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
-        {
-            intf_ErrMsg( "intf error: cannot create input_config_t" );
-        }
-        else
-        {
-            p_input_config->i_method = INPUT_METHOD_DVD;
-            p_input_config->p_source = main_GetPszVariable( INPUT_DVD_DEVICE_VAR, INPUT_DVD_DEVICE_DEFAULT );
-            p_input_config->p_default_aout = p_main->p_aout;
-            p_input_config->p_default_vout = p_intf->p_vout;
-            p_intf->p_input = input_CreateThread( p_input_config, NULL );
-        }
-    }
-    /* Or if a file was specified */
-    else if( p_main->p_playlist->p_list != NULL )
-    {
-        if( (p_input_config =
-              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
-        {
-            intf_ErrMsg( "intf error: cannot create input_config_t" );
-        }
-        else
-        {
-            p_input_config->i_method = INPUT_METHOD_FILE;
-            p_input_config->p_source = p_main->p_playlist->p_list[0]; /* FIXME ??? */
-            p_input_config->p_default_aout = p_main->p_aout;
-            p_input_config->p_default_vout = p_intf->p_vout;
-
-            p_intf->p_input = input_CreateThread( p_input_config, NULL );
-        }
-    }
-    /* Execute the initialization script - if a positive number is returned,
-     * the script could be executed but failed */
-    else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
-    {
-        intf_ErrMsg( "intf error: errors occured during startup script" );
-    }
+    p_intf->p_input = input_CreateThread( NULL );
 
     /* Main loop */
     while(!p_intf->b_die && (p_intf->p_input != NULL) )
@@ -583,7 +523,7 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
     p_file = fopen( psz_filename, "r" );
     if( p_file == NULL )
     {
-        intf_ErrMsg( "intf error: cannot open %s (%s)",
+        intf_DbgMsg( "intf warning: cannot open %s (%s)",
                      psz_filename, strerror(errno) );
         return( 1 );
     }

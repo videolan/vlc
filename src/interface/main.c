@@ -46,11 +46,11 @@
 #include "tests.h"                                              /* TestCPU() */
 #include "plugins.h"
 #include "modules.h"
-#include "playlist.h"
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
 #include "intf_msg.h"
+#include "intf_plst.h"
 #include "interface.h"
 
 #include "audio_output.h"
@@ -84,13 +84,13 @@
 #define OPT_SERVER              171
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
-#define OPT_DVD                 174
 
 #define OPT_AOUT                180
 #define OPT_VOUT                181
 #define OPT_MOTION              182
 #define OPT_IDCT                183
 #define OPT_YUV                 184
+#define OPT_INPUT               185
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -137,11 +137,11 @@ static const struct option longopts[] =
     {   "dvdsubtitle",      1,          0,      's' },
     
     /* Input options */
+    {   "input",            1,          0,      OPT_INPUT },
     {   "vlans",            0,          0,      OPT_VLANS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        0,          0,      OPT_BROADCAST },
-    {   "dvd",              0,          0,      OPT_DVD },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -231,14 +231,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         return( errno );
     }
 
-    /*
-     * Read configuration
-     */
-    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
-    {
-        intf_MsgDestroy();
-        return( errno );
-    }
+    intf_MsgImm( COPYRIGHT_MESSAGE );
 
     /*
      * Initialize playlist and get commandline files
@@ -250,7 +243,16 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return( errno );
     }
-    playlist_Init( p_main->p_playlist, optind );
+    playlist_Init( p_main->p_playlist );
+
+    /*
+     * Read configuration
+     */
+    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
+    {
+        intf_MsgDestroy();
+        return( errno );
+    }
 
     /*
      * Initialize plugin bank
@@ -478,7 +480,6 @@ static void SetDefaultConfiguration( void )
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
     p_main->b_vlans  = 0;
-    p_main->b_dvd    = 0;
 }
 
 /*****************************************************************************
@@ -500,8 +501,6 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->ppsz_argv = ppsz_argv;
     p_main->ppsz_env  = ppsz_env;
     SetDefaultConfiguration();
-
-    intf_MsgImm( COPYRIGHT_MESSAGE );
 
     /* Get the executable name (similar to the basename command) */
     p_main->psz_arg0 = p_pointer = ppsz_argv[ 0 ];
@@ -609,6 +608,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Input options */
+	case OPT_INPUT:                                           /* --input */
+            main_PutPszVariable( INPUT_METHOD_VAR, optarg );
+            break;
         case OPT_VLANS:                                           /* --vlans */
             p_main->b_vlans = 1;
             break;
@@ -620,9 +622,6 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         case OPT_BROADCAST:                                   /* --broadcast */
             main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
-            break;
-        case OPT_DVD:                                               /* --dvd */
-            p_main->b_dvd = 1;
             break;
 
         /* Synchro options */
@@ -646,11 +645,12 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 #endif
 
-    /* Parse command line parameters - no check is made for these options */
+    /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        putenv( ppsz_argv[ i_opt ] );
+        playlist_Add( p_main->p_playlist, PLAYLIST_END, ppsz_argv[ i_opt ] );
     }
+
     return( 0 );
 }
 
@@ -662,97 +662,97 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 static void Usage( int i_fashion )
 {
     /* Usage */
-    intf_Msg( "Usage: %s [options] [parameters] [file]...",
-              p_main->psz_arg0 );
+    intf_MsgImm( "Usage: %s [options] [parameters] [file]...",
+                 p_main->psz_arg0 );
 
     if( i_fashion == USAGE )
     {
-        intf_Msg( "Try `%s --help' for more information.",
-                  p_main->psz_arg0 );
+        intf_MsgImm( "Try `%s --help' for more information.",
+                     p_main->psz_arg0 );
         return;
     }
 
     /* Options */
-    intf_Msg( "\nOptions:"
-              "\n      --noaudio                  \tdisable audio"
-              "\n      --aout <module>            \taudio output method"
-              "\n      --stereo, --mono           \tstereo/mono audio"
-              "\n"
-              "\n      --novideo                  \tdisable video"
-              "\n      --vout <module>            \tvideo output method"
-              "\n      --display <display>        \tdisplay string"
-              "\n      --width <w>, --height <h>  \tdisplay dimensions"
-              "\n  -g, --grayscale                \tgrayscale output"
-              "\n      --color                    \tcolor output"
-              "\n      --motion <module>          \tmotion compensation method"
-              "\n      --idct <module>            \tIDCT method"
-              "\n      --yuv <module>             \tYUV method"
-              "\n      --synchro <type>           \tforce synchro algorithm"
-              "\n"
-              "\n      --dvd                      \tDVD mode"
-              "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
-              "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
-              "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
-              "\n"
-              "\n      --vlans                    \tenable vlans"
-              "\n      --server <host>            \tvideo server address"
-              "\n      --port <port>              \tvideo server port"
-              "\n      --broadcast                \tlisten to a broadcast"
-              "\n"
-              "\n      --warning <level>          \tdisplay warning messages"
-              "\n"
-              "\n  -h, --help                     \tprint help and exit"
-              "\n  -H, --longhelp                 \tprint long help and exit"
-              "\n  -v, --version                  \toutput version information and exit" );
+    intf_MsgImm( "\nOptions:"
+          "\n      --noaudio                  \tdisable audio"
+          "\n      --aout <module>            \taudio output method"
+          "\n      --stereo, --mono           \tstereo/mono audio"
+          "\n"
+          "\n      --novideo                  \tdisable video"
+          "\n      --vout <module>            \tvideo output method"
+          "\n      --display <display>        \tdisplay string"
+          "\n      --width <w>, --height <h>  \tdisplay dimensions"
+          "\n  -g, --grayscale                \tgrayscale output"
+          "\n      --fullscreen               \tfullscreen output"
+          "\n      --overlay                  \taccelerated display"
+          "\n      --color                    \tcolor output"
+          "\n      --motion <module>          \tmotion compensation method"
+          "\n      --idct <module>            \tIDCT method"
+          "\n      --yuv <module>             \tYUV method"
+          "\n      --synchro <type>           \tforce synchro algorithm"
+          "\n"
+          "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
+          "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
+          "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
+          "\n"
+          "\n      --input                    \tinput method"
+          "\n      --vlans                    \tenable vlans"
+          "\n      --server <host>            \tvideo server address"
+          "\n      --port <port>              \tvideo server port"
+          "\n      --broadcast                \tlisten to a broadcast"
+          "\n"
+          "\n      --warning <level>          \tdisplay warning messages"
+          "\n"
+          "\n  -h, --help                     \tprint help and exit"
+          "\n  -H, --longhelp                 \tprint long help and exit"
+          "\n  -v, --version                  \toutput version information and exit" );
 
     if( i_fashion == SHORT_HELP )
         return;
 
     /* Interface parameters */
-    intf_Msg( "\nInterface parameters:\n"
-              "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
-              "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
-              "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
+    intf_MsgImm( "\nInterface parameters:\n"
+        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
+        "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
+        "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
 
     /* Audio parameters */
-    intf_Msg( "\nAudio parameters:"
-              "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
-              "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
-              "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
-              "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
+    intf_MsgImm( "\nAudio parameters:"
+        "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
+        "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
+        "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
+        "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
 
     /* Video parameters */
-    intf_Msg( "\nVideo parameters:"
-              "\n  " VOUT_METHOD_VAR "=<method name>        \tdisplay method"
-              "\n  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used"
-              "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
-              "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
-              "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
-              "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
-              "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
-              "\n  " VOUT_OVERLAY_VAR "={1|0}               \toverlay"
-              "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
-              "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
-              "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
-              "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
- );
+    intf_MsgImm( "\nVideo parameters:"
+        "\n  " VOUT_METHOD_VAR "=<method name>        \tdisplay method"
+        "\n  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used"
+        "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
+        "\n  " VOUT_HEIGHT_VAR "=<height>             \tdislay height"
+        "\n  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path"
+        "\n  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output"
+        "\n  " VOUT_FULLSCREEN_VAR "={1|0}            \tfullscreen"
+        "\n  " VOUT_OVERLAY_VAR "={1|0}               \toverlay"
+        "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
+        "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
+        "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
+        "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm" );
 
     /* DVD parameters */
-    intf_Msg( "\nDVD parameters:"
-              "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
-              "\n  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
-              "\n  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel"
-              "\n  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
+    intf_MsgImm( "\nDVD parameters:"
+        "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
+        "\n  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
+        "\n  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel"
+        "\n  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
 
     /* Input parameters */
-    intf_Msg( "\nInput parameters:\n"
-              "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
-              "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
-              "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
-              "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
-              "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
-              "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port"
- );
+    intf_MsgImm( "\nInput parameters:\n"
+        "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
+        "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
+        "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
+        "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
+        "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
+        "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port" );
 
 }
 
@@ -763,12 +763,11 @@ static void Usage( int i_fashion )
  *****************************************************************************/
 static void Version( void )
 {
-    intf_Msg( VERSION_MESSAGE
-              "This program comes with NO WARRANTY, to the extent permitted by law.\n"
-              "You may redistribute it under the terms of the GNU General Public License;\n"
-              "see the file named COPYING for details.\n"
-              "Written by the VideoLAN team at Ecole Centrale, Paris." );
-
+    intf_MsgImm( VERSION_MESSAGE
+        "This program comes with NO WARRANTY, to the extent permitted by law.\n"
+        "You may redistribute it under the terms of the GNU General Public License;\n"
+        "see the file named COPYING for details.\n"
+        "Written by the VideoLAN team at Ecole Centrale, Paris." );
 }
 
 /*****************************************************************************

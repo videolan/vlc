@@ -179,21 +179,17 @@ INTERFACE =	src/interface/main.o \
 		src/interface/intf_msg.o \
 		src/interface/intf_cmd.o \
 		src/interface/intf_ctrl.o \
+		src/interface/intf_plst.o \
 		src/interface/intf_console.o
 
-INPUT =		src/input/input_ps.o \
-		src/input/input_ts.o \
-		src/input/dvd_ifo.o \
-		src/input/dvd_css.o \
-		src/input/input_dvd.o \
-		src/input/mpeg_system.o \
-		src/input/input_ext-dec.o \
+INPUT =		src/input/input_ext-dec.o \
 		src/input/input_ext-intf.o \
 		src/input/input_dec.o \
 		src/input/input_programs.o \
 		src/input/input_netlist.o \
 		src/input/input_clock.o \
-		src/input/input.o
+		src/input/input.o \
+		src/input/mpeg_system.o
 
 AUDIO_OUTPUT = 	src/audio_output/audio_output.o
 
@@ -238,7 +234,6 @@ MISC =		src/misc/mtime.o \
 		src/misc/rsc_files.o \
 		src/misc/modules.o \
 		src/misc/netutils.o \
-		src/misc/playlist.o \
 		src/misc/plugins.o
 
 
@@ -276,6 +271,19 @@ endif
 #
 # Plugins
 #
+PLUGIN_NULL =	plugins/null/null.o
+
+PLUGIN_PS =	plugins/mpeg/ps.o \
+		plugins/mpeg/input_ps.o
+
+PLUGIN_TS =	plugins/mpeg/ts.o \
+		plugins/mpeg/input_ts.o
+
+PLUGIN_DVD =	plugins/dvd/dvd.o \
+		plugins/dvd/input_dvd.o \
+		plugins/dvd/dvd_ifo.o \
+	        plugins/dvd/dvd_css.o
+
 PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/aout_beos.o \
 		plugins/beos/intf_beos.o \
@@ -283,7 +291,6 @@ PLUGIN_BEOS =	plugins/beos/beos.o \
 
 PLUGIN_DSP =	plugins/dsp/dsp.o \
 		plugins/dsp/aout_dsp.o
-
 
 PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 		plugins/dummy/aout_dummy.o \
@@ -305,8 +312,6 @@ PLUGIN_SDL =	plugins/sdl/sdl.o \
 		plugins/sdl/intf_sdl.o \
 		plugins/sdl/vout_sdl.o \
 		plugins/sdl/aout_sdl.o 
-
-PLUGIN_NULL =	plugins/null/null.o
 
 PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
@@ -446,9 +451,8 @@ snapshot:
 	find -type d | while read i ; \
 		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
-	find debian -mindepth 1 -type d | grep -v CVS | while read i ; \
-		do rmdir $$i ; \
-	done
+	find debian -mindepth 1 -maxdepth 1 -type d | grep -v CVS | \
+		while read i ; do rm -rf /tmp/vlc-@VLC_VERSION@/$$i ; done
 	# CVS entries
 	find . -type f | grep CVS | while read i ; \
 		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
@@ -605,6 +609,15 @@ ifeq ($(SYS),beos)
 lib/null.so: $(PLUGIN_NULL)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
+lib/ps.so: $(PLUGIN_PS)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/ts.so: $(PLUGIN_TS)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/dvd.so: $(PLUGIN_DVD)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
 lib/dummy.so: $(PLUGIN_DUMMY)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
@@ -636,6 +649,15 @@ lib/idctmmxext.so: $(PLUGIN_IDCTMMXEXT)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 lib/null.so: $(PLUGIN_NULL)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/ps.so: $(PLUGIN_PS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/ts.so: $(PLUGIN_TS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/dvd.so: $(PLUGIN_DVD)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/dummy.so: $(PLUGIN_DUMMY)

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.13 2001/02/07 17:44:52 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.14 2001/02/08 04:43:27 sam Exp $
  *
  * Authors:
  *
@@ -209,16 +209,40 @@ typedef struct input_thread_s
     /* Thread properties and locks */
     boolean_t               b_die;                             /* 'die' flag */
     boolean_t               b_error;
+    boolean_t               b_eof;
     vlc_thread_t            thread_id;            /* id for thread functions */
     int *                   pi_status;              /* temporary status flag */
 
-    struct input_config_s * p_config;
+    /* Input module */
+    struct module_s *       p_input_module;
 
-    struct input_capabilities_s *
-                            pp_plugins[INPUT_MAX_PLUGINS];/* list of plugins */
-    struct input_capabilities_s *
-                            p_plugin;                     /* selected plugin */
+    /* Init/End */
+    void                 (* pf_init)( struct input_thread_s * );
+    void                 (* pf_open)( struct input_thread_s * );
+    void                 (* pf_close)( struct input_thread_s * );
+    void                 (* pf_end)( struct input_thread_s * );
+
+    /* Read & Demultiplex */
+    int                  (* pf_read)( struct input_thread_s *,
+                                      struct data_packet_s * pp_packets[] );
+    void                 (* pf_demux)( struct input_thread_s *,
+                                       struct data_packet_s * );
+
+    /* Packet management facilities */
+    struct data_packet_s *(*pf_new_packet)( void *, size_t );
+    struct pes_packet_s *(* pf_new_pes)( void * );
+    void                 (* pf_delete_packet)( void *,
+                                               struct data_packet_s * );
+    void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
+
+    /* Stream control capabilities */
+    int                  (* pf_rewind)( struct input_thread_s * );
+                                           /* NULL if we don't support going *
+                                            * backwards (it's gonna be fun)  */
+    int                  (* pf_seek)( struct input_thread_s *, off_t );
+
     i_p_config_t            i_p_config;              /* plugin configuration */
+    char *                  p_source;
 
     int                     i_handle;           /* socket or file descriptor */
     void *                  p_method_data;     /* data of the packet manager */
@@ -273,8 +297,7 @@ typedef struct input_config_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-struct input_thread_s * input_CreateThread( struct input_config_s *,
-                                            int *pi_status );
+struct input_thread_s * input_CreateThread( int *pi_status );
 void                    input_DestroyThread( struct input_thread_s *,
                                              int *pi_status );
 void input_Play( struct input_thread_s * );

@@ -107,7 +107,7 @@ AC_CHECK_HEADERS(linux/cdrom.h)
 AC_EGREP_HEADER(dvd,linux/cdrom.h,AC_DEFINE(LINUX_DVD,1,DVD support for linux))
 
 dnl default plugins 
-PLUGINS=${PLUGINS}"yuv idct idctclassic motion ";
+PLUGINS=${PLUGINS}"ps ts dvd yuv idct idctclassic motion ";
 
 ARCH=${host_cpu}
 AC_ARG_ENABLE(ppro,

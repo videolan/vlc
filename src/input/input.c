@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.74 2001/02/07 17:44:52 massiot Exp $
+ * $Id: input.c,v 1.75 2001/02/08 04:43:27 sam Exp $
  *
  * Authors: 
  *
@@ -44,25 +44,28 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "modules.h"
 
 #include "intf_msg.h"
+#include "intf_plst.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 
 #include "input.h"
+#include "interface.h"
+
+#include "main.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void RunThread   ( input_thread_t *p_input );
-static void InitThread  ( input_thread_t *p_input );
+static void InitLoop    ( input_thread_t *p_input );
+static void StopLoop    ( input_thread_t *p_input );
 static void ErrorThread ( input_thread_t *p_input );
 static void EndThread   ( input_thread_t *p_input );
-static void NetworkOpen ( input_thread_t *p_input );
-static void FileOpen    ( input_thread_t *p_input );
-static void DvdOpen     ( input_thread_t *p_input );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -72,7 +75,7 @@ static void DvdOpen     ( input_thread_t *p_input );
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
+input_thread_t *input_CreateThread ( int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     int                 i_status;                           /* thread status */
@@ -83,7 +86,6 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     {
         intf_ErrMsg( "input error: can't allocate input thread (%s)",
                      strerror(errno) );
-        free( p_config );
         return( NULL );
     }
 
@@ -93,7 +95,6 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     /* I have never understood that stuff --Meuuh */
     p_input->pi_status          = (pi_status != NULL) ? pi_status : &i_status;
     *p_input->pi_status         = THREAD_CREATE;
-    p_input->p_config = p_config;
 
     /* Initialize stream description */
     p_input->stream.i_es_number = 0;
@@ -108,6 +109,10 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_bw = 0;
 
+    /* Initialize default settings for spawned decoders */
+    p_input->p_default_aout = p_main->p_aout;
+    p_input->p_default_vout = p_main->p_intf->p_vout;
+
     /* Create thread and set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
     vlc_mutex_init( &p_input->stream.control.control_lock );
@@ -117,7 +122,6 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
         intf_ErrMsg( "input error: can't create input thread (%s)",
                      strerror(errno) );
         free( p_input );
-        free( p_config );
         return( NULL );
     }
 
@@ -128,7 +132,7 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
         {
             msleep( THREAD_SLEEP );
         } while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR)
-                && (i_status != THREAD_FATAL) );
+                && (i_status != THREAD_FATAL) && (i_status != THREAD_OVER) );
         if( i_status != THREAD_READY )
         {
             return( NULL );
@@ -174,41 +178,61 @@ static void RunThread( input_thread_t *p_input )
     data_packet_t *         pp_packets[INPUT_READ_ONCE];
     int                     i_error, i;
 
-    InitThread( p_input );
+    *p_input->pi_status = THREAD_READY;
 
     while( !p_input->b_die && !p_input->b_error )
     {
+        InitLoop( p_input );
+
+        if( p_input->b_die || p_input->b_error )
+        {
+            break;
+        }
+
+        while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
+        {
+
 #ifdef STATS
-        p_input->c_loops++;
+            p_input->c_loops++;
 #endif
 
-        vlc_mutex_lock( &p_input->stream.control.control_lock );
-        if( p_input->stream.control.i_status == BACKWARD_S
-             && p_input->p_plugin->pf_rewind != NULL )
-        {
-            p_input->p_plugin->pf_rewind( p_input );
-            /* FIXME: probably don't do it every loop, but when ? */
-        }
-        vlc_mutex_unlock( &p_input->stream.control.control_lock );
-
-        i_error = p_input->p_plugin->pf_read( p_input, pp_packets );
-
-        /* Demultiplex read packets. */
-        for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
-        {
-            p_input->p_plugin->pf_demux( p_input, pp_packets[i] );
-        }
-
-        if( i_error )
-        {
-            if( i_error == 1 )
+            vlc_mutex_lock( &p_input->stream.control.control_lock );
+            if( p_input->stream.control.i_status == BACKWARD_S
+                 && p_input->pf_rewind != NULL )
             {
-                /* End of file */
-                intf_WarnMsg( 1, "End of file reached" );
-                /* FIXME: don't treat that as an error */
+                p_input->pf_rewind( p_input );
+                /* FIXME: probably don't do it every loop, but when ? */
             }
-            p_input->b_error = 1;
+            vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+            i_error = p_input->pf_read( p_input, pp_packets );
+
+            /* Demultiplex read packets. */
+            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+            {
+                p_input->pf_demux( p_input, pp_packets[i] );
+            }
+
+            if( i_error )
+            {
+                if( i_error == 1 )
+                {
+                    /* End of file */
+                    intf_WarnMsg( 1, "End of file reached" );
+                    /* FIXME: don't treat that as an error */
+                    p_input->b_eof = 1;
+                }
+                else
+                {
+                    p_input->b_error = 1;
+                }
+            }
         }
+
+        /* Free all ES and destroy all decoder threads */
+        input_EndStream( p_input );
+
+        StopLoop( p_input );
     }
 
     if( p_input->b_error )
@@ -221,15 +245,22 @@ static void RunThread( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * InitThread: init the input thread
+ * InitLoop: init the input loop
  *****************************************************************************/
-input_capabilities_t * PSKludge( void );
-input_capabilities_t * DVDKludge( void );
-static void InitThread( input_thread_t * p_input )
+static void InitLoop( input_thread_t * p_input )
 {
-    /* Initialize default settings for spawned decoders */
-    p_input->p_default_aout     = p_input->p_config->p_default_aout;
-    p_input->p_default_vout     = p_input->p_config->p_default_vout;
+    playlist_Next( p_main->p_playlist );
+
+    if( p_main->p_playlist->i_index == -1 )
+    {
+        /*    FIXME: wait for user to add stuff to playlist ? */
+        /* FIXME II: we shouldn't set b_error but rather b_die */
+        intf_Msg( "playlist: end" );
+        p_input->b_error = 1;
+        return;
+    }
+
+    p_input->p_source = p_main->p_playlist->current.psz_name;
 
 #ifdef STATS
     /* Initialize statistics */
@@ -240,50 +271,65 @@ static void InitThread( input_thread_t * p_input )
     p_input->c_packets_trashed          = 0;
 #endif
 
-    /* Use the appropriate input method */
-    switch( p_input->p_config->i_method )
+    p_input->p_input_module = module_Need( p_main->p_module_bank,
+                                           MODULE_CAPABILITY_INPUT, NULL );
+
+    if( p_input->p_input_module == NULL )
     {
-    case INPUT_METHOD_FILE:                                  /* file methods */
-        FileOpen( p_input );
-        /* Probe plugin (FIXME: load plugins before & write this) */
-        p_input->p_plugin = PSKludge();
-       break;
-    case INPUT_METHOD_DVD:                                     /* DVD method */
-        DvdOpen( p_input );
-        /* DVD plugin */
-        p_input->p_plugin = DVDKludge();
-        break;
-    case INPUT_METHOD_VLAN_BCAST:                     /* vlan network method */
-/*        if( !p_main->b_vlans )
-        {
-            intf_ErrMsg("input error: vlans are not activated");
-            free( p_input );
-            return( NULL );
-        } */ /* la-lala */
-        /* ... pass through */
-    case INPUT_METHOD_UCAST:                              /* network methods */
-    case INPUT_METHOD_MCAST:
-    case INPUT_METHOD_BCAST:
-        NetworkOpen( p_input );
-        break;
-#ifdef DEBUG
-    default:
-        intf_ErrMsg( "input error: unknow method 0x%.4x",
-                     p_input->p_config->i_method );
-        free( p_input->p_config );
+        intf_ErrMsg( "input error: no suitable input module" );
         p_input->b_error = 1;
-        break;
-#endif
+        return;
     }
 
-    free( p_input->p_config );
+#define f p_input->p_input_module->p_functions->input.functions.input
+    p_input->pf_init          = f.pf_init;
+    p_input->pf_open          = f.pf_open;
+    p_input->pf_close         = f.pf_close;
+    p_input->pf_end           = f.pf_end;
+    p_input->pf_read          = f.pf_read;
+    p_input->pf_demux         = f.pf_demux;
+    p_input->pf_new_packet    = f.pf_new_packet;
+    p_input->pf_new_pes       = f.pf_new_pes;
+    p_input->pf_delete_packet = f.pf_delete_packet;
+    p_input->pf_delete_pes    = f.pf_delete_pes;
+    p_input->pf_rewind        = f.pf_rewind;
+    p_input->pf_seek          = f.pf_seek;
+#undef f
 
-    if( !p_input->b_error )
+    p_input->b_eof = 0;
+    p_input->pf_open( p_input );
+
+    if( p_input->b_error )
     {
-        p_input->p_plugin->pf_init( p_input );
+        module_Unneed( p_main->p_module_bank, p_input->p_input_module );
+        return;
     }
 
-    *p_input->pi_status = THREAD_READY;
+    p_input->pf_init( p_input );
+
+    return;
+}
+
+/*****************************************************************************
+ * StopLoop: stop the input loop
+ *****************************************************************************/
+static void StopLoop( input_thread_t * p_input )
+{
+#ifdef STATS
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+    }
+#endif
+
+    /* Free demultiplexer's data */
+    p_input->pf_end( p_input );
+
+    /* Release modules */
+    module_Unneed( p_main->p_module_bank, p_input->p_input_module );
 }
 
 /*****************************************************************************
@@ -311,23 +357,6 @@ static void EndThread( input_thread_t * p_input )
     pi_status = p_input->pi_status;
     *pi_status = THREAD_END;
 
-#ifdef STATS
-    {
-        struct tms cpu_usage;
-        times( &cpu_usage );
-
-        intf_Msg("input stats: cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime);
-    }
-#endif
-
-    /* Free all ES and destroy all decoder threads */
-    input_EndStream( p_input );
-
-    /* Free demultiplexer's data */
-    p_input->p_plugin->pf_end( p_input );
-    free( p_input->p_plugin );
-
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );
     vlc_mutex_destroy( &p_input->stream.stream_lock );
@@ -340,31 +369,16 @@ static void EndThread( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * NetworkOpen : open a network socket descriptor
+ * input_FileOpen : open a file descriptor
  *****************************************************************************/
-static void NetworkOpen( input_thread_t * p_input )
-{
-    /* straight copy & paste of input_network.c of input-I */
-
-    /* We cannot rewind nor lseek() */
-    p_input->stream.b_seekable = 0;
-    /* We cannot control the pace */
-    p_input->stream.b_pace_control = 0;
-}
-
-/*****************************************************************************
- * FileOpen : open a file descriptor
- *****************************************************************************/
-static void FileOpen( input_thread_t * p_input )
+void input_FileOpen( input_thread_t * p_input )
 {
     struct stat         stat_info;
 
-#define p_config    p_input->p_config
-
-    if( stat( p_config->p_source, &stat_info ) == (-1) )
+    if( stat( p_input->p_source, &stat_info ) == (-1) )
     {
         intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
-                     p_config->p_source, strerror(errno));
+                     p_input->p_source, strerror(errno));
         p_input->b_error = 1;
         return;
     }
@@ -389,7 +403,7 @@ static void FileOpen( input_thread_t * p_input )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         intf_ErrMsg( "input error: unknown file type for `%s'",
-                     p_config->p_source );
+                     p_input->p_source );
         p_input->b_error = 1;
         return;
     }
@@ -397,8 +411,8 @@ static void FileOpen( input_thread_t * p_input )
     p_input->stream.i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_Msg( "input: opening file %s", p_config->p_source );
-    if( (p_input->i_handle = open( p_config->p_source,
+    intf_Msg( "input: opening file %s", p_input->p_source );
+    if( (p_input->i_handle = open( p_input->p_source,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
@@ -406,29 +420,15 @@ static void FileOpen( input_thread_t * p_input )
         return;
     }
 
-#undef p_config
 }
 
 /*****************************************************************************
- * DvdOpen : open the dvd device
+ * input_FileClose : close a file descriptor
  *****************************************************************************/
-static void DvdOpen( input_thread_t * p_input )
+void input_FileClose( input_thread_t * p_input )
 {
-    intf_Msg( "input: opening DVD %s", p_input->p_config->p_source );
-    if( (p_input->i_handle = open( p_input->p_config->p_source,
-                                O_RDONLY| O_NONBLOCK |O_LARGEFILE )) == (-1) )
-    {
-        intf_ErrMsg( "input error: cannot open device (%s)", strerror(errno) );
-        p_input->b_error = 1;
-        return;
-    }
+    close( p_input->i_handle );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    p_input->stream.b_pace_control = 1;
-    p_input->stream.b_seekable = 1;
-    p_input->stream.i_size = 0;
-    p_input->stream.i_tell = 0;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    return;
 }
+

@@ -2,7 +2,7 @@
  * input_ps.h: thread structure of the PS plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ps.h,v 1.2 2000/12/21 15:01:08 massiot Exp $
+ * $Id: input_ps.h,v 1.1 2001/02/08 04:43:27 sam Exp $
  *
  * Authors:
  *

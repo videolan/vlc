@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.28 2001/02/07 15:32:26 massiot Exp $
+ * $Id: input_programs.c,v 1.29 2001/02/08 04:43:28 sam Exp $
  *
  * Authors:
  *
@@ -449,8 +449,7 @@ static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
     p_config->p_decoder_fifo->i_start = p_config->p_decoder_fifo->i_end = 0;
     p_config->p_decoder_fifo->b_die = p_config->p_decoder_fifo->b_error = 0;
     p_config->p_decoder_fifo->p_packets_mgt = p_input->p_method_data;
-    p_config->p_decoder_fifo->pf_delete_pes =
-        p_input->p_plugin->pf_delete_pes;
+    p_config->p_decoder_fifo->pf_delete_pes = p_input->pf_delete_pes;
     p_es->p_decoder_fifo = p_config->p_decoder_fifo;
 
     p_config->pf_init_bit_stream = InitBitstream;

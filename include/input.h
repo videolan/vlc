@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.14 2001/02/07 17:44:52 massiot Exp $
+ * $Id: input.h,v 1.26 2001/02/08 04:43:27 sam Exp $
  *
  * Authors:
  *
@@ -34,63 +34,33 @@
                                  * of data loss (this should be < 188).      */
 
 /*****************************************************************************
- * input_capabilities_t
- *****************************************************************************
- * This structure gives pointers to the useful methods of the plugin
- *****************************************************************************/
-typedef struct input_capabilities_s
-{
-    /* Plugin properties */
-    int                     i_weight; /* for a given stream type, the plugin *
-                                       * with higher weight will be used     */
-
-    /* Init/End */
-    int                  (* pf_probe)( struct input_thread_s * );
-    void                 (* pf_init)( struct input_thread_s * );
-    void                 (* pf_end)( struct input_thread_s * );
-
-    /* Read & Demultiplex */
-    int                  (* pf_read)( struct input_thread_s *,
-                          struct data_packet_s * pp_packets[INPUT_READ_ONCE] );
-    void                 (* pf_demux)( struct input_thread_s *,
-                                       struct data_packet_s * );
-
-    /* Packet management facilities */
-    struct data_packet_s *(* pf_new_packet)( void *, size_t );
-    struct pes_packet_s *(* pf_new_pes)( void * );
-    void                 (* pf_delete_packet)( void *,
-                                               struct data_packet_s * );
-    void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
-
-    /* Stream control capabilities */
-    int                  (* pf_rewind)( struct input_thread_s * );
-                                           /* NULL if we don't support going *
-                                            * backwards (it's gonna be fun)  */
-    int                  (* pf_seek)( struct input_thread_s *, off_t );
-} input_capabilities_t;
-
-/*****************************************************************************
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
 void InitBitstream  ( struct bit_stream_s *, struct decoder_fifo_s * );
 void NextDataPacket ( struct bit_stream_s * );
 
 /*****************************************************************************
+ * Prototypes from input.c to open files
+ *****************************************************************************/
+void input_FileOpen ( struct input_thread_s * );
+void input_FileClose( struct input_thread_s * );
+
+/*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
-int input_InitStream( struct input_thread_s *, size_t );
-void input_EndStream( struct input_thread_s * );
+int  input_InitStream( struct input_thread_s *, size_t );
+void input_EndStream ( struct input_thread_s * );
 struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
-struct pgrm_descriptor_s * input_AddProgram( struct input_thread_s *,
-                                             u16, size_t );
+struct pgrm_descriptor_s * input_AddProgram ( struct input_thread_s *,
+                                              u16, size_t );
 void input_DelProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
 void input_DumpStream( struct input_thread_s * );
 struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
-struct es_descriptor_s * input_AddES( struct input_thread_s *,
-                                      struct pgrm_descriptor_s *, u16,
-                                      size_t );
-void input_DelES( struct input_thread_s *, struct es_descriptor_s * );
-int input_SelectES( struct input_thread_s *, struct es_descriptor_s * );
+struct es_descriptor_s * input_AddES ( struct input_thread_s *,
+                                       struct pgrm_descriptor_s *, u16,
+                                       size_t );
+void input_DelES     ( struct input_thread_s *, struct es_descriptor_s * );
+int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
 
 /*****************************************************************************
  * Prototypes from input_dec.c
@@ -98,13 +68,15 @@ int input_SelectES( struct input_thread_s *, struct es_descriptor_s * );
 //decoder_capabilities_s * input_ProbeDecoder( void );
 vlc_thread_t input_RunDecoder( struct decoder_capabilities_s *, void * );
 void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
-void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );
+void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
 
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
 void input_ClockNewRef( struct input_thread_s *,
                         struct pgrm_descriptor_s *, mtime_t, mtime_t );
+void input_EscapeDiscontinuity( struct input_thread_s *,
+                                struct pgrm_descriptor_s * );
 void input_ClockInit( struct pgrm_descriptor_s * );
 void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );
@@ -120,7 +92,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
     data_packet_t *             p_pad_data;
     pes_packet_t *              p_pes;
 
-    if( (p_pad_data = p_input->p_plugin->pf_new_packet(
+    if( (p_pad_data = p_input->pf_new_packet(
                     p_input->p_method_data,
                     PADDING_PACKET_SIZE )) == NULL )
     {
@@ -141,8 +113,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
     }
     else
     {
-        if( (p_pes = p_input->p_plugin->pf_new_pes(
-                                        p_input->p_method_data )) == NULL )
+        if( (p_pes = p_input->pf_new_pes( p_input->p_method_data )) == NULL )
         {
             intf_ErrMsg("Out of memory");
             p_input->b_error = 1;

@@ -36,17 +36,18 @@ typedef void *  module_handle_t;
 
 #define MODULE_CAPABILITY_NULL     0        /* The Module can't do anything */
 #define MODULE_CAPABILITY_INTF     1 <<  0  /* Interface */
-#define MODULE_CAPABILITY_INPUT    1 <<  1  /* Input */
-#define MODULE_CAPABILITY_DECAPS   1 <<  2  /* Decaps */
-#define MODULE_CAPABILITY_ADEC     1 <<  3  /* Audio decoder */
-#define MODULE_CAPABILITY_VDEC     1 <<  4  /* Video decoder */
-#define MODULE_CAPABILITY_MOTION   1 <<  5  /* Video decoder */
-#define MODULE_CAPABILITY_IDCT     1 <<  6  /* IDCT transformation */
-#define MODULE_CAPABILITY_AOUT     1 <<  7  /* Audio output */
-#define MODULE_CAPABILITY_VOUT     1 <<  8  /* Video output */
-#define MODULE_CAPABILITY_YUV      1 <<  9  /* YUV colorspace conversion */
-#define MODULE_CAPABILITY_AFX      1 << 10  /* Audio effects */
-#define MODULE_CAPABILITY_VFX      1 << 11  /* Video effects */
+#define MODULE_CAPABILITY_ACCESS   1 <<  1  /* Input */
+#define MODULE_CAPABILITY_INPUT    1 <<  2  /* Input */
+#define MODULE_CAPABILITY_DECAPS   1 <<  3  /* Decaps */
+#define MODULE_CAPABILITY_ADEC     1 <<  4  /* Audio decoder */
+#define MODULE_CAPABILITY_VDEC     1 <<  5  /* Video decoder */
+#define MODULE_CAPABILITY_MOTION   1 <<  6  /* Video decoder */
+#define MODULE_CAPABILITY_IDCT     1 <<  7  /* IDCT transformation */
+#define MODULE_CAPABILITY_AOUT     1 <<  8  /* Audio output */
+#define MODULE_CAPABILITY_VOUT     1 <<  9  /* Video output */
+#define MODULE_CAPABILITY_YUV      1 << 10  /* YUV colorspace conversion */
+#define MODULE_CAPABILITY_AFX      1 << 11  /* Audio effects */
+#define MODULE_CAPABILITY_VFX      1 << 12  /* Video effects */
 
 /* FIXME: not yet used */
 typedef struct probedata_s
@@ -64,17 +65,40 @@ typedef struct function_list_s
 
     union
     {
+        /* Input plugin */
         struct
         {
-            int  ( * pf_open )       ( struct aout_thread_s * p_aout );
-            int  ( * pf_setformat )  ( struct aout_thread_s * p_aout );
-            long ( * pf_getbufinfo ) ( struct aout_thread_s * p_aout,
-                                       long l_buffer_info );
-            void ( * pf_play )       ( struct aout_thread_s * p_aout,
-                                       byte_t *buffer, int i_size );
-            void ( * pf_close )      ( struct aout_thread_s * p_aout );
+            int  ( * pf_init ) ( struct input_thread_s * );
+            void ( * pf_open )   ( struct input_thread_s * );
+            void ( * pf_close )  ( struct input_thread_s * );
+            void ( * pf_end )  ( struct input_thread_s * );
+
+            void ( * pf_read ) ( struct input_thread_s *,
+                                 struct data_packet_s *
+                                        pp_packets[] );
+            void ( * pf_demux )( struct input_thread_s *,
+                                 struct data_packet_s * );
+
+            struct data_packet_s * ( * pf_new_packet ) ( void *, size_t );
+            struct pes_packet_s *  ( * pf_new_pes )    ( void * );
+            void ( * pf_delete_packet )  ( struct data_packet_s * );
+            void ( * pf_delete_pes )     ( struct pes_packet_s * );
+
+            int  ( * pf_rewind ) ( struct input_thread_s * );
+            int  ( * pf_seek )   ( struct input_thread_s *, off_t );
+        } input;
+
+        /* Audio output plugin */
+        struct
+        {
+            int  ( * pf_open )       ( struct aout_thread_s * );
+            int  ( * pf_setformat )  ( struct aout_thread_s * );
+            long ( * pf_getbufinfo ) ( struct aout_thread_s *, long );
+            void ( * pf_play )       ( struct aout_thread_s *, byte_t *, int );
+            void ( * pf_close )      ( struct aout_thread_s * );
         } aout;
 
+        /* Motion compensation plugin */
         struct
         {
 #define motion_functions( yuv ) \
@@ -90,23 +114,23 @@ typedef struct function_list_s
 #undef motion_functions
         } motion;
 
+        /* IDCT plugin */
         struct
         {
-            void ( * pf_init )         ( struct vdec_thread_s * p_vdec );
-            void ( * pf_sparse_idct )  ( struct vdec_thread_s * p_vdec,
-                                         dctelem_t * p_block,
-                                         int i_sparse_pos );
-            void ( * pf_idct )         ( struct vdec_thread_s * p_vdec,
-                                         dctelem_t * p_block,
-                                         int i_idontcare );
+            void ( * pf_init )         ( struct vdec_thread_s * );
+            void ( * pf_sparse_idct )  ( struct vdec_thread_s *,
+                                         dctelem_t *, int );
+            void ( * pf_idct )         ( struct vdec_thread_s *,
+                                         dctelem_t *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
         } idct;
 
+        /* YUV transformation plugin */
         struct
         {
-            int  ( * pf_init )         ( struct vout_thread_s * p_vout );
-            int  ( * pf_reset )        ( struct vout_thread_s * p_vout );
-            void ( * pf_end )          ( struct vout_thread_s * p_vout );
+            int  ( * pf_init )         ( struct vout_thread_s * );
+            int  ( * pf_reset )        ( struct vout_thread_s * );
+            void ( * pf_end )          ( struct vout_thread_s * );
         } yuv;
 
     } functions;
@@ -117,6 +141,7 @@ typedef struct module_functions_s
 {
     /* XXX: The order here has to be the same as above for the #defines */
     function_list_t intf;
+    function_list_t access;
     function_list_t input;
     function_list_t decaps;
     function_list_t adec;

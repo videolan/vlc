@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.29 2001/02/08 01:06:11 reno Exp $
+ * $Id: intf_sdl.c,v 1.30 2001/02/08 04:43:27 sam Exp $
  *
  * Authors:
  *
@@ -154,7 +154,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
                     input_Forward( p_intf->p_input, i_rate );
                 break;
 
-            case SDLK_s:
+            case SDLK_z:
                 i_rate = p_intf->p_input->stream.control.i_rate*2;
                 if ( i_rate <= MAXIMAL_RATE )
                 {

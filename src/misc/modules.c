@@ -308,7 +308,7 @@ module_t * module_Need( module_bank_t *p_bank,
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
 
-    intf_Msg( "module: locking module `%s'", p_bestmodule->psz_name );
+    intf_WarnMsg( 1, "module: locking module `%s'", p_bestmodule->psz_name );
 
     /* Don't forget that the module is still locked if bestmodule != NULL */
     return( p_bestmodule );
@@ -329,7 +329,7 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
      * so there is no need to check the return value. */
     UnlockModule( p_module );
 
-    intf_Msg( "module: unlocking module `%s'", p_module->psz_name );
+    intf_WarnMsg( 1, "module: unlocking module `%s'", p_module->psz_name );
 
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
@@ -357,7 +357,7 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     if( module_load( psz_filename, &handle ) )
     {
         /* The dynamic module couldn't be opened */
-        intf_DbgMsg( "module warning: cannot open %s (%s)",
+        intf_ErrMsg( "module warning: cannot open %s (%s)",
                      psz_filename, module_error() );
         return( -1 );
     }
@@ -452,8 +452,8 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     p_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_MsgImm( "module: dynamic module `%s', %s",
-                 p_module->psz_name, p_module->psz_longname );
+    intf_WarnMsgImm( 1, "module: dynamic module `%s', %s",
+                     p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
 }
@@ -677,8 +677,9 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     if( !p_symbol )
     {
         /* We couldn't load the symbol */
-        intf_DbgMsg( "module warning: cannot find symbol %s in module %s (%s)",
-                     psz_name, p_module->psz_filename, module_error() );
+        intf_WarnMsg( 1, "module warning: "
+                         "cannot find symbol %s in module %s (%s)",
+                         psz_name, p_module->psz_filename, module_error() );
         return( -1 );
     }
 

@@ -157,6 +157,9 @@
  * Input thread configuration
  *****************************************************************************/
 
+/* Environment variable containing the display method */
+#define INPUT_METHOD_VAR                "vlc_input"
+
 /* XXX?? */
 #define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
 

@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.5 2001/01/10 19:22:11 massiot Exp $
+ * $Id: mpeg_system.h,v 1.1 2001/02/08 04:43:27 sam Exp $
  *
  * Authors:
  *
