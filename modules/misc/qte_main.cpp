@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.3 2003/02/14 13:48:41 jpsaman Exp $
+ * $Id: qte_main.cpp,v 1.4 2003/03/06 10:11:33 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -38,10 +38,10 @@ extern "C"
 
 typedef struct qte_thread_t
 {
-	VLC_COMMON_MEMBERS
+    VLC_COMMON_MEMBERS
 
     QApplication*       p_qte_application;
-    QWidget* 			p_qte_widget;
+    QWidget* 		p_qte_widget;
 
 } qte_thread_t;
 
@@ -167,6 +167,7 @@ static void QteMain( qte_thread_t *p_this )
 
     /* signal the creation of the window */
     p_this->p_qte_application->setMainWidget(p_this->p_qte_widget);
+    p_this->p_qte_widget->show();
 
     vlc_thread_ready( p_this );
     p_this->p_qte_application->exec();

@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.14 2003/02/16 16:21:37 jpsaman Exp $
+ * $Id: qte.cpp,v 1.15 2003/03/06 10:11:33 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -146,7 +146,7 @@ static int Open( vlc_object_t *p_this )
 
     p_vout->pf_init    = Init;
     p_vout->pf_end     = End;
-    p_vout->pf_manage  = NULL; //Manage;
+    p_vout->pf_manage  = Manage;
     p_vout->pf_render  = NULL; //Render;
     p_vout->pf_display = Display;
 
@@ -291,7 +291,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                        &x, &y, &w, &h );
 #if 0
     msg_Dbg(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
-					p_vout->output.i_width, p_vout->output.i_height, x, y, w, h );
+	p_vout->output.i_width, p_vout->output.i_height, x, y, w, h );
 #endif
 
     if(p_vout->p_sys->p_VideoWidget)
@@ -337,6 +337,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         p.drawImage( x, y, rotatedFrame, 0, 0, rw, rh );
 #else
         QDirectPainter p(p_vout->p_sys->p_VideoWidget);
+        p.transformOrientation();
         // just copy the image to the frame buffer...
         memcpy(p.frameBuffer(), (p_pic->p_sys->pQImage->jumpTable())[0], h * p.lineStep());
 #endif
@@ -352,6 +353,46 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    msg_Dbg( p_vout, "Manage" );
+
+    /* Fullscreen change */
+    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
+    {
+        p_vout->b_fullscreen = ! p_vout->b_fullscreen;
+
+//        p_vout->p_sys->b_cursor_autohidden = 0;
+//        SDL_ShowCursor( p_vout->p_sys->b_cursor &&
+//                        ! p_vout->p_sys->b_cursor_autohidden );
+
+        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    /*
+     * Size change
+     */
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
+        msg_Dbg( p_vout, "video display resized (%dx%d)",
+                 p_vout->p_sys->i_width, p_vout->p_sys->i_height );
+
+        CloseDisplay( p_vout );
+        OpenDisplay( p_vout );
+
+        /* We don't need to signal the vout thread about the size change if
+         * we can handle rescaling ourselves */
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+    }
+
+    /* Pointer change */
+//    if( ! p_vout->p_sys->b_cursor_autohidden &&
+//        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+//    {
+//        /* Hide the mouse automatically */
+//        p_vout->p_sys->b_cursor_autohidden = 1;
+//        SDL_ShowCursor( 0 );
+//    }
+
     return 0;
 }
 
@@ -442,7 +483,7 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
-	if ( p_vout->b_fullscreen )
+    if ( p_vout->b_fullscreen )
        p_vout->p_sys->p_VideoWidget->showFullScreen();
     else
       p_vout->p_sys->p_VideoWidget->showNormal();
@@ -476,11 +517,19 @@ static int OpenDisplay( vout_thread_t *p_vout )
                                                     p_vout->i_window_width;
     p_vout->p_sys->i_height = p_vout->b_fullscreen ? desktop->width() :
                                                      p_vout->i_window_height;
+
+#if 0 /* FIXME: I need an event queue to handle video output size changes. */
+    /* Update dimensions */
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    p_vout->i_window_width = p_vout->p_sys->i_width;
+    p_vout->i_window_height = p_vout->p_sys->i_height;
+#endif
+
     msg_Dbg( p_vout, "OpenDisplay (h=%d,w=%d)",p_vout->p_sys->i_height,p_vout->p_sys->i_width);
 
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
-							RunQtThread,
+                            RunQtThread,
                             VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE) )
     {
         msg_Err( p_vout, "cannot create QT Embedded Thread" );
@@ -556,7 +605,7 @@ static void RunQtThread(event_thread_t *p_event)
         }
         QWidget* pWidget = new QWidget();
         if (pWidget)
-		{
+	{
             p_event->p_vout->p_sys->p_VideoWidget = pWidget;
         }
     }
@@ -569,30 +618,30 @@ static void RunQtThread(event_thread_t *p_event)
     {
         /* Set default window width and heigh to exactly preferred size. */
     	QWidget *desktop = p_event->p_vout->p_sys->p_QApplication->desktop();
-		p_event->p_vout->p_sys->p_VideoWidget->setMinimumWidth( 10 );
- 		p_event->p_vout->p_sys->p_VideoWidget->setMinimumHeight( 10 );
-		p_event->p_vout->p_sys->p_VideoWidget->setBaseSize( p_event->p_vout->p_sys->i_width,
-			p_event->p_vout->p_sys->i_height );
+	p_event->p_vout->p_sys->p_VideoWidget->setMinimumWidth( 10 );
+ 	p_event->p_vout->p_sys->p_VideoWidget->setMinimumHeight( 10 );
+	p_event->p_vout->p_sys->p_VideoWidget->setBaseSize( p_event->p_vout->p_sys->i_width,
+	p_event->p_vout->p_sys->i_height );
         p_event->p_vout->p_sys->p_VideoWidget->setMaximumWidth( desktop->width() );
         p_event->p_vout->p_sys->p_VideoWidget->setMaximumHeight( desktop->height() );
-
+        /* Check on fullscreen */
         if (p_event->p_vout->b_fullscreen)
-		    p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
+	    p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
         else
-			p_event->p_vout->p_sys->p_VideoWidget->showNormal();
+	   p_event->p_vout->p_sys->p_VideoWidget->showNormal();
 
         p_event->p_vout->p_sys->p_VideoWidget->show();
         p_event->p_vout->p_sys->bRunning = TRUE;
 
 #ifdef NEED_QTE_MAIN
         while(!p_event->b_die && p_event->p_vout->p_sys->bRunning)
-		{
+	{
     	   /* Check if we are asked to exit */
            if( p_event->b_die )
                break;
 
-			msleep(100);
-		}
+	   msleep(100);
+	}
 #else
         // run the main loop of qtapplication until someone says: 'quit'
         p_event->p_vout->p_sys->pcQApplication->exec();
