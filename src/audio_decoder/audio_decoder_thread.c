@@ -76,15 +76,16 @@ static void     EndThread              (adec_thread_t * p_adec);
  * This function creates a new audio decoder thread, and returns a pointer to
  * its description. On error, it returns NULL.
  *****************************************************************************/
-adec_thread_t * adec_CreateThread (input_thread_t * p_input)
+adec_thread_t * adec_CreateThread ( input_thread_t * p_input )
 {
     adec_thread_t *     p_adec;
 
-    intf_DbgMsg ("adec debug: creating audio decoder thread\n");
+    intf_DbgMsg ( "adec debug: creating audio decoder thread\n" );
 
     /* Allocate the memory needed to store the thread's structure */
-    if ((p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL) {
-        intf_ErrMsg ("adec error: not enough memory for adec_CreateThread() to create the new thread\n");
+    if ( (p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL ) 
+    {
+        intf_ErrMsg ( "adec error: not enough memory for adec_CreateThread() to create the new thread\n" );
         return NULL;
     }
 
@@ -99,8 +100,8 @@ adec_thread_t * adec_CreateThread (input_thread_t * p_input)
      */
     /* Initialize the decoder fifo's data lock and conditional variable and set
      * its buffer as empty */
-    vlc_mutex_init (&p_adec->fifo.data_lock);
-    vlc_cond_init (&p_adec->fifo.data_wait);
+    vlc_mutex_init ( &p_adec->fifo.data_lock );
+    vlc_cond_init ( &p_adec->fifo.data_wait );
     p_adec->fifo.i_start = 0;
     p_adec->fifo.i_end = 0;
 
@@ -110,7 +111,7 @@ adec_thread_t * adec_CreateThread (input_thread_t * p_input)
     /*
      * Initialize the decoder properties
      */
-    adec_init (&p_adec->audio_decoder);
+    adec_init ( &p_adec->audio_decoder );
 
     /*
      * Initialize the output properties
@@ -119,7 +120,8 @@ adec_thread_t * adec_CreateThread (input_thread_t * p_input)
     p_adec->p_aout_fifo = NULL;
 
     /* Spawn the audio decoder thread */
-    if (vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec)) {
+    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec) ) 
+    {
         intf_ErrMsg ("adec error: can't spawn audio decoder thread\n");
         free (p_adec);
         return NULL;
@@ -170,22 +172,24 @@ static int InitThread (adec_thread_t * p_adec)
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
-    vlc_mutex_lock (&p_adec->fifo.data_lock);
-    while (DECODER_FIFO_ISEMPTY(p_adec->fifo)) {
-        if (p_adec->b_die) {
-            vlc_mutex_unlock (&p_adec->fifo.data_lock);
+    vlc_mutex_lock ( &p_adec->fifo.data_lock );
+    while ( DECODER_FIFO_ISEMPTY(p_adec->fifo) ) 
+    {
+        if (p_adec->b_die) 
+        {
+            vlc_mutex_unlock ( &p_adec->fifo.data_lock );
             return -1;
         }
-        vlc_cond_wait (&p_adec->fifo.data_wait, &p_adec->fifo.data_lock);
+        vlc_cond_wait ( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
-    p_adec->p_ts = DECODER_FIFO_START (p_adec->fifo)->p_first_ts;
-    byte_stream = adec_byte_stream (&p_adec->audio_decoder);
+    p_adec->p_ts = DECODER_FIFO_START ( p_adec->fifo )->p_first_ts;
+    byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
     byte_stream->p_byte =
 	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_start;
     byte_stream->p_end =
 	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_end;
     byte_stream->info = p_adec;
-    vlc_mutex_unlock (&p_adec->fifo.data_lock);
+    vlc_mutex_unlock ( &p_adec->fifo.data_lock );
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
     aout_fifo.i_channels = 2;
@@ -193,11 +197,12 @@ static int InitThread (adec_thread_t * p_adec)
     aout_fifo.l_frame_size = ADEC_FRAME_SIZE;
 
     /* Creating the audio output fifo */
-    if ((p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL) {
+    if ( (p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL ) 
+    {
         return -1;
     }
 
-    intf_DbgMsg ("adec debug: audio decoder thread %p initialized\n", p_adec);
+    intf_DbgMsg ( "adec debug: audio decoder thread %p initialized\n", p_adec );
     return 0;
 }
 
@@ -211,9 +216,9 @@ static void RunThread (adec_thread_t * p_adec)
 {
     int sync;
 
-    intf_DbgMsg ("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
+    intf_DbgMsg ( "adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid() );
 
-    msleep (INPUT_PTS_DELAY);
+    msleep ( INPUT_PTS_DELAY );
 
     /* Initializing the audio decoder thread */
     if( InitThread (p_adec) )
@@ -229,26 +234,26 @@ static void RunThread (adec_thread_t * p_adec)
         s16 * buffer;
         adec_sync_info_t sync_info;
 
-        if (!sync)
+        if ( !sync )
         {	
             /* have to find a synchro point */
             adec_byte_stream_t * p_byte_stream;
             
-            printf ("sync\n");
+            printf ( "sync\n" );
             
             p_adec->align = 0;
-            p_byte_stream = adec_byte_stream (&p_adec->audio_decoder);
+            p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
             do 
             {
-                adec_byte_stream_next (p_byte_stream);
-            } while ((!p_adec->align) && (!p_adec->b_die) &&  (!p_adec->b_error));
+                adec_byte_stream_next ( p_byte_stream );
+            } while ( (!p_adec->align) && (!p_adec->b_die) &&  (!p_adec->b_error) );
 
 	        sync = 1;
 	    }
 
-        if( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
+        if( DECODER_FIFO_START( p_adec->fifo)->b_has_pts )
         {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START( p_adec->fifo )->i_pts;
             DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
         }
         else
@@ -298,26 +303,28 @@ static void RunThread (adec_thread_t * p_adec)
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
  *****************************************************************************/
-static void ErrorThread (adec_thread_t *p_adec)
+static void ErrorThread ( adec_thread_t *p_adec )
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_adec->fifo.data_lock);
+    vlc_mutex_lock ( &p_adec->fifo.data_lock );
 
     /* Wait until a `die' order is sent */
-    while (!p_adec->b_die) {
+    while ( !p_adec->b_die ) 
+    {
         /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(p_adec->fifo)) {
-            input_NetlistFreePES (p_adec->p_input, DECODER_FIFO_START(p_adec->fifo));
-            DECODER_FIFO_INCSTART (p_adec->fifo);
+        while ( !DECODER_FIFO_ISEMPTY(p_adec->fifo) ) 
+        {
+            input_NetlistFreePES ( p_adec->p_input, DECODER_FIFO_START(p_adec->fifo) );
+            DECODER_FIFO_INCSTART ( p_adec->fifo );
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_adec->fifo.data_wait, &p_adec->fifo.data_lock);
+        vlc_cond_wait ( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
 
     /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_adec->fifo.data_lock);
+    vlc_mutex_unlock ( &p_adec->fifo.data_lock );
 }
 
 /*****************************************************************************
@@ -326,13 +333,14 @@ static void ErrorThread (adec_thread_t *p_adec)
  * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
-static void EndThread (adec_thread_t *p_adec)
+static void EndThread ( adec_thread_t *p_adec )
 {
-    intf_DbgMsg ("adec debug: destroying audio decoder thread %p\n", p_adec);
+    intf_DbgMsg ( "adec debug: destroying audio decoder thread %p\n", p_adec );
 
     /* If the audio output fifo was created, we destroy it */
-    if (p_adec->p_aout_fifo != NULL) {
-        aout_DestroyFifo (p_adec->p_aout_fifo);
+    if ( p_adec->p_aout_fifo != NULL ) 
+    {
+        aout_DestroyFifo ( p_adec->p_aout_fifo );
 
         /* Make sure the output thread leaves the NextFrame() function */
         vlc_mutex_lock (&(p_adec->p_aout_fifo->data_lock));
@@ -345,23 +353,26 @@ static void EndThread (adec_thread_t *p_adec)
     intf_DbgMsg ("adec debug: audio decoder thread %p destroyed\n", p_adec);
 }
 
-void adec_byte_stream_next (adec_byte_stream_t * p_byte_stream)
+void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )
 {
     adec_thread_t * p_adec = p_byte_stream->info;
 
     /* We are looking for the next TS packet that contains real data,
      * and not just a PES header */
-    do {
+    do 
+    {
         /* We were reading the last TS packet of this PES packet... It's
          * time to jump to the next PES packet */
-        if (p_adec->p_ts->p_next_ts == NULL) {
+        if (p_adec->p_ts->p_next_ts == NULL) 
+        {
             /* We are going to read/write the start and end indexes of the
              * decoder fifo and to use the fifo's conditional variable,
              * that's why we need to take the lock before */
             vlc_mutex_lock (&p_adec->fifo.data_lock);
 
             /* Is the input thread dying ? */
-            if (p_adec->p_input->b_die) {
+            if (p_adec->p_input->b_die) 
+            {
                 vlc_mutex_unlock (&(p_adec->fifo.data_lock));
                 return;
             }
@@ -374,9 +385,11 @@ void adec_byte_stream_next (adec_byte_stream_t * p_byte_stream)
             input_NetlistFreePES (p_adec->p_input, DECODER_FIFO_START(p_adec->fifo));
             DECODER_FIFO_INCSTART (p_adec->fifo);
 
-            while (DECODER_FIFO_ISEMPTY(p_adec->fifo)) {
+            while (DECODER_FIFO_ISEMPTY(p_adec->fifo)) 
+            {
                 vlc_cond_wait (&p_adec->fifo.data_wait, &p_adec->fifo.data_lock);
-                if (p_adec->p_input->b_die) {
+                if (p_adec->p_input->b_die) 
+                {
                     vlc_mutex_unlock (&(p_adec->fifo.data_lock));
                     return;
                 }
@@ -392,7 +405,8 @@ void adec_byte_stream_next (adec_byte_stream_t * p_byte_stream)
         }
         /* Perhaps the next TS packet of the current PES packet contains
          * real data (ie its payload's size is greater than 0) */
-        else {
+        else 
+        {
             p_adec->p_ts = p_adec->p_ts->p_next_ts;
         }
     } while (p_adec->p_ts->i_payload_start == p_adec->p_ts->i_payload_end);
