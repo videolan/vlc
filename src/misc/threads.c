@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.19 2002/10/03 17:01:58 gbazin Exp $
+ * $Id: threads.c,v 1.20 2002/10/04 12:01:40 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -245,7 +245,8 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( p_this->p_vlc->SignalObjectAndWait && !p_this->p_vlc->b_fast_mutex )
+    if( p_this->p_libvlc->SignalObjectAndWait &&
+        !p_this->p_libvlc->b_fast_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -378,10 +379,10 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     p_condvar->i_waiting_threads = 0;
 
     /* Misc init */
-    p_condvar->i_win9x_cv = p_this->p_vlc->i_win9x_cv;
-    p_condvar->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
+    p_condvar->i_win9x_cv = p_this->p_libvlc->i_win9x_cv;
+    p_condvar->SignalObjectAndWait = p_this->p_libvlc->SignalObjectAndWait;
 
-    if( (p_condvar->SignalObjectAndWait && !p_this->p_vlc->b_fast_mutex)
+    if( (p_condvar->SignalObjectAndWait && !p_this->p_libvlc->b_fast_mutex)
         || p_condvar->i_win9x_cv == 0 )
     {
         /* Create an auto-reset event. */
@@ -400,7 +401,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
                                                 0x7fffffff, /* max count */
                                                 NULL );     /* unnamed */
 
-        if( p_this->p_vlc->i_win9x_cv == 1 )
+        if( p_condvar->i_win9x_cv == 1 )
             /* Create a manual-reset event initially signaled. */
             p_condvar->event = CreateEvent( NULL, TRUE, TRUE, NULL );
         else

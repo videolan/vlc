@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.15 2002/09/17 14:56:13 sam Exp $
+ * $Id: win32_specific.c,v 1.16 2002/10/04 12:01:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -55,8 +55,8 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_t *p_this )
 {
-    p_this->p_vlc->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
-    p_this->p_vlc->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
+    p_this->p_libvlc->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
+    p_this->p_libvlc->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
 }
 
 /*****************************************************************************

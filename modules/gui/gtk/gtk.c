@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.3 2002/09/30 11:05:39 sam Exp $
+ * $Id: gtk.c,v 1.4 2002/10/04 12:01:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,7 +49,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );
-static void Manage       ( intf_thread_t * );
+static int  Manage       ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -95,12 +95,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+#ifdef NEED_GTK_MAIN
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
         return VLC_EMODULE;
     }
+#endif
 
     p_intf->pf_run = Run;
 
@@ -135,7 +137,9 @@ static void Close( vlc_object_t *p_this )
 
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
+#ifdef NEED_GTK_MAIN
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
+#endif
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -157,7 +161,22 @@ static void Run( intf_thread_t *p_intf )
         { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
     };
 
+#ifdef NEED_GTK_MAIN
     gdk_threads_enter();
+#else
+    /* gtk_init needs to know the command line. We don't care, so we
+     * give it an empty one */
+    char  *p_args[] = { "" };
+    char **pp_args  = p_args;
+    int    i_args   = 1;
+    int    i_dummy;
+
+    /* gtk_init will register stuff with g_atexit, so we need to take
+     * the global lock if we want to be able to intercept the calls */
+    vlc_mutex_lock( &p_intf->p_libvlc->global_lock );
+    gtk_init( &i_args, &pp_args );
+    vlc_mutex_unlock( &p_intf->p_libvlc->global_lock );
+#endif
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window();
@@ -239,6 +258,7 @@ static void Run( intf_thread_t *p_intf )
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
+#ifdef NEED_GTK_MAIN
     while( !p_intf->b_die )
     {
         Manage( p_intf );
@@ -249,6 +269,16 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
         gdk_threads_enter();
     }
+#else
+    /* Sleep to avoid using all CPU - since some interfaces needs to access
+     * keyboard events, a 100ms delay is a good compromise */
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage,
+                               p_intf );
+    /* Enter Gtk mode */
+    gtk_main();
+    /* Remove the timeout */
+    gtk_timeout_remove( i_dummy );
+#endif
 
     /* Destroy the Tooltips structure */
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_tooltips) );
@@ -257,7 +287,9 @@ static void Run( intf_thread_t *p_intf )
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_popup) );
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
+#ifdef NEED_GTK_MAIN
     gdk_threads_leave();
+#endif
 }
 
 /* following functions are local */
@@ -268,7 +300,7 @@ static void Run( intf_thread_t *p_intf )
  * In this function, called approx. 10 times a second, we check what the
  * main program wanted to tell us.
  *****************************************************************************/
-static void Manage( intf_thread_t *p_intf )
+static int Manage( intf_thread_t *p_intf )
 {
     int i_start, i_stop;
 
@@ -414,5 +446,19 @@ static void Manage( intf_thread_t *p_intf )
         p_intf->p_sys->b_playing = 0;
     }
 
+#ifndef NEED_GTK_MAIN
+    if( p_intf->b_die )
+    {
+        vlc_mutex_unlock( &p_intf->change_lock );
+
+        /* Prepare to die, young Skywalker */
+        gtk_main_quit();
+
+        return FALSE;
+    }
+#endif
+
     vlc_mutex_unlock( &p_intf->change_lock );
+
+    return TRUE;
 }
