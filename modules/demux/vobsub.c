@@ -69,7 +69,7 @@ static void TextUnload( text_t * );
 
 typedef struct
 {
-    mtime_t i_start;
+    int64_t i_start;
     int     i_vobsub_location;
 } subtitle_t;
 
@@ -165,7 +165,7 @@ static int Open ( vlc_object_t *p_this )
             if( p_sys->track[i].i_subtitles > 1 )
             {
                 if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
-                    p_sys->i_length = (mtime_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + 1 * 1000 * 1000;
+                    p_sys->i_length = (int64_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + ( 1 *1000 *1000 );
             }
         }
     }
@@ -214,66 +214,89 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64, i64;
+    int i;
     double *pf, f;
 
     switch( i_query )
     {
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length;
+            *pi64 = (int64_t) p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            /*if( p_sys->i_current_subtitle < p_sys->i_subtitles )
+            for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                *pi64 = p_sys->subtitle[p_sys->i_current_subtitle].i_start;
+                vlc_bool_t b_selected;
+                /* Check the ES is selected */
+                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                p_sys->track[i].p_es, &b_selected );
+                if( b_selected ) break;
+            }
+            if( i < p_sys->i_tracks && p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles )
+            {
+                *pi64 = p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start;
                 return VLC_SUCCESS;
-            }*/
+            }
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            /*p_sys->i_current_subtitle = 0;
-            while( p_sys->i_current_subtitle < p_sys->i_subtitles &&
-                   p_sys->subtitle[p_sys->i_current_subtitle].i_start < i64 )
+            for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                p_sys->i_current_subtitle++;
-            }
+                p_sys->track[i].i_current_subtitle = 0;
+                while( p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles &&
+                       p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start < i64 )
+                {
+                    p_sys->track[i].i_current_subtitle++;
+                }
 
-            if( p_sys->i_current_subtitle >= p_sys->i_subtitles )
-                return VLC_EGENERIC;*/
+                if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )
+                    return VLC_EGENERIC;
+            }
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            /*if( p_sys->i_current_subtitle >= p_sys->i_subtitles )
+            for( i = 0; i < p_sys->i_tracks; i++ )
+            {
+                vlc_bool_t b_selected;
+                /* Check the ES is selected */
+                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                p_sys->track[i].p_es, &b_selected );
+                if( b_selected ) break;
+            }
+            if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )
             {
                 *pf = 1.0;
             }
-            else if( p_sys->i_subtitles > 0 )
+            else if( p_sys->track[i].i_subtitles > 0 )
             {
-                *pf = (double)p_sys->subtitle[p_sys->i_current_subtitle].i_start /
+                *pf = (double)p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start /
                       (double)p_sys->i_length;
             }
             else
             {
                 *pf = 0.0;
-            }*/
+            }
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
             f = (double)va_arg( args, double );
-            /*i64 = f * p_sys->i_length;
+            i64 = (int64_t) f * p_sys->i_length;
 
-            p_sys->i_current_subtitle = 0;
-            while( p_sys->i_current_subtitle < p_sys->i_subtitles &&
-                   p_sys->subtitle[p_sys->i_current_subtitle].i_start < i64 )
+            for( i = 0; i < p_sys->i_tracks; i++ )
             {
-                p_sys->i_current_subtitle++;
+                p_sys->track[i].i_current_subtitle = 0;
+                while( p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles &&
+                       p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start < i64 )
+                {
+                    p_sys->track[i].i_current_subtitle++;
+                }
+                if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )
+                    return VLC_EGENERIC;
             }
-            if( p_sys->i_current_subtitle >= p_sys->i_subtitles )
-                return VLC_EGENERIC;*/
             return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
@@ -304,13 +327,13 @@ static int Demux( demux_t *p_demux )
     {
 #define tk p_sys->track[i]
         if( tk.i_current_subtitle >= tk.i_subtitles )
-            return 0;
+            continue;
 
-        i_maxdate = p_sys->i_next_demux_date;
+        i_maxdate = (int64_t) p_sys->i_next_demux_date;
         if( i_maxdate <= 0 && tk.i_current_subtitle < tk.i_subtitles )
         {
             /* Should not happen */
-            i_maxdate = tk.p_subtitles[tk.i_current_subtitle].i_start + 1;
+            i_maxdate = (int64_t) tk.p_subtitles[tk.i_current_subtitle].i_start + 1;
         }
 
         while( tk.i_current_subtitle < tk.i_subtitles &&
@@ -495,8 +518,8 @@ static int ParseVobSubIDX( demux_t *p_demux )
              * loc is the hex location of the spu in the .sub file
              *
              */
-            unsigned int h, m, s, ms, loc;
-            int i_start, i_location = 0;
+            int h, m, s, ms, loc;
+            int64_t i_start, i_location = 0;
             
             vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
 
@@ -505,17 +528,17 @@ static int ParseVobSubIDX( demux_t *p_demux )
             {
                 subtitle_t *current_sub;
                 
-                i_start = ( (mtime_t)h * 3600*1000 +
-                            (mtime_t)m * 60*1000 +
-                            (mtime_t)s * 1000 +
-                            (mtime_t)ms ) * 1000;
+                i_start = (int64_t) ( h * 3600*1000 +
+                            m * 60*1000 +
+                            s * 1000 +
+                            ms ) * 1000;
                 i_location = loc;
                 
                 current_tk->i_subtitles++;
                 current_tk->p_subtitles = (subtitle_t*)realloc( current_tk->p_subtitles, sizeof( subtitle_t ) * (current_tk->i_subtitles + 1 ) );
                 current_sub = &current_tk->p_subtitles[current_tk->i_subtitles - 1];
                 
-                current_sub->i_start = i_start;
+                current_sub->i_start = (int64_t) i_start;
                 current_sub->i_vobsub_location = i_location;
             }
         }
@@ -549,7 +572,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
 
         if( p[3] != 0xbd )
         {
-            msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] );
+            /* msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] ); */
             p += i_size;
             continue;
         }
@@ -567,9 +590,8 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
             continue;
         }
         i_spu = i_id&0x1f;
-        msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size );
+        /* msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size ); */
 
-        /* FIXME i_spu == determines which of the spu tracks we will show. */
         for( i = 0; i < p_sys->i_tracks; i++ )
         {
 #define tk p_sys->track[i]
