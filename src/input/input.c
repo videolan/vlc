@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.290 2004/02/16 17:14:15 zorglub Exp $
+ * $Id: input.c,v 1.291 2004/03/03 11:59:41 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -887,6 +887,7 @@ static int InitThread( input_thread_t * p_input )
     /* get length */
     if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
     {
+        input_info_category_t *p_cat = input_InfoCategory( p_input, _("File") );
         p_playlist = (playlist_t*)vlc_object_find( p_input,
                                                    VLC_OBJECT_PLAYLIST,
                                                    FIND_PARENT );
@@ -896,6 +897,12 @@ static int InitThread( input_thread_t * p_input )
             val.b_bool = p_playlist->i_index;
             var_Set( p_playlist, "item-change", val );
             vlc_object_release( p_playlist );
+        }
+        if( p_cat )
+        {
+            char psz_buffer[MSTRTIME_MAX_SIZE];
+            input_AddInfo( p_cat, _("Duration"),
+                           msecstotimestr( psz_buffer, i_length / 1000 ) );
         }
     }
 
