@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.28 2003/05/05 22:23:36 gbazin Exp $
+ * $Id: mp4.c,v 1.29 2003/05/06 16:05:10 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -965,6 +965,9 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
         case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
             p_es->i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             break;
+        case( VLC_FOURCC( 's', '2', '6', '3' ) ):
+            p_es->i_fourcc = VLC_FOURCC( 'h', '2', '6', '3' );
+            break;
         default:
             p_es->i_fourcc = p_sample->i_type;
             break;
@@ -1491,7 +1494,7 @@ static void MP4_TrackCreate( input_thread_t *p_input,
         MP4_Box_t *p_sample;
 
         p_sample = MP4_BoxGet(  p_track->p_stsd, "[0]" );
-        if( p_sample )
+        if( p_sample && p_sample->data.p_sample_soun)
         {
             MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
             if( p_soun->i_qt_version == 0 && p_track->i_timescale != p_soun->i_sampleratehi )

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.23 2003/04/25 21:47:25 fenrir Exp $
+ * $Id: libmp4.c,v 1.24 2003/05/06 16:05:10 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2121,6 +2121,7 @@ static struct
     { FOURCC_ZyGo,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_s263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_3iv1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
