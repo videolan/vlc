@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.c,v 1.1 2004/01/30 13:17:12 rocky Exp $
+ * $Id: pixmap.c,v 1.2 2004/01/30 13:23:08 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -149,14 +149,16 @@ find_cmap_rgb8_nearest(const vout_thread_t *p_vout, const ogt_yuvt_t *p_yuv,
     /* Interval range calculations to show that we don't overflow the
        word sizes below. pixels component values start out 8
        bits. When we subtract two components we get 9 bits, then
-       square to 10 bits.  Next we scale by 6 we get 16 bits. XXX_COEF
-       all fit into 5 bits, so when we multiply we should have 21 bits
-       maximum. So computations can be done using 32-bit
-       precision. However before storing back distance components we
-       scale back down by 12 bits making the precision 9 bits.
+       square to 10 bits.  Next we scale by 6 to give 16
+       bits. XXX_COEF all fit into 5 bits, so when we multiply we
+       should have 21 bits maximum. So computations can be done using
+       32-bit precision. However before storing back distance
+       components we scale back down by 12 bits making the precision 9
+       bits. (This checks out since it is basically the range of the
+       square of the initial 8-bit value.)
 
-       The squared distance is the sum of three of the 9-bit numbers
-       described above. This then uses 21-bits and also fits in a
+       The squared distance is the sum of three of the 9-bit components
+       described above. This then uses 27-bits and also fits in a
        32-bit word.
      */
 
