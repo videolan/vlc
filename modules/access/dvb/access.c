@@ -392,7 +392,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         default:
-            msg_Err( p_access, "unimplemented query in control" );
+            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
 
     }

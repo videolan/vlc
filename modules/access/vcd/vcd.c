@@ -306,8 +306,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case ACCESS_SET_PRIVATE_ID_STATE:
+            return VLC_EGENERIC;
+
         default:
-            msg_Err( p_access, "unimplemented query in control" );
+            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
 
     }
