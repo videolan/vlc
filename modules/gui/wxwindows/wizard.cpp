@@ -1506,7 +1506,6 @@ int WizardDialog::GetAction()
 
 void WizardDialog::Run()
 {
-    fprintf(stderr, "p_intf %p %p", p_intf, this->p_intf);
     msg_Dbg( p_intf,"starting wizard");
     if( RunWizard(page1) )
     {
@@ -1514,7 +1513,7 @@ void WizardDialog::Run()
         char *psz_opt;
         msg_Dbg( p_intf,"wizard completed");
 
-        if( i_action == ACTION_TRANSCODE)
+        if( i_action == ACTION_TRANSCODE )
         {
             msg_Dbg( p_intf,"Starting transcode of %s to file %s",
                                   mrl, address);
@@ -1527,38 +1526,40 @@ void WizardDialog::Run()
             char *psz_transcode = (char *)malloc( i_tr_size * sizeof(char));
             if( vcodec || acodec )
             {
-                sprintf( psz_transcode, "transcode{");
+                fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "transcode{"));
+                fprintf(stderr, "step 1 : %s\n", psz_transcode);
             }
             else
             {
-                sprintf( psz_transcode, "%c", 0 );
+                snprintf( psz_transcode, i_tr_size, "%c", 0 );
             }
             if( vcodec )
             {
-                sprintf( psz_transcode, "%svcodec=%s,vb=%i",
-                                psz_transcode, vcodec, vb );
+                 fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "%svcodec=%s,vb=%i",
+                          psz_transcode, vcodec, vb ));
+                fprintf(stderr, "step 2 : %s\n", psz_transcode);
             }
             if( acodec )
             {
-                sprintf( psz_transcode, "%s%cacodec=%s,ab=%i",
-                                psz_transcode, vcodec ? ',' : ' ',
-                                acodec, ab );
+                 fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "%s%cacodec=%s,ab=%i",
+                          psz_transcode, vcodec ? ',' : ' ', acodec, ab ));
+                fprintf(stderr, "step 3 : %s\n", psz_transcode);
             }
             if( vcodec || acodec )
             {
-                sprintf( psz_transcode, "%s}:", psz_transcode );
+                snprintf( psz_transcode, i_tr_size, "%s}:", psz_transcode );
+                fprintf(stderr, "step 4 : %s\n", psz_transcode);
             }
             i_size = 73 + strlen(mux) + strlen(address) + strlen(psz_transcode);
             psz_opt = (char *)malloc( i_size * sizeof(char) );
-            sprintf( psz_opt, ":sout=#%sstandard{mux=%s,url=%s,"
-                               "access=file}",
-                               psz_transcode, mux, address );
+            snprintf( psz_opt, i_size, ":sout=#%sstandard{mux=%s,url=%s,"
+                      "access=file}",
+                       psz_transcode, mux, address );
         }
         else
         {
             msg_Dbg( p_intf, "Starting stream of %s to %s using %s, encap %s",
                                mrl, address, method, mux);
-
             if( b_sap )
             {
                 char *psz_sap_option = NULL;
@@ -1566,19 +1567,20 @@ void WizardDialog::Run()
                 {
                     psz_sap_option = (char *) malloc( strlen( psz_sap_name )
                                                + 15 );
-                    sprintf( psz_sap_option, "sap,name=\"%s\"",psz_sap_name );
+                    snprintf( psz_sap_option,strlen( psz_sap_name ) + 15,
+                             "sap,name=\"%s\"",psz_sap_name );
                 }
                 else
                 {
-                    psz_sap_option = (char *) malloc( 10 );
-                    sprintf( psz_sap_option, "sap" );
+                    psz_sap_option = (char *) malloc( 5 );
+                    snprintf( psz_sap_option, 5, "sap" );
                 }
                 i_size = 40 + strlen(mux) + strlen(address) +
                               strlen( psz_sap_option);
                 psz_opt = (char *)malloc( i_size * sizeof(char) );
-                sprintf( psz_opt,
-                        ":sout=#standard{mux=%s,url=%s,access=%s,%s}",
-                                  mux, address,method, psz_sap_option);
+                snprintf( psz_opt, i_size,
+                          ":sout=#standard{mux=%s,url=%s,access=%s,%s}",
+                          mux, address,method, psz_sap_option);
                 msg_Dbg( p_intf, "Sap enabled: %s", psz_sap_option);
                 if( psz_sap_option ) free( psz_sap_option );
             }
@@ -1586,8 +1588,9 @@ void WizardDialog::Run()
             {
                 i_size = 40 + strlen(mux) + strlen(address);
                 psz_opt = (char *)malloc( i_size * sizeof(char) );
-                sprintf( psz_opt, ":sout=#standard{mux=%s,url=%s,access=%s}",
-                            mux, address,method);
+                snprintf( psz_opt, i_size,
+                          ":sout=#standard{mux=%s,url=%s,access=%s}",
+                          mux, address,method);
             }
         }
 
@@ -1602,18 +1605,18 @@ void WizardDialog::Run()
             {
                 char psz_from[20];
                 msg_Dbg( p_intf, "Setting starttime");
-                sprintf( psz_from, "start-time=%i", i_from);
+                snprintf( psz_from, 20, "start-time=%i", i_from);
                 playlist_ItemAddOption( p_item, psz_from);
             }
             if( i_to != 0)
             {
                 char psz_to[20];
-                sprintf( psz_to, "stop-time=%i", i_to);
+                snprintf( psz_to, 20, "stop-time=%i", i_to);
                 playlist_ItemAddOption( p_item, psz_to);
             }
 
             char psz_ttl[20];
-            sprintf( psz_ttl, "ttl=%i",i_ttl );
+            snprintf( psz_ttl, 20, "ttl=%i",i_ttl );
             playlist_ItemAddOption( p_item, psz_ttl );
 
             playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
