@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.10 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.11 2003/04/24 20:24:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -377,6 +377,8 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 
                 if( p_vol_end != NULL && p_vol_begin < p_vol_end )
                 {
+                    BITMAPINFOHEADER *p_bih =
+                        (BITMAPINFOHEADER*)p_pack->p_fifo->p_bitmapinfoheader;
                     p_pack->i_vol = p_vol_end - p_vol_begin;
                     msg_Dbg( p_pack->p_fifo, "Reopening output" );
 
@@ -388,8 +390,16 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
                     p_pack->output_format.i_cat = VIDEO_ES;
                     p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
 
-                    p_pack->output_format.i_width  = 0;
-                    p_pack->output_format.i_height = 0;
+                    if( p_bih )
+                    {
+                        p_pack->output_format.i_width  = p_bih->biWidth;
+                        p_pack->output_format.i_height = p_bih->biHeight;
+                    }
+                    else
+                    {
+                        p_pack->output_format.i_width  = 0;
+                        p_pack->output_format.i_height = 0;
+                    }
                     p_pack->output_format.i_bitrate= 0;
 
                     p_pack->output_format.i_extra_data = p_pack->i_vol;
