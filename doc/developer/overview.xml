@@ -1,0 +1,240 @@
+<chapter> <title> VLC Overview </title>
+
+  <sect1> <title> Code modules </title>
+
+    <para>
+The VLC code uses modules and plugins. A module is a group of compiled-in
+C source files. They are linked against the main application at build time.
+At present, these modules are :
+    </para>
+  
+    <itemizedlist>
+      <listitem> <para> Interface : this is the entry point of the program. It manages
+    all user interactions and thread spawning. </para> </listitem>
+      <listitem> <para> Input : it opens the input socket, reads packets, parses
+    them and passes reconstituted elementary streams to the decoder(s).
+      </para> </listitem>
+      <listitem> <para> Video output : it initializes the video display. Then it
+    gets all pictures and subpictures (ie. subtitles) from the decoder(s),
+    optionally converts them to RGB format (from YUV), and displays them.
+      </para> </listitem>
+      <listitem> <para> Audio output : it initializes the audio mixer, ie.
+    finds the right playing frequency, and then resamples audio frames
+    received from the decoder(s). </para> </listitem>
+      <listitem> <para> Misc : miscellaneous utilities used in other modules.
+    This is the only module that will never launch a thread.
+      </para> </listitem>
+      <listitem> <para> ac3_decoder, audio_decoder, generic_decoder, lpcm_decoder,
+    spu_decoder, video_decoder, video_parser : decoders used by VLC to
+    decode different kinds of elementary stream data. [these are subject
+    to move to <filename> plugins/ </filename> in a forthcoming
+    version]</para> </listitem>
+    </itemizedlist>
+ 
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="modules.eps" format="EPS" scalefit="1" scale="80"/>
+      </imageobject>
+      <imageobject>
+        <imagedata fileref="modules.gif" format="GIF" />
+      </imageobject>
+      <textobject>
+        <phrase> Data flow between modules </phrase>
+      </textobject>
+    </mediaobject>
+
+  </sect1>
+
+  <sect1> <title> Plug-ins </title>
+
+    <para>
+Plugins are located in the <filename> plugins/ </filename> subdirectory
+and are loaded at runtime. Every plug-in
+may offer different features that will best suit a particular file or
+a particular environment. Besides, most portability works result in the writing
+of an audio_output/video_output/interface plug-in to support a new
+platform (eg. BeOS or MacOS X).
+    </para>
+
+    <para>
+Plug-ins are loaded and unloaded dynamically by functions in
+<filename> src/misc/modules.c </filename> and <filename> include/modules*.h
+</filename>. The API for writing plugins will be discussed in a
+following chapter.
+    </para>
+
+    <para>
+Plugins can also be built into the VLC main application by changing the
+<parameter> BUILTINS </parameter> line in <filename>
+Makefile.opts</filename>.
+    </para>
+
+  </sect1>
+
+  <sect1> <title> Threads </title>
+
+    <sect2> <title> Thread management </title>
+
+    <para>
+VLC is heavily multi-threaded. We chose against a single-thread approach
+because decoder preemptibility and scheduling would be a mastermind (for
+instance decoders and outputs have to be separated, otherwise it cannot
+be warrantied that a frame will be played at the exact presentation
+time), and
+we currently have no plan to support a single-threaded client.
+Multi-process decoders usually imply more overhead (problems of shared
+memory) and communication between processes is harder.
+    </para>
+
+    <para>
+Our threading structure is modeled on pthreads. However, for portability
+reasons, we don't call <function>pthread_*</function> functions
+directly, but use a similar wrapper, made of <function> vlc_thread_create,
+vlc_thread_exit, vlc_thread_join, vlc_mutex_init, vlc_mutex_lock,
+vlc_mutex_unlock, vlc_mutex_destroy, vlc_cond_init, vlc_cond_signal,
+vlc_cond_wait, vlc_cond_destroy</function>, and structures <type>
+vlc_thread_t, vlc_mutex_t, and vlc_cond_t</type>.
+    </para>
+
+    </sect2>
+
+    <sect2> <title> Synchronization </title>
+
+    <para>
+Another key feature of VLC is that decoding and playing are asynchronous :
+decoding is done by a *_decoder thread, playing is done by audio_output
+or video_output thread. The design goal is to ensure that an audio or
+video frame is played exactly at the right time, without blocking any
+of the decoder threads. This leads to a complex communication structure
+between the interface, the input, the decoders and the outputs.
+    </para>
+
+    <para>
+Having several input and video_output threads reading multiple files at
+the same time is permitted, despite the fact that the current interface
+doesn't allow any way to do it [this is subject to change in the near
+future]. Anyway the client has been written from the ground up
+with this in mind. This also implies that a non-reentrant
+library (including in particular LiViD's libac3) cannot be used.
+    </para>
+
+    <para>
+Presentation Time Stamps located in the system layer of the stream are
+passed to the decoders, and all resulting samples are dated accordingly.
+The output layers are supposed to play them at the right time. Dates are
+converted to microseconds ; an absolute date is the number of microseconds
+since Epoch (Jan 1st 1970). The <type> mtime_t </type> type is a signed
+64-bit integer.
+    </para>
+
+    <para>
+The current date can be retrieved with <function> mdate()</function>.
+Te execution of a thread can be suspended until a certain <parameter>
+date </parameter> via <function> mwait </function> <parameter>
+( mtime_t date )</parameter>. You can sleep for a fixed number of
+microseconds with <function> msleep </function> <parameter>
+( mtime_t delay )</parameter>.
+    </para>
+
+    <warning> <para>
+      Please remember to wake up a little while <emphasis> before
+      </emphasis> the presentation date, if some particular treatment
+      needs to be done (e.g. a YUV transform). For instance in <filename>
+      src/video_parser/vpar_synchro.c</filename>, track of the average
+      decoding times is kept to ensure pictures are not decoded too
+      late.
+    </para> </warning>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1> <title> Code conventions </title>
+
+    <sect2> <title> Function naming </title>
+
+      <para>
+All functions are named accordingly : module name (in lower case) + _ +
+function name (in mixed case, <emphasis> without underscores</emphasis>).
+For instance : <function>intf_FooFunction</function>. Static functions
+don't need usage of the module name.
+      </para>
+
+    </sect2>
+
+    <sect2> <title> Variable naming </title>
+
+      <para>
+Hungarian notations used, that means we have the following prefixes :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> i_ for integers (sometimes l_ for long integers) ;
+        </para> </listitem>
+        <listitem> <para> b_ for booleans ; </para> </listitem>
+        <listitem> <para> d_ for doubles (sometimes f_ for floats) ;
+        </para> </listitem>
+        <listitem> <para> pf_ for function pointers ; </para> </listitem>
+        <listitem> <para> psz_ for a Pointer to a String terminated by a
+        Zero (C-string) ;
+        </para> </listitem>
+        <listitem> <para> More generally, we add a p when the variable is
+        a pointer to a type. </para> </listitem>
+      </itemizedlist>
+
+      <para>
+If one variable has no basic type (for instance a complex structure), don't
+put any prefix (except p_* if it's a pointer). After one prefix, put
+an <emphasis> explicit </emphasis> variable name <emphasis> in lower
+case</emphasis>. If several words are required, join them with an
+underscore (no mixed case). Examples :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para>
+        <type> data_packet_t * </type> <varname> p_buffer; </varname>
+        </para> </listitem> <listitem> <para>
+        <type> char </type> <varname> psz_msg_date[42]; </varname>
+        </para> </listitem> <listitem> <para>
+        <type> int </type> <varname> pi_es_refcount[MAX_ES]; </varname>
+        </para> </listitem> <listitem> <para>
+        <type> void </type> <varname> (* pf_next_data_packet)( int * ); </varname>
+        </para> </listitem>
+      </itemizedlist>
+
+    </sect2>
+
+    <sect2> <title> A few words about white spaces </title>
+
+      <para>
+First, never use tabs in the source (you're entitled to use them in the
+Makefile :-). Use <command> set expandtab </command> under <application>
+vim </application> or the equivalent under <application>
+emacs</application>. Indents are 4 spaces long.
+      </para>
+
+      <para>
+Second, put spaces <emphasis> before and after </emphasis> operators, and
+inside brackets. For instance :
+<programlisting> for( i = 0; i &lt; 12; i++, j += 42 ); </programlisting>
+      </para>
+
+      <para>
+Third, leave braces alone on their lines (GNU style). For instance :
+        <programlisting>
+if( i_es == 42 )
+{
+    p_buffer[0] = 0x12;
+}
+        </programlisting>
+      </para>
+
+      <para>
+We write C, so use C-style comments /* ... */.
+      </para>
+
+    </sect2>
+
+  </sect1>
+
+</chapter>

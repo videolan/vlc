@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE book PUBLIC "-//Norman Walsh//DTD DocBk XML V3.1.3//EN" "docbookx.dtd"
+[
+    <!ENTITY glossary SYSTEM "glossary.xml">
+    <!ENTITY overview SYSTEM "overview.xml">
+    <!ENTITY interface SYSTEM "interface.xml">
+    <!ENTITY input SYSTEM "input.xml">
+    <!ENTITY decoders SYSTEM "decoders.xml">
+    <!ENTITY video_output SYSTEM "video_output.xml">
+    <!ENTITY audio_output SYSTEM "audio_output.xml">
+    <!ENTITY ports SYSTEM "ports.xml">
+    <!ENTITY debugging SYSTEM "debugging.xml">
+    <!ENTITY history SYSTEM "history.xml">
+    <!ENTITY gfdl SYSTEM "gfdl.xml">
+]>
+
+<book>
+
+<title> VideoLAN Client API Documentation </title>
+
+<bookinfo>
+
+  <author>
+    <firstname> Christophe </firstname>
+    <surname> Massiot </surname>
+    <affiliation>
+      <jobtitle> <ulink url="mailto:christophe.massiot@idealx.com">
+      Developer </ulink> </jobtitle>
+      <orgname> <ulink url="http://www.idealx.com"> IDEALX
+      S.A.S. </ulink> </orgname>
+      <orgdiv> Industrial Computing </orgdiv>
+    </affiliation>
+  </author>
+  <collab>
+    <collabname> <ulink url="mailto:sam@zoy.org"> Samuel Hocevar
+    </ulink> </collabname>
+    <affiliation>
+      <jobtitle> Developer </jobtitle>
+      <orgname> VideoLAN project </orgname>
+    </affiliation>
+  </collab>
+  <collab>
+    <collabname> Jean-Fran&ccedil;ois Lecomte </collabname>
+    <affiliation>
+      <jobtitle> <ulink url="mailto:jean-francois.lecomte@idealx.com">
+      Developer </ulink> </jobtitle>
+      <orgname> <ulink url="http://www.idealx.com"> IDEALX
+      S.A.S. </ulink> </orgname>
+    </affiliation>
+  </collab>
+
+  <pubdate> $Id: manual.xml,v 1.1 2001/07/16 15:54:59 massiot Exp $ </pubdate>
+  <copyright> <year> 2001 </year>
+              <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
+  </copyright>
+
+  <legalnotice> <para>
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the GNU Free Documentation License, Version 1.1
+      or any later version published by the Free Software Foundation;
+      A copy of the license is included in the section entitled "GNU
+      Free Documentation License".
+  </para> </legalnotice>
+</bookinfo>
+
+<toc />
+
+<!-- ============================ GLOSSARY ============================
+  -->
+
+&glossary;
+
+<!-- ============================ OVERVIEW ============================
+  -->
+
+&overview;
+
+<!-- =========================== INTERFACE ============================
+  -->
+
+&interface;
+
+<!-- ============================= INPUT ==============================
+  -->
+
+&input;
+
+<!-- ============================ DECODERS ============================
+  -->
+
+&decoders;
+
+<!-- ========================== VIDEO OUTPUT ==========================
+  -->
+
+&video_output;
+
+<!-- ========================== AUDIO OUTPUT ==========================
+  -->
+
+&audio_output;
+
+<!-- ============================= PORTS ==============================
+  -->
+
+&ports;
+
+<!-- ======================= ADVANCED DEBUGGING =======================
+  -->
+
+&debugging;
+
+<!-- ======================== PROJECT HISTORY =========================
+  -->
+
+&history;
+
+<!-- ============================= GFDL ===============================
+  -->
+
+&gfdl;
+
+</book>

@@ -1,0 +1,68 @@
+<chapter> <title> The audio output layer </title>
+
+  <sect1> <title> Data exchanges between a decoder and the audio output
+  </title>
+
+    <para>
+The audio output basically takes audio samples from one or several
+FIFOs, mixes and resamples them, and plays them through the audio
+chip. Data exchanges are simple and described in <filename>
+src/audio_output/audio_output.c.</filename> A decoder needs to open
+a channel FIFO with <function> aout_CreateFifo </function>, and
+then write the data to the buffer. The buffer is in <parameter>
+p_aout_fifo-&gt;buffer + p_aout_fifo-&gt;l_end_frame </parameter>
+* <constant> ADEC_FRAME_SIZE</constant>.
+    </para>
+
+  </sect1>
+
+  <sect1> <title> How to write an audio output plugin </title>
+
+    <para>
+[This API is subject to change in the very near future.] Have a look at
+<filename> plugins/dsp/aout_dsp.c</filename>. You need to write six
+functions :
+    </para>
+
+    <itemizedlist>
+
+      <listitem> <para> <type> int </type> <function> aout_Probe </function>
+      <parameter> ( probedata_t *p_data ) </parameter> :
+      Returns a score between 0 and 999 to tell whether the plugin
+      can be used. <parameter> p_data </parameter> is currently
+      unused.
+      </para> </listitem>
+
+      <listitem> <para> <type> int </type> <function> aout_Open </function>
+      <parameter> ( aout_thread_t *p_aout ) </parameter> :
+      Opens the audio device.
+      </para> </listitem>
+
+      <listitem> <para> <type> int </type> <function> aout_SetFormat
+      </function> <parameter> ( aout_thread_t *p_aout ) </parameter> :
+      Sets the output format, the number of channels, and the output
+      rate.
+      </para> </listitem>
+
+      <listitem> <para> <type> long </type> <function> aout_GetBufInfo
+      </function> <parameter> ( aout_thread_t *p_aout,
+      long l_buffer_limit ) </parameter> :
+      Gets the status of the audio buffer.
+      </para> </listitem>
+
+      <listitem> <para> <function> aout_Play </function> <parameter>
+      ( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+      </parameter> :
+      Writes the audio output buffer to the audio device.
+      </para> </listitem>
+
+      <listitem> <para> <function> aout_Close </function> <parameter>
+      ( aout_thread_t *p_aout ) </parameter> :
+      Closes the audio device.
+      </para> </listitem>
+
+    </itemizedlist>
+
+  </sect1>
+
+</chapter>
