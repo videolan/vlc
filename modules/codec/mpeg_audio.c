@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.20 2003/10/23 20:51:20 gbazin Exp $
+ * $Id: mpeg_audio.c,v 1.21 2003/10/23 21:28:11 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -276,8 +276,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             if( p_sys->pts != 0 &&
                 p_sys->pts != aout_DateGet( &p_sys->end_date ) )
             {
-	      msg_Err( p_dec, "set PTS: %lli old: %lli", p_sys->pts,
-		       aout_DateGet( &p_sys->end_date ) );
                 aout_DateSet( &p_sys->end_date, p_sys->pts );
             }
             p_sys->i_state = STATE_HEADER;
