@@ -39,9 +39,19 @@ static void GuessType( input_item_t *p_item);
  * \param psz_name a text giving a name or description of the item
  * \return the new item or NULL on failure
  */
+
 playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
                                       const char *psz_uri,
                                       const char *psz_name )
+{
+    return playlist_ItemNewWithType( p_obj, psz_uri,
+                                     psz_name, ITEM_TYPE_UNKNOWN );
+}
+
+playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
+                                            const char *psz_uri,
+                                            const char *psz_name,
+                                            int i_type )
 {
     playlist_item_t * p_item;
 
@@ -56,6 +66,8 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
 
     if( psz_name != NULL ) p_item->input.psz_name = strdup( psz_name );
     else p_item->input.psz_name = strdup ( psz_uri );
+
+    p_item->input.i_type = i_type;
 
     p_item->b_enabled = VLC_TRUE;
     p_item->i_nb_played = 0;
@@ -72,7 +84,8 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
 
     vlc_mutex_init( p_obj, &p_item->input.lock );
 
-    GuessType( &p_item->input );
+    if( p_item->input.i_type == ITEM_TYPE_UNKNOWN )
+        GuessType( &p_item->input );
 
     playlist_ItemCreateCategory( p_item, _("General") );
 

@@ -264,6 +264,7 @@ VLC_EXPORT( vlc_bool_t, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const
 #define playlist_AddItem(p,pi,i1,i2) playlist_ItemAdd(p,pi,i1,i2)
 #define playlist_ItemNew( a , b, c ) __playlist_ItemNew(VLC_OBJECT(a) , b , c )
 VLC_EXPORT( playlist_item_t* , __playlist_ItemNew, ( vlc_object_t *,const char *,const char * ) );
+VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( vlc_object_t *,const char *,const char *, int ) );
 VLC_EXPORT( int, playlist_ItemDelete, ( playlist_item_t * ) );
 VLC_EXPORT( int, playlist_ItemAddParent, ( playlist_item_t *, int,playlist_item_t *) );
 VLC_EXPORT( int, playlist_CopyParents, ( playlist_item_t *,playlist_item_t *) );

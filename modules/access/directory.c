@@ -477,8 +477,11 @@ static int ReadDir( playlist_t *p_playlist,
             }
             else
             {
-                playlist_item_t *p_item = playlist_ItemNew( p_playlist,
-                                psz_uri, p_dir_content->d_name );
+                playlist_item_t *p_item = playlist_ItemNewWithType(
+                                                p_playlist,
+                                                psz_uri,
+                                                p_dir_content->d_name,
+                                                ITEM_TYPE_FILE );
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,
