@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.25 2002/03/21 22:10:33 gbazin Exp $
+ * $Id: xcommon.c,v 1.26 2002/03/25 19:16:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -299,7 +299,12 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Open display, unsing the "display" config variable or the DISPLAY
      * environment variable */
-    psz_display = config_GetPszVariable( "display" );
+#ifdef MODULE_NAME_IS_xvideo
+    psz_display = config_GetPszVariable( "xvideo_display" );
+#else
+    psz_display = config_GetPszVariable( "x11_display" );
+#endif
+
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */

@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.18 2002/03/17 17:00:38 sam Exp $
+ * $Id: ggi.c,v 1.19 2002/03/25 19:16:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,7 +59,14 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+#define DISPLAY_TEXT "X11 display name"
+#define DISPLAY_LONGTEXT "Specify the X11 hardware display you want to use.\n"\
+                         "By default vlc will use the value of the DISPLAY " \
+                         "environment variable."
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_STRING  ( "ggi_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -399,7 +406,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Open display */
-    psz_display = config_GetPszVariable( "display" );
+    psz_display = config_GetPszVariable( "ggi_display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     if( psz_display ) free( psz_display );

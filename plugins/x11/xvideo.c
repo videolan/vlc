@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.8 2002/03/17 13:53:21 gbazin Exp $
+ * $Id: xvideo.c,v 1.9 2002/03/25 19:16:20 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -51,8 +51,14 @@
                         "2) Completly bypass the window manager, but then " \
                         "nothing will be able to show on top of the video"
 
+#define DISPLAY_TEXT "X11 display name"
+#define DISPLAY_LONGTEXT "Specify the X11 hardware display you want to use.\n"\
+                         "By default vlc will use the value of the DISPLAY " \
+                         "environment variable."
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_STRING  ( "xvideo_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_INTEGER ( "xvideo_adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
 ADD_BOOL    ( "xvideo_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP

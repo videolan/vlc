@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.168 2002/03/25 02:06:24 jobi Exp $
+ * $Id: main.c,v 1.169 2002/03/25 19:16:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -165,24 +165,28 @@
                          "video decoding stage shouldn't even be done, so it" \
                          "can allow you to save some processing power"
 
-#define DISPLAY_TEXT "display identifier"
-#define DISPLAY_LONGTEXT NULL
-
 #define WIDTH_TEXT "video width"
 #define WIDTH_LONGTEXT "You can enforce the video width here.\nNote" \
-                       "that by default vlc will adapt to the video properties"
+                       "that by default vlc will adapt to the video " \
+                       "characteristics"
 
 #define HEIGHT_TEXT "video height"
-#define HEIGHT_LONGTEXT NULL
+#define HEIGHT_LONGTEXT "You can enforce the video height here.\nNote" \
+                        "that by default vlc will adapt to the video " \
+                        "characteristics"
 
 #define GRAYSCALE_TEXT "grayscale video output"
-#define GRAYSCALE_LONGTEXT NULL
+#define GRAYSCALE_LONGTEXT "Using this option, vlc will not decode the color "\
+                           "information from the video (this can also allow " \
+                           "you to save some processing power)"
 
 #define FULLSCREEN_TEXT "fullscreen video output"
-#define FULLSCREEN_LONGTEXT NULL
+#define FULLSCREEN_LONGTEXT "If this option is enabled, vlc will always " \
+                            "start a video in fullscreen mode"
 
-#define NOOVERLAY_TEXT "disable accelerated display"
-#define NOOVERLAY_LONGTEXT NULL
+#define NOOVERLAY_TEXT "disable hardware acceleration for the video output"
+#define NOOVERLAY_LONGTEXT "By default vlc will try to take advantage of the "\
+                           "overlay capabilities of you graphics card.\n"
 
 #define SPUMARGIN_TEXT "force SPU position"
 #define SPUMARGIN_LONGTEXT NULL
@@ -313,7 +317,6 @@ ADD_INTEGER ( "aout_format", 0, NULL, FORMAT_TEXT,
 ADD_CATEGORY_HINT( "Video", NULL )
 ADD_PLUGIN  ( "vout", MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
 ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
-ADD_STRING  ( "display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
 ADD_BOOL    ( "grayscale", NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )

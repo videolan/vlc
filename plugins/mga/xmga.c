@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.10 2002/03/21 22:10:33 gbazin Exp $
+ * $Id: xmga.c,v 1.11 2002/03/25 19:16:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -102,8 +102,14 @@ static void ToggleCursor   ( vout_thread_t * );
                         "2) Completly bypass the window manager, but then " \
                         "nothing will be able to show on top of the video"
 
+#define DISPLAY_TEXT "X11 display name"
+#define DISPLAY_LONGTEXT "Specify the X11 hardware display you want to use.\n"\
+                         "By default vlc will use the value of the DISPLAY " \
+                         "environment variable."
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( "Miscellaneous", NULL )
+ADD_STRING  ( "xmga_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_BOOL    ( "xmga_altfullscreen", NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
@@ -283,7 +289,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     /* Open display, unsing the "display" config variable or the DISPLAY
      * environment variable */
-    psz_display = config_GetPszVariable( "display" );
+    psz_display = config_GetPszVariable( "xmga_display" );
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */
