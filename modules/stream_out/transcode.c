@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.50 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: transcode.c,v 1.51 2003/11/17 02:55:22 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1024,7 +1024,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
             ( av_q2d(id->ff_dec_c->sample_aspect_ratio) *
               id->ff_dec_c->width / id->ff_dec_c->height );
 #else
-        id->p_encoder->video.fmt_in.i_aspect = VOUT_ASPECT_FACTOR *
+        id->p_encoder->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR *
             id->ff_dec_c->aspect_ratio;
 #endif
 
