@@ -558,9 +558,9 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
 
         /* Create the radio buttons with their helps */
         action_radios[0] = new wxRadioButton( this, ActionRadio0_Event,
-                                              wxT( HELLO_STREAMING ) );
+                                              wxU( HELLO_STREAMING ) );
         action_radios[1] = new wxRadioButton( this, ActionRadio1_Event,
-                                              wxT( HELLO_TRANSCODE ) );
+                                              wxU( HELLO_TRANSCODE ) );
         i_action = 0;
 
         mainSizer->Add( action_radios[0], 0, wxALL, 5 );
@@ -618,10 +618,10 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
 
     /* Create the radio buttons */
     input_radios[0] = new wxRadioButton( this, InputRadio0_Event ,
-                               wxT( INPUT_OPEN ) );
+                               wxU( INPUT_OPEN ) );
     mainSizer->Add( input_radios[0], 0, wxALL, 5 );
     input_radios[1] = new wxRadioButton( this, InputRadio1_Event ,
-                               wxT( INPUT_PL ) );
+                               wxU( INPUT_PL ) );
     i_input = 0;
     mainSizer->Add( input_radios[1], 0, wxALL, 5 );
 
@@ -714,9 +714,9 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
 {
     if( i_input == 0)
     {
-        if( mrl_text->GetValue().IsSameAs( "", TRUE ) && event.GetDirection() )
+        if( mrl_text->GetValue().IsSameAs( wxT(""), TRUE ) && event.GetDirection() )
         {
-            wxMessageBox( wxU( CHOOSE_STREAM ), ERROR,
+            wxMessageBox( wxU( CHOOSE_STREAM ), wxU( ERROR ),
                           wxICON_WARNING | wxOK, this );
             event.Veto();
         }
@@ -735,7 +735,7 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
             listitem.SetId( i );
             listitem.SetColumn( 1 );
             listview->GetItem( listitem );
-            p_parent->SetMrl( (const char *)listitem.GetText() );
+            p_parent->SetMrl( (const char*) listitem.GetText().c_str() );
         }
     }
     return;
@@ -807,7 +807,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                                   wxDefaultPosition, wxSize(200,25) );
     for( int i= 0; vcodecs_array[i].psz_display != NULL; i++ )
     {
-        video_combo->Append( wxT( vcodecs_array[i].psz_display ) ,
+        video_combo->Append( wxU( vcodecs_array[i].psz_display ) ,
                             (void *)&vcodecs_array[i] );
     }
     video_sizer2->Add( video_combo, 0 , wxALIGN_RIGHT);
@@ -836,7 +836,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                                   wxDefaultPosition, wxSize(200,25) );
     for( int i= 0; acodecs_array[i].psz_display != NULL; i++ )
     {
-        audio_combo->Append( wxT( acodecs_array[i].psz_display ) ,
+        audio_combo->Append( wxU( acodecs_array[i].psz_display ) ,
                             (void *)&acodecs_array[i] );
     }
     audio_sizer2->Add( audio_combo, 0 , wxALIGN_RIGHT );
@@ -983,7 +983,7 @@ wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
     for( i = 0 ; i< 3 ; i++ )
     {
         method_radios[i] = new wxRadioButton( this, MethodRadio0_Event + i,
-                               wxT( methods_array[i].psz_method ) );
+                               wxU( methods_array[i].psz_method ) );
         method_radios[i]->SetToolTip( wxU(_( methods_array[i].psz_descr ) ) );
         mainSizer->Add( method_radios[i], 0, wxALL, 5 );
     }
@@ -1006,9 +1006,9 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid multicast address */
-    if( i_method == 1 && !ismult((char *)address_txtctrl->GetValue().mb_str()) )
+    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().c_str()) )
     {
-        wxMessageBox( wxU(INVALID_MCAST_ADDRESS) , ERROR,
+        wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR ),
                       wxICON_WARNING | wxOK, this );
         event.Veto();
 
@@ -1023,7 +1023,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     p_parent->SetStream( methods_array[i_method].psz_access ,
-                         (char *)address_txtctrl->GetValue().mb_str() );
+                         (char *)address_txtctrl->GetValue().c_str() );
     return;
 }
 
@@ -1148,10 +1148,10 @@ wizTranscodeExtraPage::wizTranscodeExtraPage( wxWizard *parent,
     wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
-    mainSizer->Add( new wxStaticText(this, -1, EXTRATRANSCODE_TITLE ),
+    mainSizer->Add( new wxStaticText(this, -1, wxU( EXTRATRANSCODE_TITLE )),
                     0, wxALL, 5 );
     mainSizer->Add( new wxStaticText(this, -1,
-                    wxU( vlc_wraptext(EXTRATRANSCODE_TEXT , TEXTWIDTH,
+                   wxU( vlc_wraptext( EXTRATRANSCODE_TEXT , TEXTWIDTH,
                                        false ) ) ),  0, wxALL, 5 );
     mainSizer->Add( new wxButton( this, Open_Event, wxU("Open") ) );
     SetSizer(mainSizer);
@@ -1168,7 +1168,7 @@ void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
         if( file_dialog->GetFilename().mb_str() )
         {
             p_parent->SetTranscodeOut( (char*)file_dialog->GetFilename().
-                                                  mb_str() );
+                                                  c_str() );
         }
     }
 
@@ -1188,7 +1188,7 @@ wizStreamingExtraPage::wizStreamingExtraPage( wxWizard *parent,
     wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
-    mainSizer->Add( new wxStaticText(this, -1, EXTRASTREAMING_TITLE ),
+    mainSizer->Add( new wxStaticText(this, -1, wxU( EXTRASTREAMING_TITLE )),
                     0, wxALL, 5 );
     mainSizer->Add( new wxStaticText(this, -1,
                     wxU( vlc_wraptext(EXTRASTREAMING_TEXT , TEXTWIDTH,
@@ -1213,7 +1213,7 @@ wizStreamingExtraPage *st_page2;
 wizEncapPage *encap_page;
 
 WizardDialog::WizardDialog(intf_thread_t *_p_intf, wxWindow *_p_parent ) :
-wxWizard( _p_parent, -1, _("Streaming/Transcoding wizard"), wxNullBitmap, wxDefaultPosition)
+wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding wizard")), wxNullBitmap, wxDefaultPosition)
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -1375,7 +1375,7 @@ void WizardDialog::Run()
         }
         else
         {
-            wxMessageBox( wxU( NO_PLAYLIST ), ERROR,
+            wxMessageBox( wxU( NO_PLAYLIST ), wxU( ERROR ),
                           wxICON_WARNING | wxOK, this );
         }
     }
