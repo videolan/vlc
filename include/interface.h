@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.39 2003/02/07 00:26:23 sam Exp $
+ * $Id: interface.h,v 1.40 2003/02/07 00:29:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -54,8 +54,7 @@ struct intf_thread_t
  * Prototypes
  *****************************************************************************/
 #define intf_Create(a,b) __intf_Create(VLC_OBJECT(a),b)
-VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t *,
-                                                  const char * ) );
+VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
