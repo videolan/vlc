@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.1 2003/08/01 00:00:12 fenrir Exp $
+ * $Id: ninput.h,v 1.2 2003/08/02 16:43:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -25,7 +25,8 @@
 #define _NINPUT_H 1
 
 /*
- * stream
+ * Stream
+ *
  */
 enum streamQuery_e
 {
@@ -40,6 +41,22 @@ enum streamQuery_e
     STREAM_GET_SIZE,            /* arg1= int64_t *      res=cannot fail (0 if no sense)*/
 };
 
+/*
+ * Demux
+ *
+ */
+#define DEMUX_POSITION_MAX  10000
+enum demuxQuery_e
+{
+    DEMUX_GET_POSITION,         /* arg1= int64_t *      res=    */
+    DEMUX_SET_POSITION,         /* arg1= int64_t        res=can fail    */
+
+    DEMUX_GET_TIME,             /* arg1= int64_t *      res=    */
+    DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
+
+    DEMUX_GET_LENGTH            /* arg1= int64_t *      res=can fail    */
+};
+
 
 VLC_EXPORT( stream_t *,     stream_OpenInput,       ( input_thread_t * ) );
 VLC_EXPORT( void,           stream_Release,         ( stream_t * ) );
@@ -49,6 +66,9 @@ VLC_EXPORT( int,            stream_Read,            ( stream_t *, void *, int ) 
 VLC_EXPORT( int,            stream_Peek,            ( stream_t *, uint8_t **, int ) );
 
 VLC_EXPORT( pes_packet_t *, stream_PesPacket,       ( stream_t *, int ) );
+
+VLC_EXPORT( int,            demux_vaControl,        ( input_thread_t *, int, va_list  ) );
+VLC_EXPORT( int,            demux_Control,          ( input_thread_t *, int, ...  ) );
 
 #endif
 
