@@ -576,7 +576,7 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
 
 wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
 {
-    int i;
+    unsigned int i;
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxSize(200, 200) );
 

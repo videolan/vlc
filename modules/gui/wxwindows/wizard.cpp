@@ -351,7 +351,7 @@ protected:
     int i_mux;
     int i_action;
     void OnEncapChange(wxEvent& event);
-    wxRadioButton *encap_radios[9];
+    wxRadioButton *encap_radios[MUXERS_NUMBER];
     WizardDialog *p_parent;
     wxWizardPage *p_prev;
     wxWizardPage *p_streaming_page;
@@ -370,6 +370,7 @@ BEGIN_EVENT_TABLE(wizEncapPage, wxWizardPage)
     EVT_RADIOBUTTON( EncapRadio7_Event, wizEncapPage::OnEncapChange)
     EVT_RADIOBUTTON( EncapRadio8_Event, wizEncapPage::OnEncapChange)
     EVT_RADIOBUTTON( EncapRadio9_Event, wizEncapPage::OnEncapChange)
+    EVT_RADIOBUTTON( EncapRadio10_Event, wizEncapPage::OnEncapChange)
 END_EVENT_TABLE()
 
 /* Additional settings for transcode */
@@ -926,20 +927,20 @@ void wizTranscodeCodecPage::OnWizardPageChanging(wxWizardEvent& event)
     /* Set the dummy codec ( accept all muxers ) if needed */
     if( !video_combo->IsEnabled() )
     {
-        i_video_codec = 12;
+        i_video_codec = VCODECS_NUMBER;
     }
     if( !audio_combo->IsEnabled() )
     {
-        i_audio_codec = 7;
+        i_audio_codec = ACODECS_NUMBER;
     }
 
     ((wizEncapPage *)GetNext())->SetPrev(this);
 
-    for( i = 0 ; i< 9 ; i++ )
+    for( i = 0 ; i< MUXERS_NUMBER ; i++ )
     {
         if( vcodecs_array[i_video_codec].muxers[i] != -1 )
         {
-            for( j = 0 ; j< 9 ; j++ )
+            for( j = 0 ; j<  MUXERS_NUMBER ; j++ )
             {
                 if( acodecs_array[i_audio_codec].muxers[j] ==
                               vcodecs_array[i_video_codec].muxers[i] )
@@ -1073,7 +1074,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     }
 
     ((wizEncapPage *)GetNext())->SetPrev(this);
-    for( i = 0 ; i< 9 ; i++ )
+    for( i = 0 ; i< MUXERS_NUMBER ; i++ )
     {
         if( methods_array[i_method].muxers[i] != -1 )
         {
@@ -1120,7 +1121,7 @@ wizEncapPage::wizEncapPage( wxWizard *parent ) : wxWizardPage(parent)
 
     mainSizer->Add( 0,0,1 );
 
-    for( i = 0 ; i< 9 ; i++ )
+    for( i = 0 ; i< MUXERS_NUMBER ; i++ )
     {
         encap_radios[i] = new wxRadioButton( this, EncapRadio0_Event + i,
                                wxU( encaps_array[i].psz_encap ) );
@@ -1144,7 +1145,7 @@ void wizEncapPage::OnWizardPageChanging(wxWizardEvent& event)
     int i;
     if( !event.GetDirection() )
     {
-        for( i = 0 ; i< 9 ; i++ )
+        for( i = 0 ; i< MUXERS_NUMBER ; i++ )
         {
             encap_radios[i]->Disable();
         }
@@ -1177,7 +1178,7 @@ void wizEncapPage::OnEncapChange(wxEvent& event)
 void wizEncapPage::EnableEncap( int encap )
 {
     int i;
-    for( i = 0 ; i< 9 ; i++)
+    for( i = 0 ; i< MUXERS_NUMBER ; i++)
     {
         if( encaps_array[i].id == encap )
         {
@@ -1519,36 +1520,36 @@ void WizardDialog::Run()
                                   mrl, address);
             msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps),encap %s",
                                 vcodec,vb,acodec,ab,mux);
-            int i_tr_size = 10; /* 10 = ab + vb */
-            i_tr_size += vcodec ? strlen(vcodec) : 0;
-            i_tr_size += acodec ? strlen(acodec) : 0;
+            int i_tr_size = 0 ; /* 10 = ab + vb */
+            i_tr_size += vcodec ? strlen(vcodec) + strlen("vcodec=") +strlen("vb="): 0;
+            i_tr_size += acodec ? strlen(acodec) + strlen("acodec=") +strlen("ab=") : 0;
 
             char *psz_transcode = (char *)malloc( i_tr_size * sizeof(char));
             if( vcodec || acodec )
             {
-                fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "transcode{"));
-                fprintf(stderr, "step 1 : %s\n", psz_transcode);
+                sprintf( psz_transcode, "transcode{" );
             }
             else
             {
-                snprintf( psz_transcode, i_tr_size, "%c", 0 );
+                snprintf( psz_transcode, 1 , "%c", 0 );
             }
             if( vcodec )
             {
-                 fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "%svcodec=%s,vb=%i",
-                          psz_transcode, vcodec, vb ));
-                fprintf(stderr, "step 2 : %s\n", psz_transcode);
+                i_tr_size += 5 + strlen(vcodec);
+                snprintf( psz_transcode, i_tr_size , "%svcodec=%s,vb=%i",
+                          psz_transcode, vcodec, vb );
             }
             if( acodec )
             {
-                 fprintf( stderr, "snprintf returned %i\n",snprintf( psz_transcode, i_tr_size, "%s%cacodec=%s,ab=%i",
-                          psz_transcode, vcodec ? ',' : ' ', acodec, ab ));
-                fprintf(stderr, "step 3 : %s\n", psz_transcode);
+                i_tr_size += 6 + strlen(acodec);
+                /* FIXME */
+                sprintf( psz_transcode, "%s%cacodec=%s,ab=%i",
+                          psz_transcode, vcodec ? ',' : ' ', acodec, ab );
             }
             if( vcodec || acodec )
             {
-                snprintf( psz_transcode, i_tr_size, "%s}:", psz_transcode );
-                fprintf(stderr, "step 4 : %s\n", psz_transcode);
+                i_tr_size +=2;
+                sprintf( psz_transcode , "%s}:", psz_transcode );
             }
             i_size = 73 + strlen(mux) + strlen(address) + strlen(psz_transcode);
             psz_opt = (char *)malloc( i_size * sizeof(char) );
