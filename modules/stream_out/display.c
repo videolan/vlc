@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.8 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: display.c,v 1.9 2003/11/26 22:56:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -259,9 +259,9 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             }
             p_data->p_payload_end = p_data->p_payload_start + p_buffer->i_size;
 
-            p_pes->i_dts = p_buffer->i_dts < 0 ? 0 :
+            p_pes->i_dts = p_buffer->i_dts <= 0 ? 0 :
                            p_buffer->i_dts + p_sys->i_delay;
-            p_pes->i_pts = p_buffer->i_pts < 0 ? 0 :
+            p_pes->i_pts = p_buffer->i_pts <= 0 ? 0 :
                            p_buffer->i_pts + p_sys->i_delay;
             p_pes->p_first = p_pes->p_last = p_data;
             p_pes->i_nb_data = 1;
