@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.46 2003/05/27 21:48:44 gbazin Exp $
+$Id: NEWS,v 1.47 2003/06/03 23:17:43 massiot Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -52,6 +52,7 @@ Mac OS X port:
  * New audio resampler. Should make VLC much faster.
  * Fixed disappearing and crackling sound (PTS is out of range bug)
  * We no longer automatically save the preferences when you quit the application
+ * Arrow keys are now use to browse the menus in a DVD
 
 Win32 port:
  * the wxWindows interface is now the default interface

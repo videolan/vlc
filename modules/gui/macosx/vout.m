@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.49 2003/05/23 00:00:48 hartman Exp $
+ * $Id: vout.m,v 1.50 2003/06/03 23:17:43 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -850,6 +850,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
+    vlc_value_t val;
 
     if( [[o_event characters] length] )
     {
@@ -876,6 +877,33 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         case ' ':
             input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
             break;
+
+        case (unichar)0xf700: /* arrow up */
+            val.psz_string = "UP";
+            var_Set( p_vout, "key-pressed", val );
+            break;
+
+        case (unichar)0xf701: /* arrow down */
+            val.psz_string = "DOWN";
+            var_Set( p_vout, "key-pressed", val );
+            break;
+
+        case (unichar)0xf702: /* arrow left */
+            val.psz_string = "LEFT";
+            var_Set( p_vout, "key-pressed", val );
+            break;
+
+        case (unichar)0xf703: /* arrow right */
+            val.psz_string = "RIGHT";
+            var_Set( p_vout, "key-pressed", val );
+            break;
+
+        case (unichar)0xd: /* return */
+        case (unichar)0x3: /* enter */
+            val.psz_string = "ENTER";
+            var_Set( p_vout, "key-pressed", val );
+            break;
+
 
         default:
             [super keyDown: o_event];
