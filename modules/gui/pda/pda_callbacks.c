@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.1 2003/10/01 20:58:45 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.2 2003/10/27 22:42:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -47,7 +47,7 @@
 #include "pda_support.h"
 #include "pda.h"
 
-static char* get_file_perm(const char *path);
+static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -173,13 +173,16 @@ void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
     else
     {
         int i;
+        uint32_t uid;
+        uint32_t gid;
+        off_t  size;
         gchar *ppsz_text[5];
 
         msg_Dbg( p_intf, "updating interface" );
 
         /* XXX : kludge temporaire pour yopy */
         ppsz_text[0]="..";
-        ppsz_text[1] = get_file_perm("..");
+        ppsz_text[1] = get_file_stat("..", &uid, &gid, &size);
         ppsz_text[2] = "";
         ppsz_text[3] = "";
         ppsz_text[4] = "";
@@ -189,10 +192,12 @@ void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
         gtk_list_store_set (p_list, &iter,
                             0, ppsz_text[0],
                             1, ppsz_text[1],
-                            2, ppsz_text[2],
+                            2, size,
                             3, ppsz_text[3],
                             4, ppsz_text[4],
                             -1);
+
+        if (ppsz_text[1]) free(ppsz_text[1]);
 
         /* kludge */
         for (i=0; i<n; i++)
@@ -201,20 +206,22 @@ void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
             {
                 /* This is a list of strings. */
                 ppsz_text[0] = namelist[i]->d_name;
-                ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+                ppsz_text[1] = get_file_stat(namelist[i]->d_name, &uid, &gid, &size);
                 ppsz_text[2] = "";
                 ppsz_text[3] = "";
                 ppsz_text[4] = "";
 
-                msg_Dbg(p_intf, "(%d) file: %s permission: %s", i, ppsz_text[0], ppsz_text[1] );
+//                msg_Dbg(p_intf, "(%d) file: %s permission: %s user: %ull group: %ull size: %ull", i, ppsz_text[0], ppsz_text[1], uid, gid, size );
                 gtk_list_store_append (p_list, &iter);
                 gtk_list_store_set (p_list, &iter,
                                     0, ppsz_text[0],
                                     1, ppsz_text[1],
-                                    2, ppsz_text[2],
+                                    2, size,
                                     3, ppsz_text[3],
                                     4, ppsz_text[4],
                                     -1);
+
+                if (ppsz_text[1]) free(ppsz_text[1]);
             }
         }
         free(namelist);
@@ -228,7 +235,7 @@ void ReadDirectory( intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
     }
 }
 
-static char* get_file_perm(const char *path)
+static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size)
 {
     struct stat st;
     char *perm;
@@ -237,6 +244,11 @@ static char* get_file_perm(const char *path)
     strncpy( perm, "----------", sizeof("----------"));
     if (lstat(path, &st)==0)
     {
+        /* user, group, filesize */
+        *uid = st.st_uid;
+        *gid = st.st_gid;
+        *size = st.st_size;
+        /* determine permission modes */
         if (S_ISLNK(st.st_mode))
             perm[0]= 'l';
         else if (S_ISDIR(st.st_mode))
@@ -312,9 +324,11 @@ onPDADeleteEvent                       (GtkWidget       *widget,
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
+    msg_Dbg( p_intf, "about to exit vlc ... " );
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
+    msg_Dbg( p_intf, "about to exit vlc ... signalled" );
 
     return TRUE;
 }
@@ -344,13 +358,15 @@ onFileOpen                             (GtkButton       *button,
        list = gtk_list_store_new (5,
                                   G_TYPE_STRING,
                                   G_TYPE_STRING,
-                                  G_TYPE_STRING,
+                                  G_TYPE_ULONG,
                                   G_TYPE_STRING,
                                   G_TYPE_STRING);
        ReadDirectory(p_intf, list, ".");
 
        /* Update TreeView */
-       gtk_tree_view_set_model(p_intf->p_sys->p_tvfile, (GtkTreeModel*) list);  
+       gtk_tree_view_set_model(p_intf->p_sys->p_tvfile, (GtkTreeModel*) list);
+       g_object_unref(list);
+       gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile)),GTK_SELECTION_NONE);
     }
 }
 
@@ -518,6 +534,37 @@ SliderPress                            (GtkWidget       *widget,
     return TRUE;
 }
 
+gboolean addSelectedToPlaylist(GtkTreeModel *model,
+                               GtkTreePath *path,
+                               GtkTreeIter *iter,
+                               gpointer *userdata)
+{
+    GtkTreeView  *tvplaylist = NULL;
+    GtkTreeModel *play_model;
+    GtkTreeIter   play_iter;
+    gchar *filename;
+    
+    gtk_tree_model_get(model, iter, 0, &filename, -1);
+    g_print("selected %s\n", filename);
+
+#if 1
+    tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(userdata), "tvPlaylist");
+    if (NULL != tvplaylist)
+    {
+        play_model = gtk_tree_view_get_model(tvplaylist);
+        /* Add a new row to the playlist treeview model */
+        gtk_list_store_append (play_model, &play_iter);
+        gtk_list_store_set (play_model, &play_iter,
+                                0, filename,   /* Add path to it !!! */
+                                1, "00:00:00",
+                                -1 );
+        /* do we need to unref ?? */
+    }
+    else
+//       msg_Err(p_intf, "Error obtaining pointer to Play List");
+       g_print("Error obtaining pointer to Play List");
+#endif
+}
 
 void
 onFileListRow                          (GtkTreeView     *treeview,
@@ -525,7 +572,9 @@ onFileListRow                          (GtkTreeView     *treeview,
                                         GtkTreeViewColumn *column,
                                         gpointer         user_data)
 {
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);    
     g_print("onFileListRow\n");
+    gtk_tree_selection_selected_foreach(selection, addSelectedToPlaylist, (gpointer) treeview);
 }
 
 
