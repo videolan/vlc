@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.11 2004/01/11 14:53:36 garf Exp $
+ * $Id: ncurses.c,v 1.12 2004/01/11 14:55:32 garf Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -764,8 +764,8 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "     n, p        Next/Previous item" );
         MainBoxWrite( p_intf, l++, 1, "     [, ]        Next/Previous title" );
         MainBoxWrite( p_intf, l++, 1, "     <, >        Next/Previous title" );
-        MainBoxWrite( p_intf, l++, 1, "     <right>     Seek +5%%" );
-        MainBoxWrite( p_intf, l++, 1, "     <left>      Seek -5%%" );
+        MainBoxWrite( p_intf, l++, 1, "     <right>     Seek +1%%" );
+        MainBoxWrite( p_intf, l++, 1, "     <left>      Seek -1%%" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Playlist]" );
