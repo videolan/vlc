@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.82 2002/03/02 09:34:23 gbazin Exp $
+ * $Id: common.h,v 1.83 2002/03/03 04:37:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -34,11 +34,28 @@
  * Basic types definitions
  *****************************************************************************/
 
+typedef unsigned char       u8;
+typedef signed char         s8;
+
+typedef unsigned short      u16;
+typedef signed short        s16;
+
+typedef unsigned int        u32;
+typedef signed int          s32;
+
+#if defined( _MSC_VER ) || ( defined( WIN32 ) && !defined( __MINGW32__ ) )
+typedef unsigned __int64    u64;
+typedef signed __int64      s64;
+#else
+typedef unsigned long long  u64;
+typedef signed long long    s64;
+#endif
+
 typedef u8                  byte_t;
 
 /* Boolean type */
 #ifdef BOOLEAN_T_IN_SYS_TYPES_H
-#   /* <sys/types.h> already included */
+    /* <sys/types.h> already included */
 #elif defined(BOOLEAN_T_IN_PTHREAD_H)
 #   include <pthread.h>
 #elif defined(BOOLEAN_T_IN_CTHREADS_H)
@@ -65,7 +82,6 @@ typedef int                 ptrdiff_t;
 #if defined( WIN32 )
 typedef int                 ssize_t;
 #endif
-
 
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
@@ -373,7 +389,7 @@ struct intf_subscription_s;
 #   endif
 
 /* win32, cl and icl support */
-#   if defined( _MSC_VER )
+#   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)
 #       define __inline__      __inline
 #       define strncasecmp     strnicmp
