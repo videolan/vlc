@@ -2228,9 +2228,29 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
                 }
+                else if( p_dr->i_tag == 0x45 )
+                {
+                    msg_Dbg( p_demux, "  * VBI Data descriptor" );
+                    pid->es->fmt.i_cat = SPU_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 'd' );
+                    pid->es->fmt.i_extra = p_dr->i_length;
+                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
+                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                            p_dr->i_length );
+                }
+                else if( p_dr->i_tag == 0x46 )
+                {
+                    msg_Dbg( p_demux, "  * VBI Teletext descriptor" );
+                    pid->es->fmt.i_cat = SPU_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 't' );
+                    pid->es->fmt.i_extra = p_dr->i_length;
+                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
+                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                            p_dr->i_length );
+                }
                 else if( p_dr->i_tag == 0x56 )
                 {
-                    msg_Dbg( p_demux, "  * Teletext descriptor" );
+                    msg_Dbg( p_demux, "  * EBU Teletext descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
                     pid->es->fmt.i_extra = p_dr->i_length;
