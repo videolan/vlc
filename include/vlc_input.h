@@ -224,6 +224,7 @@ typedef struct
 #define INPUT_UPDATE_SIZE       0x0001
 #define INPUT_UPDATE_TITLE      0x0010
 #define INPUT_UPDATE_SEEKPOINT  0x0020
+#define INPUT_UPDATE_META       0x0040
 
 /* Input control XXX: internal */
 #define INPUT_CONTROL_FIFO_SIZE    100

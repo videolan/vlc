@@ -2,7 +2,7 @@
  * vlc_access.h
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: ninput.h 7930 2004-06-07 18:23:15Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,7 +41,9 @@ enum access_query_e
     ACCESS_GET_MTU,         /* arg1= int*           cannot fail(0 if no sense)*/
     ACCESS_GET_PTS_DELAY,   /* arg1= int64_t*       cannot fail */
     /* */
-    ACCESS_GET_TITLE_INFO,      /* arg1=input_title_t*** arg2=int* can fail */
+    ACCESS_GET_TITLE_INFO,  /* arg1=input_title_t*** arg2=int* can fail */
+    /* Meta data */
+    ACCESS_GET_META,        /* arg1= vlc_meta_t **  res=can fail    */
 
     /* */
     ACCESS_SET_PAUSE_STATE, /* arg1= vlc_bool_t     can fail */

@@ -2,7 +2,7 @@
  * vlc_demux.h
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: ninput.h 7930 2004-06-07 18:23:15Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -82,6 +82,12 @@ enum demux_query_e
     /* TITLE/SEEKPOINT, only when TITLE_INFO succeed */
     DEMUX_SET_TITLE,            /* arg1= int            can fail */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
+
+    /* DEMUX_SET_GROUP only a hit for demuxer (mainly DVB) to allow not
+     * reading everything (you should not use this to call es_out_Control)
+     * if you don't know what to do with it, just IGNORE it, it is safe(r)
+     * -1 means all group, 0 default group (first es added) */
+    DEMUX_SET_GROUP,            /* arg1= int            can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call
      * but not more (and not less, at the precision avaiable of course).
