@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.28 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_alsa.c,v 1.29 2002/03/08 00:26:07 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -70,6 +70,7 @@ static int aout_Open( aout_thread_t *p_aout )
 {
 
     int i_open_returns;
+    char str_alsadev[128];
 
     /* Allocate structures */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -80,10 +81,25 @@ static int aout_Open( aout_thread_t *p_aout )
         return( 1 );
     }
 
+    if( p_aout->i_format != AOUT_FMT_AC3 )
+    {
+        strcpy(str_alsadev, "default");
+    }
+    else
+    {
+        unsigned char s[4];
+        s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
+        s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
+        s[2] = 0;
+        s[3] = IEC958_AES3_CON_FS_48000;
+        sprintf( str_alsadev, "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+                 s[0], s[1], s[2], s[3] );
+    }
+
     /* Open device */
     if( ( i_open_returns = snd_pcm_open(&(p_aout->p_sys->p_alsa_handle),
-                                        "default",
-                                        SND_PCM_STREAM_PLAYBACK, 0) ) )
+                                        str_alsadev,
+                                        SND_PCM_STREAM_PLAYBACK, 0) ) > 0 )
     {
         intf_ErrMsg( "aout error: could not open ALSA device (%s)",
                      snd_strerror(i_open_returns) );
@@ -112,11 +128,21 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     snd_pcm_hw_params_alloca(&p_hw);
     snd_pcm_sw_params_alloca(&p_sw);
 
+    /* default value for snd_pcm_hw_params_set_buffer_time_near() */
+    p_aout->p_sys->buffer_time = AOUT_BUFFER_DURATION;
+
     switch (p_aout->i_format)
     {
         case AOUT_FMT_S16_LE:
             i_format = SND_PCM_FORMAT_S16_LE;
             p_aout->p_sys->bytes_per_sample = 2;
+            break;
+
+        case AOUT_FMT_AC3:
+            i_format = SND_PCM_FORMAT_S16_LE;
+            p_aout->p_sys->bytes_per_sample = 2;
+            /* buffer_time must be 500000 to avoid a system crash */
+            p_aout->p_sys->buffer_time = 500000;
             break;
 
         default:
@@ -171,7 +197,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     p_aout->p_sys->rate = i_rv;
 
     i_rv = snd_pcm_hw_params_set_buffer_time_near( p_aout->p_sys->p_alsa_handle,
-                                                   p_hw, AOUT_BUFFER_DURATION,
+                                                   p_hw,
+                                                   p_aout->p_sys->buffer_time,
                                                    0 );
     if( i_rv < 0 )
     {
@@ -235,7 +262,7 @@ static void aout_HandleXrun(aout_thread_t *p_aout)
 
     intf_ErrMsg( "aout error: resetting output after buffer underrun" );
 
-    i_rv = snd_pcm_reset( p_aout->p_sys->p_alsa_handle );
+//    i_rv = snd_pcm_reset( p_aout->p_sys->p_alsa_handle );
     i_rv = snd_pcm_prepare( p_aout->p_sys->p_alsa_handle );
     if( i_rv < 0 )
     {
@@ -253,7 +280,7 @@ static void aout_HandleXrun(aout_thread_t *p_aout)
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-static long aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     snd_pcm_status_t *p_status;
     int i_alsa_get_status_returns;

@@ -2,7 +2,7 @@
  * aout_spdif.c: AC3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.24 2002/02/27 22:57:10 sam Exp $
+ * $Id: aout_spdif.c,v 1.25 2002/03/08 00:26:07 bozo Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -108,6 +108,8 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                             mwait( m_play - 2 * m_frame_time );
                         }
                         m_old = m_play;
+
+                        p_aout->pf_getbufinfo( p_aout, 0 );
 
                         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
                                          SPDIF_FRAME_SIZE );
