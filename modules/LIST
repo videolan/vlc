@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
+$Id: LIST,v 1.15 2003/11/06 22:23:27 zorglub Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -162,6 +162,8 @@ $Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
  * headphone_channel_mixer:
 	 headphone channel mixer with virtual spatialization effect.
 
+ * hotkeys : hotkeys control module
+
  * httpd: HTTP server
 
  * http: HTTP remote control interface
@@ -262,6 +264,8 @@ $Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
 
  * ogg: input module for OGG decapsulation.
 
+ * opie: OPIE interface module
+
  * oss: audio output module using the OSS /dev/dsp interface.
  
  * packetizer_copy: Simple copy packetizer
@@ -316,6 +320,8 @@ $Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
 
  * screensaver: screensaver disabling module
 
+ * sdp: SDP file demuxer
+
  * skins: Skinnable interface
 
  * slp: input module to access SLP registered sessions
@@ -338,6 +344,8 @@ $Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
 
  * stream_out_standard: standard stream output module
  
+ * stream_out_rtp: output using the RTP protocol
+
  * stream_out_transcode: audio & video transcoder using ffmpeg
 
  * subsdec: Another SPU decoder for text subtitles

@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.69 2003/10/22 21:08:15 gbazin Exp $
+$Id: NEWS,v 1.70 2003/11/06 22:23:27 zorglub Exp $
 
 Changes between 0.6.2 and 0.6.3:
 ---------------------------------
@@ -9,6 +9,7 @@ Core support:
  * Fixed the video filters. Video should no longer go black when these are used.
  * New input core. Advantages are: better seeking, more responsive, support for subtitle files at the core, and much much more.
  * Added a repeat mode to repeat a single file over and over.
+ * Improved playlist core.
 
 Stream output:
  * Added packetization for MPEG AAC ADTS streams.
@@ -16,6 +17,7 @@ Stream output:
  * Improved Ogg muxing and added theora, speex and subtitles support.
  * Theora video encoding.
  * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
+ * RTP output mixer
 
 Input:
  * MPEG TS demuxer also handles A52 audio in DVB streams.
@@ -23,23 +25,44 @@ Input:
  * cddax and vcdx plugins using libcdio, libvcd and libvcdinfo.
  * Reworked DVB tuning.
  * Better Icecast support.
+ * Support for framerate setting in Video4Linux
+ * PVR input now supports all video connection types
+
+Demuxers:
+ * ID3 tag parsing
+ * Vobsub subtitles support
+ * SSA decoding
+ * DVB Subtitles decoder
 
 Codecs:
  * Support for Speex audio.
  * Support for AAC + SBR.
  * MPEG 2.5 support.
+ * Support for I422 chroma
  * removed old a52, mpeg_video and mpeg_audio codecs, since we are using others now.
 
-Interface:
+Interface core:
  * Allow on the fly switching of the main interface.
- * Bug fixes / improvements in the skins (eg. "stay on top" option).
+ * Hotkeys support
+
+Skins interface
+ * Bug fixes
+ * Stay on top option
+
+WxWindows interfae:
  * Improvements to the wxwindows playlist  (Sort,Search, mode buttons).
  * Help in the preferences window.
+
+HTTP Interface:
+ * Stream seeking, playlist sorting and fullscreen support
+ * Improved default pages
+
 
 Mac OS X port:
  * Mozilla plugin for Mac OS X (experimental).
  * Save playlist.
  * Works on 10.1.x again. Apologies for that problem.
+ * Use XCode
 
 Win32 port:
  * New DirectShow input module (for video acquisition cards, webcams...).
@@ -47,6 +70,9 @@ Win32 port:
  * Support for 3F2R in audio output.
  * New --one-instance option to "force" only one running instance of VLC.
  * Mozilla plugin for Windows (experimental).
+
+iPaq port:
+ * Improvements in the GTK2 interface
 
 Subtitles:
  * Text subtitles now have a black outline.
