@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.28 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: playlist.m,v 1.29 2003/07/27 23:05:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -286,11 +286,9 @@ int MacVersion102 = -1;
     [o_table_view selectAll: nil];
 }
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos enqueue:(BOOL)b_enqueue
+- (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
-    int i_items;
-    NSString * o_value;
-    NSEnumerator * o_enum;
+    int i_item;
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -300,28 +298,58 @@ int MacVersion102 = -1;
         return;
     }
 
-    i_items = 0;
-    o_enum = [o_array objectEnumerator];
-    while( ( o_value = [o_enum nextObject] ) )
+    for ( i_item = 0; i_item < [o_array count]; i_item++ )
     {
-        NSURL * o_url;
-
+        /* One item */
+        NSDictionary *o_one_item;
+        NSString *o_url;
+        NSString *o_name;
+        NSArray *o_options;
+        int j, i_total_options = 0;
+        char **ppsz_options = NULL;
         int i_mode = PLAYLIST_INSERT;
         
-        if (i_items == 0 && !b_enqueue)
+        /* Get the item */
+        o_one_item = [o_array objectAtIndex: i_item];
+        o_url = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
+        o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
+        o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
+        
+        if( !o_name) o_name = o_url;
+        
+        if (i_item == 0 && !b_enqueue)
             i_mode |= PLAYLIST_GO;
 
-        playlist_Add( p_playlist, [o_value fileSystemRepresentation],
-            0, 0, i_mode, i_pos == -1 ? PLAYLIST_END : i_pos + i_items );
+        if( o_options && [o_options count] > 0 )
+        {
+            /* Count the input options */
+            i_total_options = [o_options count];
+    
+            /* Allocate ppsz_options */
+            for( j = 0; j < i_total_options; j++ )
+            {
+                if( !ppsz_options )
+                    ppsz_options = (char **)malloc( sizeof(char *) * i_total_options );
+    
+                ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
+            }
+        }
+        
+        playlist_AddName( p_playlist, [o_url fileSystemRepresentation], [o_name UTF8String],
+            (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options,
+            i_mode, i_position == -1 ? PLAYLIST_END : i_position + i_item );
 
-        o_url = [NSURL fileURLWithPath: o_value];
-        if( o_url != nil )
+        /* clean up */
+        for( j = 0; j < i_total_options; j++ )
+            free( ppsz_options[j] );
+        if( ppsz_options ) free( ppsz_options );
+
+        NSURL *o_true_url = [NSURL fileURLWithPath: o_url];
+        if( o_true_url != nil )
         { 
             [[NSDocumentController sharedDocumentController]
-                noteNewRecentDocumentURL: o_url]; 
+                noteNewRecentDocumentURL: o_true_url]; 
         }
-
-        i_items++;
     }
 
     vlc_object_release( p_playlist );
@@ -468,7 +496,6 @@ int MacVersion102 = -1;
     }
     else
     {
-        NSArray * o_values;
         NSPasteboard * o_pasteboard;
         
         intf_thread_t * p_intf = [NSApp getIntf];
@@ -476,15 +503,18 @@ int MacVersion102 = -1;
         
         if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
         {
-            o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
+            int i;
+            NSArray *o_array = [NSArray array];
+            NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
                         sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
-            config_PutPsz( p_intf, "sub-file", "" );
-            config_PutInt( p_intf, "sub-delay", 0 );
-            config_PutFloat( p_intf, "sub-fps", 0.0 );
-            config_PutPsz( p_intf, "sout", "" );
-
-            [self appendArray: o_values atPos: i_proposed_row enqueue:YES];
+            for( i = 0; i < [o_values count]; i++)
+            {
+                NSDictionary *o_dic;
+                o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
+                o_array = [o_array arrayByAddingObject: o_dic];
+            }
+            [self appendArray: o_array atPos: i_proposed_row enqueue:YES];
 
             return( YES );
         }

@@ -242,8 +242,10 @@
                 "o_net_udpm_port" = id; 
                 "o_net_udpm_port_lbl" = id; 
                 "o_net_udpm_port_stp" = id; 
+                "o_output_ckbox" = id; 
                 "o_panel" = id; 
                 "o_playlist" = id; 
+                "o_sout_options" = id; 
                 "o_tabview" = id; 
             }; 
             SUPERCLASS = NSObject; 

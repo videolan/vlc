@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.10 2003/07/20 19:48:30 hartman Exp $
+ * $Id: output.m,v 1.11 2003/07/27 23:05:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -58,6 +58,11 @@
     o_mrl = [o_mrl_string copy];
 }
 
+- (NSString *)getMRL
+{
+    return [o_mrl copy];
+}
+
 - (void)setTranscode:(NSString *)o_transcode_string
 {
     [o_transcode autorelease];
@@ -66,19 +71,6 @@
 
 - (void)awakeFromNib
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    char * psz_sout = config_GetPsz( p_intf, "sout" );
-
-    if ( psz_sout != NULL && *psz_sout )
-    {
-        [o_output_ckbox setState: YES];
-    }
-    else
-    {
-        [o_output_ckbox setState: NO];
-    }
-    free(psz_sout);
-
     [self initStrings];
     
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -183,8 +175,6 @@
     }
     else
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
-        config_PutPsz( p_intf, "sout", NULL );
         [o_output_settings setEnabled:NO];
     }
 }
@@ -201,7 +191,7 @@
 - (IBAction)outputCloseSheet:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    config_PutPsz( p_intf, "sout", [o_mrl UTF8String] );
+    //export sout[o_mrl UTF8String]
     
     [o_output_sheet orderOut:sender];
     [NSApp endSheet: o_output_sheet];

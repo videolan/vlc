@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.92 2003/07/27 14:10:02 massiot Exp $
+ * $Id: intf.m,v 1.93 2003/07/27 23:05:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -465,15 +465,9 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    
-    config_PutPsz( p_intf, "sub-file", "" );
-    config_PutInt( p_intf, "sub-delay", 0 );
-    config_PutFloat( p_intf, "sub-fps", 0.0 );
-    config_PutPsz( p_intf, "sout", "" );
-    
+    NSDictionary *o_dic = [NSDictionary dictionaryWithObjectsAndKeys: o_filename, @"ITEM_URL", nil];
     [o_playlist appendArray:
-        [NSArray arrayWithObject: o_filename] atPos: -1 enqueue: NO];
+        [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
             
     return( TRUE );
 }

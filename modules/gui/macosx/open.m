@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.35 2003/05/25 17:27:13 massiot Exp $
+ * $Id: open.m,v 1.36 2003/07/27 23:05:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -40,6 +40,7 @@
 #include "intf.h"
 #include "playlist.h"
 #include "open.h"
+#include "output.h"
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 
@@ -232,28 +233,26 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         intf_thread_t * p_intf = [NSApp getIntf];
 
-        NSString *o_source = [o_mrl stringValue];
+        NSMutableDictionary *o_dic;
+        NSMutableArray *o_options = [NSMutableArray array];
         BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;
-        NSString *subPath = [o_file_sub_path stringValue];
+        o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
         
-        if (([o_file_sub_ckbox state] == NSOnState) && !([subPath isEqualTo: @""]))
+        if( [o_file_sub_ckbox state] == NSOnState )
         {
-            config_PutPsz( p_intf, "sub-file", strdup( [subPath UTF8String] ) );
-            if ( [o_file_sub_override state] )
+            [o_options addObject: [NSString stringWithFormat: @"sub-file=%s", [[o_file_sub_path stringValue] UTF8String]]];
+            if( [o_file_sub_override state] == NSOnState )
             {
-                config_PutInt( p_intf, "sub-delay", (int)( [o_file_sub_delay intValue] * 10 ) );
-                config_PutFloat( p_intf, "sub-fps", [o_file_sub_fps floatValue] );
+                [o_options addObject: [NSString stringWithFormat: @"sub-delay=%i", (int)( [o_file_sub_delay intValue] * 10 )]];
+                [o_options addObject: [NSString stringWithFormat: @"sub-fps=%f", [o_file_sub_fps floatValue]]];
             }
         }
-        else
+        if( [o_output_ckbox state] == NSOnState )
         {
-            config_PutPsz( p_intf, "sub-file", "" );
-            config_PutInt( p_intf, "sub-delay", 0 );
-            config_PutFloat( p_intf, "sub-fps", 0.0 );
+            [o_options addObject: [NSString stringWithFormat: @"sout=%@", [(VLCOutput *)o_sout_options getMRL]]];
         }
-        
-        [o_playlist appendArray: 
-            [NSArray arrayWithObject: o_source] atPos: -1 enqueue:b_enq];
+        [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
+        [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:b_enq];
     }
 }
 
@@ -624,6 +623,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (IBAction)openFile:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    int i;
     
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];
@@ -633,18 +633,17 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
-        config_PutPsz( p_intf, "sout", NULL );
-        
+        NSArray *o_array = [NSArray array];
         NSArray *o_values = [[o_open_panel filenames]
                 sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-        
-        config_PutPsz( p_intf, "sub-file", "" );
-        config_PutInt( p_intf, "sub-delay", 0 );
-        config_PutFloat( p_intf, "sub-fps", 0.0 );
-        config_PutPsz( p_intf, "sout", "" );
-        
-        [o_playlist appendArray: o_values atPos: -1 enqueue:NO];
+
+        for( i = 0; i < [o_values count]; i++)
+        {
+            NSDictionary *o_dic;
+            o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
+            o_array = [o_array arrayByAddingObject: o_dic];
+        }
+        [o_playlist appendArray: o_array atPos: -1 enqueue:NO];
     }
 }
 
