@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.190 2002/03/15 04:41:54 sam Exp $
+ * $Id: input.c,v 1.191 2002/03/18 21:04:01 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -458,7 +458,13 @@ static int InitThread( input_thread_t * p_input )
     {
         *psz_parser++ = '\0';
 
-        p_input->psz_name = psz_parser;
+        /* let's skip '//' */
+        if( psz_parser[0] == '/' && psz_parser[1] == '/' )
+        {
+            psz_parser += 2 ;
+        } 
+
+        p_input->psz_name = psz_parser ;
 
         /* Come back to parse the access and demux plug-ins */
         psz_parser = p_input->psz_source;
