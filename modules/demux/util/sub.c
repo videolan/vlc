@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.24 2003/08/24 14:43:07 titer Exp $
+ * $Id: sub.c,v 1.25 2003/08/26 19:43:51 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <string.h>
 #include <errno.h>
 #include <sys/types.h>
 
@@ -246,7 +245,7 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
     char *psz_result, *psz_basename, *psz_dir = NULL;
     char *psz_file_noext, *psz_extension;
     int i;
-    size_t i_dirlen = 0;
+    size_t i_dirlen, i_baselen = 0;
 
     if( psz_filename && *psz_filename )
     {
@@ -277,7 +276,7 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
 
         if( psz_extension )
         {
-            size_t i_baselen = ( 1 + psz_extension ) - psz_basename;
+            i_baselen = ( 1 + psz_extension ) - psz_basename;
 
             psz_file_noext = (char*)malloc( i_baselen + 1 );
             if( !psz_file_noext )
@@ -292,13 +291,13 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
 
         p_dir_handle = opendir( psz_dir ? psz_dir : "" );
         if( p_dir_handle ) {
-            int i_found = 0;
-
             while(( p_dir_afile = readdir( p_dir_handle ))) {
                 char* psz_afile_ext = strrchr( p_dir_afile->d_name, '.' );
 
                 if( psz_afile_ext )
                 {
+                    int i_found = 0;
+
                     ++psz_afile_ext;
                     for (i = 0; ppsz_sub_exts[i]; i++) {
                         if( strcmp( ppsz_sub_exts[i], psz_afile_ext ) == 0 ) {
@@ -306,20 +305,24 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
                             break;
                         }
                     }
-                    if( i_found )
+                    if( i_found ) /* found a file with a subtitle extension */
                     {
-                        msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
-                        if( psz_dir )
+                        if( strncmp( p_dir_afile->d_name, psz_file_noext, (strlen( p_dir_afile->d_name ) - strlen( psz_afile_ext) ) ) == 0 )
                         {
-                            char *psz_append;
-                            psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
-                            strncpy( psz_result, psz_dir, i_dirlen );
-                            psz_append = psz_result + i_dirlen;
-                            strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
-                            psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
-                            return psz_result;
+                            /* perfect match */
+                            msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
+                            if( psz_dir )
+                            {
+                                char *psz_append;
+                                psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
+                                strncpy( psz_result, psz_dir, i_dirlen );
+                                psz_append = psz_result + i_dirlen;
+                                strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
+                                psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
+                                return psz_result;
+                            }
+                            else return strdup( p_dir_afile->d_name );
                         }
-                        else return strdup( p_dir_afile->d_name );
                     }
                 }
             }
