@@ -2,13 +2,14 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.6 2002/11/27 05:36:41 titer Exp $
+ * $Id: Interface.cpp,v 1.7 2002/12/09 13:37:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *          Stephan Aßmus <stippi@yellowbites.com>
+ *          Eric Petit <titer@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,7 +91,6 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     	message.AddPointer("window", p_intf->p_sys->p_window);
     	be_app->PostMessage(&message);
     }
-    p_intf->p_sys->b_disabled_menus = 0;
     p_intf->p_sys->i_saved_volume = AOUT_VOLUME_DEFAULT;
     p_intf->p_sys->b_loop = 0;
     p_intf->p_sys->b_mute = 0;

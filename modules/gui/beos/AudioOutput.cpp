@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.19 2002/12/09 07:57:04 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.20 2002/12/09 13:37:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -66,6 +66,11 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     int i_nb_channels;
     aout_instance_t *p_aout = (aout_instance_t*) p_this;
     p_aout->output.p_sys = (aout_sys_t *) malloc( sizeof( aout_sys_t ) );
+    if( p_aout->output.p_sys == NULL )
+    {
+        msg_Err( p_aout, "Not enough memory" );
+        return -1;
+    }
 
     aout_sys_t *p_sys = p_aout->output.p_sys;
 
@@ -101,6 +106,14 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     
     p_sys->p_player = new BSoundPlayer( p_format, "player",
                                         Play, NULL, p_aout );
+    if( p_sys->p_player->InitCheck() != B_OK )
+    {
+        msg_Err( p_aout, "BSoundPlayer InitCheck failed" );
+        delete p_sys->p_player;
+        free( p_sys );
+        return -1;
+    }
+    
     p_sys->p_player->Start();
     p_sys->p_player->SetHasData( true );
         
