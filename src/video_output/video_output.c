@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.219 2003/04/27 17:53:20 gbazin Exp $
+ * $Id: video_output.c,v 1.220 2003/05/05 11:49:50 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1099,20 +1099,20 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
     i_height = config_GetInt( p_vout, "height" );
     ll_zoom = (uint64_t)( FP_FACTOR * config_GetFloat( p_vout, "zoom" ) );
 
-    if( (i_width >= 0) && (i_height >= 0))
+    if( i_width > 0 && i_height > 0)
     {
         *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
         return;
     }
-    else if( i_width >= 0 )
+    else if( i_width > 0 )
     {
         *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( i_width * ll_zoom * VOUT_ASPECT_FACTOR /
                             p_vout->render.i_aspect / FP_FACTOR );
         return;
     }
-    else if( i_height >= 0 )
+    else if( i_height > 0 )
     {
         *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
         *pi_width = (int)( i_height * ll_zoom * p_vout->render.i_aspect /
