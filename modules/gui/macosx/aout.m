@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.27 2003/03/15 19:21:49 jlj Exp $
+ * $Id: aout.m,v 1.28 2003/03/15 22:10:58 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -1161,6 +1161,8 @@ static int InitDevice( aout_instance_t * p_aout )
     if( memcmp( &P_STREAMS[i_stream], &p_sys->sfmt_revert, 
                 sizeof( p_sys->sfmt_revert ) ) != 0 ) 
     {
+        struct timeval now;
+        struct timespec timeout;
         struct { vlc_mutex_t lock; vlc_cond_t cond; } w;
 
         vlc_cond_init( p_aout, &w.cond );
@@ -1200,17 +1202,20 @@ static int InitDevice( aout_instance_t * p_aout )
             return( VLC_EGENERIC );
         }
 
-        vlc_cond_wait( &w.cond, &w.lock );
-        vlc_mutex_unlock( &w.lock );
+        gettimeofday( &now, NULL );
+        timeout.tv_sec = now.tv_sec;
+        timeout.tv_nsec = (now.tv_usec + 100000) * 1000;
 
-        vlc_mutex_destroy( &w.lock );
-        vlc_cond_destroy( &w.cond );
+        pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout );
+        vlc_mutex_unlock( &w.lock );
 
         if( GetStreamID( p_dev->devid, p_option->i_idx + 1, 
                          &p_option->i_sid ) )
         {
             msg_Err( p_aout, "GetStreamID(%ld, %ld) failed", 
                      p_option->i_dev, p_option->i_idx );
+            vlc_mutex_destroy( &w.lock );
+            vlc_cond_destroy( &w.cond );
             return( VLC_EGENERIC );
         }
 
@@ -1221,9 +1226,13 @@ static int InitDevice( aout_instance_t * p_aout )
             msg_Err( p_aout, 
                     "AudioStreamRemovePropertyListener failed: [%4.4s]",
                     (char *)&err );
-
+            vlc_mutex_destroy( &w.lock );
+            vlc_cond_destroy( &w.cond );
             return( VLC_EGENERIC );
         }
+
+        vlc_mutex_destroy( &w.lock );
+        vlc_cond_destroy( &w.cond );
 
         p_sys->b_revert_sfmt = VLC_TRUE;
     }
