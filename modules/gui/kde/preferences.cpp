@@ -53,7 +53,7 @@
 KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                            QWidget *parent, const QString &caption) :
     KDialogBase ( TreeList, caption, Ok| Apply|Cancel|User1, Ok, parent,
-                  _("vlc preferences"), true, false, i18n(_("&Save")) )
+                  _("VLC preferences"), true, false, i18n(_("&Save")) )
 {
     module_t *p_parser = NULL;
     vlc_list_t *p_list;
