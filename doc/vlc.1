@@ -21,11 +21,37 @@ vlc, gvlc, gnome-vlc, qvlc \- The VideoLAN Client
 .B vlc
 .RI [ OPTIONS ]
 .RI [ PARAMETERS ]
-.RI [ FILE ]...
+.RI [ ITEMS ]...
 .SH DESCRIPTION
 This manual page documents briefly the
 .B vlc
 , a free MPEG, MPEG2 and DVD player.
+.SH ITEMS
+.B vlc
+recognizes several URL-style items:
+.TP
+.B *.mpg, *.vob
+Plain MPEG-1/2 files
+.TP
+.B dvd:<device>[@<raw device>]
+DVD device (for instance dvd:/dev/dvd). The raw device is optional and
+must have been prepared beforehands.
+.TP
+.B vcd:<device>
+VCD device (for instance dvd:/dev/cdrom).
+.TP
+.B udpstream:[<server>:[<server port>]][@[<bind address>][:<bind port>]]
+UDP stream, such as one sent by VideoLAN Server or VideoLAN miniserver.
+Usually "udpstream:" is enough.
+.TP
+.B vlc:<command>
+Execute a play-list command. Commands are :
+.B loop
+(loop the playlist),
+.B pause
+(pause execution of other items), and
+.B quit
+(close VLC).
 .SH OPTIONS
 .B vlc
 follows the usual GNU command line syntax, with long
@@ -57,6 +83,9 @@ Specify a module for AC3 downmix: "downmix", "sse" or "3dn" for instance.
 .TP
 .B \-\-imdct <module>
 Specify a module for AC3 IMDCT: "imdct", sse" or "3dn"  for instance.
+.TP
+.B \-\-volume [1..1024]
+Change VLC output volume (default: 512).
 .TP
 .B \-\-novideo
 Disable video output.
@@ -116,6 +145,9 @@ Choose the audio channel type. Most DVDs have AC3 audio channels, but
 you can also have Linear PCM or MPEG layer 2 sound. Also, one might decide
 not to activate the audio channel.
 .TP
+.B \-u, \-\-dvdangle <num>
+Choose the angle, available on some DVDs.
+.TP
 .B \-c, \-\-dvdchannel [ 0\-15 ]
 Select the audio channel. Most DVDs only have one or two audio channels,
 but some of them have a great number of available languages. Note that the
@@ -134,15 +166,6 @@ Select the CSS decryption verbosity level, 0, 1 or 2.
 .B \-\-input <method>
 Choose the input method, "dvd", "ps", "ts" for instance.
 .TP
-.B \-\-vlans
-Enable VLANs support. This feature isn't activated yet.
-.TP
-.B \-\-server <host>, \-\-port <port>
-Choose the video server address and port.
-.TP
-.B \-\-broadcast
-Set broadcast mode for network input.
-.TP
 .B \-h, \-\-help
 Print help and exit.
 .TP
@@ -157,8 +180,6 @@ also accepts a lot of parameters to customize its behaviour.
 .TP
 .B Interface parameters:
  vlc_intf=<method name>   interface method
- vlc_init=<filename>      initialization script
- vlc_channels=<filename>  channels list
 .TP
 .B Audio parameters:
  vlc_aout=<method name>  	audio method
@@ -167,6 +188,7 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_spdif={1|0}         	AC3 pass-through mode
  vlc_downmix=<method name>      AC3 downmix method
  vlc_imdct=<method name>        AC3 IMDCT method
+ vlc_volume=[0..1024]		VLC output volume
  vlc_audio_rate=<rate>    	output rate
 .TP
 .B Video parameters:
@@ -188,17 +210,13 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_dvd_device=<device>           DVD device
  vlc_input_title=<title>           title number
  vlc_input_chapter=<chapter>       chapter number
- vlc_audio={ac3|lpcm|mpeg|off}     audio type
- vlc_channel=[0-15]                audio channel
- vlc_subtitle=[0-31]               subtitle channel
+ vlc_input_angle=<angle>           angle number
+ vlc_input_audio={ac3|lpcm|mpeg|off} audio type
+ vlc_input_channel=[0-15]          audio channel
+ vlc_input_subtitle=[0-31]         subtitle channel
 .TP
 .B Input parameters:
- vlc_server=<hostname>    video server
- vlc_server_port=<port>   video server port
- vlc_broadcast={1|0}      broadcast mode
  vlc_iface=<interface>    network interface
- vlc_vlan_server=<host>   vlan server
- vlc_vlan_port=<port>     vlan server port
 
 .SH SEE ALSO
 .BR vls (1), vlms (1)

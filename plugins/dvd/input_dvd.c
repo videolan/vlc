@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.100 2001/11/27 11:44:48 massiot Exp $
+ * $Id: input_dvd.c,v 1.101 2001/11/27 12:33:20 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -336,12 +336,12 @@ static void DVDOpen( struct input_thread_s *p_input )
         psz_parser = psz_device = p_input->p_source;
     }
 
-    while( *psz_parser && *psz_parser != ':' )
+    while( *psz_parser && *psz_parser != '@' )
     {
         *psz_parser++;
     }
 
-    if( *psz_parser == ':' )
+    if( *psz_parser == '@' )
     {
         /* Found raw device */
         *psz_parser = '\0';
