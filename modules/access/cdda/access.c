@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.12 2003/12/05 01:56:24 rocky Exp $
+ * $Id: access.c,v 1.13 2003/12/05 02:33:49 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -947,8 +947,6 @@ E_(Open)( vlc_object_t *p_this )
     p_input->i_pts_delay = config_GetInt( p_input, 
 					  MODULE_STRING "-caching" ) * 1000;
 
-    p_cdda->p_intf = intf_Create( p_input, "cddax" );
-    intf_RunThread( p_cdda->p_intf );
     free( psz_source );
 
     return 0;
