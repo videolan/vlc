@@ -150,7 +150,6 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-
 }
 
 /*****************************************************************************
@@ -333,12 +332,10 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    return demux2_vaControlHelper( p_demux->s,
-                                   0, 0, 0, 1,
-                                   i_query, args );
+    return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 1, i_query, args );
 }
 
-#ifdef SYS_BEOS
+#if defined(SYS_BEOS) || defined(WIN32)
 /* BeOS doesn't have scandir/alphasort/versionsort */
 static int alphasort( const struct dirent **a, const struct dirent **b )
 {
@@ -355,11 +352,7 @@ static int scandir( const char *name, struct dirent ***namelist,
     struct dirent ** pp_list;
     int              ret, size;
 
-    if( !namelist ||
-        !( p_dir = opendir( name ) ) )
-    {
-        return -1;
-    }
+    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
 
     ret     = 0;
     pp_list = NULL;
@@ -400,17 +393,16 @@ static int ReadDir( playlist_t *p_playlist,
                     char *psz_name , int i_mode, int *pi_position,
                     playlist_item_t *p_parent )
 {
-    struct dirent *             p_dir_content;
-    struct dirent **            pp_dir_content;
-    int                         i_dir_content;
+    struct dirent   *p_dir_content;
+    struct dirent   **pp_dir_content;
+    int             i_dir_content, i = 0;
     playlist_item_t *p_node;
-    int i = 0;
 
-   /* Change the item to a node */
-   if( p_parent->i_children == -1)
-   {
+    /* Change the item to a node */
+    if( p_parent->i_children == -1 )
+    {
         playlist_ItemToNode( p_playlist,p_parent );
-   }
+    }
 
     /* get the first directory entry */
     i_dir_content = scandir( psz_name, &pp_dir_content, Filter, alphasort );
@@ -502,5 +494,3 @@ static int ReadDir( playlist_t *p_playlist,
     free( pp_dir_content );
     return VLC_SUCCESS;
 }
-
-
