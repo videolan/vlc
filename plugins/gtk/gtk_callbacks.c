@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.18 2001/05/15 14:49:48 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.19 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -200,11 +200,12 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
     if( i_id > 0 )
     {
         p_area = p_intf->p_input->stream.pp_areas[i_id];
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
+        GtkSetupMenus( p_intf );
     }
 }
 
@@ -221,11 +222,12 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
     if( i_id < p_intf->p_input->stream.i_area_nb )
     {
         p_area = p_intf->p_input->stream.pp_areas[i_id];   
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
+        GtkSetupMenus( p_intf );
     }
 
 }
@@ -242,11 +244,12 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
     if( p_area->i_part > 0 )
     {
         p_area->i_part--;
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
+        GtkSetupMenus( p_intf );
     }
 }
 
@@ -262,11 +265,12 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
     if( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
+        GtkSetupMenus( p_intf );
     }
 }
 
@@ -274,10 +278,9 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
  * About box
  ****************************************************************************/
 
-gboolean
-GtkAboutShow                           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkAboutShow( GtkWidget       *widget,
+                       GdkEventButton  *event,
+                       gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -305,10 +308,9 @@ void GtkAboutOk( GtkButton * button, gpointer user_data)
  * Jump box
  ****************************************************************************/
 
-gboolean
-GtkJumpShow                            (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+gboolean GtkJumpShow( GtkWidget       *widget,
+                      GdkEventButton  *event,
+                      gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -326,9 +328,8 @@ GtkJumpShow                            (GtkWidget       *widget,
 }
 
 
-void
-GtkJumpOk                              (GtkButton       *button,
-                                        gpointer         user_data)
+void GtkJumpOk( GtkButton       *button,
+                gpointer         user_data)
 {
     intf_thread_t * p_intf;
     off_t           i_seek;
@@ -365,9 +366,8 @@ GtkJumpOk                              (GtkButton       *button,
 }
 
 
-void
-GtkJumpCancel                          (GtkButton       *button,
-                                        gpointer         user_data)
+void GtkJumpCancel( GtkButton       *button,
+                    gpointer         user_data)
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
@@ -404,11 +404,3 @@ void GtkJumpActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
-
-void
-GtkPlaylistDestroy                     (GtkObject       *object,
-                                        gpointer         user_data)
-{
-
-}
-

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.55 2001/05/01 12:22:18 sam Exp $
+ * $Id: input_programs.c,v 1.56 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,6 +64,8 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     p_input->stream.b_changed = 0;
     p_input->stream.pp_es = NULL;
     p_input->stream.pp_selected_es = NULL;
+    p_input->stream.p_removed_es = NULL;
+    p_input->stream.p_newly_selected_es = NULL;
     p_input->stream.pp_programs = NULL;
 
     if( i_data_len )
@@ -673,19 +675,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
-#if 0
     case LPCM_AUDIO_ES:
         if( p_main->b_audio )
         {
-            if( p_main->b_spdif )
-            {
-                decoder.pf_create_thread = spdif_CreateThread;
-            }
-            else
-            {
-                intf_ErrMsg( "input error: LPCM audio not handled yet" );
-                break;
-            }
+            intf_ErrMsg( "input error: LPCM audio not handled yet" );
+            break;
 
             p_config = (void *)GetAdecConfig( p_input, p_es );
 
@@ -696,7 +690,6 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
-#endif
     case DVD_SPU_ES:
         if( p_main->b_video )
         {

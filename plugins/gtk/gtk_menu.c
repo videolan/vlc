@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.2 2001/05/15 14:49:48 stef Exp $
+ * $Id: gtk_menu.c,v 1.3 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -60,24 +60,57 @@
 
 #include "main.h"
 
+/*
+ * Local Prototypes
+ */
+static gint GtkLanguageMenus( gpointer , GtkWidget *, es_descriptor_t *, gint,
+                        void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) );
+
+void GtkMenubarAudioToggle   ( GtkCheckMenuItem *, gpointer );
+void GtkPopupAudioToggle     ( GtkCheckMenuItem *, gpointer );
+void GtkMenubarSubtitleToggle( GtkCheckMenuItem *, gpointer );
+void GtkPopupSubtitleToggle  ( GtkCheckMenuItem *, gpointer );
+static gint GtkTitleMenu( gpointer, GtkWidget *, 
+                    void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) );
+static gint GtkRadioMenu( intf_thread_t *, GtkWidget *, GSList *,
+                          char *, int, int,
+                   void( *pf_toggle )( GtkCheckMenuItem *, gpointer ) );
+void GtkMenubarAngleToggle( GtkCheckMenuItem *, gpointer );
+void GtkPopupAngleToggle( GtkCheckMenuItem *, gpointer );
+
+gint GtkSetupMenus( intf_thread_t * p_intf );
+
 /****************************************************************************
  * Gtk*Toggle: callbacks to toggle the value of a checkmenuitem
  ****************************************************************************
  * We need separate functions for menubar and popup here since we can't use
- * user_data to transmit intf_*
+ * user_data to transmit intf_* and we need to refresh the other menu.
  ****************************************************************************/
 
-#define GtkLangToggle( b_update )                                   \
-    es_descriptor_t *       p_es;                                   \
-                                                                    \
-    if( !b_update )                                                 \
-    {                                                               \
-        p_es = (es_descriptor_t*)user_data;                         \
-                                                                    \
-        input_ToggleES( p_intf->p_input, p_es, menuitem->active );  \
-                                                                    \
-        b_update = menuitem->active;                                \
-    }                                                               \
+#define GtkLangToggle( intf, menu, type, callback, b_update )           \
+    intf_thread_t *         p_intf;                                     \
+    GtkWidget *             p_menu;                                     \
+    es_descriptor_t *       p_es;                                       \
+                                                                        \
+    p_intf = GetIntf( GTK_WIDGET(menuitem), (intf) );                   \
+                                                                        \
+    if( !p_intf->p_sys->b_update )                                      \
+    {                                                                   \
+        p_menu = GTK_WIDGET( gtk_object_get_data(                       \
+                   GTK_OBJECT( p_intf->p_sys->p_popup ), (menu) ) );    \
+        p_es = (es_descriptor_t*)user_data;                             \
+                                                                        \
+        input_ToggleES( p_intf->p_input, p_es, menuitem->active );      \
+                                                                        \
+        p_intf->p_sys->b_update = menuitem->active;                     \
+                                                                        \
+        if( p_intf->p_sys->b_update )                                   \
+        {                                                               \
+            GtkLanguageMenus( p_intf, p_menu, p_es, type, callback );   \
+        }                                                               \
+                                                                        \
+        p_intf->p_sys->b_update = 0;                                    \
+    }
 
 /*
  * Audio
@@ -85,39 +118,38 @@
 
 void GtkMenubarAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    GtkLangToggle( p_intf->p_sys->b_audio_update );
+    GtkLangToggle( "intf_window", "popup_audio", AUDIO_ES,
+                   GtkPopupAudioToggle, b_audio_update );
 }
 
 void GtkPopupAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    GtkLangToggle( p_intf->p_sys->b_audio_update );
+    GtkLangToggle( "intf_popup", "menubar_audio", AUDIO_ES,
+                   GtkMenubarAudioToggle, b_audio_update );
 }
 
 /* 
  * Subtitles
  */ 
 
-
 void GtkMenubarSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    GtkLangToggle( p_intf->p_sys->b_spu_update );
+    GtkLangToggle( "intf_window", "popup_subpictures", SPU_ES,
+                   GtkPopupSubtitleToggle, b_spu_update );
 }
+
 void GtkPopupSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    GtkLangToggle( p_intf->p_sys->b_spu_update );
+    GtkLangToggle( "intf_popup", "menubar_subpictures", SPU_ES,
+                   GtkMenubarSubtitleToggle, b_spu_update );
 }
+
+#undef GtkLangToggle
 
 /*
  * Navigation
  */
+
 void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
                                gpointer user_data )
 {
@@ -127,10 +159,12 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         !p_intf->p_sys->b_title_update &&
         !p_intf->p_sys->b_chapter_update )
     {
-        input_area_t   *p_area = p_intf->p_input->stream.p_selected_area;
+        input_area_t   *p_area;
 
         gint i_title   = DATA2TITLE( user_data );
         gint i_chapter = DATA2CHAPTER( user_data );
+
+        p_area = p_intf->p_input->stream.p_selected_area;
 
         if( p_area != p_intf->p_input->stream.pp_areas[i_title] )
         {
@@ -139,9 +173,11 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         }
 
         p_area->i_part = i_chapter;
-        p_intf->p_sys->b_chapter_update = 1;
 
-        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+
+        p_intf->p_sys->b_chapter_update = 1;
+        GtkSetupMenus( p_intf );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
@@ -151,100 +187,106 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
  * Title
  */
 
-#define GtkTitleToggle( intf )                                              \
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), (intf) );       \
-                                                                            \
-    if( menuitem->active && !p_intf->p_sys->b_title_update )                \
-    {                                                                       \
-        gint i_title = (gint)user_data;                                     \
-        p_intf->p_input->pf_set_area( p_intf->p_input,                      \
-            p_intf->p_input->stream.pp_areas[i_title] );                    \
-                                                                            \
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );              \
-                                                                            \
-        p_intf->p_sys->b_title_update = 1;                                  \
-    }
-
 void GtkMenubarTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkTitleToggle( "intf_window" );
-}
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
-void GtkPopupTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
-{
-    GtkTitleToggle( "intf_popup" );
+    if( menuitem->active && !p_intf->p_sys->b_title_update )
+    {
+        gint i_title = (gint)user_data;
+        input_ChangeArea( p_intf->p_input,
+                          p_intf->p_input->stream.pp_areas[i_title] );
+
+        p_intf->p_sys->b_title_update = 1;
+        GtkSetupMenus( p_intf );
+        p_intf->p_sys->b_title_update = 0;
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+    }
 }
 
 /*
  * Chapter
  */
 
-#define GtkChapterToggle( intf )                                            \
-    intf_thread_t * p_intf;                                                 \
-    input_area_t *  p_area;                                                 \
-    gint            i_chapter;                                              \
-    char            psz_chapter[5];                                         \
-                                                                            \
-    p_intf    = GetIntf( GTK_WIDGET(menuitem), (intf) );                    \
-    p_area    = p_intf->p_input->stream.p_selected_area;                    \
-    i_chapter = (gint)user_data;                                            \
-                                                                            \
-    if( menuitem->active && !p_intf->p_sys->b_chapter_update )              \
-    {                                                                       \
-        p_area->i_part = i_chapter;                                         \
-        p_intf->p_input->pf_set_area( p_intf->p_input,                      \
-                                      (input_area_t*)p_area );              \
-                                                                            \
-        snprintf( psz_chapter, 3, "%02d", p_area->i_part );                 \
-        gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );  \
-                                                                            \
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );              \
-                                                                            \
-        p_intf->p_sys->b_chapter_update = 1;                                \
-    }
-
-
 void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkChapterToggle( "intf_window" );
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    gint            i_chapter;
+    char            psz_chapter[5];
+    GtkWidget *     p_popup_menu;
+
+    p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    p_area    = p_intf->p_input->stream.p_selected_area;
+    i_chapter = (gint)user_data;
+
+    if( menuitem->active && !p_intf->p_sys->b_chapter_update )
+    {
+        p_area->i_part = i_chapter;
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
+
+        snprintf( psz_chapter, 4, "%02d", p_area->i_part );
+        psz_chapter[ 4 ] = '\0';
+        gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
+
+        p_intf->p_sys->b_chapter_update = 1;
+        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                             p_intf->p_sys->p_popup ), "popup_navigation" ) );
+
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+        GtkTitleMenu( p_intf, p_popup_menu, GtkPopupNavigationToggle );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+
+        p_intf->p_sys->b_chapter_update = 0;
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
 }
 
-void GtkPopupChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
-{
-    GtkChapterToggle( "intf_popup" );
-}
 
 /*
  * Angle
  */
 
-#define GtkAngleToggle( intf )                                              \
+#define GtkAngleToggle( intf, window, menu, callback )                      \
     intf_thread_t * p_intf;                                                 \
+    GtkWidget *     p_menu;                                                 \
     input_area_t *  p_area;                                                 \
-    gint            i_angle;                                                \
                                                                             \
     p_intf    = GetIntf( GTK_WIDGET(menuitem), (intf) );                    \
-    p_area    = p_intf->p_input->stream.p_selected_area;                    \
-    i_angle   = (gint)user_data;                                            \
                                                                             \
     if( menuitem->active && !p_intf->p_sys->b_angle_update )                \
     {                                                                       \
-        p_area->i_angle = i_angle;                                          \
-        p_intf->p_input->pf_set_area( p_intf->p_input,                      \
-                                     (input_area_t*)p_area );               \
+        p_menu    = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(            \
+                                p_intf->p_sys->window ), (menu) ) );        \
+        p_area    = p_intf->p_input->stream.p_selected_area;                \
+        p_area->i_angle = (gint)user_data;                                  \
+                                                                            \
+        input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );         \
                                                                             \
         p_intf->p_sys->b_angle_update = 1;                                  \
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );             \
+        GtkRadioMenu( p_intf, p_menu, NULL, "Angle",                        \
+                      p_area->i_angle_nb, p_area->i_angle, (callback) );    \
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );           \
+        p_intf->p_sys->b_angle_update = 0;                                  \
     }
 
 void GtkMenubarAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkAngleToggle( "intf_window" )
+    GtkAngleToggle( "intf_window", p_popup, "popup_angle",
+                    GtkPopupAngleToggle );
 }
 
 void GtkPopupAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkAngleToggle( "intf_popup" )
+    GtkAngleToggle( "intf_popup", p_window, "menubar_angle",
+                    GtkMenubarAngleToggle );
 }
+
+#undef GtkAngleToggle
 
 /****************************************************************************
  * Functions to generate menus
@@ -433,6 +475,8 @@ static gint GtkLanguageMenus( gpointer          p_data,
     p_item_active = NULL;
     i_item = 0;
 
+    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+
     /* create a set of language buttons and append them to the container */
     for( i = 0 ; i < p_intf->p_input->stream.i_es_number ; i++ )
     {
@@ -468,6 +512,7 @@ static gint GtkLanguageMenus( gpointer          p_data,
         }
     }
 
+    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
     /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
@@ -477,10 +522,8 @@ static gint GtkLanguageMenus( gpointer          p_data,
      * We have to release the lock since input_ToggleES needs it */
     if( p_item_active != NULL )
     {
-        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
-        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
     }
 
     /* be sure that menu is sensitive if non empty */
@@ -492,7 +535,6 @@ static gint GtkLanguageMenus( gpointer          p_data,
     return TRUE;
 }
 
-#if 1
 /*****************************************************************************
  * GtkTitleMenu: sets menus for titles and chapters selection
  *****************************************************************************
@@ -732,13 +774,12 @@ static gint GtkTitleMenu( gpointer       p_data,
 
     return TRUE;
 }
-#endif
 
 /*****************************************************************************
- * GtkSetupMenu: function that generates title/chapter/audio/subpic
+ * GtkSetupMenus: function that generates title/chapter/audio/subpic
  * menus with help from preceding functions
  *****************************************************************************/
-gint GtkSetupMenu( intf_thread_t * p_intf )
+gint GtkSetupMenus( intf_thread_t * p_intf )
 {
     es_descriptor_t *   p_audio_es;
     es_descriptor_t *   p_spu_es;
@@ -746,12 +787,12 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
-    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update |
-        ( p_intf->p_sys->i_part !=
-            p_intf->p_input->stream.p_selected_area->i_part );
+    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_angle_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
+
+    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
     if( p_intf->p_sys->b_title_update )
     { 
@@ -760,9 +801,9 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                             p_intf->p_sys->p_window ), "menubar_title" ) );
         GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Title",
-                        p_intf->p_input->stream.i_area_nb - 1,
-                        p_intf->p_input->stream.p_selected_area->i_id,
-                        GtkMenubarTitleToggle );
+                      p_intf->p_input->stream.i_area_nb - 1,
+                      p_intf->p_input->stream.p_selected_area->i_id,
+                      GtkMenubarTitleToggle );
 
         snprintf( psz_title, 4, "%d",
                   p_intf->p_input->stream.p_selected_area->i_id );
@@ -841,6 +882,8 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
         }
     }
 
+    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+
     /* audio menus */
     if( p_intf->p_sys->b_audio_update )
     {
@@ -851,11 +894,13 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                      p_intf->p_sys->p_popup ), "popup_audio" ) );
     
+        p_intf->p_sys->b_audio_update = 1;
         GtkLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
                             GtkMenubarAudioToggle );
+        p_intf->p_sys->b_audio_update = 1;
         GtkLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
                             GtkPopupAudioToggle );
-
+    
         p_intf->p_sys->b_audio_update = 0;
     }
     
@@ -869,11 +914,13 @@ gint GtkSetupMenu( intf_thread_t * p_intf )
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                      p_intf->p_sys->p_popup ), "popup_subpictures" ) );
     
+        p_intf->p_sys->b_spu_update = 1;
         GtkLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
                             GtkMenubarSubtitleToggle  );
+        p_intf->p_sys->b_spu_update = 1;
         GtkLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
                             GtkPopupSubtitleToggle );
-
+    
         p_intf->p_sys->b_spu_update = 0;
     }
 

@@ -33,7 +33,3 @@ void     GtkWindowToggleActivate( GtkMenuItem *, gpointer );
 void     GtkFullscreenActivate  ( GtkMenuItem *, gpointer );
 void     GtkAboutActivate       ( GtkMenuItem *, gpointer );
 void     GtkJumpActivate        ( GtkMenuItem *, gpointer );
-
-void
-GtkPlaylistDestroy                     (GtkObject       *object,
-                                        gpointer         user_data);

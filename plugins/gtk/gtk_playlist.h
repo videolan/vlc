@@ -2,7 +2,7 @@
  * gtk_playlist.h : Playlist functions for the Gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_playlist.h,v 1.3 2001/05/15 14:49:48 stef Exp $
+ * $Id: gtk_playlist.h,v 1.4 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -49,4 +49,14 @@ void     GtkDeleteGListItem   ( gpointer, gpointer );
 void     GtkPlaylistActivate  ( GtkMenuItem *, gpointer );
 void     GtkNextActivate      ( GtkMenuItem *, gpointer );
 void     GtkPrevActivate      ( GtkMenuItem *, gpointer );
+
+
+struct intf_thread_s;
+struct playlist_s;
+
+void    GtkDropDataReceived   ( struct intf_thread_s *, GtkSelectionData *,
+                                guint, int );
+int     GtkAppendList         ( struct playlist_s *, int, GList * );
+void    GtkRebuildCList       ( GtkCList *, struct playlist_s * );
+void    GtkPlayListManage     ( struct intf_thread_s * );
 

@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.14 2001/04/22 00:08:25 stef Exp $
+ * $Id: dvd_ifo.h,v 1.15 2001/05/19 00:39:30 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -65,6 +65,14 @@ typedef struct ifo_audio_s
     u8      i_bar                 ;// 8;    // 0x00000000 ?
 } ifo_audio_t;
 
+/* Audio Status */
+typedef struct audio_status_s
+{
+    u8      i_available;        // 1
+    u8      i_position;         // 7
+    u8      i_foo;              // 8
+} audio_status_t;
+
 typedef struct ifo_spu_t
 {
     u16     i_prefix              ;// 16;   // 0x0100 ?
@@ -73,6 +81,15 @@ typedef struct ifo_spu_t
     u8      i_caption             ;// 8;    // 0x00 ?
 } ifo_spu_t;
 
+/* Subpicture status */
+typedef struct spu_status_s
+{
+    u8      i_available;        //1
+    u8      i_position_43;      //7
+    u8      i_position_wide;    //8
+    u8      i_position_letter;  //8
+    u8      i_position_pan;     //8
+} spu_status_t;
 
 
 /* Ifo vitual machine Commands */
@@ -153,8 +170,8 @@ typedef struct title_s
     u8              i_cell_nb;                  // 1 byte
     u32             i_play_time;                // 4 bytes
     u32             i_prohibited_user_op;       // 4 bytes
-    u16             pi_audio_status[8];         // 8*2 bytes
-    u32             pi_subpic_status[32];       // 32*4 bytes
+    audio_status_t  pi_audio_status[8];         // 8*2 bytes
+    spu_status_t    pi_spu_status[32];       // 32*4 bytes
     u16             i_next_title_num;              // 2 bytes
     u16             i_prev_title_num;              // 2 bytes
     u16             i_go_up_title_num;              // 2 bytes
@@ -530,3 +547,13 @@ typedef struct ifo_s
     vts_t           vts;            /* Vts ifo for current title set */
 } ifo_t;
 
+
+/*****************************************************************************
+ * Prototypes in dvd_ifo.c
+ *****************************************************************************/
+struct thread_dvd_data_s;
+
+int   IfoCreate   ( struct thread_dvd_data_s * );
+int   IfoInit     ( struct ifo_s * );
+int   IfoTitleSet ( struct ifo_s * );
+void  IfoDestroy  ( struct ifo_s * );

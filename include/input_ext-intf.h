@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.36 2001/05/01 12:22:18 sam Exp $
+ * $Id: input_ext-intf.h,v 1.37 2001/05/19 00:39:29 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -193,9 +193,12 @@ typedef struct stream_descriptor_s
 
     /* if (b_seekable) : */
     int                     i_area_nb;
-    input_area_t **         pp_areas;      /* list of areas in stream == offset
-                                            * interval with own properties */
+    input_area_t **         pp_areas;    /* list of areas in stream == offset
+                                          * interval with own properties */
     input_area_t *          p_selected_area;
+    input_area_t *          p_new_area;  /* Newly selected area from
+                                          * the interface */
+
     u32                     i_mux_rate; /* the rate we read the stream (in
                                          * units of 50 bytes/s) ; 0 if undef */
 
@@ -216,6 +219,10 @@ typedef struct stream_descriptor_s
     es_descriptor_t **      pp_es;             /* carried elementary streams */
     int                     i_selected_es_number;
     es_descriptor_t **      pp_selected_es;             /* ES with a decoder */
+    es_descriptor_t *       p_newly_selected_es;   /* ES selected from
+                                                    * the interface */
+    es_descriptor_t *       p_removed_es;   /* ES removed from the interface */
+
 
     /* Stream control */
     stream_ctrl_t           control;
@@ -346,3 +353,5 @@ int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, u8 );
 int  input_ToggleES ( struct input_thread_s *,
                       struct es_descriptor_s *,
                       boolean_t );
+int  input_ChangeArea( input_thread_t *, input_area_t * );
+

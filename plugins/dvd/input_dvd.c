@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.59 2001/05/15 14:49:47 stef Exp $
+ * $Id: input_dvd.c,v 1.60 2001/05/19 00:39:30 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -75,172 +75,13 @@
 #include "dvd_netlist.h"
 #include "dvd_ifo.h"
 #include "dvd_css.h"
+#include "dvd_summary.h"
 #include "input_dvd.h"
 #include "mpeg_system.h"
 
 #include "debug.h"
 
 #include "modules.h"
-
-/*****************************************************************************
- * Local tables
- *****************************************************************************/
-static struct
-{
-    char    p_code[3];
-    char    p_lang_long[20];
-}
-
-lang_tbl[] =
-{
-    /* The ISO 639 language codes.
-     * Language names with * prefix are not spelled in their own language 
-     */
-    { "  ", "Not Specified" },
-    { "aa", "*Afar" },
-    { "ab", "*Abkhazian" },
-    { "af", "*Afrikaans" },
-    { "am", "*Amharic" },
-    { "ar", "*Arabic" },
-    { "as", "*Assamese" },
-    { "ay", "*Aymara" },
-    { "az", "*Azerbaijani" },
-    { "ba", "*Bashkir" },
-    { "be", "*Byelorussian" },
-    { "bg", "*Bulgarian" },
-    { "bh", "*Bihari" },
-    { "bi", "*Bislama" },
-    { "bn", "*Bengali; Bangla" },
-    { "bo", "*Tibetan" },
-    { "br", "*Breton" },
-    { "ca", "*Catalan" },
-    { "co", "*Corsican" },
-    { "cs", "*Czech(Ceske)" },
-    { "cy", "*Welsh" },
-    { "da", "Dansk" },
-    { "de", "Deutsch" },
-    { "dz", "*Bhutani" },
-    { "el", "*Greek" },
-    { "en", "English" },
-    { "eo", "*Esperanto" },
-    { "es", "Espanol" },
-    { "et", "*Estonian" },
-    { "eu", "*Basque" },
-    { "fa", "*Persian" },
-    { "fi", "Suomi" },
-    { "fj", "*Fiji" },
-    { "fo", "*Faroese" },
-    { "fr", "Francais" },
-    { "fy", "*Frisian" },
-    { "ga", "*Irish" },
-    { "gd", "*Scots Gaelic" },
-    { "gl", "*Galician" },
-    { "gn", "*Guarani" },
-    { "gu", "*Gujarati" },
-    { "ha", "*Hausa" },
-    { "he", "*Hebrew" },                                      /* formerly iw */
-    { "hi", "*Hindi" },
-    { "hr", "Hrvatski" },                                        /* Croatian */
-    { "hu", "Magyar" },
-    { "hy", "*Armenian" },
-    { "ia", "*Interlingua" },
-    { "id", "*Indonesian" },                                  /* formerly in */
-    { "ie", "*Interlingue" },
-    { "ik", "*Inupiak" },
-    { "in", "*Indonesian" },                               /* replaced by id */
-    { "is", "Islenska" },
-    { "it", "Italiano" },
-    { "iu", "*Inuktitut" },
-    { "iw", "*Hebrew" },                                   /* replaced by he */
-    { "ja", "*Japanese" },
-    { "ji", "*Yiddish" },                                  /* replaced by yi */
-    { "jw", "*Javanese" },
-    { "ka", "*Georgian" },
-    { "kk", "*Kazakh" },
-    { "kl", "*Greenlandic" },
-    { "km", "*Cambodian" },
-    { "kn", "*Kannada" },
-    { "ko", "*Korean" },
-    { "ks", "*Kashmiri" },
-    { "ku", "*Kurdish" },
-    { "ky", "*Kirghiz" },
-    { "la", "*Latin" },
-    { "ln", "*Lingala" },
-    { "lo", "*Laothian" },
-    { "lt", "*Lithuanian" },
-    { "lv", "*Latvian, Lettish" },
-    { "mg", "*Malagasy" },
-    { "mi", "*Maori" },
-    { "mk", "*Macedonian" },
-    { "ml", "*Malayalam" },
-    { "mn", "*Mongolian" },
-    { "mo", "*Moldavian" },
-    { "mr", "*Marathi" },
-    { "ms", "*Malay" },
-    { "mt", "*Maltese" },
-    { "my", "*Burmese" },
-    { "na", "*Nauru" },
-    { "ne", "*Nepali" },
-    { "nl", "Nederlands" },
-    { "no", "Norsk" },
-    { "oc", "*Occitan" },
-    { "om", "*(Afan) Oromo" },
-    { "or", "*Oriya" },
-    { "pa", "*Punjabi" },
-    { "pl", "*Polish" },
-    { "ps", "*Pashto, Pushto" },
-    { "pt", "Portugues" },
-    { "qu", "*Quechua" },
-    { "rm", "*Rhaeto-Romance" },
-    { "rn", "*Kirundi" },
-    { "ro", "*Romanian"  },
-    { "ru", "*Russian" },
-    { "rw", "*Kinyarwanda" },
-    { "sa", "*Sanskrit" },
-    { "sd", "*Sindhi" },
-    { "sg", "*Sangho" },
-    { "sh", "*Serbo-Croatian" },
-    { "si", "*Sinhalese" },
-    { "sk", "*Slovak" },
-    { "sl", "*Slovenian" },
-    { "sm", "*Samoan" },
-    { "sn", "*Shona"  },
-    { "so", "*Somali" },
-    { "sq", "*Albanian" },
-    { "sr", "*Serbian" },
-    { "ss", "*Siswati" },
-    { "st", "*Sesotho" },
-    { "su", "*Sundanese" },
-    { "sv", "Svenska" },
-    { "sw", "*Swahili" },
-    { "ta", "*Tamil" },
-    { "te", "*Telugu" },
-    { "tg", "*Tajik" },
-    { "th", "*Thai" },
-    { "ti", "*Tigrinya" },
-    { "tk", "*Turkmen" },
-    { "tl", "*Tagalog" },
-    { "tn", "*Setswana" },
-    { "to", "*Tonga" },
-    { "tr", "*Turkish" },
-    { "ts", "*Tsonga" },
-    { "tt", "*Tatar" },
-    { "tw", "*Twi" },
-    { "ug", "*Uighur" },
-    { "uk", "*Ukrainian" },
-    { "ur", "*Urdu" },
-    { "uz", "*Uzbek" },
-    { "vi", "*Vietnamese" },
-    { "vo", "*Volapuk" },
-    { "wo", "*Wolof" },
-    { "xh", "*Xhosa" },
-    { "yi", "*Yiddish" },                                     /* formerly ji */
-    { "yo", "*Yoruba" },
-    { "za", "*Zhuang" },
-    { "zh", "*Chinese" },
-    { "zu", "*Zulu" },
-    { "\0", "" }
-};
 
 /*****************************************************************************
  * Local prototypes
@@ -255,7 +96,6 @@ static void DVDSeek     ( struct input_thread_s *, off_t );
 static int  DVDRewind   ( struct input_thread_s * );
 
 /* called only inside */
-static char * Language( u16 );
 static int  DVDChooseAngle( thread_dvd_data_t * );
 static int  DVDFindCell( thread_dvd_data_t * );
 static int  DVDFindSector( thread_dvd_data_t * );
@@ -283,26 +123,6 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_rewind           = DVDRewind;
     input.pf_seek             = DVDSeek;
 #undef input
-}
-
-/*
- * Local tools to decode some data in ifo
- */
-
-/*****************************************************************************
- * Language: gives the long language name from the two-letters ISO-639 code
- *****************************************************************************/
-static char * Language( u16 i_code )
-{
-    int     i = 0;
-
-    while( memcmp( lang_tbl[i].p_code, &i_code, 2 ) &&
-           lang_tbl[i].p_lang_long[0] )
-    {
-        i++;
-    }
-
-    return lang_tbl[i].p_lang_long;
 }
 
 /*
@@ -361,9 +181,6 @@ static void DVDInit( input_thread_t * p_input )
     int                  i_chapter;
     int                  i;
 
-    /* I don't want DVDs to start playing immediately */
-//    p_input->stream.i_new_status = PAUSE_S;
-
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
     if( p_dvd == NULL )
     {
@@ -380,13 +197,14 @@ static void DVDInit( input_thread_t * p_input )
     /* reading several block once seems to cause lock-up
      * when using input_ToggleES
      * who wrote thez damn buggy piece of shit ??? --stef */
-    p_dvd->i_block_once = 1;//32;
-    p_input->i_read_once = 8;//128;
+    p_dvd->i_block_once = 32;
+    p_input->i_read_once = 128;
 
     i = CSSTest( p_input->i_handle );
 
     if( i < 0 )
     {
+        intf_ErrMsg( "dvd error: error in css" );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -505,10 +323,10 @@ static void DVDInit( input_thread_t * p_input )
 
     p_area = p_input->stream.pp_areas[i_title];
 
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
     /* set title, chapter, audio and subpic */
     DVDSetArea( p_input, p_area );
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return;
 }
@@ -536,31 +354,23 @@ static void DVDEnd( input_thread_t * p_input )
 
 /*****************************************************************************
  * DVDSetArea: initialize input data for title x, chapter y.
- * It should be called for each user navigation request, and to change
- * audio or sub-picture streams.
- * ---
+ * It should be called for each user navigation request.
+ *****************************************************************************
  * Take care that i_title starts from 0 (vmg) and i_chapter start from 1.
- * i_audio, i_spu start from 1 ; 0 means off.
- * A negative value for an argument means it does not change
+ * Note that you have to take the lock before entering here.
  *****************************************************************************/
 static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 {
     thread_dvd_data_t *  p_dvd;
     es_descriptor_t *    p_es;
+    u16                  i_id;
+    int                  i_vts_title;
     int                  i_audio;
     int                  i_spu;
-    u16                  i_id;
-    u8                   i_ac3;
-    u8                   i_mpeg;
-    u8                   i_lpcm;
-    u8                   i_sub_pic;
-    u8                   i;
+    int                  i;
     int                  j;
-    boolean_t            b_last;
 
     p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
 
     /* we can't use the interface slider until initilization is complete */
     p_input->stream.b_seekable = 0;
@@ -575,6 +385,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_input->stream.p_selected_area =
                     p_input->stream.pp_areas[p_area->i_id];
 
+        /* release the lock to to let the interface go */
 //        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         /* title number: it is not vts nb!,
@@ -582,9 +393,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_title = p_area->i_id;
         p_dvd->p_ifo->i_title = p_dvd->i_title;
 
-        /* uodate title environnement variable so that we don't
-         * loop on the same title forever */
-//        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
+        /* set number of chapters of current title */
+        p_dvd->i_chapter_nb = p_area->i_part_nb;
 
         /* ifo vts */
         if( IfoTitleSet( p_dvd->p_ifo ) < 0 )
@@ -598,14 +408,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 #define vmg p_dvd->p_ifo->vmg
 #define vts p_dvd->p_ifo->vts
         /* title position inside the selected vts */
-        p_dvd->i_vts_title =
-                    vmg.title_inf.p_attr[p_dvd->i_title-1].i_title_num;
+        i_vts_title = vmg.title_inf.p_attr[p_dvd->i_title-1].i_title_num;
         p_dvd->i_title_id =
-          vts.title_inf.p_title_start[p_dvd->i_vts_title-1].i_title_id;
+            vts.title_inf.p_title_start[i_vts_title-1].i_title_id;
 
         intf_WarnMsg( 3, "dvd: title %d vts_title %d pgc %d",
                         p_dvd->i_title,
-                        p_dvd->i_vts_title,
+                        i_vts_title,
                         p_dvd->i_title_id );
 
         /* css title key for current vts */
@@ -686,12 +495,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         p_dvd->i_size -= (off_t)( p_dvd->i_sector + 1 ) *DVD_LB_SIZE;
 
-        intf_WarnMsg( 2, "dvd info: title: %d", p_dvd->i_title );
-        intf_WarnMsg( 2, "dvd info: vobstart at: %lld", p_dvd->i_start );
-        intf_WarnMsg( 2, "dvd info: stream size: %lld", p_dvd->i_size );
-        intf_WarnMsg( 2, "dvd info: number of chapters: %d",
-                   vmg.title_inf.p_attr[p_dvd->i_title-1].i_chapter_nb );
-        intf_WarnMsg( 2, "dvd info: number of angles: %d", p_dvd->i_angle_nb );
+        IfoPrintTitle( p_dvd );
 
 //        vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -730,6 +534,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_es = NULL;
 
         /* ES 0 -> video MPEG2 */
+        IfoPrintVideo( p_dvd );
+
         p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
@@ -739,123 +545,131 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         {
             input_SelectES( p_input, p_es );
         }
+        intf_WarnMsg( 4, "dvd info: video selected" );
 
+#define audio_status \
+    vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_audio_status[i-1]
         /* Audio ES, in the order they appear in .ifo */
-            
-        i_ac3 = 0x7f;
-        i_mpeg = 0xc0;
-        i_lpcm = 0x9f;
-
         for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
         {
+            IfoPrintAudio( p_dvd, i );
 
-        intf_WarnMsg( 5, "dvd info: audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
-            vts.manager_inf.p_audio_attr[i-1].i_num_channels,
-            vts.manager_inf.p_audio_attr[i-1].i_coding_mode,
-            vts.manager_inf.p_audio_attr[i-1].i_multichannel_extension,
-            vts.manager_inf.p_audio_attr[i-1].i_type,
-            vts.manager_inf.p_audio_attr[i-1].i_appl_mode,
-            vts.manager_inf.p_audio_attr[i-1].i_foo,
-            vts.manager_inf.p_audio_attr[i-1].i_test,
-            vts.manager_inf.p_audio_attr[i-1].i_bar,
-            vts.manager_inf.p_audio_attr[i-1].i_quantization,
-            vts.manager_inf.p_audio_attr[i-1].i_sample_freq,
-            vts.manager_inf.p_audio_attr[i-1].i_lang_code,
-            vts.manager_inf.p_audio_attr[i-1].i_caption );
-
-            switch( vts.manager_inf.p_audio_attr[i-1].i_coding_mode )
+            /* audio channel is active if first byte is 0x80 */
+            if( audio_status.i_available )
             {
-            case 0x00:              /* AC3 */
-                i_id = ( ( i_ac3 + i ) << 8 ) | 0xbd;
-                p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
-                p_es->i_stream_id = 0xbd;
-                p_es->i_type = AC3_AUDIO_ES;
-                p_es->b_audio = 1;
-                p_es->i_cat = AUDIO_ES;
-                strcpy( p_es->psz_desc, Language( hton16(
-                    vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
-                strcat( p_es->psz_desc, " (ac3)" );
-
-                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
-                              i, p_es->psz_desc, i_id );
-
-                break;
-            case 0x02:
-            case 0x03:              /* MPEG audio */
-                i_id = 0xbf + i;
-                p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
-                p_es->i_stream_id = i_id;
-                p_es->i_type = MPEG2_AUDIO_ES;
-                p_es->b_audio = 1;
-                p_es->i_cat = AUDIO_ES;
-                strcpy( p_es->psz_desc, Language( hton16(
-                    vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
-                strcat( p_es->psz_desc, " (mpeg)" );
-
-                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
-                              i, p_es->psz_desc, i_id );
-
-                break;
-            case 0x04:              /* LPCM */
-#if 0
-                i_id = ( ( i_lpcm + i ) << 8 ) | 0xbd;
-                p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
-                p_es->i_stream_id = i_id;
-                p_es->i_type = LPCM_AUDIO_ES;
-                p_es->b_audio = 1;
-                p_es->i_cat = AUDIO_ES;
-                strcpy( p_es->psz_desc, Language( hton16(
-                    vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
-                strcat( p_es->psz_desc, " (lpcm)" );
-
-                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
-                              i, p_es->psz_desc, i_id );
-#else
-                i_id = 0;
-                intf_ErrMsg( "dvd warning: LPCM audio not handled yet" );
-#endif
-                break;
-            case 0x06:              /* DTS */
-                i_id = 0;
-                i_ac3--;
-                intf_ErrMsg( "dvd warning: DTS audio not handled yet" );
-                break;
-            default:
-                i_id = 0;
-                intf_ErrMsg( "dvd warning: unknown audio type %.2x",
-                         vts.manager_inf.p_audio_attr[i-1].i_coding_mode );
-            }
-        
-        }
+                switch( vts.manager_inf.p_audio_attr[i-1].i_coding_mode )
+                {
+                case 0x00:              /* AC3 */
+                    i_id = ( ( 0x80 + audio_status.i_position ) << 8 ) | 0xbd;
+                    p_es = input_AddES( p_input,
+                               p_input->stream.pp_programs[0], i_id, 0 );
+                    p_es->i_stream_id = 0xbd;
+                    p_es->i_type = AC3_AUDIO_ES;
+                    p_es->b_audio = 1;
+                    p_es->i_cat = AUDIO_ES;
+                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                        vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                    strcat( p_es->psz_desc, " (ac3)" );
     
+                    intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
+                                  i, p_es->psz_desc, i_id );
+    
+                    break;
+                case 0x02:
+                case 0x03:              /* MPEG audio */
+                    i_id = 0xc0 + audio_status.i_position;
+                    p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                    p_es->i_stream_id = i_id;
+                    p_es->i_type = MPEG2_AUDIO_ES;
+                    p_es->b_audio = 1;
+                    p_es->i_cat = AUDIO_ES;
+                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                        vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                    strcat( p_es->psz_desc, " (mpeg)" );
+    
+                    intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
+                                  i, p_es->psz_desc, i_id );
+    
+                    break;
+                case 0x04:              /* LPCM */
+    
+                    i_id = ( ( 0xa0 + audio_status.i_position ) << 8 ) | 0xbd;
+                    p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                    p_es->i_stream_id = i_id;
+                    p_es->i_type = LPCM_AUDIO_ES;
+                    p_es->b_audio = 1;
+                    p_es->i_cat = AUDIO_ES;
+                    strcpy( p_es->psz_desc, IfoLanguage( hton16(
+                        vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                    strcat( p_es->psz_desc, " (lpcm)" );
+    
+                    intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
+                                  i, p_es->psz_desc, i_id );
+                    break;
+                case 0x06:              /* DTS */
+                    i_id = ( ( 0x88 + audio_status.i_position ) << 8 ) | 0xbd;
+                    intf_ErrMsg( "dvd warning: DTS audio not handled yet"
+                                 "(0x%x)", i_id );
+                    break;
+                default:
+                    i_id = 0;
+                    intf_ErrMsg( "dvd warning: unknown audio type %.2x",
+                             vts.manager_inf.p_audio_attr[i-1].i_coding_mode );
+                }
+            }
+        }
+#undef audio_status
+#define spu_status \
+    vts.title_unit.p_title[p_dvd->i_title_id-1].title.pi_spu_status[i-1]
+
         /* Sub Picture ES */
            
-        b_last = 0;
-        i_sub_pic = 0x20;
         for( i = 1 ; i <= vts.manager_inf.i_spu_nb; i++ )
         {
-            if( !b_last )
+            IfoPrintSpu( p_dvd, i );
+
+            if( spu_status.i_available )
             {
-                i_id = ( i_sub_pic++ << 8 ) | 0xbd;
+                /*  there are several streams for one spu */
+                if(  vts.manager_inf.video_attr.i_ratio )
+                {
+                    /* 16:9 */
+                    switch( vts.manager_inf.video_attr.i_perm_displ )
+                    {
+                    case 1:
+                        i_id = ( ( 0x20 + spu_status.i_position_pan ) << 8 )
+                               | 0xbd;
+                        break;
+                    case 2:
+                        i_id = ( ( 0x20 + spu_status.i_position_letter ) << 8 )
+                               | 0xbd;
+                        break;
+                    default:
+                        i_id = ( ( 0x20 + spu_status.i_position_wide ) << 8 )
+                               | 0xbd;
+                        break;
+                    }
+                }
+                else
+                {
+                    /* 4:3 */
+                    i_id = ( ( 0x20 + spu_status.i_position_43 ) << 8 )
+                           | 0xbd;
+                }
                 p_es = input_AddES( p_input,
                                     p_input->stream.pp_programs[0], i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;
-                strcpy( p_es->psz_desc, Language( hton16(
+                strcpy( p_es->psz_desc, IfoLanguage( hton16(
                     vts.manager_inf.p_spu_attr[i-1].i_lang_code ) ) ); 
                 intf_WarnMsg( 3, "dvd info: spu stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
-    
-                /* The before the last spu has a 0x0 prefix */
-                b_last =
-                    ( vts.manager_inf.p_spu_attr[i].i_prefix == 0 ); 
             }
         }
-
+#undef spu_status
         if( p_main->b_audio )
         {
             /* For audio: first one if none or a not existing one specified */
@@ -924,9 +738,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             p_dvd->i_chapter = 1;
         }
     }
+
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
-
     if( p_area->i_angle != p_dvd->i_angle )
     {
         if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
@@ -952,9 +766,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     /* warn interface that something has changed */
     p_input->stream.b_seekable = 1;
     p_input->stream.b_changed = 1;
-intf_WarnMsg( 3, "Pos: %lld Size: %lld", p_input->stream.p_selected_area->i_tell,p_input->stream.p_selected_area->i_size );
 
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 
     return 0;
 }
@@ -971,7 +784,6 @@ static int DVDRead( input_thread_t * p_input,
 {
     thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
-    input_area_t *          p_area;
     struct iovec *          p_vec;
     struct data_packet_s *  pp_data[p_input->i_read_once];
     u8 *                    pi_cur;
@@ -1043,7 +855,7 @@ static int DVDRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_tell = i_off -
                                     p_input->stream.p_selected_area->i_start;
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
-intf_WarnMsg( 2, "chapter %d", p_dvd->i_chapter);
+
         /* the synchro has to be reinitialized when we change cell */
         p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 
@@ -1147,7 +959,6 @@ intf_WarnMsg( 2, "chapter %d", p_dvd->i_chapter);
     p_input->stream.p_selected_area->i_tell += i_read_bytes;
     b_eot = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
-    p_area = p_input->stream.pp_areas[p_dvd->i_title + 1];
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -1158,9 +969,11 @@ intf_WarnMsg( 2, "chapter %d", p_dvd->i_chapter);
 
     if( b_eot )
     {
-        intf_WarnMsg( 3, "dvd info: new title" );
+        intf_WarnMsg( 4, "dvd info: new title" );
         p_dvd->i_title++;
-        DVDSetArea( p_input, p_area );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        DVDSetArea( p_input, p_input->stream.pp_areas[p_dvd->i_title] );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
         return 0;
     }
 
@@ -1181,10 +994,10 @@ static int DVDRewind( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * DVDSeek : Goes to a given position on the stream ; this one is used by the 
- * input and translate chronological position from input to logical postion
- * on the device
- * ---
+ * DVDSeek : Goes to a given position on the stream.
+ *****************************************************************************
+ * This one is used by the input and translate chronological position from
+ * input to logical position on the device.
  * The lock should be taken before calling this function.
  *****************************************************************************/
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
@@ -1430,7 +1243,6 @@ static int DVDChooseAngle( thread_dvd_data_t * p_dvd )
         case 0x5:
             p_dvd->i_prg_cell += p_dvd->i_angle - 1;
             p_dvd->i_angle_cell = 0;
-//            intf_WarnMsg( 3, "dvd info: choosing angle %d", p_dvd->i_angle );
             break;
         /* we exit a multi-angle section */
         case 0x9:

@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.4 2001/05/15 01:01:44 stef Exp $
+ * $Id: intf_gtk.h,v 1.5 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,21 +99,4 @@ typedef struct intf_sys_s
 
 } intf_sys_t;
 
-/****************************************************************************
- * Prototypes
- ****************************************************************************/
-
-/*
- * from gtk_menu.c
- */
-gint GtkSetupMenu( intf_thread_t * );
-
-/*
- * from gtk_playlist.c
- */
-void    GtkDropDataReceived ( intf_thread_t *, GtkSelectionData *,
-                                guint, int );
-int     GtkAppendList       ( playlist_t *, int, GList * );
-void    GtkRebuildCList     ( GtkCList *, playlist_t * );
-void    GtkPlayListManage   ( intf_thread_t * );
 

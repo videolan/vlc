@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.26 2001/05/07 04:42:42 sam Exp $
+ * $Id: dvd_ifo.c,v 1.27 2001/05/19 00:39:29 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -43,7 +43,6 @@
 #include "intf_msg.h"
 #include "dvd_ifo.h"
 #include "dvd_udf.h"
-#include "dvd_css.h"
 #include "input_dvd.h"
 
 /*
@@ -508,6 +507,7 @@ int IfoTitleSet( ifo_t * p_ifo )
     off_t       i_off;
     off_t       i_start;
     u64         i_temp;
+    u16         i_short;
     int         i, j;
 
     if( p_ifo->vts.b_initialized )
@@ -570,8 +570,27 @@ DumpBits( p_ifo, pi_buffer, &p_current, 2 );
         /* FIXME : take care of endianness */
     }
     DumpBits( p_ifo, pi_buffer, &p_current, 2 );
-//    GETS( &manager_inf.video_atrt );
-DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+
+    i_short = ReadWord( p_ifo, pi_buffer, &p_current );
+    i_short >>= 2;
+    manager_inf.video_attr.i_mode = i_short & 0x1;
+    i_short >>= 1;
+    manager_inf.video_attr.i_letterboxed = i_short & 0x1;
+    i_short >>= 1;
+    manager_inf.video_attr.i_source_res = i_short & 0x3;
+    i_short >>= 2;
+    manager_inf.video_attr.i_line21_2 = i_short & 0x1;
+    i_short >>= 1;
+    manager_inf.video_attr.i_line21_1 = i_short & 0x1;
+    i_short >>= 1;
+    manager_inf.video_attr.i_perm_displ = i_short & 0x3;
+    i_short >>= 2;
+    manager_inf.video_attr.i_ratio = i_short & 0x3;
+    i_short >>= 2;
+    manager_inf.video_attr.i_system = i_short & 0x3;
+    i_short >>= 2;
+    manager_inf.video_attr.i_compression = i_short & 0x3;
+
     DumpBits( p_ifo, pi_buffer, &p_current, 1 );
     manager_inf.i_audio_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "vtsi audio nb : %d\n", manager_inf.i_audio_nb );
@@ -613,7 +632,9 @@ DumpBits( p_ifo, pi_buffer, &p_current, 2 );
         i_temp = hton64( i_temp ) >> 16;
 //fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
         manager_inf.p_spu_attr[i].i_caption = i_temp & 0xff;
-        i_temp >>= 16;
+        i_temp >>= 8;
+        manager_inf.p_spu_attr[i].i_foo = i_temp & 0xff;
+        i_temp >>= 8;
         manager_inf.p_spu_attr[i].i_lang_code = i_temp & 0xffff;
         i_temp >>= 16;
         manager_inf.p_spu_attr[i].i_prefix = i_temp & 0xffff;
@@ -929,6 +950,8 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
     u8          pi_buffer[DVD_LB_SIZE];
     u8 *        p_current;
     off_t       i_start;
+    u16         i_audio;
+    u32         i_spu;
     int         i;
 
     p_current = FillBuffer( p_ifo, pi_buffer, i_pos );
@@ -945,11 +968,25 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
     p_title->i_prohibited_user_op = ReadDouble( p_ifo, pi_buffer, &p_current );
     for( i = 0 ; i < 8 ; i++ )
     {
-        p_title->pi_audio_status[i] = ReadWord( p_ifo, pi_buffer, &p_current );
+        i_audio = ReadWord( p_ifo, pi_buffer, &p_current );
+        p_title->pi_audio_status[i].i_foo = i_audio & 0xff;
+        i_audio >>= 8;
+        p_title->pi_audio_status[i].i_position = i_audio & 0x07;
+        i_audio >>= 7;
+        p_title->pi_audio_status[i].i_available = i_audio;
     }
     for( i = 0 ; i < 32 ; i++ )
     {
-        p_title->pi_subpic_status[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
+        i_spu = ReadDouble( p_ifo, pi_buffer, &p_current );
+        p_title->pi_spu_status[i].i_position_pan = i_spu & 0x1f;
+        i_spu >>= 8;
+        p_title->pi_spu_status[i].i_position_letter = i_spu & 0x1f;
+        i_spu >>= 8;
+        p_title->pi_spu_status[i].i_position_wide = i_spu & 0x1f;
+        i_spu >>= 8;
+        p_title->pi_spu_status[i].i_position_43 = i_spu & 0x1f;
+        i_spu >>= 7;
+        p_title->pi_spu_status[i].i_available = i_spu;
     }
     p_title->i_next_title_num = ReadWord( p_ifo, pi_buffer, &p_current );
     p_title->i_prev_title_num = ReadWord( p_ifo, pi_buffer, &p_current );

@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.5 2001/05/15 01:01:44 stef Exp $
+ * $Id: aout_spdif.c,v 1.6 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -90,10 +90,10 @@ void aout_SpdifThread( aout_thread_t * p_aout )
             /* TODO: write the muliplexer :) */
             if( p_aout->fifo[i_fifo].i_type == AOUT_ADEC_SPDIF_FIFO )
             {
-//                vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+                vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
                 if( p_aout->fifo[i_fifo].b_die )
                 {
-//                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
                     aout_FreeFifo( &p_aout->fifo[i_fifo] );
                 }
                 else if( !AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) )
@@ -112,10 +112,14 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                     p_aout->fifo[i_fifo].l_start_frame = 
                         (p_aout->fifo[i_fifo].l_start_frame + 1 )
                         & AOUT_FIFO_SIZE;
-//                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
                     
                     i_frame++;
                     i_blank = 0;
+                }
+                else
+                {
+                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
                 }
             }
         }

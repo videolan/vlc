@@ -7,7 +7,7 @@
 # Objects
 #
 
-PLUGIN_C = dvd.o input_dvd.o dvd_netlist.o dvd_ioctl.o dvd_ifo.o dvd_udf.o dvd_css.o
+PLUGIN_C = dvd.o input_dvd.o dvd_netlist.o dvd_ioctl.o dvd_ifo.o dvd_udf.o dvd_css.o dvd_summary.o
 BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
 
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)

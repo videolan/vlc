@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.23 2001/05/07 03:14:09 stef Exp $
+ * $Id: input_ext-intf.c,v 1.24 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -236,8 +236,9 @@ void input_DumpStream( input_thread_t * p_input )
 
 /*****************************************************************************
  * input_ChangeES: answers to a user request with calls to (Un)SelectES
- * ---
+ *****************************************************************************
  * Useful since the interface plugins know p_es
+ * This functon is deprecated, use input_ToggleEs instead.
  *****************************************************************************/
 int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
                     u8 i_cat )
@@ -317,13 +318,27 @@ int input_ToggleES( input_thread_t * p_input, es_descriptor_t * p_es,
     {
         if( b_select )
         {
-            input_SelectES( p_input, p_es );
+            p_input->stream.p_newly_selected_es = p_es;
         }
         else
         {
-            input_UnselectES( p_input, p_es );
+            p_input->stream.p_removed_es = p_es;
         }
     }
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}
+
+/****************************************************************************
+ * input_ChangeArea: interface request an area change
+ ****************************************************************************/
+int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.p_new_area = p_area;
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 

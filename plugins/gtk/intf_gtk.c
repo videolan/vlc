@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.19 2001/05/15 14:49:48 stef Exp $
+ * $Id: intf_gtk.c,v 1.20 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -312,7 +312,7 @@ static gint GtkManage( gpointer p_data )
     }
 
     /* update the playlist */
-    GtkPlayListManage( p_data );
+//    GtkPlayListManage( p_data );
 
     if( p_intf->p_input != NULL && !p_intf->b_die )
     {
@@ -357,9 +357,15 @@ static gint GtkManage( gpointer p_data )
             }
 #undef p_area
         }
-        GtkSetupMenu( p_intf );
-
         vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+
+        if( p_intf->p_sys->i_part !=
+            p_intf->p_input->stream.p_selected_area->i_part )
+        {
+            p_intf->p_sys->b_chapter_update = 1;
+            GtkSetupMenus( p_intf );
+        }
+
     }
     else if( !p_intf->b_die )
     {

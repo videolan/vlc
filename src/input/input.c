@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.107 2001/05/07 03:14:09 stef Exp $
+ * $Id: input.c,v 1.108 2001/05/19 00:39:30 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -133,6 +133,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.i_area_nb = 0;
     p_input->stream.pp_areas = NULL;
     p_input->stream.p_selected_area = NULL;
+    p_input->stream.p_new_area = NULL;
     /* By default there is one areas in a stream */
     input_AddArea( p_input );
     p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
@@ -239,6 +240,12 @@ static void RunThread( input_thread_t *p_input )
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
+        if( p_input->stream.p_new_area )
+        {
+            p_input->pf_set_area( p_input, p_input->stream.p_new_area );
+            p_input->stream.p_new_area = NULL;
+        }
+
         if( p_input->stream.p_selected_area->i_seek != NO_SEEK )
         {
             if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
@@ -259,6 +266,18 @@ static void RunThread( input_thread_t *p_input )
                 }
             }
             p_input->stream.p_selected_area->i_seek = NO_SEEK;
+        }
+
+        if( p_input->stream.p_removed_es )
+        {
+            input_UnselectES( p_input, p_input->stream.p_removed_es );
+            p_input->stream.p_removed_es = NULL;
+        }
+
+        if( p_input->stream.p_newly_selected_es )
+        {
+            input_SelectES( p_input, p_input->stream.p_newly_selected_es );
+            p_input->stream.p_newly_selected_es = NULL;
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );

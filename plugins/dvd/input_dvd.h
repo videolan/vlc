@@ -2,7 +2,7 @@
  * input_dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvd.h,v 1.21 2001/04/22 00:08:26 stef Exp $
+ * $Id: input_dvd.h,v 1.22 2001/05/19 00:39:30 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -40,7 +40,6 @@ typedef struct thread_dvd_data_s
 
     /* Navigation information */
     int                     i_title;
-    int                     i_vts_title;
     int                     i_title_id;
 
     int                     i_chapter_nb;
@@ -67,19 +66,3 @@ typedef struct thread_dvd_data_s
     struct ifo_s *          p_ifo;
 
 } thread_dvd_data_t;
-
-/*****************************************************************************
- * Prototypes in dvd_css.c
- *****************************************************************************/
-int   CSSTest             ( int );
-int   CSSInit             ( int, struct css_s * );
-int   CSSGetKey           ( int, struct css_s * );
-int   CSSDescrambleSector ( u8 * , u8 * );
-
-/*****************************************************************************
- * Prototypes in dvd_ifo.c
- *****************************************************************************/
-int   IfoCreate   ( struct thread_dvd_data_s * );
-int   IfoInit     ( struct ifo_s * );
-int   IfoTitleSet ( struct ifo_s * );
-void  IfoDestroy  ( struct ifo_s * );
