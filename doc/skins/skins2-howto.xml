@@ -269,6 +269,7 @@ difficulty to understand how VLC skins work.</para>
     <sect4 id="layoutheight">
       <title>height</title>
       <para><!--TODO: calculate it in VLC :)-->Height of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
+      <para><emphasis>Required.</emphasis></para>
     </sect4>
     <sect4 id="minwidth">
       <title>minwidth</title>
