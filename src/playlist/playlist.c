@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.58 2003/10/09 18:05:32 massiot Exp $
+ * $Id: playlist.c,v 1.59 2003/10/19 12:20:00 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -698,6 +698,9 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
+
     return;
 }
 /* Following functions are local */
@@ -994,8 +997,6 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
    {
         SkipItem( p_playlist , 1 );
     }
-    val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
 }
 
 /*****************************************************************************

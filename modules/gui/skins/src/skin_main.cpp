@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.51 2003/10/17 18:17:28 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.52 2003/10/19 12:20:00 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -364,14 +364,12 @@ int SkinManage( intf_thread_t *p_intf )
 
         // Refresh slider
         // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
-        if( p_input->stream.b_seekable )
-        {
 #define p_area p_input->stream.p_selected_area
+        if( p_input->stream.b_seekable && p_area->i_size )
+        {
 
             // Set value of sliders
-            long Value = SLIDER_RANGE *
-                p_input->stream.p_selected_area->i_tell /
-                p_input->stream.p_selected_area->i_size;
+            long Value = SLIDER_RANGE * p_area->i_tell / p_area->i_size;
 
             // Update sliders
             OSAPI_PostMessage( NULL, CTRL_SET_SLIDER, (unsigned int)
