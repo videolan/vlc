@@ -2,7 +2,7 @@
  * video.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.h,v 1.10 2003/08/08 17:08:32 gbazin Exp $
+ * $Id: video.h,v 1.11 2003/08/12 17:01:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,6 +40,9 @@ typedef struct vdec_thread_s
     int b_hurry_up;
     int i_frame_error;
     int i_frame_skip;
+
+    vlc_bool_t b_has_b_frames;
+
     int     i_frame_late;   /* how many decoded frames are late */
     mtime_t i_frame_late_start;
 

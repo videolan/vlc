@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.38 2003/08/09 19:49:13 gbazin Exp $
+ * $Id: video.c,v 1.39 2003/08/12 17:01:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -380,6 +380,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     p_vdec->input_pts_previous = 0;
     p_vdec->input_pts = 0;
 
+    p_vdec->b_has_b_frames = VLC_FALSE;
+
     return( VLC_SUCCESS );
 }
 
@@ -588,11 +590,14 @@ usenextdata:
     /* Set the PTS
      * There is an ugly hack here because some demuxers pass us a dts instead
      * of a pts so this screw up things for streams with B frames. */
+    if( p_vdec->p_ff_pic->pict_type == FF_B_TYPE )
+        p_vdec->b_has_b_frames = VLC_TRUE;
     if( p_vdec->p_ff_pic->pts &&
-        ( !p_vdec->p_context->has_b_frames ||
+        ( !p_vdec->p_context->has_b_frames || !p_vdec->b_has_b_frames ||
           p_vdec->p_ff_pic->pict_type == FF_B_TYPE ) )
     {
         p_vdec->pts = p_vdec->p_ff_pic->pts;
+msg_Err( p_vdec->p_fifo, "new pts: "I64Fd, p_vdec->pts );
     }
 
     if( p_vdec->pts <= 0 )
