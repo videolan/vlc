@@ -860,6 +860,7 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->f_dst.audio.i_rate     = id->p_encoder->fmt_in.audio.i_rate;
     id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
     id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
+    id->f_dst.i_codec = id->p_encoder->fmt_out.i_codec;
 
     /* Hack for mp3 transcoding support */
     if( id->f_dst.i_codec == VLC_FOURCC( 'm','p','3',' ' ) )
@@ -1534,6 +1535,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
             id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
             id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
+            id->f_dst.i_codec = id->p_encoder->fmt_out.i_codec;
 
             /* Hack for mp2v/mp1v transcoding support */
             if( id->f_dst.i_codec == VLC_FOURCC( 'm','p','1','v' ) ||
