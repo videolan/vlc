@@ -2,7 +2,7 @@
  * fixed32tos16.c : converter from fixed32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tos16.c,v 1.9 2002/12/24 15:28:57 massiot Exp $
+ * $Id: fixed32tos16.c,v 1.10 2002/12/24 19:09:12 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -195,14 +195,17 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i;
     vlc_fixed_t * p_in = (vlc_fixed_t *)p_in_buf->p_buffer;
     s16 * p_out = (s16 *)p_out_buf->p_buffer;
-    s16 sample;
-//    static struct audio_dither dither;
+#if 0
+    static struct audio_dither dither;
+#endif
 
     for ( i = p_in_buf->i_nb_samples
                * aout_FormatNbChannels( &p_filter->input ) ; i-- ; )
     {
+#if 0
         /* Accurate scaling */
-//        p_out = mpg321_s24_to_s16_pcm(16, *p_in++, &dither);
+        *p_out++ = mpg321_s24_to_s16_pcm(16, *p_in++, &dither);
+#endif
         /* Fast Scaling */
         *p_out++ = s24_to_s16_pcm(*p_in++);
     }
