@@ -91,7 +91,8 @@ struct intf_sys_t
     int i_socket_listen;
     int i_socket;
     char *psz_unix_path;
-
+    vlc_bool_t b_extend;
+    
 #ifdef WIN32
     HANDLE hConsoleIn;
 #endif
@@ -128,6 +129,9 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define HOST_TEXT N_("TCP command input")
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
+#define EXTEND_TEXT N_("Extended help")
+#define EXTEND_LONGTEXT N_("List additional commands.")
+            
 
 #ifdef WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
@@ -150,6 +154,7 @@ vlc_module_begin();
 #ifdef WIN32
     add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
 #endif
+    add_bool( "rc-extend", 0, NULL, EXTEND_TEXT, EXTEND_LONGTEXT, VLC_FALSE );
 
     set_capability( "interface", 20 );
     set_callbacks( Activate, Deactivate );
@@ -309,7 +314,8 @@ static void Run( intf_thread_t *p_intf )
     p_buffer[0] = 0;
     p_input = NULL;
     p_playlist = NULL;
-
+ 
+    p_intf->p_sys->b_extend = config_GetInt( p_intf, "rc-extend" );
     /* Register commands that will be cleaned up upon object destruction */
     var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "quit", Quit, NULL );
@@ -606,11 +612,6 @@ static void Run( intf_thread_t *p_intf )
             printf(_("| chapter_n  . . . .  next chapter in current item\n"));
             printf(_("| chapter_p  . .  previous chapter in current item\n"));
             printf("| \n");
-            printf(_("| marquee STRING . . . . . overlay STRING in video\n"));
-            printf(_("| marq-x X . . . . . .offset of marquee, from left\n"));
-            printf(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
-            printf(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
-            printf("| \n");
             printf(_("| seek X . seek in seconds, for instance `seek 12'\n"));
             printf(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
             printf(_("| f  . . . . . . . . . . . . . . toggle fullscreen\n"));
@@ -622,6 +623,14 @@ static void Run( intf_thread_t *p_intf )
             printf(_("| adev [X] . . . . . . . . .  set/get audio device\n"));
             printf(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
             printf("| \n");
+            if (p_intf->p_sys->b_extend)
+            {
+	           printf(_("| marquee STRING . . . . . overlay STRING in video\n"));
+               printf(_("| marq-x X . . . . . .offset of marquee, from left\n"));
+               printf(_("| marq-y Y . . . . . . offset of marquee, from top\n"));
+               printf(_("| marq-timeout T. . . . .timeout of marquee, in ms\n"));
+               printf("| \n");
+            }    
             printf(_("| help . . . . . . . . . . . . . this help message\n"));
             printf(_("| logout . . . . . .exit (if in socket connection)\n"));
             printf(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
