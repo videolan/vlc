@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.48 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: ogg.c,v 1.49 2003/12/04 22:37:02 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -77,7 +77,7 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
-    int     b_reinit;
+    int     i_old_synchro_state;
 
     /* stream state */
     int     i_eos;
@@ -1027,6 +1027,8 @@ static int Activate( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_ogg->i_eos = 0;
 
+    p_ogg->i_old_synchro_state = !SYNCHRO_REINIT;
+
     return 0;
 
  error:
@@ -1161,6 +1163,7 @@ static int Demux( input_thread_t * p_input )
     {
         msg_Warn( p_input, "synchro reinit" );
 
+        if( p_ogg->i_old_synchro_state != SYNCHRO_REINIT )
         for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
         {
             /* we'll trash all the data until we find the next pcr */
@@ -1169,6 +1172,7 @@ static int Demux( input_thread_t * p_input )
             p_stream->i_interpolated_pcr = -1;
             ogg_stream_reset( &p_stream->os );
         }
+        if( p_ogg->i_old_synchro_state != SYNCHRO_REINIT )
         ogg_sync_reset( &p_ogg->oy );
     }
 
@@ -1250,6 +1254,9 @@ static int Demux( input_thread_t * p_input )
     }
 
 #undef p_stream
+
+    p_ogg->i_old_synchro_state =
+        p_input->stream.p_selected_program->i_synchro_state;
 
     return 1;
 }

@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.23 2003/11/24 00:01:42 gbazin Exp $
+ * $Id: ogg.c,v 1.24 2003/12/04 22:37:02 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -912,6 +912,7 @@ static int Mux( sout_mux_t *p_mux )
         p_data   = sout_FifoGet( p_input->p_fifo );
 
         if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
+            p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
@@ -928,12 +929,13 @@ static int Mux( sout_mux_t *p_mux )
         if( p_stream->i_cat == AUDIO_ES )
         {
             if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+                p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ||
                 p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
             {
                 /* number of sample from begining + current packet */
                 op.granulepos =
-                    ( i_dts + p_data->i_length - p_sys->i_start_dts ) *
-                    p_input->p_fmt->audio.i_rate / I64C(1000000);
+                    ( i_dts - p_sys->i_start_dts + p_data->i_length ) *
+                    (mtime_t)p_input->p_fmt->audio.i_rate / I64C(1000000);
             }
             else
             {

@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.5 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: flac.c,v 1.6 2003/12/04 22:37:02 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -41,9 +41,6 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    /* Module mode */
-    vlc_bool_t b_packetizer;
-
     /*
      * Input properties
      */
@@ -184,7 +181,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Misc init */
     aout_DateSet( &p_sys->end_date, 0 );
-    p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_state = STATE_NOSYNC;
     p_sys->b_stream_info = VLC_FALSE;
 
@@ -237,8 +233,6 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     if( i_ret != VLC_SUCCESS ) return i_ret;
 
-    p_dec->p_sys->b_packetizer = VLC_TRUE;
-
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     return i_ret;
@@ -257,12 +251,17 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
 
-#if 0
+    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
+    {
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( *pp_block );
+        return NULL;
+    }
+
     if( (*pp_block)->b_discontinuity )
     {
         p_sys->i_state = STATE_NOSYNC;
     }
-#endif
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
@@ -343,14 +342,14 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( p_header[0] == 0xFF && p_header[1] == 0xF8 )
                 {
                     /* Check if frame is valid and get frame info */
-                    p_sys->i_frame_length =
+                    int i_frame_length =
                         SyncInfo( p_dec, p_header,
                                   &p_sys->i_channels,
                                   &p_sys->i_channels_conf,
                                   &p_sys->i_rate,
                                   &p_sys->i_bits_per_sample );
 
-                    if( p_sys->i_frame_length )
+                    if( i_frame_length )
                     {
                         p_sys->i_state = STATE_SEND_DATA;
                         break;
@@ -386,8 +385,9 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Date management */
             p_sout_block->i_pts =
                 p_sout_block->i_dts = aout_DateGet( &p_sys->end_date );
+            aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
             p_sout_block->i_length =
-                aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
+                aout_DateGet( &p_sys->end_date ) - p_sout_block->i_pts;
 
             return p_sout_block;
         }
@@ -404,13 +404,6 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( !pp_block || !*pp_block ) return NULL;
-
-    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
-    {
-        /* We've just started the stream, wait for the first PTS. */
-        block_Release( *pp_block );
-        return NULL;
-    }
 
     p_sys->p_aout_buffer = 0;
     if( ( p_sys->p_block = PacketizeBlock( p_dec, pp_block ) ) )
@@ -486,18 +479,6 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_block && p_sys->p_block->i_pts != 0 &&
-        p_sys->p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
-    {
-        aout_DateSet( &p_sys->end_date, p_sys->p_block->i_pts );
-    }
-    else if( !aout_DateGet( &p_sys->end_date ) )
-    {
-        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-    }
-
-    if( p_sys->p_block ) p_sys->p_block->i_pts = 0;
-
     p_sys->p_aout_buffer =
         p_dec->pf_aout_buffer_new( p_dec, frame->header.blocksize );
 
@@ -515,10 +496,10 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
                       frame->header.channels, frame->header.blocksize );
     }
 
-    /* Date management */
-    p_sys->p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
+    /* Date management (already done by packetizer) */
+    p_sys->p_aout_buffer->start_date = p_sys->p_block->i_pts;
     p_sys->p_aout_buffer->end_date =
-        aout_DateIncrement( &p_sys->end_date, frame->header.blocksize );
+        p_sys->p_block->i_pts + p_sys->p_block->i_length;
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
@@ -1093,6 +1074,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_headers = 0;
     p_sys->p_buffer = 0;
     p_sys->i_buffer = 0;
+    p_sys->i_samples_delay = 0;
 
     /* Create flac encoder */
     p_sys->p_flac = FLAC__stream_encoder_new();
@@ -1197,18 +1179,18 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block;
 
-    if( samples == 0 && p_sys->i_headers <= 1 )
+    if( samples == 0 )
     {
         if( p_sys->i_headers == 1 )
         {
-            msg_Err( p_enc, "Writing STREAMINFO: %i", bytes );
+            msg_Dbg( p_enc, "Writing STREAMINFO: %i", bytes );
 
             /* Backup the STREAMINFO metadata block */
             p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 4;
             p_enc->fmt_out.p_extra = malloc( STREAMINFO_SIZE + 4 );
             memcpy( p_enc->fmt_out.p_extra, "fLaC", 4 );
             memcpy( ((uint8_t *)p_enc->fmt_out.p_extra) + 4, buffer,
-                    STREAMINFO_SIZE + 4 );
+                    STREAMINFO_SIZE );
 
             /* Fake this as the last metadata block */
             ((uint8_t*)p_enc->fmt_out.p_extra)[4] |= 0x80;
@@ -1220,7 +1202,15 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
     p_block = block_New( p_enc, bytes );
     memcpy( p_block->p_buffer, buffer, bytes );
 
-    p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
+    p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+
+    p_sys->i_samples_delay -= samples;
+
+    p_block->i_length = (mtime_t)1000000 *
+        (mtime_t)samples / (mtime_t)p_enc->fmt_in.audio.i_rate;
+
+    /* Update pts */
+    p_sys->i_pts += p_block->i_length;
 
     block_ChainAppend( &p_sys->p_chain, p_block );
 
