@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.4 2003/05/23 00:00:48 hartman Exp $
+ * $Id: quicktime.c,v 1.5 2003/05/24 02:48:55 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -63,7 +63,7 @@ static int  RunDecoderVideo( decoder_fifo_t * );
 
 vlc_module_begin();
     set_description( _("QuickTime library decoder") );
-    set_capability( "decoder", 10 );
+    set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
 
     /* create a mutex */
@@ -104,15 +104,16 @@ typedef struct
     HMODULE     qtml;
     OSErr       (*InitializeQTML)         	( long flags );
 #endif /* SYS_DARWIN */
-    int         (*SoundConverterOpen)		( const SoundComponentData *, const SoundComponentData *, SoundConverter* );
+    int         (*SoundConverterOpen)		( const SoundComponentData *,
+                                                    const SoundComponentData *, SoundConverter* );
     int         (*SoundConverterClose)		( SoundConverter );
     int         (*SoundConverterSetInfo)	( SoundConverter , OSType ,void * );
     int         (*SoundConverterGetBufferSizes) ( SoundConverter, unsigned long,
-                                                  unsigned long*, unsigned long*, unsigned long* );
+                                                    unsigned long*, unsigned long*, unsigned long* );
     int         (*SoundConverterBeginConversion)( SoundConverter );
     int         (*SoundConverterEndConversion)  ( SoundConverter, void *, unsigned long *, unsigned long *);
     int         (*SoundConverterConvertBuffer)  ( SoundConverter, const void *, unsigned long, void *,
-                                                  unsigned long *,unsigned long * );
+                                                    unsigned long *,unsigned long * );
     SoundConverter      myConverter;
     SoundComponentData  InputFormatInfo, OutputFormatInfo;
 
@@ -835,7 +836,7 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
 
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
-    cres =  p_dec->ImageCodecGetCodecInfo( p_dec->ci,&cinfo);
+    cres =  p_dec->ImageCodecGetCodecInfo( p_dec->ci, &cinfo );
     msg_Dbg( p_dec->p_fifo, "Flags: compr: 0x%lx  decomp: 0x%lx format: 0x%lx\n",
                 cinfo.compressFlags, cinfo.decompressFlags, cinfo.formatFlags);
     msg_Dbg( p_dec->p_fifo, "quicktime_video: Codec name: %.*s\n", ((unsigned char*)&cinfo.typeName)[0],
@@ -881,26 +882,24 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
              id->frameCount,
              id->clutID );
 
-    p_dec->framedescHandle = (ImageDescriptionHandle) p_dec->NewHandleClear (id->idSize);
-    memcpy (*p_dec->framedescHandle, id, id->idSize);
+    p_dec->framedescHandle = (ImageDescriptionHandle) p_dec->NewHandleClear( id->idSize );
+    memcpy( *p_dec->framedescHandle, id, id->idSize );
 
     p_dec->plane = malloc( p_bih->biWidth * p_bih->biHeight * 3 );
 
-    i_result =  p_dec->QTNewGWorldFromPtr(&p_dec->OutBufferGWorld,
-                                         kYUVSPixelFormat, /*pixel format of new GWorld==YUY2 */
-                                         &p_dec->OutBufferRect,   /*we should benchmark if yvu9 is faster for svq3, too */
-                                         0,
-                                         0,
-                                         0,
-                                         p_dec->plane,
-                                         p_bih->biWidth * 2 );
+    i_result =  p_dec->QTNewGWorldFromPtr( &p_dec->OutBufferGWorld,
+                                           kYUVSPixelFormat, /*pixel format of new GWorld==YUY2 */
+                                           &p_dec->OutBufferRect,   /*we should benchmark if yvu9 is faster for svq3, too */
+                                           0, 0, 0,
+                                           p_dec->plane,
+                                           p_bih->biWidth * 2 );
 
-    msg_Dbg( p_dec->p_fifo, "NewGWorldFromPtr returned:%ld\n",65536-(i_result&0xffff));
+    msg_Dbg( p_dec->p_fifo, "NewGWorldFromPtr returned:%ld\n", 65536-( i_result&0xffff ) );
 
     memset( &p_dec->decpar, 0, sizeof( CodecDecompressParams ) );
     p_dec->decpar.imageDescription = p_dec->framedescHandle;
     p_dec->decpar.startLine        = 0;
-    p_dec->decpar.stopLine         = (**p_dec->framedescHandle).height;
+    p_dec->decpar.stopLine         = ( **p_dec->framedescHandle ).height;
     p_dec->decpar.frameNumber      = 1;
     p_dec->decpar.matrixFlags      = 0;
     p_dec->decpar.matrixType       = 0;
@@ -909,11 +908,10 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
     p_dec->decpar.accuracy         = codecNormalQuality;
     p_dec->decpar.srcRect          = p_dec->OutBufferRect;
     p_dec->decpar.transferMode     = srcCopy;
-    p_dec->decpar.dstPixMap        = ** p_dec->GetGWorldPixMap (p_dec->OutBufferGWorld);/*destPixmap;  */
+    p_dec->decpar.dstPixMap        = **p_dec->GetGWorldPixMap( p_dec->OutBufferGWorld );/*destPixmap;  */
 
-    msg_Dbg( p_dec->p_fifo, "will call: ImageCodecPreDecompress");
-    cres =  p_dec->ImageCodecPreDecompress (p_dec->ci, &p_dec->decpar);
-    msg_Dbg( p_dec->p_fifo, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n", (int)cres);
+    cres =  p_dec->ImageCodecPreDecompress( p_dec->ci, &p_dec->decpar );
+    msg_Dbg( p_dec->p_fifo, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n", (int)cres );
 
     p_dec->p_vout = vout_Request( p_dec->p_fifo, NULL,
                                   p_bih->biWidth, p_bih->biHeight,
@@ -941,7 +939,7 @@ exit_error:
 
 }
 
-static void DecodeThreadVideo   ( vdec_thread_t *p_dec )
+static void DecodeThreadVideo( vdec_thread_t *p_dec )
 {
     BITMAPINFOHEADER    *p_bih = (BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader;
     pes_packet_t    *p_pes;
@@ -1007,7 +1005,7 @@ static void DecodeThreadVideo   ( vdec_thread_t *p_dec )
     input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_pes );
 }
 
-static void EndThreadVideo      ( vdec_thread_t *p_dec )
+static void EndThreadVideo( vdec_thread_t *p_dec )
 {
     msg_Dbg( p_dec->p_fifo, "QuickTime library video decoder closing" );
     free( p_dec->plane );

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.70 2003/05/22 21:42:43 gbazin Exp $
+ * $Id: libvlc.h,v 1.71 2003/05/24 02:48:55 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -405,8 +405,6 @@ static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
     "robust. " \
     "Currently you can choose between implementation 0 (which is the " \
     "default and the fastest), 1 and 2.")
-
-#define RT_PRIORITY_TEXT N_("Real-time priority")
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \

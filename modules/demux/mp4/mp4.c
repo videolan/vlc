@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.32 2003/05/22 21:42:44 gbazin Exp $
+ * $Id: mp4.c,v 1.33 2003/05/24 02:48:55 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1052,6 +1052,9 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
         {
             /* qt decoder, send the complete chunk */
             case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+            case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
+            case VLC_FOURCC( 'V', 'P', '3', '1' ):
+            case VLC_FOURCC( '3', 'I', 'V', '1' ):
             case VLC_FOURCC( 'Z', 'y', 'G', 'o' ):
                 i_decoder_specific_info_len = p_sample->data.p_sample_vide->i_qt_image_description;
                 p_decoder_specific_info     = p_sample->data.p_sample_vide->p_qt_image_description;
