@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.46 2003/03/04 23:36:57 massiot Exp $
+ * $Id: libvlc.h,v 1.47 2003/03/06 09:58:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -410,6 +410,8 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "Currently you can choose between implementation 0 (which is the " \
     "default and the fastest), 1 and 2.")
 
+#define RT_PRIORITY_TEXT N_("Real-time priority")
+
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
     "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]" \
@@ -577,7 +579,7 @@ vlc_module_begin();
 #endif
 
 #if defined(SYS_DARWIN)
-    add_integer( "rt-priority", 1, NULL, NULL, NULL, VLC_TRUE );
+    add_integer( "rt-priority", 1, NULL, RT_PRIORITY_TEXT, NULL, VLC_TRUE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */
