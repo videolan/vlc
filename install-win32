@@ -5,8 +5,10 @@
 ;;;;;;;;;;;;;
 ; CHANGELOG ;
 ;;;;;;;;;;;;;
-; modifications by Gildas Bazin <gbazin@netcourrier.com> 01 Mar 2003
-; . added a shortcut to the faq in the menu.
+; modifications by Gildas Bazin <gbazin@netcourrier.com> 6 Jul 2003
+; . Start menu shortcuts now created in the "All Users" section.
+; modifications by Gildas Bazin <gbazin@netcourrier.com> 6 Apr 2003
+; . added shortcut to the skins interface, added the default skin.
 ; modifications by Gildas Bazin <gbazin@netcourrier.com> 26 Feb 2003
 ; . added the locale directory.
 ; modifications by Samuel Hocevar <sam@zoy.org> 05 Apr 2002
@@ -33,6 +35,7 @@ Caption "VLC '${VERSION}' for Win32 Setup"
 
 CRCCheck on
 
+SetShellVarContext all
 InstallDir "$PROGRAMFILES\VideoLAN\VLC"
 
 ; check if the program has already been installed, if so, take this dir

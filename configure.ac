@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.23 2003/07/03 19:25:51 garf Exp $
+dnl $Id: configure.ac,v 1.24 2003/07/06 16:13:10 gbazin Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1500,6 +1500,11 @@ AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
 if test "${enable_ffmpeg}" != "no"
 then
+  AC_ARG_WITH(ffmpeg-mp3lame,
+    [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
+    [ AX_ADD_LDFLAGS([stream_out_transcode],[-lmp3lame])
+      AX_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
+
   AC_ARG_WITH(ffmpeg-tree,
     [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
 

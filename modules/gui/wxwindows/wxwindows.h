@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.37 2003/07/04 12:20:32 adn Exp $
+ * $Id: wxwindows.h,v 1.38 2003/07/06 16:13:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -315,7 +315,6 @@ private:
     void OnCancel( wxCommandEvent& event );
     void OnMRLChange( wxCommandEvent& event );
     void OnAccessTypeChange( wxCommandEvent& event );
-    void OnSAPTypeChange( wxCommandEvent& event );
 
     /* Event handlers for the file access output */
     void OnFileChange( wxCommandEvent& event );
@@ -333,6 +332,9 @@ private:
     /* Event handlers for the transcoding panel */
     void OnTranscodingEnable( wxCommandEvent& event );
     void OnTranscodingChange( wxCommandEvent& event );
+
+    /* Event handlers for the misc panel */
+    void OnSAPMiscChange( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -352,12 +354,9 @@ private:
     wxTextCtrl *net_addrs[5];
 
     /* Controls for the SAP announces */
-     wxPanel *misc_subpanels[1];
-     wxCheckBox *misc_checkboxes[1];
-     
-     int i_sap_type;
-     
-     wxTextCtrl *misc_addrs[1];
+    wxPanel *misc_subpanels[1];
+    wxCheckBox *sap_checkbox;
+    wxTextCtrl *sap_addr;
                             
     /* Controls for the encapsulation */
     wxRadioButton *encapsulation_radios[5];
