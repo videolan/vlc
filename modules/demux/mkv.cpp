@@ -329,6 +329,18 @@ typedef struct
     vlc_bool_t b_key;
 } mkv_index_t;
 
+class chapter_codec_cmds_t
+{
+};
+
+class dvd_chapter_codec_t : public chapter_codec_cmds_t
+{
+};
+
+class matroska_script_codec_t : public chapter_codec_cmds_t
+{
+};
+
 class chapter_item_t
 {
 public:
@@ -341,6 +353,17 @@ public:
     ,b_display_seekpoint(true)
     ,psz_parent(NULL)
     {}
+        
+    ~chapter_item_t()
+    {
+        size_t i;
+        for (i=0; i<enter_cmds.size(); i++)
+            delete enter_cmds[i];
+        for (i=0; i<during_cmds.size(); i++)
+            delete during_cmds[i];
+        for (i=0; i<leave_cmds.size(); i++)
+            delete leave_cmds[i];
+    }
     
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
@@ -363,6 +386,10 @@ public:
     }
 
 protected:
+    std::vector<chapter_codec_cmds_t*> enter_cmds;
+    std::vector<chapter_codec_cmds_t*> during_cmds;
+    std::vector<chapter_codec_cmds_t*> leave_cmds;
+
     bool Enter();
     bool Leave();
 };
