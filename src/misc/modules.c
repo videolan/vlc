@@ -109,6 +109,8 @@
 
 #include "vlc_vlm.h"
 
+#include "vlc_image.h"
+
 #ifdef HAVE_DYNAMIC_PLUGINS
 #   include "modules_plugin.h"
 #endif
