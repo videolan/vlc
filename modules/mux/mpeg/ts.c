@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.16 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: ts.c,v 1.17 2003/05/03 02:18:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -354,6 +354,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         p_sys->i_mpeg4_streams--;
     }
+    free( p_stream );
+
     p_sys->i_ts_packet = 0; // force pat/pmt recreation
     p_sys->i_pat_version_number++; p_sys->i_pat_version_number %= 32;
     p_sys->i_pmt_version_number++; p_sys->i_pmt_version_number %= 32;
