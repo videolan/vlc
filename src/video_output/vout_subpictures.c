@@ -474,6 +474,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
 
+    int i_subpic_x;
+  
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
@@ -526,6 +528,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_fmt->i_height;
         }
 
+	if (p_subpic->p_region->fmt.i_aspect == 0)
+	  /* Set subtitle to be the same aspect ratio as the background
+	     source video.
+	   */
+	  p_subpic->p_region->fmt.i_aspect = p_pic_src->format.i_aspect;
+
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
 
@@ -539,6 +547,16 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Take care of the aspect ratio */
+
+	if( p_subpic->p_region->fmt.i_aspect != p_pic_src->format.i_aspect)
+	{
+	  i_scale_width = (p_subpic->p_region->fmt.i_aspect*1000) / 
+	    p_pic_src->format.i_aspect;
+	  i_subpic_x = p_subpic->i_x * i_scale_width / 1000;
+	} else 
+	  i_subpic_x = p_subpic->i_x;
+
+
         if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
             p_region->fmt.i_sar_den * p_fmt->i_sar_num )
         {
@@ -547,7 +565,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_region->fmt.i_sar_den / p_fmt->i_sar_num;
         }
 
-        /* Load the scaling module */
         if( !p_spu->p_scale && (i_scale_width != 1000 ||
             i_scale_height != 1000) )
         {
@@ -581,7 +598,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_spu->p_blend->pf_video_blend )
         {
             int i_fade_alpha = 255;
-            int i_x_offset = p_region->i_x + p_subpic->i_x;
+            int i_x_offset = p_region->i_x + i_subpic_x;
             int i_y_offset = p_region->i_y + p_subpic->i_y;
 
             if( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
@@ -679,7 +696,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_subpic->i_flags & SUBPICTURE_ALIGN_RIGHT )
             {
                 i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
-                    p_subpic->i_x;
+                    i_subpic_x;
             }
             else if ( !(p_subpic->i_flags & SUBPICTURE_ALIGN_LEFT) )
             {
@@ -689,7 +706,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_subpic->b_absolute )
             {
                 i_x_offset = p_region->i_x +
-                    p_subpic->i_x * i_scale_width / 1000;
+                    i_subpic_x * i_scale_width / 1000;
                 i_y_offset = p_region->i_y +
                     p_subpic->i_y * i_scale_height / 1000;
 
