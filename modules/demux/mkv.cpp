@@ -522,8 +522,8 @@ public:
         delete p_es;
     }
 
-    vlc_stream_io_callback  *p_in;
-    EbmlStream              *p_es;
+    IOCallback         *p_in;
+    EbmlStream         *p_es;
 
     std::vector<matroska_segment_t*> segments;
     int                              i_current_segment;
@@ -586,7 +586,7 @@ public:
     matroska_segment_t *FindSegment( EbmlBinary & uid ) const;
     void PreloadFamily( );
     void PreloadLinked( );
-    bool AnalyseAllSegmentsFound( EbmlStream *p_estream );
+    matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
 
 static int  Demux  ( demux_t * );
@@ -635,17 +635,18 @@ static int Open( vlc_object_t * p_this )
     p_stream->p_in = new vlc_stream_io_callback( p_demux->s );
     p_stream->p_es = new EbmlStream( *p_stream->p_in );
 
-    p_segment = new matroska_segment_t( *p_sys, *p_stream->p_es );
-
-    p_stream->segments.push_back( p_segment );
-    p_stream->i_current_segment = 0;
-
     if( p_stream->p_es == NULL )
     {
         msg_Err( p_demux, "failed to create EbmlStream" );
         delete p_sys;
         return VLC_EGENERIC;
     }
+
+    p_segment = new matroska_segment_t( *p_sys, *p_stream->p_es );
+
+    p_stream->segments.push_back( p_segment );
+    p_stream->i_current_segment = 0;
+
     /* Find the EbmlHead element */
     el = p_stream->p_es->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
     if( el == NULL )
@@ -718,11 +719,18 @@ static int Open( vlc_object_t * p_this )
                         StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
                         EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
-                        if ( !p_sys->AnalyseAllSegmentsFound( p_estream ))
+                        p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
+                        if ( p_stream == NULL )
                         {
                             msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
                             delete p_estream;
                             delete p_file_io;
+                        }
+                        else
+                        {
+                            p_stream->p_in = p_file_io;
+                            p_stream->p_es = p_estream;
+                            p_sys->streams.push_back( p_stream );
                         }
                     }
                 }
@@ -1398,9 +1406,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-bool demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
+matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
 {
-return false; // FIXME safer until this thing works
     int i_upper_lvl = 0;
     size_t i;
     EbmlElement *p_l0, *p_l1, *p_l2;
@@ -1410,7 +1417,7 @@ return false; // FIXME safer until this thing works
     p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
     if (p_l0 == NULL)
     {
-        return false;
+        return NULL;
     }
 
     matroska_stream_t *p_stream1 = new matroska_stream_t( *this );
@@ -1436,6 +1443,7 @@ return false; // FIXME safer until this thing works
 
             ep = new EbmlParser(p_estream, p_l0);
             p_segment1->ep = ep;
+            p_segment1->segment = (KaxSegment*)p_l0;
 
             while ((p_l1 = ep->Get()))
             {
@@ -1485,16 +1493,16 @@ return false; // FIXME safer until this thing works
         }
 
         p_l0->SkipData(*p_estream, EbmlHead_Context);
-        delete p_l0;
         p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
     }
 
-    if ( b_keep_stream )
-        streams.push_back( p_stream1 );
-    else
+    if ( !b_keep_stream )
+    {
         delete p_stream1;
+        p_stream1 = NULL;
+    }
 
-    return b_keep_stream;
+    return p_stream1;
 }
 
 static void UpdateCurrentToChapter( demux_t & demux )
