@@ -127,6 +127,18 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>wma</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>WMA File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>ogm</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
@@ -366,6 +378,24 @@
 				A064F9F203CB9EE000B21232,
 				A064F9F303CB9EE000B21232,
 				8E88833D03DD6E870059A3A7,
+				8E68B0BF03E2EA230059A3A7,
+				8ED6C28903E2EB1D0059A3A7,
+				8ED6C28A03E2EB1D0059A3A7,
+				8ED6C28B03E2EB1D0059A3A7,
+				8ED6C28C03E2EB1D0059A3A7,
+				8ED6C28D03E2EB1D0059A3A7,
+				8ED6C28E03E2EB1D0059A3A7,
+				8ED6C28F03E2EB1D0059A3A7,
+				8ED6C29003E2EB1D0059A3A7,
+				8ED6C29103E2EB1D0059A3A7,
+				8ED6C29203E2EB1D0059A3A7,
+				8ED6C29303E2EB1D0059A3A7,
+				8ED6C29403E2EB1D0059A3A7,
+				8ED6C29503E2EB1D0059A3A7,
+				8ED6C29603E2EB1D0059A3A7,
+				8ED6C29703E2EB1D0059A3A7,
+				8ED6C29F03E2F32E0059A3A7,
+				8ED6C2A003E2F32E0059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -407,6 +437,9 @@
 				A064F9E903CB9EE000B21232,
 				8E88833C03DD6E870059A3A7,
 				F69B0CA602E24F6401A80112,
+				8E68B0BE03E2EA230059A3A7,
+				8ED6C29D03E2F32E0059A3A7,
+				8ED6C29E03E2F32E0059A3A7,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -420,6 +453,21 @@
 		};
 		08FB77AFFE84173DC02AAC07 = {
 			children = (
+				8ED6C27A03E2EB1C0059A3A7,
+				8ED6C27B03E2EB1C0059A3A7,
+				8ED6C27C03E2EB1C0059A3A7,
+				8ED6C27D03E2EB1C0059A3A7,
+				8ED6C27E03E2EB1C0059A3A7,
+				8ED6C27F03E2EB1C0059A3A7,
+				8ED6C28003E2EB1C0059A3A7,
+				8ED6C28103E2EB1C0059A3A7,
+				8ED6C28203E2EB1C0059A3A7,
+				8ED6C28303E2EB1C0059A3A7,
+				8ED6C28403E2EB1C0059A3A7,
+				8ED6C28503E2EB1C0059A3A7,
+				8ED6C28603E2EB1C0059A3A7,
+				8ED6C28703E2EB1C0059A3A7,
+				8ED6C28803E2EB1C0059A3A7,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -492,6 +540,18 @@
 //8E2
 //8E3
 //8E4
+		8E68B0BE03E2EA230059A3A7 = {
+			isa = PBXFileReference;
+			name = README.MacOSX.rtf;
+			path = ../../README.MacOSX.rtf;
+			refType = 2;
+		};
+		8E68B0BF03E2EA230059A3A7 = {
+			fileRef = 8E68B0BE03E2EA230059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		8E88833C03DD6E870059A3A7 = {
 			isa = PBXFileReference;
 			name = slow.png;
@@ -500,6 +560,227 @@
 		};
 		8E88833D03DD6E870059A3A7 = {
 			fileRef = 8E88833C03DD6E870059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C27A03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = aout.m;
+			path = ../../modules/gui/macosx/aout.m;
+			refType = 2;
+		};
+		8ED6C27B03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = controls.m;
+			path = ../../modules/gui/macosx/controls.m;
+			refType = 2;
+		};
+		8ED6C27C03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = intf.h;
+			path = ../../modules/gui/macosx/intf.h;
+			refType = 2;
+		};
+		8ED6C27D03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = intf.m;
+			path = ../../modules/gui/macosx/intf.m;
+			refType = 2;
+		};
+		8ED6C27E03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = macosx.m;
+			path = ../../modules/gui/macosx/macosx.m;
+			refType = 2;
+		};
+		8ED6C27F03E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = misc.h;
+			path = ../../modules/gui/macosx/misc.h;
+			refType = 2;
+		};
+		8ED6C28003E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = misc.m;
+			path = ../../modules/gui/macosx/misc.m;
+			refType = 2;
+		};
+		8ED6C28103E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = open.h;
+			path = ../../modules/gui/macosx/open.h;
+			refType = 2;
+		};
+		8ED6C28203E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = open.m;
+			path = ../../modules/gui/macosx/open.m;
+			refType = 2;
+		};
+		8ED6C28303E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = playlist.h;
+			path = ../../modules/gui/macosx/playlist.h;
+			refType = 2;
+		};
+		8ED6C28403E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = playlist.m;
+			path = ../../modules/gui/macosx/playlist.m;
+			refType = 2;
+		};
+		8ED6C28503E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = prefs.h;
+			path = ../../modules/gui/macosx/prefs.h;
+			refType = 2;
+		};
+		8ED6C28603E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = prefs.m;
+			path = ../../modules/gui/macosx/prefs.m;
+			refType = 2;
+		};
+		8ED6C28703E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = vout.h;
+			path = ../../modules/gui/macosx/vout.h;
+			refType = 2;
+		};
+		8ED6C28803E2EB1C0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = vout.m;
+			path = ../../modules/gui/macosx/vout.m;
+			refType = 2;
+		};
+		8ED6C28903E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27A03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28A03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27B03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28B03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27C03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28C03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27D03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28D03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27E03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28E03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C27F03E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C28F03E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28003E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29003E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28103E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29103E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28203E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29203E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28303E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29303E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28403E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29403E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28503E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29503E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28603E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29603E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28703E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29703E2EB1D0059A3A7 = {
+			fileRef = 8ED6C28803E2EB1C0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C29D03E2F32E0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = AUTHORS;
+			path = ../../AUTHORS;
+			refType = 2;
+		};
+		8ED6C29E03E2F32E0059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = COPYING;
+			path = ../../COPYING;
+			refType = 2;
+		};
+		8ED6C29F03E2F32E0059A3A7 = {
+			fileRef = 8ED6C29D03E2F32E0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8ED6C2A003E2F32E0059A3A7 = {
+			fileRef = 8ED6C29E03E2F32E0059A3A7;
 			isa = PBXBuildFile;
 			settings = {
 			};

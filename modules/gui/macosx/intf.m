@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.33 2003/01/24 16:19:15 hartman Exp $
+ * $Id: intf.m,v 1.34 2003/01/25 18:42:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -268,6 +268,12 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_messages setTitle: _NS("Messages")];
 
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
+
+    [o_mu_help setTitle: _NS("Help")];
+    [o_mi_readme setTitle: _NS("ReadMe...")];
+    [o_mi_reportabug setTitle: _NS("Report A Bug")];
+    [o_mi_website setTitle: _NS("VideoLAN Website")];
+    [o_mi_license setTitle: _NS("License")];
 
     /* dock menu */
     [o_dmi_play setTitle: _NS("Play")];
@@ -1173,6 +1179,38 @@ static void Run( intf_thread_t *p_intf )
     [o_err_msg insertText: @""];
     [o_err_msg setEditable: NO];
     [o_error performClose: self];
+}
+
+- (IBAction)openReadMe:(id)sender
+{
+    NSString *readmeFile = [[NSBundle mainBundle] pathForResource:@"README.MacOSX"
+       ofType:@"rtf"];
+       
+    [[NSWorkspace sharedWorkspace] openFile: readmeFile 
+        withApplication:@"TextEdit"];
+}
+
+- (IBAction)reportABug:(id)sender
+{
+    NSURL *bugURL = [NSURL URLWithString:@"http://www.videolan.org/vlc/bug-reporting.html"];
+    
+    [[NSWorkspace sharedWorkspace] openURL: bugURL];
+}
+
+- (IBAction)openWebsite:(id)sender
+{
+    NSURL *websiteURL = [NSURL URLWithString:@"http://www.videolan.org/"];
+    
+    [[NSWorkspace sharedWorkspace] openURL: websiteURL];
+}
+
+- (IBAction)openLicense:(id)sender
+{
+    NSString *licenseFile = [[NSBundle mainBundle] pathForResource:@"COPYING"
+       ofType:nil];
+       
+    [[NSWorkspace sharedWorkspace] openFile: licenseFile 
+        withApplication:@"TextEdit"];
 }
 
 @end

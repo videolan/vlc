@@ -36,7 +36,11 @@
             ACTIONS = {
                 clearRecentItems = id; 
                 closeError = id; 
+                openLicense = id; 
+                openReadMe = id; 
                 openRecentItem = id; 
+                openWebsite = id; 
+                reportABug = id; 
                 timesliderUpdate = id; 
                 viewPreferences = id; 
             }; 
@@ -77,6 +81,7 @@
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_language" = id; 
+                "o_mi_license" = id; 
                 "o_mi_loop" = id; 
                 "o_mi_messages" = id; 
                 "o_mi_minimize" = id; 
@@ -95,6 +100,8 @@
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 
                 "o_mi_quit" = id; 
+                "o_mi_readme" = id; 
+                "o_mi_reportabug" = id; 
                 "o_mi_screen" = id; 
                 "o_mi_select_all" = id; 
                 "o_mi_show_all" = id; 
@@ -104,12 +111,14 @@
                 "o_mi_title" = id; 
                 "o_mi_vol_down" = id; 
                 "o_mi_vol_up" = id; 
+                "o_mi_website" = id; 
                 "o_msgs_btn_ok" = id; 
                 "o_msgs_panel" = id; 
                 "o_mu_audio" = id; 
                 "o_mu_controls" = id; 
                 "o_mu_edit" = id; 
                 "o_mu_file" = id; 
+                "o_mu_help" = id; 
                 "o_mu_video" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
