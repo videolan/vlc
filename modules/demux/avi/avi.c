@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.27 2003/01/20 13:01:53 fenrir Exp $
+ * $Id: avi.c,v 1.28 2003/01/23 13:44:21 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -683,7 +683,7 @@ static void    AVI_StreamStop( input_thread_t *p_input,
 static int AVI_StreamStopFinishedStreams( input_thread_t *p_input,
                                            demux_sys_t *p_avi )
 {
-    int i_stream;
+    int unsigned i_stream;
     int b_end;
 
     for( i_stream = 0,b_end = VLC_TRUE;
@@ -1689,14 +1689,15 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
     unsigned int i_stream_count;
     unsigned int i_stream;
     vlc_bool_t b_stream;
-
+    vlc_bool_t b_play_audio;
+    vlc_bool_t b_video; /* is there some video track selected */
     // cannot be more than 100 stream (dcXX or wbXX)
     avi_stream_toread_t toread[100];
 
     demux_sys_t *p_avi = p_input->p_demux_data;
 
     /* detect new selected/unselected streams */
-    for( i_stream = 0,i_stream_count= 0;
+    for( i_stream = 0,i_stream_count= 0, b_video = VLC_FALSE;
             i_stream < p_avi->i_streams; i_stream++ )
     {
 #define p_stream    p_avi->pp_info[i_stream]
@@ -1717,6 +1718,10 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         if( p_stream->b_activated )
         {
             i_stream_count++;
+            if( p_stream->i_cat == VIDEO_ES )
+            {
+                b_video = VLC_TRUE;
+            }
         }
 #undef  p_stream
     }
@@ -1770,6 +1775,19 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         subtitle_Demux( p_avi->p_sub, p_avi->i_time );
     }
 #endif
+
+    /* *** send audio data to decoder if rate == DEFAULT_RATE or no video *** */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( p_input->stream.control.i_rate == DEFAULT_RATE || !b_video )
+    {
+        b_play_audio = VLC_TRUE;
+    }
+    else
+    {
+        b_play_audio = VLC_FALSE;
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     /* init toread */
     for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
     {
@@ -1777,7 +1795,6 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         mtime_t i_dpts;
 
         toread[i_stream].b_ok = p_stream->b_activated;
-
         if( p_stream->i_idxposc < p_stream->i_idxnb )
         {
             toread[i_stream].i_posf =
@@ -2028,7 +2045,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
         b_stream = VLC_TRUE; // at least one read succeed
 
-        if( p_stream->p_es && p_stream->p_es->p_decoder_fifo )
+        if( p_stream->p_es && p_stream->p_es->p_decoder_fifo &&
+            ( b_play_audio || p_stream->i_cat != AUDIO_ES ) )
         {
             p_pes->i_dts =
                 p_pes->i_pts =
