@@ -181,7 +181,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
                       0);                    /* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
-    mad_timer_reset(&p_mad_adec->libmad_timer);
+//    mad_timer_reset(&p_mad_adec->libmad_timer);
 
     /*
      * Initialize the output properties

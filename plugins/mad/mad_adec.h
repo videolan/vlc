@@ -17,16 +17,10 @@
 
 #ifndef _VLC_MAD_ADEC_H_
 #define _VLC_MAD_ADEC_H_
+
 /*****************************************************************************
  * mad_adec_thread_t : mad decoder thread descriptor
  *****************************************************************************/
-
-// FIXME: Ugly define inside a decoder
-#define ADEC_FRAME_SIZE (2*1152)
-// MAD_BUFFER_MDLEN (511 + 2048 + MAD_BUFLEN_GUARD) and MAD_BUFLEN_GUARD is 8
-#define MAD_BUFFER_SIZE (MAD_BUFFER_MDLEN)
-//#define MAD_BUFFER_SIZE (ADEC_FRAME_SIZE*2)
-#define MAD_OUTPUT_SIZE (ADEC_FRAME_SIZE*2)
 
 typedef struct mad_adec_thread_s
 {
@@ -35,7 +29,7 @@ typedef struct mad_adec_thread_s
      */
     struct mad_decoder *libmad_decoder;
     mad_timer_t         libmad_timer;  
-    byte_t              buffer[MAD_BUFFER_SIZE]; 
+    byte_t              buffer[MAD_BUFFER_MDLEN];
    
     /*
      * Thread properties

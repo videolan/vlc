@@ -82,7 +82,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
                              Remaining );
             }
             ReadStart=p_mad_adec->buffer+Remaining;
-            ReadSize=(MAD_BUFFER_SIZE)-Remaining;
+            ReadSize=(MAD_BUFFER_MDLEN)-Remaining;
 
             /* Store time stamp of next frame */
             p_mad_adec->i_current_pts = p_mad_adec->i_next_pts;
@@ -90,7 +90,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
         }
         else
         {
-            ReadSize=(MAD_BUFFER_SIZE);
+            ReadSize=(MAD_BUFFER_MDLEN);
             ReadStart=p_mad_adec->buffer;
             Remaining=0;
             p_mad_adec->i_next_pts = 0;
@@ -154,7 +154,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
  *
  *   p_mad_adec->p_aout_fifo->i_rate = p_libmad_header->samplerate;
- *   mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
+ * //  mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
  *
  *   return MAD_FLOW_CONTINUE;
  *}
@@ -301,7 +301,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
                 AOUT_FIFO_PCM,              /* fifo type */
                 p_libmad_pcm->channels,     /* nr. of channels */
                 p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
-                ADEC_FRAME_SIZE,            /* frame size */
+                p_libmad_pcm->length*2,     /* length of output buffer *2 channels*/
                 NULL  );                    /* buffer */
 
     	if ( p_mad_adec->p_aout_fifo == NULL )
@@ -309,15 +309,15 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         	return( -1 );
     	}
 
-        intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
+      intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
     }
 
     if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
     {
-	intf_ErrMsg( "mad_adec: libmad_output samplerate is changing from [%d] Hz to [%d] Hz, sample size [%d], error_code [%0x]",
-                   p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
-     		     p_libmad_pcm->length, p_mad_adec->libmad_decoder->sync->stream.error);
-	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
+     	intf_ErrMsg( "mad_adec: libmad_output samplerate is changing from [%d] Hz to [%d] Hz, sample size [%d], error_code [%0x]",
+                        p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
+          		     p_libmad_pcm->length, p_mad_adec->libmad_decoder->sync->stream.error);
+     	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
     }
 
     if( p_mad_adec->i_current_pts )
@@ -330,28 +330,28 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
                 = LAST_MDATE;
     }
-    mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
+//    mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
 
-    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->i_end_frame * MAD_OUTPUT_SIZE);
+    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->i_end_frame * (p_libmad_pcm->length*4));
 
     while (nsamples--)
     {
 #ifdef MPG321_ROUTINES
         sample = audio_linear_dither(16, *left_ch++, &dither);
 #else
-     	sample = s24_to_s16_pcm(*left_ch++);
+     	  sample = s24_to_s16_pcm(*left_ch++);
 #endif
 
 #ifndef WORDS_BIGENDIAN
         *buffer++ = (byte_t) (sample >> 0);
         *buffer++ = (byte_t) (sample >> 8);
 #else
-     	*buffer++ = (byte_t) (sample >> 8);
-    	*buffer++ = (byte_t) (sample >> 0);
+     	  *buffer++ = (byte_t) (sample >> 8);
+    	  *buffer++ = (byte_t) (sample >> 0);
 #endif
-	if (p_libmad_pcm->channels == 2) {
-
-	    /* right audio channel */
+      	if (p_libmad_pcm->channels == 2)
+        {
+       	    /* right audio channel */
 #ifdef MPG321_ROUTINES
             sample = audio_linear_dither(16, *right_ch++, &dither);
 #else
@@ -366,14 +366,14 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
             *buffer++ = (byte_t) (sample >> 0);
 #endif						
         }
-	else {
-	    /* Somethimes a single channel frame is found, while the rest of the movie are
+      	else {
+      	    /* Somethimes a single channel frame is found, while the rest of the movie are
              * stereo channel frames. How to deal with this ??
              * One solution is to silence the second channel.
              */
             *buffer++ = (byte_t) (0);
             *buffer++ = (byte_t) (0);
-	}
+      	}
     }
     /* DEBUG */
     if (p_libmad_pcm->channels == 1) {
