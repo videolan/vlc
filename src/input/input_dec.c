@@ -285,7 +285,8 @@ void input_DecodeBlock( decoder_t * p_dec, block_t *p_block )
         if( p_dec->p_owner->p_input->b_out_pace_control )
         {
             /* FIXME !!!!! */
-            while( p_dec->p_owner->p_fifo->i_depth > 10 )
+            while( !p_dec->b_die && !p_dec->b_error &&
+                   p_dec->p_owner->p_fifo->i_depth > 10 )
             {
                 msleep( 1000 );
             }

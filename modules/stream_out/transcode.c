@@ -136,7 +136,10 @@ struct sout_stream_sys_t
     int             i_crop_right;
     int             i_crop_left;
 
+    mtime_t         i_input_dts;
     mtime_t         i_input_pts;
+    vlc_bool_t      b_input_has_b_frames;
+
     mtime_t         i_output_pts;
 };
 
@@ -167,6 +170,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_rc_buffer_aggressivity = 0.1;
     p_sys->i_threads = 0;
     p_sys->b_trellis = 0;
+    p_sys->b_input_has_b_frames = VLC_FALSE;
 
     if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "acodec" ) ) )
     {
@@ -1330,7 +1334,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
     i_data = in->i_size;
     p_data = in->p_buffer;
- 
+
     for( ;; )
     {
         block_t *p_block;
@@ -1340,6 +1344,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         /* decode frame */
         frame = id->p_ff_pic;
         p_sys->i_input_pts = in->i_pts;
+        p_sys->i_input_dts = in->i_dts;
         if( id->ff_dec )
         {
             i_used = avcodec_decode_video( id->ff_dec_c, frame,
@@ -1358,6 +1363,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             /* Set PTS */
             frame->pts = p_sys->i_input_pts ? p_sys->i_input_pts :
                          AV_NOPTS_VALUE;
+
+            frame->pict_type = FF_I_TYPE;
         }
 
         if( i_used < 0 )
@@ -1378,6 +1385,12 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         if( frame->pts != AV_NOPTS_VALUE )
         {
             p_sys->i_output_pts = frame->pts;
+        }
+
+        /* Sanity check (seems to be needed for some streams ) */
+        if( frame->pict_type == FF_B_TYPE )
+        {
+            p_sys->b_input_has_b_frames = VLC_TRUE;
         }
 
         if( !id->b_enc_inited )
@@ -1758,7 +1771,25 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_context->opaque;
 
     /* Set PTS */
-    p_frame->pts = p_sys->i_input_pts ? p_sys->i_input_pts : AV_NOPTS_VALUE;
+    if( p_sys->i_input_pts )
+    {
+        p_frame->pts = p_sys->i_input_pts;
+    }
+    else if( p_sys->i_input_dts )
+    {
+        /* Some demuxers/packetizers only set the dts so let's try to find a
+         * useful timestamp from this */
+        if( !p_context->has_b_frames || !p_sys->b_input_has_b_frames ||
+            !p_frame->reference )
+        {
+            p_frame->pts = p_sys->i_input_dts;
+        }
+        else p_frame->pts = AV_NOPTS_VALUE;
+    }
+    else p_frame->pts = AV_NOPTS_VALUE;
+
+    p_sys->i_input_pts = 0;
+    p_sys->i_input_dts = 0;
 
     return avcodec_default_get_buffer( p_context, p_frame );
 }
