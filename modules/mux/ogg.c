@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.10 2003/09/28 16:50:04 gbazin Exp $
+ * $Id: ogg.c,v 1.11 2003/09/28 19:58:19 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -347,11 +347,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_input->p_fmt->i_width );
             SetDWLE( &p_stream->header.header.video.i_height,
                      p_input->p_fmt->i_height );
+            msg_Dbg( p_mux, "mp4v/div3 stream" );
             break;
 
         case VLC_FOURCC( 't', 'h', 'e', 'o' ):
-          msg_Dbg( p_mux, "theora stream" );
-          break;
+            msg_Dbg( p_mux, "theora stream" );
+            break;
 
         default:
             FREE( p_input->p_sys );
@@ -386,6 +387,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->header.header.audio.i_block_align,
                      p_input->p_fmt->i_block_align );
             SetDWLE( &p_stream->header.header.audio.i_avgbytespersec, 0 );
+            msg_Dbg( p_mux, "mpga/a52 stream" );
             break;
 
         case VLC_FOURCC( 'v', 'o', 'r', 'b' ):
@@ -403,6 +405,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
         case VLC_FOURCC( 's', 'u','b', 't' ):
             memcpy( p_stream->header.stream_type, "text     ", 8 );
+            msg_Dbg( p_mux, "subtitles stream" );
             break;
 
         default:
@@ -415,7 +418,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return( VLC_EGENERIC );
     }
 
-    ogg_stream_init( &p_stream->os, rand () );
     p_stream->b_new = VLC_TRUE;
 
     p_sys->i_add_streams++;
@@ -483,6 +485,7 @@ static sout_buffer_t *OggStreamFlush( sout_mux_t *p_mux,
         {
             break;
         }
+
         i_size = og.header_len + og.body_len;
         p_og = sout_BufferNew( p_mux->p_sout, i_size);
 
@@ -516,6 +519,7 @@ static sout_buffer_t *OggStreamPageOut( sout_mux_t *p_mux,
         {
             break;
         }
+
         i_size = og.header_len + og.body_len;
         p_og = sout_BufferNew( p_mux->p_sout, i_size);
 
@@ -547,6 +551,12 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
     {
         ogg_stream_t *p_stream = (ogg_stream_t*)p_mux->pp_inputs[i]->p_sys;
         p_stream->b_new = VLC_FALSE;
+
+        msg_Dbg( p_mux, "creating header for %4.4s",
+                 (char *)&p_stream->i_fourcc );
+
+        ogg_stream_init( &p_stream->os, rand() );
+        p_stream->i_packet_no = 0;
 
         if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
             p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
@@ -641,6 +651,21 @@ static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
     ogg_packet    op;
     int i;
 
+    /* flush all remaining data */
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        ogg_stream_t *p_stream = p_mux->pp_inputs[i]->p_sys;
+
+        /* skip newly added streams */
+        if( p_stream->b_new ) continue;
+
+        if( ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
+        {
+            OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
+            sout_AccessOutWrite( p_mux->p_access, p_og );
+        }
+    }
+
     /* Write eos packets for each stream. */
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
@@ -659,6 +684,7 @@ static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
 
         p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
         sout_BufferChain( &p_hdr, p_og );
+        ogg_stream_clear( &p_stream->os );
     }
 
     for( i = 0; i < p_sys->i_del_streams; i++ )
@@ -673,6 +699,7 @@ static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
 
         p_og = OggStreamFlush( p_mux, &p_sys->pp_del_streams[i]->os, 0 );
         sout_BufferChain( &p_hdr, p_og );
+        ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
     }
 
     return( p_hdr );
@@ -729,7 +756,6 @@ static int Mux( sout_mux_t *p_mux )
             /* Remove deleted logical streams */
             for( i = 0; i < p_sys->i_del_streams; i++ )
             {
-                ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
                 FREE( p_sys->pp_del_streams[i] );
             }
             FREE( p_sys->pp_del_streams );
