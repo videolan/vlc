@@ -2,15 +2,20 @@ bug #09/11/2001-1: (FIXED 20/11/2001, by JP Saman)
 	Makefile.opts.in and Makefile.opts static libmad.a library is not filled in automatically by configure.
 	It should say in Makefile.opts LIB_MAD=lib/libmad.a
 
-bug #09/11/2001-2:
-	libmad/mad.h is not created automatically. Fix compile step and dependencies for mad_adec to automatically
-	configure and or build libmad when not build yet. This means integration of configure.in scripts.
+bug #09/11/2001-2: (FIXED december 2001)
+	Libmad is not included in the vlc source code. It is assumed that the library is already available on the machine
+	where the plugin is compiled on. The configure option --with-libmad tells the script where libmad.a or libmad.so library
+	and mad.h include file are installed. E.g. if libmad.a is in /usr/lib and mad.h is in /usr/include then the configure
+	option should be --with-libmad=/usr
 
 bug #12/11/2001-1 (WORKING, by JP Saman)
 	smoothen out audio in libmad_output callback function, by optimizing conversion routines. After investigation
 	and experimenting I found out that my input routine and output routine were not balanced correctly with
 	respect to buffer sizes. A lot of data got lost. I fixed that, but still need a bater scaling/smoothing routine
 	for the audio.
+	I tried a simpler audio scale function, but it did not improve the audio much. Not even on Intel machine, so I suspect the audio
+	decoding to need a bit too much time. The next thing to try is to steer the decoding process by hand (going to a lower level API).
+	This means a complete replace of mad_libmad.c and mad_libmad.h files.
 
 bug #20/11/2001-1 (FIXED 25/11/2001, by JP Saman)
 	synchronization between audio and video output is lost. In libmad_output a timestamp is set on the audio data, but
