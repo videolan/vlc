@@ -68,7 +68,7 @@ vlc_module_end();
  * Local structures
  *****************************************************************************/
 
-typedef struct host_s {
+typedef struct dhost_s {
     char *psz_name;
     int i_id;
 
@@ -81,11 +81,11 @@ typedef struct host_s {
 
     DAAP_ClientHost_DatabaseItem *p_songs;
     int i_songs;
-} host_t;
+} dhost_t;
 
 typedef struct daap_db_s {
-    host_t **pp_hosts;
-    int      i_hosts;
+    dhost_t **pp_hosts;
+    int       i_hosts;
 
     int i_last_id;
 
@@ -104,7 +104,7 @@ struct services_discovery_sys_t {
 struct access_sys_t {
     vlc_url_t url;
 
-    host_t *p_host;
+    dhost_t *p_host;
     int i_host;
     int i_song;
 
@@ -128,8 +128,8 @@ struct access_sys_t {
                                   DAAP_SClientHost *p_host,
                                   void *p_context );
     static void OnHostsUpdate( services_discovery_t *p_sd );
-    static void ProcessHost( services_discovery_t *p_sd, host_t *p_host );
-    static void FreeHost( services_discovery_t *p_sd, host_t *p_host );
+    static void ProcessHost( services_discovery_t *p_sd, dhost_t *p_host );
+    static void FreeHost( services_discovery_t *p_sd, dhost_t *p_host );
 
     static int Control( access_t *p_access, int i_query, va_list args );
     static int Read( access_t *, uint8_t *, int );
@@ -467,7 +467,7 @@ static void OnHostsUpdate( services_discovery_t *p_sd )
     {
         if( p_sd->p_sys->p_db->pp_hosts[i]->b_updated == VLC_FALSE )
         {
-            host_t *p_host = p_sd->p_sys->p_db->pp_hosts[i];
+            dhost_t *p_host = p_sd->p_sys->p_db->pp_hosts[i];
             FreeHost( p_sd, p_host );
             REMOVE_ELEM( p_sd->p_sys->p_db->pp_hosts,
                          p_sd->p_sys->p_db->i_hosts, i );
@@ -507,7 +507,7 @@ static int EnumerateCallback( DAAP_SClient *p_client,
 
     if( !b_found )
     {
-        host_t *p_vlchost = (host_t *)malloc( sizeof( host_t ) );
+        dhost_t *p_vlchost = (dhost_t *)malloc( sizeof( dhost_t ) );
         p_vlchost->p_host = p_host;
         p_vlchost->psz_name = psz_buffer;
         p_vlchost->b_new = VLC_TRUE;
@@ -519,7 +519,7 @@ static int EnumerateCallback( DAAP_SClient *p_client,
     return VLC_SUCCESS;
 }
 
-static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
+static void ProcessHost( services_discovery_t *p_sd, dhost_t *p_host )
 {
     int i_dbsize, i_db, i, i_songsize, i_ret;
     int i_size = DAAP_ClientHost_GetSharename( p_host->p_host, NULL, 0 );
@@ -618,7 +618,7 @@ static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
     vlc_object_release( p_playlist );
 }
 
-static void FreeHost( services_discovery_t *p_sd, host_t *p_host )
+static void FreeHost( services_discovery_t *p_sd, dhost_t *p_host )
 {
     playlist_t *p_playlist;
 
