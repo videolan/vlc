@@ -837,6 +837,19 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else
         i_delay = 0;
 
+    /* Mark preroll blocks */
+    if( es->i_preroll_end >= 0 )
+    {
+        int64_t i_date = p_block->i_pts;
+        if( i_date <= 0 )
+            i_date = p_block->i_dts;
+
+        if( i_date < es->i_preroll_end )
+            p_block->i_flags |= BLOCK_FLAG_PREROLL;
+        else
+            es->i_preroll_end = -1;
+    }
+
     /* +11 -> avoid null value with non null dts/pts */
     if( p_block->i_dts > 0 )
     {
@@ -865,18 +878,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     p_block->i_rate = p_input->i_rate;
-    /* Mark preroll blocks */
-    if( es->i_preroll_end >= 0 )
-    {
-        int64_t i_date = p_block->i_pts;
-        if( i_date <= 0 )
-            i_date = p_block->i_dts;
-
-        if( i_date < es->i_preroll_end )
-            p_block->i_flags |= BLOCK_FLAG_PREROLL;
-        else
-            es->i_preroll_end = -1;
-    }
 
     /* TODO handle mute */
     if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||

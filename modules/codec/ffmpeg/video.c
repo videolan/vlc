@@ -504,8 +504,16 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        b_drawpicture = 1;
-        p_sys->p_context->hurry_up = 0;
+        if (!(p_block->i_flags & BLOCK_FLAG_PREROLL))
+        {
+            b_drawpicture = 1;
+            p_sys->p_context->hurry_up = 0;
+        }
+        else
+        {
+            b_drawpicture = 0;
+            p_sys->p_context->hurry_up = 1;
+        }
     }
 
 
