@@ -3574,8 +3574,10 @@ then
   else
     if test "${SYS}" != "mingw32"; then
       LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
-      AC_CHECK_LIB(Xt,XtStrings,[
-        VLC_ADD_LDFLAGS([mozilla],[-L${x_libraries} -lXt])
+      AC_CHECK_LIB(Xt,XtStrings,
+       [VLC_ADD_LDFLAGS([mozilla],[-L${x_libraries} -lXt -lX11 -lSM -lICE],
+       [],
+       [[-L${x_libraries} -lX11 -lSM -lICE]])
       ])
       LDFLAGS="${LDFLAGS_save}"
     fi
