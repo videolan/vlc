@@ -2313,7 +2313,7 @@ AC_ARG_ENABLE(gtk2,
   [  --enable-gtk2           Gtk2 support (default disabled)])
 if test "x${enable_gtk2}" = "xyes"
 then
-  #PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
   CFLAGS_gtk2="${CFLAGS_gtk2} ${GTK2_CFLAGS}"
   LDFLAGS_gtk2="${LDFLAGS_gtk2} ${GTK2_LIBS}"
   PLUGINS="${PLUGINS} gtk2"
@@ -2445,7 +2445,7 @@ AC_ARG_ENABLE(gnome2,
   [  --enable-gnome2         Gnome2 support (default disabled)])
 if test "x${enable_gnome2}" = "xyes"
 then
-  #PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
+  PKG_CHECK_MODULES(GNOME2, [libgnomeui-2.0])
   CFLAGS_gnome2="${CFLAGS_gnome2} ${GNOME2_CFLAGS}"
   LDFLAGS_gnome2="${LDFLAGS_gnome2} ${GNOME2_LIBS}"
   PLUGINS="${PLUGINS} gnome2"

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.45 2003/03/17 16:59:46 sam Exp $
+##  $Id: bootstrap,v 1.46 2003/03/20 10:27:35 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -185,6 +185,8 @@ rm -f ltmain.sh libtool ltconfig
 # remove gettext cruft
 rm -f m4/oldgettext.m4 ABOUT-NLS
 rm -Rf intl
+# update m4 local macros
+rm -f m4/vlc.m4 && echo "Private VLC macros" > m4/vlc.m4
 
 # Check for gettext
 if gettextize --version >/dev/null 2>&1
@@ -200,15 +202,26 @@ else
   echo > ABOUT-NLS
   mkdir -p intl
   echo > intl/Makefile.am
-  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/oldgettext.m4
+  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' >> m4/vlc.m4
   GETTEXT=old
 fi;else
   # we don't have gettext. grmbl. try to continue anyway.
   echo > ABOUT-NLS
   mkdir -p intl
   echo > intl/Makefile.am
-  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/oldgettext.m4
+  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' >> m4/vlc.m4
   GETTEXT=no
+fi
+
+# Check for pkg-config
+if pkg-config --version >/dev/null 2>&1
+then
+  # We have pkg-config, everything is cool.
+  PKGCONFIG=yes
+else
+  # Not present, use a workaround.
+  echo 'AC_DEFUN([PKG_CHECK_MODULES], [])' > m4/vlc.m4
+  PKGCONFIG=no
 fi
 
 # Check for automake
@@ -298,7 +311,7 @@ rm -f mozilla/vlcintf.h
 set +x
 
 ##
-##  Tell the user about gettext and sed
+##  Tell the user about gettext, pkg-config and sed
 ##
 case "$GETTEXT" in
   yes)
@@ -320,6 +333,20 @@ NOTE: you have an old version of gettext installed on your
 system. The vlc build will work, but if your system does not
 have libintl you will not have internationalization support.
 We suggest upgrading to gettext 0.11.3 or later.
+EOF
+  ;;
+esac
+
+case "$PKGCONFIG" in
+  yes)
+  ;;
+  no)
+    cat << EOF
+
+==============================================================
+NOTE: you do not have the "pkg-config" utility on your system;
+detection of the Gtk-2.0 and GNOME 2.0 libraries will not be
+reliable.
 EOF
   ;;
 esac
