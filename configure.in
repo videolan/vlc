@@ -84,6 +84,7 @@ case "x${target_os}" in
   xdarwin*)
     SYS=darwin
     save_CFLAGS="${save_CFLAGS} -no-cpp-precomp"; CFLAGS="${save_CFLAGS}"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -all_load"
     ;;
   x*mingw32*)
     SYS=mingw32
