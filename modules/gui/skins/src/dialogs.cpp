@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.8 2003/06/28 13:04:52 sam Exp $
+ * $Id: dialogs.cpp,v 1.9 2003/07/13 14:55:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -79,21 +79,13 @@ class Instance: public wxApp
 {
 public:
     Instance();
-#ifdef GTK2_SKINS
-    Instance( intf_thread_t *_p_intf, CallBackObjects *callback );
-#else
     Instance( intf_thread_t *_p_intf );
-#endif
 
     bool OnInit();
     int  OnExit();
 
 private:
     intf_thread_t *p_intf;
-
-#ifdef GTK2_SKINS
-    CallBackObjects *callbackobj;
-#endif
 
     DECLARE_EVENT_TABLE();
 };
@@ -115,20 +107,11 @@ Instance::Instance( )
 {
 }
 
-#ifdef GTK2_SKINS
-Instance::Instance( intf_thread_t *_p_intf, CallBackObjects *callback )
-{
-    // Initialization
-    p_intf = _p_intf;
-    callbackobj = callback;
-}
-#else
 Instance::Instance( intf_thread_t *_p_intf )
 {
     // Initialization
     p_intf = _p_intf;
 }
-#endif
 
 IMPLEMENT_APP_NO_MAIN(Instance)
 
@@ -136,22 +119,12 @@ bool Instance::OnInit()
 {
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
 
-#ifdef GTK2_SKINS
-    // Set event callback. Yes, it's a big hack ;)
-    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
-#endif
-
     // Create all the dialog boxes
     p_intf->p_sys->p_dialogs->OpenDlg =
         new OpenDialog( p_intf, NULL, FILE_ACCESS );
     p_intf->p_sys->p_dialogs->MessagesDlg = new Messages( p_intf, NULL );
     p_intf->p_sys->p_dialogs->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->p_dialogs->FileInfoDlg = new FileInfo( p_intf, NULL );
-
-#ifdef GTK2_SKINS
-    // Add timer
-    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
-#endif
 
     // OK, initialization is over, now the other thread can go on working...
     vlc_thread_ready( p_intf->p_sys->p_dialogs->p_thread );

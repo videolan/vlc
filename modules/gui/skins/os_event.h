@@ -2,7 +2,7 @@
  * os_event.h: Wrapper for the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_event.h,v 1.5 2003/04/28 14:12:32 asmax Exp $
+ * $Id: os_event.h,v 1.6 2003/07/13 14:55:16 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,9 +27,6 @@
 #if defined( WIN32 )
     #include "win32/win32_event.h"
     #define OSEvent Win32Event
-#elif defined GTK2_SKINS
-    #include "gtk2/gtk2_event.h"
-    #define OSEvent GTK2Event
 #elif defined X11_SKINS
     #include "x11/x11_event.h"
     #define OSEvent X11Event

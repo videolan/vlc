@@ -2,7 +2,7 @@
  * os_font.h: Wrapper for the OSFont class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_font.h,v 1.6 2003/04/28 14:12:32 asmax Exp $
+ * $Id: os_font.h,v 1.7 2003/07/13 14:55:16 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -31,14 +31,6 @@
     #define VLC_FONT_ALIGN_LEFT    DT_LEFT
     #define VLC_FONT_ALIGN_CENTER  DT_CENTER
     #define VLC_FONT_ALIGN_RIGHT   DT_RIGHT
-
-#elif defined GTK2_SKINS
-    #include "gtk2/gtk2_font.h"
-    #define OSFont GTK2Font
-
-    #define VLC_FONT_ALIGN_LEFT    PANGO_ALIGN_LEFT
-    #define VLC_FONT_ALIGN_CENTER  PANGO_ALIGN_CENTER
-    #define VLC_FONT_ALIGN_RIGHT   PANGO_ALIGN_RIGHT
 
 #elif defined X11_SKINS
     #include "x11/x11_font.h"

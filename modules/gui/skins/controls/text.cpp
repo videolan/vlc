@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.11 2003/06/07 12:19:23 asmax Exp $
+ * $Id: text.cpp,v 1.12 2003/07/13 14:55:17 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -80,39 +80,6 @@ extern intf_thread_t *g_pIntf;
     {
         KillTimer( ( (Win32Window *)ParentWindow )->GetHandle(),
                    (UINT_PTR)this );
-    }
-    //-----------------------------------------------------------------------
-
-    #elif defined GTK2_SKINS
-
-    //-----------------------------------------------------------------------
-    // Gtk2 methods
-    //-----------------------------------------------------------------------
-    gboolean ScrollingTextTimer( gpointer data )
-    {
-        if( (ControlText *)data != NULL )
-        {
-            if( !( (ControlText *)data )->IsScrolling() )
-                return false;
-
-            if( !( (ControlText *)data )->GetSelected() )
-               ( (ControlText *)data )->DoScroll();
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void ControlText::StartScrolling()
-    {
-        g_timeout_add( 100, (GSourceFunc)ScrollingTextTimer, (gpointer)this );
-    }
-    //-----------------------------------------------------------------------
-    void ControlText::StopScrolling()
-    {
     }
     //-----------------------------------------------------------------------
 
