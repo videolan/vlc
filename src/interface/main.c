@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.175 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: main.c,v 1.176 2002/04/07 23:08:44 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -195,9 +195,6 @@
 #define FILTER_TEXT "video filter module"
 #define FILTER_LONGTEXT NULL
 
-#define INPUT_TEXT "input method"
-#define INPUT_LONGTEXT NULL
-
 #define SERVER_PORT_TEXT "server port"
 #define SERVER_PORT_LONGTEXT NULL
 
@@ -334,7 +331,6 @@ ADD_PLUGIN  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_
 
 /* Input options */
 ADD_CATEGORY_HINT( "Input", NULL )
-ADD_STRING  ( "input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT )
 ADD_INTEGER ( "server_port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
 ADD_BOOL    ( "network_channel", NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
 ADD_STRING  ( "channel_server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
@@ -732,8 +728,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * Choose the best memcpy module
      */
     psz_plugin = config_GetPszVariable( "memcpy" );
-    p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY, NULL,
-                                           psz_plugin );
+    p_main->p_memcpy_module = module_Need( MODULE_CAPABILITY_MEMCPY,
+                                           psz_plugin, NULL );
     if( psz_plugin ) free( psz_plugin );
     if( p_main->p_memcpy_module == NULL )
     {

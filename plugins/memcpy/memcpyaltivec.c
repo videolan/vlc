@@ -1,8 +1,8 @@
 /*****************************************************************************
- * memcpy.c : classic memcpy module
+ * memcpyaltivec.c : Altivec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.2 2002/04/04 22:08:05 massiot Exp $
+ * $Id: memcpyaltivec.c,v 1.3 2002/04/07 23:08:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -84,6 +84,15 @@ typedef unsigned long size_t;
 #define vector_u32_t vector unsigned int
 #define MMREG_SIZE 16
 
+#define SMALL_MEMCPY(to, from, len)                                         \
+{                                                                           \
+    unsigned char * end = to + len;                                         \
+    while( to < end )                                                       \
+    {                                                                       \
+        *to++ = *from++;                                                    \
+    }                                                                       \
+}
+
 void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
 {
     void * retval = _to;
@@ -100,9 +109,7 @@ void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
         {
             delta = MMREG_SIZE - delta;
             len -= delta;
-            memcpy(to, from, delta);
-            to += delta;
-            from += delta;
+            SMALL_MEMCPY(to, from, delta);
         }
 
         if( len & ~(MMREG_SIZE-1) )
@@ -126,12 +133,13 @@ void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
                 to += 16;
             } while( len & ~(MMREG_SIZE-1) );
             vec_st( tmp, 0, to );
+            to += 16;
         }
     }
 
     if( len )
     {
-        memcpy( to, from, len );
+        SMALL_MEMCPY( to, from, len );
     }
 
     return retval;
@@ -157,66 +165,60 @@ void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
 void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
 {
     asm ("                                              \n"                     
-	"	stwu		%r1,  -32(%r1)		\n"
-	"	mflr		%r0			\n"
-	"	stw		%r28, 16(%r1)		\n"
-	"	stw		%r29, 20(%r1)		\n"
-	"	stw		%r30, 24(%r1)		\n"
-	"	stw		%r31, 28(%r1)		\n"
-	"	stw		%r0,  36(%r1)		\n"
-	"	mr		%r29, %r5		\n"
-	"	cmplwi		%cr0, %r29, 16		\n"
-	"	mr		%r28, %r3		\n"
-	"	mr		%r31, %r4		\n"
-	"	bc		4,    1,    ._L3	\n"
-	"	andi.		%r30, %r28, 15		\n"
-	"	bc		12,   2,    ._L4	\n"
-	"	subfic		%r30, %r30, 16		\n"
-	"	mr		%r5,  %r30		\n"
-	"	crxor		6,    6,    6		\n"
-	"	bl		memcpy			\n"
-	"	add		%r31, %r31, %r30	\n"
-	"	subf		%r29, %r30, %r29	\n"
-	"	add		%r3,  %r28, %r30	\n"
-	"	._L4:					\n"
-	"	rlwinm.		%r0,  %r29, 0,	  0,	27    \n"
-	"	bc		12,   2,    ._L3	\n"
-	"	li		%r9,  15		\n"
-	"	lvsl		%v12, 0,    %r31	\n"
-	"	lvx		%v1,  0,    %r31	\n"
-	"	lvx		%v0,  %r9,  %r31	\n"
-	"	addi		%r31, %r31, 16		\n"
-	"	vperm		%v13, %v1,  %v0,  %v12	\n"
-	"	addi		%r29, %r29, -16		\n"
-	"	._L9:					\n"
-	"	addi		%r29, %r29, -16		\n"
-	"	li		%r9,  15		\n"
-	"	lvx		%v1,  0,    %r31	\n"
-	"	lvx		%v0,  %r9,  %r31	\n"
-	"	rlwinm.		%r0,  %r29, 0,	  0,	27    \n"
-	"	stvx		%v13, 0,    %r3		\n"
-	"	vperm		%v13, %v1,  %v0,  %v12	\n"
-	"	addi		%r31, %r31, 16		\n"
-	"	addi		%r3,  %r3,  16		\n"
-	"	bc		4,    2,    ._L9	\n"
-	"	stvx		%v13, 0,    %r3		\n"
-	"	._L3:					\n"
-	"	cmpwi		%cr0, %r29, 0		\n"
-	"	bc		12,   2,    ._L10	\n"
-	"	mr		%r4,  %r31		\n"
-	"	mr		%r5,  %r29		\n"
-	"	crxor		6,    6,    6		\n"
-	"	bl		memcpy			\n"
-	"	._L10:					\n"
-	"	mr		%r3,  %r28		\n"
-	"	lwz		%r0,  36(%r1)		\n"
-	"	mtlr		%r0			\n"
-	"	lwz		%r28, 16(%r1)		\n"
-	"	lwz		%r29, 20(%r1)		\n"
-	"	lwz		%r30, 24(%r1)		\n"
-	"	lwz		%r31, 28(%r1)		\n"
-	"	la		%r1,  32(%r1)		\n"
-	"	blr					\n"
+        "       cmplwi          %cr0, %r5,  16          \n"
+        "       mr              %r9,  %r3               \n"
+        "       bc              4,    1,    ._L3        \n"
+        "       andi.           %r0,  %r3,  15          \n"
+        "       bc              12,   2,    ._L4        \n"
+        "       subfic          %r0,  %r0,  16          \n"
+        "       add             %r11, %r3,  %r0         \n"
+        "       cmplw           %cr0, %r3,  %r11        \n"
+        "       subf            %r5,  %r0,  %r5         \n"
+        "       bc              4,    0,    ._L4        \n"
+        "       ._L7:                                   \n"
+        "       lbz             %r0,  0(%r4)            \n"
+        "       stb             %r0,  0(%r9)            \n"
+        "       addi            %r9,  %r9,  1           \n"
+        "       cmplw           %cr0, %r9,  %r11        \n"
+        "       addi            %r4,  %r4,  1           \n"
+        "       bc              12,   0,    ._L7        \n"
+        "       ._L4:                                   \n"
+        "       rlwinm.         %r0,  %r5,  0,    0,    27    \n"
+        "       bc              12,   2,    ._L3        \n"
+        "       li              %r11, 15                \n"
+        "       lvsl            %v12, 0,    %r4         \n"
+        "       lvx             %v1,  0,    %r4         \n"
+        "       lvx             %v0,  %r11, %r4         \n"
+        "       addi            %r4,  %r4,  16          \n"
+        "       vperm           %v13, %v1,  %v0,  %v12  \n"
+        "       addi            %r5,  %r5,  -16         \n"
+        "       ._L13:                                  \n"
+        "       addi            %r5,  %r5,  -16         \n"
+        "       li              %r11, 15                \n"
+        "       lvx             %v1,  0,    %r4         \n"
+        "       lvx             %v0,  %r11, %r4         \n"
+        "       rlwinm.         %r0,  %r5,  0,    0,    27    \n"
+        "       stvx            %v13, 0,    %r9         \n"
+        "       vperm           %v13, %v1,  %v0,  %v12  \n"
+        "       addi            %r4,  %r4,  16          \n"
+        "       addi            %r9,  %r9,  16          \n"
+        "       bc              4,    2,    ._L13       \n"
+        "       stvx            %v13, 0,    %r9         \n"
+        "       addi            %r9,  %r9,  16          \n"
+        "       ._L3:                                   \n"
+        "       cmpwi           %cr0, %r5,  0           \n"
+        "       bclr            12,   2                 \n"
+        "       add             %r5,  %r9,  %r5         \n"
+        "       cmplw           %cr0, %r9,  %r5         \n"
+        "       bclr            4,    0                 \n"
+        "       ._L17:                                  \n"
+        "       lbz             %r0,  0(%r4)            \n"
+        "       stb             %r0,  0(%r9)            \n"
+        "       addi            %r9,  %r9,  1           \n"
+        "       cmplw           %cr0, %r9,  %r5         \n"
+        "       addi            %r4,  %r4,  1           \n"
+        "       bc              12,   0,    ._L17       \n"
+        "       blr                                     \n"
         );
 }
 
