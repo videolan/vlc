@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.29 2003/07/09 21:42:28 gbazin Exp $
+ * $Id: alsa.c,v 1.30 2003/07/11 07:13:27 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -173,8 +173,8 @@ static void Probe( aout_instance_t * p_aout,
                     text.psz_string = N_("Stereo");
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
+                    var_Set( p_aout, "audio-device", val );
                     break;
-/*
                 case 4:
                     val.i_int = AOUT_VAR_2F2R;
                     text.psz_string = N_("2 Front 2 Rear");
@@ -187,7 +187,6 @@ static void Probe( aout_instance_t * p_aout,
                     var_Change( p_aout, "audio-device",
                                 VLC_VAR_ADDCHOICE, &val, &text );
                     break;
-*/
                 }
             }
 
@@ -469,9 +468,10 @@ static int Open( vlc_object_t *p_this )
                                 p_aout->output.output.i_rate, NULL ) ) < 0 )
 #endif
     {
-        msg_Err( p_aout, "unable to set sample rate (%s)",
-                         snd_strerror( i_snd_rc ) );
-        goto error;
+        msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
+                  "Using %d Hz instead.\n", p_aout->output.output.i_rate,
+                  i_snd_rc );
+        p_aout->output.output.i_rate = i_snd_rc;
     }
 
     /* Set buffer size. */
