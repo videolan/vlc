@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: vout.c,v 1.2 2002/09/10 12:58:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,11 +77,8 @@ static int Init( vout_thread_t *p_vout )
     {
         if( strlen( psz_chroma ) >= 4 )
         {
-            i_chroma  = (unsigned char)psz_chroma[0] <<  0;
-            i_chroma |= (unsigned char)psz_chroma[1] <<  8;
-            i_chroma |= (unsigned char)psz_chroma[2] << 16;
-            i_chroma |= (unsigned char)psz_chroma[3] << 24;
-
+            i_chroma = VLC_FOURCC( psz_chroma[0], psz_chroma[1],
+                                   psz_chroma[2], psz_chroma[3] );
             b_chroma = 1;
         }
 
