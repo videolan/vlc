@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.34 2003/11/02 16:12:27 sigmunau Exp $
+ * $Id: mkv.cpp,v 1.35 2003/11/02 18:03:45 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1508,7 +1508,8 @@ static pes_packet_t *MemToPES( input_thread_t *p_input, uint8_t *p_mem, int i_me
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_nb_data = 1;
     p_pes->i_pes_size = i_mem;
-
+    p_pes->i_rate = p_input->stream.control.i_rate;
+    
     return p_pes;
 }
 
@@ -1686,11 +1687,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
 
         /* use time stamp only for first block */
-        if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
-        {
-            i_pts += 1000 * i_duration;
-        }
-        else i_pts = 0;
+        i_pts = 0;
     }
 
 #undef tk
