@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.28 2003/10/28 17:02:14 gbazin Exp $
+ * $Id: freetype.c,v 1.29 2003/10/29 00:04:56 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -719,7 +719,11 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         msg_Err( p_vout, "Out of memory" );
         goto error;
     }
+#if defined(WORDS_BIGENDIAN)
+    iconv_handle = iconv_open( "UCS-4BE", "UTF-8" );
+#else    
     iconv_handle = iconv_open( "UCS-4LE", "UTF-8" );
+#endif
     if( iconv_handle == (iconv_t)-1 )
     {
         msg_Warn( p_vout, "Unable to do convertion" );
@@ -728,7 +732,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
 
     {
         char *p_in_buffer, *p_out_buffer;
-        int i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
+        size_t i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
         i_in_bytes = strlen( psz_string );
         i_out_bytes = i_in_bytes * sizeof( uint32_t );
         i_out_bytes_left = i_out_bytes;
@@ -777,9 +781,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
 
     while( *p_unicode_string )
     {
-//        i_char = GetUnicodeCharFromUTF8( &psz_string );
         i_char = *p_unicode_string++;
-        msg_Dbg( p_vout, "got char %d, '%c'", i_char, (char)i_char );
         if ( i_char == '\r' ) /* ignore CR chars wherever they may be */
         {
             continue;
