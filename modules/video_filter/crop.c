@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.5 2002/12/06 16:34:07 sam Exp $
+ * $Id: crop.c,v 1.6 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -98,7 +98,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return 1;
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -107,7 +107,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -118,11 +118,11 @@ static int Init( vout_thread_t *p_vout )
     int   i_index;
     char *psz_var;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     p_vout->p_sys->i_lastchange = 0;
-    p_vout->p_sys->b_changed = 0;
+    p_vout->p_sys->b_changed = VLC_FALSE;
 
     /* Initialize the output structure */
     p_vout->output.i_chroma = p_vout->render.i_chroma;
@@ -238,12 +238,12 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        return 0;
+        return VLC_EGENERIC;
     }
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -284,7 +284,7 @@ static int Manage( vout_thread_t *p_vout )
 {
     if( !p_vout->p_sys->b_changed )
     {
-        return 0;
+        return VLC_SUCCESS;
     }
 
     vout_Destroy( p_vout->p_sys->p_vout );
@@ -295,13 +295,13 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        return 1;
+        return VLC_EGENERIC;
     }
 
-    p_vout->p_sys->b_changed = 0;
+    p_vout->p_sys->b_changed = VLC_FALSE;
     p_vout->p_sys->i_lastchange = 0;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -339,9 +339,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        u8 *p_in, *p_out, *p_out_end;
+        uint8_t *p_in, *p_out, *p_out_end;
         int i_in_pitch = p_pic->p[i_plane].i_pitch;
         const int i_out_pitch = p_outpic->p[i_plane].i_pitch;
+        const int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
 
         p_in = p_pic->p[i_plane].p_pixels
                 /* Skip the right amount of lines */
@@ -355,7 +356,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         while( p_out < p_out_end )
         {
-            p_vout->p_vlc->pf_memcpy( p_out, p_in, i_out_pitch );
+            p_vout->p_vlc->pf_memcpy( p_out, p_in, i_copy_pitch );
             p_in += i_in_pitch;
             p_out += i_out_pitch;
         }
@@ -365,18 +366,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 
     /* The source image may still be in the cache ... parse it! */
-    if( !p_vout->p_sys->b_autocrop )
+    if( p_vout->p_sys->b_autocrop )
     {
-        return;
+        UpdateStats( p_vout, p_pic );
     }
-
-    UpdateStats( p_vout, p_pic );
 }
 
 static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
 {
     uint8_t *p_in = p_pic->p[0].p_pixels;
     int i_pitch = p_pic->p[0].i_pitch;
+    int i_visible_pitch = p_pic->p[0].i_visible_pitch;
     int i_lines = p_pic->p[0].i_lines;
     int i_firstwhite = -1, i_lastwhite = -1, i;
 
@@ -391,8 +391,8 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
             const int i_col = i * i_pitch / i_lines;
 
             if( p_in[i_col/2] > 40
-                 && p_in[i_pitch / 2] > 40
-                 && p_in[i_pitch/2 + i_col/2] > 40 )
+                 && p_in[i_visible_pitch/2] > 40
+                 && p_in[i_visible_pitch/2 + i_col/2] > 40 )
             {
                 if( i_lastwhite == -1 )
                 {
@@ -457,5 +457,6 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
                             * p_vout->output.i_height / p_vout->p_sys->i_height
                             * p_vout->p_sys->i_width / p_vout->output.i_width;
 
-    p_vout->p_sys->b_changed = 1;
+    p_vout->p_sys->b_changed = VLC_TRUE;
 }
+

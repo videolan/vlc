@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: transform.c,v 1.5 2003/01/09 14:00:00 sam Exp $
+ * $Id: transform.c,v 1.6 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -288,7 +288,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
         case TRANSFORM_MODE_180:
-            /* FIXME: we should use i_visible_pitch here */
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
@@ -299,7 +298,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                 for( ; p_in < p_in_end ; )
                 {
-                    *p_out++ = *(--p_in_end);
+                    uint8_t *p_line_start = p_in - p_pic->p[i_index].i_pitch;
+                    p_in_end -= p_pic->p[i_index].i_pitch
+                                 - p_pic->p[i_index].i_visible_pitch;
+
+                    for( ; p_line_start < p_in_end ; )
+                    {
+                        *p_out++ = *(--p_in_end);
+                    }
+
+                    p_out += p_outpic->p[i_index].i_pitch
+                              - p_outpic->p[i_index].i_visible_pitch;
                 }
             }
             break;

@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.7 2003/01/09 16:26:14 sam Exp $
+ * $Id: adjust.c,v 1.8 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -195,8 +195,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     int pi_luma[256];
 
     picture_t *p_outpic;
-    uint8_t *p_in, *p_in_u, *p_in_v, *p_in_end, *p_line_end;
-    uint8_t *p_out, *p_out_u, *p_out_v;
+    uint8_t *p_in, *p_in_v, *p_in_end, *p_line_end;
+    uint8_t *p_out, *p_out_v;
 
     double  f_hue;
     int32_t i_cont, i_lum;
@@ -263,17 +263,18 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         p_in += p_pic->p[0].i_pitch - p_pic->p[0].i_visible_pitch;
+        p_out += p_outpic->p[0].i_pitch - p_outpic->p[0].i_visible_pitch;
     }
 
     /*
      * Do the U and V planes
      */
 
-    p_in_u = p_pic->p[1].p_pixels;
+    p_in = p_pic->p[1].p_pixels;
     p_in_v = p_pic->p[2].p_pixels;
-    p_in_end = p_in_u + p_pic->p[1].i_lines * p_pic->p[1].i_pitch - 8;
+    p_in_end = p_in + p_pic->p[1].i_lines * p_pic->p[1].i_pitch - 8;
 
-    p_out_u = p_outpic->p[1].p_pixels;
+    p_out = p_outpic->p[1].p_pixels;
     p_out_v = p_outpic->p[2].p_pixels;
 
     i_sin = sin(f_hue) * 256;
@@ -285,19 +286,19 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     if ( i_sat > 256 )
     {
 #define WRITE_UV_CLIP() \
-    i_u = *p_in_u++ ; i_v = *p_in_v++ ; \
-    *p_out_u++ = clip( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
+    i_u = *p_in++ ; i_v = *p_in_v++ ; \
+    *p_out++ = clip( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
                            * i_sat) >> 8) + 128); \
     *p_out_v++ = clip( (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
                            * i_sat) >> 8) + 128)
 
         uint8_t i_u, i_v;
 
-        for( ; p_in_u < p_in_end ; )
+        for( ; p_in < p_in_end ; )
         {
-            p_line_end = p_in_u + p_pic->p[1].i_visible_pitch - 8;
+            p_line_end = p_in + p_pic->p[1].i_visible_pitch - 8;
 
-            for( ; p_in_u < p_line_end ; )
+            for( ; p_in < p_line_end ; )
             {
                 /* Do 8 pixels at a time */
                 WRITE_UV_CLIP(); WRITE_UV_CLIP();
@@ -308,33 +309,33 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_line_end += 8;
 
-            for( ; p_in_u < p_line_end ; )
+            for( ; p_in < p_line_end ; )
             {
                 WRITE_UV_CLIP();
             }
 
-            p_in_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_in += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
             p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
-            p_out_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
-            p_out_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
+            p_out += p_outpic->p[1].i_pitch - p_outpic->p[1].i_visible_pitch;
+            p_out_v += p_outpic->p[2].i_pitch - p_outpic->p[2].i_visible_pitch;
         }
     }
     else
     {
 #define WRITE_UV() \
-    i_u = *p_in_u++ ; i_v = *p_in_v++ ; \
-    *p_out_u++ = (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
+    i_u = *p_in++ ; i_v = *p_in_v++ ; \
+    *p_out++ = (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
                        * i_sat) >> 8) + 128; \
     *p_out_v++ = (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
                        * i_sat) >> 8) + 128
 
         uint8_t i_u, i_v;
 
-        for( ; p_in_u < p_in_end ; )
+        for( ; p_in < p_in_end ; )
         {
             p_line_end = p_in + p_pic->p[1].i_visible_pitch - 8;
 
-            for( ; p_in_u < p_line_end ; )
+            for( ; p_in < p_line_end ; )
             {
                 /* Do 8 pixels at a time */
                 WRITE_UV(); WRITE_UV(); WRITE_UV(); WRITE_UV();
@@ -343,15 +344,15 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_line_end += 8;
 
-            for( ; p_in_u < p_line_end ; )
+            for( ; p_in < p_line_end ; )
             {
                 WRITE_UV();
             }
 
-            p_in_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_in += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
             p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
-            p_out_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
-            p_out_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
+            p_out += p_outpic->p[1].i_pitch - p_outpic->p[1].i_visible_pitch;
+            p_out_v += p_outpic->p[2].i_pitch - p_outpic->p[2].i_visible_pitch;
         }
     }
 

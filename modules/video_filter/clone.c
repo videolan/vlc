@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.3 2002/11/28 17:35:00 sam Exp $
+ * $Id: clone.c,v 1.4 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -121,7 +121,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int   i_index, i_vout;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -217,22 +217,30 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            u8 *p_in, *p_in_end, *p_out;
+            uint8_t *p_in, *p_in_end, *p_out;
             int i_in_pitch = p_pic->p[i_plane].i_pitch;
             const int i_out_pitch = p_outpic->p[i_plane].i_pitch;
+            const int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
 
             p_in = p_pic->p[i_plane].p_pixels;
-
-            p_in_end = p_in + p_outpic->p[i_plane].i_lines
-                               * p_pic->p[i_plane].i_pitch;
-
             p_out = p_outpic->p[i_plane].p_pixels;
 
-            while( p_in < p_in_end )
+            if( i_in_pitch == i_copy_pitch
+                 && i_out_pitch == i_copy_pitch )
             {
-                p_vout->p_vlc->pf_memcpy( p_out, p_in, i_out_pitch );
-                p_in += i_in_pitch;
-                p_out += i_out_pitch;
+                p_vout->p_vlc->pf_memcpy( p_out, p_in, i_in_pitch
+                                           * p_outpic->p[i_plane].i_lines );
+            }
+            else
+            {
+                p_in_end = p_in + i_in_pitch * p_outpic->p[i_plane].i_lines;
+
+                while( p_in < p_in_end )
+                {
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in, i_copy_pitch );
+                    p_in += i_in_pitch;
+                    p_out += i_out_pitch;
+                }
             }
         }
 

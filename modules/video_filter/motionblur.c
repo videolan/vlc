@@ -2,7 +2,7 @@
  * motion_blur.c : motion blur filter for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: motionblur.c,v 1.4 2002/11/28 17:35:00 sam Exp $
+ * $Id: motionblur.c,v 1.5 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -83,7 +83,7 @@ struct vout_sys_t
  * This function allocates and initializes a Deinterlace vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
-{   
+{
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     /* Allocate structure */
@@ -91,7 +91,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return 1;
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -105,7 +105,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->last_date = 0;
     p_vout->p_sys->p_lastpic = NULL;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -115,7 +115,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure, full of directbuffers since we want
@@ -133,7 +133,7 @@ static int Init( vout_thread_t *p_vout )
             break;
 
         default:
-            return 0; /* unknown chroma */
+            return VLC_EGENERIC; /* unknown chroma */
             break;
     }
 
@@ -157,12 +157,12 @@ static int Init( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot open vout, aborting" );
 
-        return 0;
+        return VLC_EGENERIC;
     }
- 
+
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -214,7 +214,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
     vout_DatePicture( p_vout, p_outpic, p_pic->date );
-    
+
     if ( p_vout->p_sys->p_lastpic == NULL )
     {
         /* Get a new picture */
@@ -252,28 +252,44 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
     }
     CopyPicture( p_vout, p_vout->p_sys->p_lastpic, p_outpic );
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-
 }
 
-static void CopyPicture( vout_thread_t *p_vout,
-                         picture_t *p_dest, picture_t *p_source)
+/* FIXME: this is a verbatim copy from src/video_output/vout_pictures.c */
+/* XXX: the order is fucked up!! */
+static void CopyPicture( vout_thread_t * p_vout,
+                         picture_t *p_dest, picture_t *p_src )
 {
-    int i_plane;
+    int i;
 
-    for( i_plane = 0 ; i_plane < p_dest->i_planes ; i_plane++ )
+    for( i = 0; i < p_src->i_planes ; i++ )
     {
-        u8 *p_in, *p_out;
+        if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
+        {
+            /* There are margins, but with the same width : perfect ! */
+            p_vout->p_vlc->pf_memcpy(
+                         p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                         p_src->p[i].i_pitch * p_src->p[i].i_lines );
+        }
+        else
+        {
+            /* We need to proceed line by line */
+            uint8_t *p_in = p_src->p[i].p_pixels;
+            uint8_t *p_out = p_dest->p[i].p_pixels;
+            int i_line;
 
-        p_in = p_source->p[i_plane].p_pixels;
-
-        p_out = p_dest->p[i_plane].p_pixels;
-        p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                  p_dest->p[i_plane].i_pitch *
-                                  p_dest->p[i_plane].i_lines);
+            for( i_line = p_src->p[i].i_lines; i_line--; )
+            {
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_src->p[i].i_visible_pitch );
+                p_in += p_src->p[i].i_pitch;
+                p_out += p_dest->p[i].i_pitch;
+            }
+        }
     }
 }
+
 /*****************************************************************************
- * RenderBob: renders a bob picture
+ * RenderBlur: renders a blurred picture
  *****************************************************************************/
 static void RenderBlur( vout_thread_t *p_vout, picture_t *p_oldpic,
                         picture_t *p_newpic, picture_t *p_outpic )
@@ -283,19 +299,31 @@ static void RenderBlur( vout_thread_t *p_vout, picture_t *p_oldpic,
     int i_newfactor = 128 - p_vout->p_sys->i_factor;
     for( i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
     {
-        u8 *p_old, *p_new, *p_out, *p_out_end;
+        uint8_t *p_old, *p_new, *p_out, *p_out_end, *p_out_line_end;
         p_out = p_outpic->p[i_plane].p_pixels;
         p_new = p_newpic->p[i_plane].p_pixels;
         p_old = p_oldpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch *
-            p_outpic->p[i_plane].i_lines;
+                             p_outpic->p[i_plane].i_lines;
         while ( p_out < p_out_end )
         {
-            *p_out++ = (((*p_old++) * i_oldfactor) +
-                        ((*p_new++) * i_newfactor)) >> 7;
-            
-//            *p_out++ = (*p_old++ >> 1) + (*p_new++ >> 1);
-                
+            p_out_line_end = p_out + p_outpic->p[i_plane].i_visible_pitch;
+
+            while ( p_out < p_out_line_end )
+            {
+                *p_out++ = (((*p_old++) * i_oldfactor) +
+                            ((*p_new++) * i_newfactor)) >> 7;
+
+//                *p_out++ = (*p_old++ >> 1) + (*p_new++ >> 1);
+            }
+
+            p_old += p_oldpic->p[i_plane].i_pitch
+                      - p_oldpic->p[i_plane].i_visible_pitch;
+            p_new += p_newpic->p[i_plane].i_pitch
+                      - p_newpic->p[i_plane].i_visible_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch
+                      - p_outpic->p[i_plane].i_visible_pitch;
         }
     }
 }
+

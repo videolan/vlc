@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.4 2002/11/28 17:35:00 sam Exp $
+ * $Id: wall.c,v 1.5 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -106,7 +106,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -132,7 +132,7 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "out of memory" );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     psz_method_tmp = psz_method = config_GetPsz( p_vout, "wall-active" );
@@ -185,7 +185,7 @@ static int Create( vlc_object_t *p_this )
 
     free( psz_method_tmp );
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -195,7 +195,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index, i_row, i_col, i_width, i_height;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -258,7 +258,7 @@ static int Init( vout_thread_t *p_vout )
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
                                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );
                 RemoveAllVout( p_vout );
-                return 0;
+                return VLC_EGENERIC;
             }
 
             p_vout->p_sys->i_vout++;
@@ -267,7 +267,7 @@ static int Init( vout_thread_t *p_vout )
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -363,9 +363,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
             for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
             {
-                u8 *p_in, *p_in_end, *p_out;
+                uint8_t *p_in, *p_in_end, *p_out;
                 int i_in_pitch = p_pic->p[i_plane].i_pitch;
                 int i_out_pitch = p_outpic->p[i_plane].i_pitch;
+                int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
 
                 p_in = p_pic->p[i_plane].p_pixels
                         + pi_top_skip[i_plane] + pi_left_skip[i_plane];
@@ -377,7 +378,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                 while( p_in < p_in_end )
                 {
-                    p_vout->p_vlc->pf_memcpy( p_out, p_in, i_out_pitch );
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in, i_copy_pitch );
                     p_in += i_in_pitch;
                     p_out += i_out_pitch;
                 }

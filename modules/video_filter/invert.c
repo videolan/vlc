@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.3 2002/11/28 17:35:00 sam Exp $
+ * $Id: invert.c,v 1.4 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -119,7 +119,7 @@ static int Init( vout_thread_t *p_vout )
 
         return( 0 );
     }
- 
+
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     return( 0 );
@@ -146,7 +146,7 @@ static void End( vout_thread_t *p_vout )
  * Terminate an output method created by InvertCreateOutputMethod
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
-{   
+{
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     vout_Destroy( p_vout->p_sys->p_vout );
@@ -175,40 +175,49 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
         msleep( VOUT_OUTMEM_SLEEP );
-    }   
+    }
 
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-        u8 *p_in, *p_in_end, *p_out;
+        uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
 
         p_in = p_pic->p[i_index].p_pixels;
-        p_in_end = p_in - 64 + p_pic->p[i_index].i_lines
-                                * p_pic->p[i_index].i_pitch;
+        p_in_end = p_in + p_pic->p[i_index].i_lines
+                           * p_pic->p[i_index].i_pitch;
 
         p_out = p_outpic->p[i_index].p_pixels;
 
         for( ; p_in < p_in_end ; )
         {
-            /* Do 64 pixels at a time */
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
-        }
+            p_line_end = p_in + p_pic->p[i_index].i_visible_pitch - 64;
 
-        p_in_end += 64;
+            for( ; p_in < p_line_end ; )
+            {
+                /* Do 64 pixels at a time */
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+                *((uint64_t*)p_out)++ = ~( *((uint64_t*)p_in)++ );
+            }
 
-        for( ; p_in < p_in_end ; )
-        {
-            /* Do 1 pixel at a time */
-            *p_out++ = ~( *p_in++ );
+            p_line_end += 64;
+
+            for( ; p_in < p_line_end ; )
+            {
+                *p_out++ = ~( *p_in++ );
+            }
+
+            p_in += p_pic->p[i_index].i_pitch
+                     - p_pic->p[i_index].i_visible_pitch;
+            p_out += p_outpic->p[i_index].i_pitch
+                     - p_outpic->p[i_index].i_visible_pitch;
         }
     }
 

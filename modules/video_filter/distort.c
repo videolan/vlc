@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.4 2002/11/28 17:35:00 sam Exp $
+ * $Id: distort.c,v 1.5 2003/01/09 17:47:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -99,7 +99,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     p_vout->pf_init = Init;
@@ -113,7 +113,7 @@ static int Create( vlc_object_t *p_this )
     if( !(psz_method = psz_method_tmp = config_GetPsz( p_vout, "filter" )) )
     {
         msg_Err( p_vout, "configuration variable %s empty", "filter" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
     while( *psz_method && *psz_method != ':' )
     {
@@ -141,7 +141,7 @@ static int Create( vlc_object_t *p_this )
             p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
         else {
-        
+
             if( !strcmp( psz_method, "wave" ) )
             {
                 p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
@@ -150,7 +150,6 @@ static int Create( vlc_object_t *p_this )
             {
                 p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
             }
-            
             else
             {
                 msg_Err( p_vout, "no valid distort mode provided, "
@@ -160,10 +159,10 @@ static int Create( vlc_object_t *p_this )
         }
     }
     free( psz_method_tmp );
-    
-    return( 0 );
+
+    return VLC_SUCCESS;
 }
-    
+
 /*****************************************************************************
  * Init: initialize Distort video thread output method
  *****************************************************************************/
@@ -192,7 +191,7 @@ static int Init( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot open vout, aborting" );
 
-        return( 0 );
+        return VLC_EGENERIC;
     }
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -200,7 +199,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->f_angle = 0.0;
     p_vout->p_sys->last_date = 0;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -290,8 +289,8 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
     for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
     {
         int i_line, i_num_lines, i_offset;
-        u8 black_pixel;
-        u8 *p_in, *p_out;
+        uint8_t black_pixel;
+        uint8_t *p_in, *p_out;
 
         p_in = p_inpic->p[i_index].p_pixels;
         p_out = p_outpic->p[i_index].p_pixels;
@@ -304,7 +303,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (int)( (double)(p_inpic->p[i_index].i_pitch)
+            i_offset = (int)( (double)(p_inpic->p[i_index].i_visible_pitch)
                          * sin( f_angle + 10.0 * (double)i_line
                                                / (double)i_num_lines )
                          / 20.0 );
@@ -314,7 +313,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
                 if( i_offset < 0 )
                 {
                     p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
-                                 p_inpic->p[i_index].i_pitch + i_offset );
+                             p_inpic->p[i_index].i_visible_pitch + i_offset );
                     p_in += p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                     memset( p_out + i_offset, black_pixel, -i_offset );
@@ -322,7 +321,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
                 else
                 {
                     p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
-                                 p_inpic->p[i_index].i_pitch - i_offset );
+                             p_inpic->p[i_index].i_visible_pitch - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in += p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
@@ -331,7 +330,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
             else
             {
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                          p_inpic->p[i_index].i_pitch );
+                                          p_inpic->p[i_index].i_visible_pitch );
                 p_in += p_inpic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }
@@ -357,8 +356,8 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
     for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
     {
         int i_line, i_first_line, i_num_lines, i_offset;
-        u8 black_pixel;
-        u8 *p_in, *p_out;
+        uint8_t black_pixel;
+        uint8_t *p_in, *p_out;
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
@@ -369,11 +368,13 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         p_in = p_inpic->p[i_index].p_pixels;
         p_out = p_outpic->p[i_index].p_pixels;
 
-        p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                  i_first_line * p_inpic->p[i_index].i_pitch );
-
-        p_in += i_first_line * p_inpic->p[i_index].i_pitch;
-        p_out += i_first_line * p_outpic->p[i_index].i_pitch;
+        for( i_line = 0 ; i_line < i_first_line ; i_line++ )
+        {
+            p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                      p_inpic->p[i_index].i_visible_pitch );
+            p_in += p_inpic->p[i_index].i_pitch;
+            p_out += p_outpic->p[i_index].i_pitch;
+        }
 
         /* Ok, we do 3 times the sin() calculation for each line. So what ? */
         for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
@@ -392,7 +393,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
                 if( i_offset < 0 )
                 {
                     p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
-                                 p_inpic->p[i_index].i_pitch + i_offset );
+                             p_inpic->p[i_index].i_visible_pitch + i_offset );
                     p_in -= p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
                     memset( p_out + i_offset, black_pixel, -i_offset );
@@ -400,7 +401,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
                 else
                 {
                     p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
-                                 p_inpic->p[i_index].i_pitch - i_offset );
+                             p_inpic->p[i_index].i_visible_pitch - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in -= p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
@@ -409,7 +410,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
             else
             {
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                          p_inpic->p[i_index].i_pitch );
+                                          p_inpic->p[i_index].i_visible_pitch );
                 p_in -= p_inpic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }
