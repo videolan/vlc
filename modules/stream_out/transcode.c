@@ -801,6 +801,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 
     id->b_enc_inited = VLC_FALSE;
 
+    id->f_dst.audio.i_channels = id->p_encoder->fmt_in.audio.i_channels;
+    id->f_dst.audio.i_rate     = id->p_encoder->fmt_in.audio.i_rate;
     id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
     id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
 
