@@ -267,12 +267,12 @@ static vlc_fourcc_t __GetFOURCC( uint8_t *p )
  *****************************************************************************/
 typedef struct
 {
-    vlc_bool_t  b_default;
-    vlc_bool_t  b_enabled;
-    int         i_number;
+    vlc_bool_t   b_default;
+    vlc_bool_t   b_enabled;
+    unsigned int i_number;
 
-    int         i_extra_data;
-    uint8_t     *p_extra_data;
+    int          i_extra_data;
+    uint8_t      *p_extra_data;
 
     char         *psz_codec;
 
@@ -535,7 +535,7 @@ public:
     EbmlStream         *p_es;
 
     std::vector<matroska_segment_t*> segments;
-    int                              i_current_segment;
+    size_t                           i_current_segment;
 
     demux_sys_t                      & sys;
     
