@@ -62,7 +62,6 @@ static void UpdateItemLength( input_thread_t *, int64_t i_length, vlc_bool_t );
 static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
 static void DecodeUrl( char * );
-static void MRLSplit( input_thread_t *, char *, char **, char **, char ** );
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
@@ -2114,7 +2113,7 @@ error:
         demux2_Delete( in->p_demux );
 
     if( in->p_stream )
-        stream_AccessDelete( in->p_stream );
+        stream_Delete( in->p_stream );
 
     if( in->p_access )
         access2_Delete( in->p_access );
@@ -2132,7 +2131,7 @@ static void InputSourceClean( input_thread_t *p_input, input_source_t *in )
         demux2_Delete( in->p_demux );
 
     if( in->p_stream )
-        stream_AccessDelete( in->p_stream );
+        stream_Delete( in->p_stream );
 
     if( in->p_access )
         access2_Delete( in->p_access );
@@ -2393,8 +2392,8 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-static void MRLSplit( input_thread_t *p_input, char *psz_dup,
-                      char **ppsz_access, char **ppsz_demux, char **ppsz_path )
+void MRLSplit( vlc_object_t *p_input, char *psz_dup,
+               char **ppsz_access, char **ppsz_demux, char **ppsz_path )
 {
     char *psz_access = NULL;
     char *psz_demux  = NULL;

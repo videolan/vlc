@@ -29,21 +29,29 @@
 
 struct stream_sys_t
 {
+    vlc_bool_t  i_preserve_memory;
     int64_t     i_pos;      /* Current reading offset */
     int64_t     i_size;
     uint8_t    *p_buffer;
 
 };
 
-static int AStreamReadMem( stream_t *, void *p_read, int i_read );
-static int AStreamPeekMem( stream_t *, uint8_t **pp_peek, int i_read );
-static int AStreamControl( stream_t *, int i_query, va_list );
+static int  Read   ( stream_t *, void *p_read, int i_read );
+static int  Peek   ( stream_t *, uint8_t **pp_peek, int i_read );
+static int  Control( stream_t *, int i_query, va_list );
+static void Delete ( stream_t * );
 
-/****************************************************************************
- * stream_MemoryNew: create a stream from a buffer
- ****************************************************************************/
+/**
+ * Create a stream from a memory buffer
+ *
+ * \param p_this the calling vlc_object
+ * \param p_buffer the memory buffer for the stream
+ * \param i_buffer the size of the buffer
+ * \param i_preserve_memory if this is set to VLC_FALSE the memory buffer
+ *        pointed to by p_buffer is freed on stream_Destroy
+ */
 stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
-                              int64_t i_size )
+                              int64_t i_size, vlc_bool_t i_preserve_memory )
 {
     stream_t *s = vlc_object_create( p_this, VLC_OBJECT_STREAM );
     stream_sys_t *p_sys;
@@ -54,19 +62,21 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;
+    p_sys->i_preserve_memory = i_preserve_memory;
 
     s->pf_block   = NULL;
-    s->pf_read    = AStreamReadMem;    /* Set up later */
-    s->pf_peek    = AStreamPeekMem;
-    s->pf_control = AStreamControl;
+    s->pf_read    = Read;
+    s->pf_peek    = Peek;
+    s->pf_control = Control;
+    s->pf_destroy = Delete;
     vlc_object_attach( s, p_this );
 
     return s;
 }
 
-void stream_MemoryDelete( stream_t *s, vlc_bool_t b_free_buffer )
+static void Delete( stream_t *s )
 {
-    if( b_free_buffer ) free( s->p_sys->p_buffer );
+    if( !s->p_sys->i_preserve_memory ) free( s->p_sys->p_buffer );
     free( s->p_sys );
     vlc_object_detach( s );
     vlc_object_destroy( s );
@@ -75,7 +85,7 @@ void stream_MemoryDelete( stream_t *s, vlc_bool_t b_free_buffer )
 /****************************************************************************
  * AStreamControl:
  ****************************************************************************/
-static int AStreamControl( stream_t *s, int i_query, va_list args )
+static int Control( stream_t *s, int i_query, va_list args )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -128,7 +138,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static int AStreamReadMem( stream_t *s, void *p_read, int i_read )
+static int Read( stream_t *s, void *p_read, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );
@@ -137,7 +147,7 @@ static int AStreamReadMem( stream_t *s, void *p_read, int i_read )
     return i_res;
 }
 
-static int AStreamPeekMem( stream_t *s, uint8_t **pp_peek, int i_read )
+static int Peek( stream_t *s, uint8_t **pp_peek, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );

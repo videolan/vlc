@@ -180,12 +180,43 @@ static int  AReadStream( stream_t *s, void *p_read, int i_read );
 
 /* Common */
 static int AStreamControl( stream_t *s, int i_query, va_list );
+static void AStreamDestroy( stream_t *s );
+static void UStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, int64_t i_pos );
 
 
 /****************************************************************************
  * stream_AccessNew: create a stream from a access
  ****************************************************************************/
+stream_t *__stream_UrlNew( vlc_object_t *p_parent, char *psz_url )
+{
+    char *psz_access, *psz_demux, *psz_path;
+    access_t *p_access;
+    stream_t *p_res;
+    
+    MRLSplit( p_parent, psz_url, &psz_access, &psz_demux, &psz_path );
+    
+    /* Now try a real access */
+    p_access = access2_New( p_parent, psz_access, NULL,
+                            psz_path, VLC_TRUE );
+
+    if( p_access == NULL )
+    {
+        msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
+        return NULL;
+    }
+    p_res = stream_AccessNew( p_access, VLC_TRUE );
+    if( p_res )
+    {
+        p_res->pf_destroy = UStreamDestroy;
+        return p_res;
+    }
+    else
+    {
+        access2_Delete( p_access );
+    }
+}
+
 stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
 {
     stream_t *s = vlc_object_create( p_access, VLC_OBJECT_STREAM );
@@ -201,6 +232,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     s->pf_read   = NULL;    /* Set up later */
     s->pf_peek   = NULL;
     s->pf_control= AStreamControl;
+    s->pf_destroy = AStreamDestroy;
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
 
@@ -354,9 +386,9 @@ error:
 }
 
 /****************************************************************************
- * stream_AccessDelete:
+ * AStreamDestroy:
  ****************************************************************************/
-void stream_AccessDelete( stream_t *s )
+static void AStreamDestroy( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -379,6 +411,13 @@ void stream_AccessDelete( stream_t *s )
 
     free( s->p_sys );
     vlc_object_destroy( s );
+}
+
+static void UStreamDestroy( stream_t *s )
+{
+    access_t *p_access = (access_t*)vlc_object_find( s, VLC_OBJECT_ACCESS, FIND_PARENT );
+    AStreamDestroy( s );
+    access2_Delete( p_access );
 }
 
 /****************************************************************************
