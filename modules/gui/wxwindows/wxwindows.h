@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.44 2003/07/17 18:58:23 gbazin Exp $
+ * $Id: wxwindows.h,v 1.45 2003/07/18 11:39:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,7 +86,6 @@ struct intf_sys_t
 
     /* Popup menu */
     wxMenu              *p_popup_menu;
-    vlc_bool_t          b_popup_change;
 
 };
 #endif /* !defined(MODULE_NAME_IS_skins) */

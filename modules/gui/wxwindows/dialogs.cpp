@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.2 2003/07/17 18:58:23 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.3 2003/07/18 11:39:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -244,14 +244,7 @@ void DialogsProvider::Open( int i_access_method, int i_arg )
 
 void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
 {
-    wxPoint mousepos = wxGetMousePosition();
-
-#if 0
-    wxMouseEvent event = wxMouseEvent( wxEVT_RIGHT_UP );
-    event.m_x = p_main_interface->ScreenToClient(mousepos).x;
-    event.m_y = p_main_interface->ScreenToClient(mousepos).y;
-#endif
-
+    wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
     ::PopupMenu( p_intf, this, mousepos );
 
 }

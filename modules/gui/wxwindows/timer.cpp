@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.27 2003/07/17 18:58:23 gbazin Exp $
+ * $Id: timer.cpp,v 1.28 2003/07/18 11:39:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -96,24 +96,6 @@ void Timer::Notify()
     vlc_bool_t b_pace_control;
 
     vlc_mutex_lock( &p_intf->change_lock );
-
-    /* If the "display popup" flag has changed */
-    if( p_intf->p_sys->b_popup_change )
-    {
-#if 0
-        wxPoint mousepos = wxGetMousePosition();
-
-        wxMouseEvent event = wxMouseEvent( wxEVT_RIGHT_UP );
-        event.m_x = p_main_interface->ScreenToClient(mousepos).x;
-        event.m_y = p_main_interface->ScreenToClient(mousepos).y;
-
-        p_main_interface->AddPendingEvent(event);
-#endif
-        if( p_intf->p_sys->pf_show_dialog )
-            p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0 );
-
-        p_intf->p_sys->b_popup_change = VLC_FALSE;
-    }
 
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
@@ -301,7 +283,8 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
-    p_intf->p_sys->b_popup_change = VLC_TRUE;
+    if( p_intf->p_sys->pf_show_dialog )
+        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0 );
 
     return VLC_SUCCESS;
 }

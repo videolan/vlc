@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.17 2003/05/26 19:26:53 gbazin Exp $
+ * $Id: events.c,v 1.18 2003/07/18 11:39:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -196,8 +196,8 @@ void DirectXEventThread( event_thread_t *p_event )
                 }
                 else
                 {
-                    /* exit application */
-                    p_event->p_vout->p_vlc->b_die = VLC_TRUE;
+                    /* close video window */
+                    PostMessage( msg.hwnd, WM_CLOSE, 0, 0 );
                 }
                 break;
 
@@ -660,10 +660,19 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     /* the user wants to close the window */
     case WM_CLOSE:
-        msg_Dbg( p_vout, "WinProc WM_CLOSE" );
-        /* exit application */
-        p_vout->p_vlc->b_die = VLC_TRUE;
+    {
+        playlist_t * p_playlist =
+            (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
         return 0;
+    }
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
@@ -724,4 +733,3 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
-
