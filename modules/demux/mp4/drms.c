@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.9 2004/01/20 17:44:30 sam Exp $
+ * $Id: drms.c,v 1.10 2004/01/22 01:20:39 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -52,6 +52,10 @@
 /* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>
+#endif
+
+#ifdef HAVE_SYSFS_LIBSYSFS_H
+#    include <sysfs/libsysfs.h>
 #endif
 
 #include "drms.h"
@@ -128,13 +132,14 @@ static void Digest        ( struct md5_s *, uint32_t * );
 static void InitShuffle   ( struct shuffle_s *, uint32_t * );
 static void DoShuffle     ( struct shuffle_s *, uint8_t *, uint32_t );
 
-static int GetSystemKey   ( uint32_t * );
+static int GetSystemKey   ( uint32_t *, vlc_bool_t );
 static int WriteUserKey   ( void *, uint32_t * );
 static int ReadUserKey    ( void *, uint32_t * );
 static int GetUserKey     ( void *, uint32_t * );
 
-static int GetSCIData     ( uint32_t **, uint32_t * );
+static int GetSCIData     ( char *, uint32_t **, uint32_t * );
 static int HashSystemInfo ( uint32_t * );
+static int GetiPodID      ( long long * );
 
 #ifdef WORDS_BIGENDIAN
 /*****************************************************************************
@@ -746,15 +751,17 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
  *****************************************************************************
  * Compute the system key from various system information, see HashSystemInfo.
  *****************************************************************************/
-static int GetSystemKey( uint32_t *p_sys_key )
+static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
 {
     static char const p_secret1[ 8 ] = "YuaFlafu";
     static char const p_secret2[ 8 ] = "zPif98ga";
     struct md5_s md5;
+    long long i_ipod_id;
     uint32_t p_system_hash[ 4 ];
 
     /* Compute the MD5 hash of our system info */
-    if( HashSystemInfo( p_system_hash ) )
+    if( ( !b_ipod && HashSystemInfo( p_system_hash ) ) ||
+        (  b_ipod && GetiPodID( &i_ipod_id ) ) )
     {
         return -1;
     }
@@ -763,10 +770,22 @@ static int GetSystemKey( uint32_t *p_sys_key )
      * MD5 hash will be our system key. */
     InitMD5( &md5 );
     AddMD5( &md5, p_secret1, 8 );
-    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-    AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-    AddMD5( &md5, p_secret2, 8 );
+
+    if( !b_ipod )
+    {
+        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
+        AddMD5( &md5, p_secret2, 8 );
+    }
+    else
+    {
+        i_ipod_id = U64_AT(&i_ipod_id);
+        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+        AddMD5( &md5, (uint8_t *)&i_ipod_id, sizeof(i_ipod_id) );
+    }
+
     EndMD5( &md5 );
 
     memcpy( p_sys_key, md5.p_digest, 16 );
@@ -867,6 +886,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     uint32_t i_sci_size, i_blocks;
     uint32_t *p_sci0, *p_sci1, *p_buffer;
     uint32_t p_sci_key[ 4 ];
+    char *psz_ipod;
     int i_ret = -1;
 
     if( !ReadUserKey( p_drms, p_user_key ) )
@@ -875,12 +895,14 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
         return 0;
     }
 
-    if( GetSystemKey( p_sys_key ) )
+    psz_ipod = getenv( "IPOD" );
+
+    if( GetSystemKey( p_sys_key, psz_ipod ? VLC_TRUE : VLC_FALSE ) )
     {
         return -1;
     }
 
-    if( GetSCIData( &p_sci_data, &i_sci_size ) )
+    if( GetSCIData( psz_ipod, &p_sci_data, &i_sci_size ) )
     {
         return -1;
     }
@@ -977,74 +999,84 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
  *****************************************************************************
  * Read SCI data from "\Apple Computer\iTunes\SC Info\SC Info.sidb"
  *****************************************************************************/
-static int GetSCIData( uint32_t **pp_sci, uint32_t *pi_sci_size )
+static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
+                       uint32_t *pi_sci_size )
 {
+    FILE *file;
+    char *psz_path = NULL;
+    char p_tmp[ PATH_MAX ];
     int i_ret = -1;
 
-#ifdef WIN32
-    HANDLE i_file;
-    DWORD i_size, i_read;
-    TCHAR p_path[ PATH_MAX ];
-    TCHAR *p_filename = _T("\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb");
-
-    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                               LPTSTR );
-
-    HINSTANCE shfolder_dll = NULL;
-    SHGETFOLDERPATH dSHGetFolderPath = NULL;
-
-    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
+    if( psz_ipod == NULL )
     {
-        dSHGetFolderPath =
-            (SHGETFOLDERPATH)GetProcAddress( shfolder_dll,
-#ifdef _UNICODE
-                                             _T("SHGetFolderPathW") );
-#else
-                                             _T("SHGetFolderPathA") );
+#ifdef WIN32
+        char *p_filename = "\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb";
+        typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
+                                                   LPSTR );
+        HINSTANCE shfolder_dll = NULL;
+        SHGETFOLDERPATH dSHGetFolderPath = NULL;
+
+        if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
+        {
+            dSHGetFolderPath =
+                (SHGETFOLDERPATH)GetProcAddress( shfolder_dll,
+                                                 _T("SHGetFolderPathA") );
+        }
+
+        if( dSHGetFolderPath != NULL &&
+            SUCCEEDED( dSHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
+                                         NULL, 0, p_tmp ) ) )
+        {
+            strncat( p_tmp, p_filename, min( strlen( p_filename ),
+                      (sizeof(p_tmp) - 1) - strlen( p_tmp ) ) );
+            psz_path = p_tmp;
+        }
+
+        if( shfolder_dll != NULL )
+        {
+            FreeLibrary( shfolder_dll );
+        }
 #endif
     }
-
-    if( dSHGetFolderPath != NULL &&
-        SUCCEEDED( dSHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
-                                     NULL, 0, p_path ) ) )
+    else
     {
-        _tcsncat( p_path, p_filename, min( _tcslen( p_filename ),
-                  (PATH_MAX-1) - _tcslen( p_path ) ) );
+        char *p_filename = "/iPod_Control/iTunes/iSCInfo";
+        snprintf( p_tmp, sizeof(p_tmp) - 1, "%s%s",
+                  psz_ipod, p_filename );
+        psz_path = p_tmp;
+    }
 
-        i_file = CreateFile( p_path, GENERIC_READ, 0, NULL,
-                             OPEN_EXISTING, 0, NULL );
-        if( i_file != INVALID_HANDLE_VALUE )
+    if( psz_path == NULL )
+    {
+        return -1;
+    }
+
+    file = fopen( psz_path, "r" );
+    if( file != NULL )
+    {
+        struct stat st;
+
+        if( !fstat( fileno( file ), &st ) )
         {
-            i_size = GetFileSize( i_file, NULL );
-            if( i_size != INVALID_FILE_SIZE &&
-                i_size > (sizeof(uint32_t) * 22) )
+            *pp_sci = malloc( st.st_size );
+            if( *pp_sci != NULL )
             {
-                *pp_sci = malloc( i_size );
-                if( *pp_sci != NULL )
+                if( fread( *pp_sci, 1, st.st_size,
+                           file ) == (size_t)st.st_size )
                 {
-                    if( ReadFile( i_file, *pp_sci, i_size, &i_read, NULL ) &&
-                        i_read == i_size )
-                    {
-                        *pi_sci_size = i_size;
-                        i_ret = 0;
-                    }
-                    else
-                    {
-                        free( (void *)*pp_sci );
-                        *pp_sci = NULL;
-                    }
+                    *pi_sci_size = st.st_size;
+                    i_ret = 0;
+                }
+                else
+                {
+                    free( (void *)*pp_sci );
+                    *pp_sci = NULL;
                 }
             }
-
-            CloseHandle( i_file );
         }
-    }
 
-    if( shfolder_dll != NULL )
-    {
-        FreeLibrary( shfolder_dll );
+        fclose( file );
     }
-#endif
 
     return i_ret;
 }
@@ -1132,6 +1164,57 @@ static int HashSystemInfo( uint32_t *p_system_hash )
 
     EndMD5( &md5 );
     memcpy( p_system_hash, md5.p_digest, 16 );
+
+    return i_ret;
+}
+
+/*****************************************************************************
+ * GetiPodID: Get iPod ID
+ *****************************************************************************
+ * This function gets the iPod ID.
+ *****************************************************************************/
+static int GetiPodID( long long *p_ipod_id )
+{
+    int i_ret = -1;
+
+#ifdef HAVE_SYSFS_LIBSYSFS_H
+    struct sysfs_bus *bus = NULL;
+    struct dlist *devlist = NULL;
+    struct dlist *attributes = NULL;
+    struct sysfs_device *curdev = NULL;
+    struct sysfs_attribute *curattr = NULL;
+
+    bus = sysfs_open_bus( "ieee1394" );
+    if( bus != NULL )
+    {
+        devlist = sysfs_get_bus_devices( bus );
+        if( devlist != NULL )
+        {
+            dlist_for_each_data( devlist, curdev, struct sysfs_device )
+            {
+                attributes = sysfs_get_device_attributes( curdev );
+                if( attributes != NULL )
+                {
+                    dlist_for_each_data( attributes, curattr,
+                                         struct sysfs_attribute )
+                    {
+                        if( ( strcmp( curattr->name, "model_name" ) == 0 ) &&
+                            ( strncmp( curattr->value, "iPod", 4 ) == 0 ) )
+                        {
+                            *p_ipod_id = strtoll( curdev->name, NULL, 16 );
+                            i_ret = 0;
+                            break;
+                        }
+                    }
+                }
+
+                if( !i_ret ) break;
+            }
+        }
+
+        sysfs_close_bus( bus );
+    }
+#endif
 
     return i_ret;
 }
