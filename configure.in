@@ -34,7 +34,11 @@ dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 dnl Check for endianness
+dnl if we cross compile for win32, we don't need to test it.
+dnl quick and udly hack. Gonna search the way to do it better.
+if eval "test $CC = gcc"; then
 AC_C_BIGENDIAN
+fi
 
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
