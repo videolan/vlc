@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.17 2002/11/27 05:36:41 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.18 2002/11/27 06:27:52 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -129,19 +129,16 @@ static void Play( void *aout, void *p_buffer, size_t i_size,
     aout_buffer_t * p_aout_buffer;
     aout_instance_t *p_aout = (aout_instance_t*) aout;
 
+    vlc_mutex_lock( &p_aout->output_fifo_lock );
     p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+    vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
     if( p_aout_buffer != NULL )
     {
-        /* sometimes p_aout_buffer is not NULL but still isn't valid.
-           we check i_nb_bytes so we are sure it is */
-        if( p_aout_buffer->i_nb_bytes == BUFFER_SIZE )
-        {
-           memcpy( (float*)p_buffer,
-                   p_aout_buffer->p_buffer,
-                   BUFFER_SIZE );
-           aout_BufferFree( p_aout_buffer );
-        }
+       memcpy( (float*)p_buffer,
+               p_aout_buffer->p_buffer,
+               MIN( BUFFER_SIZE, p_aout_buffer->i_nb_bytes ) );
+       aout_BufferFree( p_aout_buffer );
     }
 }
 
