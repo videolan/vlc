@@ -191,7 +191,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt,
     while( p < &p_pkt->p_buffer[p_pkt->i_buffer] )
     {
         /* msg_Dbg( p_demux, "   SYSTEM_START_CODE: id=0x%x", p[0] ); */
-        if( p[0] != 0xbd )
+        if( p[0]  >= 0xc0 ) /* And != 0xbd */
         {
             int i_id = p[0];
             int i_tk = PS_ID_TO_TK( i_id );
