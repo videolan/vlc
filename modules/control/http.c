@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.25 2003/11/02 19:26:30 gbazin Exp $
+ * $Id: http.c,v 1.26 2003/11/02 22:51:56 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1502,7 +1502,8 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                         if( !*item ) continue;
 
                         i_item = atoi( item );
-                        p_items = realloc( p_items, i_nb_items+1 );
+                        p_items = realloc( p_items, (i_nb_items + 1) *
+                                           sizeof(int) );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
