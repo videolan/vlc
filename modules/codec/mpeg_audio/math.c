@@ -2,7 +2,7 @@
  * math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: math.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: math.c,v 1.3 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -312,10 +312,10 @@ void DCT32( adec_bank_t *b, float *x )
  * Compute 32 PCM samples with a convolution product
  *****************************************************************************/
 
-void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
+void PCM(adec_bank_t *b, float *p_pcm, int jump)
 {
     /* scale factor */
-#define F -32768
+#define F -1 //-32768
     /* These values are not in the same order as in Annex 3-B.3 of the ISO/IEC
        DIS 11172-3 */
     static const float c[512] =
@@ -478,19 +478,19 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
                     /* ceiling saturation */
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
                     /* floor saturation */
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -516,17 +516,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0;
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -552,17 +552,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -588,17 +588,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -624,17 +624,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -660,17 +660,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0;
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -696,17 +696,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -732,17 +732,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                     *p_pcm = (s16)tmp;
+                     *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -768,17 +768,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0;
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -804,17 +804,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 } 
                 p_pcm += jump;
                 v += 15;
@@ -840,17 +840,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {    
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -876,17 +876,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -912,17 +912,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 v += 15;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -948,17 +948,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v;
                 v += 15;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -984,17 +984,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v;
                 v += 15;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0;
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0;
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 15;
@@ -1019,17 +1019,17 @@ void PCM(adec_bank_t *b, s16 *p_pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if ((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 1.0)
                 {
-                    *p_pcm = 32767; /* 0x7ffff */
+                    *p_pcm = 1.0; 
                 }
-                else if (tmp < -32768)
+                else if (tmp < -1.0)
                 {
-                    *p_pcm = -32768; /* 0x8000 */
+                    *p_pcm = -1.0; 
                 }
                 else
                 {
-                    *p_pcm = (s16)tmp;
+                    *p_pcm = tmp;
                 }
                 p_pcm += jump;
                 v += 31;

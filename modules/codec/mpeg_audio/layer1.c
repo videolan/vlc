@@ -2,7 +2,7 @@
  * layer1.c: MPEG Layer I audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: layer1.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: layer1.c,v 1.3 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -27,7 +27,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-
+#include <vlc/aout.h>
 #include "generic.h"
 #include "decoder.h"
 #include "math.h"                                          /* DCT32(), PCM() */
@@ -85,7 +85,7 @@ static u8 adec_layer1_allocation_table[15] =
 
 static int adec_bound_table[4] = { 4, 8, 12, 16 };
 
-int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
+int adec_layer1_mono( adec_thread_t * p_adec, float * buffer )
 {
     u8 allocation[32];
     float slope[32];
@@ -178,7 +178,7 @@ int adec_layer1_mono( adec_thread_t * p_adec, s16 * buffer )
     return 0;
 }
 
-int adec_layer1_stereo( adec_thread_t * p_adec, s16 * buffer )
+int adec_layer1_stereo( adec_thread_t * p_adec, float * buffer )
 {
     u8 allocation_0[32], allocation_1[32];
     float slope_0[32], slope_1[32];

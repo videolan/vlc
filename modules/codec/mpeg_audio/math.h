@@ -2,7 +2,7 @@
  * adec_math.h : PCM and DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: math.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: math.h,v 1.2 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -25,5 +25,5 @@
  * Prototypes
  *****************************************************************************/
 void     DCT32 ( adec_bank_t *, float * );
-void     PCM   ( adec_bank_t *, s16 *, int );
+void     PCM   ( adec_bank_t *, float *, int );
 

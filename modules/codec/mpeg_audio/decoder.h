@@ -2,7 +2,7 @@
  * mpeg_adec.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: decoder.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: decoder.h,v 1.2 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -49,8 +49,11 @@ typedef struct adec_thread_s
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo;   /* stores the decompressed frames */
-
+    aout_instance_t     *p_aout;       /* opaque */
+    aout_input_t        *p_aout_input; /* opaque */
+    audio_sample_format_t output_format;
+    mtime_t             i_pts;
+            
 } adec_thread_t;
 
 /*****************************************************************************
@@ -61,5 +64,5 @@ typedef struct adec_thread_s
  * From adec_generic.c
  */
 int adec_SyncFrame( adec_thread_t *, adec_sync_info_t * );
-int adec_DecodeFrame( adec_thread_t * , s16 * );
+int adec_DecodeFrame( adec_thread_t * , float * );
 

@@ -2,7 +2,7 @@
  * decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: decoder.c,v 1.2 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -37,7 +37,7 @@
 #include "generic.h"
 #include "decoder.h"
 
-#define ADEC_FRAME_SIZE (2*1152)
+#define ADEC_FRAME_SIZE 1152 /* XXX Frame size for only one channel */
 
 /*****************************************************************************
  * Local Prototypes
@@ -113,7 +113,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
     /* We do not create the audio output fifo now, but
        it will be created when the first frame is received */
-    p_adec->p_aout_fifo = NULL;
+    p_adec->p_aout = NULL;
+    p_adec->p_aout_input = NULL;
+    p_adec->i_pts = 0;
 
     p_adec->i_sync = 0;
 
@@ -144,69 +146,74 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static void DecodeThread( adec_thread_t * p_adec )
 {
-    s16 *p_buffer;
-    adec_sync_info_t sync_info;
+    mtime_t i_pts;
+    aout_buffer_t *p_aout_buffer;
 
+    adec_sync_info_t sync_info;
+    
     if( ! adec_SyncFrame (p_adec, &sync_info) )
     {
         
-        /* TODO: check if audio type has changed */
-        
         /* Create the output fifo if it doesn't exist yet */
-        if( p_adec->p_aout_fifo == NULL )
+        if( ( p_adec->p_aout_input == NULL )||
+            ( p_adec->output_format.i_channels != ( sync_info.b_stereo ? 2 : 1 ) )||
+            ( p_adec->output_format.i_rate != sync_info.sample_rate ) )
         {
-            int i_channels;
-            
-            if( !config_GetInt( p_adec->p_fifo, "mono" ) )
+            if( p_adec->p_aout_input )
             {
-                msg_Dbg( p_adec->p_fifo, "setting stereo output" );
-                i_channels = 2;
+                /* Delete old output */
+                msg_Warn( p_adec->p_fifo, "opening a new aout" );
+                aout_InputDelete( p_adec->p_aout, p_adec->p_aout_input );
             }
-            else if( sync_info.b_stereo )
-            {
-                i_channels = 2;
-            }
-            else
-            {
-                i_channels = 1;
-            }
-            p_adec->p_aout_fifo =
-               aout_CreateFifo( p_adec->p_fifo, AOUT_FIFO_PCM, i_channels,
-                                sync_info.sample_rate, ADEC_FRAME_SIZE, NULL );
-            if( p_adec->p_aout_fifo == NULL)
-            {
-                msg_Err( p_adec->p_fifo, "failed to create aout fifo" );
-                p_adec->p_fifo->b_error = 1;
-                return;
-            }
+
+            /* Set output configuration */
+            p_adec->output_format.i_format   = AOUT_FMT_FLOAT32;
+            p_adec->output_format.i_channels = ( sync_info.b_stereo ? 2 : 1 );
+            p_adec->output_format.i_rate     = sync_info.sample_rate;
+            p_adec->p_aout_input = aout_InputNew( p_adec->p_fifo,
+                                                  &p_adec->p_aout,
+                                                  &p_adec->output_format );
+        }
+
+        if( p_adec->p_aout_input == NULL )
+        {
+            msg_Err( p_adec->p_fifo, "failed to create aout fifo" );
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+
+        p_aout_buffer = aout_BufferNew( p_adec->p_aout,
+                                        p_adec->p_aout_input,
+                                        ADEC_FRAME_SIZE );
+        if( !p_aout_buffer )
+        {
+            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
+            p_adec->p_fifo->b_error = 1;
+            return;
         }
 
         p_adec->i_sync = 1;
 
-        p_buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
-                    + (p_adec->p_aout_fifo->i_end_frame * ADEC_FRAME_SIZE);
-
-        CurrentPTS( &p_adec->bit_stream,
-            &p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame],
-            NULL );
-        if( !p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame] )
+        
+        CurrentPTS( &p_adec->bit_stream, &i_pts, NULL );
+        if( i_pts > 0 )
         {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->i_end_frame] =
-                LAST_MDATE;
+            p_adec->i_pts = i_pts;
         }
+        p_aout_buffer->start_date = p_adec->i_pts;
+        p_adec->i_pts += (mtime_t)1000000 * (mtime_t)ADEC_FRAME_SIZE /
+                            (mtime_t)p_adec->output_format.i_rate;
+        p_aout_buffer->end_date = p_adec->i_pts;
 
-        if( adec_DecodeFrame (p_adec, p_buffer) )
+        if( adec_DecodeFrame (p_adec, (float*)p_aout_buffer->p_buffer ) )
         {
             /* Ouch, failed decoding... We'll have to resync */
             p_adec->i_sync = 0;
+            aout_BufferDelete( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
         }
         else
         {
-            vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
-            p_adec->p_aout_fifo->i_end_frame =
-                (p_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
-            vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
-            vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
+            aout_BufferPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
         }
     }
 }
@@ -220,15 +227,12 @@ static void DecodeThread( adec_thread_t * p_adec )
 static void EndThread ( adec_thread_t *p_adec )
 {
     /* If the audio output fifo was created, we destroy it */
-    if ( p_adec->p_aout_fifo != NULL ) 
+    if( p_adec->p_aout_input )
     {
-        aout_DestroyFifo ( p_adec->p_aout_fifo );
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock (&(p_adec->p_aout_fifo->data_lock));
-        vlc_cond_signal (&(p_adec->p_aout_fifo->data_wait));
-        vlc_mutex_unlock (&(p_adec->p_aout_fifo->data_lock));
+        aout_InputDelete( p_adec->p_aout, p_adec->p_aout_input );
+        
     }
+
     /* Destroy descriptor */
     free( p_adec );
 }

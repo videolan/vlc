@@ -2,7 +2,7 @@
  * layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: layer2.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: layer2.c,v 1.3 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -27,7 +27,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-
+#include <vlc/aout.h>
 #include "generic.h"
 #include "decoder.h"
 #include "math.h"                                          /* DCT32(), PCM() */
@@ -184,7 +184,7 @@ static void adec_layer2_get_table( u32 header, u8 freq_table[15],
     *sblimit = sblimit_table[index];
 }
 
-int adec_layer2_mono( adec_thread_t * p_adec, s16 * buffer )
+int adec_layer2_mono( adec_thread_t * p_adec, float * buffer )
 {
     static u8 freq_table[15] = {2, 1, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2};
     static float L3_table[3] = {-2/3.0, 0, 2/3.0};
@@ -450,7 +450,7 @@ int adec_layer2_mono( adec_thread_t * p_adec, s16 * buffer )
     return 0;
 }
 
-int adec_layer2_stereo( adec_thread_t * p_adec, s16 * buffer )
+int adec_layer2_stereo( adec_thread_t * p_adec, float * buffer )
 {
     static u8 freq_table[15] = {3, 0, 0, 0, 1, 0, 1, 2, 2, 2, 3, 3, 3, 3, 3};
     static float L3_table[3] = {-2/3.0, 0, 2/3.0};

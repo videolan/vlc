@@ -2,7 +2,7 @@
  * adec_layer2.h: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: layer2.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: layer2.h,v 1.2 2002/08/17 15:35:10 fenrir Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -21,6 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-int adec_layer2_mono   ( adec_thread_t * p_adec, s16 * buffer );
-int adec_layer2_stereo ( adec_thread_t * p_adec, s16 * buffer );
+int adec_layer2_mono   ( adec_thread_t * p_adec, float * buffer );
+int adec_layer2_stereo ( adec_thread_t * p_adec, float * buffer );
 
