@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.17 2003/05/22 20:45:25 hartman Exp $
+ * $Id: transcode.c,v 1.18 2003/06/25 21:47:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -601,15 +601,15 @@ static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     }
 
 
-    id->i_buffer_in      = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer_in      = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
     id->i_buffer_in_pos = 0;
     id->p_buffer_in      = malloc( id->i_buffer_in );
 
-    id->i_buffer     = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
     id->i_buffer_pos = 0;
     id->p_buffer     = malloc( id->i_buffer );
 
-    id->i_buffer_out     = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    id->i_buffer_out     = 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
     id->i_buffer_out_pos = 0;
     id->p_buffer_out     = malloc( id->i_buffer_out );
 
@@ -635,6 +635,8 @@ static void transcode_audio_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
 static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                                            sout_buffer_t *in, sout_buffer_t **out )
 {
+    vlc_bool_t b_again = VLC_FALSE;
+
     *out = NULL;
 
     /* gather data into p_buffer_in */
@@ -654,164 +656,175 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             in->i_size );
     id->i_buffer_in_pos += in->i_size;
 
-    /* decode as many data as possible */
-    if( id->ff_dec )
+    do
     {
-        for( ;; )
+        /* decode as many data as possible */
+        if( id->ff_dec )
         {
-            int i_buffer_size;
-            int i_used;
-
-            i_buffer_size = id->i_buffer - id->i_buffer_pos;
-
-            i_used = avcodec_decode_audio( id->ff_dec_c,
-                                           (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
-                                           id->p_buffer_in, id->i_buffer_in_pos );
-
-            /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
-            id->i_buffer_pos += i_buffer_size;
-
-            if( i_used < 0 )
+            for( ;; )
             {
-                msg_Warn( p_stream, "error");
-                id->i_buffer_in_pos = 0;
-                break;
+                int i_buffer_size;
+                int i_used;
+
+                i_buffer_size = id->i_buffer - id->i_buffer_pos;
+
+                i_used = avcodec_decode_audio( id->ff_dec_c,
+                                               (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
+                                               id->p_buffer_in, id->i_buffer_in_pos );
+
+                /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
+                id->i_buffer_pos += i_buffer_size;
+
+                if( i_used < 0 )
+                {
+                    msg_Warn( p_stream, "error");
+                    id->i_buffer_in_pos = 0;
+                    break;
+                }
+                else if( i_used < id->i_buffer_in_pos )
+                {
+                    memmove( id->p_buffer_in,
+                             &id->p_buffer_in[i_used],
+                             id->i_buffer_in - i_used );
+                    id->i_buffer_in_pos -= i_used;
+                }
+                else
+                {
+                    id->i_buffer_in_pos = 0;
+                    break;
+                }
+
+                if( id->i_buffer_pos >= AVCODEC_MAX_AUDIO_FRAME_SIZE )
+                {
+                    /* buffer full */
+                    b_again = VLC_TRUE;
+                    break;
+                }
             }
-            else if( i_used < id->i_buffer_in_pos )
+        }
+        else
+        {
+            int16_t *sout  = (int16_t*)&id->p_buffer[id->i_buffer_pos];
+            int     i_used = 0;
+
+            if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+            {
+                int8_t *sin = (int8_t*)id->p_buffer_in;
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+                i_used = i_samples;
+                while( i_samples > 0 )
+                {
+                    *sout++ = ( *sin++ ) << 8;
+                    i_samples--;
+                }
+            }
+            else if( id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
+            {
+                int8_t *sin = (int8_t*)id->p_buffer_in;
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+                i_used = i_samples;
+                while( i_samples > 0 )
+                {
+                    *sout++ = ( *sin++ - 128 ) << 8;
+                    i_samples--;
+                }
+            }
+            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
+            {
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+#ifdef WORDS_BIGENDIAN
+                uint8_t *sin = (uint8_t*)id->p_buffer_in;
+                i_used = i_samples * 2;
+                while( i_samples > 0 )
+                {
+                    uint8_t tmp[2];
+
+                    tmp[1] = *sin++;
+                    tmp[0] = *sin++;
+                    *sout++ = *(int16_t*)tmp;
+                    i_samples--;
+                }
+
+#else
+                memcpy( sout, id->p_buffer_in, i_samples * 2 );
+                sout += i_samples;
+                i_used = i_samples * 2;
+#endif
+            }
+            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
+            {
+                int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+#ifdef WORDS_BIGENDIAN
+                memcpy( sout, id->p_buffer_in, i_samples * 2 );
+                sout += i_samples;
+                i_used = i_samples * 2;
+#else
+                uint8_t *sin = (uint8_t*)id->p_buffer_in;
+                i_used = i_samples * 2;
+                while( i_samples > 0 )
+                {
+                    uint8_t tmp[2];
+
+                    tmp[1] = *sin++;
+                    tmp[0] = *sin++;
+                    *sout++ = *(int16_t*)tmp;
+                    i_samples--;
+                }
+#endif
+            }
+
+            id->i_buffer_pos = (uint8_t*)sout - id->p_buffer;
+            if( i_used < id->i_buffer_in_pos )
             {
                 memmove( id->p_buffer_in,
                          &id->p_buffer_in[i_used],
                          id->i_buffer_in - i_used );
-                id->i_buffer_in_pos -= i_used;
             }
-            else
+            id->i_buffer_in_pos -= i_used;
+        }
+
+        /* encode as many data as possible */
+        for( ;; )
+        {
+            int i_frame_size = id->ff_enc_c->frame_size * 2 * id->ff_enc_c->channels;
+            int i_out_size;
+            sout_buffer_t *p_out;
+
+            if( id->i_buffer_pos < i_frame_size )
             {
-                id->i_buffer_in_pos = 0;
                 break;
             }
-        }
-    }
-    else
-    {
-        int16_t *sout  = (int16_t*)&id->p_buffer[id->i_buffer_pos];
-        int     i_used = 0;
 
-        if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
-        {
-            int8_t *sin = (int8_t*)id->p_buffer_in;
-            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
-            i_used = i_samples;
-            while( i_samples > 0 )
+            /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d", i_frame_size); */
+            i_out_size = avcodec_encode_audio( id->ff_enc_c,
+                                               id->p_buffer_out, id->i_buffer_out,
+                                               (int16_t*)id->p_buffer );
+
+            if( i_out_size <= 0 )
             {
-                *sout++ = ( *sin++ ) << 8;
-                i_samples--;
+                break;
             }
-        }
-        else if( id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
-        {
-            int8_t *sin = (int8_t*)id->p_buffer_in;
-            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
-            i_used = i_samples;
-            while( i_samples > 0 )
-            {
-                *sout++ = ( *sin++ - 128 ) << 8;
-                i_samples--;
-            }
-        }
-        else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
-        {
-            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
-#ifdef WORDS_BIGENDIAN
-            uint8_t *sin = (uint8_t*)id->p_buffer_in;
-            i_used = i_samples * 2;
-            while( i_samples > 0 )
-            {
-                uint8_t tmp[2];
+            memmove( id->p_buffer,
+                     &id->p_buffer[i_frame_size],
+                     id->i_buffer - i_frame_size );
+            id->i_buffer_pos -= i_frame_size;
 
-                tmp[1] = *sin++;
-                tmp[0] = *sin++;
-                *sout++ = *(int16_t*)tmp;
-                i_samples--;
-            }
+            p_out = sout_BufferNew( p_stream->p_sout, i_out_size );
+            memcpy( p_out->p_buffer, id->p_buffer_out, i_out_size );
+            p_out->i_size = i_out_size;
+            p_out->i_length = (mtime_t)1000000 * (mtime_t)id->ff_enc_c->frame_size / (mtime_t)id->ff_enc_c->sample_rate;
+            /* FIXME */
+            p_out->i_dts = id->i_dts;
+            p_out->i_pts = id->i_dts;
 
-#else
-            memcpy( sout, id->p_buffer_in, i_samples * 2 );
-            sout += i_samples;
-            i_used = i_samples * 2;
-#endif
-        }
-        else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
-        {
-            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
-#ifdef WORDS_BIGENDIAN
-            memcpy( sout, id->p_buffer_in, i_samples * 2 );
-            sout += i_samples;
-            i_used = i_samples * 2;
-#else
-            uint8_t *sin = (uint8_t*)id->p_buffer_in;
-            i_used = i_samples * 2;
-            while( i_samples > 0 )
-            {
-                uint8_t tmp[2];
+            /* update dts */
+            id->i_dts += p_out->i_length;
 
-                tmp[1] = *sin++;
-                tmp[0] = *sin++;
-                *sout++ = *(int16_t*)tmp;
-                i_samples--;
-            }
-#endif
+           /* msg_Warn( p_stream, "frame dts=%lld len %lld out=%d", p_out->i_dts, p_out->i_length, i_out_size ); */
+            sout_BufferChain( out, p_out );
         }
 
-        id->i_buffer_pos = (uint8_t*)sout - id->p_buffer;
-        if( i_used < id->i_buffer_in_pos )
-        {
-            memmove( id->p_buffer_in,
-                     &id->p_buffer_in[i_used],
-                     id->i_buffer_in - i_used );
-        }
-        id->i_buffer_in_pos -= i_used;
-    }
-
-    /* encode as many data as possible */
-    for( ;; )
-    {
-        int i_frame_size = id->ff_enc_c->frame_size * 2 * id->ff_enc_c->channels;
-        int i_out_size;
-        sout_buffer_t *p_out;
-
-        if( id->i_buffer_pos < i_frame_size )
-        {
-            break;
-        }
-
-        /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d", i_frame_size); */
-        i_out_size = avcodec_encode_audio( id->ff_enc_c,
-                                           id->p_buffer_out, id->i_buffer_out,
-                                           (int16_t*)id->p_buffer );
-
-        if( i_out_size <= 0 )
-        {
-            break;
-        }
-        memmove( id->p_buffer,
-                 &id->p_buffer[i_frame_size],
-                 id->i_buffer - i_frame_size );
-        id->i_buffer_pos -= i_frame_size;
-
-        p_out = sout_BufferNew( p_stream->p_sout, i_out_size );
-        memcpy( p_out->p_buffer, id->p_buffer_out, i_out_size );
-        p_out->i_size = i_out_size;
-        p_out->i_length = (mtime_t)1000000 * (mtime_t)id->ff_enc_c->frame_size / (mtime_t)id->ff_enc_c->sample_rate;
-        /* FIXME */
-        p_out->i_dts = id->i_dts;
-        p_out->i_pts = id->i_dts;
-
-        /* update dts */
-        id->i_dts += p_out->i_length;
-
-       /* msg_Warn( p_stream, "frame dts=%lld len %lld out=%d", p_out->i_dts, p_out->i_length, i_out_size ); */
-        sout_BufferChain( out, p_out );
-    }
+    } while( b_again );
 
     return VLC_SUCCESS;
 }
