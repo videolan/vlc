@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.92 2003/07/01 12:56:47 sam Exp $
+ * $Id: libvlc.c,v 1.93 2003/07/19 14:22:08 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -350,7 +350,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
         textdomain( PACKAGE );
 
-#if defined( SYS_BEOS ) || defined ( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined ( SYS_DARWIN ) || \
+    ( defined( WIN32 ) && !defined( HAVE_INCLUDED_GETTEXT ) )
         /* BeOS only support UTF8 strings */
         /* Mac OS X prefers UTF8 */
         bind_textdomain_codeset( PACKAGE, "UTF-8" );
@@ -1014,9 +1015,21 @@ static void SetLanguage ( char const *psz_lang )
     char            psz_tmp[1024];
 #endif
 
-#   if defined( HAVE_INCLUDED_GETTEXT ) && !defined( HAVE_LC_MESSAGES )
-    if( *psz_lang )
+    if( psz_lang && !*psz_lang )
     {
+#   if defined( HAVE_LC_MESSAGES )
+        setlocale( LC_MESSAGES, psz_lang );
+#   endif
+        setlocale( LC_CTYPE, psz_lang );
+    }
+    else if( psz_lang )
+    {
+#ifdef SYS_DARWIN
+        /* I need that under Darwin, please check it doesn't disturb
+         * other platforms. --Meuuh */
+        setenv( "LANG", psz_lang, 1 );
+
+#elif defined( SYS_BEOS ) || defined( WIN32 )
         /* We set LC_ALL manually because it is the only way to set
          * the language at runtime under eg. Windows. Beware that this
          * makes the environment unconsistent when libvlc is unloaded and
@@ -1025,33 +1038,9 @@ static void SetLanguage ( char const *psz_lang )
         snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
         psz_lcall[19] = '\0';
         putenv( psz_lcall );
-    }
-#   endif
+#endif
 
-    if( psz_lang && !*psz_lang )
-    {
-#   if defined( HAVE_LC_MESSAGES )
-        setlocale( LC_MESSAGES, psz_lang );
-#   endif
-        setlocale( LC_CTYPE, psz_lang );
-    }
-    else
-    {
-#ifdef SYS_BEOS 
-        static char psz_lcall[20];
-#endif
         setlocale( LC_ALL, psz_lang );
-#ifdef SYS_DARWIN
-        /* I need that under Darwin, please check it doesn't disturb
-         * other platforms. --Meuuh */
-        setenv( "LANG", psz_lang, 1 );
-#endif
-#ifdef SYS_BEOS
-        /* I need this under BeOS... */
-        snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
-        psz_lcall[19] = '\0';
-        putenv( psz_lcall );
-#endif
     }
 
     /* Specify where to find the locales for current domain */
@@ -1071,7 +1060,8 @@ static void SetLanguage ( char const *psz_lang )
     /* Set the default domain */
     textdomain( PACKAGE );
 
-#if defined( SYS_BEOS ) || defined ( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined ( SYS_DARWIN ) || \
+    ( defined( WIN32 ) && !defined( HAVE_INCLUDED_GETTEXT ) )
     /* BeOS only support UTF8 strings */
     /* Mac OS X prefers UTF8 */
     bind_textdomain_codeset( PACKAGE, "UTF-8" );
