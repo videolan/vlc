@@ -29,11 +29,10 @@ void input_PcrReInit( input_thread_t *p_input )
 {
     ASSERT(p_input);
 
-    pthread_mutex_lock( &p_input->p_pcr->lock );
-
     p_input->p_pcr->delta_clock = 0;
     p_input->p_pcr->c_average = 0;
     p_input->p_pcr->c_pts = 0;
+    p_input->p_pcr->last_pcr = 0;
 
 #ifdef STATS
     p_input->p_pcr->c_average_jitter = 0;
@@ -42,8 +41,6 @@ void input_PcrReInit( input_thread_t *p_input )
     /* For the printf in input_PcrDecode() (for debug purpose only) */
     printf("\n");
 #endif
-
-    pthread_mutex_unlock( &p_input->p_pcr->lock );
 }
 
 /******************************************************************************
@@ -77,11 +74,6 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
     ASSERT(p_es);
 
     p_pcr = p_input->p_pcr;
-    if( p_es->b_discontinuity )
-    {
-        input_PcrReInit(p_input);
-        p_es->b_discontinuity = 0;
-    }
     
     /* Express the PCR in microseconde
      * WARNING: do not remove the casts in the following calculation ! */
@@ -91,6 +83,17 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
     
     pthread_mutex_lock( &p_pcr->lock );
     
+    if( p_es->b_discontinuity ||
+        ( p_pcr->last_pcr != 0 && 
+	  ( (p_pcr->last_pcr - pcr_time) > PCR_MAX_GAP
+	    || (p_pcr->last_pcr - pcr_time) < - PCR_MAX_GAP ) ) )
+    {
+        intf_DbgMsg("input debug: input_PcrReInit()\n");
+        input_PcrReInit(p_input);
+        p_es->b_discontinuity = 0;
+    }
+    p_pcr->last_pcr = pcr_time;
+
     if( p_pcr->c_average == PCR_MAX_AVERAGE_COUNTER )
     {
         p_pcr->delta_clock = (delta_clock + (p_pcr->delta_clock * (PCR_MAX_AVERAGE_COUNTER-1)))

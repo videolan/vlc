@@ -9,6 +9,9 @@
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1) */
 #define PCR_MAX_AVERAGE_COUNTER 40
 
+/* Maximum allowed gap between two PCRs. */
+#define PCR_MAX_GAP 1000000
+
 /******************************************************************************
  * Prototypes
  ******************************************************************************/

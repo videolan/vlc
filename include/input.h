@@ -212,6 +212,8 @@ typedef struct pcr_descriptor_struct
     mtime_t                 delta_clock;
     mtime_t                 delta_decode;
                             /* represents decoder_time - pcr_time in usecondes */
+    mtime_t                 last_pcr;
+
     count_t                 c_average;
                              /* counter used to compute dynamic average values */
     count_t                 c_pts;
