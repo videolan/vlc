@@ -308,9 +308,21 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     if( p_input->b_restart )
     {
+        aout_fifo_t fifo, dummy_fifo;
+        int p_first_byte_to_mix;
+
         vlc_mutex_lock( &p_aout->mixer_lock );
+
+        /* A little trick to avoid loosing our input fifo */
+        aout_FifoInit( p_aout, &dummy_fifo, p_aout->mixer.mixer.i_rate );
+        p_first_byte_to_mix = p_input->p_first_byte_to_mix;
+        fifo = p_input->fifo;
+        p_input->fifo = dummy_fifo;
         aout_InputDelete( p_aout, p_input );
         aout_InputNew( p_aout, p_input );
+        p_input->p_first_byte_to_mix = p_first_byte_to_mix;
+        p_input->fifo = fifo;
+
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 

@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: common.c,v 1.19 2004/01/06 12:02:05 zorglub Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -401,6 +401,9 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
         aout_BufferFree( p_buffer );
         p_buffer = p_next;
     }
+
+    p_fifo->p_first = NULL;
+    p_fifo->pp_last = &p_fifo->p_first;
 }
 
 
