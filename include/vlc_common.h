@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.88 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: vlc_common.h,v 1.89 2003/11/22 13:56:21 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -111,7 +111,9 @@ typedef int                 ptrdiff_t;
 
 #if defined( WIN32 )
 #   include <malloc.h>
-#define PATH_MAX MAX_PATH
+#   ifndef PATH_MAX
+#       define PATH_MAX MAX_PATH
+#   endif
 #endif
 
 #if (defined( WIN32 ) || defined( UNDER_CE )) && !defined( _SSIZE_T_ )
