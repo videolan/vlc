@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
+    which caused subtitles to appear slanted in odd width windows.
   * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate
     popup menus when no stream is being played, even in network mode.
   * ./src/input/mpeg_system.c: removed unnecessarily verbose message.
