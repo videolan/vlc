@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.1 2003/04/26 21:36:23 gbazin Exp $
+ * $Id: http.c,v 1.2 2003/04/27 00:02:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -368,10 +368,23 @@ static int httpd_page_interface_update( intf_thread_t *p_intf,
                                         playlist_t *p_playlist,
                                         uint8_t **pp_data, int *pi_data )
 {
-    int i;
+    int i, i_size = 0;
     char *p;
 
-    p = *pp_data = malloc( 10240 );
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    /*
+     * Count playlist items for memory allocation
+     */
+    for ( i = 0; i < p_playlist->i_size; i++ )
+    {
+        i_size += sizeof("<a href=?action=play&item=?>? - </a><br />\n" );
+        i_size += strlen( p_playlist->pp_items[i]->psz_name );
+    }
+    /* add something for all the static strings below */
+    i_size += 8192;
+
+    p = *pp_data = malloc( i_size );
 
     p += sprintf( p, "<html>\n" );
     p += sprintf( p, "<head>\n" );
@@ -426,6 +439,8 @@ static int httpd_page_interface_update( intf_thread_t *p_intf,
     p += sprintf( p, "</html>\n" );
 
     *pi_data = strlen( *pp_data ) + 1;
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     return VLC_SUCCESS;
 }
