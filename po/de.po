@@ -1,15 +1,15 @@
-# German locale definition for VLC.
+# German translation for VLC.
 # Copyright (C) 1999-2003 VideoLAN <videolan@videolan.org>
 #
-# Thomas Graf <tgr@reeler.org>
-# Felix Kuehne <fk@aenneburghardt.de>
+# Thomas Graf <tgr@reeler.org>, before 1/24/03
+# Felix Kühne <fk@aenneburghardt.de>, since 1/24/03
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
 "POT-Creation-Date: 2003-02-10 22:48+0100\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
-"Last-Translator: Felix Kuehne <fk@aenneburghardt.de><fk@aenneburghardt.de>\n"
+"Last-Translator: Felix Kühne <fk@aenneburghardt.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -106,13 +106,14 @@ msgstr ""
 
 #: src/libvlc.h:49
 msgid "verbosity (0,1,2)"
-msgstr ""
+msgstr "Menge der Meldungen (0,1,2)"
 
 #: src/libvlc.h:51
 msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
-msgstr ""
+msgstr "Mit dieser Option können Sie die Anzahl der Meldungen festlegen "
+"(0=nur Fehler- und Standardmeldungen, 1=Warnungen, 2=Entwickler)."
 
 #: src/libvlc.h:54
 msgid "be quiet"
@@ -200,13 +201,12 @@ msgstr ""
 "Sie  können hier die Standard-Lautstärke zwischen 0 und 1024 festlegen."
 
 #: src/libvlc.h:92
-#, fuzzy
 msgid "audio output saved volume"
 msgstr "Ton Ausgabelautstärke"
 
 #: src/libvlc.h:94
 msgid "This saves the audio output volume when you select mute."
-msgstr ""
+msgstr "Dies speichert die Ton-Ausgabe-Lautstärke, wenn Sie 'Stumm' auswählen."
 
 #: src/libvlc.h:96
 msgid "audio output frequency (Hz)"
@@ -437,9 +437,8 @@ msgstr ""
 "eingestellt."
 
 #: src/libvlc.h:199
-#, fuzzy
 msgid "MTU of the network interface"
-msgstr "Oberfläche ein/ausschalten"
+msgstr "MTU des Netzwerk-Anschlusses"
 
 #: src/libvlc.h:201
 msgid ""
@@ -814,11 +813,12 @@ msgstr ""
 
 #: src/libvlc.h:376
 msgid "demux module"
-msgstr "demux Modul"
+msgstr "Bild/Ton Trenn-modul"
 
 #: src/libvlc.h:378
 msgid "This is a legacy entry to let you configure demux modules"
-msgstr "Dies ist ein Eintrag, mit Sie die demux Module konfigurieren können."
+msgstr "Dies ist ein Eintrag, mit Sie die Bild/Ton Trenn-Module "
+"konfigurieren können."
 
 #: src/libvlc.h:380
 msgid "fast mutex on NT/2K/XP (developers only)"
@@ -966,9 +966,8 @@ msgid "print a list of available modules"
 msgstr "Liste aller verfügbaren Plugins ausgeben"
 
 #: src/libvlc.h:577
-#, fuzzy
 msgid "print help on module"
-msgstr "Hilfe über Modul <text> ausgeben"
+msgstr "Hilfe über Modul ausgeben"
 
 #: src/libvlc.h:580
 msgid "print version information"
@@ -980,7 +979,7 @@ msgstr "boolesch"
 
 #: src/audio_output/output.c:72 src/audio_output/output.c:139
 msgid "Reverse stereo"
-msgstr ""
+msgstr "Stereo-Kanäle umkehren"
 
 #: modules/audio_output/alsa.c:182 modules/audio_output/alsa.c:333
 #: modules/audio_output/oss.c:208 modules/audio_output/oss.c:317
@@ -995,16 +994,16 @@ msgstr "Stereo"
 #: src/audio_output/output.c:113 src/audio_output/output.c:135
 #: src/audio_output/output.c:145
 msgid "Left"
-msgstr ""
+msgstr "Links"
 
 #: src/audio_output/output.c:86 src/audio_output/output.c:107
 #: src/audio_output/output.c:137
 msgid "Right"
-msgstr ""
+msgstr "Rechts"
 
 #: src/audio_output/output.c:90 src/audio_output/output.c:128
 msgid "Dolby Surround"
-msgstr ""
+msgstr "Dolby Surround"
 
 #: include/interface.h:72
 msgid ""
@@ -1014,8 +1013,8 @@ msgid ""
 msgstr ""
 "\n"
 "Warnung: Falls Sie die Oberfläche nicht mehr benutzen können, öffnen Sie die "
-"DOS-Eingabe, gehen Sie in den Ordner von VLC lassen Sie \"vlc -I win32\" "
-"laufen.\n"
+"DOS-Eingabe, gehen Sie in den Ordner von VLC und führen Sie \"vlc -I win32\" "
+" aus.\n"
 
 #. ****************************************************************************
 #. * Module descriptor
@@ -1101,13 +1100,12 @@ msgid "specify an HTTP proxy"
 msgstr "einen HTTP-Proxy angeben"
 
 #: modules/access/http.c:80
-#, fuzzy
 msgid ""
 "Specify an HTTP proxy to use. It must be in the form http://myproxy.mydomain:"
 "myport. If none is specified, the HTTP_PROXY environment variable will be "
 "tried."
 msgstr ""
-"Geben Sie ein HTTP-Proxy ein. Dies muss in der Form http://myproxy.mydomain:"
+"Geben Sie einen HTTP-Proxy ein. Dies muss in der Form http://myproxy.mydomain:"
 "myport . Wenn kein Port angegeben ist, wird die HTTP_PROXYenvironment "
 "Variable benutzt."
 
@@ -1131,7 +1129,8 @@ msgstr "HTTP-Zugriffsmodul"
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
-msgstr ""
+msgstr "Erlaubt Ihnen den Standard-Zwischenspeicher-Wert für UDP streams "
+"zu ändern. Dieser Wert sollte in Millisekunden sein."
 
 #: modules/access/udp.c:81
 msgid "raw UDP access module"
@@ -1139,7 +1138,7 @@ msgstr "rohes UDP Zugriffsmodul"
 
 #: modules/access/udp.c:82
 msgid "udp"
-msgstr "udp"
+msgstr "UDP"
 
 #: modules/access/dvdread/dvdread.c:46
 msgid "DVDRead input module"
@@ -1354,7 +1353,8 @@ msgstr "Ton-Ausgabeformat"
 msgid ""
 "one of \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be\", "
 "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\""
-msgstr ""
+msgstr "eines von \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be\", "
+"\"s16_be\", \"fixed32\", \"float32\" oder \"spdif\""
 
 #: modules/audio_output/file.c:86
 msgid "add wave header"
@@ -1363,7 +1363,7 @@ msgstr "wave header hinzufügen"
 #: modules/audio_output/file.c:87
 msgid "instead of writing a raw file, you can add a wav header to the file"
 msgstr ""
-"Anstatt in eine raw Datei zu schreiben, können Sie einen Header der Datei "
+"Anstatt in eine raw Datei zu schreiben, können Sie einen wav Header der Datei "
 "hinzufügen"
 
 #: modules/audio_output/file.c:104
@@ -1452,9 +1452,8 @@ msgid "3D Now! A52 IMDCT module"
 msgstr "3D Now! A52 IMDCT Modul"
 
 #: modules/codec/araw.c:73
-#, fuzzy
 msgid "Pseudo Raw Audio decoder"
-msgstr "AC3 Audio Dekoder wählen"
+msgstr "Pseudo Raw Audio Dekoder"
 
 #: modules/codec/dv.c:48
 msgid "DV video decoder"
@@ -1465,9 +1464,8 @@ msgid "AAC decoder module (libfaad2)"
 msgstr "AAC Tondekodierungsmodul (libfaad2)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
-#, fuzzy
 msgid "ffmpeg"
-msgstr "Ffmpeg"
+msgstr "ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.c:113
 msgid "Post processing"
@@ -1656,14 +1654,12 @@ msgid "remote control interface module"
 msgstr "Fernbedienung Schnittstellen-Modul"
 
 #: modules/demux/aac/demux.c:46
-#, fuzzy
 msgid "AAC stream demux"
-msgstr "AAC Stream Hilfe"
+msgstr "AAC Stream Bild/Ton-Trennung"
 
 #: modules/demux/mpeg/audio.c:47
-#, fuzzy
 msgid "MPEG I/II audio stream demux"
-msgstr "MPEG I/II - Stream Ton-Dekoder"
+msgstr "MPEG I/II - Ton-Stream Bild/Ton-Trenner"
 
 #: modules/demux/mpeg/es.c:49
 msgid "ISO 13818-1 MPEG Elementary Stream input"
@@ -1675,7 +1671,7 @@ msgstr "ISO 13818-1 MPEG Program Stream Eingabe"
 
 #: modules/demux/mpeg/system.c:56
 msgid "generic ISO 13818-1 MPEG demultiplexing"
-msgstr ""
+msgstr "normales ISO 13818-1 MPEG demultiplexing"
 
 #. ****************************************************************************
 #. * Module descriptor
@@ -1696,13 +1692,14 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:103
 msgid "buggy PSI"
-msgstr ""
+msgstr "fehlerhaftes PSI"
 
 #: modules/demux/mpeg/ts.c:105
 msgid ""
 "If you have a stream whose PSI packets do not feature incremented continuity "
 "counters, select this option."
-msgstr ""
+msgstr "Wenn Sie einen Stream, dessen PSI packets keine sich erhöhenden "
+"Zähler (feature incremented continuity counters) enthalten, wählen Sie diese " "Option."
 
 #: modules/demux/mpeg/ts.c:110
 msgid "ISO 13818-1 MPEG Transport Stream input"
@@ -1767,7 +1764,7 @@ msgstr "Datei öffnen"
 #: modules/gui/macosx/intf.m:282 modules/gui/macosx/prefs.m:191
 #: modules/gui/win32/strings.cpp:211
 msgid "Preferences"
-msgstr "Einstellungen..."
+msgstr "Einstellungen"
 
 #: modules/gui/familiar/interface.c:118
 msgid "Rewind"
@@ -2484,9 +2481,8 @@ msgid "Horizontal"
 msgstr "Horizontal"
 
 #: modules/gui/gtk/gnome_interface.c:2063 modules/gui/gtk/gtk_interface.c:2378
-#, fuzzy
 msgid "Satellite"
-msgstr "Satelliten Karte öffnen"
+msgstr "Satellit"
 
 #: modules/gui/gtk/gnome_interface.c:2070 modules/gui/gtk/gtk_interface.c:2385
 msgid "Subtitle"
@@ -2537,7 +2533,7 @@ msgstr "Objekt"
 
 #: modules/gui/gtk/gnome_interface.c:2435 modules/gui/win32/strings.cpp:198
 msgid "Crop"
-msgstr "Kürzen"
+msgstr "Beschneiden"
 
 #: modules/gui/gtk/gnome_interface.c:2442 modules/gui/win32/strings.cpp:196
 msgid "Invert"
@@ -2780,7 +2776,7 @@ msgstr "Ausgewählt"
 
 #: modules/gui/gtk/gtk_interface.c:2914
 msgid "_Crop"
-msgstr ""
+msgstr "_Beschneiden"
 
 #: modules/gui/gtk/gtk_interface.c:2925
 msgid "_Invert"
@@ -2883,13 +2879,12 @@ msgstr "Schließen"
 
 #: modules/gui/macosx/intf.m:291
 msgid "Open CrashLog"
-msgstr ""
+msgstr "Das CrashLog öffnen"
 
 #. main menu
 #: modules/gui/macosx/intf.m:294
-#, fuzzy
 msgid "About VLC media player"
-msgstr "Über den VLC Media Player"
+msgstr "Über den VLC media player"
 
 #: modules/gui/macosx/intf.m:295 modules/gui/win32/strings.cpp:126
 msgid "Preferences..."
@@ -2962,42 +2957,39 @@ msgstr "Alles auswählen"
 
 #: modules/gui/macosx/intf.m:316 modules/gui/win32/strings.cpp:77
 msgid "Controls"
-msgstr "Einstellungen"
+msgstr "Steuerung"
 
 #: modules/gui/macosx/controls.m:721 modules/gui/macosx/intf.m:323
 msgid "Loop"
 msgstr "Wiederholen"
 
 #: modules/gui/macosx/controls.m:728 modules/gui/macosx/intf.m:324
-#, fuzzy
 msgid "Step Forward"
-msgstr "Schnell vorwärts"
+msgstr "ein Stück vorwärts"
 
 #: modules/gui/macosx/controls.m:729 modules/gui/macosx/intf.m:325
-#, fuzzy
 msgid "Step Backward"
-msgstr "Zurück gehen"
+msgstr "ein Stück rückwärts"
 
 #: modules/gui/macosx/intf.m:329 modules/gui/win32/strings.cpp:86
 msgid "Language"
 msgstr "Sprache"
 
 #: modules/gui/macosx/controls.m:747 modules/gui/macosx/intf.m:340
-#, fuzzy
 msgid "Half Size"
-msgstr "Größe"
+msgstr "Halbe Größe"
 
 #: modules/gui/macosx/controls.m:748 modules/gui/macosx/intf.m:341
 msgid "Normal Size"
-msgstr ""
+msgstr "Normale Größe"
 
 #: modules/gui/macosx/controls.m:749 modules/gui/macosx/intf.m:342
 msgid "Double Size"
-msgstr ""
+msgstr "Doppelte Größe"
 
 #: modules/gui/macosx/controls.m:746 modules/gui/macosx/intf.m:343
 msgid "Fullscreen"
-msgstr "Vollbildmodus"
+msgstr "Vollbild"
 
 #: modules/gui/macosx/intf.m:347
 msgid "Window"
@@ -3028,7 +3020,6 @@ msgid "ReadMe..."
 msgstr "Lies mich..."
 
 #: modules/gui/macosx/intf.m:358
-#, fuzzy
 msgid "Report a Bug"
 msgstr "Einen Fehler melden"
 
@@ -3076,22 +3067,21 @@ msgid "Language 0x%x"
 msgstr "Sprache 0x%x"
 
 #: modules/gui/macosx/intf.m:1420
-#, fuzzy
 msgid "No CrashLog found"
-msgstr "Keine %@s gefunden"
+msgstr "Kein CrashLog gefunden"
 
 #: modules/gui/macosx/intf.m:1420
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
-msgstr ""
+msgstr "Entweder benutzten Sie eine ältere Version von Mac OS X als 10.2 "
+"oder Sie hatten keine ernsthaften Abstürze."
 
 #: modules/gui/macosx/open.m:165
 msgid "Open Source"
 msgstr "Quelle öffnen"
 
 #: modules/gui/macosx/open.m:167
-#, fuzzy
 msgid "Only enqueue in playlist, do not play"
 msgstr "Nur an die Abspielliste anhängen. Nicht abspielen."
 
@@ -3100,9 +3090,8 @@ msgid "Treat as a pipe rather than as a file"
 msgstr "Eher als Datenleitung als als Datei behandeln"
 
 #: modules/gui/macosx/open.m:180
-#, fuzzy
 msgid "Load subtitles file:"
-msgstr "Untertitel laden"
+msgstr "Untertitel-Datei laden:"
 
 #: modules/gui/macosx/open.m:186
 msgid "Use DVD menus (EXPERIMENTAL)"
@@ -3130,7 +3119,6 @@ msgid "Save File"
 msgstr "Datei sichern"
 
 #: modules/gui/macosx/controls.m:579
-#, fuzzy
 msgid "Open subtitle file"
 msgstr "Datei mit Untertiteln öffnen"
 
@@ -3171,7 +3159,6 @@ msgid "Native Windows interface module"
 msgstr "Natives Windows-Benutzeroberflächen-Modul"
 
 #: modules/gui/win32/strings.cpp:12
-#, fuzzy
 msgid "Version x.y.z"
 msgstr "Version x.y.z"
 
@@ -3424,7 +3411,7 @@ msgstr "Das Fenster nach Vorne bringen"
 
 #: modules/gui/win32/strings.cpp:155
 msgid "&Copy text"
-msgstr ""
+msgstr "Text &Kopieren"
 
 #.
 #. * from modules/gui/win32/network.dfm:
@@ -3480,7 +3467,7 @@ msgstr "Auswahl &invertieren"
 
 #: modules/gui/win32/strings.cpp:193
 msgid "&Crop selection"
-msgstr "Auswahl &croppen"
+msgstr "Auswahl &freistellen"
 
 #: modules/gui/win32/strings.cpp:194
 msgid "&Delete selection"
@@ -3496,7 +3483,7 @@ msgstr "Auswahl invertieren"
 
 #: modules/gui/win32/strings.cpp:199
 msgid "Crop selection"
-msgstr "Auswahl croppen"
+msgstr "Auswahl freistellen"
 
 #: modules/gui/win32/strings.cpp:201
 msgid "Delete selection"
@@ -3515,7 +3502,6 @@ msgid "Stream output MRL (Media Resource Locator)"
 msgstr "Stream-Ausgabe durch MRL (Media Resource Locator)"
 
 #: modules/gui/win32/strings.cpp:225
-#, fuzzy
 msgid "file/ts://"
 msgstr "Datei/ts://:"
 
@@ -3677,23 +3663,23 @@ msgstr "Bild-Klon-Video-Modul"
 #. ****************************************************************************
 #: modules/video_filter/crop.c:54
 msgid "crop geometry"
-msgstr ""
+msgstr "Geometrie beschneiden"
 
 #: modules/video_filter/crop.c:55
 msgid "Set the geometry of the zone to crop"
-msgstr ""
+msgstr "Geben Sie die Geometrie der Zone ein, die freigestellt werden soll"
 
 #: modules/video_filter/crop.c:57
 msgid "automatic cropping"
-msgstr ""
+msgstr "automatisches Freistellen"
 
 #: modules/video_filter/crop.c:58
 msgid "Activate automatic black border cropping"
-msgstr ""
+msgstr "'automatisches Beschneiden der schwarzen Ränder' aktivieren"
 
 #: modules/video_filter/crop.c:64
 msgid "image crop video module"
-msgstr ""
+msgstr "Bild-Beschneidungs-Freistell-Modul"
 
 #. ****************************************************************************
 #. * Module descriptor
@@ -4131,15 +4117,12 @@ msgstr "xosd Benutzeroberflächen Modul"
 #~ msgid "Open a network stream"
 #~ msgstr "Netzwerk Stream öffnen"
 
-#, fuzzy
 #~ msgid "Open file..."
 #~ msgstr "Datei öffnen..."
 
-#, fuzzy
 #~ msgid "Open disc..."
 #~ msgstr "Volume öffnen..."
 
-#, fuzzy
 #~ msgid "Network stream..."
 #~ msgstr "Netzwerk Stream..."
 
