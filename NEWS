@@ -26,6 +26,7 @@ Input:
  * New "file-cat" option to play truncated movies.
  * Better handling of meta info (title, author, description, etc...).
  * New options to pass meta info to the input.
+ * Fixes and improvements to DVB-S/C/T
 
 Demux:
  * Annodex (http://www.annodex.net) support.
@@ -57,30 +58,35 @@ VideoLAN manager:
  * HTTP interface for vlm.
 
 Interfaces:
- * Skins II
+ * Skins II (Windows and Linux only)
     - Ability to embed video output.
     - Support for bitmap fonts.
     - Lots of improvements.
- * wxWindows
+ * wxWindows (default Windows and Linux interface)
     - New design and set of icons.
     - Ability to embed video output.
     - Support for hotkeys.
+    - Support for bookmarks.
  * Mac OS X
     - Support for 'groups' and playlist item properties.
     - Better hotkeys handling.
 
 Mac OS X port:
  * OpenGL video output is now the default when available.
+ * Added FLAC encoder.
+ * Audio output fix to work with multiple streams on a HAL device.
+ * Possible fix for conflict with CodeTek VirtualDesktop (untested).
 
 Win32 port:
  * DirectShow input plugin should work with more devices.
  * Disable monitor power down when watching movies.
+ * Improved Windows installer.
 
 Linux port:
  * PowerPC fixes.
 
 Misc:
- * Improvements to the GOOM visualisation plugin.
+ * Improvements to the Goom visualisation plugin.
  * Roku HD1000 audio output.
 
 Changes between 0.7.1 and 0.7.1a:
