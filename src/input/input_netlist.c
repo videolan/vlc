@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.25 2001/01/05 18:46:44 massiot Exp $
+ * $Id: input_netlist.c,v 1.26 2001/01/06 03:16:00 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -122,11 +122,6 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
         p_netlist->pp_free_data[i_loop]->p_buffer = 
             p_netlist->p_buffers + i_loop * i_buffer_size;
         
-        //peut-être pas nécessaire ici vu qu'on le fera à chaque fois
-        //dans NewPacket et Getiovec
-    //    p_netlist->pp_free_data[i_loop]->p_payload_start = 
-    //        p_netlist->pp_free_data[i_loop]->p_buffer;
-
         p_netlist->pp_free_data[i_loop]->p_payload_end =
             p_netlist->pp_free_data[i_loop]->p_buffer + i_buffer_size;
     }
@@ -169,7 +164,6 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
 struct iovec * input_NetlistGetiovec( void * p_method_data )
 {
     netlist_t * p_netlist;
-    int i_loop;
 
     /* cast */
     p_netlist = ( netlist_t * ) p_method_data;
@@ -194,43 +188,16 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
                 * sizeof(struct iovec *)
               );
  
-    // je suis pas complétement sûr que je fais ce que tu voulais ici ...
-    //Hum t'as pas l'impression de faire INPUT_READ_ONCE fois la même chose ?
-    
-    for (i_loop=0; i_loop<INPUT_READ_ONCE; i_loop++)
-    {
-        //Noooooooooooooooooooooooooooooooooooooooooooooooooooooooooon !!!
-        p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start 
-            = (byte_t *)p_netlist->pp_free_data[p_netlist->i_data_start];
-
-        p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_end 
-            = p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start
-            + p_netlist->i_buffer_size;
-    }
+    /* Initialize payload start and end */
+    p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start 
+        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_buffers;
+ 
+    p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_end 
+        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start
+        + p_netlist->i_buffer_size;
 
     return &p_netlist->p_free_iovec[p_netlist->i_data_start];
 
-    // ya un truc qui me pose pb : on va appeler Getiovec puis Mviovec, mais
-    // entre deux un autre thread peut pas venir foutre le brin dans les
-    // i_data_start et stop, du genre avec un newpacket ? 
-    
-    //Bonne question, c'est là tout l'avantage de la FIFO : les décodeurs ne
-    //déplacent _que_ i_data_end, et l'input déplace i_data_start.
-    //Pas de concurrence possible. L'input appelle NewPacket() et les
-    //décodeurs appellent DeletePES().
-    
-    // je suppose qu'on fait pas tout dans une même fonction parce que si le
-    // readv a besoin de moins que INPUT_READ_ONCE on perdrait de la place, mais
-    //Oui.
-    // est-ce qu'il faut pas laisser le lock à ce moment là et le rendre
-    // à la fin de Mviovec ?
-    //Non. Un read() est une opération bloquante qui peut prendre un temps
-    //*énorme* sur lecture réseau notamment (pas temps CPU, temps réel
-    //d'attente). Si on lockait pendant tout ce temps les décodeurs seraient
-    //bloqués très souvent.
-    
-    //Pour le corrigé (et la version LIFO de l'algorithme) tu peux regarder
-    //input.c:input_ReadPacket() de l'input-I.
 }
 
 /*****************************************************************************
@@ -301,12 +268,8 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     p_return->p_next = NULL;
     p_return->b_discard_payload = 0;
     
-    //Nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooon !!!
-    p_return->p_payload_start = (byte_t *)p_return;
-    //Plus précisément, + i_buffer_size (il a le droit de vouloir un buffer
-    //plus petit)
-    p_return->p_payload_end = p_return->p_payload_start 
-                            + p_netlist->i_buffer_size;
+    p_return->p_payload_start = p_return->p_buffers;
+    p_return->p_payload_end = p_return->p_payload_start + i_buffer_size;
     
     return ( p_return );
 }
