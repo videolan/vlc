@@ -186,6 +186,36 @@ int vout_SDLManage( vout_thread_t *p_vout )
 
     return( 0 );
 }
+/*****************************************************************************
+ * vout_SDLSetPalette: sets an 8 bpp palette
+ *****************************************************************************
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
+ *****************************************************************************/
+void vout_SDLSetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green, u16 *blue, u16 *transp)
+{
+     /* Create a display surface with a grayscale palette */
+    SDL_Color colors[256];
+    int i;
+    intf_ErrMsgImm( "palettin'\n");
+  
+    /* Fill colors with color information */
+    for(i=0;i<256;i++){
+      colors[i].r=red[i]>>8;
+      colors[i].g=green[i]>>8;
+      colors[i].b=blue[i]>>8;
+    }
+    
+    /* Set palette */
+    if(SDL_SetColors(p_vout->p_sys->p_display, colors, 0, 256) == 0)
+        intf_ErrMsgImm( "error\n");
+
+}
+
+
+
+
 
 /*****************************************************************************
  * vout_SDLDisplay: displays previously rendered output
@@ -271,7 +301,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
      */
 
     /* init flags and cursor */
-    flags = SDL_ANYFORMAT;
+    flags = SDL_ANYFORMAT | SDL_HWPALETTE;
 
     if( p_vout->p_sys->b_fullscreen )
         flags |= SDL_FULLSCREEN;

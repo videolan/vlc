@@ -127,6 +127,8 @@ static void vout_GetPlugin( p_vout_thread_t p_vout )
     p_vout->p_sys_destroy = vout_SDLDestroy;
     p_vout->p_sys_manage  = vout_SDLManage;
     p_vout->p_sys_display = vout_SDLDisplay;
+    p_vout->p_set_palette = vout_SDLSetPalette;
+
 }
 
 static void intf_GetPlugin( p_intf_thread_t p_intf )
