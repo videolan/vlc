@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.24 2003/09/30 20:23:03 gbazin Exp $
+ * $Id: a52.c,v 1.25 2003/09/30 20:36:46 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -361,7 +361,7 @@ static int EndDecoder( decoder_t *p_dec )
         sout_InputDelete( p_dec->p_sys->p_sout_input );
     }
 
-    if( p_dec->p_sys->p_chain ) block_ChainRelease( p_sys->p_chain );
+    if( p_dec->p_sys->p_chain ) block_ChainRelease( p_dec->p_sys->p_chain );
 
     free( p_dec->p_sys );
 
@@ -534,7 +534,7 @@ static int SendOutBuffer( decoder_t *p_dec )
         p_sys->p_aout_buffer = NULL;
     }
 
-    p_dec->p_sys->p_out_buffer = NULL;
+    p_sys->p_out_buffer = NULL;
 
     return VLC_SUCCESS;
 }

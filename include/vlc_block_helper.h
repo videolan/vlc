@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.1 2003/09/30 20:23:03 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.2 2003/09/30 20:36:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,19 +49,6 @@ static inline block_bytestream_t __block_BytestreamInit( vlc_object_t *p_obj,
 }
 
 static inline block_t *block_BytestreamFlush( block_bytestream_t *p_bytestream)
-{
-    while( p_bytestream->p_chain != p_bytestream->p_block )
-    {
-        block_t *p_next;
-        p_next = p_bytestream->p_chain->p_next;
-        p_bytestream->p_chain->pf_release( p_bytestream->p_chain );
-        p_bytestream->p_chain = p_next;
-    }
-
-    return p_bytestream->p_chain;
-}
-
-static inline mtime_t block_BytestreamPTS( block_bytestream_t *p_bytestream )
 {
     while( p_bytestream->p_chain != p_bytestream->p_block )
     {
