@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.9 2003/02/04 20:45:24 hartman Exp $
+ * $Id: darwin_specific.m,v 1.10 2003/02/06 23:01:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -33,42 +33,30 @@
  *****************************************************************************/
 static int FindLanguage( const char * psz_lang )
 {
-    const char * psz_short = NULL;
+    const char ** ppsz_parser;
+    const char * ppsz_all[] =
+    {
+        "German", "de",
+        "British", "en_GB",
+        "French", "fr",
+        "Italian", "it",
+        "Japanese", "ja",
+        "Dutch", "nl",
+        "Norwegian", "no",
+        "Polish", "pl",
+        "Russian", "ru",
+        "Swedish", "sv",
+        NULL
+    };
 
-    if ( !strcmp(psz_lang, "German") )
+    for( ppsz_parser = ppsz_all ; ppsz_parser[0] ; ppsz_parser += 2 )
     {
-        psz_short = "de";
-    }
-    else if ( !strcmp(psz_lang, "British") )
-    {
-        psz_short = "en_GB";
-    }
-    else if ( !strcmp(psz_lang, "French") )
-    {
-        psz_short = "fr";
-    }
-    else if ( !strcmp(psz_lang, "Italian") )
-    {
-        psz_short = "it";
-    }
-    else if ( !strcmp(psz_lang, "Japanese") )
-    {
-        psz_short = "ja";
-    }
-    else if ( !strcmp(psz_lang, "Dutch") )
-    {
-        psz_short = "nl";
-    }
-    else
-    {
-        /* Just in case gettext knows about this. */
-        psz_short = psz_lang;
-    }
-
-    if ( psz_short != NULL )
-    {
-        setenv("LANG", psz_short, 1);
-        return 1;
+        if( !strcmp( psz_lang, ppsz_parser[0] )
+             || !strcmp( psz_lang, ppsz_parser[1] ) )
+        {
+            setenv( "LANG", ppsz_parser[1], 1 );
+            return 1;
+        }
     }
 
     return 0;
@@ -98,7 +86,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     /* Check if $LANG is set. */
     if ( (p_char = getenv("LANG")) == NULL )
     {
-        vlc_bool_t b_found = 0;
         NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
         /* Retrieve user's preferences. */
@@ -107,12 +94,12 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         NSEnumerator * o_enumerator = [o_languages objectEnumerator]; 
         NSString * o_lang;
 
-        while ( (o_lang = [o_enumerator nextObject]) && ( !b_found ) )
+        while ( (o_lang = [o_enumerator nextObject]) )
         { 
             const char * psz_string = [o_lang lossyCString];
             if ( FindLanguage( psz_string ) )
             {
-                b_found = 1;
+                break;
             }
         }
         
