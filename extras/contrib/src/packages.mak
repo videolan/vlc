@@ -85,7 +85,7 @@ LIBDVDNAV_VERSION=0.1.9
 LIBDVDNAV_URL=http://ftp.snt.utwente.nl/pub/linux/gentoo/distfiles/libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 LIBDVBPSI_VERSION=0.1.4
 LIBDVBPSI_URL=http://download.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
-LIVEDOTCOM_VERSION=2004.02.26
+LIVEDOTCOM_VERSION=2004.04.09
 LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.9
@@ -94,3 +94,6 @@ LIBDTS_VERSION=0.0.2
 LIBDTS_URL=http://download.videolan.org/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
 MODPLUG_VERSION=0.7
 MODPLUG_URL=http://download.videolan.org/pub/videolan/contrib/libmodplug-$(MODPLUG_VERSION).tar.gz
+MASH_VERSION=5.2
+MASH_URL=$(SF)/openmash/mash-src-$(MASH_VERSION).tar.gz
+

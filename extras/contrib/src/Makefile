@@ -747,6 +747,24 @@ CLEAN_PKG += libmodplug
 DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 
 # ***************************************************************************
+# OpenMash
+# ***************************************************************************
+
+mash-src-$(MASH_VERSION).tar.gz:
+	$(WGET) $(MASH_URL)
+
+mash-code: mash-src-$(MASH_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.mash: mash-code
+	(cd $<; ./configure && make )
+	touch $@
+
+CLEAN_FILE += .mash
+CLEAN_PKG += mash-code
+DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
+
+# ***************************************************************************
 # Some cleansing
 # ***************************************************************************
 
