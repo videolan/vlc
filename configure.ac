@@ -955,7 +955,7 @@ VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
-VLC_ADD_PLUGINS([rawvideo blend scale time marq])
+VLC_ADD_PLUGINS([rawvideo blend scale time marq logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
 VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
 VLC_ADD_PLUGINS([access_ftp access_directory sap http])
@@ -2443,14 +2443,32 @@ dnl  dirac decoder plugin
 dnl
 AC_ARG_ENABLE(dirac,
 [  --enable-dirac         experimental dirac codec (default disabled)])
-if test "${enable_dirac}" = "yes"
-then
+if test "${enable_dirac}" = "yes"; then
   AC_CHECK_HEADERS(libdirac_decoder/dirac_parser.h, [
     AC_CHECK_LIB(dirac_decoder, dirac_decoder_init, [
       VLC_ADD_PLUGINS([dirac])
       VLC_ADD_LDFLAGS([dirac],[-ldirac_decoder -ldirac_encoder -ldirac_motionest -ldirac_common]) ],[
       AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])],
       [-ldirac_common])
+  ])
+fi
+
+dnl
+dnl  PNG decoder module
+dnl
+AC_ARG_ENABLE(png,
+  [  --enable-png            PNG support (default enabled)])
+if test "${enable_png}" != "no"; then
+AC_CHECK_HEADERS(png.h, [
+  LDFLAGS="${LDFLAGS_save} -lz"
+  AC_CHECK_LIB(png, png_set_rows, [
+    VLC_ADD_LDFLAGS([png],[-lpng -lz])
+    VLC_ADD_PLUGINS([png])
+    VLC_ADD_LDFLAGS([svcdsub],[-lpng -lz])
+    VLC_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
+    AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
+    [],[-lz])
+  LDFLAGS="${LDFLAGS_save}"
   ])
 fi
 
@@ -2516,25 +2534,6 @@ then
   VLC_ADD_PLUGINS([cmml])
 fi
 
-
-dnl
-dnl  Video Filters
-dnl
-
-dnl
-dnl   png
-dnl
-AC_CHECK_HEADERS(png.h, [
-  LDFLAGS="${LDFLAGS_save} -lz"
-  AC_CHECK_LIB(png, png_set_rows, [
-    VLC_ADD_LDFLAGS([logo],[-lpng -lz])
-    VLC_ADD_PLUGINS([logo])
-    VLC_ADD_LDFLAGS([svcdsub],[-lpng -lz])
-    VLC_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
-    AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
-    [],[-lz])
-  ])
-  LDFLAGS="${LDFLAGS_save}"
 
 dnl
 dnl  Video plugins
@@ -3257,7 +3256,7 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
   dnl freetype
   if test "${FREETYPE_CONFIG}" != "no"; then
     VLC_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs` -lpng])
+    VLC_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs`])
   else
     skins2_missing_lib="yes"
     if test "${enable_skins2}" = "yes"; then
