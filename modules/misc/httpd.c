@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.10 2003/03/17 23:48:26 fenrir Exp $
+ * $Id: httpd.c,v 1.11 2003/03/18 02:28:53 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1179,7 +1179,6 @@ static int  httpd_page_admin_get( httpd_file_callback_args_t *p_args,
 {
     httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
     httpd_connection_t *p_con;
-    int i;
 
     if( i_request > 0)
     {

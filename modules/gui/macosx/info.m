@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.4 2003/03/14 01:23:06 hartman Exp $
+ * $Id: info.m,v 1.5 2003/03/18 02:28:53 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -74,10 +74,14 @@
 
 - (void)updateInfo
 {
+    NSString *o_selectedPane;
+    
     if( ![o_window isVisible] )
     {
         return;
     }
+    
+    o_selectedPane = [[o_selector selectedItem] title];
 
     intf_thread_t * p_intf = [NSApp getIntf]; 
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -113,7 +117,12 @@
     vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
 
-    [o_selector selectItemAtIndex: 0];
+    int i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
+    if ( i_select < 0 )
+    {
+        i_select = 0;
+    }
+    [o_selector selectItemAtIndex: i_select ];
     [self showCategory: o_selector];
 }
 
