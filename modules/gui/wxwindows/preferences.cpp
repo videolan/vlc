@@ -42,6 +42,14 @@
 #include <wx/clntdata.h>
 #include <wx/dynarray.h>
 
+#include "bitmaps/type_net.xpm"
+#include "bitmaps/codec.xpm"
+#include "bitmaps/video.xpm"
+#include "bitmaps/type_playlist.xpm"
+#include "bitmaps/advanced.xpm"
+#include "bitmaps/intf.xpm"
+#include "bitmaps/audio.xpm"
+
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
 #endif
@@ -322,6 +330,16 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
     root_item = AddRoot( wxT("") );
 
+    wxImageList *p_images = new wxImageList( 16,16,TRUE );
+    p_images->Add( wxIcon( audio_xpm ) );
+    p_images->Add( wxIcon( video_xpm ) );
+    p_images->Add( wxIcon( codec_xpm ) );
+    p_images->Add( wxIcon( type_net_xpm ) );
+    p_images->Add( wxIcon( advanced_xpm ) );
+    p_images->Add( wxIcon( type_playlist_xpm ) );
+    p_images->Add( wxIcon( intf_xpm ) );
+    AssignImageList( p_images );
+
     /* List the plugins */
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     if( !p_list ) return;
@@ -369,6 +387,24 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 current_item = AppendItem( root_item,
                                            wxU( config_data->psz_name ),
                                            -1, -1, config_data );
+
+                switch( p_item->i_value )
+                {
+                    case CAT_AUDIO:
+                        SetItemImage( current_item, 0 );break;
+                    case CAT_VIDEO:
+                        SetItemImage( current_item, 1 );break;
+                    case CAT_INPUT:
+                        SetItemImage( current_item, 2 );break;
+                    case CAT_SOUT:
+                        SetItemImage( current_item, 3 );break;
+                    case CAT_ADVANCED:
+                        SetItemImage( current_item, 4 );break;
+                    case CAT_PLAYLIST:
+                        SetItemImage( current_item, 5 );break;
+                    case CAT_INTERFACE:
+                        SetItemImage( current_item, 6 );break;
+                }
                 break;
             case CONFIG_SUBCATEGORY:
                 if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
