@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.10 2003/09/24 10:21:32 zorglub Exp $
+ * $Id: visual.c,v 1.11 2003/11/02 06:33:49 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -101,6 +101,8 @@ vlc_module_end();
  *****************************************************************************/
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
+static int FilterCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 static struct
 {
     char *psz_name;
@@ -122,6 +124,7 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
+    vlc_value_t        val;
 
     char *psz_effects, *psz_parser;
 
@@ -150,8 +153,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->effect   = NULL;
 
     /* Parse the effect list */
-    psz_parser = psz_effects = config_GetPsz( p_filter, "effect-list" );
+    var_Create( p_filter, "effect-list", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "effect-list", &val);
+    psz_parser = psz_effects = strdup( val.psz_string );
+    free( val.psz_string );
     msg_Dbg( p_filter , "Building list of effects" );
+    
+    var_AddCallback( p_filter, "effect-list", FilterCallback, NULL );
 
     while( psz_parser && *psz_parser != '\0' )
     {
@@ -335,3 +343,17 @@ static void Close( vlc_object_t *p_this )
 
     free( p_filter->p_sys );
 }
+
+/*****************************************************************************
+ * FilterCallback: called when changing the deinterlace method on the fly.
+ *****************************************************************************/
+static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
+    /* restart this baby */
+    msg_Dbg( p_filter, "We should restart the visual filter" );
+    return VLC_SUCCESS;
+}
+
