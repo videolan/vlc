@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.12 2002/11/14 22:38:47 massiot Exp $
+ * $Id: decoder.c,v 1.13 2002/11/15 01:17:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -296,7 +296,9 @@ static int InitThread( adec_thread_t * p_adec )
     /* Initialize the thread properties */
     p_adec->output_format.i_format = VLC_FOURCC('f','l','3','2');
     p_adec->output_format.i_rate = i_rate;
-    p_adec->output_format.i_channels = pi_channels_maps[i_nb_channels];
+    p_adec->output_format.i_physical_channels =
+        p_adec->output_format.i_original_channels =
+            pi_channels_maps[i_nb_channels];
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 
@@ -389,7 +391,7 @@ static void DecodeThread( adec_thread_t *p_adec )
     
     /* **** First check if we have a valid output **** */
     if( ( !p_adec->p_aout_input )||
-        ( p_adec->output_format.i_channels !=
+        ( p_adec->output_format.i_original_channels !=
              pi_channels_maps[faad_frame.channels] ) )
     {
         if( p_adec->p_aout_input )
@@ -399,8 +401,10 @@ static void DecodeThread( adec_thread_t *p_adec )
         }
 
         /* **** Create a new audio output **** */
-        p_adec->output_format.i_channels = 
+        p_adec->output_format.i_physical_channels =
+            p_adec->output_format.i_original_channels =
                 pi_channels_maps[faad_frame.channels];
+
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
         p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
                                             &p_adec->p_aout,
