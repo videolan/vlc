@@ -2,23 +2,17 @@ This is the contrib build system for VLC Media Player. It has been
 primarily developed for Mac OS X, though it should be easy to adapt to
 other operating systems.
 
-To use it, first type :
+To use it, first in the contrib directory, type :
 	./bootstrap
 
-Customize config.mak if you need type, then you need to choose between
+Customize config.mak if you need to, then you need to choose between
 building from source (can take a long time but is easily customizable)
 and fetching a pre-compiled binary package. Either type 'make src'
-or 'make bin'.
+or 'make bin' (also from the contrib directory).
 
-Once the contribs are built, you can start building VLC. VLC's bootstrap
-and configure scripts will automatically detect the contrib directory,
-but you still need to specify which plug-ins you want to build (though
-it is unnecessary to add --with-* or --with-*-tree). For instance my
-configure line is :
-	./configure --disable-x11 --disable-xvideo --disable-gtk --disable-sdl --enable-ffmpeg --with-ffmpeg-mp3lame --enable-mad --enable-libdvbpsi --enable-a52 --enable-dvdplay --enable-faad --enable-vorbis --enable-theora --enable-ogg --enable-slp --enable-flac --enable-libmpeg2 --enable-mkv --enable-speex --enable-debug
-
-Then for Darwin, 'make' will build the VLC.app application and copy the
-contrib libs to VLC.app/Contents/MacOS/lib. The application is ready.
+Once the contribs are built, you can start building VLC.
+See: http://developers.videolan.org/vlc/osx-compile.html 
+for more details on that.
 
 Happy hacking.
 --Meuuh 2003-11-15
