@@ -4,7 +4,6 @@ SOURCES_flac = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_m3u = m3u.c
 SOURCES_demuxdump = demuxdump.c
-SOURCES_demuxstream = demuxstream.c
 SOURCES_rawdv = rawdv.c
 SOURCES_au = au.c
 SOURCES_wav = wav.c
