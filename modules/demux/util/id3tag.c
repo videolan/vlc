@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.5 2003/03/13 22:35:51 sigmunau Exp $
+ * $Id: id3tag.c,v 1.6 2003/03/18 00:33:29 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -150,20 +150,15 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 }
                 ParseID3Tag( p_input, p_peek, i_size2 );
             }
-        }
 
-        /* look for id3v2.4 tag at end of file */
-        if ( p_pos->i_size > 10 )
-        {
-            input_AccessReinit( p_input );
-            p_input->pf_seek( p_input, p_pos->i_size - 10 );
+            /* look for id3v2.4 tag at end of file */
             /* get 10 byte id3 footer */    
-            if( input_Peek( p_input, &p_peek, 10 ) < 10 )
+            if( input_Peek( p_input, &p_peek, 128 ) < 128 )
             {
                 msg_Err( p_input, "cannot peek()" );
                 return( VLC_EGENERIC );
             }
-            i_size2 = id3_tag_query( p_peek, 10 );
+            i_size2 = id3_tag_query( p_peek + 118, 10 );
             if ( i_size2 < 0  && p_pos->i_size > -i_size2 )
             {                                          /* id3v2.4 footer found */
                 input_AccessReinit( p_input );
