@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads_funcs.h,v 1.4.2.1 2002/06/17 08:37:56 sam Exp $
+ * $Id: threads_funcs.h,v 1.4.2.2 2002/07/25 22:23:52 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -364,12 +364,10 @@ static inline int vlc_cond_init( vlc_cond_t *p_condvar )
         p_condvar->signal = NULL;
 
         /* Create an auto-reset event and a manual-reset event. */
-        p_condvar->p_events[SIGNAL] = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->p_events[BROADCAST] = CreateEvent( NULL, TRUE, FALSE, NULL );
-        return !p_condvar->p_events[SIGNAL] || !p_condvar->p_events[BROADCAST];
+        p_condvar->p_events[0] = CreateEvent( NULL, FALSE, FALSE, NULL );
+        p_condvar->p_events[1] = CreateEvent( NULL, TRUE, FALSE, NULL );
+        return !p_condvar->p_events[0] || !p_condvar->p_events[1];
     }
-
-    return( !p_condvar->signal );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_init( p_condvar, NULL );
@@ -424,7 +422,7 @@ static inline int vlc_cond_signal( vlc_cond_t *p_condvar )
         }
         else
         {
-            SetEvent( p_condvar->p_events[SIGNAL] );
+            SetEvent( p_condvar->p_events[0] );
         }
     }
     return 0;
@@ -511,7 +509,7 @@ static inline int vlc_cond_broadcast( vlc_cond_t *p_condvar )
         }
         else
         {
-            SetEvent( p_condvar->p_events[BROADCAST] );
+            SetEvent( p_condvar->p_events[1] );
         }
     }
     return 0;
@@ -637,10 +635,10 @@ static inline int _vlc_cond_wait( char * psz_file, int i_line,
 
         /* If we are the last waiter and it was a broadcast signal, reset
          * the broadcast event. */
-        if( i_ret == WAIT_OBJECT_0 + BROADCAST
+        if( i_ret == WAIT_OBJECT_0 + 1
              && p_condvar->i_waiting_threads == 0 )
         {
-            ResetEvent( p_condvar->p_events[BROADCAST] );
+            ResetEvent( p_condvar->p_events[1] );
         } 
     
         return( i_ret == WAIT_FAILED );
@@ -742,8 +740,8 @@ static inline int _vlc_cond_destroy( char * psz_file, int i_line,
     }
     else
     {
-        return !CloseHandle( p_condvar->p_events[SIGNAL] )
-                 || !CloseHandle( p_condvar->p_events[BROADCAST] );
+        return !CloseHandle( p_condvar->p_events[0] )
+                 || !CloseHandle( p_condvar->p_events[1] );
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
