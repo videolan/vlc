@@ -39,7 +39,7 @@ static void NotifyPlaylist( input_thread_t * );
  * Control function for inputs.
  * \param p_input input handle
  * \param i_query query type
- * \return VLC_SUCESS if ok
+ * \return VLC_SUCCESS if ok
  */
 int input_Control( input_thread_t *p_input, int i_query, ...  )
 {
