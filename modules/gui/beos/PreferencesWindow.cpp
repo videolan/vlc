@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.3 2002/11/26 01:06:08 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.4 2003/01/08 02:32:50 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -123,9 +123,10 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     rect = fPrefsView->Bounds();
     rect.bottom -= 43;
     rect.top = rect.bottom - 10;
-    fRestartString = new BStringView( rect, NULL, "" );
-    rgb_color redColor = {255, 0, 0, 255};
-    fRestartString->SetHighColor(redColor);
+    fRestartString = new BStringView( rect, NULL,
+        "Warning: changing settings after starting playback may have no effect." );
+    /*rgb_color redColor = {255, 0, 0, 255};
+    fRestartString->SetHighColor(redColor);*/
     fRestartString->SetAlignment( B_ALIGN_CENTER );
     fPrefsView->AddChild( fRestartString );
 
@@ -136,10 +137,6 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     rect.top = rect.bottom - 25;
     rect.left = rect.right - 80;
     button = new BButton( rect, NULL, "OK", new BMessage( PREFS_OK ) );
-    fPrefsView->AddChild( button );
-    
-    rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, NULL, "Cancel", new BMessage( PREFS_CANCEL ) );
     fPrefsView->AddChild( button );
     
     rect.OffsetBy( -90, 0 );
@@ -173,14 +170,13 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
 	    case PREFS_DEFAULTS:
 	    {
 	        SetDefaults();
+            ApplyChanges();
 	        break;
 	    }
 	    case PREFS_OK:
 	    {
-	        config_PutInt( p_intf, "ffmpeg-pp-q", fPpSlider->Value() );
-            config_PutPsz( p_intf, "filter", "adjust" );
-            ApplyChanges();
             Hide();
+            break;
 	    }
 		default:
 			BWindow::MessageReceived( p_message );
@@ -207,14 +203,6 @@ void PreferencesWindow::SetDefaults()
     fContrastSlider->SetValue( 100 );
     fHueSlider->SetValue( 0 );
     fSaturationSlider->SetValue( 100 );
-
-    fRestartString->SetText( config_GetInt( p_intf, "ffmpeg-pp-q" ) ?
-        "Changes will take effect after you restart playback" : "" );
-    
-    config_PutPsz( p_intf, "filter", NULL );
-    config_PutInt( p_intf, "ffmpeg-pp-q", 0 );
-    
-    ApplyChanges();
 }
 
 /*****************************************************************************
@@ -222,23 +210,7 @@ void PreferencesWindow::SetDefaults()
  *****************************************************************************/
 void PreferencesWindow::ApplyChanges()
 {
-    bool b_restart_needed = false;
-
-    if( ( !config_GetPsz( p_intf, "filter" ) ||
-          strncmp( config_GetPsz( p_intf, "filter" ), "adjust", 6 ) ) &&
-        ( fBrightnessSlider->Value() != 100 ||
-          fContrastSlider->Value() != 100 ||
-          fHueSlider->Value() ||
-          fSaturationSlider->Value() != 100 ) )
-    {
-        b_restart_needed = true;
-    }
-
-    if( fPpSlider->Value() != config_GetInt( p_intf, "ffmpeg-pp-q" ) )
-    {
-        b_restart_needed = true;
-    }
-    
+    config_PutInt( p_intf, "ffmpeg-pp-q", fPpSlider->Value() );
     config_PutFloat( p_intf, "Brightness",
                      (float)fBrightnessSlider->Value() / 100 );
     config_PutFloat( p_intf, "Contrast",
@@ -246,9 +218,16 @@ void PreferencesWindow::ApplyChanges()
     config_PutInt( p_intf, "Hue", fHueSlider->Value() );
     config_PutFloat( p_intf, "Saturation",
                      (float)fSaturationSlider->Value() / 100 );
-    
-    fRestartString->LockLooper();
-    fRestartString->SetText( b_restart_needed ?
-        "Changes will take effect after you restart playback" : "" );
-    fRestartString->UnlockLooper();
+
+    if( config_GetFloat( p_intf, "Brightness" ) != 1 ||
+        config_GetFloat( p_intf, "Contrast" ) != 1 ||
+        config_GetInt( p_intf, "Hue" ) != 0 ||
+        config_GetFloat( p_intf, "Saturation" ) != 1 )
+    {
+        config_PutPsz( p_intf, "filter", "adjust" );
+    }
+    else
+    {
+        config_PutPsz( p_intf, "filter", NULL );
+    }
 }
