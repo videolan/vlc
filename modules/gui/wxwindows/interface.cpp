@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.19 2003/04/01 16:11:43 gbazin Exp $
+ * $Id: interface.cpp,v 1.20 2003/04/07 09:25:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -355,8 +355,6 @@ void Interface::Open( int i_access_method )
         {
             return;
         }
-
-        msg_Err( p_intf, "%s", (char *)dialog.mrl.c_str() );
 
         playlist_Add( p_playlist, (char *)dialog.mrl.c_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
