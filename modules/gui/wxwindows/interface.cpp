@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.69 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: interface.cpp,v 1.70 2003/10/29 18:54:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,8 +39,6 @@
 
 /* include the toolbar graphics */
 #include "bitmaps/file.xpm"
-
-#include "bitmaps/stream.xpm"
 
 #include "bitmaps/disc.xpm"
 #include "bitmaps/net.xpm"
@@ -303,7 +301,7 @@ void Interface::CreateOurMenuBar()
 #define HELP_EJECT N_("Eject the DVD/CD")
 #define HELP_EXIT  N_("Exit this program")
 
-#define HELP_STREAM N_("Streaming wizard")
+#define HELP_STREAMWIZARD N_("Open the streaming wizard")
 #define HELP_OTHER N_("Open other types of inputs")
 
 #define HELP_PLAYLIST   N_("Open the playlist")
@@ -317,16 +315,16 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
-    file_menu->Append( OpenFileSimple_Event, wxU(_("Simple &Open ...")),
+    file_menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open ...")),
                        wxU(_(HELP_SIMPLE)) );
 
     file_menu->AppendSeparator();
     file_menu->Append( OpenFile_Event, wxU(_("Open &File...")),
-                      wxT(_(HELP_FILE)));
+                      wxU(_(HELP_FILE)));
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")),
-                      wxT(_(HELP_DISC)));
+                      wxU(_(HELP_DISC)));
     file_menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")),
-                      wxT(_(HELP_NET)));
+                      wxU(_(HELP_NET)));
 
 #if 0
     file_menu->Append( OpenSat_Event, wxU(_("Open &Satellite Stream...")),
@@ -334,7 +332,7 @@ void Interface::CreateOurMenuBar()
 #endif
     file_menu->AppendSeparator();
     file_menu->Append( Stream_Event, wxU(_("Streaming Wizard...")),
-                       wxU(_(HELP_STREAM)) );
+                       wxU(_(HELP_STREAMWIZARD)) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit")), wxU(_(HELP_EXIT)) );
 
@@ -416,8 +414,8 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Simple open")), wxBitmap( file_xpm ),
-                      wxU(_(HELP_SIMPLE)) );
+    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Quick")),
+                      wxBitmap( file_xpm ), wxU(_(HELP_SIMPLE)) );
 
     toolbar->AddSeparator();
 
@@ -431,11 +429,6 @@ void Interface::CreateOurToolBar()
     toolbar->AddTool( OpenSat_Event, wxU(_("Sat")), wxBitmap( sat_xpm ),
                       wxU(_(HELP_SAT)) );
 #endif
-    toolbar->AddSeparator();
-
-    toolbar->AddTool( Stream_Event, wxU(_("Stream")), wxBitmap( stream_xpm ),
-                      wxU(_(HELP_STREAM)) );
-
     toolbar->AddSeparator();
 
     toolbar->AddTool( StopStream_Event, wxU(_("Stop")), wxBitmap( stop_xpm ),
@@ -647,17 +640,15 @@ void Interface::CreateOurExtraPanel()
     extra_sizer->SetSizeHints(extra_frame);
 
     /* Write down initial values */
-
-    if( strstr( config_GetPsz( p_intf, "audio-filter" ), "visual" ) )
+    psz_filters = config_GetPsz( p_intf, "audio-filter" );
+    if( psz_filters && strstr( psz_filters, "visual" ) )
     {
         visual_checkbox->SetValue(1);
     }
+    if( psz_filters ) free( psz_filters );
 
     psz_filters = config_GetPsz( p_intf, "filter" );
-
-    if(psz_filters == NULL) psz_filters=strdup("");
-
-    if( strstr(psz_filters,"adjust") )
+    if( psz_filters && strstr( psz_filters, "adjust" ) )
     {
         adjust_check->SetValue( 1 );
         saturation_slider->Enable();
@@ -673,6 +664,7 @@ void Interface::CreateOurExtraPanel()
         brightness_slider->Disable();
         hue_slider->Disable();
     }
+    if( psz_filters ) free( psz_filters );
 
     int i_value = config_GetInt( p_intf, "hue" );
     if( i_value > 0 && i_value < 360 )
@@ -690,7 +682,6 @@ void Interface::CreateOurExtraPanel()
         brightness_slider->SetValue( (int)(100 * f_value) );
 
     extra_frame->Hide();
-    free(psz_filters);
 }
 
 void Interface::UpdateAcceleratorTable()

@@ -2,7 +2,7 @@
  * stream.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: stream.cpp,v 1.1 2003/10/29 18:00:46 zorglub Exp $
+ * $Id: streamwizard.cpp,v 1.1 2003/10/29 18:54:46 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -241,7 +241,7 @@ void StreamDialog::OnStart( wxCommandEvent& event )
             i_total_options += sout_mrl.GetCount();
 
         }
-        msg_Dbg(p_intf,"playings %s",p_open_dialog->mrl[i].mb_str());
+        msg_Dbg(p_intf,"playings %s",(const char *)p_open_dialog->mrl[i].mb_str());
         playlist_Add( p_playlist, (const char *)p_open_dialog->mrl[i].mb_str(),
                       (const char **)ppsz_options, i_total_options,
                       PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );

@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: iteminfo.cpp,v 1.3 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: iteminfo.cpp,v 1.4 2003/10/29 18:54:45 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -243,11 +243,11 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
                                  wxCB_READONLY );
 
     wxButton *newgroup_button = new wxButton( group_subpanel, New_Event,
-                                    wxT(_("New Group")));
+                                    wxU(_("New Group")));
 
     for( int i=0; i< p_playlist->i_groups ; i++)
     {
-        group_combo->Append( wxT( p_playlist->pp_groups[i]->psz_name));
+        group_combo->Append( wxU( p_playlist->pp_groups[i]->psz_name ) );
     }
 
     vlc_object_release ( p_playlist );
@@ -299,7 +299,7 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         for (int i=0 ; i< p_playlist->i_groups ; i++)
         {
            if( !strcasecmp( p_playlist->pp_groups[i]->psz_name,
-                           group_combo->GetValue() ))
+                            group_combo->GetValue().mb_str() ))
            {
                p_item->i_group = p_playlist->pp_groups[i]->i_id;
                break;
@@ -328,7 +328,7 @@ void ItemInfoDialog::OnNewGroup( wxCommandEvent& WXUNUSED(event) )
     {
         if( p_newgroup->ShowModal() == wxID_OK && p_newgroup->psz_name)
         {
-            group_combo->Append( wxT( p_newgroup->psz_name));
+            group_combo->Append( wxU( p_newgroup->psz_name ) );
         }
         delete( p_newgroup );
     }
