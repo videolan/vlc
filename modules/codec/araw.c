@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: araw.c,v 1.22 2003/11/05 01:47:40 fenrir Exp $
+ * $Id: araw.c,v 1.23 2003/11/08 04:57:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -319,11 +319,13 @@ static int DecoderInit( decoder_t *p_dec )
         {
             p_sys->output_format.i_format = AOUT_FMT_S16_NE;
             p_sys->p_logtos16  = alawtos16;
+            p_wf->wBitsPerSample = 8;
         }
         else if( p_dec->p_fifo->i_fourcc == VLC_FOURCC( 'u', 'l', 'a', 'w' ) )
         {
             p_sys->output_format.i_format = AOUT_FMT_S16_NE;
             p_sys->p_logtos16  = ulawtos16;
+            p_wf->wBitsPerSample = 8;
         }
     }
     p_sys->output_format.i_rate = p_wf->nSamplesPerSec;
