@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.94 2002/05/14 20:27:25 massiot Exp $
+ * $Id: mpeg_system.c,v 1.95 2002/05/14 20:54:52 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1151,7 +1151,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     /* Don't change the order of the tests : if b_psi then p_pgrm_demux 
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
-    if( ( p_es != NULL ) && 
+    if( ( p_es  ) && 
         ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr ) )
     {
         p_es->c_packets++;
@@ -1211,40 +1211,6 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                         p_es_demux->i_continuity_counter = (p[3] & 0x0f) - 1;
                     }
     
-                    /* If this is a PCR_PID, and this TS packet contains a
-                     * PCR, we pass it along to the PCR decoder. */
-
-                    if( !b_psi && b_pcr && (p[5] & 0x10) )
-                    {
-                        /* There should be a PCR field in the packet, check
-                         * if the adaptation field is long enough to carry
-                         * it. */
-                        if( p[4] >= 7 )
-                        {
-                            /* Read the PCR. */
-                            mtime_t     pcr_time;
-                            pcr_time = ( (mtime_t)p[6] << 25 ) |
-                                       ( (mtime_t)p[7] << 17 ) |
-                                       ( (mtime_t)p[8] << 9 ) |
-                                       ( (mtime_t)p[9] << 1 ) |
-                                       ( (mtime_t)p[10] >> 7 );
-                            /* Call the pace control. */
-                            for( i_dummy = 0; 
-                                    i_dummy < p_input->stream.i_pgrm_number; 
-                                    i_dummy ++ )
-                            {
-                                if( ( ( pgrm_ts_data_t * )
-                                    p_input->stream.pp_programs[i_dummy]->
-                                    p_demux_data )->i_pcr_pid == i_pid )
-                                {
-                                    input_ClockManageRef( p_input,
-                                        p_input->stream.pp_programs[i_dummy],
-                                        pcr_time );
-                                }
-                            }
-
-                        }
-                    } /* PCR ? */
                 } /* valid TS adaptation field ? */
             } /* length > 0 */
         } /* has adaptation field */
@@ -1299,6 +1265,30 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
             } /* not continuous */
         } /* continuity */
     } /* if selected or PCR */
+    
+    /* Handle PCR */
+    if( b_pcr && b_adaptation && (p[5] & 0x10) && p[4]>=7 )
+    {
+        /* Read the PCR. */
+        mtime_t     pcr_time;
+        pcr_time = ( (mtime_t)p[6] << 25 ) |
+                   ( (mtime_t)p[7] << 17 ) |
+                   ( (mtime_t)p[8] << 9 ) |
+                   ( (mtime_t)p[9] << 1 ) |
+                   ( (mtime_t)p[10] >> 7 );
+        /* Call the pace control. */
+        for( i_dummy = 0; i_dummy < p_input->stream.i_pgrm_number; 
+                                i_dummy ++ )
+        {
+            if( ( ( pgrm_ts_data_t * ) p_input->stream.pp_programs[i_dummy]->
+                        p_demux_data )->i_pcr_pid == i_pid )
+            {
+                input_ClockManageRef( p_input,
+                    p_input->stream.pp_programs[i_dummy], pcr_time );
+            }
+        }
+
+    }
     
     /* Trash the packet if it has no payload or if it isn't selected */
     if( b_trash )
