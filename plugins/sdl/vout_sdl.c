@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.60 2001/07/27 16:40:20 massiot Exp $
+ * $Id: vout_sdl.c,v 1.61 2001/07/30 13:57:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -40,15 +40,7 @@
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
 #endif
 
-#if HAVE_SDL_SDL_H
-#   include <SDL/SDL.h>
-#elif HAVE_SDL11_SDL_H
-#   include <SDL11/SDL.h>
-#elif HAVE_SDL12_SDL_H
-#   include <SDL12/SDL.h>
-#else
-#   error
-#endif
+#include SDL_INCLUDE_FILE
 
 #include "config.h"
 #include "common.h"

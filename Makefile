@@ -2,7 +2,9 @@
 # vlc (VideoLAN Client) main Makefile - (c)1998 VideoLAN
 ###############################################################################
 
-include Makefile.opts
+ifeq ($(shell [ ! -r Makefile.opts ] && echo 1),)
+    include Makefile.opts
+endif
 
 ###############################################################################
 # Objects and files
@@ -95,7 +97,13 @@ export
 #
 # Virtual targets
 #
-all: vlc ${ALIASES} plugins vlc.app
+all: Makefile.opts vlc ${ALIASES} plugins vlc.app
+
+Makefile.opts:
+	@echo "**** No configuration found, running ./configure..."
+	./configure
+	$(MAKE) all
+	exit
 
 clean: libdvdcss-clean plugins-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
@@ -279,7 +287,7 @@ libdvdcss-snapshot: clean Makefile.opts
 	rm -Rf /tmp/libdvdcss-${LIBDVDCSS_VERSION}*
 
 .PHONY: vlc.app
-vlc.app:
+vlc.app: Makefile.opts
 ifneq (,$(findstring darwin,$(SYS)))
 	rm -Rf vlc.app
 	mkdir -p vlc.app/Contents/Resources
@@ -375,6 +383,6 @@ $(BUILTIN_OBJ): FORCE
 #
 # libdvdcss target
 #
-libdvdcss:
+libdvdcss: Makefile.opts
 	cd extras/libdvdcss && $(MAKE)
 

@@ -88,6 +88,9 @@
 /* Define if you have the <getopt.h> header file.  */
 #undef HAVE_GETOPT_H
 
+/* Define if you have the <gtk/gtk.h> header file.  */
+#undef HAVE_GTK_GTK_H
+
 /* Define if you have the <image.h> header file.  */
 #undef HAVE_IMAGE_H
 
@@ -145,9 +148,6 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
-/* Define if you have the <videolan/dvdcss.h> header file.  */
-#undef HAVE_VIDEOLAN_DVDCSS_H
-
 /* Define if you have the <winioctl.h> header file.  */
 #undef HAVE_WINIOCTL_H
 
@@ -193,12 +193,6 @@
 /* Define if you want DVD CSS decryption. */
 #undef HAVE_CSS
 
-/* Define if you have SDL/SDL.h */
-#undef HAVE_SDL_SDL_H
-
-/* Define if you have SDL/SDL11.h */
-#undef HAVE_SDL11_SDL_H
-
-/* Define if you have SDL/SDL12.h */
-#undef HAVE_SDL12_SDL_H
+/* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
+#undef SDL_INCLUDE_FILE
 

@@ -21,6 +21,11 @@ PLUGIN_KDE =	kde.o \
 		knetdialog.o \
 		ktitlemenu.o
 
+KDE_CFLAGS = -I/usr/include/kde -I/usr/include/qt
+ifneq ($(KDEDIR),)
+  KDE_CFLAGS += -I$(KDEDIR)/include -I$(QTDIR)/include
+endif
+
 PLUGIN_KDE_MOC = $(MOCFILES:%.cpp=%.o)
 
 BUILTIN_KDE = $(PLUGIN_KDE:%.o=BUILTIN_%.o)
@@ -39,19 +44,19 @@ $(MOCFILES): %.moc.cpp: %.h
 
 $(PLUGIN_KDE): %.o: .dep/%.dpp
 $(PLUGIN_KDE): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(KDE_CFLAGS) -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
 
 $(PLUGIN_KDE_MOC): %.o: .dep/%.dpp
 $(PLUGIN_KDE_MOC): %.o: %.cpp
-	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/kde -I/usr/include/qt -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) $(KDE_CFLAGS) -DPLUGIN -DMODULE_NAME=kde -c -o $@ $<
 
 $(BUILTIN_KDE): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_KDE): BUILTIN_%.o: %.cpp
-	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
+	$(CC) $(CFLAGS) -DBUILTIN $(KDE_CFLAGS) -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
 
 $(BUILTIN_KDE_MOC): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_KDE_MOC): BUILTIN_%.o: %.cpp
-	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/kde -I/usr/include/qt -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
+	$(CC) $(CFLAGS) -DBUILTIN $(KDE_CFLAGS) -DBUILTIN -DMODULE_NAME=kde -c -o $@ $<
 
 #
 # Real targets
