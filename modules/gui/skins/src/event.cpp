@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.21 2003/09/05 15:55:30 asmax Exp $
+ * $Id: event.cpp,v 1.22 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -271,7 +271,7 @@ void Event::CreateEvent()
             else if( strcmp( para1, "SET" ) == 0 )
             {
                 Param1 = VLC_VOLUME_SET;
-                Param2 = atoi( para2 ) * AOUT_VOLUME_MAX / 100;
+                Param2 = atoi( para2 ) * (AOUT_VOLUME_MAX * 2) / 100;
             }
             break;
 

@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.5 2003/10/07 14:59:10 gbazin Exp $
+ * $Id: mp4.c,v 1.6 2003/10/17 16:40:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,6 +92,8 @@ struct sout_mux_sys_t
     uint64_t i_mdat_pos;
     uint64_t i_pos;
 
+    mtime_t  i_start_dts;
+
     int          i_nb_streams;
     mp4_stream_t **pp_streams;
 };
@@ -148,6 +150,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_streams   = NULL;
     p_sys->i_mdat_pos   = 0;
     p_sys->b_mov        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mov" );
+    p_sys->i_start_dts  = 0;
 
     msg_Info( p_mux, "Open" );
 
@@ -1047,6 +1050,8 @@ static int Mux( sout_mux_t *p_mux )
             return( VLC_SUCCESS );
         }
 
+        if( !p_sys->i_start_dts )
+            p_sys->i_start_dts = i_dts;
 
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (mp4_stream_t*)p_input->p_sys;
@@ -1061,6 +1066,16 @@ static int Mux( sout_mux_t *p_mux )
         p_stream->entry[p_stream->i_entry_count].i_dts   = p_data->i_dts;
         p_stream->entry[p_stream->i_entry_count].i_length=
             __MAX( p_data->i_length, 0 );
+
+        if( p_stream->i_entry_count == 0 )
+        {
+            /* Here is another bad hack.
+             * To make sure audio/video are in sync, we report a corrected
+             * length for the 1st sample. */
+            p_stream->entry[p_stream->i_entry_count].i_length =
+                __MAX( p_data->i_length, 0 ) +
+                p_data->i_pts - p_sys->i_start_dts;
+        }
 
         p_stream->i_entry_count++;
         if( p_stream->i_entry_count >= p_stream->i_entry_max )

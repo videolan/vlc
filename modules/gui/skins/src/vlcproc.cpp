@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.46 2003/10/16 16:04:25 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.47 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -569,7 +569,8 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
             aout_VolumeDown( p_intf, 1, NULL );
             break;
         case VLC_VOLUME_SET:
-            aout_VolumeSet( p_intf, param * AOUT_VOLUME_MAX / SLIDER_RANGE );
+            aout_VolumeSet( p_intf, param * (AOUT_VOLUME_DEFAULT * 2) /
+                            SLIDER_RANGE );
             break;
     }
     aout_VolumeGet( p_intf, &volume );

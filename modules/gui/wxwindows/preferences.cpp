@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.34 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: preferences.cpp,v 1.35 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -980,9 +980,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                        -16000, 16000, p_item->i_value);
                 spin->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.spinctrl = spin;
-                panel_sizer->Add( label, 3, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
-                panel_sizer->Add( spin, 1, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5 );
 
                 spin->SetClientData((void *)config_data);
@@ -1028,9 +1028,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                            wxTE_PROCESS_ENTER );
                 textctrl->SetToolTip( wxU(p_item->psz_longtext) );
                 config_data->control.textctrl = textctrl;
-                panel_sizer->Add( label, 3, wxALIGN_CENTER_VERTICAL 
-                                  | wxALL | wxEXPAND, 5 );
-                panel_sizer->Add( textctrl, 1, wxALIGN_CENTER_VERTICAL 
+                panel_sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL 
+                                  | wxALL, 5 );
+                panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL 
                                   | wxALL, 5);
                 if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
                 break;

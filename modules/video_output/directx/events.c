@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.23 2003/09/24 16:10:02 gbazin Exp $
+ * $Id: events.c,v 1.24 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -224,26 +224,34 @@ void DirectXEventThread( event_thread_t *p_event )
                 break;
 
             case VK_LEFT:
-                /* input_Seek( p_event->p_vout, -5,
-                   INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "LEFT";
-                var_Set( p_event->p_vout, "key-pressed", val );
+                if( GetKeyState(VK_CONTROL) & 0x8000 )
+                {
+                    input_Seek( p_event->p_vout, -60,
+                                INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                }
+                else
+                {
+                    val.psz_string = "LEFT";
+                    var_Set( p_event->p_vout, "key-pressed", val );
+                }
                 break;
             case VK_RIGHT:
-                /* input_Seek( p_event->p_vout, 5,
-                   INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "RIGHT";
-                var_Set( p_event->p_vout, "key-pressed", val );
+                if( GetKeyState(VK_CONTROL) & 0x8000 )
+                {
+                   input_Seek( p_event->p_vout, 60,
+                               INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                }
+                else
+                {
+                    val.psz_string = "RIGHT";
+                    var_Set( p_event->p_vout, "key-pressed", val );
+                }
                 break;
             case VK_UP:
-                /* input_Seek( p_event->p_vout, 60,
-                   INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "UP";
                 var_Set( p_event->p_vout, "key-pressed", val );
                 break;
             case VK_DOWN:
-                /* input_Seek( p_event->p_vout, -60,
-                   INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
                 val.psz_string = "DOWN";
                 var_Set( p_event->p_vout, "key-pressed", val );
                 break;

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.22 2003/09/26 16:03:21 gbazin Exp $
+ * $Id: directx.c,v 1.23 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -221,11 +221,10 @@ static int OpenVideo( vlc_object_t *p_this )
     }
 
     /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "directx-on-top", VLC_VAR_BOOL );
+    var_Create( p_vout, "directx-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     text.psz_string = _("Always on top");
     var_Change( p_vout, "directx-on-top", VLC_VAR_SETTEXT, &text, NULL );
-    val.b_bool = config_GetInt( p_vout, "directx-on-top" );
-    var_Set( p_vout, "directx-on-top", val );
+    var_Get( p_vout, "directx-on-top", &val );
     p_vout->p_sys->b_on_top_change = val.b_bool; 
     var_AddCallback( p_vout, "directx-on-top", OnTopCallback, NULL );
 

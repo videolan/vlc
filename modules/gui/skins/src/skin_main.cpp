@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.49 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.50 2003/10/17 16:40:09 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -358,7 +358,7 @@ int SkinManage( intf_thread_t *p_intf )
         OSAPI_PostMessage( NULL, CTRL_SET_SLIDER,
             (unsigned int)
             p_intf->p_sys->p_theme->EvtBank->Get( "volume_refresh" ),
-            (long)( volume * SLIDER_RANGE / AOUT_VOLUME_MAX ) );
+            (long)( volume * SLIDER_RANGE / (AOUT_VOLUME_DEFAULT * 2) ) );
 
         // Refresh slider
         // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
