@@ -236,7 +236,7 @@ static void Run( intf_thread_t *p_intf )
         /* Find action triggered by hotkey */
         i_action = 0;
         i_key = GetKey( p_intf );
-        for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+        for( i = 0; i_key != -1 && p_hotkeys[i].psz_action != NULL; i++ )
         {
             if( p_hotkeys[i].i_key == i_key )
             {
@@ -298,6 +298,10 @@ static void Run( intf_thread_t *p_intf )
                 var_Set( p_playlist, "intf-show", val );
                 vlc_object_release( p_playlist );
             }
+        }
+        else if( i_action == ACTIONID_SNAPSHOT )
+        {
+            if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
         }
         else if( i_action == ACTIONID_SUBDELAY_DOWN )
         {

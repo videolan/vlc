@@ -252,6 +252,11 @@ static char *ppsz_align_descriptions[] =
     "picture quality, for instance deinterlacing, or to clone or distort " \
     "the video window.")
 
+#define SNAP_PATH_TEXT N_("Video snapshot directory")
+#define SNAP_PATH_LONGTEXT N_( \
+    "Allows you to specify the directory where the video snapshots will " \
+    "be stored.")
+
 #define ASPECT_RATIO_TEXT N_("Source aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
     "This will force the source aspect ratio. For instance, some DVDs claim " \
@@ -788,6 +793,8 @@ static char *ppsz_align_descriptions[] =
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
 #define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows")
+#define SNAP_KEY_TEXT N_("Take video snapshot")
+#define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
 #define PLAYLIST_USAGE N_( \
     "\nPlaylist MRL syntax:" \
@@ -899,6 +906,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_module_list_cat( "filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
+    add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
+                   SNAP_PATH_LONGTEXT, VLC_TRUE );
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
@@ -1193,6 +1202,7 @@ vlc_module_begin();
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
+#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2
@@ -1251,6 +1261,7 @@ vlc_module_begin();
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
+#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
@@ -1342,6 +1353,8 @@ vlc_module_begin();
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
              INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-snapshot", KEY_SNAPSHOT, NULL,
+             SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, VLC_TRUE );
 
     add_key( "key-set-bookmark1", KEY_SET_BOOKMARK1, NULL,
              SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
@@ -1454,6 +1467,7 @@ static struct hotkey p_hotkeys[] =
     { "key-audio-track", ACTIONID_AUDIO_TRACK, 0},
     { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0},
     { "key-intf-show", ACTIONID_INTF_SHOW, 0},
+    { "key-snapshot", ACTIONID_SNAPSHOT, 0},
     { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
     { "key-nav-up", ACTIONID_NAV_UP, 0 },
     { "key-nav-down", ACTIONID_NAV_DOWN, 0 },
