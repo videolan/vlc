@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html> <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <meta name="Description" content="Web streaming">
+  <meta name="Keywords" content="MPEG, Web, streaming, VideoLAN">
+  <meta name="Author"
+        content="Christophe Massiot, massiot@via.ecp.fr">
+  <link rev="made" href="mailto:massiot@via.ecp.fr">
+  <title>How to setup VLC for web streaming (X11 only)</title>
+  <style type="text/css">
+    <!--
+    body, table, td, p, blockquote, th, td, tr, caption, dir
+          {font-family: Verdana, Arial, Helvetica, Lucida, sans-serif;
+           text-decoration: none; font-weight: 100; margin-left: 25px;}
+    ul, li {font-family: Verdana, Arial, Helvetica, Lucida, sans-serif;
+            text-decoration: none; font-weight: 100;}
+    code {font-family: "Letter Gothic", "Courier New", Courier, monospace;
+          font-weight: bold}
+    pre {font-family: "Letter Gothic", "Courier New", Courier, monospace;}
+    a {text-decoration: none}
+    b, strong {font-weight: bold}
+    h1 {font-family: Verdana, Arial, Helvetica, Lucida, sans-serif;
+        font-weight: bold; text-align: center}
+    h2 {font-family: Verdana, Arial, Helvetica, Lucida, sans-serif;
+        font-weight: bold; margin-left: -20px;}
+    h3 {font-family: Verdana, Arial, Helvetica, Lucida, sans-serif;
+        font-weight: bold; text-decoration: underline}
+    .lettrine {font-size: 18pt;}
+    -->
+  </style>
+</head>
+
+<body bgcolor="#E8E8E8">
+
+  <h1> How to set up VLC for web streaming (X11 only) </h1>
+
+  <h2> Abstract </h2>
+
+VLC is a separate application which can either read a plain file or a TS
+network stream. Using XSwallow, it is possible to incorporate VLC video
+output window right into the window of a browser. With additional
+tricks, it is also possible to launch a VLMS (VideoLAN MiniServer) on the
+server-side, and have the client read a live network stream. This document,
+intended for expert users only, describes the ways to do it.
+
+
+  <h2> Installing and configuring XSwallow for plain MPEG files </h2>
+
+XSwallow is a software which allows any X11 window to be "swallowed"
+(technically, just reparented, so that it has no effet on performance
+anyhow) into the window of a netscape-compatible browser (Navigator,
+Mozilla, Konqueror, Galeon, Opera...). This is indeed a trick in the X11
+windowing model, and don't even expect to port this behaviour to any
+non-X11-based operating system, even supported by VLC (MS Windows,
+MacOS X, BeOS, QNX, ...). <p>
+
+Download it here : <a href="http://www.csn.ul.ie/~caolan/docs/XSwallow.html">
+http://www.csn.ul.ie/~caolan/docs/XSwallow.html</a>. Compilation is really
+straightforward, it basically boils down to some :
+<pre> make -f makefile.linux </pre> <p>
+
+Place the resulting xswallow.so in a directory scanned by your browser
+for plug-ins (for instance, /usr/lib/netscape/plugins, this scan path
+can with some browsers be read in $NPX_PLUGIN_PATH) and xswallow.conf
+in the directory indicated by the environment variable $MOZILLA_HOME. If
+it is currently unset, <b>set it</b> with for instance :
+<pre> export MOZILLA_HOME=/etc </pre> <p>
+
+Of course your mileage may vary. The last step is to customize xswallow.conf
+so that it launches VLC to handle MPEG files. Comment out all lines you
+don't need, and add :
+<pre>
+video/mpeg; mpeg,mpg,vob;   vlc -I dummy -V xvideo %s; VideoLAN Client 0.2.83 (XVideo output); VideoLAN
+</pre> <p>
+
+Notes :
+<ul>
+  <li> This assumes vlc is in your $PATH, if it is not the case, adapt it.
+  <li> If nothing shows up, it might be because VLC cannot find its plug-ins.
+       Please check that they are in an appropriate place (such as
+       /usr/lib/videolan/vlc). You can try to add -vvvvv to the arguments to
+       see where it fails.
+  <li> The third field on the line is the actual name of the window to
+       swallow. This is currently annoying, you will have to guess the
+       name of the video output window, ie. changing the version number
+       and the output plug-in (to SDL for instance if you use SDL). At
+       present there is no way to force VLC to use a definite name, but
+       it will be added by 0.2.90.
+  <li> When the window is first spawned, it will appear on screen and
+       then be quicky reparented, making some flickering. The usual
+       workaround is to make the window appear at offset +10000+10000
+       using the --geometry switch, but it is not currently supported
+       by VLC. The will be addressed by 0.2.90 too.
+  <li> If your window manager isn't configured for automatic placement
+       of new windows, it may ask you to manually place the window before
+       XSwallow can swallow it. This is annoying, too. The only workaround
+       is to disable the functionality (for instance with twm, add
+       RandomPlacement in .twmrc). It will be addressed at the same time
+       with --geometry.
+  <li> XSwallow will first download the file, and then launch VLC. There
+       is no way to begin reading the stream before it is complete, à la
+       QuickTime plug-in. This will be addressed in a future version of
+       VLC (0.4). If you want to do live streaming, proceed to the next
+       chapter.
+</ul> <p>
+
+From now on, if you have your browser reload its plug-in list, it will
+display VideoLAN as application handler for video/mpeg. You should now
+try and see what it yields.
+
+
+  <h2> Tricks for live web streaming using VLMS </h2>
+
+With a little trick, it is possible to stream a video using VLC and VLMS,
+and make it appear in a Web browser (without having a local copy of the
+file). This will only work if there is no firewall (nor masquerading)
+between the server and the client. It requires to have a CGI support
+built into the Web server. <p>
+
+Here is the sketch :
+<ul>
+  <li> The client requests a specific page, say video.html. This page
+       contains an image tag to a file vlc.ts, AND launches a VLMS
+       through a CGI script.
+  <li> The client receives the vlc.ts file which contains the address
+       of the VLMS server, and through a special mime-type in XSwallow
+       spawns a VLC.
+  <li> As soon as VLC begins to receive the stream, it is swallowed by
+       XSwallow and appears in the browser's window.
+</ul>
+
+  <h3> Configuring the Web server </h3>
+
+In this section I will only give configuration directives for Apache.
+You need to add a new MIME type for TS stream in httpd.conf :
+<pre> AddType video/x-mpeg-ts .ts </pre> <p>
+
+And relaunch your Web server (apachectl reload). Next, create the vlc.html
+page. You need two specific lines, one to load vlc.ts, the other to start
+the VLMS server ; for instance in PHP (adapt it for Perl, Java, or whatever) :
+<pre>
+&lt;img src="vlc.ts"&gt;
+&lt;?php system("/var/www/cgi-bin/stream.sh $REMOTE_ADDR mystream.mpg &gt; /dev/null 2&gt;&amp;1 &amp;"); ?&gt;
+</pre> <p>
+
+Where stream.sh is a simple shell script :
+<pre>
+#!/bin/sh
+vlms -d $1 -a mpeg $2
+</pre> <p>
+
+VLMS starts streaming mystream.mpg to $REMOTE_ADDR (the IP address fetched
+by the server, this is why you cannot do it through firewalls) on port 1234.
+
+Notes :
+<ul>
+  <li> The -a mpeg option may surprise you ; the VLMS doesn't preparse the
+       stream and thus cannot know which audio channel to send. If you had
+       an AC3 audio track, you could have put -a ac3. You can also
+       activate subtitles with -s.
+  <li> VLMS only reads MPEG-1 files from version 0.2 on. If you have an
+       older version, you may want to upgrade.
+  <li> It is possible that, due to the client latency, the client misses
+       the first frames of the stream. I have no ideal workaround for this.
+  <li> Some streams (especially MPEG-1) only have one sequence header at the
+       beginning of the stream. Since the client risks missing it, it may
+       be completely unable to decode the stream _at all_. If you only get
+       a blank screen, please try with another stream, such as one test
+       stream on <a href="ftp://ftp.videolan.org/pub/videolan/streams">
+       ftp://ftp.videolan.org/pub/videolan/streams</a> before issuing
+       a bug report.
+  <li> You should be careful that the stream.sh script is indeed launched
+       in the background. If your CGI program waits for it, it doesn't
+       hang up the connection until it finishes, and Web browsers wait
+       for the connection to be closed before launching plug-ins. In
+       that case you have nothing on screen, not even a <em> Click to
+       abort swallow </em> message.
+</ul> <p>
+
+Finally, create the vlc.ts file. It just contains the address of the server,
+so that VLC can bind on it (you can't retrieve that from XSwallow). For
+instance :
+<pre> streaming.idealx.com </pre> <p>
+
+  <h3> Configuring XSwallow </h3>
+
+You need to add an entry video/x-mpeg-ts in you xswallow.conf :
+<pre> video/x-mpeg-ts; ts; video-streaming.sh %s; VideoLAN Client 0.2.83 (XVideo output); VideoLAN </pre> <p>
+
+The same provisions as before apply here. The video-streaming.sh file is a
+simple shell script which retrieves the server's name and spawns VLC :
+<pre>
+#!/bin/sh
+SERVER=$( cat $@ )
+vlc -I dummy -V xvideo ts://$SERVER
+</pre> <p>
+
+Here you go. This is quite a hack, but it will hold until the next major
+release of VLC.
+
+
+  <h2> Acknowledgements </h2>
+
+This page has been written by <a href="mailto:massiot@via.ecp.fr">
+Christophe Massiot</a> for <a href="http://www.idealx.com/"> IDEALX
+S.A.S</a>. <br>
+<em> $Id: web-streaming.html,v 1.1 2001/08/22 18:47:52 massiot Exp $ </em>
+
+</body>
+
+</html>
+
