@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.24 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.25 2003/10/01 22:39:43 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -128,32 +128,51 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_3vid         VLC_FOURCC('3','v','i','d')
 
 /* H263 and H263i */
+/* H263(+) is also known as Real Video 1.0 */
 #define FOURCC_H263         VLC_FOURCC('H','2','6','3')
 #define FOURCC_h263         VLC_FOURCC('h','2','6','3')
 #define FOURCC_U263         VLC_FOURCC('U','2','6','3')
 #define FOURCC_I263         VLC_FOURCC('I','2','6','3')
 #define FOURCC_i263         VLC_FOURCC('i','2','6','3')
+/* Flash (H263) variant */
+#define FOURCC_FLV1         VLC_FOURCC('F','L','V','1')
+
 
 /* Sorenson v1/3 */
-#define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
-#define FOURCC_SVQ3 VLC_FOURCC( 'S', 'V', 'Q', '3' )
+#define FOURCC_SVQ1         VLC_FOURCC('S','V','Q','1')
+#define FOURCC_SVQ3         VLC_FOURCC('S','V','Q','3')
 
 /* mjpeg */
-#define FOURCC_MJPG VLC_FOURCC( 'M', 'J', 'P', 'G' )
-#define FOURCC_mjpg VLC_FOURCC( 'm', 'j', 'p', 'g' )
+#define FOURCC_MJPG         VLC_FOURCC( 'M', 'J', 'P', 'G' )
+#define FOURCC_mjpg         VLC_FOURCC( 'm', 'j', 'p', 'g' )
     /* for mov file */
-#define FOURCC_mjpa VLC_FOURCC( 'm', 'j', 'p', 'a' )
+#define FOURCC_mjpa         VLC_FOURCC( 'm', 'j', 'p', 'a' )
     /* for mov file XXX: untested */
-#define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'p', 'b' )
+#define FOURCC_mjpb         VLC_FOURCC( 'm', 'j', 'p', 'b' )
 
-#define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
-#define FOURCC_JPEG VLC_FOURCC( 'J', 'P', 'E', 'G' )
-#define FOURCC_JFIF VLC_FOURCC( 'J', 'F', 'I', 'F' )
+#define FOURCC_jpeg         VLC_FOURCC( 'j', 'p', 'e', 'g' )
+#define FOURCC_JPEG         VLC_FOURCC( 'J', 'P', 'E', 'G' )
+#define FOURCC_JFIF         VLC_FOURCC( 'J', 'F', 'I', 'F' )
+#define FOURCC_JPGL         VLC_FOURCC( 'J', 'P', 'G', 'L' )
 
-/* wmv */
+/* Microsoft Video 1 */
+#define FOURCC_MSVC         VLC_FOURCC('M','S','V','C') 
+#define FOURCC_msvc         VLC_FOURCC('m','s','v','c') 
+#define FOURCC_CRAM         VLC_FOURCC('C','R','A','M') 
+#define FOURCC_cram         VLC_FOURCC('c','r','a','m') 
+#define FOURCC_WHAM         VLC_FOURCC('W','H','A','M') 
+#define FOURCC_wham         VLC_FOURCC('w','h','a','m') 
+
+/* Windows Screen Video */
+#define FOURCC_MSS1         VLC_FOURCC('M','S','S','1')
+
+/* Microsoft RLE */
+#define FOURCC_mrle         VLC_FOURCC('m','r','l','e')
+#define FOURCC_1000         VLC_FOURCC(0x1,0x0,0x0,0x0)
+
+/* Windows Media Video */
 #define FOURCC_WMV1         VLC_FOURCC('W','M','V','1')
 #define FOURCC_WMV2         VLC_FOURCC('W','M','V','2')
-#define FOURCC_MSS1         VLC_FOURCC('M','S','S','1')
 
 /* DV */
 #define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')
@@ -174,9 +193,31 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_VP31         VLC_FOURCC('V','P','3','1')
 #define FOURCC_vp31         VLC_FOURCC('v','p','3','1')
 
-/* Asus Video 1 */
-#define FOURCC_asv1         VLC_FOURCC('a','s','v','1')
+/* Asus Video */
 #define FOURCC_ASV1         VLC_FOURCC('A','S','V','1')
+#define FOURCC_ASV2         VLC_FOURCC('A','S','V','2')
+
+/* ATI VCR1 */
+#define FOURCC_VCR1         VLC_FOURCC('V','C','R','1')
+
+/* FFMPEG Video 1 (lossless codec) */
+#define FOURCC_FFV1         VLC_FOURCC('F','F','V','1')
+
+/* Cirrus Logic AccuPak */
+#define FOURCC_CLJR         VLC_FOURCC('C','L','J','R')
+
+/* Creative YUV */
+#define FOURCC_CYUV         VLC_FOURCC('C','Y','U','V')
+
+/* Huff YUV */
+#define FOURCC_HFYU         VLC_FOURCC('H','F','Y','U')
+
+/* Apple Video */
+#define FOURCC_rpza         VLC_FOURCC('r','p','z','a')
+
+/* Cinepak */
+#define FOURCC_cvid         VLC_FOURCC('c','v','i','d')
+
 
 /*****************************************************************************
  * Audio codec fourcc
@@ -189,4 +230,7 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 
 #define FOURCC_MAC3         VLC_FOURCC('M','A','C','3')
 #define FOURCC_MAC6         VLC_FOURCC('M','A','C','6')
+
+#define FOURCC_RA10         VLC_FOURCC('1','4','_','4')
+#define FOURCC_RA20         VLC_FOURCC('2','8','_','8')
 

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.51 2003/09/26 16:10:24 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.52 2003/10/01 22:39:43 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -498,6 +498,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_MPEG4;
             psz_name = "MPEG-4";
             break;
+
 /* FIXME FOURCC_H263P exist but what fourcc ? */
         case FOURCC_H263:
         case FOURCC_h263:
@@ -519,7 +520,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Video 1";
             break;
         case FOURCC_WMV2:
-        case FOURCC_MSS1:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_WMV2;
             psz_name ="Windows Media Video 2";
@@ -530,6 +530,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_jpeg:
         case FOURCC_JPEG:
         case FOURCC_JFIF:
+        case FOURCC_JPGL:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_MJPEG;
             psz_name = "Motion JPEG";
@@ -580,6 +581,19 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Audio 2";
             break;
 
+        case FOURCC_HFYU:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_HUFFYUV;
+            psz_name ="Huff YUV";
+            break;
+
+        case FOURCC_CYUV:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_CYUV;
+            psz_name ="Creative YUV";
+            break;
+
+
 #if( ( LIBAVCODEC_BUILD >= 4663 ) && ( !defined( WORDS_BIGENDIAN ) ) )
         /* Quality of this decoder on ppc is not good */
         case FOURCC_IV31:
@@ -593,7 +607,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
 #endif
 
 #if LIBAVCODEC_BUILD >= 4668
-        /* Not yet finished 
+/* Sorta works */
         case FOURCC_vp31:
         case FOURCC_VP31:
             i_cat    = VIDEO_ES;
@@ -601,14 +615,96 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name = "On2's VP3 Video";
             break;
 
-        case FOURCC_asv1:
+#if ( !defined( WORDS_BIGENDIAN ) )
+/* Another thing that doesn't work */
         case FOURCC_ASV1:
             i_cat    = VIDEO_ES;
             i_codec  = CODEC_ID_ASV1;
             psz_name = "Asus V1";
-            break; */
+            break;
 #endif
 
+        case FOURCC_FFV1:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_FFV1;
+            psz_name = "FFMpeg Video 1";
+            break;
+
+        case FOURCC_RA10:
+            i_cat    = AUDIO_ES;
+            i_codec  = CODEC_ID_RA_144;
+            psz_name = "RealAudio 1.0";
+            break;
+
+        case FOURCC_RA20:
+            i_cat    = AUDIO_ES;
+            i_codec  = CODEC_ID_RA_288;
+            psz_name = "RealAudio 2.0";
+            break;
+#endif
+
+#if LIBAVCODEC_BUILD >= 4669
+        case FOURCC_FLV1:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_FLV1;
+            psz_name = "Flash Video";
+            break;
+
+        case FOURCC_VCR1:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_VCR1;
+            psz_name = "ATI VCR1";
+            break;
+
+#endif
+
+#if LIBAVCODEC_BUILD >= 4672
+        case FOURCC_CLJR:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_CLJR;
+            psz_name = "Creative Logic AccuPak";
+            break;
+#endif
+
+#if LIBAVCODEC_BUILD >= 4677
+        case FOURCC_ASV2:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_ASV2;
+            psz_name = "Asus V2";
+            break;
+#endif
+
+#if LIBAVCODEC_BUILD >= 4683
+        case FOURCC_rpza:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_RPZA;
+            psz_name = "Apple Video";
+            break;
+
+        case FOURCC_cvid:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_CINEPAK;
+            psz_name = "Cinepak";
+            break;
+
+        case FOURCC_mrle:
+        case FOURCC_1000:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_MSRLE;
+            psz_name = "Microsoft RLE";
+            break;
+
+        case FOURCC_cram:
+        case FOURCC_CRAM:
+        case FOURCC_msvc:
+        case FOURCC_MSVC
+        case FOURCC_wham:
+        case FOURCC_WHAM:
+            i_cat    = VIDEO_ES;
+            i_codec  = CODEC_ID_MSVIDEO1;
+            psz_name = "Microsoft Video 1";
+            break;
+#endif
         default:
             i_cat = UNKNOWN_ES;
             i_codec = CODEC_ID_NONE;
