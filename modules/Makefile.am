@@ -1,3 +1,5 @@
+NULL = 
+
 EXTRA_DIST = \
 	LIST \
 	access/Modules.am \
