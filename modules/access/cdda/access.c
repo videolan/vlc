@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.24 2004/02/11 18:08:05 gbazin Exp $
+ * $Id: access.c,v 1.25 2004/02/14 17:36:05 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1040,10 +1040,9 @@ E_(Open)( vlc_object_t *p_this )
 #undef area
 
     CDDAPlay( p_input, i_track);
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     CDDAFixupPlayList(p_input, p_cdda, psz_source, play_single_track);
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_input->pf_read = CDDARead;
     p_input->pf_seek = CDDASeek;

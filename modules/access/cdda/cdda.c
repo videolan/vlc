@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.17 2004/01/25 18:53:06 gbazin Exp $
+ * $Id: cdda.c,v 1.18 2004/02/14 17:36:05 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,8 +37,6 @@ void E_(Close)        ( vlc_object_t * );
 
 int  E_(OpenIntf)     ( vlc_object_t * );
 void E_(CloseIntf)    ( vlc_object_t * );
-int  E_(DemuxOpen)    ( vlc_object_t * p_this);
-void E_(DemuxClose)   ( vlc_object_t * p_this);
 
 int  E_(DebugCB)      ( vlc_object_t *p_this, const char *psz_name,
                         vlc_value_t oldval, vlc_value_t val,
@@ -182,11 +180,5 @@ vlc_module_begin();
                  VLC_TRUE );
 
 #endif
-
-    add_submodule();
-        set_description( _("Audio CD demux") );
-        set_capability( "demux", 0 );
-        set_callbacks( E_(DemuxOpen), E_(DemuxClose) );
-        add_shortcut( "cdda" );
 
 vlc_module_end();
