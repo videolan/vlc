@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.18 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,6 +63,11 @@ static void Manage       ( intf_thread_t * );
     "You can set the maximum height that the configuration windows in the " \
     "preferences menu will occupy.")
 
+#define PATH_TEXT N_("Interface default search path")
+#define PATH_LONGTEXT N_( \
+    "This option allows you to set the default path that the interface will " \
+    "open when looking for a file.")
+
 vlc_module_begin();
 #ifdef WIN32
     int i = 90;
@@ -77,6 +82,8 @@ vlc_module_begin();
               TOOLBAR_LONGTEXT, VLC_FALSE );
     add_integer( "gnome-prefs-maxh", 480, NULL,
                  PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT, VLC_TRUE );
+    add_directory( "gnome-search-path", NULL, NULL, PATH_TEXT,
+                   PATH_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", i );
     set_callbacks( Open, Close );

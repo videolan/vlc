@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.23 2004/01/05 13:07:03 zorglub Exp $
+ * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -555,7 +555,7 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
                          "p_intf", p_intf );
 
     /* FileOpen stuff */
-    psz_var = config_GetPsz( p_intf, "search-path" );
+    psz_var = config_GetPsz( p_intf, MODULE_STRING"-search-path" );
     if( psz_var )
     {
         gtk_file_selection_set_filename( GTK_FILE_SELECTION(
