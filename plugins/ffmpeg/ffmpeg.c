@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.5 2002/05/06 22:02:32 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.6 2002/05/07 13:55:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -133,7 +133,7 @@ static int decoder_Probe( u8 *pi_type )
  * Functions locales 
  *****************************************************************************/
 
-static int __ParseBitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
+static void __ParseBitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
 {
     h->i_size          = __GetDoubleWordLittleEndianFromBuff( p_data );
     h->i_width         = __GetDoubleWordLittleEndianFromBuff( p_data + 4 );
@@ -146,7 +146,6 @@ static int __ParseBitMapInfoHeader( bitmapinfoheader_t *h, byte_t *p_data )
     h->i_ypelspermeter = __GetDoubleWordLittleEndianFromBuff( p_data + 28 );
     h->i_clrused       = __GetDoubleWordLittleEndianFromBuff( p_data + 32 );
     h->i_clrimportant  = __GetDoubleWordLittleEndianFromBuff( p_data + 36 );
-    return( 0 );
 }
 /* get the first pes from fifo */
 static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
@@ -364,7 +363,7 @@ static int InitThread( videodec_thread_t *p_vdec )
     /*init ffmpeg */
     /* TODO: add a global variable to know if init was already done 
         in case we use it also for audio */
-    if( b_ffmpeginit == 0 )
+    if( !b_ffmpeginit )
     {
         avcodec_init();
         avcodec_register_all();
@@ -396,7 +395,7 @@ static int InitThread( videodec_thread_t *p_vdec )
             p_vdec->psz_namecodec = "Unknown";
     }
 
-    if( p_vdec->p_codec == NULL )
+    if( !p_vdec->p_codec )
     {
         intf_ErrMsg( "vdec error: codec not found (%s)",
                      p_vdec->psz_namecodec );
@@ -427,9 +426,9 @@ static int InitThread( videodec_thread_t *p_vdec )
     {
         vlc_mutex_unlock( &p_vout_bank->lock );
         vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
+        vlc_mutex_lock( &p_vout_bank->lock );
         p_vout_bank->i_count--; 
         p_vout_bank->pp_vout[ 0 ] = NULL;
-        vlc_mutex_lock( &p_vout_bank->lock );
     }
     vlc_mutex_unlock( &p_vout_bank->lock );
     __PACKET_REINIT( p_vdec );
@@ -457,13 +456,14 @@ static void EndThread( videodec_thread_t *p_vdec )
                         p_vdec->psz_namecodec);
     }
 
+    vlc_mutex_lock( &p_vout_bank->lock );
     if( p_vout_bank->i_count != 0 )
     {
         vlc_mutex_unlock( &p_vout_bank->lock );
         vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
+        vlc_mutex_lock( &p_vout_bank->lock );
         p_vout_bank->i_count--; 
         p_vout_bank->pp_vout[ 0 ] = NULL;
-        vlc_mutex_lock( &p_vout_bank->lock );
     }
     vlc_mutex_unlock( &p_vout_bank->lock );
 
@@ -528,7 +528,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     {
         /* create vout */
 
-        /* ffmpeg set it for our with some codec */  
+        /* ffmpeg set it for us with some codec */  
         if( (!p_vdec->format.i_width )||(!p_vdec->format.i_height) )
         {
             p_vdec->format.i_width  = p_vdec->p_context->width;
