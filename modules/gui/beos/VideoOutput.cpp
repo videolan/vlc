@@ -762,7 +762,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
                 {
                     msg_Dbg( p_vout, "using single-buffered overlay" );
                     bitmap_count = 2;
-                    if( bitmap[2] ) delete bitmap[2];
+                    if( bitmap[2] ) { delete bitmap[2]; bitmap[2] = NULL; }
                 }
                 break;
             }
