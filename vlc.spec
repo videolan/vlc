@@ -1,7 +1,7 @@
 
 
 %define name 		vlc
-%define vlc_ver 	0.4.0
+%define vlc_ver 	0.4.1
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -411,6 +411,9 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
+* Mon Jun 3 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.1-1mdk
+- new upstream release
+
 * Thu May 23 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.0-1mdk
 - version 0.4.0 with MPEG4 (DivX) support thx ffmpeg.
   thus s/MPEG, MPEG2 and DVD/multimedia/g
