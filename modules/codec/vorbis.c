@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.17 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: vorbis.c,v 1.18 2003/09/24 23:45:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -222,7 +222,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
     /* Block to Ogg packet */
     oggpacket.packet = p_block->p_buffer;
     oggpacket.bytes = p_block->i_buffer;
-    oggpacket.granulepos = p_block->i_dts;
+    oggpacket.granulepos = -1;
     oggpacket.b_o_s = 0;
     oggpacket.e_o_s = 0;
     oggpacket.packetno = 0;
@@ -380,6 +380,12 @@ static int ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     if( i_pts > 0 && i_pts != aout_DateGet( &p_sys->end_date ) )
     {
         aout_DateSet( &p_sys->end_date, i_pts );
+    }
+
+    if( !aout_DateGet( &p_sys->end_date ) )
+    {
+        /* We've just started the stream, wait for the first PTS. */
+        return VLC_SUCCESS;
     }
 
     if( p_sys->b_packetizer )
