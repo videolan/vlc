@@ -4,6 +4,7 @@
  * Copyright (C) 1999, 2000 VideoLAN
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Benoit Steiner <benny@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,9 +47,9 @@
 #if defined (HAVE_NET_IF_H)
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
-//#ifdef HAVE_SYS_SOCKIO_H
+#ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
-//#endif
+#endif
 
 #include "config.h"
 #include "common.h"

@@ -20,6 +20,9 @@ SNAPSHOTDIR=vlc-@VLC_VERSION@
 INSTALL=@INSTALL@
 ARCH=@ARCH@
 prefix=@prefix@
+CC=@CC@
+SHELL=@SHELL@
+
 
 #----------------- do not change anything below this line ----------------------
 
@@ -62,7 +65,6 @@ INCLUDE += -Iinclude -I/usr/local/include -I/usr/X11R6/include
 #
 # Libraries
 #
-
 ifeq ($(SYS),gnu)
 LIB += -lthreads -ldl
 endif
@@ -76,6 +78,10 @@ ifneq (,$(findstring linux,$(SYS)))
 LIB += -lpthread -ldl
 endif
 
+ifneq (,$(findstring solaris,$(SYS)))
+LIB += -ldl -lsocket -lnsl -lposix4 -lpthread
+endif
+
 ifeq ($(SYS),beos)
 LIB += -lbe -lroot -lgame
 else
@@ -83,7 +89,7 @@ LIB += -lm
 endif
 
 #
-# C compiler flags: compilation
+# C compiler flags: mainstream compilation
 #
 CFLAGS += $(DEFINE) $(INCLUDE)
 CFLAGS += -Wall -Winline
@@ -130,7 +136,7 @@ ifneq (,$(findstring sparc,$(ARCH)))
 CFLAGS += -mhard-float
 endif
 
-# /debug
+#end of optimisations
 endif
 
 # Optional MMX optimizations for x86
@@ -138,7 +144,12 @@ ifneq (,$(findstring mmx,$(ARCH)))
 CFLAGS += -DHAVE_MMX
 endif
 
-# End of optimizations
+#
+# C compiler flags: plugin compilation
+#
+ifneq (,$(findstring solaris,$(SYS)))
+PCFLAGS += -fPIC
+endif
 
 #
 # C compiler flags: dependancies
@@ -154,12 +165,12 @@ LCFLAGS += -Wall
 #LCFLAGS += -s
 
 #
-# Additionnal debugging flags
+# Debugging and profiling support (unless optimisations are active)
 #
-
-# Debugging and profiling support
-ifneq ($(OPTIMS),0)
+ifeq ($(DEBUG),1)
+ifneq ($(OPTIMS),1)
 CFLAGS += -g
+endif
 endif
 
 #################################################################################
@@ -169,88 +180,91 @@ endif
 #
 # C Objects
 # 
-interface_obj =  	interface/main.o \
-				interface/interface.o \
-				interface/intf_msg.o \
-				interface/intf_cmd.o \
-				interface/intf_ctrl.o \
-				interface/intf_console.o
+INTERFACE =	src/interface/main.o \
+		src/interface/interface.o \
+		src/interface/intf_msg.o \
+		src/interface/intf_cmd.o \
+		src/interface/intf_ctrl.o \
+		src/interface/intf_console.o
 
-input_obj =		input/input_ps.o \
-				input/mpeg_system.o \
-				input/input_ext-dec.o \
-				input/input.o
+INPUT =		src/input/input_ps.o \
+		src/input/mpeg_system.o \
+		src/input/input_ext-dec.o \
+		src/input/input.o
 
-audio_output_obj = 	audio_output/audio_output.o
+AUDIO_OUTPUT = 	src/audio_output/audio_output.o
 
-video_output_obj = 	video_output/video_output.o \
-				video_output/video_text.o \
-				video_output/video_spu.o \
-				video_output/video_yuv.o
+VIDEO_OUTPUT = 	src/video_output/video_output.o \
+		src/video_output/video_text.o \
+		src/video_output/video_spu.o \
+		src/video_output/video_yuv.o
 
-ac3_decoder_obj =	ac3_decoder/ac3_decoder_thread.o \
-				ac3_decoder/ac3_decoder.o \
-				ac3_decoder/ac3_parse.o \
-				ac3_decoder/ac3_exponent.o \
-				ac3_decoder/ac3_bit_allocate.o \
-				ac3_decoder/ac3_mantissa.o \
-				ac3_decoder/ac3_rematrix.o \
-				ac3_decoder/ac3_imdct.o \
-				ac3_decoder/ac3_downmix.o
-						
-lpcm_decoder_obj =	lpcm_decoder/lpcm_decoder_thread.o \
-				lpcm_decoder/lpcm_decoder.o
+AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
+		src/ac3_decoder/ac3_decoder.o \
+		src/ac3_decoder/ac3_parse.o \
+		src/ac3_decoder/ac3_exponent.o \
+		src/ac3_decoder/ac3_bit_allocate.o \
+		src/ac3_decoder/ac3_mantissa.o \
+		src/ac3_decoder/ac3_rematrix.o \
+		src/ac3_decoder/ac3_imdct.o \
+		src/ac3_decoder/ac3_downmix.o
 
-audio_decoder_obj =	audio_decoder/audio_decoder_thread.o \
-				audio_decoder/audio_decoder.o \
-				audio_decoder/audio_math.o
+LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
+		src/lpcm_decoder/lpcm_decoder.o
 
-spu_decoder_obj =	spu_decoder/spu_decoder.o
+AUDIO_DECODER =	src/audio_decoder/audio_decoder_thread.o \
+		src/audio_decoder/audio_decoder.o \
+		src/audio_decoder/audio_math.o
 
-#??generic_decoder_obj =		generic_decoder/generic_decoder.o
-# remeber to add it to OBJ 
+SPU_DECODER =	src/spu_decoder/spu_decoder.o
 
-video_parser_obj = 	video_parser/video_parser.o \
-				video_parser/vpar_headers.o \
-				video_parser/vpar_blocks.o \
-				video_parser/vpar_synchro.o \
-				video_parser/video_fifo.o
+#GEN_DECODER =	src/generic_decoder/generic_decoder.o
+
+
+VIDEO_PARSER = 	src/video_parser/video_parser.o \
+		src/video_parser/vpar_headers.o \
+		src/video_parser/vpar_blocks.o \
+		src/video_parser/vpar_synchro.o \
+		src/video_parser/video_fifo.o
 
 ifneq (,$(findstring mmx,$(ARCH)))
-	vdec_motion_inner = video_decoder/vdec_motion_inner_mmx.o
+	vdec_motion_inner = src/video_decoder/vdec_motion_inner_mmx.o
 else
-	vdec_motion_inner = video_decoder/vdec_motion_inner.o
+	vdec_motion_inner = src/video_decoder/vdec_motion_inner.o
 endif
 
-video_decoder_obj =	video_decoder/video_decoder.o \
-				video_decoder/vdec_motion.o \
-				video_decoder/vdec_idct.o \
-				$(vdec_motion_inner)
+VIDEO_DECODER =	src/video_decoder/video_decoder.o \
+		src/video_decoder/vdec_motion.o \
+		src/video_decoder/vdec_idct.o \
+		$(vdec_motion_inner)
 
-misc_obj =		misc/mtime.o \
-				misc/tests.o \
-				misc/rsc_files.o \
-				misc/netutils.o \
-				misc/playlist.o \
-				misc/plugins.o
+MISC =		src/misc/mtime.o \
+		src/misc/tests.o \
+		src/misc/rsc_files.o \
+		src/misc/netutils.o \
+		src/misc/playlist.o \
+		src/misc/plugins.o
 
 
-C_OBJ = $(interface_obj) \
-		$(input_obj) \
-		$(audio_output_obj) \
-		$(video_output_obj) \
-		$(ac3_decoder_obj) \
-		$(lpcm_decoder_obj) \
-		$(audio_decoder_obj) \
-		$(spu_decoder_obj) \
-		$(generic_decoder_obj) \
-		$(video_parser_obj) \
-		$(video_decoder_obj) \
-		$(vlan_obj) \
-		$(misc_obj)
+C_OBJ =		$(INTERFACE) \
+		$(INPUT) \
+		$(VIDEO_OUTPUT) \
+		$(AUDIO_OUTPUT) \
+		$(AC3_DECODER) \
+		$(LPCM_DECODER) \
+		$(AUDIO_DECODER) \
+		$(SPU_DEOCDER) \
+		$(GEN_DECODER) \
+		$(VIDEO_PARSER) \
+		$(VIDEO_DECODER) \
+		$(MISC)
 
+
+#
+# CPP Objects
+# 
 ifeq ($(SYS),beos)
-CPP_OBJ =			misc/beos_specific.o
+CPP_OBJ =	src/misc/beos_specific.o
 endif
 
 #
@@ -258,74 +272,70 @@ endif
 # 
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
-ASM_OBJ = 			video_decoder/vdec_idctmmx.o \
-						video_output/video_yuv_mmx.o
+ASM_OBJ = 	src/video_decoder/vdec_idctmmx.o \
+		src/video_output/video_yuv_mmx.o
 endif
 endif
 
 #
 # Plugins
 #
-PLUGINS := $(PLUGINS:%=lib/%.so)
-
-PLUGIN_BEOS   = plugins/beos/beos.o \
+PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/aout_beos.o \
 		plugins/beos/intf_beos.o \
 		plugins/beos/vout_beos.o
 
-PLUGIN_DSP    = plugins/dsp/dsp.o \
+PLUGIN_DSP =	plugins/dsp/dsp.o \
 		plugins/dsp/aout_dsp.o \
 
-PLUGIN_DUMMY  = plugins/dummy/dummy.o \
+PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 		plugins/dummy/aout_dummy.o \
 		plugins/dummy/intf_dummy.o \
 		plugins/dummy/vout_dummy.o
 
-PLUGIN_ESD    = plugins/esd/esd.o \
+PLUGIN_ESD =	plugins/esd/esd.o \
 		plugins/esd/aout_esd.o
 
-PLUGIN_FB     = plugins/fb/fb.o \
+PLUGIN_FB =	plugins/fb/fb.o \
 		plugins/fb/intf_fb.o \
 		plugins/fb/vout_fb.o
 
-PLUGIN_GGI    = plugins/ggi/ggi.o \
+PLUGIN_GGI =	plugins/ggi/ggi.o \
 		plugins/ggi/intf_ggi.o \
 		plugins/ggi/vout_ggi.o
 
-PLUGIN_SDL    = plugins/sdl/sdl.o \
+PLUGIN_SDL =	plugins/sdl/sdl.o \
 		plugins/sdl/intf_sdl.o \
 		plugins/sdl/vout_sdl.o 
 #		plugins/sdl/video_yuv.o \
 #		plugins/sdl/video_yuvall.o
 
-
-PLUGIN_GLIDE  = plugins/glide/glide.o \
+PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
 
-PLUGIN_GNOME  = plugins/gnome/gnome.o \
+PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/intf_gnome.o \
 		plugins/gnome/intf_gnome_callbacks.o \
 		plugins/gnome/intf_gnome_interface.o \
 		plugins/gnome/intf_gnome_support.o \
 		plugins/gnome/vout_gnome.o
 
-PLUGIN_MGA    = plugins/mga/mga.o \
+PLUGIN_MGA =	plugins/mga/mga.o \
 		plugins/mga/intf_mga.o \
 		plugins/mga/vout_mga.o
 
-PLUGIN_X11    = plugins/x11/x11.o \
+PLUGIN_X11=	plugins/x11/x11.o \
 		plugins/x11/intf_x11.o \
 		plugins/x11/vout_x11.o
 
-PLUGIN_YUV    = plugins/yuv/yuv.o \
+PLUGIN_YUV =	plugins/yuv/yuv.o \
 		plugins/yuv/video_yuv.o \
 		plugins/yuv/video_yuv8.o \
 		plugins/yuv/video_yuv15.o \
 		plugins/yuv/video_yuv16.o \
 		plugins/yuv/video_yuv24.o \
 		plugins/yuv/video_yuv32.o
-
 
 PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 		plugins/yuvmmx/video_yuv.o \
@@ -335,21 +345,27 @@ PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 		plugins/yuvmmx/video_yuv24.o \
 		plugins/yuvmmx/video_yuv32.o
 
-PLUGIN_ALSA = plugins/alsa/alsa.o \
-	      plugins/alsa/aout_alsa.o
+PLUGIN_ALSA =	plugins/alsa/alsa.o \
+		plugins/alsa/aout_alsa.o
 
-PLUGIN_OBJ = $(PLUGIN_BEOS) $(PLUGIN_DSP) $(PLUGIN_DUMMY) $(PLUGIN_ESD) \
-		$(PLUGIN_FB) $(PLUGIN_GGI) $(PLUGIN_GLIDE) $(PLUGIN_GNOME) \
-		$(PLUGIN_MGA) $(PLUGIN_X11) $(PLUGIN_YUV) $(PLUGIN_YUVMMX) \
-		$(PLUGIN_SDL) $(PLUGIN_ALSA)
+STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
+		$(PLUGIN_DSP) \
+		$(PLUGIN_DUMMY) \
+		$(PLUGIN_ESD) \
+		$(PLUGIN_FB) \
+		$(PLUGIN_GGI) \
+		$(PLUGIN_MGA) \
+		$(PLUGIN_X11) \
+		$(PLUGIN_YUV) \
+		$(PLUGIN_YUVMMX) \
+		$(PLUGIN_SDL) \
+		$(PLUGIN_ALSA)
+
 #
 # Other lists of files
 #
-C_OBJ := $(C_OBJ:%.o=src/%.o)
-CPP_OBJ := $(CPP_OBJ:%.o=src/%.o)
-ASM_OBJ := $(ASM_OBJ:%.o=src/%.o)
-sources_c := $(C_OBJ:%.o=%.c)
-dependancies := $(sources_c:%.c=.dep/%.d)
+objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
+dependancies := $(objects:%.o=.dep/%.d)
 
 # All symbols must be exported
 export
@@ -379,7 +395,7 @@ distclean: clean
 install:
 	mkdir -p $(prefix)/bin
 	$(INSTALL) vlc $(prefix)/bin
-	# ugly
+# ugly
 	for alias in "" @ALIASES@ ; do if test $$alias ; then ln -s vlc $(prefix)/bin/$$alias ; fi ; done
 	mkdir -p $(prefix)/lib/videolan/vlc
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
@@ -411,19 +427,9 @@ snapshot:
 	mv /tmp/${SNAPSHOTDIR}.tar.bz2 ..
 	@echo "Sources are in ../${SNAPSHOTDIR}.tar.[gz,bz2]"
 
-FORCE:
+plugins: $(PLUGINS:%=lib/%.so)
 
-#
-# Real targets
-#
-vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
-ifeq ($(SYS),beos)
-	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
-	rm -f ./plugins/_APP_
-	ln -s ../vlc ./plugins/_APP_
-else
-	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
-endif
+FORCE:
 
 #
 # Gnome and Framebuffer aliases - don't add new aliases which could bloat
@@ -432,7 +438,6 @@ endif
 gvlc fbvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
-plugins: $(PLUGINS)
 
 #
 # Generic rules (see below)
@@ -452,90 +457,84 @@ $(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-#$(PLUGIN_OBJ): %.so: Makefile.dep
-#$(PLUGIN_OBJ): %.so: .dep/%.d
+$(STD_PLUGIN_OBJ): %.o: Makefile.dep
+$(STD_PLUGIN_OBJ): %.o: .dep/%.d
+$(STD_PLUGIN_OBJ): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-$(PLUGIN_BEOS): %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/esd.so: $(PLUGIN_ESD)
-ifneq (,$(findstring bsd,$(SYS)))
-	ld -shared -lesd -o $@ $^
-else
-	ld -shared -laudiofile -lesd -o $@ $^
-endif
-$(PLUGIN_ESD): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/dsp.so: $(PLUGIN_DSP)
-	ld -shared -o $@ $^
-$(PLUGIN_DSP): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/alsa.so: $(PLUGIN_ALSA)
-	ld -shared -o $@ $^
-$(PLUGIN_ALSA): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/dummy.so: $(PLUGIN_DUMMY)
-	ld -shared -o $@ $^
-$(PLUGIN_DUMMY): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/fb.so: $(PLUGIN_FB)
-	ld -shared -o $@ $^
-$(PLUGIN_FB): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/x11.so: $(PLUGIN_X11)
-	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
-$(PLUGIN_X11): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/mga.so: $(PLUGIN_MGA)
-	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
-$(PLUGIN_MGA): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-lib/gnome.so: $(PLUGIN_GNOME)
-	ld -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
+$(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: %.c
 	$(CC) $(CFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
 
-lib/glide.so: $(PLUGIN_GLIDE)
-	ld -shared -lglide2x -o $@ $^
+$(PLUGIN_GLIDE): %.o: Makefile.dep
 $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) -I/usr/include/glide -c -o $@ $<
 
+#
+# Real targets
+#
+vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+ifeq ($(SYS),beos)
+	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+	rm -f ./plugins/_APP_
+	ln -s ../vlc ./plugins/_APP_
+else
+	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic  -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+endif
+
+lib/beos.so: $(PLUGIN_BEOS)
+	$(CC) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/esd.so: $(PLUGIN_ESD)
+ifneq (,$(findstring bsd,$(SYS)))
+	$(CC) -shared -lesd -o $@ $^
+else
+	$(CC) -shared -laudiofile -lesd -o $@ $^
+endif
+
+lib/dsp.so: $(PLUGIN_DSP)
+	$(CC) -shared -o $@ $^
+
+lib/alsa.so: $(PLUGIN_ALSA)
+	$(CC) -shared -o $@ $^
+
+lib/dummy.so: $(PLUGIN_DUMMY)
+	$(CC) -shared -o $@ $^
+
+lib/fb.so: $(PLUGIN_FB)
+	$(CC) -shared -o $@ $^
+
+lib/x11.so: $(PLUGIN_X11)
+	$(CC) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+
+lib/mga.so: $(PLUGIN_MGA)
+	$(CC) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+
+lib/gnome.so: $(PLUGIN_GNOME)
+	$(CC) -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
+
+lib/glide.so: $(PLUGIN_GLIDE)
+	$(CC) -shared -lglide2x -o $@ $^
+
 lib/ggi.so: $(PLUGIN_GGI)
-	ld -shared -lggi -o $@ $^
-$(PLUGIN_GGI): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) -shared -lggi -o $@ $^
 
 lib/sdl.so: $(PLUGIN_SDL)
-	ld -shared -lSDL -o $@ $^
-$(PLUGIN_SDL): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) -shared -lSDL -o $@ $^
 
 lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	ld -shared -o $@ $^
+	$(CC) -shared -o $@ $^
 endif
-$(PLUGIN_YUV): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	ld -shared -o $@ $^
+	$(CC) $(LCFLAGS) -shared -o $@ $^
 endif
-$(PLUGIN_YUVMMX): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies

@@ -458,14 +458,15 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
  *****************************************************************************/
 static int SpawnInput( int i_argc, intf_arg_t *p_argv )
 {
+    /* FIXME */
+#if 0
+
     int                 i_arg;
     int                 i_method = 0;                    /* method parameter */
     char *              p_source = NULL;                 /* source parameter */
     int                 i_port = 0;                        /* port parameter */
     int                 i_vlan = 0;                        /* vlan parameter */
 
-    /* FIXME */
-#if 0
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {

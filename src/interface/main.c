@@ -30,7 +30,7 @@
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <stdio.h>                                              /* sprintf() */
 
-#ifdef HAVE_LIBGNUGETOPT
+#ifdef HAVE_GETOPT_H
 #include <getopt.h>                                              /* getopt() */
 #endif
 
@@ -94,7 +94,7 @@
 #define LONG_HELP                 2
 
 /* Long options */
-#ifdef HAVE_LIBGNUGETOPT
+#ifdef HAVE_GETOPT_H
 static const struct option longopts[] =
 {
     /*  name,               has_arg,    flag,   val */
@@ -471,7 +471,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /* Parse command line options */
-#ifdef HAVE_LIBGNUGETOPT
+#ifdef HAVE_GETOPT_H
     opterr = 0;
     while( ( c = getopt_long( i_argc, ppsz_argv, psz_shortopts, longopts, 0 ) ) != EOF )
     {

@@ -49,6 +49,8 @@ dnl check for getopt_long, substitute the distributed versions if not
 AC_CHECK_FUNC(getopt_long,,[LIBOBJS="$LIBOBJS getopt.o getopt1.o"])
 AC_SUBST(LIBOBJS)
 
+AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(sys/sockio.h)
 AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)

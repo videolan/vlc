@@ -67,6 +67,9 @@
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
+/* Define if you have the <getopt.h> header file.  */
+#undef HAVE_GETOPT_H
+
 /* Define if you have the <image.h> header file.  */
 #undef HAVE_IMAGE_H
 
@@ -93,6 +96,9 @@
 
 /* Define if you have the <sys/socket.h> header file.  */
 #undef HAVE_SYS_SOCKET_H
+
+/* Define if you have the <sys/sockio.h> header file.  */
+#undef HAVE_SYS_SOCKIO_H
 
 /* Define if you have the <sys/soundcard.h> header file.  */
 #undef HAVE_SYS_SOUNDCARD_H
