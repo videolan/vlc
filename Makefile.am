@@ -659,7 +659,7 @@ endif
 package-win32-base-exe:
 # Create package 
 	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
-             -- /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/vlc.win32.nsi
+             /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/vlc.win32.nsi
 
 package-win32-base-zip:
 # Create package 
