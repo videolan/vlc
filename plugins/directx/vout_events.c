@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.18.2.1 2002/06/03 00:28:07 sam Exp $
+ * $Id: vout_events.c,v 1.18.2.2 2002/06/03 17:19:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -196,17 +196,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 p_vout->b_interface = ! p_vout->b_interface;
                 p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
                 break;
-
-            case '0': network_ChannelJoin( 0 ); break;
-            case '1': network_ChannelJoin( 1 ); break;
-            case '2': network_ChannelJoin( 2 ); break;
-            case '3': network_ChannelJoin( 3 ); break;
-            case '4': network_ChannelJoin( 4 ); break;
-            case '5': network_ChannelJoin( 5 ); break;
-            case '6': network_ChannelJoin( 6 ); break;
-            case '7': network_ChannelJoin( 7 ); break;
-            case '8': network_ChannelJoin( 8 ); break;
-            case '9': network_ChannelJoin( 9 ); break;
 
             default:
                 break;

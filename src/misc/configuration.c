@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.26.2.1 2002/06/02 23:01:32 sam Exp $
+ * $Id: configuration.c,v 1.26.2.2 2002/06/03 17:19:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -950,8 +950,8 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
             module_config_t *p_conf;
             char *psz_name = (char *)p_longopts[i_index].name;
 
-            /* Check if we deal with a --no-foo long option */
-            if( flag ) psz_name += 3;
+            /* Check if we deal with a --nofoo or --no-foo long option */
+            if( flag ) psz_name += psz_name[2] == '-' ? 3 : 2;
 
             /* Store the configuration option */
             p_conf = config_FindConfig( psz_name );

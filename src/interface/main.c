@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.1 2002/06/02 23:01:32 sam Exp $
+ * $Id: main.c,v 1.195.2.2 2002/06/03 17:19:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -463,12 +463,6 @@ static module_config_t p_help_config[] =
     { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0,
       NULL, NULL, 0 }
 };
-static module_t help_module = { "help", "help module", NULL, {NULL}, 0, {0}, 0,
-                                NULL, p_help_config, {0},
-                                sizeof(p_help_config)/sizeof(module_config_t),
-                                sizeof(p_help_config)/sizeof(module_config_t)
-};
-
 
 /*****************************************************************************
  * End configuration.
@@ -503,7 +497,9 @@ static void ShowConsole                 ( void );
 
 static jmp_buf env;
 static int     i_illegal;
+#if defined( __i386__ )
 static char   *psz_capability;
+#endif
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -611,7 +607,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     module_LoadMain();
 
     /* Hack: insert the help module here */
+    help_module.psz_name = "help";
+    help_module.psz_longname = "help module";
+    help_module.psz_program = NULL;
+    help_module.pp_shortcuts[0] = NULL;
+    help_module.i_capabilities = 0;
+    help_module.i_cpu_capabilities = 0;
+    help_module.p_config = p_help_config;
     vlc_mutex_init( &help_module.config_lock );
+    help_module.i_config_items = sizeof(p_help_config)
+                                  / sizeof(module_config_t);
+    help_module.i_bool_items = help_module.i_config_items;
     help_module.next = p_module_bank->first;
     p_module_bank->first = &help_module;
     /* end hack */
@@ -1471,7 +1477,6 @@ static u32 CPUCapabilities( void )
 #   ifdef CAN_COMPILE_ALTIVEC
     signal( SIGILL, IllegalSignalHandler );
 
-    psz_capability = "AltiVec";
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {

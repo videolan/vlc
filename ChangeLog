@@ -4,6 +4,10 @@
 
 HEAD
 
+  * ./src/misc/configuration.c: fixed the --nofoo option handling.
+  * ./src/interface/main.c: fixed two compilation warnings under Solaris.
+  * ./plugins/avi/avi.c, ./plugins/mpeg_system/mpeg_audio.c: ES will be
+    selected only once.
   * ./src/misc/netutils.c: factored code common to the interfaces into the
     network_ChannelJoin function.
   * ./plugins/mga/xmga.c, ./plugins/x11/xcommon.c, ./plugins/sdl/vout_sdl.c,
