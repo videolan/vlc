@@ -96,6 +96,8 @@ VLC\ Plugin.plugin:
 	cp $(top_srcdir)/extras/MacOSX/plugin/pbdevelopment.plist $(srcdir)/VLC\ Plugin.plugin/Contents/pbdevelopment.plist
 	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj $(srcdir)/VLC\ Plugin.plugin/Contents/Resources/
 	Rez /Developer/Headers/FlatCarbon/Types.r $(srcdir)/vlc.r -o $(srcdir)/VLC\ Plugin.plugin/Contents/Resources/Vlc\ Plugin.rsrc
+	mkdir $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS/modules
+	cp -r $(top_srcdir)/VLC.app/Contents/MacOS/modules/* $(srcdir)/VLC\ Plugin.plugin/Contents/MacOS/modules/
 endif
 endif
 

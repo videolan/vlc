@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.19 2003/08/25 14:51:49 garf Exp $
+ * $Id: vlcshell.cpp,v 1.20 2003/08/27 07:21:07 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -242,12 +242,31 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 #if USE_LIBVLC
     vlc_value_t value;
     int i_ret;
+    char * home_user;
+    char * plugin_path;
+    char * directory;
 
+#ifdef XP_MACOSX
+    home_user = strdup( getenv("HOME") );
+    directory = strdup( "/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS/modules" );
+    plugin_path = malloc( strlen( directory ) + strlen( home_user ) );
+    memcpy( plugin_path , home_user , strlen(home_user) );
+    memcpy( plugin_path + strlen( home_user ) , directory , strlen( directory ) );
+
+    char *ppsz_foo[] =
+    {
+        "vlc"
+        /* , "--plugin-path", "/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS/modules" */
+        , "--plugin-path", plugin_path
+        , "--filter invert"
+    };
+#else
     char *ppsz_foo[] =
     {
         "vlc"
         /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
     };
+#endif
 #endif
 
     if( instance == NULL )
@@ -298,6 +317,12 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         p_plugin = NULL;
         return NPERR_GENERIC_ERROR;
     }
+
+#ifdef XP_MACOSX
+    free(home_user);
+    free(directory);
+    free(plugin_path);
+#endif
 
     value.psz_string = "dummy";
     VLC_Set( p_plugin->i_vlc, "conf::intf", value );
@@ -472,6 +497,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     text = strdup( WINDOW_TEXT );
     MoveTo( valuew.i_int / 2 - 40 , valueh.i_int / 2 );
     DrawText( text , 0 , strlen(text) );
+    free(text);
 
 #else
     /* FIXME: this cast sucks */
