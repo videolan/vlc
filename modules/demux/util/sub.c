@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.50 2004/01/27 22:51:39 hartman Exp $
+ * $Id: sub.c,v 1.51 2004/01/27 23:09:25 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -210,7 +210,7 @@ static int  sub_SubRipRead  ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *
 static int  sub_SSARead     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Vplayer     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Sami        ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
-static int  sub_VobSub      ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_VobSubIDX   ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 
 static int  DemuxVobSub     ( subtitle_demux_t *, block_t * );
 
@@ -228,7 +228,7 @@ static struct
     { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",sub_SSARead },
     { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  sub_Vplayer },
     { "sami",       SUB_TYPE_SAMI,      "SAMI",     sub_Sami },
-    { "vobsub",     SUB_TYPE_VOBSUB,    "VobSub",   sub_VobSub },
+    { "vobsub",     SUB_TYPE_VOBSUB,    "VobSub",   sub_VobSubIDX },
     { NULL,         SUB_TYPE_UNKNOWN,   "Unknown",  NULL }
 };
 
@@ -730,6 +730,11 @@ static int  sub_MicroDvdRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *
     unsigned int    i_start;
     unsigned int    i_stop;
     unsigned int i;
+    
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
 
     for( ;; )
     {
@@ -777,6 +782,11 @@ static int  sub_SubRipRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_
     int  i_buffer_text;
     mtime_t     i_start;
     mtime_t     i_stop;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
 
     for( ;; )
     {
@@ -844,6 +854,11 @@ static int  sub_SSARead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_sub
     char *s;
     mtime_t     i_start;
     mtime_t     i_stop;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
 
     for( ;; )
     {
@@ -928,6 +943,11 @@ static int  sub_Vplayer( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_sub
     char buffer_text[MAX_LINE + 1];
     mtime_t    i_start;
     unsigned int i;
+    
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
 
     for( ;; )
     {
@@ -1004,6 +1024,12 @@ static int  sub_Sami( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtit
 
     int  i_text;
     char buffer_text[10*MAX_LINE + 1];
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
+
 #define ADDC( c ) \
     if( i_text < 10*MAX_LINE )      \
     {                               \
@@ -1086,7 +1112,7 @@ static int  sub_Sami( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtit
 #undef ADDC
 }
 
-static int  sub_VobSub( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
+static int  sub_VobSubIDX( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe)
 {
     /*
      * Parse the idx file. Each line:
@@ -1095,9 +1121,13 @@ static int  sub_VobSub( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subt
      *
      */
     char *p;
-
     char buffer_text[MAX_LINE + 1];
     unsigned int    i_start, i_location;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
 
     for( ;; )
     {
@@ -1123,6 +1153,7 @@ static int  sub_VobSub( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subt
     }
     p_subtitle->i_start = (mtime_t)i_start;
     p_subtitle->i_stop  = 0;
+    p_subtitle->psz_text = NULL;
     p_subtitle->i_vobsub_location = i_location;
     fprintf( stderr, "time: %x, location: %x\n", i_start, i_location );
     return( 0 );
