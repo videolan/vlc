@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.95 2004/03/01 18:31:13 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,11 +50,13 @@
 #endif
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
+DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 class OpenDialog;
 class Playlist;
 class Messages;
 class FileInfo;
+class VideoWindow;
 
 #define SLIDER_MAX_POS 10000
 
@@ -130,6 +132,8 @@ struct intf_sys_t
     /* Popup menu */
     wxMenu              *p_popup_menu;
 
+    VideoWindow         *p_video_window;
+    wxBoxSizer          *p_video_sizer;
 };
 
 /*****************************************************************************
@@ -194,7 +198,7 @@ private:
     void UpdateAcceleratorTable();
     void CreateOurMenuBar();
     void CreateOurToolBar();
-    void CreateOurExtraPanel();
+    void CreateOurExtendedPanel();
     void CreateOurSlider();
     void Open( int i_access_method );
 
@@ -208,7 +212,8 @@ private:
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
     void OnOpenV4L( wxCommandEvent& event );
-    void OnExtra( wxCommandEvent& event );
+    void OnExtended( wxCommandEvent& event );
+    void OnBookmarks( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
@@ -235,6 +240,8 @@ private:
 #endif
     void OnContextMenu(wxMouseEvent& event);
 
+    void UpdateSizeEvent( wxCommandEvent& event );
+
     DECLARE_EVENT_TABLE();
 
     Timer *timer;
@@ -255,6 +262,7 @@ private:
 };
 
 class StreamDialog;
+class BookmarksDialog;
 
 /* Dialogs Provider */
 class DialogsProvider: public wxFrame
@@ -274,6 +282,7 @@ private:
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
     void OnStreamWizardDialog( wxCommandEvent& event );
+    void OnBookmarks( wxCommandEvent& event );
 
     void OnOpenFileGeneric( wxCommandEvent& event );
     void OnOpenFileSimple( wxCommandEvent& event );
@@ -301,6 +310,7 @@ public:
     FileInfo            *p_fileinfo_dialog;
     StreamDialog        *p_streamwizard_dialog;
     wxFrame             *p_prefs_dialog;
+    BookmarksDialog     *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
 };
 
@@ -987,6 +997,35 @@ private:
     intf_thread_t *p_intf;
 
     int  i_item_id;
+};
+
+wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
+
+class BookmarksDialog: public wxFrame
+{
+public:
+    /* Constructor */
+    BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~BookmarksDialog();
+
+    bool Show( bool );
+
+private:
+
+    void Update();
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+    void OnAdd( wxCommandEvent& event );
+    void OnDel( wxCommandEvent& event );
+    void OnActivateItem( wxListEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    wxWindow *p_parent;
+
+    wxListView *list_ctrl;
 };
 
 static inline int ConvertHotkeyModifiers( int i_hotkey )

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 VideoLAN
- * $Id: interface.cpp,v 1.87 2004/03/01 18:31:13 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -105,6 +105,8 @@ END_EVENT_TABLE()
  * Event Table.
  *****************************************************************************/
 
+DEFINE_LOCAL_EVENT_TYPE( wxEVT_INTF );
+
 /* IDs for the controls and the menu commands */
 enum
 {
@@ -127,7 +129,8 @@ enum
     FileInfo_Event,
 
     Prefs_Event,
-    Extra_Event,
+    Extended_Event,
+    Bookmarks_Event,
     Skins_Event,
 
     SliderScroll_Event,
@@ -166,9 +169,10 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     EVT_MENU_OPEN(Interface::OnMenuOpen)
 
-    EVT_MENU( Extra_Event, Interface::OnExtra)
-    EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
+    EVT_MENU( Extended_Event, Interface::OnExtended)
+    EVT_MENU( Bookmarks_Event, Interface::OnShowDialog)
 
+    EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
     EVT_TEXT( Ratio_Event, Interface::OnRatio)
     EVT_CHECKBOX( Visual_Event, Interface::OnEnableVisual)
 
@@ -200,6 +204,9 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnBrightnessUpdate)
     EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnSaturationUpdate)
     EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnGammaUpdate)
+
+    /* Custom events */
+    EVT_COMMAND(0, wxEVT_INTF, Interface::UpdateSizeEvent)
 
 END_EVENT_TABLE()
 
@@ -240,7 +247,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     frame_sizer->Hide( slider_frame );
 
     /* Create the extra panel */
-    CreateOurExtraPanel();
+    CreateOurExtendedPanel();
     frame_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
     frame_sizer->Hide( extra_frame );
 
@@ -254,6 +261,13 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
     /* Make sure we've got the right background colour */
     SetBackgroundColour( slider_frame->GetBackgroundColour() );
+
+    /* Video window */
+    if( config_GetInt( p_intf, "wxwin-embed" ) )
+    {
+        VideoWindow( p_intf, this );
+        frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND , 0 );
+    }
 
     /* Layout everything */
     frame_sizer->Layout();
@@ -281,13 +295,19 @@ Interface::~Interface()
     delete timer;
 }
 
+void Interface::UpdateSizeEvent( wxCommandEvent& event )
+{
+    frame_sizer->Layout();
+    frame_sizer->Fit(this);
+}
+
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
 void Interface::CreateOurMenuBar()
 {
 #define HELP_SIMPLE N_("Quick file open")
-#define HELP_ADV N_("Advanced open")
+#define HELP_ADV   N_("Advanced open")
 #define HELP_FILE  N_("Open a file")
 #define HELP_DISC  N_("Open Disc Media")
 #define HELP_NET   N_("Open a network stream")
@@ -296,14 +316,14 @@ void Interface::CreateOurMenuBar()
 #define HELP_EXIT  N_("Exit this program")
 
 #define HELP_STREAMWIZARD N_("Open the streaming wizard")
-#define HELP_OTHER N_("Open other types of inputs")
 
 #define HELP_PLAYLIST   N_("Open the playlist")
 #define HELP_LOGS       N_("Show the program logs")
-#define HELP_FILEINFO       N_("Show information about the file being played")
+#define HELP_FILEINFO   N_("Show information about the file being played")
 
-#define HELP_PREFS N_("Go to the preferences menu")
-#define EXTRA_PREFS N_("Shows the extended GUI")
+#define HELP_PREFS     N_("Go to the preferences menu")
+#define HELP_EXTENDED  N_("Shows the extended GUI")
+#define HELP_BOOKMARKS N_("Shows the bookmarks window")
 
 #define HELP_ABOUT N_("About this program")
 
@@ -485,7 +505,7 @@ void Interface::CreateOurSlider()
 }
 
 
-void Interface::CreateOurExtraPanel()
+void Interface::CreateOurExtendedPanel()
 {
     char *psz_filters;
 
@@ -752,8 +772,10 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
             p_settings_menu = SettingsMenu( p_intf, this );
 
             /* Add static items */
-            p_settings_menu->AppendCheckItem( Extra_Event,
-                             wxU(_("&Extended GUI") ), wxU(_(EXTRA_PREFS)) );
+            p_settings_menu->AppendCheckItem( Extended_Event,
+                             wxU(_("&Extended GUI") ), wxU(_(HELP_EXTENDED)) );
+            p_settings_menu->AppendCheckItem( Bookmarks_Event,
+                             wxU(_("&Bookmarks") ), wxU(_(HELP_BOOKMARKS)) );
             p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
                                      wxU(_(HELP_PREFS)) );
 
@@ -831,8 +853,10 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 #else
     p_settings_menu = SettingsMenu( p_intf, this );
     /* Add static items */
-    p_settings_menu->AppendCheckItem( Extra_Event, wxU(_("&Extended GUI") ),
-                                      wxU(_(EXTRA_PREFS)) );
+    p_settings_menu->AppendCheckItem( Extended_Event, wxU(_("&Extended GUI") ),
+                                      wxU(_(HELP_EXTENDED)) );
+    p_settings_menu->AppendCheckItem( Bookmarks_Event, wxU(_("&Bookmarks") ),
+                                      wxU(_(HELP_BOOKMARKS)) );
     p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
                              wxU(_(HELP_PREFS)) );
     wxMenu *menu =
@@ -934,6 +958,9 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case StreamWizard_Event:
             i_id = INTF_DIALOG_STREAMWIZARD;
             break;
+        case Bookmarks_Event:
+            i_id = INTF_DIALOG_BOOKMARKS;
+            break;
         default:
             i_id = INTF_DIALOG_FILE;
             break;
@@ -943,7 +970,7 @@ void Interface::OnShowDialog( wxCommandEvent& event )
     }
 }
 
-void Interface::OnExtra(wxCommandEvent& event)
+void Interface::OnExtended(wxCommandEvent& event)
 {
     if( b_extra == VLC_FALSE)
     {

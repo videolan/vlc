@@ -1,0 +1,199 @@
+/*****************************************************************************
+ * bookmarks.cpp : wxWindows plugin for vlc
+ *****************************************************************************
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: bookmarks.cpp 6961 2004-03-05 17:34:23Z sam $
+ *
+ * Authors: Gildas Bazin <gbazin@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <errno.h>                                                 /* ENOMEM */
+#include <string.h>                                            /* strerror() */
+#include <stdio.h>
+
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
+#include "wxwindows.h"
+
+/*****************************************************************************
+ * Event Table.
+ *****************************************************************************/
+
+/* IDs for the controls and the menu commands */
+enum
+{
+    /* menu items */
+    ButtonAdd_Event = wxID_HIGHEST + 1,
+    ButtonDel_Event
+};
+
+BEGIN_EVENT_TABLE(BookmarksDialog, wxFrame)
+    /* Hide the window when the user closes the window */
+    EVT_CLOSE(BookmarksDialog::OnClose )
+    EVT_BUTTON( ButtonAdd_Event, BookmarksDialog::OnAdd )
+    EVT_BUTTON( ButtonDel_Event, BookmarksDialog::OnDel )
+
+    EVT_LIST_ITEM_ACTIVATED( -1, BookmarksDialog::OnActivateItem )
+END_EVENT_TABLE()
+
+/*****************************************************************************
+ * Constructor.
+ *****************************************************************************/
+BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
+  : wxFrame( p_parent->GetParent() ? p_parent->GetParent() : p_parent,
+             -1, wxU(_("Bookmarks")),
+             !p_parent->GetParent() ? wxDefaultPosition :
+               wxPoint( p_parent->GetParent()->GetRect().GetX(),
+                        p_parent->GetParent()->GetRect().GetY() +
+                        p_parent->GetParent()->GetRect().GetHeight() + 40 ),
+             !p_parent->GetParent() ? wxDefaultSize :
+               wxSize( p_parent->GetParent()->GetRect().GetWidth(), -1 ),
+             wxDEFAULT_FRAME_STYLE | wxFRAME_FLOAT_ON_PARENT )
+{
+    /* Initializations */
+    p_intf = _p_intf;
+
+    wxBoxSizer *sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    wxPanel *panel = new wxPanel( this, -1 );
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    wxButton *button_add =
+        new wxButton( panel, ButtonAdd_Event, wxU(_("Add")) );
+    wxButton *button_del =
+        new wxButton( panel, ButtonDel_Event, wxU(_("Remove")) );
+    panel_sizer->Add( button_add, 0, wxEXPAND );
+    panel_sizer->Add( button_del, 0, wxEXPAND );
+    panel->SetSizerAndFit( panel_sizer );
+
+    list_ctrl = new wxListView( this, -1, wxDefaultPosition, wxDefaultSize,
+                                wxLC_REPORT | wxSUNKEN_BORDER |
+                                wxLC_SINGLE_SEL );
+    list_ctrl->InsertColumn( 0, wxU(_("Description")) );
+    list_ctrl->SetColumnWidth( 0, 240 );
+    list_ctrl->InsertColumn( 1, wxU(_("Size offset")) );
+    list_ctrl->InsertColumn( 2, wxU(_("Time offset")) );
+
+    sizer->Add( panel, 0, wxEXPAND | wxALL, 5 );
+    sizer->Add( list_ctrl, 1, wxEXPAND | wxALL, 5 );
+    SetSizer( sizer );
+}
+
+BookmarksDialog::~BookmarksDialog()
+{
+}
+
+/*****************************************************************************
+ * Private methods.
+ *****************************************************************************/
+
+void BookmarksDialog::Update()
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_input ) return;
+
+    seekpoint_t **pp_bookmarks;
+    int i_bookmarks;
+
+    if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
+                       &i_bookmarks ) != VLC_SUCCESS )
+    {
+        vlc_object_release( p_input );
+        return;
+    }
+
+    list_ctrl->DeleteAllItems();
+    for( int i = 0; i < i_bookmarks; i++ )
+    {
+        list_ctrl->InsertItem( i, wxL2U( pp_bookmarks[i]->psz_name ) );
+        list_ctrl->SetItem( i, 1, wxString::Format(wxT("%i"),
+                            pp_bookmarks[i]->i_byte_offset ) );
+        list_ctrl->SetItem( i, 2, wxString::Format(wxT("%i"),
+                            pp_bookmarks[i]->i_time_offset/1000000 ) );
+    }
+
+    vlc_object_release( p_input );
+}
+
+bool BookmarksDialog::Show( bool show )
+{
+    Update();
+    return wxFrame::Show( show );
+}
+
+void BookmarksDialog::OnClose( wxCommandEvent& event )
+{
+    Hide();
+}
+
+void BookmarksDialog::OnAdd( wxCommandEvent& event )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_input ) return;
+
+    seekpoint_t bookmark;
+    vlc_value_t pos;
+    var_Get( p_input, "position", &pos );
+    bookmark.psz_name = NULL;
+    bookmark.i_byte_offset =
+        (pos.f_float * p_input->stream.p_selected_area->i_size);
+    var_Get( p_input, "time", &pos );
+    bookmark.i_time_offset = pos.i_time;
+    input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+
+    vlc_object_release( p_input );
+
+    Update();
+}
+
+void BookmarksDialog::OnDel( wxCommandEvent& event )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_input ) return;
+
+    int i_focused = list_ctrl->GetFocusedItem();
+    if( i_focused >= 0 )
+    {
+        input_Control( p_input, INPUT_DEL_BOOKMARK, i_focused );
+    }
+
+    vlc_object_release( p_input );
+
+    Update();
+}
+
+void BookmarksDialog::OnActivateItem( wxListEvent& event )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_input ) return;
+
+    input_Control( p_input, INPUT_SET_BOOKMARK, event.GetIndex() );
+
+    vlc_object_release( p_input );
+}

@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: menus.cpp,v 1.33 2004/02/26 12:04:14 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -170,6 +170,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
+        ppsz_varnames[i] = "bookmark";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "title";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "chapter";
@@ -342,6 +344,8 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
+        ppsz_varnames[i] = "bookmark";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "title";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "chapter";

@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: dialogs.cpp,v 1.16 2004/03/01 18:31:13 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -64,6 +64,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnStreamWizardDialog)
     EVT_COMMAND(INTF_DIALOG_FILEINFO, wxEVT_DIALOG,
                 DialogsProvider::OnFileInfo)
+    EVT_COMMAND(INTF_DIALOG_BOOKMARKS, wxEVT_DIALOG,
+                DialogsProvider::OnBookmarks)
     EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
                 DialogsProvider::OnPopupMenu)
     EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
@@ -86,12 +88,18 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_prefs_dialog = NULL;
     p_file_generic_dialog = NULL;
     p_streamwizard_dialog = NULL;
+    p_bookmarks_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
 
     /* Create the messages dialog so it can begin storing logs */
     p_messages_dialog = new Messages( p_intf, p_parent ? p_parent : this );
+
+    /* Check if user wants to show the bookmarks dialog by default */
+    wxCommandEvent dummy_event;
+    if( config_GetInt( p_intf, "wxwin-bookmarks" ) )
+        OnBookmarks( dummy_event );
 
     /* Intercept all menu events in our custom event handler */
     PushEventHandler( new MenuEvtHandler( p_intf, NULL ) );
@@ -108,6 +116,7 @@ DialogsProvider::~DialogsProvider()
     if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
     if( p_streamwizard_dialog ) delete p_streamwizard_dialog;
+    if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
 
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
@@ -191,6 +200,18 @@ void DialogsProvider::OnStreamWizardDialog( wxCommandEvent& WXUNUSED(event) )
     if( p_streamwizard_dialog )
     {
         p_streamwizard_dialog->Show( !p_streamwizard_dialog->IsShown() );
+    }
+}
+
+void DialogsProvider::OnBookmarks( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the open dialog */
+    if( !p_bookmarks_dialog )
+        p_bookmarks_dialog = new BookmarksDialog( p_intf, this );
+
+    if( p_bookmarks_dialog )
+    {
+        p_bookmarks_dialog->Show( !p_bookmarks_dialog->IsShown() );
     }
 }
 

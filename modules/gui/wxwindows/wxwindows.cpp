@@ -80,6 +80,13 @@ private:
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define EMBED_TEXT N_("Embed video in interface")
+#define EMBED_LONGTEXT N_("Embed the video window inside the interface. The "\
+    "default behaviour is to have video windows separate from the interface.")
+#define BOOKMARKS_TEXT N_("Show bookmarks dialog")
+#define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
+    "starts.")
+
 vlc_module_begin();
 #ifdef WIN32
     int i_score = 150;
@@ -93,6 +100,11 @@ vlc_module_begin();
     add_shortcut( "wxwin" );
     add_shortcut( "wx" );
     set_program( "wxvlc" );
+
+    add_bool( "wxwin-embed", 0, NULL,
+              EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
+    add_bool( "wxwin-bookmarks", 0, NULL,
+              BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
 
     add_submodule();
     set_description( _("wxWindows dialogs provider") );
@@ -132,6 +144,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->i_slider_pos = p_intf->p_sys->i_slider_oldpos = 0;
 
     p_intf->p_sys->p_popup_menu = NULL;
+    p_intf->p_sys->p_video_window = NULL;
 
     p_intf->pf_show_dialog = NULL;
 

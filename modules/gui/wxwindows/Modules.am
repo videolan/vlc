@@ -16,6 +16,8 @@ SOURCES_wxwindows = \
 	timer.cpp \
 	fileinfo.cpp \
 	subtitles.cpp \
+	bookmarks.cpp \
+	video.cpp \
 	v4l.cpp \
 	$(NULL)
 
