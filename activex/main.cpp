@@ -72,7 +72,8 @@ STDAPI DllCanUnloadNow(VOID)
     return (0 == i_class_ref) ? S_OK: S_FALSE;
 };
 
-static LPCTSTR TStrFromGUID(REFGUID clsid) {
+static LPCTSTR TStrFromGUID(REFGUID clsid)
+{
     LPOLESTR oleStr;
 
     if( FAILED(StringFromIID(clsid, &oleStr)) )
@@ -160,7 +161,7 @@ STDAPI DllRegisterServer(VOID)
     char DllPath[MAX_PATH];
     DWORD DllPathLen= GetModuleFileName(h_instance, DllPath, sizeof(DllPath)) ;
 	if( 0 == DllPathLen )
-        return E_FAIL;
+        return E_UNEXPECTED;
 
     LPCTSTR psz_CLSID = TStrFromGUID(CLSID_VLCPlugin);
 
@@ -170,7 +171,7 @@ STDAPI DllRegisterServer(VOID)
     HKEY hBaseKey;
 
     if( ERROR_SUCCESS != RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_CREATE_SUB_KEY, &hBaseKey) )
-        return E_FAIL;
+        return SELFREG_E_CLASS;
 
     HKEY hClassKey = keyCreate(hBaseKey, psz_CLSID);
     if( NULL != hClassKey )
@@ -185,6 +186,13 @@ STDAPI DllRegisterServer(VOID)
         hSubKey = keyCreate(hClassKey, TEXT("Control"));
         RegCloseKey(hSubKey);
 
+#ifdef BUILD_LOCALSERVER
+        // LocalServer32 key value
+        hSubKey = keyCreate(hClassKey, TEXT("LocalServer32"));
+        RegSetValueEx(hSubKey, NULL, 0, REG_SZ,
+                (const BYTE*)DllPath, DllPathLen);
+        RegCloseKey(hSubKey);
+#else
         // InprocServer32 key value
         hSubKey = keyCreate(hClassKey, TEXT("InprocServer32"));
         RegSetValueEx(hSubKey, NULL, 0, REG_SZ,
@@ -192,6 +200,7 @@ STDAPI DllRegisterServer(VOID)
         RegSetValueEx(hSubKey, TEXT("ThreadingModel"), 0, REG_SZ,
                 (const BYTE*)THREADING_MODEL, sizeof(THREADING_MODEL));
         RegCloseKey(hSubKey);
+#endif
 
         // MiscStatus key value
         hSubKey = keyCreate(hClassKey, TEXT("MiscStatus\\1"));
@@ -299,18 +308,20 @@ STDAPI DllRegisterServer(VOID)
     // register type lib into the registry
     ITypeLib *typeLib;
 #ifndef OLE2ANSI
-    size_t typeLibPathLen = MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, NULL, 0);
+    size_t typeLibPathLen = MultiByteToWideChar(CP_ACP, 0, DllPath, -1, NULL, 0);
     if( typeLibPathLen > 0 )
     {
         LPOLESTR typeLibPath = (LPOLESTR)CoTaskMemAlloc(typeLibPathLen*sizeof(wchar_t));
         MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, typeLibPath, typeLibPathLen);
-        if( SUCCEEDED(LoadTypeLibEx(typeLibPath, REGKIND_REGISTER, &typeLib)) )
-            typeLib->Release();
+        if( FAILED(LoadTypeLibEx(typeLibPath, REGKIND_REGISTER, &typeLib)) )
+            return SELFREG_E_TYPELIB;
+        typeLib->Release();
         CoTaskMemFree((void *)typeLibPath);
     }
 #else
-    if( SUCCEEDED(LoadTypeLibEx((LPOLESTR)DllPath, REGKIND_REGISTER, &typeLib)) )
-        typeLib->Release();
+    if( FAILED(LoadTypeLibEx((LPOLESTR)DllPath, REGKIND_REGISTER, &typeLib)) )
+        return SELFREG_E_TYPELIB;
+    typeLib->Release();
 #endif
 
     CoTaskMemFree((void *)psz_CLSID);
@@ -332,6 +343,14 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     if( FAILED(OleInitialize(NULL)) )
     {
         cerr << "cannot initialize OLE" << endl;
+        return 1;
+    }
+
+    h_instance = hInst;
+
+    if( FAILED(DllRegisterServer()) )
+    {
+        cerr << "cannot register Local Server" << endl;
         return 1;
     }
 

@@ -484,13 +484,15 @@ void VLCPlugin::calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect)
     }
 };
 
-#include <iostream>
-
 HRESULT VLCPlugin::onInit(BOOL isNew)
 {
     if( 0 == _i_vlc )
     {
+#ifdef ACTIVEX_DEBUG
+        char *ppsz_argv[] = { "vlc", "-vvv", "--fast-mutex", "--win9x-cv-method=1" };
+#else
         char *ppsz_argv[] = { "vlc", "-vv" };
+#endif
         HKEY h_key;
         DWORD i_type, i_data = MAX_PATH + 1;
         char p_data[MAX_PATH + 1];
@@ -514,7 +516,7 @@ HRESULT VLCPlugin::onInit(BOOL isNew)
 #endif
 
         _i_vlc = VLC_Create();
-        
+
         if( VLC_Init(_i_vlc, sizeof(ppsz_argv)/sizeof(char*), ppsz_argv) )
         {
             VLC_Destroy(_i_vlc);
