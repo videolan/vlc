@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.12 2002/12/12 12:24:23 sam Exp $
+ * $Id: familiar.c,v 1.13 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -198,36 +198,37 @@ static void Run( intf_thread_t *p_intf )
 void GtkAutoPlayFile( vlc_object_t *p_this )
 {
     GtkWidget *cbautoplay;
-    intf_thread_t **pp_intf;
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+    intf_thread_t *p_intf;
+    int i_index;
+    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
                                                 FIND_ANYWHERE );
 
-    for( pp_intf = (intf_thread_t **)p_list->pp_objects ;
-         *pp_intf ;
-         pp_intf++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( strcmp( MODULE_STRING, (*pp_intf)->p_module->psz_object_name ) )
+        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
+
+        if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
             continue;
         }
 
         cbautoplay = GTK_WIDGET( gtk_object_get_data(
-                            GTK_OBJECT( (*pp_intf)->p_sys->p_window ),
+                            GTK_OBJECT( p_intf->p_sys->p_window ),
                             "cbautoplay" ) );
 
         if( !config_GetInt( p_this, "familiar-autoplayfile" ) )
         {
-            (*pp_intf)->p_sys->b_autoplayfile = VLC_FALSE;
+            p_intf->p_sys->b_autoplayfile = VLC_FALSE;
         }
         else
         {
-            (*pp_intf)->p_sys->b_autoplayfile = VLC_TRUE;
+            p_intf->p_sys->b_autoplayfile = VLC_TRUE;
         }
 
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
-                                      (*pp_intf)->p_sys->b_autoplayfile );
+                                      p_intf->p_sys->b_autoplayfile );
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 }
 

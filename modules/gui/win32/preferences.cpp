@@ -248,8 +248,9 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
 //---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
 {
-    module_t **pp_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser;
+    vlc_list_t list;
+    int i_index;
 
     /* check that the click is valid (we are on an item, and the click
      * started on an item */
@@ -262,17 +263,17 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
         return;
 
     /* look for module 'Name' */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( strcmp( (*pp_parser)->psz_object_name, Name.c_str() ) == 0 )
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+        if( strcmp( p_parser->psz_object_name, Name.c_str() ) == 0 )
         {
-            ModuleSelected = (*pp_parser);
+            ModuleSelected = p_parser;
             ButtonConfig->Enabled =
-                (*pp_parser)->i_config_items ? true : false;
+                p_parser->i_config_items ? true : false;
 
             break;
         }
@@ -523,8 +524,9 @@ void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    module_t          **pp_parser;
-    vlc_list_t         *p_list;
+    module_t           *p_parser;
+    vlc_list_t          list;
+    int                 i_index;
 
     module_config_t    *p_item;
     int                 i_pages, i_ctrl;
@@ -539,21 +541,21 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TPanelBool         *PanelBool;
 
     /* Look for the selected module */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
         if( psz_module_name
-             && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
+             && !strcmp( psz_module_name, p_parser->psz_object_name ) )
         {
             break;
         }
     }
-    if( !(*pp_parser) )
+    if( !p_parser || i_index == list.i_count )
     {
-        vlc_list_release( p_list );
+        vlc_list_release( &list );
         return;
     }
 
@@ -562,7 +564,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
      */
 
     /* Enumerate config options and add corresponding config boxes */
-    p_item = (*pp_parser)->p_config;
+    p_item = p_parser->p_config;
     if( p_item ) do
     {
         switch( p_item->i_type )
@@ -595,29 +597,29 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             PanelPlugin->Parent = ScrollBox;
 
             /* Look for valid modules */
-            pp_parser = (module_t **)p_list->pp_objects;
-
-            for( ; *pp_parser ; pp_parser++ )
+            for( i_index = 0; i_index < list.i_count; i_index++ )
             {
-                if( !strcmp( (*pp_parser)->psz_capability, p_item->psz_type ) )
+                p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+                if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
                 {
                     AnsiString ModuleDesc;
-                    if ( (*pp_parser)->psz_longname != NULL ) {
-                        ModuleDesc = AnsiString((*pp_parser)->psz_longname) +
-                            " (" + AnsiString((*pp_parser)->psz_object_name) +
+                    if ( p_parser->psz_longname != NULL ) {
+                        ModuleDesc = AnsiString(p_parser->psz_longname) +
+                            " (" + AnsiString(p_parser->psz_object_name) +
                             ")";
                     }
                     else
-                        ModuleDesc = AnsiString((*pp_parser)->psz_object_name);
+                        ModuleDesc = AnsiString(p_parser->psz_object_name);
 
                     int item = PanelPlugin->CleanCheckListBox->Items->AddObject(
                         ModuleDesc.c_str(),
-                        new TObjectString((*pp_parser)->psz_object_name) );
+                        new TObjectString(p_parser->psz_object_name) );
 
                     /* check the box if it's the default module */
                     AnsiString Name = p_item->psz_value ?
                         p_item->psz_value : "";
-                    if( !strcmp( (*pp_parser)->psz_object_name, Name.c_str()) )
+                    if( !strcmp( p_parser->psz_object_name, Name.c_str()) )
                     {
                         PanelPlugin->CleanCheckListBox->Checked[item] = true;
                     }
@@ -683,7 +685,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         }
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
     /* set active tabsheet
      * FIXME: i don't know why, but both lines are necessary */

@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.13 2002/10/14 16:46:55 sam Exp $
+ * $Id: vlc_objects.h,v 1.14 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,19 +51,6 @@ struct vlc_object_t
 };
 
 /*****************************************************************************
- * The vlc_list_t object list type
- *****************************************************************************/
-struct vlc_list_t
-{
-    int             i_count;
-    vlc_object_t ** pp_objects;
-
-    /* Private */
-    int             _i_extra;
-    vlc_object_t *  _p_first;
-};  
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
@@ -74,7 +61,7 @@ VLC_EXPORT( void *, __vlc_object_get, ( vlc_object_t *, int ) );
 VLC_EXPORT( void *, __vlc_object_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
-VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
+VLC_EXPORT( vlc_list_t, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
 #define vlc_object_create(a,b) \

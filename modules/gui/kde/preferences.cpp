@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.8 2002/10/16 23:34:27 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.9 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -52,37 +52,37 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
                   "vlc preferences", true, false, "Save")
 {
-    module_t **pp_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser;
+    vlc_list_t list;
     module_config_t *p_item;
+    int i_index;
     QVBox *category_table = NULL;
     QString *category_label;
 
     this->p_intf = p_intf;
 
     /* List all modules */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     /* Look for the selected module */
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
 
         if( psz_module_name
-            && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
+            && !strcmp( psz_module_name, p_parser->psz_object_name ) )
         {
             break;
         }
     }
 
-    if( !(*pp_parser) )
+    if( !p_parser || i_index == list.i_count )
     {
-        vlc_list_release( p_list );
+        vlc_list_release( list );
         return;
     }
 
-    p_item = (*pp_parser)->p_config;
+    p_item = p_parser->p_config;
     if( p_item ) do
     {
         switch( p_item->i_type )
@@ -129,18 +129,18 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             connect(item_frame, SIGNAL(selectionChanged(const QString &)),
                     ci, SLOT(setValue(const QString &)));
 
-                
+
             /* build a list of available plugins */
-            for( pp_parser = (module_t **)p_list->pp_objects ;
-                 *pp_parser ;
-                 pp_parser++ )
+            for( i_index = 0; i_index < list.i_count; i_index++ )
             {
-                if( !strcmp( (*pp_parser)->psz_capability,
+                p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+                if( !strcmp( p_parser->psz_capability,
                              p_item->psz_type ) )
                 {
                     new QListViewItem(item_frame->getListView(),
-                                      (*pp_parser)->psz_object_name,
-                                      (*pp_parser)->psz_longname);
+                                      p_parser->psz_object_name,
+                                      p_parser->psz_longname);
                 }
             }
 
@@ -256,7 +256,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     }
     while( p_item->i_type != CONFIG_HINT_END );
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
     exec();
 }
@@ -273,24 +273,25 @@ KPreferences::~KPreferences()
 */
 bool KPreferences::isConfigureable(QString module)
 {
-    module_t **pp_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser;
+    vlc_list_t list;
+    int i_index;
 
-    p_list = vlc_list_find( this->p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( this->p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( !module.compare( (*pp_parser)->psz_object_name ) )
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+        if( !module.compare( p_parser->psz_object_name ) )
         {
-            bool ret = (*pp_parser)->i_config_items != 0;
-            vlc_list_release( p_list );
+            bool ret = p_parser->i_config_items != 0;
+            vlc_list_release( &list );
             return ret;
         }
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
     return false;
 }
 

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.1 2002/11/05 03:57:16 jlj Exp $
+ * $Id: prefs.m,v 1.2 2002/12/13 01:56:30 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -100,28 +100,29 @@
 
 - (BOOL)hasPrefs:(NSString *)o_module_name
 {
-    module_t **pp_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser;
+    vlc_list_t list;
     char *psz_module_name;
+    int i_index;
 
     psz_module_name = (char *)[o_module_name lossyCString];
 
     /* look for module */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( !strcmp( (*pp_parser)->psz_object_name, psz_module_name ) )
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_object_name, psz_module_name ) )
         {
-            BOOL b_has_prefs = (*pp_parser)->i_config_items != 0;
-            vlc_list_release( p_list );
+            BOOL b_has_prefs = p_parser->i_config_items != 0;
+            vlc_list_release( &list );
             return( b_has_prefs );
         }
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
     return( NO );
 }
@@ -131,10 +132,11 @@
     int i_pos;
     int i_module_tag;
 
-    module_t **pp_parser;
-    vlc_list_t *p_list;
+    module_t *p_parser;
+    vlc_list_t list;
     module_config_t *p_item;
     char *psz_module_name;
+    int i_index;
 
     NSPanel *o_panel;                   /* panel                        */
     NSRect s_panel_rc;                  /* panel rect                   */
@@ -163,22 +165,22 @@
     psz_module_name = (char *)[o_module_name lossyCString];
 
     /* Look for the selected module */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
         if( psz_module_name
-            && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
+            && !strcmp( psz_module_name, p_parser->psz_object_name ) )
         {
             break;
         }
     }
 
-    if( !(*pp_parser) )
+    if( !p_parser || i_index == list.i_count )
     {
-        vlc_list_release( p_list );
+        vlc_list_release( &list );
         return;
     }
 
@@ -211,7 +213,7 @@
                   forKey: o_module_name];
 
     /* Enumerate config options and add corresponding config boxes */
-    p_item = (*pp_parser)->p_config;
+    p_item = p_parser->p_config;
 
     i_pos = 0;
     o_view = nil;
@@ -381,15 +383,15 @@
 
             /* build a list of available modules */
             {
-                pp_parser = (module_t **)p_list->pp_objects;
-
-                for( ; *pp_parser ; pp_parser++ )
+                for( i_index = 0; i_index < list.i_count; i_index++ )
                 {
-                    if( !strcmp( (*pp_parser)->psz_capability,
+                    p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+                    if( !strcmp( p_parser->psz_capability,
                                  p_item->psz_type ) )
                     {
                         NSString *o_object_name = [NSString 
-                            stringWithCString: (*pp_parser)->psz_object_name];
+                            stringWithCString: p_parser->psz_object_name];
                         [o_modules addItemWithTitle: o_object_name];
                     }
                 }
@@ -517,7 +519,7 @@
     }
     while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
     [o_toolbars setObject: o_tb_items forKey: o_module_name];
     [o_toolbar setDelegate: self];

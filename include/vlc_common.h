@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.42 2002/11/28 23:24:14 massiot Exp $
+ * $Id: vlc_common.h,v 1.43 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -178,8 +178,6 @@ typedef uint32_t vlc_fourcc_t;
 /* Internal types */
 typedef struct libvlc_t libvlc_t;
 typedef struct vlc_t vlc_t;
-typedef struct vlc_list_t vlc_list_t;
-typedef struct vlc_object_t vlc_object_t;
 typedef struct variable_t variable_t;
 
 /* Messages */

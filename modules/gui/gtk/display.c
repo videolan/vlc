@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.4 2002/09/30 11:05:38 sam Exp $
+ * $Id: display.c,v 1.5 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -237,32 +237,33 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
  *****************************************************************************/
 void E_(GtkHideTooltips)( vlc_object_t *p_this )
 {
-    intf_thread_t **pp_intf;
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                                FIND_ANYWHERE );
+    intf_thread_t *p_intf;
+    int i_index;
+    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                             FIND_ANYWHERE );
 
     vlc_bool_t b_enable = config_GetInt( p_this, "gnome-tooltips" );
 
-    for( pp_intf = (intf_thread_t **)p_list->pp_objects ;
-         *pp_intf ;
-         pp_intf++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( strcmp( MODULE_STRING, (*pp_intf)->p_module->psz_object_name ) )
+        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
+
+        if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
             continue;
         }
 
         if( b_enable )
         {
-            gtk_tooltips_enable( (*pp_intf)->p_sys->p_tooltips );
+            gtk_tooltips_enable( p_intf->p_sys->p_tooltips );
         }
         else
         {
-            gtk_tooltips_disable( (*pp_intf)->p_sys->p_tooltips );
+            gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
         }
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 }
 
 #ifdef MODULE_NAME_IS_gnome
@@ -276,28 +277,29 @@ void GtkHideToolbarText( vlc_object_t *p_this )
 {
     GtkToolbarStyle style;
     GtkToolbar * p_toolbar;
-    intf_thread_t **pp_intf;
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                                FIND_ANYWHERE );
+    intf_thread_t *p_intf;
+    int i_index;
+    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                             FIND_ANYWHERE );
 
     style = config_GetInt( p_this, "gnome-toolbartext" )
             ? GTK_TOOLBAR_BOTH
             : GTK_TOOLBAR_ICONS;
 
-    for( pp_intf = (intf_thread_t **)p_list->pp_objects ;
-         *pp_intf ;
-         pp_intf++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        if( strcmp( MODULE_STRING, (*pp_intf)->p_module->psz_object_name ) )
+        p_intf = (module_t *)list.p_values[i_index].p_object ;
+
+        if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
             continue;
         }
 
-        p_toolbar = GTK_TOOLBAR(lookup_widget( (*pp_intf)->p_sys->p_window,
+        p_toolbar = GTK_TOOLBAR(lookup_widget( p_intf->p_sys->p_window,
                                                "toolbar" ));
         gtk_toolbar_set_style( p_toolbar, style );
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 }
 #endif

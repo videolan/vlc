@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.31 2002/12/07 15:25:27 gbazin Exp $
+ * $Id: objects.c,v 1.32 2002/12/13 01:56:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,8 +57,9 @@ static void           DumpStructure ( vlc_object_t *, int, char * );
 static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
 static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
 
-static vlc_list_t *   NewList       ( void );
-static vlc_list_t *   ListAppend    ( vlc_list_t *, vlc_object_t * );
+static vlc_list_t     NewList       ( int );
+static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
+static void           ListAppend    ( vlc_list_t *, vlc_object_t * );
 
 /*****************************************************************************
  * Local structure lock
@@ -486,9 +487,9 @@ void __vlc_object_detach( vlc_object_t *p_this )
  * This function recursively looks for a given object type. i_mode can be one
  * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
  *****************************************************************************/
-vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
+vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
-    vlc_list_t *p_list = NewList();
+    vlc_list_t list;
 
     vlc_mutex_lock( &structure_lock );
 
@@ -496,6 +497,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
     {
         vlc_object_t **pp_current, **pp_end;
+        int i_count = 0, i_index = 0;
 
         pp_current = p_this->p_libvlc->pp_objects;
         pp_end = pp_current + p_this->p_libvlc->i_objects;
@@ -505,18 +507,32 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
             if( (*pp_current)->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
-                p_list = ListAppend( p_list, *pp_current );
+                i_count++;
+            }
+        }
+
+        list = NewList( i_count );
+        pp_current = p_this->p_libvlc->pp_objects;
+
+        for( ; pp_current < pp_end ; pp_current++ )
+        {
+            if( (*pp_current)->b_attached
+                 && (*pp_current)->i_object_type == i_type )
+            {
+                ListReplace( &list, *pp_current, i_index );
+                if( i_index < i_count ) i_index++;
             }
         }
     }
     else
     {
         msg_Err( p_this, "unimplemented!" );
+        list = NewList( 0 );
     }
 
     vlc_mutex_unlock( &structure_lock );
 
-    return p_list;
+    return list;
 }
 
 /*****************************************************************************
@@ -592,22 +608,18 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
  *****************************************************************************/
 void vlc_list_release( vlc_list_t *p_list )
 {
-    if( p_list->i_count )
-    {
-        vlc_object_t ** pp_current = p_list->pp_objects;
+    int i_index;
 
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
         vlc_mutex_lock( &structure_lock );
 
-        while( pp_current[0] )
-        {
-            pp_current[0]->i_refcount--;
-            pp_current++;
-        }
+        p_list->p_values[i_index].p_object->i_refcount--;
 
         vlc_mutex_unlock( &structure_lock );
     }
 
-    free( p_list );
+    free( p_list->p_values );
 }
 
 /* Following functions are local */
@@ -844,57 +856,62 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
     }
 }
 
-static vlc_list_t * NewList( void )
+static vlc_list_t NewList( int i_count )
 {
-    vlc_list_t *p_list = malloc( sizeof( vlc_list_t )
-                                     + 3 * sizeof( vlc_object_t * ) );
+    vlc_list_t list;
 
-    if( p_list == NULL )
+    list.i_count = i_count;
+
+    if( i_count == 0 )
     {
-        return NULL;
+        list.p_values = NULL;
+        return list;
     }
 
-    p_list->i_count = 0;
-    p_list->pp_objects = &p_list->_p_first;
+    list.p_values = malloc( i_count * sizeof( vlc_value_t ) );
+    if( list.p_values == NULL )
+    {
+        list.i_count = 0;
+        return list;
+    }
 
-    /* We allocated space for NULL and for three extra objects */
-    p_list->_i_extra = 3;
-    p_list->_p_first = NULL;
-
-    return p_list;
+    return list;
 }
 
-static vlc_list_t * ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
+static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
+                         int i_index )
 {
-    if( p_list == NULL )
+    if( p_list == NULL || i_index >= p_list->i_count )
     {
-        return NULL;
-    }
-
-    if( p_list->_i_extra == 0 )
-    {
-        /* If we had X objects it means the array has a size of X+1, we
-         * make it size 2X+2, so we alloc 2X+1 because there is already
-         * one allocated in the real structure */
-        p_list = realloc( p_list, sizeof( vlc_list_t )
-                                   + (p_list->i_count * 2 + 1)
-                                       * sizeof( vlc_object_t * ) );
-        if( p_list == NULL ) 
-        {
-            return NULL;
-        }
-
-        /* We have X+1 extra slots */
-        p_list->_i_extra = p_list->i_count + 1;
-        p_list->pp_objects = &p_list->_p_first;
+        return;
     }
 
     p_object->i_refcount++;
 
-    p_list->pp_objects[p_list->i_count] = p_object;
-    p_list->i_count++;
-    p_list->pp_objects[p_list->i_count] = NULL;
-    p_list->_i_extra--;
+    p_list->p_values[i_index].p_object = p_object;
 
-    return p_list;
+    return;
+}
+
+static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
+{
+    if( p_list == NULL )
+    {
+        return;
+    }
+
+    p_list->p_values = realloc( p_list->p_values, (p_list->i_count + 1)
+                                * sizeof( vlc_value_t ) );
+    if( p_list->p_values == NULL )
+    {
+        p_list->i_count = 0;
+        return;
+    }
+
+    p_object->i_refcount++;
+
+    p_list->p_values[p_list->i_count].p_object = p_object;
+    p_list->i_count++;
+
+    return;
 }

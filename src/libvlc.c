@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.50 2002/12/08 00:41:06 massiot Exp $
+ * $Id: libvlc.c,v 1.51 2002/12/13 01:56:30 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1005,11 +1005,12 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
      */
 #define LINE_START 8
 #define PADDING_SPACES 25
-    vlc_list_t *p_list;
-    module_t **pp_parser;
+    vlc_list_t list;
+    module_t *p_parser;
     module_config_t *p_item;
     char psz_spaces[PADDING_SPACES+LINE_START+1];
     char psz_format[sizeof(FORMAT_STRING)];
+    int i_index;
 
     memset( psz_spaces, ' ', PADDING_SPACES+LINE_START );
     psz_spaces[PADDING_SPACES+LINE_START] = '\0';
@@ -1021,31 +1022,31 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 #endif
 
     /* List all modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     /* Enumerate the config for each module */
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
         vlc_bool_t b_help_module;
 
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
         if( psz_module_name && strcmp( psz_module_name,
-                                       (*pp_parser)->psz_object_name ) )
+                                       p_parser->psz_object_name ) )
         {
             continue;
         }
 
         /* Ignore modules without config options */
-        if( !(*pp_parser)->i_config_items )
+        if( !p_parser->i_config_items )
         {
             continue;
         }
 
-        b_help_module = !strcmp( "help", (*pp_parser)->psz_object_name );
+        b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
         /* Print module options */
-        for( p_item = (*pp_parser)->p_config;
+        for( p_item = p_parser->p_config;
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
@@ -1180,7 +1181,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     }
 
     /* Release the module list */
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
         fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
@@ -1196,9 +1197,10 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
  *****************************************************************************/
 static void ListModules( vlc_t *p_this )
 {
-    vlc_list_t *p_list;
-    module_t **pp_parser;
+    vlc_list_t list;
+    module_t *p_parser;
     char psz_spaces[22];
+    int i_index;
 
     memset( psz_spaces, ' ', 22 );
 
@@ -1213,28 +1215,28 @@ static void ListModules( vlc_t *p_this )
     fprintf( stdout, _("[module]              [description]\n") );
 
     /* List all modules */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     /* Enumerate each module */
-    for( pp_parser = (module_t **)p_list->pp_objects ;
-         *pp_parser ;
-         pp_parser++ )
+    for( i_index = 0; i_index < list.i_count; i_index++ )
     {
         int i;
 
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
         /* Nasty hack, but right now I'm too tired to think about a nice
          * solution */
-        i = 22 - strlen( (*pp_parser)->psz_object_name ) - 1;
+        i = 22 - strlen( p_parser->psz_object_name ) - 1;
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
-        fprintf( stdout, "  %s%s %s\n", (*pp_parser)->psz_object_name,
-                         psz_spaces, (*pp_parser)->psz_longname );
+        fprintf( stdout, "  %s%s %s\n", p_parser->psz_object_name,
+                         psz_spaces, p_parser->psz_longname );
 
         psz_spaces[i] = ' ';
     }
 
-    vlc_list_release( p_list );
+    vlc_list_release( &list );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
         fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
@@ -1283,4 +1285,3 @@ static void ShowConsole( void )
     return;
 }
 #endif
-

@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.18 2002/12/03 16:29:04 gitan Exp $
+ * $Id: vlc.h,v 1.19 2002/12/13 01:56:29 gbazin Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,19 +30,29 @@ extern "C" {
  * Our custom types
  *****************************************************************************/
 typedef int vlc_bool_t;
+typedef struct vlc_list_t vlc_list_t;
+typedef struct vlc_object_t vlc_object_t;
 
 typedef union
 {
-    int         i_int;
-    vlc_bool_t  b_bool;
-    float       f_float;
-    char *      psz_string;
-    void *      p_address;
+    int             i_int;
+    vlc_bool_t      b_bool;
+    float           f_float;
+    char *          psz_string;
+    void *          p_address;
+    vlc_object_t *  p_object;
 
     /* Make sure the structure is at least 64bits */
     struct { char a, b, c, d, e, f, g, h; } padding;
 
 } vlc_value_t;
+
+struct vlc_list_t
+{
+    int             i_count;
+    vlc_value_t *   p_values;
+
+};
 
 /*****************************************************************************
  * Error values

@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.9 2002/12/07 15:25:26 gbazin Exp $
+ * $Id: variables.h,v 1.10 2002/12/13 01:56:29 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,7 +87,9 @@ struct variable_t
 #define VLC_VAR_HASMAX    0x0400
 #define VLC_VAR_HASSTEP   0x0800
 
-#define VLC_VAR_ISCOMMAND 0x1000
+#define VLC_VAR_ISLIST    0x1000
+#define VLC_VAR_ISCOMMAND 0x2000
+#define VLC_VAR_ISCONFIG  0x2000
 
 /*****************************************************************************
  * Variable actions

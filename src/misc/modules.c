@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.107 2002/11/19 17:38:07 sam Exp $
+ * $Id: modules.c,v 1.108 2002/12/13 01:56:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -250,13 +250,12 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     };
 
     module_list_t *p_list, *p_first, *p_tmp;
-    vlc_list_t *p_all;
+    vlc_list_t all;
 
-    int i_index = 0;
+    int i_which_module, i_index = 0;
     vlc_bool_t b_intf = VLC_FALSE;
 
     module_t *p_module;
-    module_t **pp_parser;
 
     int   i_shortcuts = 0;
     char *psz_shortcuts = NULL, *psz_var = NULL;
@@ -296,17 +295,17 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* Sort the modules and test them */
-    p_all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    p_list = malloc( p_all->i_count * sizeof( module_list_t ) );
+    all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = malloc( all.i_count * sizeof( module_list_t ) );
     p_first = NULL;
 
     /* Parse the module list for capabilities and probe each of them */
-    for( pp_parser = (module_t**)p_all->pp_objects ; *pp_parser ; pp_parser++ )
+    for( i_which_module = 0; i_which_module < all.i_count; i_which_module++ )
     {
         module_t * p_submodule = NULL;
         int i_shortcut_bonus = 0, i_submodule;
 
-        p_module = *pp_parser;
+        p_module = (module_t *)all.p_values[i_which_module].p_object;
 
         /* Test that this module can do what we need */
         if( strcmp( p_module->psz_capability, psz_capability ) )
@@ -449,7 +448,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* We can release the list, interesting modules were yielded */
-    vlc_list_release( p_all );
+    vlc_list_release( &all );
 
     /* Parse the linked list and use the first successful module */
     p_tmp = p_first;
@@ -977,4 +976,3 @@ static int CallEntry( module_t * p_module )
     return 0;
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
-
