@@ -787,8 +787,9 @@ AC_ARG_WITH(mad,
 dnl special case for BeOS
 if test x$SYS = xbeos
 then
+    LIB="${LIB} -lbe"
     BUILTINS="${BUILTINS} beos"
-    LIB_BEOS="-lbe -lgame -lroot -ltracker"
+    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
     PLCFLAGS="${PLCFLAGS} -nostart"
 
 dnl default case
