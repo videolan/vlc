@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.1 2003/10/04 18:55:13 gbazin Exp $
+ * $Id: cddax.c,v 1.2 2003/10/05 10:54:55 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -84,7 +84,7 @@ static void CDDACloseDemux   ( vlc_object_t * );
 static int  CDDADemux        ( input_thread_t * p_input );
 
 /*****************************************************************************
- * Module descriptior
+ * Module descriptor
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -155,7 +155,7 @@ static int CDDAOpen( vlc_object_t *p_this )
       psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
       
       if( !psz_source ) {
-        /* Scan for a CD with a VCD in it. */
+        /* Scan for a CD with a CD-DA in it. */
         char **cd_drives = 
           cdio_get_devices_with_cap(NULL,  CDIO_FS_AUDIO, false);
         if (NULL == cd_drives) return -1;
@@ -416,6 +416,7 @@ static int  CDDAOpenDemux    ( vlc_object_t * p_this)
     p_demux->p_es = NULL;
 
     p_input->pf_demux  = CDDADemux;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->pf_rewind = NULL;
     p_input->p_demux_data = p_demux;
 
