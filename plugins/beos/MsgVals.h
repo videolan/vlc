@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.9 2002/03/22 13:16:35 tcastley Exp $
+ * $Id: MsgVals.h,v 1.9.2.1 2002/07/11 07:21:57 tcastley Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
@@ -43,4 +43,9 @@ const uint32 NEXT_TITLE     = 'NXTI';
 const uint32 PREV_CHAPTER   = 'PRCH';
 const uint32 NEXT_CHAPTER   = 'NXCH';
 const uint32 TOGGLE_ON_TOP  = 'ONTP';
+const uint32 TOGGLE_FULL_SCREEN = 'TGFS';
+const uint32 RESIZE_100     = 'RSOR';
+const uint32 RESIZE_200     = 'RSDB';
+const uint32 ASPECT_CORRECT = 'ASCO';
+const uint32 VERT_SYNC      = 'VSYN';
 

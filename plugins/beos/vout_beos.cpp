@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58.2.1 2002/06/01 10:12:10 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.2 2002/07/11 07:21:57 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,6 +49,7 @@ extern "C"
 
 #include "VideoWindow.h"
 #include "DrawingTidbits.h"
+#include "MsgVals.h"
 
 /*****************************************************************************
  * vout_sys_t: BeOS video output method descriptor
@@ -63,7 +64,7 @@ typedef struct vout_sys_s
     s32 i_width;
     s32 i_height;
 
-    u8 *pp_buffer[3];
+//    u8 *pp_buffer[3];
     int i_index;
 
 } vout_sys_t;
@@ -133,12 +134,21 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     } 
     delete screen;
     
+    mode = SelectDrawingMode(v_width, v_height);
+
     // remember current settings
     i_width = frame.IntegerWidth();
     i_height = frame.IntegerHeight();
-    FrameResized(frame.IntegerWidth(), frame.IntegerHeight());
+    FrameResized(i_width, i_height);
 
-    mode = SelectDrawingMode(v_width, v_height);
+    if (mode == OVERLAY)
+    {
+       overlay_restrictions r;
+
+       bitmap[1]->GetOverlayRestrictions(&r);
+       SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
+                     (i_height * r.min_height_scale), i_height * r.max_height_scale);
+    }
     Show();
 }
 
@@ -153,16 +163,42 @@ VideoWindow::~VideoWindow()
     delete bitmap[2];
 }
 
-bool VideoWindow::QuitRequested()
+void VideoWindow::MessageReceived( BMessage *p_message )
 {
-    return true;
+    switch( p_message->what )
+    {
+    case TOGGLE_FULL_SCREEN:
+        ((BWindow *)this)->Zoom();
+        break;
+    case RESIZE_100:
+        if (is_zoomed)
+        {
+            MoveTo(winSize.left, winSize.top);
+            be_app->ShowCursor();
+        }
+        ResizeTo(i_width, i_height);
+        break;
+    case RESIZE_200:
+        if (is_zoomed)
+        {
+            MoveTo(winSize.left, winSize.top);
+            be_app->ShowCursor();
+        }
+        ResizeTo(i_width * 2, i_height * 2);
+        break;
+    case VERT_SYNC:
+        vsync = !vsync;
+        break;
+    default:
+        BWindow::MessageReceived( p_message );
+        break;
+    }
 }
 
 void VideoWindow::drawBuffer(int bufferIndex)
 {
-    status_t status;
-
     i_buffer = bufferIndex;
+
     // sync to the screen if required
     if (vsync)
     {
@@ -183,7 +219,7 @@ void VideoWindow::drawBuffer(int bufferIndex)
                             &key, B_FOLLOW_ALL,
 		                    B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
 		                    B_OVERLAY_TRANSFER_CHANNEL);
-		   //view->SetViewColor(key);
+		   view->SetViewColor(key);
 	   }
        else
        {
@@ -267,13 +303,6 @@ void VideoWindow::ScreenChanged(BRect frame, color_space mode)
     { 
         vsync = true; 
     } 
-    rgb_color key;
-    view->SetViewOverlay(bitmap[i_buffer], 
-                         bitmap[i_buffer]->Bounds() ,
-                         view->Bounds(),
-                         &key, B_FOLLOW_ALL,
-                         B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
-    view->SetViewColor(key);
 }
 
 void VideoWindow::WindowActivated(bool active)
@@ -360,8 +389,46 @@ VLCView::~VLCView()
  *****************************************************************************/
 void VLCView::MouseDown(BPoint point)
 {
-    BWindow *win = Window();
-    win->Zoom();
+    BMessage* msg = Window()->CurrentMessage();
+    int32 clicks = msg->FindInt32("clicks");
+    VideoWindow *vWindow = (VideoWindow *)Window();
+
+    if (clicks > 1)
+    {
+       Window()->Zoom();
+       return;
+    }
+    uint32 mouseButtons;
+    BPoint where;
+	GetMouse(&where, &mouseButtons, true);
+	// bring up pop-up menu
+	if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) {
+		BPopUpMenu *menu = new BPopUpMenu("context menu");
+		// Toggle FullScreen
+		BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
+		zoomItem->SetMarked(vWindow->is_zoomed);
+		menu->AddItem(zoomItem);
+		// Resize to 100%
+		BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
+		menu->AddItem(origItem);
+		// Resize to 200%
+		BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
+		menu->AddItem(doubleItem);
+		menu->AddSeparatorItem();
+//		// Toggle the Aspect Ratio Correction
+//		BMenuItem *aspectItem = new BMenuItem("Aspect Correction", 
+//		                                       new BMessage(ASPECT_CORRECT));
+//		aspectItem->SetMarked(vWindow->is_zoomed);
+//		menu->AddItem(aspectItem);
+		// Toggle vSync
+		BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
+		vsyncItem->SetMarked(vWindow->vsync);
+		menu->AddItem(vsyncItem);
+		
+		menu->SetTargetForItems(this);
+		ConvertToScreen(&where);
+		menu->Go(where, true, false, true);
+	} 
 }
 
 /*****************************************************************************
@@ -443,10 +510,6 @@ int vout_Init( vout_thread_t *p_vout )
         intf_ErrMsg("vout error: can't open display");
         return 0;
     }
-    /* Set the buffers */
-    p_vout->p_sys->pp_buffer[0] = (u8*)p_vout->p_sys->p_window->bitmap[0]->Bits();
-    p_vout->p_sys->pp_buffer[1] = (u8*)p_vout->p_sys->p_window->bitmap[1]->Bits();
-    p_vout->p_sys->pp_buffer[2] = (u8*)p_vout->p_sys->p_window->bitmap[2]->Bits();
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
 
@@ -455,6 +518,8 @@ int vout_Init( vout_thread_t *p_vout )
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
     p_vout->output.i_chroma = colspace[p_vout->p_sys->p_window->colspace_index].chroma;
     p_vout->p_sys->i_index = 0;
+
+    p_vout->b_direct = 1;
 
     p_vout->output.i_rmask  = 0x00ff0000;
     p_vout->output.i_gmask  = 0x0000ff00;
@@ -478,16 +543,16 @@ int vout_Init( vout_thread_t *p_vout )
        {
            return 0;
        }
-       p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[0];
+       p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
        p_pic->p->i_lines = p_vout->p_sys->i_height;
 
        p_pic->p->i_pixel_bytes = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
        p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
-       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow(); 
+       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[buffer_index]->BytesPerRow(); 
 
        if (p_vout->p_sys->p_window->mode == OVERLAY)
        {
-          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[0]->Bounds().IntegerWidth()+1) 
+          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[buffer_index]->Bounds().IntegerWidth()+1) 
                                      * p_pic->p->i_pixel_bytes; 
           p_pic->p->b_margin = 1;
           p_pic->p->b_hidden = 0;
@@ -564,7 +629,7 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
     /* change buffer */
     p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
-    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index];
+    p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
 }
 
 /* following functions are local */

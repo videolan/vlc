@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.19.2.2 2002/07/10 05:17:27 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.19.2.3 2002/07/11 07:21:57 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -74,8 +74,8 @@ public:
     void            drawBuffer(int bufferIndex);
     void            WindowActivated(bool active);
     int             SelectDrawingMode(int width, int height);
-    bool            QuitRequested();
-    
+    virtual void    MessageReceived(BMessage *message);
+
     // this is the hook controling direct screen connection
     int32           i_width;     // incomming bitmap size 
     int32           i_height;
