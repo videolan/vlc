@@ -378,7 +378,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 if( b_access_demux )
                 {
                     /* Let the access (only) take care of that */
-                  return VLC_EGENERIC;
+                    return VLC_EGENERIC;
                 }
             }
         }
@@ -391,6 +391,15 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
             {
                 /* Let the access (only) take care of that */
                 return VLC_EGENERIC;
+            }
+
+            var_Get( p_this, "dshow-tuner", &val );
+            if( val.b_bool )
+            {
+                /* FIXME: we do MEDIATYPE_Stream here so we don't do
+                 * it twice. */
+                ShowTunerProperties( p_this, p_sys->p_capture_graph_builder2,
+                                     p_stream->p_device_filter, 0 );
             }
         }
     }
@@ -597,7 +606,6 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
     /* Uninitialize OLE/COM */
     CoUninitialize();
 
-    /* Remove filters from graph */
     for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
     if( p_sys->i_streams ) free( p_sys->pp_streams );
 
@@ -952,15 +960,16 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
                                   p_device_filter, b_audio );
         }
 
+        ConfigTuner( p_this, p_sys->p_capture_graph_builder2,
+                     p_device_filter );
+
         var_Get( p_this, "dshow-tuner", &val );
-        if( val.b_bool )
+        if( val.b_bool && dshow_stream.mt.majortype != MEDIATYPE_Stream )
         {
+            /* FIXME: we do MEDIATYPE_Stream later so we don't do it twice. */
             ShowTunerProperties( p_this, p_sys->p_capture_graph_builder2,
                                  p_device_filter, b_audio );
         }
-
-        ConfigTuner( p_this, p_sys->p_capture_graph_builder2,
-                     p_device_filter );
 
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
@@ -1662,7 +1671,7 @@ static void ShowPropertyPage( IUnknown *obj )
 }
 
 static void ShowDeviceProperties( vlc_object_t *p_this,
-                                  ICaptureGraphBuilder2 *p_capture_graph,
+                                  ICaptureGraphBuilder2 *p_graph,
                                   IBaseFilter *p_device_filter,
                                   vlc_bool_t b_audio )
 {
@@ -1677,16 +1686,15 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
     /*
      * Audio capture pin
      */
-    if( p_capture_graph && b_audio )
+    if( p_graph && b_audio )
     {
         IAMStreamConfig *p_SC;
 
         msg_Dbg( p_this, "Showing WDM Audio Configuration Pages" );
 
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Audio, p_device_filter,
-                                             IID_IAMStreamConfig,
-                                             (void **)&p_SC );
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                     &MEDIATYPE_Audio, p_device_filter,
+                                     IID_IAMStreamConfig, (void **)&p_SC );
         if( SUCCEEDED(hr) )
         {
             ShowPropertyPage(p_SC);
@@ -1697,7 +1705,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
          * TV Audio filter
          */
         IAMTVAudio *p_TVA;
-        HRESULT hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+        HRESULT hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                              &MEDIATYPE_Audio, p_device_filter,
                                              IID_IAMTVAudio, (void **)&p_TVA );
         if( SUCCEEDED(hr) )
@@ -1710,24 +1718,27 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
     /*
      * Video capture pin
      */
-    if( p_capture_graph && !b_audio )
+    if( p_graph && !b_audio )
     {
         IAMStreamConfig *p_SC;
 
         msg_Dbg( p_this, "Showing WDM Video Configuration Pages" );
 
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Interleaved,
-                                             p_device_filter,
-                                             IID_IAMStreamConfig,
-                                             (void **)&p_SC );
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                     &MEDIATYPE_Interleaved, p_device_filter,
+                                     IID_IAMStreamConfig, (void **)&p_SC );
         if( FAILED(hr) )
         {
-            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                                 &MEDIATYPE_Video,
-                                                 p_device_filter,
-                                                 IID_IAMStreamConfig,
-                                                 (void **)&p_SC );
+            hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                         &MEDIATYPE_Video, p_device_filter,
+                                         IID_IAMStreamConfig, (void **)&p_SC );
+        }
+
+        if( FAILED(hr) )
+        {
+            hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                         &MEDIATYPE_Stream, p_device_filter,
+                                         IID_IAMStreamConfig, (void **)&p_SC );
         }
 
         if( SUCCEEDED(hr) )
@@ -1739,39 +1750,41 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 }
 
 static void ShowTunerProperties( vlc_object_t *p_this,
-                                 ICaptureGraphBuilder2 *p_capture_graph,
+                                 ICaptureGraphBuilder2 *p_graph,
                                  IBaseFilter *p_device_filter,
                                  vlc_bool_t b_audio )
 {
     HRESULT hr;
     msg_Dbg( p_this, "Configuring Tuner Properties" );
 
-    if( p_capture_graph && !b_audio )
-    {
-        IAMTVTuner *p_TV;
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Interleaved,
-                                             p_device_filter,
-                                             IID_IAMTVTuner, (void **)&p_TV );
-        if( FAILED(hr) )
-        {
-            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                                 &MEDIATYPE_Video,
-                                                 p_device_filter,
-                                                 IID_IAMTVTuner,
-                                                 (void **)&p_TV );
-        }
+    if( !p_graph || b_audio ) return;
 
-        if( SUCCEEDED(hr) )
-        {
-            ShowPropertyPage(p_TV);
-            p_TV->Release();
-        }
+    IAMTVTuner *p_TV;
+    hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                 &MEDIATYPE_Interleaved, p_device_filter,
+                                 IID_IAMTVTuner, (void **)&p_TV );
+    if( FAILED(hr) )
+    {
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                     &MEDIATYPE_Video, p_device_filter,
+                                     IID_IAMTVTuner, (void **)&p_TV );
+    }
+
+    if( FAILED(hr) )
+    {
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                     &MEDIATYPE_Stream, p_device_filter,
+                                     IID_IAMTVTuner, (void **)&p_TV );
+    }
+
+    if( SUCCEEDED(hr) )
+    {
+        ShowPropertyPage(p_TV);
+        p_TV->Release();
     }
 }
 
-static void ConfigTuner( vlc_object_t *p_this,
-                         ICaptureGraphBuilder2 *p_capture_graph,
+static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
                          IBaseFilter *p_device_filter )
 {
     int i_channel, i_country, i_input;
@@ -1779,7 +1792,7 @@ static void ConfigTuner( vlc_object_t *p_this,
     IAMTVTuner *p_TV;
     HRESULT hr;
 
-    if( !p_capture_graph ) return;
+    if( !p_graph ) return;
 
     i_channel = var_GetInteger( p_this, "dshow-tuner-channel" );
     i_country = var_GetInteger( p_this, "dshow-tuner-country" );
@@ -1790,15 +1803,21 @@ static void ConfigTuner( vlc_object_t *p_this,
     msg_Dbg( p_this, "tuner config: channel %i, country %i, input type %i",
              i_channel, i_country, i_input );
 
-    hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                         &MEDIATYPE_Interleaved,
-                                         p_device_filter,
-                                         IID_IAMTVTuner, (void **)&p_TV );
+    hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved,
+                                 p_device_filter, IID_IAMTVTuner,
+                                 (void **)&p_TV );
     if( FAILED(hr) )
     {
-        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
-                                             &MEDIATYPE_Video, p_device_filter,
-                                             IID_IAMTVTuner, (void **)&p_TV );
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
+                                     p_device_filter, IID_IAMTVTuner,
+                                     (void **)&p_TV );
+    }
+
+    if( FAILED(hr) )
+    {
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Stream,
+                                     p_device_filter, IID_IAMTVTuner,
+                                     (void **)&p_TV );
     }
 
     if( FAILED(hr) )
