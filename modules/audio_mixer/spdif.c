@@ -2,7 +2,7 @@
  * spdif.c : dummy mixer for S/PDIF output (1 input only)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: spdif.c,v 1.5 2002/08/21 22:41:59 massiot Exp $
+ * $Id: spdif.c,v 1.6 2002/09/20 23:27:03 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,6 +74,7 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     aout_input_t * p_input = p_aout->pp_inputs[0];
+    if ( p_input->b_error ) return;
     aout_FifoPop( p_aout, &p_input->fifo );
 }
 

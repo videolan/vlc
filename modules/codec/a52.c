@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.11 2002/09/16 20:46:38 massiot Exp $
+ * $Id: a52.c,v 1.12 2002/09/20 23:27:03 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -43,9 +43,9 @@
 #define A52_FRAME_NB 1536 
 
 /*****************************************************************************
- * spdif_thread_t : A52 pass-through thread descriptor
+ * dec_thread_t : A52 pass-through thread descriptor
  *****************************************************************************/
-typedef struct spdif_thread_s
+typedef struct dec_thread_t
 {
     /*
      * Thread properties
@@ -56,8 +56,6 @@ typedef struct spdif_thread_s
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-
-    /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
 
     /*
@@ -66,7 +64,7 @@ typedef struct spdif_thread_s
     aout_instance_t *   p_aout; /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
-} spdif_thread_t;
+} dec_thread_t;
 
 /****************************************************************************
  * Local prototypes
@@ -74,8 +72,7 @@ typedef struct spdif_thread_s
 static int  OpenDecoder    ( vlc_object_t * );
 static int  RunDecoder     ( decoder_fifo_t * );
 
-static int  InitThread     ( spdif_thread_t *, decoder_fifo_t * );
-static void EndThread      ( spdif_thread_t * );
+static void EndThread      ( dec_thread_t * );
 
 static int  SyncInfo       ( const byte_t *, int *, int *, int * );
 
@@ -86,15 +83,10 @@ vlc_module_begin();
     set_description( _("A/52 parser") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
-    add_shortcut( "pass_through" );
-    add_shortcut( "pass" );
 vlc_module_end();
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
- *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able 
- * to chose.
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this ) 
 {   
@@ -117,11 +109,11 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************/
 static int RunDecoder( decoder_fifo_t *p_fifo )
 {
-    spdif_thread_t * p_dec;
+    dec_thread_t * p_dec;
     audio_date_t end_date;
     
     /* Allocate the memory needed to store the thread's structure */
-    p_dec = malloc( sizeof(spdif_thread_t) );
+    p_dec = malloc( sizeof(dec_thread_t) );
     if( p_dec == NULL )
     {
         msg_Err( p_fifo, "out of memory" );
@@ -129,21 +121,21 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return -1;
     }
   
-    if ( InitThread( p_dec, p_fifo ) )
-    {
-        
-        msg_Err( p_fifo, "could not initialize thread" );
-        DecoderError( p_fifo );
-        free( p_dec );
-        return -1;
-    }
+    /* Initialize the thread properties */
+    p_dec->p_aout = NULL;
+    p_dec->p_aout_input = NULL;
+    p_dec->p_fifo = p_fifo;
+    p_dec->output_format.i_format = AOUT_FMT_A52;
+
+    /* Init the bitstream */
+    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
+                   NULL, NULL );
 
     /* decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
         int i_frame_size, i_channels, i_rate, i_bit_rate;
         mtime_t pts;
-        /* Temporary buffer to store the raw frame to be decoded */
         byte_t p_header[7];
         aout_buffer_t * p_buffer;
 
@@ -248,28 +240,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     return 0;
 }
 
-/****************************************************************************
- * InitThread: initialize thread data and create output fifo
- ****************************************************************************/
-static int InitThread( spdif_thread_t * p_dec, decoder_fifo_t * p_fifo )
-{
-    /* Initialize the thread properties */
-    p_dec->p_aout = NULL;
-    p_dec->p_aout_input = NULL;
-    p_dec->p_fifo = p_fifo;
-    p_dec->output_format.i_format = AOUT_FMT_A52;
-
-    /* Init the Bitstream */
-    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
-                   NULL, NULL );
-
-    return 0;
-}
-
 /*****************************************************************************
  * EndThread : spdif thread destruction
  *****************************************************************************/
-static void EndThread( spdif_thread_t * p_dec )
+static void EndThread( dec_thread_t * p_dec )
 {
     if ( p_dec->p_aout_input != NULL )
     {

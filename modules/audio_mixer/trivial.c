@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
+ * $Id: trivial.c,v 1.7 2002/09/20 23:27:03 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,6 +76,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                       * p_aout->mixer.mixer.i_channels;
     byte_t * p_in = p_input->p_first_byte_to_mix;
     byte_t * p_out = p_buffer->p_buffer;
+
+    if ( p_input->b_error ) return;
 
     for ( ; ; )
     {

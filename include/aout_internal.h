@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.19 2002/09/19 21:56:39 massiot Exp $
+ * $Id: aout_internal.h,v 1.20 2002/09/20 23:27:03 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -146,6 +146,9 @@ struct aout_input_t
 
     /* Mixer information */
     byte_t *                p_first_byte_to_mix;
+
+    /* Is the input dead ? */
+    vlc_bool_t              b_error;
 };
 
 /*****************************************************************************
@@ -211,8 +214,8 @@ struct aout_instance_t
  * Prototypes
  *****************************************************************************/
 /* From input.c : */
-void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                     aout_buffer_t * p_buffer );
+int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+                    aout_buffer_t * p_buffer );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,

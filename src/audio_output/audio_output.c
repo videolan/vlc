@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance miscellaneous functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.102 2002/09/16 20:46:38 massiot Exp $
+ * $Id: audio_output.c,v 1.103 2002/09/20 23:27:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -125,8 +125,8 @@ void aout_BufferDelete( aout_instance_t * p_aout, aout_input_t * p_input,
 /*****************************************************************************
  * aout_BufferPlay : filter & mix the decoded buffer
  *****************************************************************************/
-void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                      aout_buffer_t * p_buffer )
+int aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+                     aout_buffer_t * p_buffer )
 {
     if ( p_buffer->start_date == 0 )
     {
@@ -143,7 +143,7 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* If the buffer is too early, wait a while. */
     mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
 
-    aout_InputPlay( p_aout, p_input, p_buffer );
+    if ( aout_InputPlay( p_aout, p_input, p_buffer ) == -1 ) return -1;
 
     /* Run the mixer if it is able to run. */
     aout_MixerRun( p_aout );

@@ -222,9 +222,12 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
             *p_samples++ = *p_right++;
         }
         break;
+
     case 1:
         p_dec->p_fifo->p_vlc->pf_memcpy( p_samples, p_left,
                                          i_samples * sizeof(mad_fixed_t) );
+        break;
+
     default:
         msg_Err( p_dec->p_fifo, "cannot interleave %i channels",
                                 p_pcm->channels );

@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.13 2002/09/19 21:56:40 massiot Exp $
+ * $Id: mixer.c,v 1.14 2002/09/20 23:27:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -106,6 +106,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             aout_fifo_t * p_fifo = &p_input->fifo;
             aout_buffer_t * p_buffer;
 
+            if ( p_input->b_error ) continue;
+
             p_buffer = p_fifo->p_first;
             if ( p_buffer == NULL )
             {
@@ -139,6 +141,8 @@ static int MixBuffer( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         mtime_t prev_date;
         vlc_bool_t b_drop_buffers;
+
+        if ( p_input->b_error ) continue;
 
         p_buffer = p_fifo->p_first;
         if ( p_buffer == NULL )

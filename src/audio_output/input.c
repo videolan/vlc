@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.11 2002/08/30 22:22:24 massiot Exp $
+ * $Id: input.c,v 1.12 2002/09/20 23:27:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -81,6 +81,7 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
         aout_MixerDelete( p_aout );
     }
 
+    p_input->b_error = 0;
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
     aout_FormatPrepare( &p_input->input );
@@ -95,9 +96,6 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
     if ( aout_MixerNew( p_aout ) < 0 )
     {
         p_aout->i_nb_inputs--;
-        aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
-                                     p_input->i_nb_filters );
-        aout_FifoDestroy( p_aout, &p_input->fifo );
 
         if ( !p_aout->i_nb_inputs )
         {
@@ -107,6 +105,8 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
         {
             aout_MixerNew( p_aout );
         }
+
+        aout_FifoDestroy( p_aout, &p_input->fifo );
         vlc_mutex_unlock( &p_input->lock );
         vlc_mutex_destroy( &p_input->lock );
         free( p_input );
@@ -124,17 +124,24 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
     {
         msg_Err( p_aout, "couldn't set an input pipeline" );
 
-        aout_FifoDestroy( p_aout, &p_input->fifo );
+        p_aout->i_nb_inputs--;
 
+        aout_MixerDelete( p_aout );
+        if ( !p_aout->i_nb_inputs )
+        {
+            aout_OutputDelete( p_aout );
+        }
+        else
+        {
+            aout_MixerNew( p_aout );
+        }
+
+        aout_FifoDestroy( p_aout, &p_input->fifo );
         vlc_mutex_unlock( &p_input->lock );
         vlc_mutex_destroy( &p_input->lock );
         free( p_input );
         vlc_mutex_unlock( &p_aout->mixer_lock );
 
-        if ( !p_aout->i_nb_inputs )
-        {
-            aout_OutputDelete( p_aout );
-        }
         return NULL;
     }
 
@@ -236,14 +243,63 @@ void aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 }
 
 /*****************************************************************************
+ * aout_InputChange : recreate the pipeline framework, in case the output
+ *                    device has changed
+ *****************************************************************************
+ * You must own p_input->lock and the mixer lock before entering this function.
+ * It returns -1 if the input pipeline couldn't be created. Please remember
+ * to call aout_MixerNew() afterwards.
+ *****************************************************************************/
+int aout_InputChange( aout_instance_t * p_aout, aout_input_t * p_input )
+{
+    aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
+                                 p_input->i_nb_filters );
+    aout_FifoDestroy( p_aout, &p_input->fifo );
+
+    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
+    p_input->p_first_byte_to_mix = NULL;
+
+    /* Create filters. */
+    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                     &p_input->i_nb_filters, &p_input->input,
+                                     &p_aout->mixer.mixer ) < 0 )
+    {
+        p_input->b_error = 1;
+
+        return -1;
+    }
+
+    /* Prepare hints for the buffer allocator. */
+    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_input->input_alloc.i_bytes_per_sec = -1;
+
+    aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
+                             p_input->i_nb_filters,
+                             &p_input->input_alloc );
+
+    /* i_bytes_per_sec is still == -1 if no filters */
+    p_input->input_alloc.i_bytes_per_sec = __MAX(
+                                    p_input->input_alloc.i_bytes_per_sec,
+                                    p_input->input.i_bytes_per_frame
+                                     * p_input->input.i_rate
+                                     / p_input->input.i_frame_length );
+    /* Allocate in the heap, it is more convenient for the decoder. */
+    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+
+    return 0;
+}
+
+/*****************************************************************************
  * aout_InputPlay : play a buffer
  *****************************************************************************/
-void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                     aout_buffer_t * p_buffer )
+int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+                    aout_buffer_t * p_buffer )
 {
     mtime_t start_date, duration;
 
     vlc_mutex_lock( &p_input->lock );
+
+    if ( p_input->b_error ) return -1;
 
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
@@ -272,7 +328,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
 
         vlc_mutex_unlock( &p_input->lock );
-        return;
+        return 0;
     }
 
     if ( start_date == 0 ) start_date = p_buffer->start_date;
@@ -326,7 +382,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             aout_BufferFree( p_buffer );
 
             vlc_mutex_unlock( &p_input->lock );
-            return;
+            return 0;
         }
 
         dummy_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
@@ -372,4 +428,6 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->end_date = start_date + duration;
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
     vlc_mutex_unlock( &p_aout->input_fifos_lock );
+
+    return 0;
 }

@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.3 2002/09/19 21:56:39 massiot Exp $
+ * $Id: float32.c,v 1.4 2002/09/20 23:27:03 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -120,6 +120,8 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         aout_input_t * p_input = p_aout->pp_inputs[i_input];
         float * p_out = (float *)p_buffer->p_buffer;
         float * p_in = (float *)p_input->p_first_byte_to_mix;
+
+        if ( p_input->b_error ) continue;
 
         for ( ; ; )
         {
