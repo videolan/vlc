@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.102 2004/02/03 13:00:27 titer Exp $
+# $Id: AUTHORS,v 1.103 2004/02/08 16:43:17 rocky Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -66,6 +66,13 @@ D: Ogg and Raw DV demultiplexers
 D: Configuration file infrastructure
 D: wxWindows and http interfaces
 S: France
+
+N: Rocky Bernstein
+E: rocky@panix.com
+C: rocky
+D: Navigation-enabled VCD (via libvcdinfo) enhanced CDDA (via libcdio)
+D: SVCD/CVD subtitles
+S: USA
 
 N: Johan Bilien
 E: jobi@via.ecp.fr
