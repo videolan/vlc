@@ -25,6 +25,7 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_sys.h"
+#include "video_yuv.h"
 #include "intf_msg.h"
 
 /*******************************************************************************
@@ -38,23 +39,25 @@
 typedef struct vout_sys_s
 {
     /* User settings */
-    boolean_t           b_shm;                 /* shared memory extension flag */
+    boolean_t           b_shm;               /* shared memory extension flag */
 
     /* Internal settings and properties */
-    Display *           p_display;                          /* display pointer */
-    int                 i_screen;                             /* screen number */
-    Window              root_window;                            /* root window */
-    Window              window;                     /* window instance handler */
-    GC                  gc;                /* graphic context instance handler */    
+    Display *           p_display;                        /* display pointer */
+    Visual *            p_visual;                          /* visual pointer */    
+    int                 i_screen;                           /* screen number */
+    Window              root_window;                          /* root window */
+    Window              window;                   /* window instance handler */
+    GC                  gc;              /* graphic context instance handler */    
+    Colormap            colormap;               /* colormap used (8bpp only) */
 
     /* Display buffers and shared memory information */
-    XImage *            p_ximage[2];                         /* XImage pointer */   
-    XShmSegmentInfo     shm_info[2];         /* shared memory zone information */
+    XImage *            p_ximage[2];                       /* XImage pointer */   
+    XShmSegmentInfo     shm_info[2];       /* shared memory zone information */
 } vout_sys_t;
 
-/*******************************************************************************
+/*****************************************************************************
  * Local prototypes
- *******************************************************************************/
+ *****************************************************************************/
 static int  X11OpenDisplay      ( vout_thread_t *p_vout, char *psz_display, Window root_window );
 static void X11CloseDisplay     ( vout_thread_t *p_vout );
 static int  X11CreateWindow     ( vout_thread_t *p_vout );
@@ -65,7 +68,6 @@ static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
                                   XShmSegmentInfo *p_shm_info );
 static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage, 
                                   XShmSegmentInfo *p_shm_info );
-
 
 /*******************************************************************************
  * vout_SysCreate: allocate X11 video thread output method
@@ -202,6 +204,18 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
+    /*
+     * Color/Grayscale or gamma change: in 8bpp, just change the colormap
+     */
+    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE) && (p_vout->i_screen_depth == 8) )
+    {
+        //??
+        //?? clear flags
+    }
+    
+    /*
+     * Size change
+     */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {        
         intf_DbgMsg("resizing window\n");      
@@ -265,14 +279,19 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 
 /* following functions are local */
 
-/*******************************************************************************
+/*****************************************************************************
  * X11OpenDisplay: open and initialize X11 device 
- *******************************************************************************
+ *****************************************************************************
  * Create a window according to video output given size, and set other 
  * properties according to the display properties.
- *******************************************************************************/
+ *****************************************************************************/
 static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root_window )
 {
+    XPixmapFormatValues *       p_xpixmap_format;           /* pixmap formats */    
+    XVisualInfo *               p_xvisual;            /* visuals informations */
+    XVisualInfo                 xvisual_template;          /* visual template */
+    int                         i_count;                        /* array size */    
+
     /* Open display */
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
     if( p_vout->p_sys->p_display == NULL )
@@ -290,31 +309,65 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
         intf_Msg("XShm video extension is not available\n");    
     }    
 
-    /* Get the screen depth */
-    p_vout->i_screen_depth = DefaultDepth( p_vout->p_sys->p_display, 
-                                           p_vout->p_sys->i_screen );
+    /* Get screen depth */
+    p_vout->i_screen_depth = XDefaultDepth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );    
     switch( p_vout->i_screen_depth )
     {
-    case 8:                                    /* 24 bpp (millions of colors) */
-        p_vout->i_bytes_per_pixel = 1;
+    case 8:
+        /*
+         * Screen depth is 8bpp. Use PseudoColor visual with private colormap.
+         */
+        xvisual_template.screen =   p_vout->p_sys->i_screen;
+        xvisual_template.class =    DirectColor;
+        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display, VisualScreenMask | VisualClassMask, 
+                                    &xvisual_template, &i_count );
+        if( p_xvisual == NULL )
+        {
+            intf_ErrMsg("error: no PseudoColor visual available\n");
+            XCloseDisplay( p_vout->p_sys->p_display );
+            return( 1 );        
+        }
+        //??
+        //?? SetColormap;
+        p_vout->i_bytes_per_pixel = 1;        
         break;
-    case 15:                       /* 15 bpp (16bpp with a missing green bit) */
-    case 16:                                         /* 16 bpp (65536 colors) */
-        p_vout->i_bytes_per_pixel = 2;
+    case 15:
+    case 16:
+    case 24:
+    default:        
+        /*
+         * Screen depth is higher than 8bpp. TrueColor visual is used.
+         */
+        xvisual_template.screen =   p_vout->p_sys->i_screen;
+        xvisual_template.class =    TrueColor;
+        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display, VisualScreenMask | VisualClassMask, 
+                                    &xvisual_template, &i_count );
+        if( p_xvisual == NULL )
+        {
+            intf_ErrMsg("error: no TrueColor visual available\n");
+            XCloseDisplay( p_vout->p_sys->p_display );
+            return( 1 );        
+        }
+        p_vout->i_red_mask =        p_xvisual->red_mask;
+        p_vout->i_green_mask =      p_xvisual->green_mask;
+        p_vout->i_blue_mask =       p_xvisual->blue_mask;
+
+        /* There is no difference yet between 3 and 4 Bpp. The only way to find
+         * the actual number of bytes per pixel is to list supported pixmap 
+         * formats. */
+        p_xpixmap_format = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
+        p_vout->i_bytes_per_pixel = 0;        
+        for( ; i_count--; p_xpixmap_format++ )
+        {
+            if( p_xpixmap_format->bits_per_pixel / 8 > p_vout->i_bytes_per_pixel )
+            {
+                p_vout->i_bytes_per_pixel = p_xpixmap_format->bits_per_pixel / 8;                
+            }
+        }
         break;
-    case 24:                                   /* 24 bpp (millions of colors) */
-        p_vout->i_bytes_per_pixel = 3;
-        break;
-    case 32:                                   /* 32 bpp (millions of colors) */
-        p_vout->i_bytes_per_pixel = 4;
-        break;
-    default:                                      /* unsupported screen depth */
-        intf_ErrMsg("error: screen depth %d is not supported\n", 
-                    p_vout->i_screen_depth);    
-        XCloseDisplay( p_vout->p_sys->p_display );        
-        return( 1  );
-        break;
-    }    
+    }
+    p_vout->p_sys->p_visual = p_xvisual->visual;
+    XFree( p_xvisual );
 
     /* Create a window */
     if( X11CreateWindow( p_vout ) )
@@ -334,29 +387,35 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
  *******************************************************************************/
 static void X11CloseDisplay( vout_thread_t *p_vout )
 {
+    /* Destroy colormap */
+    if( p_vout->i_screen_depth == 8 )
+    {
+        XFreeColormap( p_vout->p_sys->p_display, p_vout->p_sys->colormap );
+    }
+
     /* Destroy window and close display */
     X11DestroyWindow( p_vout );
     XCloseDisplay( p_vout->p_sys->p_display );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * X11CreateWindow: create X11 vout window
- *******************************************************************************
+ ******************************************************************************
  * The video output window will be created. Normally, this window is wether 
  * full screen or part of a parent window. Therefore, it does not need a 
  * title or other hints. Thery are still supplied in case the window would be
  * spawned as a standalone one by the interface.
- *******************************************************************************/
+ ******************************************************************************/
 static int X11CreateWindow( vout_thread_t *p_vout )
 {
-    XSetWindowAttributes    xwindow_attributes;
-    XGCValues               xgcvalues;
-    XEvent                  xevent;
-    boolean_t               b_expose;
-    boolean_t               b_map_notify;    
+    XSetWindowAttributes    xwindow_attributes;          /* window attributes */
+    XGCValues               xgcvalues;       /* graphic context configuration */
+    XEvent                  xevent;                           /* first events */
+    boolean_t               b_expose;              /* 'expose' event received */
+    boolean_t               b_map_notify;      /* 'map_notify' event received */
 
     /* Prepare window attributes */
-    xwindow_attributes.backing_store = Always;         /* save the hidden part */
+    xwindow_attributes.backing_store = Always;        /* save the hidden part */
  
     /* Create the window and set hints */
     p_vout->p_sys->window = XCreateSimpleWindow( p_vout->p_sys->p_display,
@@ -453,8 +512,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
     }
     
     /* Create XImage */
-    *pp_ximage = XCreateImage( p_vout->p_sys->p_display, 
-                               DefaultVisual(p_vout->p_sys->p_display, p_vout->p_sys->i_screen),
+    *pp_ximage = XCreateImage( p_vout->p_sys->p_display, p_vout->p_sys->p_visual,
                                p_vout->i_screen_depth, ZPixmap, 0, pb_data, 
                                p_vout->i_width, p_vout->i_height, i_quantum, 0);
     if(! *pp_ximage )                                                 /* error */
@@ -479,8 +537,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                               XShmSegmentInfo *p_shm_info)
 {
     /* Create XImage */
-    *pp_ximage = XShmCreateImage( p_vout->p_sys->p_display, 
-                                  DefaultVisual(p_vout->p_sys->p_display, p_vout->p_sys->i_screen),
+    *pp_ximage = XShmCreateImage( p_vout->p_sys->p_display, p_vout->p_sys->p_visual, 
                                   p_vout->i_screen_depth, ZPixmap, 0, 
                                   p_shm_info, p_vout->i_width, p_vout->i_height );
     if(! *pp_ximage )                                                 /* error */

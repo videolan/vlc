@@ -119,6 +119,7 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
+    //?? 8bpp: change palette
     return( 0 );    
 }
 
@@ -286,32 +287,13 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display )
     p_vout->i_width =           mode.visible.x;    
     p_vout->i_height =          mode.visible.y;
     p_vout->i_bytes_per_line =  p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.stride;    
-    switch( mode.graphtype )
-    {
-    case GT_15BIT:
-        p_vout->i_screen_depth =        15;
-        p_vout->i_bytes_per_pixel =     2;
-        break;        
-    case GT_16BIT:
-        p_vout->i_screen_depth =        16;
-        p_vout->i_bytes_per_pixel =     2;
-        break;        
-    case GT_24BIT:
-        p_vout->i_screen_depth =        24;
-        p_vout->i_bytes_per_pixel =     3;
-        break;        
-    case GT_32BIT:
-        p_vout->i_screen_depth =        32;
-        p_vout->i_bytes_per_pixel =     4;
-       break;        
-    default:
-        intf_ErrMsg("error: unsupported screen depth\n");        
-        ggiClose( p_vout->p_sys->p_display );
-        ggiExit();        
-        return( 1 );        
-        break;        
-    }
-
+    p_vout->i_screen_depth =    p_vout->p_sys->p_buffer[ 0 ]->buffer.plb->pixelformat.depth;
+    p_vout->i_bytes_per_pixel = p_vout->p_sys->p_buffer[ 0 ]->buffer.plb->pixelformat.size / 8;    
+    p_vout->i_red_mask =        p_vout->p_sys->p_buffer[ 0 ]->buffer.plb->pixelformat.red_mask;
+    p_vout->i_green_mask =      p_vout->p_sys->p_buffer[ 0 ]->buffer.plb->pixelformat.green_mask;
+    p_vout->i_blue_mask =       p_vout->p_sys->p_buffer[ 0 ]->buffer.plb->pixelformat.blue_mask;            
+    //?? palette in 8bpp
+    
     /* Set and initialize buffers */
     vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ]->write, p_vout->p_sys->p_buffer[ 1 ]->write );
 

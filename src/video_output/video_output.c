@@ -30,6 +30,8 @@
 /******************************************************************************
  * Local prototypes
  ******************************************************************************/
+static int      BinaryLog         ( u32 i );
+static void     MaskToShift       ( int *pi_left, int *pi_right, u32 i_mask );
 static int      InitThread        ( vout_thread_t *p_vout );
 static void     RunThread         ( vout_thread_t *p_vout );
 static void     ErrorThread       ( vout_thread_t *p_vout );
@@ -95,15 +97,14 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     p_vout->i_bytes_per_pixel   = 2;
     p_vout->f_gamma             = VOUT_GAMMA;    
 
-    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, 
-                                                       VOUT_GRAYSCALE_DEFAULT );
+    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info              = 0;    
     p_vout->b_interface         = 0;
     p_vout->b_scale             = 0;
     
-    intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
+    intf_DbgMsg("wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
+                p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
     /* Initialize idle screen */
     p_vout->last_display_date   = mdate();
@@ -135,9 +136,21 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
       free( p_vout );
       return( NULL );
     }
-    intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
+    intf_DbgMsg("actual configuration: %dx%d, %d/%d bpp (%d Bpl), masks: 0x%x/0x%x/0x%x\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
+                p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
+                p_vout->i_red_mask, p_vout->i_green_mask, p_vout->i_blue_mask );
+
+    /* Calculate shifts from system-updated masks */
+    MaskToShift( &p_vout->i_red_lshift,   &p_vout->i_red_rshift,   p_vout->i_red_mask );
+    MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift, p_vout->i_green_mask );
+    MaskToShift( &p_vout->i_blue_lshift,  &p_vout->i_blue_rshift,  p_vout->i_blue_mask );
+
+    /* Set some usefull colors */
+    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
+    p_vout->i_black_pixel = RGB2PIXEL( p_vout, 0, 0, 0 );
+    p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
+    p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );    
 
     /* Load fonts - fonts must be initialized after the systme method since
      * they may be dependant of screen depth and other thread properties */
@@ -172,8 +185,8 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
         return( NULL );
     }   
 
-    intf_Msg("Video display initialized (%dx%d, %d bpp)\n", 
-             p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth );    
+    intf_Msg("Video display initialized (%dx%d, %d/%d bpp)\n", p_vout->i_width, 
+             p_vout->i_height, p_vout->i_screen_depth, p_vout->i_bytes_per_pixel * 8 );
 
     /* If status is NULL, wait until the thread is created */
     if( pi_status == NULL )
@@ -717,7 +730,81 @@ void vout_SetBuffers( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 )
     p_vout->p_buffer[1].p_data = p_buf2;    
 }
 
+/*****************************************************************************
+ * vout_Pixel2RGB: return red, green and blue from pixel value
+ *****************************************************************************
+ * Return color values, in 0-255 range, of the decomposition of a pixel. This
+ * is a slow routine and should only be used for initialization phase.
+ *****************************************************************************/
+void vout_Pixel2RGB( vout_thread_t *p_vout, u32 i_pixel, int *pi_red, int *pi_green, int *pi_blue )
+{
+    *pi_red =   i_pixel & p_vout->i_red_mask;
+    *pi_green = i_pixel & p_vout->i_green_mask;
+    *pi_blue =  i_pixel & p_vout->i_blue_mask;
+}
+
 /* following functions are local */
+
+/*****************************************************************************
+ * BinaryLog: computes the base 2 log of a binary value
+ *****************************************************************************
+ * This functions is used by MaskToShift, to get a bit index from a binary 
+ * value.
+ *****************************************************************************/
+static int BinaryLog(u32 i)
+{
+    int i_log;
+
+    i_log = 0;
+    if (i & 0xffff0000) 
+    {        
+        i_log = 16;
+    }    
+    if (i & 0xff00ff00) 
+    {        
+        i_log += 8;
+    }    
+    if (i & 0xf0f0f0f0) 
+    {        
+        i_log += 4;
+    }    
+    if (i & 0xcccccccc) 
+    {        
+        i_log += 2;
+    }    
+    if (i & 0xaaaaaaaa) 
+    {        
+        i_log++;
+    }    
+    if (i != ((u32)1 << i_log))
+    {        
+	intf_ErrMsg("internal error: binary log overflow\n");        
+    }    
+
+    return( i_log );
+}
+
+/*****************************************************************************
+ * MaskToShift: transform a color mask into right and left shifts
+ *****************************************************************************
+ * This function is used for obtaining color shifts from masks.
+ *****************************************************************************/
+static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
+{
+    u32 i_low, i_high;                 /* lower hand higher bits of the mask */
+
+    /* Get bits */
+    i_low =  i_mask & (- i_mask);                   /* lower bit of the mask */
+    i_high = i_mask + i_low;                       /* higher bit of the mask */
+
+    /* Transform bits into an index */
+    i_low =  BinaryLog (i_low);
+    i_high = BinaryLog (i_high);
+
+    /* Update pointers and return */
+    *pi_left =   i_low;
+    *pi_right = (8 - i_high + i_low);
+}
 
 /******************************************************************************
  * InitThread: initialize video output thread
@@ -1093,7 +1180,8 @@ void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_h_align, int i_v_alig
         vout_Print( p_vout->p_default_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data + 
                     i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line, 
-                    0xffffffff, 0x00000000, 0x00000000, 0, psz_text );
+                    p_vout->i_white_pixel, 0, 0, 
+                    0, psz_text );
     }    
 }
 
@@ -1397,34 +1485,6 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
      * Clear areas array
      */
     p_buffer->i_areas = 0;
-
-#ifdef DEBUG_VIDEO
-    /*
-     * In DEBUG_VIDEO mode, draw white pixels at the beginning and the end of
-     * the picture area. These pixels should not be erased by rendering functions,
-     * otherwise segmentation fault is menacing !
-     */
-    if( i_pic_x > 0 )
-    {
-        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * i_pic_y + 
-                p_vout->i_bytes_per_pixel * (i_pic_x - 1)) = 0xffff;
-    }
-    if( i_pic_y > 0 )
-    {
-        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y - 1) + 
-                p_vout->i_bytes_per_pixel * i_pic_x ) = 0xffff;
-    }
-    if( i_pic_x + i_pic_width < p_vout->i_width )
-    {
-        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y + i_pic_height - 1) + 
-                p_vout->i_bytes_per_pixel * (i_pic_x + i_pic_width) ) = 0xffff;
-    }    
-    if( i_pic_y + i_pic_height < p_vout->i_height )
-    {
-        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y + i_pic_height) + 
-                p_vout->i_bytes_per_pixel * (i_pic_x + i_pic_width - 1) ) = 0xffff;
-    }    
-#endif
 }
 
 /******************************************************************************
@@ -1583,7 +1643,7 @@ static int RenderIdle( vout_thread_t *p_vout )
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
                         p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                        0xffffffff, 0x33333333, 0,
+                        p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
                         WIDE_TEXT | OUTLINED_TEXT, psz_text );        
             SetBufferArea( p_vout, i_x, i_y, i_width, i_height );
         }        
@@ -1683,7 +1743,7 @@ static void RenderInterface( vout_thread_t *p_vout )
 {
     int         i_height, i_text_height;              /* total and text height */
     int         i_width_1, i_width_2;                            /* text width */
-    int         i_byte;                                          /* byte index */    
+    int         i_byte;                                          /* byte index */
     const char *psz_text_1 = "[1-9] Channel   [i]nfo   [c]olor     [g/G]amma";
     const char *psz_text_2 = "[+/-] Volume    [m]ute   [s]caling   [Q]uit";    
 
@@ -1692,13 +1752,13 @@ static void RenderInterface( vout_thread_t *p_vout )
     vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT, psz_text_2, &i_width_2, &i_text_height );
     i_height += i_text_height;
 
-    /* Render background - effective background color will depend of the screen
-     * depth */
+    /* Render background */
     for( i_byte = (p_vout->i_height - i_height) * p_vout->i_bytes_per_line;
          i_byte < p_vout->i_height * p_vout->i_bytes_per_line;
          i_byte++ )
     {
-        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data[ i_byte ] = 0x33;        
+        //?? noooo !
+        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data[ i_byte ] = p_vout->i_blue_pixel;
     }    
 
     /* Render text, if not larger than screen */
@@ -1707,7 +1767,7 @@ static void RenderInterface( vout_thread_t *p_vout )
         vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                     (p_vout->i_height - i_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                    0xffffffff, 0x00000000, 0x00000000,
+                    p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
                     OUTLINED_TEXT, psz_text_1 );
     }
     if( i_width_2 < p_vout->i_width )
@@ -1715,7 +1775,7 @@ static void RenderInterface( vout_thread_t *p_vout )
         vout_Print( p_vout->p_large_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                     (p_vout->i_height - i_height + i_text_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                    0xffffffff, 0x00000000, 0x00000000,
+                    p_vout->i_white_pixel, p_vout->i_black_pixel, 0,
                     OUTLINED_TEXT, psz_text_2 );
     }    
 

@@ -60,8 +60,9 @@ typedef void (vout_put_byte_t)( void *p_pic, int i_byte, int i_char, int i_borde
  *******************************************************************************/
 
 /* PUT_BYTE_MASK: put pixels from a byte-wide mask. It uses a branching tree
- * to optimize the number of tests. It is used in the PutByte functions. */
-#define TREE( i_mask, i_mask_color )                                          \
+ * to optimize the number of tests. It is used in the PutByte functions. 
+ * This macro works for 1, 2 and 4 Bpp. */
+#define PUT_BYTE_MASK( i_mask, i_mask_color )                                 \
 if( i_mask & 0xf0 )                                       /* one from 1111 */ \
 {                                                                             \
     if( i_mask & 0xc0 )                                   /* one from 1100 */ \
@@ -364,17 +365,9 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
         p_PutByte = (vout_put_byte_t *) PutByte24;
         break;
     case 4:
-#ifndef DEBUG
     default:
-#endif
         p_PutByte = (vout_put_byte_t *) PutByte32;
         break;
-#ifdef DEBUG
-    default:
-        intf_DbgMsg("error: invalid bytes per pixel %d\n", i_bytes_per_pixel );
-        p_PutByte = NULL;
-        break;
-#endif
     }
 
     /* Choose masks and copy font data to local variables */
@@ -447,7 +440,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
 /* following functions are local */
 
 /*****************************************************************************
- * PutByte8: print a fixed width font character byte in 15 or 16 bpp
+ * PutByte8: print a fixed width font character byte in 1 Bpp
  *****************************************************************************/
 static void PutByte8( u8 *p_pic, int i_byte, int i_char, int i_border,
                        int i_bg, u32 i_char_color, u32 i_border_color,
@@ -458,13 +451,13 @@ static void PutByte8( u8 *p_pic, int i_byte, int i_char, int i_border,
     i_bg &= ~(i_char | i_border);
 
     /* Put character bits */
-    TREE(i_char, i_char_color);
-    TREE(i_border, i_border_color);
-    TREE(i_bg, i_bg_color);
+    PUT_BYTE_MASK(i_char, i_char_color);
+    PUT_BYTE_MASK(i_border, i_border_color);
+    PUT_BYTE_MASK(i_bg, i_bg_color);
 }
 
 /*****************************************************************************
- * PutByte16: print a fixed width font character byte in 15 or 16 bpp
+ * PutByte16: print a fixed width font character byte in 2 Bpp
  *****************************************************************************/
 static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border,
                        int i_bg, u32 i_char_color, u32 i_border_color,
@@ -475,13 +468,13 @@ static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border,
     i_bg &= ~(i_char | i_border);
 
     /* Put character bits */
-    TREE(i_char, i_char_color);
-    TREE(i_border, i_border_color);
-    TREE(i_bg, i_bg_color);
+    PUT_BYTE_MASK(i_char, i_char_color);
+    PUT_BYTE_MASK(i_border, i_border_color);
+    PUT_BYTE_MASK(i_bg, i_bg_color);
 }
 
 /*****************************************************************************
- * PutByte24: print a fixed width font character byte in 24 bpp
+ * PutByte24: print a fixed width font character byte in 3 Bpp
  *****************************************************************************/
 static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
                        u32 i_char_color, u32 i_border_color, u32 i_bg_color )
@@ -490,7 +483,7 @@ static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border, 
 }
 
 /*****************************************************************************
- * PutByte32: print a fixed width font character byte in 32 bpp
+ * PutByte32: print a fixed width font character byte in 4 Bpp
  *****************************************************************************/
 static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
                        u32 i_char_color, u32 i_border_color, u32 i_bg_color )
@@ -500,8 +493,8 @@ static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, b
     i_bg &= ~(i_char | i_border);
 
     /* Put character bits */
-    TREE(i_char, i_char_color);
-    TREE(i_border, i_border_color);
-    TREE(i_bg, i_bg_color);
+    PUT_BYTE_MASK(i_char, i_char_color);
+    PUT_BYTE_MASK(i_border, i_border_color);
+    PUT_BYTE_MASK(i_bg, i_bg_color);
 }
 

@@ -103,9 +103,26 @@ typedef struct vout_thread_s
     int                 i_width;               /* current output method width */
     int                 i_height;             /* current output method height */
     int                 i_bytes_per_line;   /* bytes per line (incl. virtual) */
-    int                 i_screen_depth;                     /* bits per pixel */
-    int                 i_bytes_per_pixel;               /* real screen depth */
+    int                 i_screen_depth;   /* significant bpp: 8, 15, 16 or 24 */
+    int                 i_bytes_per_pixel; /* real screen depth: 1, 2, 3 or 4 */
     float               f_gamma;                                     /* gamma */
+
+    /* Color masks and shifts in RGB mode - masks are set by system 
+     * initialization, shifts are calculated. A pixel color value can be 
+     * obtained using the formula ((value >> rshift) << lshift) */
+    u32                 i_red_mask;                               /* red mask */
+    u32                 i_green_mask;                           /* green mask */
+    u32                 i_blue_mask;                             /* blue mask */
+    int                 i_red_lshift, i_red_rshift;             /* red shifts */
+    int                 i_green_lshift, i_green_rshift;       /* green shifts */
+    int                 i_blue_lshift, i_blue_rshift;          /* blue shifts */
+
+    /* Usefull pre-calculated pixel values - these are not supposed to be 
+     * accurate values, but rather values looking nice, given their usage. */
+    u32                 i_white_pixel;                               /* white */
+    u32                 i_black_pixel;                               /* black */
+    u32                 i_gray_pixel;                                 /* gray */
+    u32                 i_blue_pixel;                                 /* blue */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;            /* color or grayscale display */
@@ -152,6 +169,17 @@ typedef struct vout_thread_s
 #define VOUT_NODISPLAY_CHANGE   0xff00     /* changes which forbidden display */
 
 /*******************************************************************************
+ * Macros
+ *******************************************************************************/
+
+/* RGB2PIXEL: assemble RGB components to a pixel value, returns a u32 */
+#define RGB2PIXEL( p_vout, i_red, i_green, i_blue )                            \
+    (((((u32)i_red)   >> p_vout->i_red_rshift)   << p_vout->i_red_lshift)   |  \
+     ((((u32)i_green) >> p_vout->i_green_rshift) << p_vout->i_green_lshift) |  \
+     ((((u32)i_blue)  >> p_vout->i_blue_rshift)  << p_vout->i_blue_lshift))
+
+
+/*******************************************************************************
  * Prototypes
  *******************************************************************************/
 vout_thread_t * vout_CreateThread       ( char *psz_display, int i_root_window, 
@@ -169,3 +197,4 @@ void            vout_DestroySubPicture  ( vout_thread_t *p_vout, subpicture_t *p
 void            vout_DisplaySubPicture  ( vout_thread_t *p_vout, subpicture_t *p_subpic );
 
 void            vout_SetBuffers         ( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 );
+
