@@ -411,11 +411,18 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
          * formats. */
         p_xpixmap_format = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
         p_vout->i_bytes_per_pixel = 0;
+
+        /* Under XFree 4, XListPixmapFormats returns a list of available
+         * formats under each screen depth ; so we have to select the one
+         * for the current display. */
         for( ; i_count--; p_xpixmap_format++ )
         {
-            if( p_xpixmap_format->bits_per_pixel / 8 > p_vout->i_bytes_per_pixel )
+            if( p_vout->i_screen_depth == p_xpixmap_format->depth )
             {
-                p_vout->i_bytes_per_pixel = p_xpixmap_format->bits_per_pixel / 8;
+                if( p_xpixmap_format->bits_per_pixel / 8 > p_vout->i_bytes_per_pixel )
+                {
+                    p_vout->i_bytes_per_pixel = p_xpixmap_format->bits_per_pixel / 8;
+                }
             }
         }
         break;
