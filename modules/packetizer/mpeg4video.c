@@ -1,8 +1,8 @@
 /*****************************************************************************
- * mpeg4video.c:
+ * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.2 2002/12/18 16:33:09 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.3 2003/01/08 10:26:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -34,6 +34,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
+#include "codecs.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -41,17 +43,16 @@ typedef struct packetizer_thread_s
 {
     /* Input properties */
     decoder_fifo_t          *p_fifo;
-    bit_stream_t            bit_stream;
-
-    mtime_t                 i_dts;
 
     /* Output properties */
     sout_input_t            *p_sout_input;
     sout_packet_format_t    output_format;
 
+    mtime_t i_pts_start;
 
-    sout_buffer_t           *p_vol;
-    int                     i_vop_since_vol;
+    int                     i_vol;
+    uint8_t                 *p_vol;
+
 } packetizer_thread_t;
 
 static int  Open    ( vlc_object_t * );
@@ -61,12 +62,15 @@ static int  InitThread     ( packetizer_thread_t * );
 static void PacketizeThread   ( packetizer_thread_t * );
 static void EndThread      ( packetizer_thread_t * );
 
+
+static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("MPEG-4 packetizer") );
+    set_description( _("MPEG4 Video packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( Open, NULL );
 vlc_module_end();
@@ -90,6 +94,7 @@ vlc_module_end();
 #define STILL_TEXTURE_OBJECT_START_CODE         0x1be
 #define TEXTURE_SPATIAL_LAYER_START_CODE        0x1bf
 #define TEXTURE_SNR_LAYER_START_CODE            0x1c0
+
 
 /*****************************************************************************
  * OpenDecoder: probe the packetizer and return score
@@ -126,7 +131,7 @@ static int Run( decoder_fifo_t *p_fifo )
     packetizer_thread_t *p_pack;
     int b_error;
 
-    msg_Info( p_fifo, "Running MPEG-4 packetizer" );
+    msg_Info( p_fifo, "Running MPEG4 Video packetizer" );
     if( !( p_pack = malloc( sizeof( packetizer_thread_t ) ) ) )
     {
         msg_Err( p_fifo, "out of memory" );
@@ -166,186 +171,229 @@ static int Run( decoder_fifo_t *p_fifo )
 
 #define FREE( p ) if( p ) free( p ); p = NULL
 
-static int CopyUntilNextStartCode( packetizer_thread_t   *p_pack,
-                                   sout_buffer_t  *p_sout_buffer,
-                                   int            *pi_pos )
-{
-    int i_copy = 0;
-
-    do
-    {
-        p_sout_buffer->p_buffer[(*pi_pos)++] =
-        GetBits( &p_pack->bit_stream, 8 );
-        i_copy++;
-
-        if( *pi_pos + 2048 > p_sout_buffer->i_allocated_size )
-        {
-            sout_BufferRealloc( p_pack->p_sout_input->p_sout,
-                                p_sout_buffer,
-                                p_sout_buffer->i_allocated_size + 50 * 1024);
-        }
-
-    } while( ShowBits( &p_pack->bit_stream, 24 ) != 0x01 &&
-             !p_pack->p_fifo->b_die && !p_pack->p_fifo->b_error );
-
-    return( i_copy );
-}
-
-static int sout_BufferAddMem( sout_instance_t *p_sout,
-                              sout_buffer_t   *p_buffer,
-                              int             i_mem,
-                              uint8_t         *p_mem )
-{
-    if( p_buffer->i_size + i_mem >= p_buffer->i_allocated_size )
-    {
-        sout_BufferRealloc( p_sout,
-                            p_buffer,
-                            p_buffer->i_size + i_mem + 1024 );
-    }
-    memcpy( p_buffer->p_buffer + p_buffer->i_size, p_mem, i_mem );
-    p_buffer->i_size += i_mem;
-
-    return( i_mem );
-}
-
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
  *****************************************************************************/
 
 static int InitThread( packetizer_thread_t *p_pack )
 {
-    p_pack->i_dts = 0;
-    p_pack->p_vol = NULL;
-    p_pack->i_vop_since_vol = 0;
-    p_pack->output_format.i_cat = VIDEO_ES;
-    p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
+    BITMAPINFOHEADER *p_bih;
 
-    if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
-                       NULL, NULL ) != VLC_SUCCESS )
+    p_bih = (BITMAPINFOHEADER*)p_pack->p_fifo->p_bitmapinfoheader;
+
+    if( p_bih && p_bih->biSize > sizeof( BITMAPINFOHEADER ) )
     {
-        msg_Err( p_pack->p_fifo, "cannot initialize bitstream" );
-        return -1;
-    }
+        /* We have a vol */
+        p_pack->i_vol = p_bih->biSize - sizeof( BITMAPINFOHEADER );
+        p_pack->p_vol = malloc( p_pack->i_vol );
+        memcpy( p_pack->p_vol, &p_bih[1], p_pack->i_vol );
 
-    p_pack->p_sout_input =
-        sout_InputNew( p_pack->p_fifo,
-                       &p_pack->output_format );
+        /* create stream input output */
+        p_pack->output_format.i_cat = VIDEO_ES;
+        p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
+        p_pack->output_format.p_format = malloc( p_bih->biSize );
+        memcpy( p_pack->output_format.p_format, p_bih, p_bih->biSize );
+
+        msg_Warn( p_pack->p_fifo, "opening with vol size:%d", p_pack->i_vol );
+        p_pack->p_sout_input =
+            sout_InputNew( p_pack->p_fifo,
+                           &p_pack->output_format );
+    }
+    else
+    {
+        p_pack->i_vol = 0;
+        p_pack->p_vol = 0;
+        p_pack->output_format.i_cat = UNKNOWN_ES;
+        p_pack->output_format.i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
+        p_pack->output_format.p_format = NULL;
+
+        p_pack->p_sout_input =
+            sout_InputNew( p_pack->p_fifo,
+                           &p_pack->output_format );
+    }
 
     if( !p_pack->p_sout_input )
     {
-        msg_Err( p_pack->p_fifo,
-                 "cannot add a new stream" );
+        msg_Err( p_pack->p_fifo, "cannot add a new stream" );
         return( -1 );
     }
-
+    p_pack->i_pts_start = -1;
     return( 0 );
 }
 
+static int m4v_FindStartCode( uint8_t **pp_data, uint8_t *p_end )
+{
+    for( ; *pp_data < p_end - 4; (*pp_data)++ )
+    {
+        if( (*pp_data)[0] == 0 && (*pp_data)[1] == 0 && (*pp_data)[2] == 1 )
+        {
+            return( 0 );
+        }
+    }
+    fprintf( stderr, "\n********* cannot find startcode\n" );
+    return( -1 );
+}
 /*****************************************************************************
  * PacketizeThread: packetize an unit (here copy a complete pes)
  *****************************************************************************/
 static void PacketizeThread( packetizer_thread_t *p_pack )
 {
-    sout_instance_t *p_sout = p_pack->p_sout_input->p_sout;
-    sout_buffer_t   *p_frame;
+    sout_buffer_t   *p_sout_buffer;
+    pes_packet_t    *p_pes;
+    size_t          i_size;
 
-    uint32_t        i_startcode;
-
-    /* Idea: Copy until a vop has been found
-     *       Once a videoobject & videoobjectlayer has been found we save it
-     */
-
-    p_frame = sout_BufferNew( p_sout, 20*1024 );    // FIXME
-    p_frame->i_size = 0;
-
-    for( ;; )
+    /* **** get samples count **** */
+    input_ExtractPES( p_pack->p_fifo, &p_pes );
+    if( !p_pes )
     {
-        while( ( ( i_startcode = ShowBits( &p_pack->bit_stream, 32 ) )&0xffffff00 ) != 0x00000100 )
-        {
-            RemoveBits( &p_pack->bit_stream, 8 );
-        }
+        p_pack->p_fifo->b_error = 1;
+        return;
+    }
+    if( p_pack->i_pts_start < 0 && p_pes->i_pts > 0 )
+    {
+        p_pack->i_pts_start = p_pes->i_pts;
+    }
+    i_size = p_pes->i_pes_size;
+    if( i_size > 0 )
+    {
+        pes_packet_t    *p_pes_next;
+        data_packet_t   *p_data;
+        size_t          i_buffer;
 
-        if( i_startcode == VISUAL_OBJECT_SEQUENCE_START_CODE )
+        p_sout_buffer = 
+            sout_BufferNew( p_pack->p_sout_input->p_sout, i_size );
+        if( !p_sout_buffer )
         {
-            msg_Dbg( p_pack->p_fifo, "<visuel_object_sequence>" );
-            RemoveBits32( &p_pack->bit_stream );
+            p_pack->p_fifo->b_error = 1;
+            return;
         }
-        else if( i_startcode == VISUAL_OBJECT_SEQUENCE_END_CODE )
+        /* TODO: memcpy of the pes packet */
+        for( i_buffer = 0, p_data = p_pes->p_first;
+             p_data != NULL && i_buffer < i_size;
+             p_data = p_data->p_next)
         {
-            msg_Dbg( p_pack->p_fifo, "</visuel_object_sequence>" );
-            RemoveBits32( &p_pack->bit_stream );
-        }
-        else
-        {
-            msg_Dbg( p_pack->p_fifo, "start code:0x%8.8x", i_startcode );
+            size_t          i_copy;
 
-            if( ( i_startcode & ~VIDEO_OBJECT_MASK ) == VIDEO_OBJECT_START_CODE )
+            i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+                            i_size - i_buffer );
+            if( i_copy > 0 )
             {
-                msg_Dbg( p_pack->p_fifo, "<video_object>" );
-                CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
+                p_pack->p_fifo->p_vlc->pf_memcpy( p_sout_buffer->p_buffer + i_buffer,
+                                                  p_data->p_payload_start,
+                                                  i_copy );
             }
-            else if( ( i_startcode & ~VIDEO_OBJECT_LAYER_MASK ) == VIDEO_OBJECT_LAYER_START_CODE )
+            i_buffer += i_copy;
+        }
+        p_sout_buffer->i_length = 0;
+        p_sout_buffer->i_dts = p_pes->i_pts - p_pack->i_pts_start;
+        p_sout_buffer->i_pts = p_pes->i_pts - p_pack->i_pts_start;
+        p_sout_buffer->i_bitrate = 0;
+
+        if( p_pack->p_vol == NULL )
+        {
+            uint8_t *p_vol_begin, *p_vol_end, *p_end;
+            /* search if p_sout_buffer contains with a vol */
+            p_vol_begin = p_sout_buffer->p_buffer;
+            p_vol_end   = NULL;
+            p_end       = p_sout_buffer->p_buffer + p_sout_buffer->i_size;
+
+            for( ;; )
             {
-                /* first: save it */
-                if( p_pack->p_vol == NULL )
+                if( m4v_FindStartCode( &p_vol_begin, p_end ) )
                 {
-                    p_pack->p_vol = sout_BufferNew( p_sout, 1024 );
+                    break;
                 }
-                p_pack->p_vol->i_size = 0;
-                CopyUntilNextStartCode( p_pack, p_pack->p_vol, &p_pack->p_vol->i_size );
-                p_pack->i_vop_since_vol = 0;
+                msg_Dbg( p_pack->p_fifo,
+                          "starcode 0x%2.2x%2.2x%2.2x%2.2x",
+                          p_vol_begin[0], p_vol_begin[1], p_vol_begin[2], p_vol_begin[3] );
 
-                /* then: add it to p_frame */
-                sout_BufferAddMem( p_sout, p_frame,
-                                   p_pack->p_vol->i_size,
-                                   p_pack->p_vol->p_buffer );
-            }
-            else if( i_startcode == GROUP_OF_VOP_START_CODE )
-            {
-                msg_Dbg( p_pack->p_fifo, "<group_of_vop>" );
-#if 0
-                if( p_pack->p_vol && p_pack->i_vop_since_vol > 100 ) // FIXME
+                if( ( p_vol_begin[3] & ~VIDEO_OBJECT_MASK ) == ( VIDEO_OBJECT_START_CODE&0xff ) )
                 {
-                    sout_BufferAddMem( p_sout, p_frame,
-                                       p_pack->p_vol->i_size,
-                                       p_pack->p_vol->p_buffer );
-                    p_pack->i_vop_since_vol = 0;
+                    p_vol_end = p_vol_begin + 4;
+                    if( m4v_FindStartCode( &p_vol_end, p_end ) )
+                    {
+                        break;
+                    }
+                    if( ( p_vol_end[3] & ~VIDEO_OBJECT_LAYER_MASK ) == ( VIDEO_OBJECT_LAYER_START_CODE&0xff ) )
+                    {
+                        p_vol_end += 4;
+                        if( m4v_FindStartCode( &p_vol_end, p_end ) )
+                        {
+                            p_vol_end = p_end;
+                        }
+                    }
+                    else
+                    {
+                        p_vol_end = NULL;
+                    }
                 }
-#endif
-                CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
-            }
-            else if( i_startcode == VOP_START_CODE )
-            {
-                msg_Dbg( p_pack->p_fifo, "<vop>" );
-#if 1
-                if( p_pack->p_vol && p_pack->i_vop_since_vol > 30 ) // FIXME
+                else if( ( p_vol_begin[3] & ~VIDEO_OBJECT_LAYER_MASK ) == ( VIDEO_OBJECT_LAYER_START_CODE&0xff) )
                 {
-                    sout_BufferAddMem( p_sout, p_frame,
-                                       p_pack->p_vol->i_size,
-                                       p_pack->p_vol->p_buffer );
-                    p_pack->i_vop_since_vol = 0;
+                    p_vol_end = p_vol_begin + 4;
+                    if( m4v_FindStartCode( &p_vol_end, p_end ) )
+                    {
+                        p_vol_end = p_end;
+                    }
                 }
-#endif
-                CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
-                p_pack->i_vop_since_vol++;
-                break;
-            }
-            else
-            {
-                msg_Dbg( p_pack->p_fifo, "unknown start code" );
-                CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
-            }
 
+                if( p_vol_end != NULL && p_vol_begin < p_vol_end )
+                {
+                    BITMAPINFOHEADER *p_bih;
+
+                    p_pack->i_vol = p_vol_end - p_vol_begin;
+                    msg_Dbg( p_pack->p_fifo, "Reopening output" );
+
+                    p_pack->p_vol = malloc( p_pack->i_vol );
+                    memcpy( p_pack->p_vol, p_vol_begin, p_pack->i_vol );
+
+                    sout_InputDelete( p_pack->p_sout_input );
+
+                    p_pack->output_format.i_cat = VIDEO_ES;
+                    p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
+                    p_pack->output_format.p_format =
+                        (void*)p_bih = malloc( sizeof( BITMAPINFOHEADER ) + p_pack->i_vol);
+
+                    p_bih->biSize = sizeof( BITMAPINFOHEADER ) + p_pack->i_vol;
+                    p_bih->biWidth  = 0;
+                    p_bih->biHeight = 0;
+                    p_bih->biPlanes = 1;
+                    p_bih->biBitCount = 0;
+                    p_bih->biCompression = 0; /* FIXME */
+                    p_bih->biSizeImage = 0;
+                    p_bih->biXPelsPerMeter = 0;
+                    p_bih->biYPelsPerMeter = 0;
+                    p_bih->biClrUsed = 0;
+                    p_bih->biClrImportant = 0;
+                    memcpy( &p_bih[1], p_pack->p_vol, p_pack->i_vol );
+
+                    p_pack->p_sout_input =
+                        sout_InputNew( p_pack->p_fifo,
+                                       &p_pack->output_format );
+                    if( !p_pack->p_sout_input )
+                    {
+                        p_pack->p_fifo->b_error = 1;
+                        return;
+                    }
+
+                    break;
+                }
+                else
+                {
+                    p_vol_begin += 4;
+                }
+            }
         }
+
+        input_ShowPES( p_pack->p_fifo, &p_pes_next );
+        if( p_pes_next )
+        {
+            p_sout_buffer->i_length = p_pes_next->i_pts - p_pes->i_pts;
+        }
+        sout_InputSendBuffer( p_pack->p_sout_input,
+                               p_sout_buffer );
     }
 
-    p_frame->i_length = 1000000 / 25;
-    p_frame->i_bitrate= 0;
-    p_frame->i_dts = p_pack->i_dts;
-    p_frame->i_pts = p_pack->i_dts;
-
-    p_pack->i_dts += 1000000 / 25;
-    sout_InputSendBuffer( p_pack->p_sout_input, p_frame );
+    input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
 }
 
 
@@ -357,6 +405,38 @@ static void EndThread ( packetizer_thread_t *p_pack)
     if( p_pack->p_sout_input )
     {
         sout_InputDelete( p_pack->p_sout_input );
+    }
+}
+
+static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
+{
+    pes_packet_t *p_pes;
+
+    vlc_mutex_lock( &p_fifo->data_lock );
+
+    if( p_fifo->p_first == NULL )
+    {
+        if( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            if( pp_pes ) *pp_pes = NULL;
+            return;
+        }
+
+        /* Signal the input thread we're waiting. This is only
+         * needed in case of slave clock (ES plug-in) but it won't
+         * harm. */
+        vlc_cond_signal( &p_fifo->data_wait );
+
+        /* Wait for the input to tell us when we received a packet. */
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+    p_pes = p_fifo->p_first;
+    vlc_mutex_unlock( &p_fifo->data_lock );
+
+    if( pp_pes )
+    {
+        *pp_pes = p_pes;
     }
 }
 

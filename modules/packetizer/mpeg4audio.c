@@ -1,11 +1,10 @@
 /*****************************************************************************
- * copy.c
+ * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.2 2003/01/08 10:26:49 fenrir Exp $
+ * $Id: mpeg4audio.c,v 1.1 2003/01/08 10:26:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Eric Petit <titer@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,43 +29,65 @@
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
-
+#include "codecs.h"
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+/* AAC Config in ES:
+ *
+ * AudioObjectType          5 bits
+ * samplingFrequencyIndex   4 bits
+ * if (samplingFrequencyIndex == 0xF)
+ *  samplingFrequency   24 bits
+ * channelConfiguration     4 bits
+ * GA_SpecificConfig
+ *  FrameLengthFlag         1 bit 1024 or 960
+ *  DependsOnCoreCoder      1 bit (always 0)
+ *  ExtensionFlag           1 bit (always 0)
+ */
+
 typedef struct packetizer_thread_s
 {
     /* Input properties */
+    int                     b_adts;
+
     decoder_fifo_t          *p_fifo;
+    bit_stream_t            bit_stream;
 
     /* Output properties */
     sout_input_t            *p_sout_input;
     sout_packet_format_t    output_format;
 
-    mtime_t i_pts_start;
+    mtime_t                 i_pts_start;
+    mtime_t                 i_pts;
+
+    WAVEFORMATEX            *p_wf;
+
+    /* Extracted from AAC config */
+    int                     i_sample_rate;
+    int                     i_frame_size;   // 1024 or 960
 
 } packetizer_thread_t;
 
 static int  Open    ( vlc_object_t * );
 static int  Run     ( decoder_fifo_t * );
 
-static int  InitThread     ( packetizer_thread_t * );
-static void PacketizeThread   ( packetizer_thread_t * );
-static void EndThread      ( packetizer_thread_t * );
-
-
-static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes );
+static int  InitThread           ( packetizer_thread_t * );
+static void PacketizeThreadMPEG4 ( packetizer_thread_t * );
+static void PacketizeThreadADTS  ( packetizer_thread_t * );
+static void EndThread            ( packetizer_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("Copy packetizer") );
-    set_capability( "packetizer", 0 );
+    set_description( _("MPEG4 Audio packetizer") );
+    set_capability( "packetizer", 50 );
     set_callbacks( Open, NULL );
 vlc_module_end();
 
@@ -83,12 +104,14 @@ static int Open( vlc_object_t *p_this )
 
     p_fifo->pf_run = Run;
 
-    return VLC_SUCCESS;
-
-#if 0
-    if( p_fifo->i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'a') )
-        ....
-#endif
+    if( p_fifo->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'a') )
+    {
+        return( VLC_SUCCESS );
+    }
+    else
+    {
+        return( VLC_EGENERIC );
+    }
 }
 
 /*****************************************************************************
@@ -99,7 +122,7 @@ static int Run( decoder_fifo_t *p_fifo )
     packetizer_thread_t *p_pack;
     int b_error;
 
-    msg_Info( p_fifo, "Running copy packetizer" );
+    msg_Info( p_fifo, "Running MPEG4 audio packetizer" );
     if( !( p_pack = malloc( sizeof( packetizer_thread_t ) ) ) )
     {
         msg_Err( p_fifo, "out of memory" );
@@ -118,7 +141,14 @@ static int Run( decoder_fifo_t *p_fifo )
 
     while( ( !p_pack->p_fifo->b_die )&&( !p_pack->p_fifo->b_error ) )
     {
-        PacketizeThread( p_pack );
+        if( p_pack->b_adts )
+        {
+            PacketizeThreadADTS( p_pack );
+        }
+        else
+        {
+            PacketizeThreadMPEG4( p_pack );
+        }
     }
 
 
@@ -142,55 +172,88 @@ static int Run( decoder_fifo_t *p_fifo )
 /*****************************************************************************
  * InitThread: initialize data before entering main loop
  *****************************************************************************/
+static int i_sample_rates[] = 
+{
+    96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 
+    16000, 12000, 11025, 8000,  7350,  0,     0,     0
+};
 
 static int InitThread( packetizer_thread_t *p_pack )
 {
+    WAVEFORMATEX    *p_wf;
 
-    switch( p_pack->p_fifo->i_fourcc )
+    p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
+
+    if( p_wf && p_wf->cbSize > 0)
     {
-        case VLC_FOURCC( 'm', 'p', '4', 'v'):
-        case VLC_FOURCC( 'D', 'I', 'V', 'X'):
-        case VLC_FOURCC( 'd', 'i', 'v', 'x'):
-        case VLC_FOURCC( 'X', 'V', 'I', 'D'):
-        case VLC_FOURCC( 'X', 'v', 'i', 'D'):
-        case VLC_FOURCC( 'x', 'v', 'i', 'd'):
-        case VLC_FOURCC( 'D', 'X', '5', '0'):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v');
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-        case VLC_FOURCC( 'm', 'p', 'g', '1' ):
-        case VLC_FOURCC( 'm', 'p', 'g', '2' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v' );
-            p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-            p_pack->output_format.i_cat = AUDIO_ES;
-            break;
-        default:
-            p_pack->output_format.i_fourcc = p_pack->p_fifo->i_fourcc;
-            p_pack->output_format.i_cat = UNKNOWN_ES;
-            break;
+        uint8_t *p_config = (uint8_t*)&p_wf[1];
+        int i_wf = sizeof( WAVEFORMATEX ) + p_wf->cbSize;
+        int i_index;
+
+
+        p_pack->p_wf = malloc( i_wf );
+        memcpy( p_pack->p_wf,
+                p_wf,
+                i_wf );
+        p_pack->output_format.i_cat = AUDIO_ES;
+        p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
+        p_pack->output_format.p_format = p_pack->p_wf;
+        p_pack->b_adts = 0;
+
+        i_index = ( ( p_config[0] << 1 ) | ( p_config[1] >> 7 ) )&0x0f;
+        if( i_index != 0x0f )
+        {
+            p_pack->i_sample_rate = i_sample_rates[i_index];
+            p_pack->i_frame_size  = ( ( p_config[1] >> 2 )&0x01 ) ? 960 : 1024;
+        }
+        else
+        {
+            p_pack->i_sample_rate = ( ( p_config[1]&0x7f ) << 17 ) | ( p_config[2] << 9 )| 
+                                      ( p_config[3] << 1 ) | ( p_config[4] >> 7 );
+            p_pack->i_frame_size  = ( ( p_config[4] >> 2 )&0x01 ) ? 960 : 1024;
+        }
+        msg_Dbg( p_pack->p_fifo,
+                 "aac %dHz %d samples/frame",
+                 p_pack->i_sample_rate,
+                 p_pack->i_frame_size );
+    }
+    else
+    {
+        int i_wf = sizeof( WAVEFORMATEX ) + 5;
+        /* we will try to create a AAC Config from adts */
+        p_pack->output_format.i_cat = UNKNOWN_ES;
+        p_pack->output_format.i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
+        p_pack->b_adts = 1;
+
+        if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
+               NULL, NULL ) != VLC_SUCCESS )
+        {
+            msg_Err( p_pack->p_fifo, "cannot initialize bitstream" );
+            return -1;
+        }
+
     }
 
-    p_pack->p_sout_input =
+    p_pack->p_sout_input = 
         sout_InputNew( p_pack->p_fifo,
                        &p_pack->output_format );
 
     if( !p_pack->p_sout_input )
     {
-        msg_Err( p_pack->p_fifo, "cannot add a new stream" );
+        msg_Err( p_pack->p_fifo, 
+                 "cannot add a new stream" );
         return( -1 );
     }
+
     p_pack->i_pts_start = -1;
+    p_pack->i_pts = 0;
     return( 0 );
 }
 
 /*****************************************************************************
  * PacketizeThread: packetize an unit (here copy a complete pes)
  *****************************************************************************/
-static void PacketizeThread( packetizer_thread_t *p_pack )
+static void PacketizeThreadMPEG4( packetizer_thread_t *p_pack )
 {
     sout_buffer_t   *p_sout_buffer;
     pes_packet_t    *p_pes;
@@ -203,15 +266,18 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         p_pack->p_fifo->b_error = 1;
         return;
     }
+#if 0
     if( p_pack->i_pts_start < 0 && p_pes->i_pts > 0 )
     {
         p_pack->i_pts_start = p_pes->i_pts;
     }
+    p_pack->i_pts = p_pes->i_pts - p_pack->i_pts_start;
+#endif
+
     i_size = p_pes->i_pes_size;
-//    msg_Dbg( p_pack->p_fifo, "pes size:%d", i_size );
+
     if( i_size > 0 )
     {
-        pes_packet_t    *p_pes_next;
         data_packet_t   *p_data;
         size_t          i_buffer;
 
@@ -239,23 +305,27 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             }
             i_buffer += i_copy;
         }
-        p_sout_buffer->i_length = 0;
-        p_sout_buffer->i_dts = p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_pts = p_pes->i_pts - p_pack->i_pts_start;
-        p_sout_buffer->i_bitrate = 0;
 
-        input_ShowPES( p_pack->p_fifo, &p_pes_next );
-        if( p_pes_next )
-        {
-            p_sout_buffer->i_length = p_pes_next->i_pts - p_pes->i_pts;
-        }
+        p_sout_buffer->i_length = (mtime_t)1000000 * (mtime_t)p_pack->i_frame_size / (mtime_t)p_pack->i_sample_rate;
+        p_sout_buffer->i_bitrate = 0;
+        p_sout_buffer->i_dts = p_pack->i_pts;
+        p_sout_buffer->i_pts = p_pack->i_pts;
+
         sout_InputSendBuffer( p_pack->p_sout_input,
                                p_sout_buffer );
+
+        p_pack->i_pts += (mtime_t)1000000 * (mtime_t)p_pack->i_frame_size / (mtime_t)p_pack->i_sample_rate;
     }
 
     input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
 }
 
+
+static void PacketizeThreadADTS( packetizer_thread_t *p_pack )
+{
+    msg_Err( p_pack->p_fifo, "adts stream unsupported" );
+    p_pack->p_fifo->b_error = 1;
+}
 
 /*****************************************************************************
  * EndThread : packetizer thread destruction
@@ -266,37 +336,9 @@ static void EndThread ( packetizer_thread_t *p_pack)
     {
         sout_InputDelete( p_pack->p_sout_input );
     }
-}
-
-static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
-{
-    pes_packet_t *p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    if( p_fifo->p_first == NULL )
+    if( p_pack->p_wf )
     {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            if( pp_pes ) *pp_pes = NULL;
-            return;
-        }
-
-        /* Signal the input thread we're waiting. This is only
-         * needed in case of slave clock (ES plug-in) but it won't
-         * harm. */
-        vlc_cond_signal( &p_fifo->data_wait );
-
-        /* Wait for the input to tell us when we received a packet. */
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    if( pp_pes )
-    {
-        *pp_pes = p_pes;
+        free( p_pack->p_wf );
     }
 }
 
