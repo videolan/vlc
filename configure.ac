@@ -985,7 +985,7 @@ VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
-VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http access_mms])
+VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp access_http access_mms])
 VLC_ADD_PLUGINS([access_ftp ipv4])
 
 if test "${SYS}" != "mingwce"; then

@@ -138,7 +138,6 @@ Todo:<br />
    - *   Live directory representation<br /> 
 - *** Implement in Skins 2 interfaces<br />
 - wx implementation :<br />
-   - *** Fix deadlocks<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
    - *   Playlist preferences panel<br />
