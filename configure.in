@@ -16,7 +16,7 @@ fi
 HAVE_LIBDVDCSS=0
 if test -r extras/libdvdcss/libdvdcss.c; then
   HAVE_LIBDVDCSS=1
-  LIBDVDCSS_VERSION=0.0.2
+  LIBDVDCSS_VERSION=0.0.3
   AC_SUBST(LIBDVDCSS_VERSION)
 fi
 
@@ -62,18 +62,17 @@ AC_CHECK_FUNCS(swab)
 AC_CHECK_FUNCS(sigrelse)
 
 dnl Check for getopt
-GETOPT=0
+NEED_GETOPT=0
 AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
   AC_CHECK_LIB([gnugetopt],[getopt_long],
     [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB="${LIB} -lgnugetopt"],
-    [GETOPT=1])])
+    [NEED_GETOPT=1])])
 
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
 AC_CHECK_LIB(m,pow,LIB_YUV="${LIB_YUV} -lm")
-AC_CHECK_LIB(dvd,dvd_cdrom_ioctl,LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd")
 
 CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 CFLAGS="${CFLAGS} -I/usr/local/include"
@@ -250,15 +249,27 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
   dnl
   dnl BSDI: dvd.h
   dnl
+  NEED_BSDI_LIBDVD=0
   AC_EGREP_HEADER(dvd_struct,dvd.h,[
     AC_DEFINE(DVD_STRUCT_IN_DVD_H, 1,
               Define if <dvd.h> defines DVD_STRUCT.)
     LINUX_DVD_STRUCT=1
+    OBJ_LIBDVDCSS="${OBJ_LIBDVDCSS} bsdi_dvdioctl.o"
+    LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd"
+    CFLAGS_LIBDVDCSS="${CFLAGS_LIBDVDCSS} -I../BSDI_ioctl"
+  ],[
+    dnl
+    dnl BSDI: /sys/dev/scsi/scsi_ioctl.h, using our own libdvd
+    dnl
+    AC_CHECK_HEADERS(/sys/dev/scsi/scsi_ioctl.h,[
+      NEED_BSDI_LIBDVD=1
+      LINUX_DVD_STRUCT=1
+    ])
   ])
   dnl
-  dnl Solaris: sys/scsi/generic/commands.h sys/scsi/impl/uscsi.h
+  dnl Solaris: sys/scsi/scsi_types.h, sys/scsi/impl/uscsi.h
   dnl
-  AC_CHECK_HEADER(/usr/include/sys/scsi/scsi_types.h,[
+  AC_CHECK_HEADER(sys/scsi/scsi_types.h,[
     AC_CHECK_HEADER(sys/scsi/impl/uscsi.h,[
       AC_DEFINE(SOLARIS_USCSI, 1, Have userspace SCSI headers.)
     ])
@@ -837,7 +848,8 @@ AC_SUBST(ASM)
 AC_SUBST(TRACE)
 AC_SUBST(PROFILING)
 AC_SUBST(OPTIMS)
-AC_SUBST(GETOPT)
+AC_SUBST(NEED_GETOPT)
+AC_SUBST(NEED_BSDI_LIBDVD)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 
@@ -872,11 +884,13 @@ AC_SUBST(LIB_YUV)
 
 AC_SUBST(CFLAGS_VLC)
 AC_SUBST(CFLAGS_DVD)
+AC_SUBST(CFLAGS_LIBDVDCSS)
 AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
 
 AC_SUBST(OBJ_DVD)
+AC_SUBST(OBJ_LIBDVDCSS)
 
 AC_SUBST(LOCAL_LIBDVDCSS)
 
@@ -899,7 +913,7 @@ debug mode            : ${DEBUG}
 statistics            : ${STATS}
 trace mode            : ${TRACE}
 profiling             : ${PROFILING}
-need builtin getopt   : ${GETOPT}
+need builtin getopt   : ${NEED_GETOPT}
 built-in modules      :${BUILTINS}
 plugin modules        :${PLUGINS}
 vlc aliases           :${ALIASES}"
@@ -912,6 +926,7 @@ can be built          : ${CAN_BUILD_LIBDVDCSS}
 will be built         : ${LOCAL_LIBDVDCSS}"
 if test x${LOCAL_LIBDVDCSS} = x1
 then
+  echo "need BSDI libdvd      : ${NEED_BSDI_LIBDVD}"
   echo "link statically       : ${STATIC_LIBDVDCSS}"
 else
   echo "use dummy replacement : ${DUMMY_LIBDVDCSS}"

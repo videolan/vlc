@@ -4,6 +4,12 @@
 
 HEAD
 
+  * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
+    extras/BSDI_dvdioctl after he suggested us to do so. License is GPL.
+  * ./configure now checks for an installed libdvd under BSD/OS and
+    falls back to ours if not found.
+  * Fixed harmless typos in yesterday's Solaris libdvd patches.
+  * Bumped libdvdcss version number up to 0.0.3.
   * Added vlc:loop playlist command to go back at the beginning.
     Usage: vlc file1.mpeg file2.mpeg ... fileN.mpeg vlc:loop
   * Fixed a bug in the gtk interface which caused vlc to go amok after

@@ -9,30 +9,38 @@ MAJOR_SO := libdvdcss.so.$(shell echo $(LIBDVDCSS_VERSION) | cut -f1 -d.)
 FULL_SO := libdvdcss.so.$(LIBDVDCSS_VERSION)
 ifneq (,$(SOFLAGS))
 ALL_SOFLAGS := $(SOFLAGS)$(MAJOR_SO)
+SOFLAGS :=
 endif
 
 #
 # Objects
 #
 
-LIBDVDCSS_O = libdvdcss.o css.o ioctl.o
-ALL_OBJ = $(LIBDVDCSS_O)
+OBJ_C = libdvdcss.o css.o ioctl.o
+
+ALL_OBJ = $(OBJ_C) $(OBJ_LIBDVDCSS)
 
 include ../../Makefile.modules
 
-$(LIBDVDCSS_O): %.o: .dep/%.d
-$(LIBDVDCSS_O): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+$(OBJ_C): %.o: .dep/%.d
+$(OBJ_C): %.o: %.c
+	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
 
-../../lib/$(FULL_SO): $(LIBDVDCSS_O)
+bsdi_dvdioctl.o: ../BSDI_ioctl/dvdioctl.c
+	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDCSS) $(PCFLAGS) -c -o $@ $<
+
+../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDCSS)
 	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDCSS)
 	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
 	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
 
-../../lib/$(BASE_A): $(LIBDVDCSS_O)
+../../lib/$(BASE_A): $(OBJ_C) $(OBJ_LIBDVDCSS)
 	ar r $@ $^
 	$(RANLIB) $@
 
+#
+# Virtual targets
+#
 all: ../../lib/$(FULL_SO) ../../lib/$(BASE_A)
 
 install:

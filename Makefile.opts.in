@@ -39,7 +39,6 @@ STATS = @STATS@
 TRACE = @TRACE@
 PROFILING = @PROFILING@
 OPTIMS = @OPTIMS@
-GETOPT = @GETOPT@
 
 # 
 # Build environment
@@ -92,14 +91,22 @@ LIB_YUV = @LIB_YUV@
 # CFLAGS for special cases
 #
 CFLAGS_DVD = @CFLAGS_DVD@
+CFLAGS_LIBDVDCSS = @CFLAGS_LIBDVDCSS@
 CFLAGS_GTK = @CFLAGS_GTK@
 CFLAGS_SDL = @CFLAGS_SDL@
 CFLAGS_X11 = @CFLAGS_X11@
 
 #
-# Other special cases
+# Additional objects
 #
 OBJ_DVD = @OBJ_DVD@
+OBJ_LIBDVDCSS = @OBJ_LIBDVDCSS@
+
+#
+# Other special cases
+#
+NEED_GETOPT = @NEED_GETOPT@
+NEED_BSDI_LIBDVD = @NEED_BSDI_LIBDVD@
 LOCAL_LIBDVDCSS = @LOCAL_LIBDVDCSS@
 
 ###############################################################################

@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.9 2001/08/09 08:20:26 sam Exp $
+ * $Id: ioctl.c,v 1.10 2001/08/09 23:12:36 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,7 +59,7 @@
 #ifdef SOLARIS_USCSI
 #   include <unistd.h>
 #   include <stropts.h>
-#   include </usr/include/sys/scsi/scsi_types.h>
+#   include <sys/scsi/scsi_types.h>
 #   include <sys/scsi/impl/uscsi.h>
 #endif
 
@@ -67,7 +67,7 @@
 #include "common.h"
 
 #ifdef SYS_DARWIN
-#   include "DVDioctl/DVDioctl.h"
+#   include "MacOSX_dvdioctl/DVDioctl.h"
 #endif
 
 #include "ioctl.h"

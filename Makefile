@@ -50,7 +50,7 @@ C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 #
 # Misc Objects
 # 
-ifeq ($(GETOPT),1)
+ifeq ($(NEED_GETOPT),1)
 C_OBJ += extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o 
 endif
 
