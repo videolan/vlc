@@ -481,15 +481,16 @@ all: vlc @ALIASES@ plugins
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
-	rm -f plugins/*/*.o src/*/*.o lib/*.so extras/*/*.o
-	rm -f vlc gvlc kvlc qvlc
+	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
+	rm -f src/*/*.o extras/*/*.o
+	rm -f lib/*.so vlc gvlc kvlc qvlc
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
-	rm -rf .dep
+	rm -Rf .dep
 
 install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -531,24 +532,31 @@ show:
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
-	rm -rf /tmp/vlc-@VLC_VERSION@* /tmp/vlc-@VLC_VERSION@nocss*
+	rm -Rf /tmp/vlc-@VLC_VERSION@* /tmp/vlc-@VLC_VERSION@nocss*
 	# copy archive in /tmp
 	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
 		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
 	find debian -mindepth 1 -maxdepth 1 -type d | \
-		while read i ; do rm -rf /tmp/vlc-@VLC_VERSION@/$$i ; done
+		while read i ; do rm -Rf /tmp/vlc-@VLC_VERSION@/$$i ; done
 	# .c .h .in .cpp
 	find include src plugins -type f -name '*.[chi]*' | while read i ; \
 		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
+	# extra files
+	cp -a extras/* /tmp/vlc-@VLC_VERSION@/extras
+	cp -a doc/* /tmp/vlc-@VLC_VERSION@/doc
+	find /tmp/vlc-@VLC_VERSION@/extras /tmp/vlc-@VLC_VERSION@/doc \
+		-type d -name CVS | while read i ; \
+			do rm -Rf $$i ; \
+		done
 	# copy misc files
 	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO \
 		Makefile.in Makefile.dep configure configure.in install-sh \
 		config.sub config.guess todo.pl \
 			/tmp/vlc-@VLC_VERSION@/
 	for file in control control-css vlc-gtk.menu vlc.copyright vlc.docs \
-		changelog changelog-css rules rules-css vlc.1 vlc.dirs \
+		changelog changelog-css rules rules-css vlc.dirs \
 		vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-@VLC_VERSION@/debian/ ; done
 	for file in default8x16.psf default8x9.psf gvlc.png vlc.png \
@@ -563,7 +571,7 @@ snapshot:
 	mv /tmp/vlc-@VLC_VERSION@.tar.gz /tmp/vlc-@VLC_VERSION@.tar.bz2 ..
 
 	# clean up
-	rm -rf /tmp/vlc-@VLC_VERSION@*
+	rm -Rf /tmp/vlc-@VLC_VERSION@*
 
 plugins: $(PLUGINS:%=lib/%.so)
 

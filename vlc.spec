@@ -48,7 +48,7 @@ make install prefix=$RPM_BUILD_ROOT/usr
 %attr(-, root, root) /usr/bin/vlc
 %attr(-, root, root) /usr/share/videolan
 %attr(-, root, root) /usr/lib/videolan
-%attr(-, root, root) %doc ChangeLog AUTHORS COPYING INSTALL README doc
+%attr(-, root, root) %doc ChangeLog AUTHORS COPYING INSTALL README TODO doc
 %clean
 rm -rf $RPM_BUILD_ROOT
 

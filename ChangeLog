@@ -1,3 +1,103 @@
+vlc changelog:
+
+0.2.70:
+
+  * Fixed headers for FreeBSD compilation.
+  * Fixed debian/rules for non-x86 packages (Closes: Debian bug #88583).
+  * Deleted BBitmap[0] directly after overlay creation as no longer needed
+    as overlay now owns Bits()
+  * Fixed MPEG-1 mux_rate parsing.
+  * Fixed MPEG-1 stuffing.
+  * Don't create BBitmap drawing thread if using overlays
+  * Changes to BeOS interface with file selection support
+  * Fixed a boolean_t/int mix.
+  * Increased FIFO_SIZE.
+  * Fixed all alignment issues
+  * Networked TS input
+  * Working menus for run-time audio/spu/title/chapter selection with gtk
+    interface.
+  * Port of the interface menus to gnome plugin.
+  * Gtk playlist
+  * Tried to fix the "stream jumps at will" bug.
+  * Fixed most of the bugs in gnome interface menus
+  * Added radio checks in menu items.
+  * Bug fixes and enhancements in the Gtk+/Gnome interfaces.
+  * Borrowed config.guess and config.sub from SDL [MacOS X port] ;
+  * Changed files so that the MacOS X port compiles & runs [MacOS X port] ;
+  * If SDL/GTK/DSP is not available, don't compile the associated module.
+  * Gtk+ interface: fixed a precision issue in the scale.
+  * Qt interface: somebody pop up us the menu!!
+  * Fixed Debian sparc build for real (Closes: Debian bug #89285).
+  * vlc core compiles under QNX RTOS. Now if anyone feels like tidying
+    it and writing output and interface plugins...
+  * Split audio output into several separate files to make it easier
+    to debug. Removed a few redundancies as well.
+  * Support for Darwin CoreAudio, courtesy of Colin Delacroix [MacOS X port] ;
+  * Added warnings for ac3 mantissa (we still have problems with AC3 on
+    MacOS X) ;
+  * Renamed WriteResource to avoid a namespace clash with Darwin's
+    WriteResource.
+  * Compile Darwin module by default on Darwin system. [MacOS X port]
+  * Use $QTDIR for the qt module ;
+  * SDL fixes and enhancements by Shane Harper <shanegh@optusnet.com.au>
+  * Header cleaning: filled all empty authors fields, added CVS $Id stuff.
+  * Fixes to aout_darwin.c by Colin Delacroix <colin@zoy.org>.
+  * Fixes to configure.in, Makefile.in and main.c (Altivec detection)
+    by Eugenio Jarosiewicz <ej0@cise.ufl.edu>.   
+  * Added a SYNCHRO_START in DVDRead for each cell change to fix
+    multi-angle streams
+  * Changed seek function to prevent jump-at-will and to remove two bugs in
+    sector computing.
+  * Initialize some values in netlist (payload_discard wasn't which caused
+    frame dropping)
+  * Come back of multi-sector read which should make reading faster
+  * Language & Inteface support for BeOS interface
+  * XVideo plugin courtesy of Shane Harper <shanegh@optusnet.com.au>
+  * Makefile.in and configure.in fixes by Nilmoni Deb <ndeb@ece.cmu.edu>
+  * A few syntax fixes in the plain X11 plugin
+  * Various bug fixes in dvd_netlist. Some bugs seem to remain though.
+  * New function input_ToggleES for interaction with interface.
+  * Changes in gnome interface : navigation menus are now splited, there
+    are radio item in menus and the code should be better.
+  * First step for dvd_ifo rewritting. Now allocation/disallocation is
+    being done as it has to be.
+  * Fixed a bug in title management that make dvd like Seven work.
+  * vout_beos now uses double buffering for YCbCr overlay.
+    This (for some reason) improves audio/video sync
+  * Fixes for the Qt plugin compilation under Debian
+  * Heavy butchering in the CSS and DVD ioctl code to put all architecture-
+    dependent code in dvd_ioctl.c
+  * Added almost fully-functional /dev/dvd driver for MacOS X in
+    extras/DVDioctl.
+  * Fall back to one-packet-once reading in dvd input since multi-block
+    seems to have a bug that make the vlc crash on title/audio/spu change. I
+    hope that this bug will be fixed soon for the performance is poorer now
+  * Add-ons and changes in gnome interface:
+    o menu subdivision is done only if there are over 20 items,
+    o in DVD mode next/prev apply to title,
+    o in DVD mode, added a box with button to navigate through chapters.
+  * Additional enhancements to the OS X DVD ioctl module
+  * Big cleaning of the BeOS DVD ioctl code, got rid of all Linuxisms
+  * Compilation fixes for the BeOS DVD ioctls
+  * XVideo plugin enhancements by Shane Harper <shanegh@optusnet.com.au>
+  * Added the GNU getopt library, which gets compiled in when getopt_long
+    isn't available on the desired platform.
+  * Replaced the `--warning' flag with the standard cumulative `-v' flag.
+    `-v' is like `--warning 3', and `-vvvv' is like `--warning 0'
+    (`--warning' is still valid for those used to it)
+  * Cleaning in configure.in and Makefile.in, the Solaris port now
+    builds and runs properly.
+  * Code cleanup: removed a few tabulations.
+  * Fixed inline asm routines to remove all read/write operands.
+  * Added <string.h> to most files to prevent warnings under FreeBSD.
+  * Added "break;" after "default:" in case switches to prevent
+    warnings when compiling with GCC 3.0pre.
+  * Sync MOSX dev/CVS tree : code support for MacOS X audio, video and
+    interface (courtesy of Eugenio Jarosiewicz & Colin Delacroix) ;
+  * Cleaning code and a small fix to make quit work on OSX
+  * Disable x11 plugin if X11 headers are not found.
+
+0.2.63:
 
 ### THIS CHANGELOG HASN'T BEEN UPDATED FOR UNSTABLE ###
 

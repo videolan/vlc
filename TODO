@@ -99,7 +99,7 @@ Description: Write TS support
  The parser has already been back-ported, but it still lacks the
  PSI parser, and currently the functions to read from the network
  are yet to be written.
-Status: Todo
+Status: Done 7 Mar 2001 (henri)
 
 Task: 0x42
 Difficulty: Medium
@@ -295,7 +295,7 @@ Urgency: Normal
 Description: ALSA audio output support
  ALSA is the Advanced Linux Sound Architecture and is believed to be
  technically superior to the usual OSS support found in the Linux kernel.
-Status: Done ( henri )
+Status: Done (henri)
 
 Task: 0x29
 Difficulty: Guru
@@ -356,7 +356,7 @@ Description: Xv video output support
  XFree 4.0 provides the Xv interface which can do hardware YUV on supported
  hardware. Unfortunately, there doesn't seem to be much documentation
  available.
-Status: Todo
+Status: Done 1 Apr 2001 (shane)
 
 Task: 0x22
 Difficulty: Medium
