@@ -133,20 +133,20 @@ fi
 rm -f m4/private.m4-tmp1 && cat > m4/private.m4-tmp1 << EOF
 dnl  The required AM_CONDITIONAL calls
 dnl  XXX: too many conditionals make the build very slow, disabled them
-AC_DEFUN([AX_VLC_CONDITIONALS], [
+AC_DEFUN([VLC_CONDITIONALS], [
 EOF
 rm -f m4/private.m4-tmp2 && cat > m4/private.m4-tmp2 << EOF
 dnl  The required AC_SUBST calls
-AC_DEFUN([AX_VLC_SUBSTS], [
+AC_DEFUN([VLC_SUBSTS], [
 EOF
 rm -f m4/private.m4-tmp3 && cat > m4/private.m4-tmp3 << EOF
 dnl  The required AC_OUTPUT calls
 dnl  XXX: this feature is only supported starting from automake-1.7
-AC_DEFUN([AX_VLC_MAKEFILES], [AC_OUTPUT([
+AC_DEFUN([VLC_MAKEFILES], [AC_OUTPUT([
 EOF
 rm -f m4/private.m4-tmp4 && cat > m4/private.m4-tmp4 << EOF
 dnl  Helper macro for vlc-config generation
-AC_DEFUN([AX_VLC_CONFIG_HELPER], [
+AC_DEFUN([VLC_CONFIG_HELPER], [
   cat >> vlc-config.in << BLAH
 EOF
 

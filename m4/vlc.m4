@@ -1,17 +1,57 @@
 dnl  Macros needed for VLC
-dnl  $Id: vlc.m4,v 1.6 2003/07/17 15:49:37 sam Exp $
+dnl  $Id$
 
-dnl  Add plugins or builtins
-AC_DEFUN([AX_ADD_BUILTINS], [
+dnl ===========================================================================
+dnl  Macros to add plugins or builtins and handle their flags
+
+AC_DEFUN([VLC_ADD_BUILTINS], [
   BUILTINS="${BUILTINS} $1"
 ])
 
-AC_DEFUN([AX_ADD_PLUGINS], [
+AC_DEFUN([VLC_ADD_PLUGINS], [
   PLUGINS="${PLUGINS} $1"
 ])
 
-dnl  Save and restore default flags
-AC_DEFUN([AX_SAVE_FLAGS], [
+dnl  Special cases: vlc, pics, plugins, save
+AC_DEFUN([VLC_ADD_CPPFLAGS], [
+  for element in [$1]; do
+    eval "CPPFLAGS_${element}="'"$'"{CPPFLAGS_${element}} $2"'"'
+    am_modules_with_cppflags="${am_modules_with_cppflags} ${element}"
+  done
+])
+
+AC_DEFUN([VLC_ADD_CFLAGS], [
+  for element in [$1]; do
+    eval "CFLAGS_${element}="'"$'"{CFLAGS_${element}} $2"'"'
+    am_modules_with_cflags="${am_modules_with_cflags} ${element}"
+  done
+])
+
+AC_DEFUN([VLC_ADD_CXXFLAGS], [
+  for element in [$1]; do
+    eval "CXXFLAGS_${element}="'"$'"{CXXFLAGS_${element}} $2"'"'
+    am_modules_with_cxxflags="${am_modules_with_cxxflags} ${element}"
+  done
+])
+
+AC_DEFUN([VLC_ADD_OBJCFLAGS], [
+  for element in [$1]; do
+    eval "OBJCFLAGS_${element}="'"$'"{OBJCFLAGS_${element}} $2"'"'
+    am_modules_with_objcflags="${am_modules_with_objcflags} ${element}"
+  done
+])
+
+AC_DEFUN([VLC_ADD_LDFLAGS], [
+  for element in [$1]; do
+    eval "LDFLAGS_${element}="'"'"$2 "'$'"{LDFLAGS_${element}} "'"'
+    am_modules_with_ldflags="${am_modules_with_ldflags} ${element}"
+  done
+])
+
+dnl ===========================================================================
+dnl  Macros to save and restore default flags
+
+AC_DEFUN([VLC_SAVE_FLAGS], [
   CPPFLAGS_save="${CPPFLAGS}"
   CFLAGS_save="${CFLAGS}"
   CXXFLAGS_save="${CXXFLAGS}"
@@ -19,7 +59,7 @@ AC_DEFUN([AX_SAVE_FLAGS], [
   LDFLAGS_save="${LDFLAGS}"
 ])
 
-AC_DEFUN([AX_RESTORE_FLAGS], [
+AC_DEFUN([VLC_RESTORE_FLAGS], [
   CPPFLAGS="${CPPFLAGS_save}"
   CFLAGS="${CFLAGS_save}"
   CXXFLAGS="${CXXFLAGS_save}"
@@ -27,43 +67,10 @@ AC_DEFUN([AX_RESTORE_FLAGS], [
   LDFLAGS="${LDFLAGS_save}"
 ])
 
-dnl  Special cases: vlc, pics, plugins, save
-AC_DEFUN([AX_ADD_CPPFLAGS], [
-  for element in [$1]; do
-    eval "CPPFLAGS_${element}="'"$'"{CPPFLAGS_${element}} $2"'"'
-    am_modules_with_cppflags="${am_modules_with_cppflags} ${element}"
-  done
-])
+dnl ===========================================================================
+dnl  Helper macro to generate the vlc-config.in file
 
-AC_DEFUN([AX_ADD_CFLAGS], [
-  for element in [$1]; do
-    eval "CFLAGS_${element}="'"$'"{CFLAGS_${element}} $2"'"'
-    am_modules_with_cflags="${am_modules_with_cflags} ${element}"
-  done
-])
-
-AC_DEFUN([AX_ADD_CXXFLAGS], [
-  for element in [$1]; do
-    eval "CXXFLAGS_${element}="'"$'"{CXXFLAGS_${element}} $2"'"'
-    am_modules_with_cxxflags="${am_modules_with_cxxflags} ${element}"
-  done
-])
-
-AC_DEFUN([AX_ADD_OBJCFLAGS], [
-  for element in [$1]; do
-    eval "OBJCFLAGS_${element}="'"$'"{OBJCFLAGS_${element}} $2"'"'
-    am_modules_with_objcflags="${am_modules_with_objcflags} ${element}"
-  done
-])
-
-AC_DEFUN([AX_ADD_LDFLAGS], [
-  for element in [$1]; do
-    eval "LDFLAGS_${element}="'"'"$2 "'$'"{LDFLAGS_${element}} "'"'
-    am_modules_with_ldflags="${am_modules_with_ldflags} ${element}"
-  done
-])
-
-AC_DEFUN([AX_OUTPUT_VLC_CONFIG_IN], [
+AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
 
   AC_MSG_RESULT(configure: creating ./vlc-config.in)
 
@@ -116,10 +123,33 @@ AC_DEFUN([AX_OUTPUT_VLC_CONFIG_IN], [
   sed -ne '/#@1@#/,/#@2@#/p' < "${srcdir}/vlc-config.in.in" \
    | sed -e '/#@.@#/d' >> vlc-config.in
 
-  AX_VLC_CONFIG_HELPER
+  VLC_CONFIG_HELPER
 
   dnl  '/#@2@#/,${/#@.@#/d;p}' won't work on OS X
   sed -ne '/#@2@#/,$p' < "${srcdir}/vlc-config.in.in" \
    | sed -e '/#@.@#/d' >> vlc-config.in
+])
+
+dnl ===========================================================================
+dnl  Macros for shared object handling (TODO)
+
+AC_DEFUN([VLC_LIBRARY_SUFFIX], [
+  AC_MSG_CHECKING(for shared objects suffix)
+  case "${target_os}" in
+    darwin*)
+      LIBEXT=".dylib"
+      ;;
+    *mingw32* | *cygwin*)
+      LIBEXT=".dll"
+      ;;
+    hpux*)
+      LIBEXT=".sl"
+      ;;
+    *)
+      LIBEXT=".so"
+      ;;
+  esac
+  AC_MSG_RESULT(${LIBEXT})
+  AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
 ])
 
