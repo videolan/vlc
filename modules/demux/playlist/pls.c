@@ -272,6 +272,8 @@ static int Demux( demux_t *p_demux )
         psz_name = NULL;
     }
 
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,p_playlist->status.i_view,	
+                      p_playlist->status.p_item, NULL );
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 }
