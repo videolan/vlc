@@ -958,13 +958,13 @@ void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
 
 static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
 {
+    playlist_view_t *p_view;
     mvar_t *s = mvar_New( name, "set" );
 
     fprintf( stderr," mvar_PlaylistSetNew: name=`%s'\n", name );
 
     vlc_mutex_lock( &p_pl->object_lock );
 
-    playlist_view_t *p_view;
     p_view = playlist_ViewFind( p_pl, VIEW_CATEGORY ); /* FIXME */
 
     if( p_view != NULL )
