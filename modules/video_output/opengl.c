@@ -94,14 +94,19 @@ static int SendEvents( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define EFFECT_TEXT N_("Select effect")
+#define EFFECT_TEXT N_("Effect")
 #define EFFECT_LONGTEXT N_( \
     "Allows you to select different visual effects.")
+
+static char *ppsz_effects[] = {
+        "none", "cube", "transparent-cube", NULL };
+static char *ppsz_effects_text[] = {
+        N_("None"), N_("Cube"), N_("Transparent Cube"), NULL };
 
 vlc_module_begin();
     set_description( _("OpenGL video output") );
 #ifdef SYS_DARWIN
-    set_capability( "video output", 200 );
+    set_capability( "video output", 0 );
 #else
     set_capability( "video output", 20 );
 #endif
@@ -110,6 +115,7 @@ vlc_module_begin();
 
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_TRUE );
+        change_string_list( ppsz_effects, ppsz_effects_text, 0 );
 vlc_module_end();
 
 /*****************************************************************************
