@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.87 2004/03/04 22:52:43 bigben Exp $
+ * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1574,9 +1574,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) exitFullScreen
 {
-     vlc_value_t val;
-    intf_thread_t * p_intf;
-
     /* Free current OpenGL context */
     [NSOpenGLContext clearCurrentContext];
     [fullScreenContext clearDrawable];

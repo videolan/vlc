@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.h,v 1.22 2004/03/03 11:34:19 bigben Exp $
+ * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -52,6 +52,7 @@
 
     IBOutlet id o_ctx_menu;
     IBOutlet id o_mi_save_playlist;
+    IBOutlet id o_mi_info;
     IBOutlet id o_mi_play;
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_selectall;
@@ -63,9 +64,20 @@
 
     IBOutlet id o_loop_popup;
 
+/*For playlist info window*/
+
+    IBOutlet id o_info_window;
+    IBOutlet id o_uri_lbl;
+    IBOutlet id o_title_lbl;
+    IBOutlet id o_author_lbl;
+    IBOutlet id o_uri_txt; 
+    IBOutlet id o_title_txt; 
+    IBOutlet id o_author_txt; 
+    IBOutlet id o_btn_info_ok;
+    IBOutlet id o_btn_info_cancel;
+
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
-
 }
 
 - (void)initStrings;
@@ -83,5 +95,11 @@
 
 - (void)updateRowSelection;
 - (void)playlistUpdated;
+
+/*For playlist info window*/
+
+- (IBAction)togglePlaylistInfoPanel:(id)sender;
+- (IBAction)infoCancel:(id)sender;
+- (IBAction)infoOk:(id)sender;
 
 @end
