@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.32 2001/04/12 03:26:53 stef Exp $
+ * $Id: input_ext-intf.h,v 1.33 2001/04/13 05:36:12 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -187,6 +187,8 @@ typedef struct stream_descriptor_s
                                            * or modify stream, pgrm or es    */
 
     /* Input method data */
+    int                     i_method;       /* input method for stream: file,
+                                               disc or network */
     boolean_t               b_pace_control;    /* can we read when we want ? */
     boolean_t               b_seekable;               /* can we do lseek() ? */
 
@@ -312,35 +314,20 @@ typedef struct input_thread_s
 #endif
 } input_thread_t;
 
-
-/*
- * Communication interface -> input
- */
-
-/*****************************************************************************
- * input_config_t
- *****************************************************************************
- * This structure is given by the interface to an input thread
- *****************************************************************************/
-typedef struct input_config_s
-{
-    /* Input method description */
-    int                         i_method;                    /* input method */
-    char *                      p_source;                          /* source */
-
-    /* For auto-launch of decoders */
-    struct aout_thread_s *      p_default_aout;
-    struct vout_thread_s *      p_default_vout;
-} input_config_t;
-
 /* Input methods */
-#define INPUT_METHOD_NONE           0            /* input thread is inactive */
-#define INPUT_METHOD_FILE          10   /* stream is read from file p_source */
-#define INPUT_METHOD_DVD           11      /* stream is read from dvd device */
-#define INPUT_METHOD_UCAST         20                         /* UDP unicast */
-#define INPUT_METHOD_MCAST         21                       /* UDP multicast */
-#define INPUT_METHOD_BCAST         22                       /* UDP broadcast */
-#define INPUT_METHOD_VLAN_BCAST    32            /* UDP broadcast with VLANs */
+/* The first figure is a general method that can be used in interface plugins ;
+ * The second figure is a detailed sub-method */
+#define INPUT_METHOD_NONE         0x0            /* input thread is inactive */
+#define INPUT_METHOD_FILE        0x10   /* stream is read from file p_source */
+#define INPUT_METHOD_DISC        0x20   /* stream is read directly from disc */
+#define INPUT_METHOD_DVD         0x21             /* stream is read from DVD */
+#define INPUT_METHOD_VCD         0x22             /* stream is read from VCD */
+#define INPUT_METHOD_NETWORK     0x30         /* stream is read from network */
+#define INPUT_METHOD_UCAST       0x31                         /* UDP unicast */
+#define INPUT_METHOD_MCAST       0x32                       /* UDP multicast */
+#define INPUT_METHOD_BCAST       0x33                       /* UDP broadcast */
+#define INPUT_METHOD_VLAN_BCAST  0x34            /* UDP broadcast with VLANs */
+
 
 /* Status changing methods */
 #define INPUT_STATUS_END            0

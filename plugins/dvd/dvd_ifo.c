@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.19 2001/04/12 02:40:09 stef Exp $
+ * $Id: dvd_ifo.c,v 1.20 2001/04/13 05:36:12 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -74,56 +74,89 @@ static __inline__ u8* FillBuffer( ifo_t* p_ifo, u8* pi_buffer, off_t i_pos )
     return pi_buffer;
 }
 
-static __inline__ u8 ReadByte( u8** ppi_buffer )
+static __inline__ u8 ReadByte( ifo_t * p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u8      i_ret;
 
-    i_ret = *(*ppi_buffer)++;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    i_ret = *(*pp_current)++;
 
     return i_ret;
 }
 
-static __inline__ u16 ReadWord( u8** ppi_buffer )
+static __inline__ u16 ReadWord( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u16     i_ret;
 
-    i_ret = U16_AT(*ppi_buffer);
-    (*ppi_buffer) += 2;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 2 )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    i_ret = U16_AT(*pp_current);
+    (*pp_current) += 2;
 
     return i_ret;
 }
 
-static __inline__ u32 ReadDouble( u8** ppi_buffer )
+static __inline__ u32 ReadDouble( ifo_t * p_ifo, u8* pi_buffer,
+                                  u8** pp_current )
 {
     u32     i_ret;
 
-    i_ret = U32_AT(*ppi_buffer);
-    (*ppi_buffer) += 4;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 4 )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    i_ret = U32_AT(*pp_current);
+    (*pp_current) += 4;
 
     return i_ret;
 }
 
-static __inline__ u64 ReadQuad( u8** ppi_buffer )
+static __inline__ u64 ReadQuad( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current )
 {
     u64     i_ret;
 
-    i_ret = U64_AT(*ppi_buffer);
-    (*ppi_buffer) += 8;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE - 8 )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    i_ret = U64_AT(*pp_current);
+    (*pp_current) += 8;
 
     return i_ret;
 }
 
-static __inline__ void ReadBits( u8** ppi_buffer, u8* pi_dest, int i_nb )
+static __inline__ void ReadBits( ifo_t* p_ifo, u8* pi_buffer, u8** pp_current,
+                                  u8* pi_dest, int i_nb )
 {
-    memcpy( pi_dest, *ppi_buffer, i_nb );
-    *ppi_buffer += i_nb;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE - i_nb )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    memcpy( pi_dest, *pp_current, i_nb );
+    *pp_current += i_nb;
 
     return;
 }
 
-static __inline__ void DumpBits( u8** ppi_buffer, int i_nb )
+static __inline__ void DumpBits( ifo_t* p_ifo, u8* pi_buffer,
+                                 u8** pp_current, int i_nb )
 {
-    *ppi_buffer += i_nb;
+    if( *pp_current >= pi_buffer + DVD_LB_SIZE - i_nb )
+    {
+        *pp_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
+    }
+
+    *pp_current += i_nb;
 
     return;
 }
@@ -175,49 +208,49 @@ int IfoInit( ifo_t * p_ifo )
 #define manager_inf     p_ifo->vmg.manager_inf
 //fprintf( stderr, "VMGI\n" );
 
-    ReadBits( &p_current, manager_inf.psz_id, 12 );
+    ReadBits( p_ifo, pi_buffer, &p_current, manager_inf.psz_id, 12 );
     manager_inf.psz_id[12] = '\0';
-    manager_inf.i_vmg_end_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 12 );
-    manager_inf.i_vmg_inf_end_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 1 );
-    manager_inf.i_spec_ver = ReadByte( &p_current );
-    manager_inf.i_cat = ReadDouble( &p_current );
-    manager_inf.i_volume_nb = ReadWord( &p_current );
-    manager_inf.i_volume = ReadWord( &p_current );
-    manager_inf.i_disc_side = ReadByte( &p_current );
-    DumpBits( &p_current, 19 );
-    manager_inf.i_title_set_nb = ReadWord( &p_current );
-    ReadBits( &p_current, manager_inf.ps_provider_id, 32 );
-    manager_inf.i_pos_code = ReadQuad( &p_current );
-    DumpBits( &p_current, 24 );
-    manager_inf.i_vmg_inf_end_byte = ReadDouble( &p_current );
-    manager_inf.i_first_play_title_start_byte = ReadDouble( &p_current );
-    DumpBits( &p_current, 56 );
-    manager_inf.i_vob_start_sector = ReadDouble( &p_current );
-    manager_inf.i_title_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_title_unit_start_sector = ReadDouble( &p_current );
-    manager_inf.i_parental_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_vts_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_text_data_start_sector = ReadDouble( &p_current );
-    manager_inf.i_cell_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_vobu_map_start_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 32 );
+    manager_inf.i_vmg_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 12 );
+    manager_inf.i_vmg_inf_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+    manager_inf.i_spec_ver = ReadByte( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_cat = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_volume_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_volume = ReadWord( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_disc_side = ReadByte( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 19 );
+    manager_inf.i_title_set_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+    ReadBits( p_ifo, pi_buffer, &p_current, manager_inf.ps_provider_id, 32 );
+    manager_inf.i_pos_code = ReadQuad( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 24 );
+    manager_inf.i_vmg_inf_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_first_play_title_start_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 56 );
+    manager_inf.i_vob_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_title_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_title_unit_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_parental_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_vts_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_text_data_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_cell_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_vobu_map_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 32 );
 //    GETS( &manager_inf.video_atrt );
-DumpBits( &p_current, 2 );
-    DumpBits( &p_current, 1 );
-    manager_inf.i_audio_nb = ReadByte( &p_current );
+DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+    manager_inf.i_audio_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "vmgi audio nb : %d\n", manager_inf.i_audio_nb );
     for( i=0 ; i < 8 ; i++ )
     {
-        i_temp = ReadQuad( &p_current );
+        i_temp = ReadQuad( p_ifo, pi_buffer, &p_current );
     }
-    DumpBits( &p_current, 17 );
-    manager_inf.i_spu_nb = ReadByte( &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 17 );
+    manager_inf.i_spu_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "vmgi subpic nb : %d\n", manager_inf.i_spu_nb );
     for( i=0 ; i < manager_inf.i_spu_nb ; i++ )
     {
-        ReadBits( &p_current, (u8*)(&i_temp), 6 );
+        ReadBits( p_ifo, pi_buffer, &p_current, (u8*)(&i_temp), 6 );
         /* FIXME : take care of endianness */
     }
 
@@ -240,10 +273,10 @@ DumpBits( &p_current, 2 );
                     manager_inf.i_title_inf_start_sector *DVD_LB_SIZE );
 //fprintf( stderr, "title inf %lld\n", p_ifo->i_pos );
     
-        title_inf.i_title_nb = ReadWord( &p_current );
+        title_inf.i_title_nb = ReadWord( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "title_inf: TTU nb %d\n", title_inf.i_title_nb );
-        DumpBits( &p_current, 2 );
-        title_inf.i_end_byte = ReadDouble( &p_current );
+        DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+        title_inf.i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
     
         /* parsing of title attributes */
         title_inf.p_attr = malloc( title_inf.i_title_nb *sizeof(title_attr_t) );
@@ -255,13 +288,13 @@ DumpBits( &p_current, 2 );
     
         for( i = 0 ; i < title_inf.i_title_nb ; i++ )
         {
-            title_inf.p_attr[i].i_play_type = ReadByte( &p_current );
-            title_inf.p_attr[i].i_angle_nb = ReadByte( &p_current );
-            title_inf.p_attr[i].i_chapter_nb = ReadWord( &p_current );
-            title_inf.p_attr[i].i_parental_id = ReadWord( &p_current );
-            title_inf.p_attr[i].i_title_set_num = ReadByte( &p_current );
-            title_inf.p_attr[i].i_title_num = ReadByte( &p_current );
-            title_inf.p_attr[i].i_start_sector = ReadDouble( &p_current );
+            title_inf.p_attr[i].i_play_type = ReadByte( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_angle_nb = ReadByte( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_chapter_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_parental_id = ReadWord( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_title_set_num = ReadByte( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_title_num = ReadByte( p_ifo, pi_buffer, &p_current );
+            title_inf.p_attr[i].i_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "title_inf: %d %d %d\n",title_inf.p_attr[i].i_chapter_nb ,title_inf.p_attr[i].i_title_set_num,title_inf.p_attr[i].i_title_num );
         }
     }
@@ -295,9 +328,9 @@ DumpBits( &p_current, 2 );
 
 //fprintf( stderr, "PTL\n" );
     
-        parental.i_country_nb = ReadWord( &p_current );
-        parental.i_vts_nb = ReadWord( &p_current );
-        parental.i_end_byte = ReadDouble( &p_current );
+        parental.i_country_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+        parental.i_vts_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+        parental.i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
         
         parental.p_parental_desc = malloc( parental.i_country_nb *
                                            sizeof(parental_desc_t) );
@@ -309,12 +342,12 @@ DumpBits( &p_current, 2 );
 
         for( i = 0 ; i < parental.i_country_nb ; i++ )
         {
-            ReadBits( &p_current,
+            ReadBits( p_ifo, pi_buffer, &p_current,
                       parental.p_parental_desc[i].ps_country_code, 2 );
-            DumpBits( &p_current, 2 );
+            DumpBits( p_ifo, pi_buffer, &p_current, 2 );
             parental.p_parental_desc[i].i_parental_mask_start_byte =
-                                                    ReadWord( &p_current );
-            DumpBits( &p_current, 2 );
+                                                    ReadWord( p_ifo, pi_buffer, &p_current );
+            DumpBits( p_ifo, pi_buffer, &p_current, 2 );
         }
 
         parental.p_parental_mask = malloc( parental.i_country_nb *
@@ -341,7 +374,7 @@ DumpBits( &p_current, 2 );
                 for( k = 0 ; k < parental.i_vts_nb + 1 ; k++ )
                 {
                     parental.p_parental_mask[i].ppi_mask[j][k] =
-                                                        ReadWord( &p_current );
+                                                        ReadWord( p_ifo, pi_buffer, &p_current );
                 }
             }
         }
@@ -362,10 +395,10 @@ DumpBits( &p_current, 2 );
     
 //fprintf( stderr, "VTS ATTR\n" );
     
-        vts_inf.i_vts_nb = ReadWord( &p_current );;
+        vts_inf.i_vts_nb = ReadWord( p_ifo, pi_buffer, &p_current );;
 //fprintf( stderr, "VTS ATTR Nb: %d\n", vts_inf.i_vts_nb );
-        DumpBits( &p_current, 2 );
-        vts_inf.i_end_byte = ReadDouble( &p_current );
+        DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+        vts_inf.i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
         vts_inf.pi_vts_attr_start_byte =
                             malloc( vts_inf.i_vts_nb *sizeof(u32) );
         if( vts_inf.pi_vts_attr_start_byte == NULL )
@@ -376,7 +409,7 @@ DumpBits( &p_current, 2 );
 
         for( i = 0 ; i < vts_inf.i_vts_nb ; i++ )
         {
-            vts_inf.pi_vts_attr_start_byte[i] = ReadDouble( &p_current );
+            vts_inf.pi_vts_attr_start_byte[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
         }
 
         vts_inf.p_vts_attr = malloc( vts_inf.i_vts_nb *sizeof(vts_attr_t) );
@@ -390,42 +423,42 @@ DumpBits( &p_current, 2 );
         {
             p_current = FillBuffer( p_ifo, pi_buffer, i_start +
                                     vts_inf.pi_vts_attr_start_byte[i] );
-            vts_inf.p_vts_attr[i].i_end_byte = ReadDouble( &p_current );
-            vts_inf.p_vts_attr[i].i_cat_app_type  = ReadDouble( &p_current );
+            vts_inf.p_vts_attr[i].i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
+            vts_inf.p_vts_attr[i].i_cat_app_type  = ReadDouble( p_ifo, pi_buffer, &p_current );
     //        GETS( &vts_inf.p_vts_attr[i].vts_menu_video_attr );
-DumpBits( &p_current, 2 );
-            DumpBits( &p_current, 1 );
-            vts_inf.p_vts_attr[i].i_vts_menu_audio_nb = ReadByte( &p_current );
+DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+            DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+            vts_inf.p_vts_attr[i].i_vts_menu_audio_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "m audio nb : %d\n", vts_inf.p_vts_attr[i].i_vts_menu_audio_nb );
             for( j = 0 ; j < 8 ; j++ )
             {
-                i_temp = ReadQuad( &p_current );;
+                i_temp = ReadQuad( p_ifo, pi_buffer, &p_current );;
             }
-            DumpBits( &p_current, 17 );
-            vts_inf.p_vts_attr[i].i_vts_menu_spu_nb = ReadByte( &p_current );
+            DumpBits( p_ifo, pi_buffer, &p_current, 17 );
+            vts_inf.p_vts_attr[i].i_vts_menu_spu_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "m subp nb : %d\n", vts_inf.p_vts_attr[i].i_vts_menu_spu_nb );
             for( j = 0 ; j < 28 ; j++ )
             {
-                ReadBits( &p_current, (u8*)(&i_temp), 6 );
+                ReadBits( p_ifo, pi_buffer, &p_current, (u8*)(&i_temp), 6 );
                 /* FIXME : Fix endianness issue here */
             }
-            DumpBits( &p_current, 2 );
+            DumpBits( p_ifo, pi_buffer, &p_current, 2 );
     //        GETS( &vts_inf.p_vts_attr[i].vtstt_video_vts_inf );
-DumpBits( &p_current, 2 );
-            DumpBits( &p_current, 1 );
+DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+            DumpBits( p_ifo, pi_buffer, &p_current, 1 );
             vts_inf.p_vts_attr[i].i_vts_title_audio_nb =
-                                                ReadDouble( &p_current );
+                                                ReadDouble( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "tt audio nb : %d\n", vts_inf.p_vts_attr[i].i_vts_title_audio_nb );
             for( j = 0 ; j < 8 ; j++ )
             {
-                i_temp = ReadQuad( &p_current );;
+                i_temp = ReadQuad( p_ifo, pi_buffer, &p_current );;
             }
-            DumpBits( &p_current, 17 );
-            vts_inf.p_vts_attr[i].i_vts_title_spu_nb = ReadByte( &p_current );
+            DumpBits( p_ifo, pi_buffer, &p_current, 17 );
+            vts_inf.p_vts_attr[i].i_vts_title_spu_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "tt subp nb : %d\n", vts_inf.p_vts_attr[i].i_vts_title_spu_nb );
             for( j=0 ; j<28/*vts_inf.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
             {
-                ReadBits( &p_current, (u8*)(&i_temp), 6 );
+                ReadBits( p_ifo, pi_buffer, &p_current, (u8*)(&i_temp), 6 );
                 /* FIXME : Fix endianness issue here */
             }
         }
@@ -498,52 +531,52 @@ int IfoTitleSet( ifo_t * p_ifo )
      */
 //fprintf( stderr, "VTSI\n" );
 
-    ReadBits( &p_current, manager_inf.psz_id , 12 );
+    ReadBits( p_ifo, pi_buffer, &p_current, manager_inf.psz_id , 12 );
     manager_inf.psz_id[12] = '\0';
-    manager_inf.i_end_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 12 );
-    manager_inf.i_inf_end_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 1 );
-    manager_inf.i_spec_ver = ReadByte( &p_current );
-    manager_inf.i_cat = ReadDouble( &p_current );
-    DumpBits( &p_current, 90 );
-    manager_inf.i_inf_end_byte = ReadDouble( &p_current );
-    DumpBits( &p_current, 60 );
-    manager_inf.i_menu_vob_start_sector = ReadDouble( &p_current );
-    manager_inf.i_title_vob_start_sector = ReadDouble( &p_current );
-    manager_inf.i_title_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_title_unit_start_sector = ReadDouble( &p_current );
-    manager_inf.i_menu_unit_start_sector = ReadDouble( &p_current );
-    manager_inf.i_time_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_menu_cell_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_menu_vobu_map_start_sector = ReadDouble( &p_current );
-    manager_inf.i_cell_inf_start_sector = ReadDouble( &p_current );
-    manager_inf.i_vobu_map_start_sector = ReadDouble( &p_current );
-    DumpBits( &p_current, 24 );
+    manager_inf.i_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 12 );
+    manager_inf.i_inf_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+    manager_inf.i_spec_ver = ReadByte( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_cat = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 90 );
+    manager_inf.i_inf_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 60 );
+    manager_inf.i_menu_vob_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_title_vob_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_title_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_title_unit_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_menu_unit_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_time_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_menu_cell_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_menu_vobu_map_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_cell_inf_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    manager_inf.i_vobu_map_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 24 );
 //    GETS( &manager_inf.m_video_atrt );
-DumpBits( &p_current, 2 );
-    DumpBits( &p_current, 1 );
-    manager_inf.i_menu_audio_nb = ReadByte( &p_current );
+DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+    manager_inf.i_menu_audio_nb = ReadByte( p_ifo, pi_buffer, &p_current );
     for( i = 0 ; i < 8 ; i++ )
     {
-        i_temp = ReadQuad( &p_current );
+        i_temp = ReadQuad( p_ifo, pi_buffer, &p_current );
     }
-    DumpBits( &p_current, 17 );
-    manager_inf.i_menu_spu_nb = ReadByte( &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 17 );
+    manager_inf.i_menu_spu_nb = ReadByte( p_ifo, pi_buffer, &p_current );
     for( i = 0 ; i < 28 ; i++ )
     {
-        ReadBits( &p_current, (u8*)(&i_temp), 6 );
+        ReadBits( p_ifo, pi_buffer, &p_current, (u8*)(&i_temp), 6 );
         /* FIXME : take care of endianness */
     }
-    DumpBits( &p_current, 2 );
+    DumpBits( p_ifo, pi_buffer, &p_current, 2 );
 //    GETS( &manager_inf.video_atrt );
-DumpBits( &p_current, 2 );
-    DumpBits( &p_current, 1 );
-    manager_inf.i_audio_nb = ReadByte( &p_current );
+DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+    manager_inf.i_audio_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "vtsi audio nb : %d\n", manager_inf.i_audio_nb );
     for( i = 0 ; i < 8 ; i++ )
     {
-        i_temp = ReadQuad( &p_current );
+        i_temp = ReadQuad( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "Audio %d: %llx\n", i, i_temp );
         i_temp >>= 8;
         manager_inf.p_audio_attr[i].i_bar = i_temp & 0xff;
@@ -570,12 +603,12 @@ DumpBits( &p_current, 2 );
         i_temp >>= 1;
         manager_inf.p_audio_attr[i].i_coding_mode = i_temp & 0x7;
     }
-    DumpBits( &p_current, 17 );
-    manager_inf.i_spu_nb = ReadByte( &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 17 );
+    manager_inf.i_spu_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "vtsi subpic nb : %d\n", manager_inf.i_spu_nb );
     for( i=0 ; i<manager_inf.i_spu_nb ; i++ )
     {
-        ReadBits( &p_current, (u8*)(&i_temp), 6 );
+        ReadBits( p_ifo, pi_buffer, &p_current, (u8*)(&i_temp), 6 );
         i_temp = hton64( i_temp ) >> 16;
 //fprintf( stderr, "Subpic %d: %llx\n", i, i_temp );
         manager_inf.p_spu_attr[i].i_caption = i_temp & 0xff;
@@ -598,10 +631,10 @@ DumpBits( &p_current, 2 );
     
 //fprintf( stderr, "VTS PTR\n" );
    
-        title_inf.i_title_nb = ReadWord( &p_current );
+        title_inf.i_title_nb = ReadWord( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "VTS title_inf nb: %d\n", title_inf.i_title_nb );
-        DumpBits( &p_current, 2 );
-        title_inf.i_end_byte = ReadDouble( &p_current );
+        DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+        title_inf.i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
         title_inf.pi_start_byte = malloc( title_inf.i_title_nb *sizeof(u32) );
         if( title_inf.pi_start_byte == NULL )
@@ -612,7 +645,7 @@ DumpBits( &p_current, 2 );
 
         for( i = 0 ; i < title_inf.i_title_nb ; i++ )
         {
-            title_inf.pi_start_byte[i] = ReadDouble( &p_current );
+            title_inf.pi_start_byte[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
         }
 
         /* Parsing of tts */
@@ -630,8 +663,8 @@ DumpBits( &p_current, 2 );
                             title_inf.pi_start_byte[i] );
 
             title_inf.p_title_start[i].i_program_chain_num =
-                                                       ReadWord( &p_current );
-            title_inf.p_title_start[i].i_program_num = ReadWord( &p_current );
+                                                       ReadWord( p_ifo, pi_buffer, &p_current );
+            title_inf.p_title_start[i].i_program_num = ReadWord( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "VTS %d title_inf Pgc: %d Prg: %d\n", i,title_inf.p_title_start[i].i_program_chain_num, title_inf.p_title_start[i].i_program_num );
         }
     }
@@ -667,16 +700,16 @@ DumpBits( &p_current, 2 );
 #define time_inf p_ifo->vts.time_inf
     if( manager_inf.i_time_inf_start_sector )
     {
-        u8      pi_buffer[2*DVD_LB_SIZE];
+        u8      pi_buffer[DVD_LB_SIZE];
 
         p_current = FillBuffer( p_ifo, pi_buffer, p_ifo->vts.i_pos +
                         manager_inf.i_time_inf_start_sector *DVD_LB_SIZE );
 
 //fprintf( stderr, "TMAP\n" );
 
-        time_inf.i_nb = ReadWord( &p_current );;
-        DumpBits( &p_current, 2 );
-        time_inf.i_end_byte = ReadDouble( &p_current );
+        time_inf.i_nb = ReadWord( p_ifo, pi_buffer, &p_current );;
+        DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+        time_inf.i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
         time_inf.pi_start_byte = malloc( time_inf.i_nb *sizeof(u32) );
         if( time_inf.pi_start_byte == NULL )
@@ -687,7 +720,7 @@ DumpBits( &p_current, 2 );
 
         for( i = 0 ; i < time_inf.i_nb ; i++ )
         {    
-            time_inf.pi_start_byte[i] = ReadDouble( &p_current );
+            time_inf.pi_start_byte[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
         }
 
         time_inf.p_time_map = malloc( time_inf.i_nb *sizeof(time_map_t) );
@@ -699,9 +732,9 @@ DumpBits( &p_current, 2 );
 
         for( i = 0 ; i < time_inf.i_nb ; i++ )
         {    
-            time_inf.p_time_map[i].i_time_unit = ReadByte( &p_current );
-            DumpBits( &p_current, 1 );
-            time_inf.p_time_map[i].i_entry_nb = ReadWord( &p_current );
+            time_inf.p_time_map[i].i_time_unit = ReadByte( p_ifo, pi_buffer, &p_current );
+            DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+            time_inf.p_time_map[i].i_entry_nb = ReadWord( p_ifo, pi_buffer, &p_current );
 
             time_inf.p_time_map[i].pi_sector =
                      malloc( time_inf.p_time_map[i].i_entry_nb *sizeof(u32) );
@@ -713,7 +746,7 @@ DumpBits( &p_current, 2 );
 
             for( j = 0 ; j < time_inf.p_time_map[i].i_entry_nb ; j++ )
             {
-                time_inf.p_time_map[i].pi_sector[j] = ReadDouble( &p_current );
+                time_inf.p_time_map[i].pi_sector[j] = ReadDouble( p_ifo, pi_buffer, &p_current );
             }
         }
     }
@@ -903,35 +936,35 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
 //fprintf( stderr, "PGC @ %lld\n",p_ifo->i_pos  );
 
-    DumpBits( &p_current, 2);
-    p_title->i_chapter_nb = ReadByte( &p_current );
-    p_title->i_cell_nb = ReadByte( &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 2);
+    p_title->i_chapter_nb = ReadByte( p_ifo, pi_buffer, &p_current );
+    p_title->i_cell_nb = ReadByte( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "title: Prg: %d Cell: %d\n",p_title->i_chapter_nb,p_title->i_cell_nb  );
-    p_title->i_play_time = ReadDouble( &p_current );
-    p_title->i_prohibited_user_op = ReadDouble( &p_current );
+    p_title->i_play_time = ReadDouble( p_ifo, pi_buffer, &p_current );
+    p_title->i_prohibited_user_op = ReadDouble( p_ifo, pi_buffer, &p_current );
     for( i = 0 ; i < 8 ; i++ )
     {
-        p_title->pi_audio_status[i] = ReadWord( &p_current );
+        p_title->pi_audio_status[i] = ReadWord( p_ifo, pi_buffer, &p_current );
     }
     for( i = 0 ; i < 32 ; i++ )
     {
-        p_title->pi_subpic_status[i] = ReadDouble( &p_current );
+        p_title->pi_subpic_status[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
-    p_title->i_next_title_num = ReadWord( &p_current );
-    p_title->i_prev_title_num = ReadWord( &p_current );
-    p_title->i_go_up_title_num = ReadWord( &p_current );
+    p_title->i_next_title_num = ReadWord( p_ifo, pi_buffer, &p_current );
+    p_title->i_prev_title_num = ReadWord( p_ifo, pi_buffer, &p_current );
+    p_title->i_go_up_title_num = ReadWord( p_ifo, pi_buffer, &p_current );
 //fprintf( stderr, "title: Prev: %d Next: %d Up: %d\n",pgc.i_prev_pgc_nb ,pgc.i_next_pgc_nb, pgc.i_goup_pgc_nb );
-    p_title->i_still_time = ReadByte( &p_current );
-    p_title->i_play_mode = ReadByte( &p_current );
+    p_title->i_still_time = ReadByte( p_ifo, pi_buffer, &p_current );
+    p_title->i_play_mode = ReadByte( p_ifo, pi_buffer, &p_current );
     for( i = 0 ; i < 16 ; i++ )
     {
-        p_title->pi_yuv_color[i] = ReadDouble( &p_current );
+        p_title->pi_yuv_color[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
         /* FIXME : We have to erase the extra bit */
     }
-    p_title->i_command_start_byte = ReadWord( &p_current );
-    p_title->i_chapter_map_start_byte = ReadWord( &p_current );
-    p_title->i_cell_play_start_byte = ReadWord( &p_current );
-    p_title->i_cell_pos_start_byte = ReadWord( &p_current );
+    p_title->i_command_start_byte = ReadWord( p_ifo, pi_buffer, &p_current );
+    p_title->i_chapter_map_start_byte = ReadWord( p_ifo, pi_buffer, &p_current );
+    p_title->i_cell_play_start_byte = ReadWord( p_ifo, pi_buffer, &p_current );
+    p_title->i_cell_pos_start_byte = ReadWord( p_ifo, pi_buffer, &p_current );
 
     /* parsing of command_t */
     if( p_title->i_command_start_byte )
@@ -940,10 +973,10 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
                               i_start + p_title->i_command_start_byte );
 
         /* header */
-        p_title->command.i_pre_command_nb = ReadWord( &p_current );
-        p_title->command.i_post_command_nb = ReadWord( &p_current );
-        p_title->command.i_cell_command_nb = ReadWord( &p_current );
-        DumpBits( &p_current, 2 );
+        p_title->command.i_pre_command_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+        p_title->command.i_post_command_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+        p_title->command.i_cell_command_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+        DumpBits( p_ifo, pi_buffer, &p_current, 2 );
 
         /* pre-title commands */
         if( p_title->command.i_pre_command_nb )
@@ -960,7 +993,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
             for( i = 0 ; i < p_title->command.i_pre_command_nb ; i++ )
             {
-                p_title->command.p_pre_command[i] = ReadQuad( &p_current );
+                p_title->command.p_pre_command[i] = ReadQuad( p_ifo, pi_buffer, &p_current );
             }
         }
         else
@@ -983,7 +1016,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
             for( i=0 ; i<p_title->command.i_post_command_nb ; i++ )
             {
-                p_title->command.p_post_command[i] = ReadQuad( &p_current );
+                p_title->command.p_post_command[i] = ReadQuad( p_ifo, pi_buffer, &p_current );
             }
         }
         else
@@ -1006,7 +1039,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
             for( i=0 ; i<p_title->command.i_cell_command_nb ; i++ )
             {
-                p_title->command.p_cell_command[i] = ReadQuad( &p_current );
+                p_title->command.p_cell_command[i] = ReadQuad( p_ifo, pi_buffer, &p_current );
             }
         }
         else
@@ -1031,7 +1064,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
             return -1;
         }
 
-        ReadBits( &p_current, p_title->chapter_map.pi_start_cell,
+        ReadBits( p_ifo, pi_buffer, &p_current, p_title->chapter_map.pi_start_cell,
                   p_title->i_chapter_nb );
     }
     else
@@ -1056,16 +1089,16 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
         for( i = 0 ; i < p_title->i_cell_nb ; i++ )
         {
-            p_title->p_cell_play[i].i_category = ReadWord( &p_current );
-            p_title->p_cell_play[i].i_still_time = ReadByte( &p_current );
-            p_title->p_cell_play[i].i_command_nb = ReadByte( &p_current );
-            p_title->p_cell_play[i].i_play_time = ReadDouble( &p_current );
-            p_title->p_cell_play[i].i_start_sector = ReadDouble( &p_current );
+            p_title->p_cell_play[i].i_category = ReadWord( p_ifo, pi_buffer, &p_current );
+            p_title->p_cell_play[i].i_still_time = ReadByte( p_ifo, pi_buffer, &p_current );
+            p_title->p_cell_play[i].i_command_nb = ReadByte( p_ifo, pi_buffer, &p_current );
+            p_title->p_cell_play[i].i_play_time = ReadDouble( p_ifo, pi_buffer, &p_current );
+            p_title->p_cell_play[i].i_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
             p_title->p_cell_play[i].i_first_ilvu_vobu_esector =
-                                                     ReadDouble( &p_current );
+                                                     ReadDouble( p_ifo, pi_buffer, &p_current );
             p_title->p_cell_play[i].i_last_vobu_start_sector =
-                                                     ReadDouble( &p_current );
-            p_title->p_cell_play[i].i_end_sector = ReadDouble( &p_current );
+                                                     ReadDouble( p_ifo, pi_buffer, &p_current );
+            p_title->p_cell_play[i].i_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
         }
     }
 
@@ -1086,9 +1119,9 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, off_t i_pos )
 
         for( i = 0 ; i < p_title->i_cell_nb ; i++ )
         {
-            p_title->p_cell_pos[i].i_vob_id = ReadWord( &p_current );
-            DumpBits( &p_current, 1 );
-            p_title->p_cell_pos[i].i_cell_id = ReadByte( &p_current );
+            p_title->p_cell_pos[i].i_vob_id = ReadWord( p_ifo, pi_buffer, &p_current );
+            DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+            p_title->p_cell_pos[i].i_cell_id = ReadByte( p_ifo, pi_buffer, &p_current );
         }
     } 
 
@@ -1151,9 +1184,9 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf, off_t i_pos )
     i_start = p_ifo->i_pos;
 //fprintf( stderr, "Unit\n" );
 
-    p_unit_inf->i_title_nb = ReadWord( &p_current );
-    DumpBits( &p_current, 2 );
-    p_unit_inf->i_end_byte = ReadDouble( &p_current );
+    p_unit_inf->i_title_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    p_unit_inf->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
     p_unit_inf->p_title =
             malloc( p_unit_inf->i_title_nb *sizeof(unit_title_t) );
@@ -1165,10 +1198,10 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf, off_t i_pos )
 
     for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
     {
-        p_unit_inf->p_title[i].i_category_mask = ReadByte( &p_current );
-        p_unit_inf->p_title[i].i_category = ReadByte( &p_current );
-        p_unit_inf->p_title[i].i_parental_mask = ReadWord( &p_current );
-        p_unit_inf->p_title[i].i_title_start_byte = ReadDouble( &p_current );
+        p_unit_inf->p_title[i].i_category_mask = ReadByte( p_ifo, pi_buffer, &p_current );
+        p_unit_inf->p_title[i].i_category = ReadByte( p_ifo, pi_buffer, &p_current );
+        p_unit_inf->p_title[i].i_parental_mask = ReadWord( p_ifo, pi_buffer, &p_current );
+        p_unit_inf->p_title[i].i_title_start_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
 
     for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
@@ -1210,9 +1243,9 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
     i_start = p_ifo->i_pos;
 //fprintf( stderr, "Unit Table\n" );
 
-    p_title_unit->i_unit_nb = ReadWord( &p_current );
-    DumpBits( &p_current, 2 );
-    p_title_unit->i_end_byte = ReadDouble( &p_current );
+    p_title_unit->i_unit_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    p_title_unit->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
 //fprintf(stderr, "Unit: nb %d end %d\n", p_title_unit->i_unit_nb, p_title_unit->i_end_byte );
 
@@ -1225,11 +1258,11 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
 
     for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
     {
-        ReadBits( &p_current, p_title_unit->p_unit[i].ps_lang_code, 2 );
-        DumpBits( &p_current, 1 );
-        p_title_unit->p_unit[i].i_existence_mask = ReadByte( &p_current );
+        ReadBits( p_ifo, pi_buffer, &p_current, p_title_unit->p_unit[i].ps_lang_code, 2 );
+        DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+        p_title_unit->p_unit[i].i_existence_mask = ReadByte( p_ifo, pi_buffer, &p_current );
         p_title_unit->p_unit[i].i_unit_inf_start_byte =
-                                                   ReadDouble( &p_current );
+                                                   ReadDouble( p_ifo, pi_buffer, &p_current );
     }
 
     p_title_unit->p_unit_inf =
@@ -1283,9 +1316,9 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
     i_start = p_ifo->i_pos;
 //fprintf( stderr, "CELL ADD\n" );
 
-    p_cell_inf->i_vob_nb = ReadWord( &p_current );
-    DumpBits( &p_current, 2 );
-    p_cell_inf->i_end_byte = ReadDouble( &p_current );
+    p_cell_inf->i_vob_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+    DumpBits( p_ifo, pi_buffer, &p_current, 2 );
+    p_cell_inf->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
     p_cell_inf->i_cell_nb =
         ( i_start + p_cell_inf->i_end_byte + 1 - p_ifo->i_pos )
@@ -1303,11 +1336,11 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, off_t i_pos )
 
     for( i = 0 ; i < p_cell_inf->i_cell_nb ; i++ )
     {
-        p_cell_inf->p_cell_map[i].i_vob_id = ReadWord( &p_current );
-        p_cell_inf->p_cell_map[i].i_cell_id = ReadByte( &p_current );
-        DumpBits( &p_current, 1 );
-        p_cell_inf->p_cell_map[i].i_start_sector = ReadDouble( &p_current );
-        p_cell_inf->p_cell_map[i].i_end_sector = ReadDouble( &p_current );
+        p_cell_inf->p_cell_map[i].i_vob_id = ReadWord( p_ifo, pi_buffer, &p_current );
+        p_cell_inf->p_cell_map[i].i_cell_id = ReadByte( p_ifo, pi_buffer, &p_current );
+        DumpBits( p_ifo, pi_buffer, &p_current, 1 );
+        p_cell_inf->p_cell_map[i].i_start_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
+        p_cell_inf->p_cell_map[i].i_end_sector = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
     
     return 0;
@@ -1337,7 +1370,7 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, off_t i_pos )
     i_start = p_ifo->i_pos;
 //fprintf( stderr, "VOBU ADMAP\n" );
 
-    p_vobu_map->i_end_byte = ReadDouble( &p_current );
+    p_vobu_map->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
     i_max = ( i_start + p_vobu_map->i_end_byte + 1 - p_ifo->i_pos )
             / sizeof(u32);
 
@@ -1350,11 +1383,7 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, off_t i_pos )
 
     for( i = 0 ; i < i_max ; i++ )
     {
-        p_vobu_map->pi_vobu_start_sector[i] = ReadDouble( &p_current );
-        if( p_current == pi_buffer + DVD_LB_SIZE )
-        {
-            p_current = FillBuffer( p_ifo, pi_buffer, p_ifo->i_pos );
-        }
+        p_vobu_map->pi_vobu_start_sector[i] = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
 
     return 0;

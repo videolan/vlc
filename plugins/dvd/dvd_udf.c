@@ -5,12 +5,13 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.3 2001/02/20 07:49:12 sam Exp $
+ * $Id: dvd_udf.c,v 1.4 2001/04/13 05:36:12 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
  * based on:
  *  - dvdudf by Christian Wolff <scarabaeus@convergence.de>
+ *  - fixes by Billy Biggs <vektor@dumbterm.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -401,7 +402,7 @@ static int UDFMapICB( struct ad_s icb, u8 * pi_file_type, struct ad_s * p_file,
 static int UDFScanDir( struct ad_s dir, char * psz_filename,
                        struct ad_s * p_file_icb, struct partition_s partition )
 {
-    u8      pi_lb[DVD_LB_SIZE];
+    u8      pi_lb[2*DVD_LB_SIZE];
     u32     i_lba;
     u16     i_tag_id;
     u8      i_file_char;
@@ -410,7 +411,7 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
   
     /* Scan dir for ICB of file */
     i_lba = partition.i_start + dir.i_location;
-
+#if 0
     do
     {
         if( !UDFReadLB( partition.i_fd, i_lba++, 1, pi_lb ) )
@@ -443,6 +444,44 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
     } while( i_lba <=
       partition.i_start + dir.i_location + ( dir.i_length - 1 ) / DVD_LB_SIZE );
 
+#else
+
+    if( UDFReadLB( partition.i_fd, i_lba, 2, pi_lb ) <= 0 ) {
+        return 0;
+    }
+
+    p = 0;
+    while( p < dir.i_length )
+    {
+        if( p > DVD_LB_SIZE )
+        {
+            ++i_lba;
+            p -= DVD_LB_SIZE;
+            dir.i_length -= DVD_LB_SIZE;
+            if( UDFReadLB( partition.i_fd, i_lba, 2, pi_lb ) <= 0 )
+            {
+                return 0;
+            }
+        }
+
+        UDFDescriptor( &pi_lb[p], &i_tag_id );
+
+        if( i_tag_id == 257 )
+        {
+            p += UDFFileIdentifier( &pi_lb[p], &i_file_char,
+                                    psz_temp, p_file_icb, partition );
+            if( !strcasecmp( psz_filename, psz_temp ) )
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+#endif
     return 0;
 }
 

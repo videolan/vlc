@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.13 2001/03/19 22:16:31 henri Exp $
+ * $Id: input_ts.c,v 1.14 2001/04/13 05:36:12 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -166,6 +166,10 @@ static void TSInit( input_thread_t * p_input )
    
     /* Initialize the stream */
     input_InitStream( p_input, sizeof( stream_ts_data_t ) );
+
+    /* input method type */
+    /* FIXME: should test if you have network or file here */
+    p_input->stream.i_method = INPUT_METHOD_NETWORK;
 
     /* Init */
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;

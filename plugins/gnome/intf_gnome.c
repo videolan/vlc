@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.29 2001/04/13 01:49:22 henri Exp $
+ * $Id: intf_gnome.c,v 1.30 2001/04/13 05:36:12 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -75,7 +75,7 @@ static gint GnomeTitleMenu    ( gpointer, GtkWidget *,
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeSetupMenu    ( intf_thread_t * p_intf );
 static void GnomeDisplayDate  ( GtkAdjustment *p_adj );
-static gint GnomeDVDModeManage( intf_thread_t * p_intf );
+static gint GnomeDiscModeManage( intf_thread_t * p_intf );
 static gint GnomeFileModeManage( intf_thread_t * p_intf );
 static gint GnomeNetworkModeManage( intf_thread_t * p_intf );
 
@@ -311,49 +311,66 @@ static gint GnomeManage( gpointer p_data )
         p_intf->b_menu_change = 0;
     }
 
-    if( p_intf->p_sys->b_mode_changed )
-    {
-        /* Sets the interface mode according to playlist item */
-        if( p_main->p_playlist->p_item != NULL )
-        {
-            if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
-            {
-                p_intf->p_sys->i_intf_mode = DVD_MODE;
-            }
-            else if( !strncmp(
-                        p_main->p_playlist->p_item->psz_name, "ts:", 4 ) )
-            {
-                p_intf->p_sys->i_intf_mode = NET_MODE;
-            }
-        }
-
-        switch( p_intf->p_sys->i_intf_mode )
-        {
-            case DVD_MODE:
-                GnomeDVDModeManage( p_intf );
-                break;
-            case NET_MODE:
-                GnomeNetworkModeManage( p_intf );
-                break;
-            case FILE_MODE:
-            default:
-                GnomeFileModeManage( p_intf );
-                break;
-        }
-
-        p_intf->p_sys->b_mode_changed = 0;
-    }
-
-
     if( p_intf->p_input != NULL )
     {
         float           newvalue;
         char            psz_title[3];
         char            psz_chapter[3];
 
-        /* Used by TS input when PMT changes */
+        /* New input or stream map change */
         if( p_intf->p_input->stream.b_changed )
         {
+            /* input method */
+            if( p_intf->p_sys->b_mode_changed )
+            {
+#if 0
+                /* Sets the interface mode according to playlist item */
+                if( p_main->p_playlist->p_item != NULL )
+                {
+                    if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
+                    {
+                        p_intf->p_sys->i_intf_mode = DVD_MODE;
+                    }
+                    else if( !strncmp(
+                                p_main->p_playlist->p_item->psz_name, "ts:", 4 ) )
+                    {
+                        p_intf->p_sys->i_intf_mode = NET_MODE;
+                    }
+                }
+        
+                switch( p_intf->p_sys->i_intf_mode )
+                {
+                    case DVD_MODE:
+                        GnomeDVDModeManage( p_intf );
+                        break;
+                    case NET_MODE:
+                        GnomeNetworkModeManage( p_intf );
+                        break;
+                    case FILE_MODE:
+                    default:
+                        GnomeFileModeManage( p_intf );
+                        break;
+                }
+#else
+                switch( p_intf->p_input->stream.i_method & 0xf0 )
+                {
+                    case INPUT_METHOD_FILE:
+                        GnomeFileModeManage( p_intf );
+                        break;
+                    case INPUT_METHOD_DISC:
+                        GnomeDiscModeManage( p_intf );
+                        break;
+                    case INPUT_METHOD_NETWORK:
+                        GnomeNetworkModeManage( p_intf );
+                        break;
+                    default:
+                        intf_ErrMsg( "intf error: can't determine input method" );
+                        break;
+                }
+#endif
+                p_intf->p_sys->b_mode_changed = 0;
+            }
+
             p_intf->p_sys->b_menus_update = 1;
             p_intf->p_input->stream.b_changed = 0;
             intf_WarnMsg( 2, 
@@ -961,9 +978,9 @@ void GnomeDisplayDate( GtkAdjustment *p_adj )
 
 
 /*****************************************************************************
- * GnomeDVDModeManage
+ * GnomeDiscModeManage
  *****************************************************************************/
-static gint GnomeDVDModeManage( intf_thread_t * p_intf )
+static gint GnomeDiscModeManage( intf_thread_t * p_intf )
 {
     GtkWidget *     p_dvd_box;
     GtkWidget *     p_file_box;
@@ -995,6 +1012,7 @@ static gint GnomeFileModeManage( intf_thread_t * p_intf )
     GtkWidget *     p_dvd_box;
     GtkWidget *     p_file_box;
     GtkWidget *     p_network_box;
+//    char *          psz_name;
 
     p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                  p_intf->p_sys->p_window ), "network_box" ) );
@@ -1007,10 +1025,17 @@ static gint GnomeFileModeManage( intf_thread_t * p_intf )
     p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                  p_intf->p_sys->p_window ), "file_box" ) );
     gtk_widget_show( GTK_WIDGET( p_file_box ) );
+#if 0
+    psz_name = malloc( 16 + strlen( p_intf->p_input->p_source ) );
+    sprintf( psz_name, "Status: playing %s", p_intf->p_input->p_source );
 
+    gtk_label_set_text( p_intf->p_sys->p_label_status, psz_name );
+
+    free( psz_name );
+#else
     gtk_label_set_text( p_intf->p_sys->p_label_status,
                         "Status: foo" );
-
+#endif
     return TRUE;
 }
 

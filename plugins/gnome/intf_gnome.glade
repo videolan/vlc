@@ -528,8 +528,8 @@
 	  <ypad>0</ypad>
 	  <child>
 	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
+	    <expand>True</expand>
+	    <fill>True</fill>
 	  </child>
 	</widget>
 

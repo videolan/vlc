@@ -468,7 +468,7 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label_status", label_status,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label_status);
-  gtk_box_pack_start (GTK_BOX (hbox4), label_status, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox4), label_status, TRUE, TRUE, 0);
 
   label_bar = gtk_label_new (_("Bar: baz"));
   gtk_widget_ref (label_bar);
