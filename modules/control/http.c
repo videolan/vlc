@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.19 2003/07/30 21:09:06 gbazin Exp $
+ * $Id: http.c,v 1.20 2003/07/31 21:46:37 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -997,8 +997,12 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     sep = '/';
 #endif
 
-    /* remove trailling separoator */
-    while( strlen( psz_dir ) > 1 && psz_dir[strlen( psz_dir ) -1 ] == sep )
+    /* remove trailling separator */
+    while( strlen( psz_dir ) > 1 &&
+#if defined( WIN32 )
+           !( strlen(psz_dir)==3 && psz_dir[1]==':' && psz_dir[2]==sep ) &&
+#endif
+           psz_dir[strlen( psz_dir ) -1 ] == sep )
     {
         psz_dir[strlen( psz_dir ) -1 ]  ='\0';
     }

@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.23 2003/07/18 20:52:11 gbazin Exp $
+ * $Id: win32_specific.c,v 1.24 2003/07/31 21:46:37 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -64,6 +64,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     /* Set the default file-translation mode */
     _fmode = _O_BINARY;
+    _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
 
     /* WinSock Library Init. */
     if( !WSAStartup( MAKEWORD( 2, 0 ), &Data ) )
