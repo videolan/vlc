@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.12 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.13 2003/05/11 13:45:21 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -158,7 +158,7 @@ void FileInfo::UpdateFileInfo()
         input_info_t *p_info = p_cat->p_info;
         while( p_info )
         {
-            fileinfo_tree->AppendItem( cat, wxU(p_info->psz_name) +
+            fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name) +
                                        wxT(": ") + wxU(p_info->psz_value) );
             p_info = p_info->p_next;
         }

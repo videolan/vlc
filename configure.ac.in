@@ -2385,15 +2385,15 @@ if test "x${enable_skins}" != "xno"; then
         WXWINDOWS_PATH="${with_skins_wx_config_path}:${PATH}"
       fi ])
   # look for wx-config
-  AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
-  if test "x${WX_CONFIG}" != "xno"
+  AC_PATH_PROG(WX_CONFIG_SKINS, wx-config, no, ${WXWINDOWS_PATH})
+  if test "x${WX_CONFIG_SKINS}" != "xno"
   then
-    if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
+    if expr 2.3.0 \> `${WX_CONFIG_SKINS} --version` >/dev/null
     then
       AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-skins.])
     fi
-    CPPFLAGS_skins="${CPPFLAGS_skins} `${WX_CONFIG} --cxxflags` -DWX_SKINS"
-    LDFLAGS_skins="${LDFLAGS_skins} `${WX_CONFIG} --libs`"
+    CPPFLAGS_skins="${CPPFLAGS_skins} `${WX_CONFIG_SKINS} --cxxflags` -DWX_SKINS"
+    LDFLAGS_skins="${LDFLAGS_skins} `${WX_CONFIG_SKINS} --libs`"
   fi
 
   if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
