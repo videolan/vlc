@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.12 2002/01/05 16:09:49 sam Exp $
+ * $Id: mga.c,v 1.13 2002/01/06 17:18:12 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,9 +65,15 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
+#ifdef MODULE_NAME_IS_mga
     SET_DESCRIPTION( "Matrox Graphic Array video module" )
     ADD_CAPABILITY( VOUT, 10 )
     ADD_SHORTCUT( "mga" )
+#else
+    SET_DESCRIPTION( "MMX-accelerated Matrox Graphic Array video module" )
+    ADD_CAPABILITY( VOUT, 11 )
+    ADD_SHORTCUT( "mgammx" )
+#endif
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -367,18 +373,55 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
     {
         /* Grmbl, we have a G200 which mistakenly assumes 4:2:0 planar
          * has *packed* chroma information! Do some conversion... */
-        u8 *p_cr, *p_cb, *p_dest;
+        u8 *p_dest = p_pic->p_sys->p_chroma;
+        u8 *p_cr = p_pic->U_PIXELS;
+        u8 *p_cb = p_pic->V_PIXELS;
         int i;
 
-        /* TODO: optimize this a bit... */
-        p_dest = p_pic->p_sys->p_chroma;
-        p_cr = p_pic->U_PIXELS;
-        p_cb = p_pic->V_PIXELS;
-
-        for( i = p_vout->p_sys->mga.frame_size / 4; i--; )
+        /* frame_size is a multiple of 64 */
+        for( i = p_vout->p_sys->mga.frame_size / 64; i--; )
         {
-            *p_dest++ = *p_cr++;
-            *p_dest++ = *p_cb++;
+#ifdef MODULE_NAME_IS_mga
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
+#else
+
+#   define MMX_MERGECBCR "                                                \n\
+movd       (%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm0, (%2)   # Store CrCb                                      \n\
+movd      4(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd      4(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm0, 8(%2)  # Store CrCb                                      \n\
+movd      8(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd      8(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm0, 16(%2) # Store CrCb                                      \n\
+movd     16(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd     16(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm0, 32(%2) # Store CrCb                                      \n\
+"
+            __asm__( ".align 8" MMX_MERGECBCR
+                     : : "r" (p_cr), "r" (p_cb), "r" (p_dest) );
+            p_cr += 16; p_cb += 16; p_dest += 32;
+#endif
         }
     }
 }

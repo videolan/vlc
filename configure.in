@@ -949,6 +949,9 @@ AC_ARG_ENABLE(mga,
   [ if test x$enable_mga = xyes
     then
       PLUGINS="${PLUGINS} mga"
+      if test x"$ac_cv_mmx_inline" != x"no"; then
+        PLUGINS="${PLUGINS} mgammx"
+      fi    
     fi ])
 
 dnl

@@ -98,6 +98,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		memcpy/memcpymmxext \
 		memcpy/memcpy3dn \
 		mga/mga \
+		mga/mgammx \
 		motion/motion \
 		motion/motionmmx \
 		motion/motionmmxext \
