@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.6 2002/12/06 16:34:07 sam Exp $
+ * $Id: wav.c,v 1.7 2002/12/10 23:34:19 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -283,7 +283,7 @@ static int PCM_GetFrame( input_thread_t *p_input,
                  (mtime_t)i_samples / 
                  (mtime_t)p_wf->nSamplesPerSec;
 
-    i_bytes = i_samples * p_wf->nChannels * ( p_wf->wBitsPerSample + 7 ) / 8;
+    i_bytes = i_samples * p_wf->nChannels * ( (p_wf->wBitsPerSample + 7) / 8 );
     
     if( p_wf->nBlockAlign > 0 )
     {
