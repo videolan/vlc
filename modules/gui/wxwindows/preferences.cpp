@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: preferences.cpp,v 1.46 2004/01/25 03:29:01 hartman Exp $
+ * $Id: preferences.cpp,v 1.47 2004/02/06 03:52:09 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -289,43 +289,6 @@ void PrefsDialog::OnAdvanced( wxCommandEvent& event )
     newevent.SetInt( event.GetInt() );
 
     prefs_tree->AddPendingEvent( newevent );
-}
-
-/*****************************************************************************
- * GetCapabilityHelp: Display the help for one capability.
- *****************************************************************************/
-static char * GetCapabilityHelp( char *psz_capability, int i_type)
-{
-    if( psz_capability == NULL) return "";
-
-    if( !strcasecmp(psz_capability,"access") )
-        return i_type == 1 ? ACCESS_TITLE : ACCESS_HELP;
-    if( !strcasecmp(psz_capability,"audio filter") )
-        return i_type == 1 ? AUDIO_FILTER_TITLE : AUDIO_FILTER_HELP;
-    if( !strcasecmp(psz_capability,"audio output") )
-        return i_type == 1 ? AOUT_TITLE : AOUT_HELP;
-    if( !strcasecmp(psz_capability,"audio encoder") )
-        return i_type == 1 ? AOUT_ENC_TITLE : AOUT_ENC_HELP;
-    if( !strcasecmp(psz_capability,"chroma") )
-        return i_type == 1 ? CHROMA_TITLE : CHROMA_HELP;
-    if( !strcasecmp(psz_capability,"decoder") )
-        return i_type == 1 ? DECODER_TITLE : DECODER_HELP;
-    if( !strcasecmp(psz_capability,"demux") )
-        return i_type == 1 ? DEMUX_TITLE : DEMUX_HELP;
-    if( !strcasecmp(psz_capability,"interface") )
-        return i_type == 1 ? INTERFACE_TITLE : INTERFACE_HELP;
-    if( !strcasecmp(psz_capability,"sout access") )
-        return i_type == 1 ? SOUT_TITLE : SOUT_HELP;
-    if( !strcasecmp(psz_capability,"subtitle demux") )
-        return i_type == 1 ? SUBTITLE_DEMUX_TITLE : SUBTITLE_DEMUX_HELP;
-    if( !strcasecmp(psz_capability,"text renderer") )
-        return i_type == 1 ? TEXT_TITLE : TEXT_HELP;
-    if( !strcasecmp(psz_capability,"video output") )
-        return i_type == 1 ? VOUT__TITLE : VOUT_HELP;
-    if( !strcasecmp(psz_capability,"video filter") )
-        return i_type == 1 ? VIDEO_FILTER_TITLE : VIDEO_FILTER_HELP;
-
-    return " ";
 }
 
 /*****************************************************************************
