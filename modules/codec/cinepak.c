@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: cinepak.c,v 1.5 2003/11/23 05:30:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,16 +28,32 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  OpenDecoder ( vlc_object_t * );
+static void CloseDecoder( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("Cinepak video decoder") );
+    set_capability( "decoder", 100 );
+    set_callbacks( OpenDecoder, CloseDecoder );
+vlc_module_end();
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 #define CINEPAK_MAXSTRIP 32
 
-typedef struct cinepak_codebook_s
+typedef struct
 {
     uint8_t i_y[4];
     uint8_t i_u, i_v;
 
 } cinepak_codebook_t;
 
-typedef struct cinepak_context_s
+typedef struct
 {
     int b_grayscale; /* force to grayscale */
 
@@ -66,26 +82,12 @@ struct decoder_sys_t
     /*
      * Cinepak properties
      */
-    cinepak_context_t *p_context;
+    cinepak_context_t context;
 };
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  OpenDecoder( vlc_object_t * );
-static void CloseDecoder( vlc_object_t * );
 static picture_t *DecodeBlock ( decoder_t *, block_t ** );
 
 static int cinepak_decode_frame( cinepak_context_t *, int, uint8_t * );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin();
-    set_description( _("Cinepak video decoder") );
-    set_capability( "decoder", 70 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-vlc_module_end();
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -99,33 +101,23 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     vlc_value_t val;
 
-    switch( p_dec->fmt_in.i_codec )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('c','v','i','d') &&
+        p_dec->fmt_in.i_codec != VLC_FOURCC('C','V','I','D') )
     {
-        case VLC_FOURCC('c','v','i','d'):
-        case VLC_FOURCC('C','V','I','D'):
-            break;
-
-        default:
-            return VLC_EGENERIC;
+        return VLC_EGENERIC;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
-
-    if( !(p_sys->p_context = malloc( sizeof( cinepak_context_t ) ) ) )
-    {
-        msg_Err( p_dec, "out of memory" );
-    }
-    memset( p_sys->p_context, 0, sizeof( cinepak_context_t ) );
+    memset( &p_sys->context, 0, sizeof( cinepak_context_t ) );
 
     var_Create( p_dec, "grayscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "grayscale", &val );
-    p_sys->p_context->b_grayscale = val.b_bool;
+    p_sys->context.b_grayscale = val.b_bool;
 
     p_dec->pf_decode_video = DecodeBlock;
 
@@ -147,11 +139,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     picture_t *p_pic;
     block_t *p_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
-
+    if( !pp_block || !*pp_block )
+    {
+        return NULL;
+    }
     p_block = *pp_block;
+    *pp_block = NULL;
 
-    i_status = cinepak_decode_frame( p_sys->p_context, p_block->i_buffer,
+    i_status = cinepak_decode_frame( &p_sys->context, p_block->i_buffer,
                                      p_block->p_buffer );
     if( i_status < 0 )
     {
@@ -161,43 +156,38 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    p_dec->fmt_out.video.i_width = p_sys->p_context->i_width;
-    p_dec->fmt_out.video.i_height = p_sys->p_context->i_height;
-    p_dec->fmt_out.video.i_aspect = p_sys->p_context->i_width
-        * VOUT_ASPECT_FACTOR / p_sys->p_context->i_height;
+    p_dec->fmt_out.video.i_width = p_sys->context.i_width;
+    p_dec->fmt_out.video.i_height = p_sys->context.i_height;
+    p_dec->fmt_out.video.i_aspect = p_sys->context.i_width
+        * VOUT_ASPECT_FACTOR / p_sys->context.i_height;
     p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
-
-    if( p_pic == NULL )
+    if( ( p_pic = p_dec->pf_vout_buffer_new( p_dec ) ) )
     {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    for( i_plane = 0; i_plane < 3; i_plane++ )
-    {
-        int i_line, i_lines;
-
-        p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = p_sys->p_context->p_pix[i_plane];
-
-        i_lines = __MIN( p_sys->p_context->i_lines[i_plane],
-                         p_pic->p[i_plane].i_lines );
-        for( i_line = 0; i_line < i_lines; i_line++ )
+        for( i_plane = 0; i_plane < 3; i_plane++ )
         {
-            memcpy( p_dst, p_src,
-                    __MIN( p_pic->p[i_plane].i_pitch,
-                           p_sys->p_context->i_stride[i_plane] ) );
-            p_dst += p_pic->p[i_plane].i_pitch;
-            p_src += p_sys->p_context->i_stride[i_plane];
+            int i_line, i_lines;
+
+            p_dst = p_pic->p[i_plane].p_pixels;
+            p_src = p_sys->context.p_pix[i_plane];
+
+            i_lines = __MIN( p_sys->context.i_lines[i_plane],
+                             p_pic->p[i_plane].i_lines );
+            for( i_line = 0; i_line < i_lines; i_line++ )
+            {
+                memcpy( p_dst, p_src,
+                        __MIN( p_pic->p[i_plane].i_pitch,
+                               p_sys->context.i_stride[i_plane] ) );
+                p_dst += p_pic->p[i_plane].i_pitch;
+                p_src += p_sys->context.i_stride[i_plane];
+            }
         }
+
+        p_pic->date = p_block->i_pts;
     }
 
-    p_pic->date = p_block->i_pts;
     block_Release( p_block );
-
     return p_pic;
 }
 
@@ -206,7 +196,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static void CloseDecoder( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_t     *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i;
 
@@ -214,10 +204,8 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     for( i = 0; i < 3; i++ )
     {
-        if( p_sys->p_context->p_pix[i] ) free( p_sys->p_context->p_pix[i] );
+        if( p_sys->context.p_pix[i] ) free( p_sys->context.p_pix[i] );
     }
-
-    free( p_sys->p_context );
 
     free( p_sys );
 }
