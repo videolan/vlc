@@ -2,7 +2,7 @@
  * aout_esd.c : Esound functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_esd.c,v 1.13 2001/05/30 17:03:12 sam Exp $
+ * $Id: aout_esd.c,v 1.14 2001/07/12 20:31:33 reno Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -134,7 +134,7 @@ static int aout_Open( aout_thread_t *p_aout )
     /* Initialize some variables */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
     p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
-    p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
+    p_aout->l_rate = esd_audio_rate; /* We use actual esd rate value, not AOUT_RATE_DEFAULT */
 
     i_bits = ESD_BITS16;
     i_mode = ESD_STREAM;
@@ -162,10 +162,6 @@ static int aout_Open( aout_thread_t *p_aout )
         return( -1 );
     }
 
-    intf_ErrMsg( "aout error: you are using the Esound plugin. There is no way yet to get the\n"
-                 "            driver latency because esd_get_latency() hangs, so expect a one\n"
-                 "            second delay with sound. Type `esdctl off' to disable esd." );
-
     return( 0 );
 }
 
@@ -174,6 +170,13 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
+    int i_fd;
+
+    i_fd = esd_open_sound(NULL);
+    p_aout->i_latency = esd_get_latency(i_fd);
+   
+    intf_WarnMsg(2, "aout_esd_latency: %d",p_aout->i_latency);
+
     return( 0 );
 }
 
@@ -194,7 +197,7 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_amount;
-
+    
     if (p_aout->p_sys->esd_format & ESD_STEREO)
     {
         if (p_aout->p_sys->esd_format & ESD_BITS16)

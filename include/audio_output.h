@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.37 2001/05/30 17:03:11 sam Exp $
+ * $Id: audio_output.h,v 1.38 2001/07/12 20:31:33 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -171,6 +171,7 @@ typedef struct aout_thread_s
     /* Rate and gain of the audio output sound (in Hz) */
     long                l_rate;
     long                l_gain;
+    int                 i_latency;
 
     /* there might be some useful private structure, such as audio_buf_info
      * for the OSS output */

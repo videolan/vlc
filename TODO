@@ -103,7 +103,7 @@ Urgency: Critical
 Description: Fix AC3 decoder
  The AC3 decoder still has a few quality issues; fix them, and try to add
  MMX support to it as well.
-Status: Todo
+Status: Done 15 June 2001 (reno)
 
 Task: 0x52
 Difficulty: Guru
@@ -193,7 +193,7 @@ Urgency: Critical
 Description: Fix audio synchro
  With some audio plugins, the audio stream is late because of buffer
  sizes. See what's wrong and fix it.
-Status: Todo
+Status: Done 12 July 2001 (reno)
 
 Task: 0x47
 Difficulty: Hard

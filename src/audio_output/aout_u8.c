@@ -2,7 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_u8.c,v 1.5 2001/05/15 16:19:42 sam Exp $
+ * $Id: aout_u8.c,v 1.6 2001/07/12 20:31:33 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -82,7 +82,10 @@ void aout_U8MonoThread( aout_thread_t * p_aout )
         }
 
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 1 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 1 */
+        /* sizeof(u8) << (p_aout->b_stereo) == 1 */
+        p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 * p_aout->i_latency) / 1)) * 1000000)
+                                   / ((mtime_t)p_aout->l_rate));
+ 
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8) * 2) ) /* There are 2 channels (left & right) */
         {
@@ -133,7 +136,10 @@ void aout_U8StereoThread( aout_thread_t * p_aout )
             p_aout->s32_buffer[l_buffer] = 0;
         }
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 2 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 2 */
+        /* sizeof(u8) << (p_aout->b_stereo) == 2 */
+        p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 * p_aout->i_latency) / 2)) * 1000000)
+                                   / ((mtime_t)p_aout->l_rate));
+ 
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8)) )
         {
