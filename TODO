@@ -123,7 +123,7 @@ Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
  - caching support
-Status: Todo
+Status: Assigned to zorglub
 
 Task
 Difficulty: Medium
@@ -131,8 +131,8 @@ Urgency: Normal
 Platform: any
 Description: Tree playlist
  A hierarchized playlist structure, eventually using a media library.
-Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas</a>
-Status: Todo
+Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a>
+Status: Assigned to zorglub
 
 Task
 Difficulty: Easy
@@ -318,6 +318,7 @@ Urgency: Wishlist
 Platform: any
 Description: Equalizer Graphic control
 Now that VLC has an equalizer, we need a way to control it easily from the GUI.
+( Done in WX )
 Status: Todo
 
 Task
