@@ -106,12 +106,13 @@ struct access_sys_t
 
     /* */
     int        i_code;
-    char      *psz_protocol;
+    char       *psz_protocol;
     int        i_version;
 
     char       *psz_mime;
     char       *psz_pragma;
     char       *psz_location;
+    vlc_bool_t b_mms;
 
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
@@ -185,6 +186,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_seekable = VLC_TRUE;
     p_sys->psz_mime = NULL;
     p_sys->psz_pragma = NULL;
+    p_sys->b_mms = VLC_FALSE;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
@@ -294,7 +296,7 @@ static int Open( vlc_object_t *p_this )
         p_access->info.i_size = 0;  /* Force to stop reading */
     }
 
-    if( p_sys->psz_pragma != NULL )
+    if( p_sys->b_mms )
     {
         msg_Dbg( p_access, "This is actually a live mms server, BAIL" );
         goto error;
@@ -609,6 +611,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
     p_sys->psz_pragma = NULL;
+    p_sys->b_mms = VLC_FALSE;
     p_sys->b_chunked = VLC_FALSE;
     p_sys->i_chunk = 0;
 
@@ -784,6 +787,8 @@ static int Connect( access_t *p_access, int64_t i_tell )
         }
         else if( !strcasecmp( psz, "Pragma" ) )
         {
+            if( !strcasecmp( psz, "Pragma: features" ) )
+            	p_sys->b_mms = VLC_TRUE;
             if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
             p_sys->psz_pragma = strdup( p );
             msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
