@@ -56,9 +56,9 @@ typedef void (yuv_end_t)            ( p_vout_thread_t p_vout );
 typedef struct vout_yuv_s
 {
     /* conversion functions */
-    vout_yuv_convert_t *        p_Convert420;         /* YUV 4:2:0 converter */
-    vout_yuv_convert_t *        p_Convert422;         /* YUV 4:2:2 converter */
-    vout_yuv_convert_t *        p_Convert444;         /* YUV 4:4:4 converter */
+    vout_yuv_convert_t *pf_yuv420;                    /* YUV 4:2:0 converter */
+    vout_yuv_convert_t *pf_yuv422;                    /* YUV 4:2:2 converter */
+    vout_yuv_convert_t *pf_yuv444;                    /* YUV 4:4:4 converter */
 
     /* Pre-calculated conversion tables */
     void *              p_base;            /* base for all conversion tables */
@@ -166,6 +166,7 @@ typedef struct vout_thread_s
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */
+    boolean_t           b_YCbr;            /* use YUV to YCbr instead of RGB */
     boolean_t           b_info;              /* print additional information */
     boolean_t           b_interface;                     /* render interface */
     boolean_t           b_scale;                    /* allow picture scaling */
@@ -197,7 +198,9 @@ typedef struct vout_thread_s
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
 
+#ifdef STATS
     count_t             c_loops;
+#endif
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another

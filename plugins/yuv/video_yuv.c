@@ -436,30 +436,59 @@ static void SetYUV( vout_thread_t *p_vout )
     /*
      * Set functions pointers
      */
-    if( p_vout->b_grayscale )
+    if( p_vout->b_YCbr)
+    {
+        switch( p_vout->i_bytes_per_pixel)
+        {
+        case 1:
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr8;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr8;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr8;
+            break;
+        
+        case 2:
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr16;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr16;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr16;
+           break;
+        
+        case 3:
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr24;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr24;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr24;
+             break;
+        
+        case 4:
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr32;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr32;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr32;
+            break;
+        }
+    }    
+    else if( p_vout->b_grayscale )
     {
         /* Grayscale */
         switch( p_vout->i_bytes_per_pixel )
         {
         case 1:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray8;
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray8;
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray8;
             break;
         case 2:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray16;
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray16;
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray16;
             break;
         case 3:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray24;
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray24;
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray24;
             break;
         case 4:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertY4Gray32;
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertY4Gray32;
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray32;
             break;
         }
     }
@@ -469,26 +498,27 @@ static void SetYUV( vout_thread_t *p_vout )
         switch( p_vout->i_bytes_per_pixel )
         {
         case 1:
-            p_vout->yuv.p_Convert420 = (vout_yuv_convert_t *) ConvertYUV420RGB8;
-            p_vout->yuv.p_Convert422 = (vout_yuv_convert_t *) ConvertYUV422RGB8;
-            p_vout->yuv.p_Convert444 = (vout_yuv_convert_t *) ConvertYUV444RGB8;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB8;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB8;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB8;
             break;
         case 2:
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB16;
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB16;
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB16;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB16;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB16;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB16;
             break;
         case 3:
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB24;
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB24;
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB24;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB24;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB24;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB24;
             break;
         case 4:
-            p_vout->yuv.p_Convert420 =   (vout_yuv_convert_t *) ConvertYUV420RGB32;
-            p_vout->yuv.p_Convert422 =   (vout_yuv_convert_t *) ConvertYUV422RGB32;
-            p_vout->yuv.p_Convert444 =   (vout_yuv_convert_t *) ConvertYUV444RGB32;
+            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB32;
+            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB32;
+            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB32;
             break;
-        }
+      }
+ 
     }
 }
 

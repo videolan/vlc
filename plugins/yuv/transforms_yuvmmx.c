@@ -168,8 +168,6 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
     i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
-        /* Mark beginnning of line for possible later line copy, and initialize
-         * buffer */
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
@@ -189,11 +187,11 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
             p_v += 4;
             p_buffer += 8;
         }
-
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 2 );
-    }
+      }
 }
+
 
 /*****************************************************************************
  * ConvertYUV422RGB16: color YUV 4:2:2 to RGB 2 Bpp
@@ -251,6 +249,7 @@ void ConvertY4Gray32( YUV_ARGS_32BPP )
     intf_ErrMsg( "yuvmmx error: unhandled function, grayscale, bpp = 32" );
 }
 
+
 /*****************************************************************************
  * ConvertYUV420RGB32: color YUV 4:2:0 to RGB 4 Bpp
  *****************************************************************************/
@@ -277,14 +276,9 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
-    /*
-     * Perform conversion
-     */
     i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
-        /* Mark beginnning of line for possible later line copy, and initialize
-         * buffer */
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
@@ -309,6 +303,7 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 4 );
     }
+
 }
 
 /*****************************************************************************
@@ -326,4 +321,151 @@ void ConvertYUV444RGB32( YUV_ARGS_32BPP )
 {
     intf_ErrMsg( "yuv error: unhandled function, chroma = 444, bpp = 32" );
 }
+
+/*****************************************************************************
+ * ConvertYUV420YCbr8: color YUV 4:2:0 to YCbr 8 Bpp
+ *****************************************************************************/
+
+void ConvertYUV420YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 420, YCbr = 8" );
+}
+/*****************************************************************************
+ * ConvertYUV422YCbr8: color YUV 4:2:2 to YCbr 8 Bpp
+ *****************************************************************************/
+
+void ConvertYUV422YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, YCbr = 8" );
+
+}
+/*****************************************************************************
+ * ConvertYUV444YCbr8: color YUV 4:4:4 to YCbr 8 Bpp
+ *****************************************************************************/
+void ConvertYUV444YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, YCbr = 8" );
+
+}
+/*****************************************************************************
+ * ConvertYUV420YCbr16: color YUV 4:2:0 to YCbr 16 Bpp
+ *****************************************************************************/
+void ConvertYUV420YCbr16    ( YUV_ARGS_16BPP )
+{
+    boolean_t   b_horizontal_scaling;             /* horizontal scaling type */
+    int         i_vertical_scaling;                 /* vertical scaling type */
+    int         i_x, i_y;                 /* horizontal and vertical indexes */
+    int         i_scale_count;                       /* scale modulo counter */
+    int         i_chroma_width;                              /* chroma width */
+    u16 *       p_pic_start;       /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
+    int *       p_offset_start;                        /* offset array start */
+    int *       p_offset;                            /* offset array pointer */
+
+    i_pic_line_width -= i_pic_width;
+    i_chroma_width =    i_width / 2;
+    p_buffer_start =    p_vout->yuv.p_buffer;
+    p_offset_start =    p_vout->yuv.p_offset;
+    SetOffset( i_width, i_height, i_pic_width, i_pic_height,
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
+
+    i_scale_count = ( i_vertical_scaling == 1 ) ? i_pic_height : i_height;
+    for( i_y = 0; i_y < i_height; i_y++ )
+    {
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
+
+        for ( i_x = i_width / 8; i_x--; )
+        {
+            __asm__( MMX_INIT_16
+                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+            __asm__( ".align 8"
+                     MMX_YUV_YCBR_422
+                     : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+
+            p_y += 8;
+            p_u += 4;
+            p_v += 4;
+            p_buffer += 8;
+        }
+        SCALE_WIDTH;
+        SCALE_HEIGHT( 420, 2 );
+  
+      }
+
+}
+/*****************************************************************************
+ * ConvertYUV422YCbr8: color YUV 4:2:2 to YCbr 16 Bpp
+ *****************************************************************************/
+
+void ConvertYUV422YCbr16    ( YUV_ARGS_16BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, YCbr = 16" );
+
+}
+/*****************************************************************************
+ * ConvertYUV424YCbr8: color YUV 4:4:4 to YCbr 16 Bpp
+ *****************************************************************************/
+
+void ConvertYUV444YCbr16    ( YUV_ARGS_16BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, YCbr = 16" );
+
+}
+/*****************************************************************************
+ * ConvertYUV420YCbr24: color YUV 4:2:0 to YCbr 24 Bpp
+ *****************************************************************************/
+
+void ConvertYUV420YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 420, YCbr = 24" );
+
+}
+/*****************************************************************************
+ * ConvertYUV422YCbr24: color YUV 4:2:2 to YCbr 24 Bpp
+ *****************************************************************************/
+
+void ConvertYUV422YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, YCbr = 24" );
+
+}
+/*****************************************************************************
+ * ConvertYUV444YCbr24: color YUV 4:4:4 to YCbr 24 Bpp
+ *****************************************************************************/
+
+void ConvertYUV444YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, YCbr = 24" );
+
+}
+/*****************************************************************************
+ * ConvertYUV420YCbr32: color YUV 4:2:0 to YCbr 32 Bpp
+ *****************************************************************************/
+
+void ConvertYUV420YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 420, YCbr = 32" );
+
+}
+/*****************************************************************************
+ * ConvertYUV422YCbr32: color YUV 4:2:2 to YCbr 32 Bpp
+ *****************************************************************************/
+
+void ConvertYUV422YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 422, YCbr = 32" );
+
+}
+/*****************************************************************************
+ * ConvertYUV444YCbr32: color YUV 4:4:4 to YCbr 32 Bpp
+ *****************************************************************************/
+void ConvertYUV444YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuvmmx error: unhandled function, chroma = 444, YCbr = 32" );
+
+}
+
 

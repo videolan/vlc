@@ -91,3 +91,20 @@ void ConvertYUV420RGB32   ( YUV_ARGS_32BPP );
 void ConvertYUV422RGB32   ( YUV_ARGS_32BPP );
 void ConvertYUV444RGB32   ( YUV_ARGS_32BPP );
 
+void ConvertYUV420YCbr8    ( YUV_ARGS_8BPP );
+void ConvertYUV422YCbr8    ( YUV_ARGS_8BPP );
+void ConvertYUV444YCbr8    ( YUV_ARGS_8BPP );
+
+void ConvertYUV420YCbr16    ( YUV_ARGS_16BPP );
+void ConvertYUV422YCbr16    ( YUV_ARGS_16BPP );
+void ConvertYUV444YCbr16    ( YUV_ARGS_16BPP );
+
+void ConvertYUV420YCbr24    ( YUV_ARGS_24BPP );
+void ConvertYUV422YCbr24    ( YUV_ARGS_24BPP );
+void ConvertYUV444YCbr24    ( YUV_ARGS_24BPP );
+
+void ConvertYUV420YCbr32    ( YUV_ARGS_32BPP );
+void ConvertYUV422YCbr32    ( YUV_ARGS_32BPP );
+void ConvertYUV444YCbr32    ( YUV_ARGS_32BPP );
+
+

@@ -288,7 +288,9 @@ PLUGIN_ALSA =	plugins/alsa/alsa.o \
 PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/aout_beos.o \
 		plugins/beos/intf_beos.o \
-		plugins/beos/vout_beos.o
+		plugins/beos/vout_beos.o \
+		plugins/beos/DrawingTidbits.o \
+		plugins/beos/TransportButton.o
 
 PLUGIN_DSP =	plugins/dsp/dsp.o \
 		plugins/dsp/aout_dsp.o

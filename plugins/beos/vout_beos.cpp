@@ -5,6 +5,7 @@
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +35,11 @@
 #include <stdio.h>
 #include <string.h>                                            /* strerror() */
 #include <kernel/OS.h>
-#include <Message.h>
 #include <View.h>
-#include <Window.h>
-#include <Bitmap.h>
 #include <Application.h>
+#include <Window.h>
+#include <Locker.h>
+#include <Screen.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -54,13 +55,14 @@ extern "C"
 #include "video.h"
 #include "video_output.h"
 
-#include "interface.h" /* XXX maybe to remove if window.h is splitted */
+#include "interface.h"
 #include "intf_msg.h"
 
 #include "main.h"
 }
 
-#include "window.h"
+#include "VideoWindow.h"
+#include <Screen.h>
 
 #define WIDTH 128
 #define HEIGHT 64
@@ -78,10 +80,9 @@ typedef struct vout_sys_s
 {
     VideoWindow *         p_window;
 
-    BBitmap *             pp_bitmap[2];
+    byte_t *              pp_buffer[2];
     s32                   i_width;
     s32                   i_height;
-    boolean_t             b_overlay_enabled;
 } vout_sys_t;
 
 
@@ -113,32 +114,148 @@ BWindow *beos_GetAppWindow(char *name)
 }
 
 /*****************************************************************************
+ * DrawingThread : thread that really does the drawing
+ *****************************************************************************/
+
+int32 DrawingThread(void *data)
+{
+    VideoWindow *w;
+    w = (VideoWindow*) data;
+    
+    while(!w->teardownwindow)
+    {
+    w->Lock();
+       if( w->fDirty )
+            {
+              if(!w->fUsingOverlay)
+              	w->view->DrawBitmap(w->bitmap[w->i_buffer_index], w->bitmap[w->i_buffer_index]->Bounds(), w->Bounds());
+              w->fDirty = false;
+            }
+    w->Unlock();
+   	snooze(20000);
+    }
+    return B_OK;
+}
+
+/*****************************************************************************
  * VideoWindow constructor and destructor
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_TITLED_WINDOW, 0)
+        : BWindow(frame, name, B_TITLED_WINDOW, NULL)
 {
+	float minWidth, minHeight, maxWidth, maxHeight; 
+
+    teardownwindow = false;
+    is_zoomed = false;
     p_vout = p_video_output;
 
-    p_view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
-    p_view->SetViewColor(0,0,0); /* set the background to black */
-    AddChild(p_view);
+    rect = Frame();
+    view = new VLCView(Bounds());
+    AddChild(view);
+	bitmap[0] = new BBitmap(Bounds(), B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL, B_YCbCr422);
+	fUsingOverlay = true;
+	i_screen_depth = 32;
+	p_vout->b_YCbr = true;
+	
+	if (bitmap[0]->InitCheck() != B_OK)
+	{
+		delete bitmap[0];
+		p_vout->b_YCbr = false;
+		fUsingOverlay = false;
+		BScreen *screen;
+		screen = new BScreen();
+		color_space space = screen->ColorSpace();
+		delete screen;
 
+		if(space == B_RGB15)
+			{
+			bitmap[0] = new BBitmap(Bounds(), B_RGB15);
+			bitmap[1] = new BBitmap(Bounds(), B_RGB15);
+	    	i_screen_depth = 15;
+		    }
+		    else if(space == B_RGB16)
+		 	{
+			bitmap[0] = new BBitmap(Bounds(), B_RGB16);
+			bitmap[1] = new BBitmap(Bounds(), B_RGB16);
+	   		i_screen_depth = 16;
+			}
+			else //default to 32bpp
+			{
+			bitmap[0] = new BBitmap(Bounds(), B_RGB32);
+			bitmap[1] = new BBitmap(Bounds(), B_RGB32);
+	   		i_screen_depth = 32;
+			}
+		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
+	 	memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
+	 	SetTitle("VideoLAN (BBitmap)");
+	 }
+
+	if(fUsingOverlay)
+		{
+		memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
+		rgb_color key;
+		view->SetViewOverlay(bitmap[0], bitmap[0]->Bounds(), Bounds(), &key, B_FOLLOW_ALL,
+				B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
+		view->SetViewColor(key);
+	 	SetTitle("VideoLAN (Overlay)");
+		GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
+		SetSizeLimits((float) Bounds().IntegerWidth(), maxWidth, (float) Bounds().IntegerHeight(), maxHeight);
+		}
+
+	i_bytes_per_pixel = bitmap[0]->BytesPerRow()/bitmap[0]->Bounds().IntegerWidth();
+    fRowBytes = bitmap[0]->BytesPerRow();
+    fDirty = false;
+    fDrawThreadID = spawn_thread(DrawingThread, "drawing_thread",
+                    B_DISPLAY_PRIORITY, (void*) this);
+    resume_thread(fDrawThreadID);
     Show();
 }
 
 VideoWindow::~VideoWindow()
 {
-}
+    int32 result;
+
+    Hide();
+    Sync();
+    wait_for_thread(fDrawThreadID, &result);
+    delete bitmap[0];
+    if(!fUsingOverlay)
+    	delete bitmap[1];
+ }
+
 
 /*****************************************************************************
  * VideoWindow::FrameResized
  *****************************************************************************/
-
 void VideoWindow::FrameResized( float width, float height )
 {
-    //b_resized = 1;
+}
+
+/*****************************************************************************
+ * VideoWindow::Zoom
+ *****************************************************************************/
+
+void VideoWindow::Zoom(BPoint origin, float width, float height )
+{
+if(is_zoomed)
+	{
+	MoveTo(rect.left, rect.top);
+	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+	be_app->ShowCursor();
+	}
+else
+	{
+	rect = Frame();
+	BScreen *screen;
+	screen = new BScreen(this);
+	BRect rect = screen->Frame();
+	delete screen;
+	MoveTo(0,0);
+	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+	be_app->HideCursor();
+	}
+is_zoomed = !is_zoomed;
 }
 
 /*****************************************************************************
@@ -175,8 +292,37 @@ bool VideoWindow::QuitRequested()
 {
     /* FIXME: send a message ! */
     p_main->p_intf->b_die = 1;
-
+    teardownwindow = true;
     return( false );
+}
+
+/*****************************************************************************
+ * VLCView::VLCView
+ *****************************************************************************/
+VLCView::VLCView(BRect bounds) : BView(bounds, "", B_FOLLOW_ALL, B_WILL_DRAW)
+{
+SetViewColor(B_TRANSPARENT_32_BIT);
+}
+
+/*****************************************************************************
+ * VLCView::~VLCView
+ *****************************************************************************/
+VLCView::~VLCView()
+{
+
+}
+
+/*****************************************************************************
+ * VLCVIew::~VLCView
+ *****************************************************************************/
+void VLCView::MouseDown(BPoint point)
+{
+VideoWindow *w = (VideoWindow *) Window();
+if(w->is_zoomed)
+	{
+	BWindow *win = Window();
+	win->Zoom();
+	}
 }
 
 extern "C"
@@ -266,64 +412,24 @@ int vout_Create( vout_thread_t *p_vout )
 int vout_Init( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
-    BBitmap **const & p_bmp = p_vout->p_sys->pp_bitmap;
+    u32 i_page_size;
 
-    p_win->Lock();
+
+    i_page_size =   p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
     
-    p_vout->p_sys->i_width =            p_vout->i_width;
-    p_vout->p_sys->i_height =           p_vout->i_height;
-    p_vout->p_sys->b_overlay_enabled =  false;
+    p_vout->p_sys->i_width =         p_vout->i_width;
+    p_vout->p_sys->i_height =        p_vout->i_height;    
 
-    /*
-     * Create the two bitmaps we need for double buffering
-     */
-    BRect bounds = BRect( 0, 0, p_vout->i_width-1, p_vout->i_height-1 );
-
-    /* First we try to create an overlay bitmap */
-    p_bmp[0] = new BBitmap( bounds,
-        B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL,
-        B_YCbCr420 );
-    p_bmp[1] = new BBitmap( bounds,
-        B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL,
-        B_YCbCr420 );
-    
-    if( p_bmp[0]->InitCheck() == B_OK && p_bmp[1]->InitCheck() == B_OK )
-    {
-        p_vout->p_sys->b_overlay_enabled = true;
-    }
+    if(p_win->fUsingOverlay)
+    	{
+	    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+    	                 (byte_t *)p_win->bitmap[0]->Bits());
+    	}
     else
-    {
-        delete p_bmp[0];
-        delete p_bmp[1];
-    }
-    
-    /* We failed to create overlay bitmaps, use standard bmp instead */
-    if( !p_vout->p_sys->b_overlay_enabled )
-    {
-        p_bmp[0] = new BBitmap( bounds, B_RGB32 );
-        p_bmp[1] = new BBitmap( bounds, B_RGB32 );
-        if( p_bmp[0]->InitCheck() != B_OK || p_bmp[1]->InitCheck() != B_OK )
-        {
-            delete p_bmp[0];
-            delete p_bmp[1];
-            intf_ErrMsg( "vout error: failed to create BBitmap" );
-            return( 1 );
-        }
-    }
-
-    p_vout->b_need_render = !p_vout->p_sys->b_overlay_enabled;
-    intf_Msg( "vout: YUV acceleration %s",
-        p_vout->p_sys->b_overlay_enabled ? "activated" : "unavailable !" ); 
- 
-    /* Initialize the bitmap buffers to black (0,0,0) */
-    memset( p_bmp[0]->Bits(), 0, p_bmp[0]->BitsLength() );
-    memset( p_bmp[1]->Bits(), 0, p_bmp[1]->BitsLength() );
-
-     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_bmp[0]->Bits(), p_bmp[1]->Bits() );
-
-    p_win->Unlock();
-
+   		{
+	    vout_SetBuffers( p_vout, (byte_t *)p_win->bitmap[0]->Bits(),
+   	                 (byte_t *)p_win->bitmap[1]->Bits());
+    	}
     return( 0 );
 }
 
@@ -332,14 +438,6 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
-   VideoWindow * p_win = p_vout->p_sys->p_window;
-   
-   p_win->Lock();
-   
-   delete p_vout->p_sys->pp_bitmap[0];
-   delete p_vout->p_sys->pp_bitmap[1];
-
-   p_win->Unlock();   
 }
 
 /*****************************************************************************
@@ -362,40 +460,7 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->p_window->b_resized )
-    {
-        p_vout->p_sys->p_window->b_resized = 0;
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
-    }
-
-    /* XXX: I doubt that this code is working correctly (Polux) */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
-    {
-       intf_WarnMsg( 1, "resizing window" );
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
-        /* Resize window */
-        p_vout->p_sys->p_window->ResizeTo( p_vout->i_width, p_vout->i_height );
-
-        /* Destroy XImages to change their size */
-        vout_End( p_vout );
-
-        /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_Init( p_vout ) )
-        {
-            intf_ErrMsg( "error: can't resize display" );
-            return( 1 );
-        }
-
-        /* Tell the video output thread that it will need to rebuild YUV
-         * tables. This is needed since convertion buffer size may have
-         * changed */
-        p_vout->i_changes |= VOUT_YUV_CHANGE;
-        intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->i_width, p_vout->i_height );
-    }
-
-    return( 0 );
+   return( 0 );
 }
 
 /*****************************************************************************
@@ -407,58 +472,44 @@ int vout_Manage( vout_thread_t *p_vout )
 void vout_Display( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
-    BBitmap **const & p_bmp = p_vout->p_sys->pp_bitmap;
-
-    p_win->Lock();
     
-    p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
-    if( p_vout->p_sys->b_overlay_enabled )
-    {
-        rgb_color key;
-        p_win->p_view->ClearViewOverlay();
-		p_win->p_view->SetViewOverlay( p_bmp[p_vout->i_buffer_index],
-            p_bmp[p_vout->i_buffer_index]->Bounds(),
-            p_win->p_view->Bounds(), &key, B_FOLLOW_ALL,
-			B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL );
-		p_win->p_view->SetViewColor( key );
-    }
-    else
-    {
-        p_win->p_view->DrawBitmap( p_bmp[p_vout->i_buffer_index],
-            p_win->p_view->Bounds() );
-    }
-    
-    p_win->Unlock();
+   	p_win->i_buffer_index = p_vout->i_buffer_index;
+   	p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
+    p_win->fDirty = true;
 }
 
 /* following functions are local */
 
 /*****************************************************************************
  * BeosOpenDisplay: open and initialize BeOS device
+ *****************************************************************************
+ * XXX?? The framebuffer mode is only provided as a fast and efficient way to
+ * display video, providing the card is configured and the mode ok. It is
+ * not portable, and is not supposed to work with many cards. Use at your
+ * own risk !
  *****************************************************************************/
 
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
-    /* Create the video window */
     p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), VOUT_TITLE " (BeOS output) - drop a file here to play it !", p_vout );
+        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), NULL, p_vout );
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );
         intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
         return( 1 );
     }   
+    VideoWindow * p_win = p_vout->p_sys->p_window;
     
-    /* XXX: 32 is only chosen for test purposes */
-    p_vout->i_screen_depth =         32;
-    p_vout->i_bytes_per_pixel =      4;
-    p_vout->i_bytes_per_line =       p_vout->i_width*p_vout->i_bytes_per_pixel;
+    p_vout->i_screen_depth =         p_win->i_screen_depth;
+    p_vout->i_bytes_per_pixel =      p_win->i_bytes_per_pixel;
+    p_vout->i_bytes_per_line =       p_vout->i_width*p_win->i_bytes_per_pixel;
     
     switch( p_vout->i_screen_depth )
     {
     case 8:
         intf_ErrMsg( "vout error: 8 bit mode not fully supported" );
-        return( 1 );
+        break;
     case 15:
         p_vout->i_red_mask =        0x7c00;
         p_vout->i_green_mask =      0x03e0;
@@ -477,7 +528,6 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
         p_vout->i_blue_mask =       0x0000ff;
         break;
     }
-
     return( 0 );
 }
 

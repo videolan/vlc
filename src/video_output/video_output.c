@@ -6,7 +6,7 @@
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
  *
- * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ * Authors:
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,7 +154,8 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->i_bytes_per_pixel     = 2;
     p_vout->f_gamma               = VOUT_GAMMA;
     p_vout->b_need_render         = 1;
-
+    p_vout->b_YCbr                = 0;
+    
     p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
                                                      VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info                = 0;
@@ -979,27 +980,14 @@ static void RunThread( vout_thread_t *p_vout)
         p_subpic =      NULL;
         display_date =  0;
         current_date =  mdate();
-
+#ifdef STATS
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
-#ifdef STATS
             intf_Msg("vout stats: picture heap: %d/%d",
                      p_vout->i_pictures, VOUT_MAX_PICTURES);
-#endif
-
-            if( p_vout->b_info )
-            {
-                long i_fps = VOUT_FPS_SAMPLES * 1000000 * 10 /
-                           ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1)
-                                                   % VOUT_FPS_SAMPLES ] -
-                             p_vout->p_fps_sample[ p_vout->c_fps_samples
-                                                   % VOUT_FPS_SAMPLES ] );
-                intf_Msg( "vout stats: %li.%i fps",
-                          i_fps / 10, (int)i_fps % 10 );
-            }
         }
-
+#endif
 
         /*
          * Find the picture to display - this operation does not need lock,
@@ -1487,7 +1475,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
             if( i_area_copy != i_area )
             {
                 /* Merge with last possible areas */
-                p_buffer->pi_area_end[i_area] = MAX( i_h, p_buffer->pi_area_end[i_area_copy] );
+                //p_buffer->pi_area_end[i_area] = MAX( i_h, p_buffer->pi_area_end[i_area_copy] );
 
                 /* Shift lower areas upward */
                 i_area_shift = i_area_copy - i_area;
@@ -1699,28 +1687,28 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     switch( p_pic->i_type )
     {
     case YUV_420_PICTURE:
-        p_vout->yuv.p_Convert420( p_vout, p_pic_data,
-                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height,
-                                  p_buffer->i_pic_width, p_buffer->i_pic_height,
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
-                                  p_pic->i_matrix_coefficients );
+        p_vout->yuv.pf_yuv420( p_vout, p_pic_data,
+                               p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                               p_pic->i_width, p_pic->i_height,
+                               p_buffer->i_pic_width, p_buffer->i_pic_height,
+                               p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
+                               p_pic->i_matrix_coefficients );
         break;
     case YUV_422_PICTURE:
-        p_vout->yuv.p_Convert422( p_vout, p_pic_data,
-                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height,
-                                  p_buffer->i_pic_width, p_buffer->i_pic_height,
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
-                                  p_pic->i_matrix_coefficients );
+        p_vout->yuv.pf_yuv422( p_vout, p_pic_data,
+                               p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                               p_pic->i_width, p_pic->i_height,
+                               p_buffer->i_pic_width, p_buffer->i_pic_height,
+                               p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
+                               p_pic->i_matrix_coefficients );
         break;
     case YUV_444_PICTURE:
-        p_vout->yuv.p_Convert444( p_vout, p_pic_data,
-                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height,
-                                  p_buffer->i_pic_width, p_buffer->i_pic_height,
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
-                                  p_pic->i_matrix_coefficients );
+        p_vout->yuv.pf_yuv444( p_vout, p_pic_data,
+                               p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                               p_pic->i_width, p_pic->i_height,
+                               p_buffer->i_pic_width, p_buffer->i_pic_height,
+                               p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
+                               p_pic->i_matrix_coefficients );
         break;
 #ifdef DEBUG
     default:

@@ -105,6 +105,16 @@ pmulhw    mmx_Y_coeff, %%mm6    # Mul 4 Y even    00 y6 00 y4 00 y2 00 y0   \n\
 pmulhw    mmx_Y_coeff, %%mm7    # Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
 "
 
+#define MMX_YUV_YCBR_422 "                                                  \n\
+                                                                            \n\
+punpcklbw %%mm1, %%mm0                                                      \n\
+movq %%mm6, %%mm2                                                           \n\
+punpckhbw %%mm0, %%mm6                                                      \n\
+punpcklbw %%mm0, %%mm2                                                      \n\
+movq %%mm2, (%3)                                                            \n\
+movq %%mm6, 8(%3)                                                           \n\
+"
+
 /*
  * Do the addition part of the conversion for even and odd pixels,
  * register usage:

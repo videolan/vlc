@@ -1,12 +1,14 @@
 /*****************************************************************************
  * transforms_yuv.c: C YUV transformation functions
- * Provides functions to perform the YUV conversion. The functions provided here
- * are a complete and portable C implementation, and may be replaced in certain
- * case by optimized functions.
+ * Provides functions to perform the YUV conversion. The functions provided
+ * here are a complete and portable C implementation, and may be replaced in
+ * certain cases by optimized functions.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Vincent Seguin <ptyx@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
+ *          Richard Shepherd <richard@rshepherd.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,7 +136,7 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     static int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
     static int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
-    /*
+   /*
      * Initialize some values  - i_pic_line_width will store the line skip
      */
     i_pic_line_width -= i_pic_width;
@@ -689,5 +691,104 @@ void ConvertYUV444RGB32( YUV_ARGS_32BPP )
         SCALE_WIDTH;
         SCALE_HEIGHT(444, 4);
     }
+}
+
+static __inline__ void yuv2YCbCr422_inner( u8 *p_y, u8 *p_u, u8 *p_v,
+                                           u8 *p_out, int i_width_by_4 )
+{
+    int i_x;
+
+    for( i_x = 0 ; i_x < 4 * i_width_by_4 ; ++i_x )
+    {
+        *p_out++ = p_y[ 2 * i_x ];
+        *p_out++ = p_u[ i_x ];
+        *p_out++ = p_y[ 2 * i_x + 1 ];
+        *p_out++ = p_v[ i_x ];
+    }
+}
+
+void ConvertYUV420YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 420, YCbr = 8" );
+}
+
+void ConvertYUV422YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, YCbr = 8" );
+
+}
+void ConvertYUV444YCbr8    ( YUV_ARGS_8BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, YCbr = 8" );
+
+}
+
+/*****************************************************************************
+ * yuv2YCbCr422: color YUV 4:2:0 to color YCbCr 16bpp
+ *****************************************************************************/
+void ConvertYUV420YCbr16    ( YUV_ARGS_16BPP )
+{
+    int i_y;
+
+    for( i_y = 0 ; i_y < i_height ; ++i_y )
+    {
+        yuv2YCbCr422_inner( p_y, p_u, p_v, (u8 *)p_pic, i_width / 8 );
+
+        p_pic += i_width * 2;
+        
+        p_y += i_width;
+
+        if( i_y & 0x1 )
+        {
+            p_u += i_width / 2;
+            p_v += i_width / 2;
+        }
+    }
+}
+
+void ConvertYUV422YCbr16    ( YUV_ARGS_16BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, YCbr = 16" );
+
+}
+void ConvertYUV444YCbr16    ( YUV_ARGS_16BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, YCbr = 16" );
+
+}
+
+void ConvertYUV420YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 420, YCbr = 24" );
+
+}
+
+void ConvertYUV422YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, YCbr = 24" );
+
+}
+
+void ConvertYUV444YCbr24    ( YUV_ARGS_24BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, YCbr = 24" );
+
+}
+
+void ConvertYUV420YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 420, YCbr = 32" );
+
+}
+
+void ConvertYUV422YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 422, YCbr = 32" );
+
+}
+void ConvertYUV444YCbr32    ( YUV_ARGS_32BPP )
+{
+    intf_ErrMsg( "yuv error: unhandled function, chroma = 444, YCbr = 32" );
+
 }
 

@@ -33,6 +33,10 @@
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                       /* read(), close() */
 
+#ifdef SYS_BEOS
+#include "beos_specific.h"
+#endif
+
 #include "config.h"
 #include "common.h"
 #include "video_text.h"
