@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.1 2002/08/07 21:36:56 massiot Exp $
+ * $Id: filters.c,v 1.2 2002/08/09 23:47:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,11 +26,12 @@
  *****************************************************************************/
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
+
+#include <vlc/vlc.h>
+
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h> 
 #endif
-
-#include <vlc/vlc.h>
 
 #include "audio_output.h"
 #include "aout_internal.h"
@@ -160,10 +161,10 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
     {
         aout_filter_t * p_filter = pp_filters[i];
 
-        int i_output_size = aout_FormatToBytes( &p_filter->output )
-                             * p_filter->output.i_rate;
-        int i_input_size = aout_FormatToBytes( &p_filter->input )
-                             * p_filter->input.i_rate;
+        int i_output_size = aout_FormatToByterate( &p_filter->output,
+                                                   p_filter->output.i_rate );
+        int i_input_size = aout_FormatToByterate( &p_filter->input,
+                                                  p_filter->input.i_rate );
 
         p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
                                                 i_output_size );

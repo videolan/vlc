@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: oss.c,v 1.4 2002/08/09 23:47:23 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -170,15 +170,24 @@ static int SetFormat( aout_instance_t *p_aout )
     }
 
     /* Set the output format */
-    i_format = AOUT_FMT_S16_NE;
+    if ( AOUT_FMT_IS_SPDIF( &p_aout->output.output ) )
+    {
+        p_aout->output.output.i_format = i_format = AOUT_FMT_SPDIF;
+        p_aout->output.i_nb_samples = 1;
+    }
+    else
+    {
+        p_aout->output.output.i_format = i_format = AOUT_FMT_S16_NE;
+        p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+    }
+
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
-         || i_format != AOUT_FMT_S16_NE )
+         || i_format != p_aout->output.output.i_format )
     {
         msg_Err( p_aout, "cannot set audio output format (%i)",
                           i_format );
         return -1;
     }
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
 
     /* FIXME */
     if ( p_aout->output.output.i_channels > 2 )
@@ -221,8 +230,6 @@ static int SetFormat( aout_instance_t *p_aout )
                           p_aout->output.output.i_rate, i_rate );
         p_aout->output.output.i_rate = i_rate;
     }
-
-    p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
 
     p_sys->b_initialized = VLC_TRUE;
 
@@ -299,7 +306,7 @@ static int OSSThread( aout_instance_t * p_aout )
             continue;
         }
 
-        i_bytes_per_sample = aout_FormatToBytes( &p_aout->output.output );
+        i_bytes_per_sample = aout_FormatToSize( &p_aout->output.output, 1 );
         next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
                       / i_bytes_per_sample
                       / p_aout->output.output.i_rate;

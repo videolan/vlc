@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.1 2002/08/07 21:36:56 massiot Exp $
+ * $Id: output.c,v 1.2 2002/08/09 23:47:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -110,8 +110,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Prepare hints for the buffer allocator. */
     p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_aout->mixer.output_alloc.i_bytes_per_sec
-         = aout_FormatToBytes( &p_aout->output.output )
-            * p_aout->output.output.i_rate;
+         = aout_FormatToByterate( &p_aout->output.output,
+                                  p_aout->output.output.i_rate );
 
     aout_FiltersHintBuffers( p_aout, p_aout->output.pp_filters,
                              p_aout->output.i_nb_filters,

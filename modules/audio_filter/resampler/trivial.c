@@ -1,8 +1,8 @@
 /*****************************************************************************
- * float32tos16.c : converter from float32 to signed 16 bits integer
+ * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.2 2002/08/09 23:47:22 massiot Exp $
+ * $Id: trivial.c,v 1.1 2002/08/09 23:47:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for float32->s16 conversion") );
+    set_description( _("aout filter for trivial resampling") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -58,19 +58,6 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != AOUT_FMT_FLOAT32
-          && p_filter->output.i_format != AOUT_FMT_S16_NE )
-    {
-        return -1;
-    }
-
-    if ( p_filter->input.i_rate != p_filter->output.i_rate
-          || p_filter->input.i_channels != p_filter->output.i_channels )
-    {
-        return -1;
-    }
-
-
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 1;
 
@@ -83,18 +70,24 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int i;
-    float * p_in = (float *)p_in_buf->p_buffer;
-    s16 * p_out = (s16 *)p_out_buf->p_buffer;
+    int i_in_nb = p_in_buf->i_nb_samples;
+    int i_out_nb = i_in_nb * p_filter->output.i_rate
+                    / p_filter->input.i_rate;
 
-    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
+    if ( p_out_buf != p_in_buf )
     {
-        if ( *p_in >= 1.0 ) *p_out = 32767;
-        else if ( *p_in < -1.0 ) *p_out = -32768;
-        else *p_out = *p_in * 32768.0;
-        p_in++; p_out++;
+        /* For whatever reason the buffer allocator decided to allocate
+         * a new buffer. */
+        p_aout->p_vlc->pf_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
+                                  __MIN(i_out_nb, i_in_nb) );
     }
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    if ( i_out_nb > i_in_nb )
+    {
+        /* Pad with zeroes. */
+        memset( p_out_buf->p_buffer + i_in_nb, 0, i_out_nb - i_in_nb );
+    }
+
+    p_out_buf->i_nb_samples = i_out_nb;
 }
 

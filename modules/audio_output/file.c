@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: file.c,v 1.3 2002/08/09 23:47:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,8 +136,8 @@ static int SetFormat( aout_instance_t * p_aout )
 static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     if( fwrite( p_buffer->p_buffer,
-                p_buffer->i_nb_samples
-                 * aout_FormatToBytes( &p_aout->output.output ), 1,
+                aout_FormatToSize( &p_aout->output.output,
+                                   p_buffer->i_nb_samples ), 1,
                 (FILE *)p_aout->output.p_sys ) != 1 )
     {
         msg_Err( p_aout, "write error (%s)", strerror(errno) );

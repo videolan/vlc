@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.53 2002/08/08 00:35:10 sam Exp $
+ * $Id: audio_output.h,v 1.54 2002/08/09 23:46:53 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,9 +42,11 @@ struct audio_sample_format_t
 #define AOUT_FMT_S8         0x00000040
 #define AOUT_FMT_U16_LE     0x00000080                  /* Little endian U16 */
 #define AOUT_FMT_U16_BE     0x00000100                     /* Big endian U16 */
-#define AOUT_FMT_A52        0x00000400             /* ATSC A/52 (for SP/DIF) */
-#define AOUT_FMT_FLOAT32    0x00000800
-#define AOUT_FMT_FIXED32    0x00001000
+#define AOUT_FMT_SPDIF      0x00000400            /* S/PDIF hardware support */
+#define AOUT_FMT_FLOAT32    0x00010000
+#define AOUT_FMT_FIXED32    0x00020000
+#define AOUT_FMT_A52        0x00100000
+#define AOUT_FMT_DTS        0x00200000
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     (p_first->i_format == p_second->i_format)                               \
@@ -60,6 +62,11 @@ struct audio_sample_format_t
 #   define AOUT_FMT_U16_NE AOUT_FMT_U16_LE
 #endif
 
+#define AOUT_FMT_IS_SPDIF( p_format )                                      \
+    ( (p_format->i_format == AOUT_FMT_SPDIF)                               \
+       || (p_format->i_format == AOUT_FMT_A52)                             \
+       || (p_format->i_format == AOUT_FMT_DTS) )
+
 /*****************************************************************************
  * aout_buffer_t : audio output buffer
  *****************************************************************************/
@@ -74,6 +81,8 @@ struct aout_buffer_t
     struct aout_buffer_t *  p_next;
 };
 
+#define AOUT_SPDIF_FRAME 1536
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -84,7 +93,9 @@ VLC_EXPORT( void,              aout_DeleteInstance, ( aout_instance_t * ) );
 VLC_EXPORT( aout_buffer_t *, aout_BufferNew, ( aout_instance_t *, aout_input_t *, size_t ) );
 VLC_EXPORT( void, aout_BufferDelete, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 VLC_EXPORT( void, aout_BufferPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
-VLC_EXPORT( int, aout_FormatToBytes, ( audio_sample_format_t * p_format ) );
+VLC_EXPORT( int, aout_FormatTo, ( audio_sample_format_t * p_format, int ) );
+#define aout_FormatToByterate(a,b) aout_FormatTo(a,b)
+#define aout_FormatToSize(a,b) aout_FormatTo(a,b)
 
 /* From input.c : */
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)

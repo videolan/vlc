@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: cdrom.c,v 1.3 2002/08/09 23:47:22 massiot Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -62,7 +62,7 @@
  * Platform specific 
  *****************************************************************************/
 #if defined( SYS_DARWIN )
-CDTOC *getTOC( const char * );
+CDTOC *getTOC( vlc_object_t *, const char * );
 #define freeTOC( p ) free( (void*)p )
 int getNumberOfDescriptors( CDTOC * );
 int getNumberOfTracks( CDTOC *, int );
@@ -81,7 +81,7 @@ int ioctl_GetTrackCount( vlc_object_t * p_this, int i_fd, const char *psz_dev )
     CDTOC *pTOC;
     int i_descriptors;
 
-    if( ( pTOC = getTOC( psz_dev ) ) == NULL )
+    if( ( pTOC = getTOC( p_this, psz_dev ) ) == NULL )
     {
         msg_Err( p_this, "failed to get the TOC" );
         return( -1 );
@@ -134,7 +134,7 @@ int * ioctl_GetSectors( vlc_object_t *p_this, int i_fd, const char *psz_dev )
     int i_leadout = -1;
     CDTOCDescriptor *pTrackDescriptors;
 
-    if( ( pTOC = getTOC( psz_dev ) ) == NULL )
+    if( ( pTOC = getTOC( p_this, psz_dev ) ) == NULL )
     {
         msg_Err( p_this, "failed to get the TOC" );
         return( NULL );
@@ -334,7 +334,7 @@ int ioctl_ReadSector( vlc_object_t *p_this,
 /****************************************************************************
  * getTOC: get the TOC
  ****************************************************************************/
-CDTOC *getTOC( const char *psz_dev )
+CDTOC *getTOC( vlc_object_t * p_this, const char *psz_dev )
 {
     mach_port_t port;
     char *psz_devname;

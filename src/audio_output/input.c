@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.1 2002/08/07 21:36:56 massiot Exp $
+ * $Id: input.c,v 1.2 2002/08/09 23:47:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -116,8 +116,8 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
     /* i_bytes_per_sec is still == -1 if no filters */
     p_input->input_alloc.i_bytes_per_sec = __MAX(
                                     p_input->input_alloc.i_bytes_per_sec,
-                                    aout_FormatToBytes( &p_input->input )
-                                     * p_input->input.i_rate );
+                                    aout_FormatToByterate( &p_input->input,
+                                                   p_input->input.i_rate ) );
     /* Allocate in the heap, it is more convenient for the decoder. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
