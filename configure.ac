@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.183 2004/02/22 00:15:33 gbazin Exp $
+dnl $Id: configure.ac,v 1.184 2004/02/22 15:03:33 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-test2)
 
@@ -203,6 +203,14 @@ else
 fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
 XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
+
+AC_ARG_ENABLE(utf8,
+  [  --enable-utf8           unicode utf8 support (default enabled on darwin/beos/win32)])
+if test "${enable_utf8}" = "yes" || (test "${enable_utf8}" != "no" && (test "${SYS}" = "mingw32" || test "${SYS}" = "beos" || test "${SYS}" = "darwin" ) )
+then
+  AC_DEFINE(ENABLE_UTF8, 1,
+            Define if you want utf8 support)
+fi
 
 AC_MSG_CHECKING(for suffix of libraries)
 AC_MSG_RESULT(${LIBEXT})

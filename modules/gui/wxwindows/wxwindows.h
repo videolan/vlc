@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.89 2004/02/16 17:14:39 zorglub Exp $
+ * $Id: wxwindows.h,v 1.90 2004/02/22 15:03:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -53,8 +53,7 @@ class FileInfo;
 #define SLIDER_MAX_POS 10000
 
 /* wxU is used to convert ansi/utf8 strings to unicode strings (wchar_t) */
-#if defined( ENABLE_NLS ) && defined( HAVE_GETTEXT ) && \
-    defined( WIN32 ) && !defined( HAVE_INCLUDED_GETTEXT )
+#if defined( ENABLE_NLS ) && defined( ENABLE_UTF8 )
 #if wxUSE_UNICODE
 #   define wxU(utf8) wxString(utf8, wxConvUTF8)
 #else
@@ -62,7 +61,7 @@ class FileInfo;
 #endif
 #define ISUTF8 1
 
-#else // ENABLE_NLS && HAVE_GETTEXT && WIN32 && !HAVE_INCLUDED_GETTEXT
+#else // ENABLE_NLS && ENABLE_UTF8
 #if wxUSE_UNICODE
 #   define wxU(ansi) wxString(ansi, *wxConvCurrent)
 #else
