@@ -475,8 +475,8 @@ vlc.app: vlc $(PLUGIN_FILES)
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 	$(INSTALL) -d vlc.app/Contents/MacOS/locale
 	for i in $(CATALOGS); do
-		mkdir -p vlc.app/Contents/MacOS/locale/${i%.gmo}/LC_MESSAGES
-		cp po/$i vlc.app/Contents/MacOS/locale/${i%.gmo}/LC_MESSAGES/vlc.mo
+		mkdir -p vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES
+		cp po/$$i vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo
 	done
 endif
 
