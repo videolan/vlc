@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.4 2003/11/27 12:22:15 fenrir Exp $
+ * $Id: es_out.c,v 1.5 2003/11/30 17:29:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -44,6 +44,7 @@ struct es_out_id_t
 struct es_out_sys_t
 {
     input_thread_t *p_input;
+    vlc_bool_t      b_pcr_set;
 
     /* all es */
     int         i_id;
@@ -92,6 +93,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     out->p_sys      = p_sys;
 
     p_sys->p_input = p_input;
+    p_sys->b_pcr_set = VLC_FALSE;
 
     p_sys->b_active = VLC_FALSE;
     p_sys->i_mode   = ES_OUT_MODE_AUTO;
@@ -422,6 +424,25 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
  *****************************************************************************/
 static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
+    es_out_sys_t *p_sys = out->p_sys;
+
+    if( p_sys->b_pcr_set && p_sys->p_input->stream.p_selected_program )
+    {
+        input_thread_t *p_input = p_sys->p_input;
+
+        if( p_block->i_dts > 0 )
+        {
+            p_block->i_dts = input_ClockGetTS( p_input,
+                                               p_input->stream.p_selected_program,
+                                               p_block->i_dts * 9 / 100 );
+        }
+        if( p_block->i_pts > 0 )
+        {
+            p_block->i_pts = input_ClockGetTS( p_input,
+                                               p_input->stream.p_selected_program,
+                                               p_block->i_pts * 9 / 100 );
+        }
+    }
     vlc_mutex_lock( &out->p_sys->p_input->stream.stream_lock );
     if( es->p_es->p_dec )
     {
@@ -489,6 +510,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     es_out_sys_t *p_sys = out->p_sys;
     vlc_bool_t  b, *pb;
     int         i, *pi;
+    int         i_group;
+    int64_t     i_pcr;
 
     es_out_id_t *es;
 
@@ -594,6 +617,31 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 EsOutSelect( out, es, VLC_TRUE );
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
             }
+            return VLC_SUCCESS;
+
+        case ES_OUT_SET_PCR:
+        {
+            pgrm_descriptor_t *p_prgm = NULL;
+
+            i_group = (int)va_arg( args, int );
+            i_pcr   = (int64_t)va_arg( args, int64_t );
+
+            /* search program */
+            if( ( p_prgm = input_FindProgram( p_sys->p_input, i_group ) ) )
+            {
+                input_ClockManageRef( p_sys->p_input, p_prgm, i_pcr );
+            }
+            p_sys->b_pcr_set = VLC_TRUE;
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_RESET_PCR:
+            /* FIXME do it for all program */
+            if( p_sys->p_input->stream.p_selected_program )
+            {
+                p_sys->p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
+            }
+            p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
 
         default:

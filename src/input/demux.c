@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: demux.c,v 1.4 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: demux.c,v 1.5 2003/11/30 17:29:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -160,3 +160,96 @@ static void SeekOffset( input_thread_t *p_input, int64_t i_pos )
     p_input->pf_seek( p_input, i_pos );
     vlc_mutex_lock( &p_input->stream.stream_lock );
 }
+
+
+/*****************************************************************************
+ * demux2_New:
+ *****************************************************************************/
+demux_t *__demux2_New( vlc_object_t *p_obj,
+                       char *psz_mrl, stream_t *s, es_out_t *out )
+{
+    demux_t *p_demux = vlc_object_create( p_obj, sizeof( demux_t ) );
+
+    char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
+    char    *psz = strchr( psz_dup, ':' );
+
+    if( p_demux == NULL )
+    {
+        free( psz_dup );
+        return NULL;
+    }
+
+    /* Parse URL */
+    p_demux->psz_access = NULL;
+    p_demux->psz_demux  = NULL;
+    p_demux->psz_path   = NULL;
+
+    if( psz )
+    {
+        *psz++ = '\0';
+
+        if( psz[0] == '/' && psz[1] == '/' )
+        {
+            psz += 2;
+        }
+        p_demux->psz_path = strdup( psz );
+
+        psz = strchr( psz_dup, '/' );
+        if( psz )
+        {
+            *psz++ = '\0';
+            p_demux->psz_access = strdup( psz_dup );
+            p_demux->psz_demux  = strdup( psz );
+        }
+    }
+    free( psz_dup );
+
+
+    if( p_demux->psz_access == NULL )
+    {
+        p_demux->psz_access = strdup( "" );
+    }
+    if( p_demux->psz_demux == NULL )
+    {
+        p_demux->psz_demux = strdup( "" );
+    }
+    if( p_demux->psz_path == NULL )
+    {
+        p_demux->psz_path = strdup( "" );
+    }
+
+    p_demux->s          = s;
+    p_demux->out        = out;
+
+    p_demux->pf_demux   = NULL;
+    p_demux->pf_control = NULL;
+    p_demux->p_sys      = NULL;
+
+    vlc_object_attach( p_demux, p_obj ); /* before module_Need (for var_Create...)*/
+
+    p_demux->p_module = module_Need( p_demux, "demux2", p_demux->psz_demux );
+    if( p_demux->p_module == NULL )
+    {
+        vlc_object_detach( p_demux );
+        vlc_object_destroy( p_demux );
+        return NULL;
+    }
+
+    return p_demux;
+}
+
+/*****************************************************************************
+ * demux2_Delete:
+ *****************************************************************************/
+void demux2_Delete( demux_t *p_demux )
+{
+    module_Unneed( p_demux, p_demux->p_module );
+    vlc_object_detach( p_demux );
+
+    free( p_demux->psz_path );
+    free( p_demux->psz_demux );
+    free( p_demux->psz_access );
+
+    vlc_object_destroy( p_demux );
+}
+
