@@ -5,6 +5,7 @@
  * $Id$
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
+ *         Jean-Paul Saman <M2X>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +71,8 @@ static void Deactivate   ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 
 static vlc_bool_t ReadCommand( intf_thread_t *, char *, int * );
+
+static void mrl_Split( vlc_object_t *, char const *, char **, char **, int * );
 
 static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -825,9 +828,38 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "add" ) )
     {
+        playlist_item_t *p_item = NULL;
+        char *psz_options = NULL;
+        char *psz_uri = NULL;
+        int i_count = 0;
+        int i = 0;
+        int i_id;
+
         msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
-        playlist_Add( p_playlist, newval.psz_string, newval.psz_string,
-                      PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+        mrl_Split( p_this, newval.psz_string, &psz_uri, &psz_options, &i_count );
+
+        msg_Dbg( p_intf, "found [%s] with options [%s] to playlist", psz_uri, psz_options );
+
+        /* Create a playlist Item */
+        p_item = playlist_ItemNew( p_intf, (const char*)psz_uri, (const char *)newval.psz_string );
+        if( !p_item )
+        {
+            msg_rc( _("failed adding %s to playlist\n"), newval.psz_string);
+            goto failed;
+        }
+
+        /* Insert options */
+        for( i=0; i < i_count; i++ )
+        {
+            playlist_ItemAddOption( p_item, psz_options );
+        }
+        i_id = playlist_AddItem( p_playlist, p_item,
+                             PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
+        if( i_id < 0 )
+        {
+            msg_rc( _("(%d) failed adding %s to playlist\n"), i_id, newval.psz_string );
+            goto failed;
+        }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
@@ -850,10 +882,15 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         msg_rc( _("unknown command!\n") );
+        goto failed;
     }
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
+
+failed:
+    vlc_object_release( p_playlist );
+    return VLC_EGENERIC;
 }
 
 static int Other( vlc_object_t *p_this, char const *psz_cmd,
@@ -1194,4 +1231,64 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 
     return VLC_FALSE;
+}
+
+static void mrl_Split( vlc_object_t *p_this, char const *psz_mrl, char **ppsz_uri, char **ppsz_options, int *i_count )
+{
+    char *psz_name = strdup( psz_mrl );
+    char *psz_parser = psz_name;
+
+    char *psz_option = "";
+    char *psz_protocol = psz_parser;
+    *i_count = 0;
+    vlc_bool_t b_found = VLC_FALSE;
+
+    msg_Dbg( p_this, "Parsing %s for MRL options", psz_mrl );
+    while( *psz_parser && *psz_parser != '\0' && b_found == VLC_FALSE )
+    {
+        if( *psz_parser == ':' )
+        {   /* Found first (protocol/demux) part of MRL */
+            *psz_parser++;
+            while( *psz_parser && *psz_parser != '\0' )
+            {
+                if( *psz_parser == ':' )
+                {   
+                    *psz_parser++ = '\0';    /* terminate first part of MRL */
+                    psz_option = psz_parser; /* options start here */
+                    b_found = VLC_TRUE;
+                    break;
+                }
+                else if( *psz_parser == ' ' )
+                {
+                    /* Should be followed by '--<protocol>[/<demux>] <options>' part */
+                    *psz_parser++ = '\0';
+                    if( *psz_parser && *psz_parser == '-' )
+                        psz_parser++;
+                    if( *psz_parser && *psz_parser == '-' )
+                        *psz_parser++ = '\0';
+                    psz_option = psz_parser; /* options start here */
+                    b_found = VLC_TRUE;
+                    /* Keep <protocol>[/<demux>] part and replace ' ' by ':' */
+                    while( *psz_parser && *psz_parser != '\0' )
+                    {
+                        if( *psz_parser == ' ' )
+                        {
+                            *psz_parser++ = '=';
+                            break;
+                        }
+                        psz_parser++;
+                    }
+                    break;
+                }
+                psz_parser++;
+            }
+        }
+        psz_parser++;
+    }
+
+    *i_count = 1;
+    (*ppsz_uri) = strdup( psz_protocol );
+    (*ppsz_options) = strdup( psz_option );
+    msg_Dbg( p_this, "Leaving mrl_Split(psz_mrl, %s, %s, %d)", *ppsz_uri, *ppsz_options, *i_count );
+    free( psz_name );
 }
