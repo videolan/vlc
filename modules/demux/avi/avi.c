@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.44 2003/04/27 13:55:51 fenrir Exp $
+ * $Id: avi.c,v 1.45 2003/04/28 23:25:50 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -357,8 +357,9 @@ static int AVI_PacketNext( input_thread_t *p_input )
     {
         return VLC_EGENERIC;
     }
+    //msg_Dbg( p_input, "skip %4.4s:%4.4s", (char*)&avi_ck.i_fourcc, (char*)&avi_ck.i_type );
 
-    if( avi_ck.i_fourcc == AVIFOURCC_LIST && avi_ck.i_type == AVIFOURCC_rec )
+    if( avi_ck.i_fourcc == AVIFOURCC_LIST && ( avi_ck.i_type == AVIFOURCC_rec || avi_ck.i_type == AVIFOURCC_movi ) )
     {
         return AVI_SkipBytes( p_input, 12 );
     }
@@ -1554,7 +1555,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
 
     /* find first chunk of i_stream that isn't in index */
 
-    if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin )
+    if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin + 12 )
     {
         AVI_SeekAbsolute( p_input, p_avi->i_movi_lastchunk_pos );
         if( AVI_PacketNext( p_input ) )
@@ -1564,7 +1565,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
     }
     else
     {
-        AVI_SeekAbsolute( p_input, p_avi->i_movi_begin );
+        AVI_SeekAbsolute( p_input, p_avi->i_movi_begin + 12 );
     }
 
     for( ;; )
@@ -2143,7 +2144,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         {
             /* no valid index, we will parse directly the stream
              * in case we fail we will disable all finished stream */
-            if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin )
+            if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin + 12 )
             {
                 AVI_SeekAbsolute( p_input, p_avi->i_movi_lastchunk_pos );
                 if( AVI_PacketNext( p_input ) )
@@ -2153,7 +2154,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
             }
             else
             {
-                AVI_SeekAbsolute( p_input, p_avi->i_movi_begin );
+                AVI_SeekAbsolute( p_input, p_avi->i_movi_begin + 12 );
             }
 
             for( ;; )
