@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.26 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: alsa.c,v 1.27 2003/05/19 23:36:44 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -314,7 +314,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( val.i_int, AOUT_VAR_SPDIF )
+    if ( val.i_int == AOUT_VAR_SPDIF )
     {
         p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
     }
