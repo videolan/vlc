@@ -429,7 +429,7 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan, du code de pro
 %
-<Dnumgis> someone is not releasing a p_vout object corectly
+<Dnumgis> someone is not releasing a p_vout object correctly
 <tooney> it's not me
 <tooney> i was not there this afternoon
 * Meuuh looks in his pockets
@@ -440,6 +440,14 @@ the Boston strangler is to the woman home alone.
            VideoLAN?  It can't be to keep us BeOS people happy  ;-)
 <jlj> world domination
 <jlj> didn't you get the memo ?
+
+  -- #videolan
+%
+<sam> kali: j'ai raté mon train ...
+<sam> ben je voulais partir en belgique ce matin
+<ka|i> sam : a cause de la greve ou tu te reveilles ?
+<sam> mais ç'aurait été une mauvaise idée ...
+<sam> vu qu'en fait c'est la semaine prochaine le fosdem !
 
   -- #videolan
 %
