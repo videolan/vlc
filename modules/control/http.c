@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.4 2003/05/06 14:19:29 fenrir Exp $
+ * $Id: http.c,v 1.5 2003/05/09 16:01:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -180,7 +180,8 @@ static void Run( intf_thread_t *p_intf )
     p_page_intf = p_intf->p_sys->p_httpd->pf_register_file(
                       p_intf->p_sys->p_httpd, "/", "text/html",
                       NULL, NULL, httpd_page_interface_get,
-                      NULL, (httpd_file_callback_args_t*)p_intf );
+                      httpd_page_interface_get,
+                      (httpd_file_callback_args_t*)p_intf );
 
     while( !p_intf->b_die )
     {
@@ -279,7 +280,16 @@ static void uri_extract_value( char *psz_uri, char *psz_name,
         }
         else
         {
-            i_len = strlen( p );
+            /* for POST method */
+            if( strchr( p, '\n' ) )
+            {
+                i_len = strchr( p, '\n' ) - p;
+                if( i_len && *(p+i_len-1) == '\r' ) i_len--;
+            }
+            else
+            {
+                i_len = strlen( p );
+            }
         }
         i_len = __MIN( i_value_max - 1, i_len );
         if( i_len > 0 )

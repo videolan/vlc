@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.13 2003/04/27 14:11:26 gbazin Exp $
+ * $Id: httpd.c,v 1.14 2003/05/09 16:01:17 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1803,7 +1803,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
 
 #if defined( WIN32 ) || defined( UNDER_CE )
-                if( ( i_len < 0 && WSAGetLastError() == !WSAEWOULDBLOCK ) ||
+                if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) ||
 #else
                 if( ( i_len < 0 && errno != EAGAIN && errno != EINTR ) ||
 #endif
@@ -1853,7 +1853,11 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 }
 //                msg_Warn( p_httpt, "on %d send %d bytes %s", p_con->i_buffer_size, i_len, p_con->p_buffer + p_con->i_buffer );
 
-                if( ( i_len < 0 && errno != EAGAIN && errno != EINTR )||
+#if defined( WIN32 ) || defined( UNDER_CE )
+                if( ( i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK ) ||
+#else
+                if( ( i_len < 0 && errno != EAGAIN && errno != EINTR ) ||
+#endif
                     ( i_len == 0 ) )
                 {
                     httpd_connection_t *p_next = p_con->p_next;
@@ -1952,7 +1956,12 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                     }
                     i_send = send( p_con->fd, &p_stream->p_buffer[i_pos], i_write, 0 );
 
-                    if( ( i_send < 0 && errno != EAGAIN && errno != EINTR )|| ( i_send == 0 ) )
+#if defined( WIN32 ) || defined( UNDER_CE )
+                    if( ( i_send < 0 && WSAGetLastError() != WSAEWOULDBLOCK )||
+#else
+                    if( ( i_send < 0 && errno != EAGAIN && errno != EINTR )||
+#endif
+                        ( i_send == 0 ) )
                     {
                         httpd_connection_t *p_next = p_con->p_next;
 
