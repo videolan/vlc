@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.62 2003/04/16 11:47:08 gbazin Exp $
+ * $Id: vlc_common.h,v 1.63 2003/05/12 19:11:53 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -384,9 +384,12 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
         {                                                                     \
             (p_ar) = malloc( ((i_oldsize) + 1) * sizeof( *(p_ar) ) );         \
         }                                                                     \
-        memmove( (p_ar) + (i_pos) + 1,                                        \
-                 (p_ar) + (i_pos),                                            \
-                 ((i_oldsize) - (i_pos)) * sizeof( *(p_ar) ) );               \
+        if( (i_oldsize) - (i_pos) )                                           \
+        {                                                                     \
+            memmove( (p_ar) + (i_pos) + 1,                                    \
+                     (p_ar) + (i_pos),                                        \
+                     ((i_oldsize) - (i_pos)) * sizeof( *(p_ar) ) );           \
+        }                                                                     \
         (p_ar)[i_pos] = elem;                                                 \
         (i_oldsize)++;                                                        \
     }                                                                         \
@@ -395,9 +398,12 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #define REMOVE_ELEM( p_ar, i_oldsize, i_pos )                                 \
     do                                                                        \
     {                                                                         \
-        memmove( (p_ar) + (i_pos),                                            \
-                 (p_ar) + (i_pos) + 1,                                        \
-                 ((i_oldsize) - (i_pos) - 1) * sizeof( *(p_ar) ) );           \
+        if( (i_oldsize) - (i_pos) - 1 )                                       \
+        {                                                                     \
+            memmove( (p_ar) + (i_pos),                                        \
+                     (p_ar) + (i_pos) + 1,                                    \
+                     ((i_oldsize) - (i_pos) - 1) * sizeof( *(p_ar) ) );       \
+        }                                                                     \
         if( i_oldsize > 1 )                                                   \
         {                                                                     \
             (p_ar) = realloc( p_ar, ((i_oldsize) - 1) * sizeof( *(p_ar) ) );  \
