@@ -2,8 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, jam, nasm, libmodplug-dev, libhal-dev, libtar-dev, libdvdnav-dev
-Build-Conflicts: libavcodec-dev
+Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.6), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.1-5), libimlib2-dev, libmatroska-dev (>= 0.7.5), libfreetype6-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.11.11a-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, jam, nasm, libmodplug-dev, libhal-dev, libtar-dev, libdvdnav-dev, libgnutls11-dev, libavcodec-dev (>= 0.cvs20050313-1), libavformat-dev (>= 0.cvs20050313-1), libpostproc-dev (>= 0.cvs20050313-1), libncurses5-dev
 Standards-Version: 3.6.1.1
 
 Package: vlc
@@ -11,6 +10,7 @@ Section: graphics
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, wxvlc, ttf-freefont
 Recommends: ttf-thryomanes, videolan-doc
+Suggests: vlc-plugin-alsa, mozilla-plugin-vlc
 Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Provides: mp3-decoder
@@ -23,8 +23,13 @@ Description: multimedia player for all audio and video formats
  reads and multicasts them through the network to other clients, or serves
  them through HTTP.
  .
- VLC has support for on-the-fly transcoding of audio and video formats,
- either for broadcasting purposes or for movie format transformations.
+ VLC has support for on-the-fly transcoding of audio and video formats, either
+ for broadcasting purposes or for movie format transformations. Support for
+ most output methods is provided by this package, but features can be added
+ by installing additional audio plugins (vlc-plugin-esd, vlc-plugin-alsa,
+ vlc-plugin-arts) or video plugins (vlc-plugin-sdl, vlc-plugin-ggi,
+ vlc-plugin-glide, vlc-plugin-svgalib). There is also a web browser plugin
+ in the mozilla-plugin-vlc package.
 
 Package: libvlc0-dev
 Section: libdevel

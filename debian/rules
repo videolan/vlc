@@ -38,6 +38,7 @@ CONFIG_FLAGS += \
 	--enable-ogg \
 	--enable-vorbis \
 	--enable-wxwindows \
+	--with-wx-config=wxgtk-2.4-config \
 	--disable-slp \
 	--enable-flac \
 	--disable-skins \
@@ -58,11 +59,12 @@ CONFIG_FLAGS += \
 	--enable-theora \
 	--enable-modplug \
 	--enable-dvdnav \
+	--enable-gnutls \
+	--enable-ffmpeg \
+	--enable-ncurses \
 	$(NULL)
 
 # These ones are currently shipped with VLC
-CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
-#CONFIG_FLAGS += --enable-ffmpegaltivec
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
 CONFIG_FLAGS += --enable-x264 --with-x264-tree=extras/x264
 
@@ -94,17 +96,6 @@ configure-stamp:
 	touch configure
 	touch config.h.in
 	touch `find . -name Makefile.in`
-
-	# Check that we have an ffmpeg tree in here (can be a symlink)
-	test -d extras/ffmpeg
-	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/ffmpeg \
-	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug --disable-mmx --disable-altivec \
-	  && cd libavcodec \
-	  && $(MAKE) \
-	  && cd ../libavformat \
-	  && $(MAKE); \
-	fi
 
 	# Check that we have an x264 tree in here (can be a symlink)
 	test -d extras/x264
@@ -144,22 +135,6 @@ build-stamp: patch configure-stamp
 
 	# Hackety hackety hack
 	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/ffmpeg/libavcodec \
-	  && $(MAKE) clean \
-	  && rm -f Makefile.pic \
-	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
-	  && $(MAKE) -f Makefile.pic \
-	  && rm -f Makefile.pic \
-	  && cd ../libavformat \
-	  && $(MAKE) clean \
-	  && rm -f Makefile.pic \
-	  && sed 's/^CFLAGS *=/&-fPIC -DPIC /' <Makefile >Makefile.pic \
-	  && $(MAKE) -f Makefile.pic \
-	  && rm -f Makefile.pic; \
-	fi
-
-	# Hackety hackety hack
-	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/x264 \
 	  && jam -dx clean \
 	  && rm -f Jamfile.pic \
@@ -185,11 +160,6 @@ clean: unpatch
 	dh_testroot
 	rm -f configure-stamp build-stamp
 
-	# Check that we have an ffmpeg tree in here (can be a symlink)
-	test -d extras/ffmpeg
-	-if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/ffmpeg && $(MAKE) distclean; \
-	fi
 	# Check that we have an x264 tree in here (can be a symlink)
 	test -d extras/x264
 	-if test ! '(' -d CVS -o -d .svn ')'; then \

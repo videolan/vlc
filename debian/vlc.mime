@@ -1,32 +1,43 @@
 video/mpeg; vlc %s; description="MPEG Video"; test=test -n "$DISPLAY"; priority=7
-video/mpeg; vlc -I rc -V aalib %s; needsterminal; description="MPEG Video"; priority=4
+video/mpeg; vlc -I rc -V caca %s; needsterminal; description="MPEG Video"; priority=4
 video/x-mpeg; vlc %s; description="MPEG Video"; test=test -n "$DISPLAY"; priority=7
-video/x-mpeg; vlc -I rc -V aalib %s; needsterminal; description="MPEG Video"; priority=4
+video/x-mpeg; vlc -I rc -V caca %s; needsterminal; description="MPEG Video"; priority=4
 video/mpeg-system; vlc %s; description="MPEG Video"; test=test -n "$DISPLAY"; priority=7
-video/mpeg-system; vlc -I rc -V aalib %s; needsterminal; description="MPEG Video"; priority=4
+video/mpeg-system; vlc -I rc -V caca %s; needsterminal; description="MPEG Video"; priority=4
 video/x-mpeg-system; vlc %s; description="MPEG Video"; test=test -n "$DISPLAY"; priority=7
-video/x-mpeg-system; vlc -I rc -V aalib %s; needsterminal; description="MPEG Video"; priority=4
+video/x-mpeg-system; vlc -I rc -V caca %s; needsterminal; description="MPEG Video"; priority=4
+
+audio/x-wav; nametemplate=%s.wav; vlc %s; description="WAV Audio"; test=test -n "$DISPLAY"; priority=7
+audio/x-wav; nametemplate=%s.wav; vlc -I rc -V caca %s; needsterminal; description="WAV Audio"; priority=4
 
 video/mpeg4; vlc %s; description="MPEG-4 Video"; test=test -n "$DISPLAY"; priority=7
-video/mpeg4; vlc -I rc -V aalib %s; needsterminal; description="MPEG-4 Video"; priority=4
+video/mpeg4; vlc -I rc -V caca %s; needsterminal; description="MPEG-4 Video"; priority=4
+audio/mpeg; nametemplate=%s.mpg; vlc %s; description="MPEG Audio"; test=test -n "$DISPLAY"; priority=7
+audio/mpeg; nametemplate=%s.mpg; vlc -I rc -V caca %s; needsterminal; description="MPEG Audio"; priority=4
+audio/mpegurl; nametemplate=%s.m3u; vlc %s; description="MPEG Audio URL"; test=test -n "$DISPLAY"; priority=7
+audio/mpegurl; nametemplate=%s.m3u; vlc -I rc -V caca %s; needsterminal; description="MPEG Audio URL"; priority=4
+audio/x-mp3; nametemplate=%s.mp3; vlc %s; description="MPEG Audio"; test=test -n "$DISPLAY"; priority=7
+audio/x-mp3; nametemplate=%s.mp3; vlc -I rc -V caca %s; needsterminal; description="MPEG Audio"; priority=4
 audio/mpeg4; vlc %s; description="MPEG-4 Audio"; test=test -n "$DISPLAY"; priority=7
-audio/mpeg4; vlc -I rc -V aalib %s; needsterminal; description="MPEG-4 Audio"; priority=4
+audio/mpeg4; vlc -I rc -V caca %s; needsterminal; description="MPEG-4 Audio"; priority=4
 application/mpeg4-iod; vlc %s; description="MPEG-4 Video"; test=test -n "$DISPLAY"; priority=7
-application/mpeg4-iod; vlc -I rc -V aalib %s; needsterminal; description="MPEG-4 Video"; priority=4
+application/mpeg4-iod; vlc -I rc -V caca %s; needsterminal; description="MPEG-4 Video"; priority=4
 application/mpeg4-muxcodetable; vlc %s; description="MPEG-4 Video"; test=test -n "$DISPLAY"; priority=7
-application/mpeg4-muxcodetable; vlc -I rc -V aalib %s; needsterminal; description="MPEG-4 Video"; priority=4
+application/mpeg4-muxcodetable; vlc -I rc -V caca %s; needsterminal; description="MPEG-4 Video"; priority=4
 
 video/x-msvideo; vlc %s; description="MS Video (AVI)"; test=test -n "$DISPLAY"; priority=4
-video/x-msvideo; vlc -I rc -V aalib %s; needsterminal; description="MS Video (AVI)"; priority=3
+video/x-msvideo; vlc -I rc -V caca %s; needsterminal; description="MS Video (AVI)"; priority=3
 
 video/quicktime; vlc %s; description="Apple Quicktime Video"; test=test -n "$DISPLAY"; priority=4
-video/quicktime; vlc -I rc -V aalib %s; needsterminal; description="Apple Quicktime Video"; priority=3
+video/quicktime; vlc -I rc -V caca %s; needsterminal; description="Apple Quicktime Video"; priority=3
 
-application/x-ogg; vlc %s; description="Ogg stream"; test=test -n "$DISPLAY"; priority=4
-application/x-ogg; vlc -I rc -V aalib %s; needsterminal; description="Ogg stream"; priority=3
+application/ogg; nametemplate=%s.ogg; vlc %s; description="Ogg stream"; test=test -n "$DISPLAY"; priority=4
+application/ogg; nametemplate=%s.ogg; vlc -I rc -V caca %s; needsterminal; description="Ogg stream"; priority=3
+application/x-ogg; nametemplate=%s.ogg; vlc %s; description="Ogg stream"; test=test -n "$DISPLAY"; priority=4
+application/x-ogg; nametemplate=%s.ogg; vlc -I rc -V caca %s; needsterminal; description="Ogg stream"; priority=3
 
 application/x-ms-asf-plugin; vlc %s; description="Windows Media Video"; test=test -n "$DISPLAY"; priority=4
-application/x-ms-asf-plugin; vlc -I rc -V aalib %s; needsterminal; description="Windows Media Video"; priority=3
+application/x-ms-asf-plugin; vlc -I rc -V caca %s; needsterminal; description="Windows Media Video"; priority=3
 application/x-mplayer2; vlc %s; description="Windows Media"; test=test -n "$DISPLAY"; priority=4
-application/x-mplayer2; vlc -I rc -V aalib %s; needsterminal; description="Windows Media"; priority=3
+application/x-mplayer2; vlc -I rc -V caca %s; needsterminal; description="Windows Media"; priority=3
 

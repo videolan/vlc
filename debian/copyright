@@ -1,21 +1,14 @@
 This package was debianized by Sam Hocevar <sam@zoy.org> on
 Mon, 13 Mar 2000 02:21:45 +0100.
 
-It was taken from http://download.videolan.org/pub/vlc/0.7.1/, and the source
-tarball also contains the ffmpeg, faad2 and x264 trees.
+It was taken from http://download.videolan.org/pub/vlc/, and the source
+tarball also contains the faad2 and x264 trees.
 
 Upstream authors: The VideoLAN Team <videolan@videolan.org>
 
 faad2 authors: M. Bakker (mbakker(at)nero.com)
                Alexander Kurpiers (a.kurpiers(at)nt.tu-darmstadt.de)
                Volker Fischer (v.fischer(at)nt.tu-darmstadt.de)
-
-ffmpeg authors: Fabrice Bellard, BERO, Mario Brito, Alex Beregszaszi,
-                Tim Ferguson, Brian Foley, Arpad Gereoffy, Philip Gladstone,
-                Vladimir Gneushev, Falk Hueffner, Zdenek Kabelac, Robin Kay,
-                Nick Kurshev, Mike Melanson, Michael Niedermayer,
-                François Revol, Roman Shaposhnik, Dieter Shirley,
-                Juan J. Sierralta, Ewald Snel, Roberto Togni, Lionel Ulmer
 
 x264 authors: Laurent Aimar <fenrir@via.ecp.fr>
               Eric Petit <titer@videolan.org>
