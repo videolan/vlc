@@ -771,6 +771,17 @@ static int InitThread( adec_thread_t * p_adec )
     return( 0 );
 }
 
+#define UPDATE_INCREMENT( increment, integer ) \
+    if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 ) \
+    { \
+        (integer) += (increment).l_euclidean_integer + 1; \
+        (increment).l_remainder -= (increment).l_euclidean_denominator; \
+    } \
+    else \
+    { \
+        (integer) += (increment).l_euclidean_integer; \
+    }
+
 /******************************************************************************
  * RunThread : audio decoder thread
  ******************************************************************************
@@ -783,7 +794,11 @@ static void RunThread( adec_thread_t * p_adec )
 //    int                 i_header;
 //    int                 i_framesize;
 //    int                 i_dummy;
-    mtime_t             adec_date = 0;
+    s64                 s64_numerator;
+    s64                 s64_denominator;
+    /* The synchronization needs date and date_increment for the moment */
+    mtime_t             date = 0;
+    aout_increment_t    date_increment;
 
     intf_DbgMsg("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
 
@@ -792,6 +807,31 @@ static void RunThread( adec_thread_t * p_adec )
     {
         p_adec->b_error = 1;
     }
+
+    /* Initializing date_increment */
+    switch ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT )
+    {
+        /* Layer 2 */
+        case 2:
+            s64_numerator = 1152 * 1000000;
+            s64_denominator = (s64)p_adec->p_aout->dsp.l_rate;
+            break;
+
+        /* Layer 1 */
+        case 3:
+            s64_numerator = 384 * 1000000;
+            s64_denominator = (s64)p_adec->p_aout->dsp.l_rate;
+            break;
+    }
+    date_increment.l_remainder = -(long)s64_denominator;
+    date_increment.l_euclidean_integer = 0;
+    while ( s64_numerator >= s64_denominator )
+    {
+        date_increment.l_euclidean_integer++;
+        s64_numerator -= s64_denominator;
+    }
+    date_increment.l_euclidean_remainder = (long)s64_numerator;
+    date_increment.l_euclidean_denominator = (long)s64_denominator;
 
     /* Audio decoder thread's main loop */
     while ( (!p_adec->b_die) && (!p_adec->b_error) )
@@ -849,7 +889,7 @@ static void RunThread( adec_thread_t * p_adec )
                     {
                         pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                         /* Frame 1 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = adec_date;
+                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = date;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
@@ -867,8 +907,10 @@ static void RunThread( adec_thread_t * p_adec )
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-                        /* 24000 == 6*384/2/48000*1000000 */
-                        adec_date += 24000; /* !! */
+                        date += 24000;
+/*
+                        UPDATE_INCREMENT( date_increment, date )
+*/
                     }
                 }
                 break;
