@@ -2,7 +2,7 @@
  * playlist.c :  Playlist import module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: playlist.c,v 1.3 2004/01/25 20:05:29 hartman Exp $
+ * $Id: playlist.c,v 1.4 2004/01/26 20:48:51 fenrir Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -25,7 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include "ninput.h"
+#include <vlc/input.h>
 
 #include "playlist.h"
 
