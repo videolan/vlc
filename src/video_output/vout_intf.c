@@ -79,7 +79,7 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
         return NULL;
     }
 
-    p_window = p_intf->pf_request_window( p_intf, pi_x_hint, pi_y_hint,
+    p_window = p_intf->pf_request_window( p_intf, p_vout, pi_x_hint, pi_y_hint,
                                           pi_width_hint, pi_height_hint );
     vlc_object_release( p_intf );
 
@@ -103,6 +103,28 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
 
     p_intf->pf_release_window( p_intf, p_window );
     vlc_object_release( p_intf );
+}
+
+int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
+                        int i_query, va_list args )
+{
+    intf_thread_t *p_intf;
+    int i_ret;
+
+    /* Find the main interface */
+    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    if( !p_intf ) return VLC_EGENERIC;
+
+    if( !p_intf->pf_control_window )
+    {
+        msg_Err( p_vout, "no pf_control_window");
+        vlc_object_release( p_intf );
+        return VLC_EGENERIC;
+    }
+
+    i_ret = p_intf->pf_control_window( p_intf, p_window, i_query, args );
+    vlc_object_release( p_intf );
+    return i_ret;
 }
 
 /*****************************************************************************

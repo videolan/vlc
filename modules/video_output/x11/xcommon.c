@@ -2126,6 +2126,10 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
         case VOUT_SET_ZOOM:
+            if( p_vout->p_sys->p_win->owner_window )
+                return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+
             f_arg = va_arg( args, double );
 
             /* Update dimensions */
@@ -2136,7 +2140,16 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
             return VLC_SUCCESS;
 
-        default:
+       case VOUT_REPARENT:
+            XReparentWindow( p_vout->p_sys->p_display,
+                             p_vout->p_sys->p_win->base_window,
+                             DefaultRootWindow( p_vout->p_sys->p_display ),
+                             0, 0 );
+            XSync( p_vout->p_sys->p_display, False );
+            p_vout->p_sys->p_win->owner_window = 0;
+            return VLC_SUCCESS;
+
+       default:
             msg_Dbg( p_vout, "control query not supported" );
             return VLC_EGENERIC;
     }

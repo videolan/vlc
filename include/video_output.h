@@ -218,6 +218,7 @@ picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
 VLC_EXPORT( void *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
 VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
+VLC_EXPORT( int, vout_ControlWindow, ( vout_thread_t *, void *, int, va_list ) );
 
 static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
                                   va_list args )
@@ -242,7 +243,8 @@ static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
 enum output_query_e
 {
     VOUT_SET_ZOOM,         /* arg1= double *       res=    */
-    VOUT_REPARENT
+    VOUT_REPARENT,
+    VOUT_CLOSE
 };
 
 /**

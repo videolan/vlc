@@ -85,6 +85,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     }
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
+    p_intf->pf_control_window = NULL;
 
     /* Choose the best module */
     p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );

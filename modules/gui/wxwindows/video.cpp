@@ -31,10 +31,15 @@
 
 #include "wxwindows.h"
 
-static void *GetWindow( intf_thread_t *p_intf, int *pi_x_hint, int *pi_y_hint,
+static void *GetWindow( intf_thread_t *p_intf, vout_thread_t *,
+                        int *pi_x_hint, int *pi_y_hint,
                         unsigned int *pi_width_hint,
                         unsigned int *pi_height_hint );
+
 static void ReleaseWindow( intf_thread_t *p_intf, void *p_window );
+
+static int ControlWindow( intf_thread_t *p_intf, void *p_window,
+                          int i_query, va_list args );
 
 /* IDs for the controls and the menu commands */
 enum
@@ -50,14 +55,16 @@ public:
     VideoWindow( intf_thread_t *_p_intf, wxWindow *p_parent );
     virtual ~VideoWindow();
 
-    void *GetWindow( int *, int *, unsigned int *, unsigned int * );
+    void *GetWindow( vout_thread_t *p_vout, int *, int *,
+                     unsigned int *, unsigned int * );
     void ReleaseWindow( void * );
+    int  ControlWindow( void *, int, va_list );
 
 private:
     intf_thread_t *p_intf;
+    vout_thread_t *p_vout;
     wxWindow *p_parent;
     vlc_mutex_t lock;
-    vlc_bool_t  b_in_use;
 
     wxWindow *p_child_window;
 
@@ -91,10 +98,12 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     p_parent = _p_parent;
 
     vlc_mutex_init( p_intf, &lock );
-    b_in_use = VLC_FALSE;
+
+    p_vout = NULL;
 
     p_intf->pf_request_window = ::GetWindow;
     p_intf->pf_release_window = ::ReleaseWindow;
+    p_intf->pf_control_window = ::ControlWindow;
 
     p_intf->p_sys->p_video_window = this;
     p_child_window = new wxWindow( this, -1, wxDefaultPosition, wxSize(0,0) );
@@ -109,17 +118,27 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
 VideoWindow::~VideoWindow()
 {
+    vlc_mutex_lock( &lock );
+    if( p_vout )
+    {
+        if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
+            vout_Control( p_vout, VOUT_CLOSE );
+    }
+    vlc_mutex_unlock( &lock );
+
     vlc_mutex_destroy( &lock );
 }
 
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-static void *GetWindow( intf_thread_t *p_intf, int *pi_x_hint, int *pi_y_hint,
+static void *GetWindow( intf_thread_t *p_intf, vout_thread_t *p_vout,
+                        int *pi_x_hint, int *pi_y_hint,
                         unsigned int *pi_width_hint,
                         unsigned int *pi_height_hint )
 {
-    return p_intf->p_sys->p_video_window->GetWindow( pi_x_hint, pi_y_hint,
+    return p_intf->p_sys->p_video_window->GetWindow( p_vout,
+                                                     pi_x_hint, pi_y_hint,
                                                      pi_width_hint,
                                                      pi_height_hint );
 }
@@ -134,23 +153,24 @@ extern "C" {
 }
 #endif
 
-void *VideoWindow::GetWindow( int *pi_x_hint, int *pi_y_hint,
+void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
+                              int *pi_x_hint, int *pi_y_hint,
                               unsigned int *pi_width_hint,
                               unsigned int *pi_height_hint )
 {
 #if defined(__WXGTK__) || defined(WIN32)
     vlc_mutex_lock( &lock );
 
-    if( b_in_use )
+    if( p_vout )
     {
         msg_Dbg( p_intf, "Video window already in use" );
         return NULL;
     }
 
-    b_in_use = VLC_TRUE;
+    p_vout = _p_vout;
 
     wxSizeEvent event( wxSize(*pi_width_hint, *pi_height_hint),
-		       UpdateSize_Event );
+                       UpdateSize_Event );
     AddPendingEvent( event );
     vlc_mutex_unlock( &lock );
 
@@ -185,7 +205,7 @@ void VideoWindow::ReleaseWindow( void *p_window )
 {
     vlc_mutex_lock( &lock );
 
-    b_in_use = VLC_FALSE;
+    p_vout = NULL;
 
 #if defined(__WXGTK__) || defined(WIN32)
     wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
@@ -220,4 +240,43 @@ void VideoWindow::UpdateHide( wxSizeEvent &event )
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
+}
+
+static int ControlWindow( intf_thread_t *p_intf, void *p_window,
+                          int i_query, va_list args )
+{
+    return p_intf->p_sys->p_video_window->ControlWindow( p_window, i_query,
+                                                         args );
+}
+
+int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
+{
+    int i_ret = VLC_EGENERIC;
+
+    vlc_mutex_lock( &lock );
+
+    switch( i_query )
+    {
+        case VOUT_SET_ZOOM:
+        {
+            double f_arg = va_arg( args, double );
+
+            /* Update dimensions */
+            wxSizeEvent event( wxSize(p_vout->render.i_width * f_arg,
+                                      p_vout->render.i_height * f_arg),
+                               UpdateSize_Event );
+            AddPendingEvent( event );
+
+            i_ret = VLC_SUCCESS;
+        }
+        break;
+
+        default:
+            msg_Dbg( p_intf, "control query not supported" );
+            break;
+    }
+
+    vlc_mutex_unlock( &lock );
+
+    return i_ret;
 }

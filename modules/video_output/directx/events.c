@@ -927,6 +927,10 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
     case VOUT_SET_ZOOM:
+        if( p_vout->p_sys->p_win->owner_window )
+            return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->hparent, i_query, args );
+
         f_arg = va_arg( args, double );
 
         /* Update dimensions */
@@ -939,6 +943,9 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                       rect_window.right - rect_window.left,
                       rect_window.bottom - rect_window.top, SWP_NOMOVE );
 
+        return VLC_SUCCESS;
+
+    case VOUT_CLOSE:
         return VLC_SUCCESS;
 
     default:
