@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.7 2003/04/01 22:29:41 massiot Exp $
+ * $Id: udp.c,v 1.8 2003/05/24 11:53:11 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -383,7 +383,6 @@ static void ThreadWrite( vlc_object_t *p_this )
             return;
         }
         i_wait = i_date + p_buffer->i_dts;
-        mwait( i_wait );
 
         if( i_wait - mdate() > MAX_ERROR ||
             i_wait - mdate() < -MAX_ERROR )
@@ -391,6 +390,11 @@ static void ThreadWrite( vlc_object_t *p_this )
             msg_Warn( p_sout, "resetting clock" );
             i_date = mdate() - p_buffer->i_dts;
         }
+        else
+        {
+            mwait( i_wait );
+        }
+
         send( p_thread->i_handle,
               p_buffer->p_buffer,
               p_buffer->i_size,

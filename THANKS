@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.7 2003/05/20 15:51:03 hartman Exp $
+$Id: THANKS,v 1.8 2003/05/24 11:53:12 sam Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -36,6 +36,7 @@ Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API
 Joel Arvidsson <dogai@privat.utfors.se> - Swedish translation
 Joeri van Dooren <joeri@van.dooren.be> - OS X icon
+Johen Michael Zorko <zorko@att.net> - fix for delay issues in udp sout
 John Paul Lorenti <jpl31@columbia.edu> - ALSA device selection patch
 Julien Blache <jb@technologeek.org> - disc ejection code
 Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
