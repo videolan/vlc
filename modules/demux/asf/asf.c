@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.19 2003/01/29 21:54:34 fenrir Exp $
+ * $Id: asf.c,v 1.20 2003/02/01 01:21:04 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -103,7 +103,6 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-    p_demux->i_first_pts = -1;
 
     /* Now load all object ( except raw data ) */
     if( !ASF_ReadObjectRoot( p_input, &p_demux->root, p_input->stream.b_seekable ) )
@@ -417,6 +416,33 @@ static int Activate( vlc_object_t * p_this )
     return( 0 );
 }
 
+
+static mtime_t GetMoviePTS( demux_sys_t *p_demux )
+{
+    mtime_t i_time;
+    int     i_stream;
+
+    i_time = -1;
+    for( i_stream = 0; i_stream < 128 ; i_stream++ )
+    {
+#define p_stream p_demux->stream[i_stream]
+        if( p_stream && p_stream->p_es && p_stream->p_es->p_decoder_fifo && p_stream->i_time > 0)
+        {
+            if( i_time < 0 )
+            {
+                i_time = p_stream->i_time;
+            }
+            else
+            {
+                i_time = __MIN( i_time, p_stream->i_time );
+            }
+        }
+#undef p_stream
+    }
+
+    return( i_time );
+}
+
 /*****************************************************************************
  * Demux: read packet and send them to decoders
  *****************************************************************************/
@@ -668,18 +694,12 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                 p_stream->i_time =
                     ( (mtime_t)i_pts + i_payload * (mtime_t)i_pts_delta );
 
-                if( p_demux->i_first_pts == -1 )
-                {
-                    p_demux->i_first_pts = p_stream->i_time;
-                }
-                p_stream->i_time -= p_demux->i_first_pts;
-
                 p_stream->p_pes = input_NewPES( p_input->p_method_data );
                 p_stream->p_pes->i_dts =
                     p_stream->p_pes->i_pts =
                         input_ClockGetTS( p_input,
                                           p_input->stream.p_selected_program,
-                                          ( p_stream->i_time+DEFAULT_PTS_DELAY) * 9 /100 );
+                                          p_stream->i_time * 9 /100 );
 
                 p_stream->p_pes->p_next = NULL;
                 p_stream->p_pes->i_nb_data = 0;
@@ -754,6 +774,7 @@ static int Demux( input_thread_t *p_input )
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         off_t i_offset;
+
         msleep( DEFAULT_PTS_DELAY );
         i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
 
@@ -766,17 +787,16 @@ static int Demux( input_thread_t *p_input )
                         i_offset % p_demux->p_fp->i_min_data_packet_size;
         ASF_SeekAbsolute( p_input, p_demux->i_data_begin + i_offset );
 
-        p_demux->i_time = 0;
+        p_demux->i_time = -1;
         for( i = 0; i < 128 ; i++ )
         {
 #define p_stream p_demux->stream[i]
             if( p_stream )
             {
-                p_stream->i_time = 0;
+                p_stream->i_time = -1;
             }
 #undef p_stream
         }
-        p_demux->i_first_pts = -1;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -803,46 +823,41 @@ static int Demux( input_thread_t *p_input )
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-
-    for( i = 0; i < 10; i++ ) // parse 10 packets
+    for( ;; )
     {
+        mtime_t i_length;
+        mtime_t i_time_begin = GetMoviePTS( p_demux );
         int i_result;
 
         if( ( i_result = DemuxPacket( p_input, b_play_audio ) ) <= 0 )
         {
             return i_result;
         }
-    }
-
-    p_demux->i_time = -1;
-    for( i = 0; i < 128 ; i++ )
-    {
-#define p_stream p_demux->stream[i]
-        if( p_stream && p_stream->p_es && p_stream->p_es->p_decoder_fifo )
+        if( i_time_begin == -1 )
         {
-            if( p_demux->i_time < 0 )
+            i_time_begin = GetMoviePTS( p_demux );
+        }
+        else
+        {
+            i_length = GetMoviePTS( p_demux ) - i_time_begin;
+            if( i_length < 0 || i_length >= 40 * 1000 )
             {
-                p_demux->i_time = p_stream->i_time;
-            }
-            else
-            {
-                p_demux->i_time = __MIN( p_demux->i_time, p_stream->i_time );
+                break;
             }
         }
-#undef p_stream
     }
 
+    p_demux->i_time = GetMoviePTS( p_demux );
     if( p_demux->i_time >= 0 )
     {
         /* update pcr XXX in mpeg scale so in 90000 unit/s */
-        p_demux->i_pcr =( __MAX( p_demux->i_time /*- DEFAULT_PTS_DELAY*/, 0 ) ) * 9 / 100;
+        p_demux->i_pcr = p_demux->i_time * 9 / 100;
 
         /* first wait for the good time to read next packets */
         input_ClockManageRef( p_input,
                               p_input->stream.p_selected_program,
                               p_demux->i_pcr );
     }
-
 
     return( 1 );
 }
