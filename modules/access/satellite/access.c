@@ -115,7 +115,7 @@ int E_(Open) ( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "invalid frequency, using default one" );
         i_freq = config_GetInt( p_input, "frequency" );
-        if( i_freq > (12999*1000) || i_freq < (10000*1000)a )
+        if( i_freq > (12999*1000) || i_freq < (10000*1000) )
         {
             msg_Err( p_input, "invalid default frequency" );
             return -1;
