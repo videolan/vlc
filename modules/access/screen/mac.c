@@ -55,7 +55,9 @@ int screen_InitCapture( demux_t *p_demux )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
-    int            i_chroma;
+    int            i_chroma, i_bbp, i_offset;
+
+    i_chroma = i_bbp = i_offset = 0;
 
     p_sys->p_data = p_data =
         (screen_data_t *)malloc( sizeof( screen_data_t ) );
@@ -77,25 +79,27 @@ int screen_InitCapture( demux_t *p_demux )
     
     switch( CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID) )
     {
-    case 8: /* FIXME: set the palette */
-        i_chroma = VLC_FOURCC('R','G','B','2'); break;
-    case 15:
-        i_chroma = VLC_FOURCC('R','V','1','5'); break;
-    case 16:
-        i_chroma = VLC_FOURCC('R','V','1','6'); break;
+    /* TODO figure out 256 colors (who uses it anyways) */
+    case 15: /* TODO this is not RV16, but BGR16 */
+        i_chroma = VLC_FOURCC('R','V','1','6');
+        i_bbp = 16;
+        i_offset = 8;
+        break;
     case 24:
-        i_chroma = VLC_FOURCC('R','V','2','4'); break;
     case 32:
-        i_chroma = VLC_FOURCC('R','V','3','2'); break;
+        i_chroma = VLC_FOURCC('R','V','3','2');
+        i_bbp = 32;
+        i_offset = 4;
+        break;
     default:
-        msg_Err( p_demux, "unknown screen depth" );
+        msg_Err( p_demux, "unknown screen depth: %d", CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID) );
         return VLC_EGENERIC;
     }
 
     GetBackColor(&p_data->oldBackColor);
     GetPenState(&p_data->oldState);
-//    ForeColor(blackColor);
-//    BackColor(whiteColor);
+    ForeColor(blackColor);
+    BackColor(whiteColor);
     
     p_data->gMainDevice = GetMainDevice();
     p_data->gDeviceState = HGetState((Handle)p_data->gMainDevice);
@@ -107,12 +111,12 @@ int screen_InitCapture( demux_t *p_demux )
     LockPixels(p_data->LocalBufferPix);
     
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
-    p_sys->fmt.video.i_width  = CGDisplayPixelsWide(p_data->displayID);
+    p_sys->fmt.video.i_width  = CGDisplayPixelsWide(p_data->displayID) + i_offset;
+    p_sys->fmt.video.i_visible_width  = CGDisplayPixelsWide(p_data->displayID);
     p_sys->fmt.video.i_height = CGDisplayPixelsHigh(p_data->displayID);
-    p_sys->fmt.video.i_bits_per_pixel = CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID);
+    p_sys->fmt.video.i_bits_per_pixel = i_bbp;
 
     GetForeColor(&p_data->oldForeColor);
-    assert(CGSNewConnection(NULL, &p_data->gConnection) == kCGErrorSuccess);
 
     HSetState( (Handle)p_data->gMainDevice, p_data->gDeviceState );
     SetPenState( &p_data->oldState);
@@ -126,7 +130,6 @@ int screen_CloseCapture( demux_t *p_demux )
 {
     screen_data_t *p_data = (screen_data_t *)p_demux->p_sys->p_data;
 
-    assert(CGSReleaseConnection(p_data->gConnection) == kCGErrorSuccess);
     if(p_data->LocalBufferPix) UnlockPixels(p_data->LocalBufferPix); p_data->LocalBufferPix = NULL;
     if(p_data->LocalBufferGW) DisposeGWorld(p_data->LocalBufferGW); p_data->LocalBufferGW = NULL;
 
@@ -140,7 +143,7 @@ block_t *screen_Capture( demux_t *p_demux )
     block_t *p_block;
     int i_size;
  
-    i_size = p_sys->fmt.video.i_height * CGDisplayBytesPerRow(p_data->displayID);
+    i_size = p_sys->fmt.video.i_height * p_sys->fmt.video.i_width * 32 / 8; 
 
     if( !( p_block = block_New( p_demux, i_size ) ) )
     {
@@ -151,9 +154,10 @@ block_t *screen_Capture( demux_t *p_demux )
     GetForeColor(&p_data->oldForeColor);
     GetBackColor(&p_data->oldBackColor);
     GetPenState(&p_data->oldState);
-//    ForeColor(blackColor);
-//    BackColor(whiteColor);
+    ForeColor(blackColor);
+    BackColor(whiteColor);
 
+    assert(CGSNewConnection(NULL, &p_data->gConnection) == kCGErrorSuccess);
     p_data->gMainDevice = GetMainDevice();
     p_data->gDeviceState = HGetState((Handle)p_data->gMainDevice);
     HLock((Handle)p_data->gMainDevice);
@@ -168,6 +172,7 @@ block_t *screen_Capture( demux_t *p_demux )
     RGBForeColor( &p_data->oldForeColor );
     RGBBackColor( &p_data->oldBackColor );
 
+    assert(CGSReleaseConnection(p_data->gConnection) == kCGErrorSuccess);
     memcpy( p_block->p_buffer, (**p_data->LocalBufferPix).baseAddr, i_size );
 
     return p_block;
