@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.7 2004/01/04 04:56:21 rocky Exp $
+ * $Id: cvd.c,v 1.8 2004/01/04 16:51:59 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -182,11 +182,11 @@ Packetize( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  Reassemble:
 
- The data for single screen subtitle may come in one of many
- non-contiguous packets of a stream. This routine is called when the
- next packet in the stream comes in. The job of this routine is to
- parse the header, if this is the beginning, and combine the packets
- into one complete subtitle unit.
+ Data for single screen subtitle may come in several non-contiguous
+ packets of a stream. This routine is called when the next packet in
+ the stream comes in. The job of this routine is to parse the header,
+ if this is the beginning, and combine the packets into one complete
+ subtitle unit.
 
  If everything is complete, we will return a block. Otherwise return
  NULL.
@@ -225,10 +225,10 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
     if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[0] )
       return NULL;
 
-    /* There is little data on the format, but it does not seem to have a
-       good way to detect the first packet in the subtitle.  It seems,
-       however, that it has a valid pts while later packets for the same
-       image don't */
+    /* From the scant data on the format, there is only only way known
+       to detect the first packet in a subtitle.  The first packet
+       seems to have a valid PTS while later packets for the same
+       image don't. */
 
     if ( p_sys->state == SUBTITLE_BLOCK_EMPTY && p_block->i_pts == 0 ) {
       msg_Warn( p_dec, 

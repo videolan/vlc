@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.141 2004/01/04 15:32:13 fenrir Exp $
+dnl $Id: configure.ac,v 1.142 2004/01/04 16:51:59 rocky Exp $
 
 AC_INIT(vlc,0.7.0)
 
@@ -869,8 +869,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
-AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv demux2 nsv real])
-AX_ADD_PLUGINS([spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
+AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
 AX_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
@@ -2209,7 +2208,10 @@ dnl   png
 dnl
 AC_CHECK_HEADERS(png.h, [
     AX_ADD_LDFLAGS([logo],[-lpng -lz])
-    AX_ADD_PLUGINS([logo])])
+    AX_ADD_PLUGINS([logo])
+    AX_ADD_LDFLAGS([svcdsub],[-lpng -lz])
+    AX_ADD_LDFLAGS([cvdsub],[-lpng -lz])
+    AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])])
 
 dnl
 dnl  Video plugins
@@ -3555,6 +3557,7 @@ AC_CONFIG_FILES([
   modules/codec/Makefile
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
+  modules/codec/ogt/Makefile
   modules/codec/spudec/Makefile
   modules/control/Makefile
   modules/control/corba/Makefile

@@ -1,4 +1,4 @@
-$Id: cvd-subtitles.txt,v 1.1 2004/01/04 16:25:00 rocky Exp $
+$Id: cvd-subtitles.txt,v 1.2 2004/01/04 16:51:59 rocky Exp $
 The following information is culled from information from 
 Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
 by Rocky Bernstein. 
@@ -18,10 +18,10 @@ subtitle data and the offset to the metadata - i.e. size of the image
 data plus the four bytes at the beginning.
 
 Data for single screen subtitle may come in several non-contiguous
-packets of a stream. From the scant data on the format, there is only
-only way known to detect the first packet in a subtitle.  The first
-packet seems to have a valid PTS while later packets for the same
-image don't.
+packets of a stream. From the scant data on the format, the only way
+known to detect the first packet in a subtitle.  The first packet
+seems to have a valid PTS while later packets for the same image
+don't.
 
 Image data comes interlaced and is run-length encoded (RLE). Each
 field is a four-bit nibbles that is further subdivided in a two-bit
@@ -56,23 +56,23 @@ code    Meaning
            x = ((p[1]&0x0f)<<6) + (p[2]>>2)
            y = ((p[2]&0x03)<<8) + p[3];
 
-0x1f	lower right x, y postion, each a 10-bit (0-1023) value,
+0x1f	lower right x, y position, each a 10-bit (0-1023) value,
         encoded as above 
 
 0x24    3 bytes primary palette 0 - 1 byte for each of y, u, and v 
-0x25    3 bytes primary palette 1 - 1 byte for each of y, u  and v
-0x26    3 bytes primary palette 2 - 1 byte for each of y, u  and v
-0x27    3 bytes primary palette 3 - 1 byte for each of y, u  and v
+0x25    3 bytes primary palette 1 - 1 byte for each of y, u, and v
+0x26    3 bytes primary palette 2 - 1 byte for each of y, u, and v
+0x27    3 bytes primary palette 3 - 1 byte for each of y, u, and v
 
 0x2c    3 bytes highlight palette 0 - 1 byte for each of y, u, and v 
-0x2d    3 bytes highlight palette 1 - 1 byte for each of y, u  and v
-0x2e    3 bytes highlight palette 2 - 1 byte for each of y, u  and v
-0x2f    3 bytes highlight palette 3 - 1 byte for each of y, u  and v
+0x2d    3 bytes highlight palette 1 - 1 byte for each of y, u, and v
+0x2e    3 bytes highlight palette 2 - 1 byte for each of y, u, and v
+0x2f    3 bytes highlight palette 3 - 1 byte for each of y, u, and v
 
-0x37    3 bytes transparancy for primary palette - 1 byte for each 
+0x37    3 bytes transparency for primary palette - 1 byte for each 
 	of y, u  and v
 
-0x3f    3 bytes transparancy for highlight palette - 1 byte for each 
+0x3f    3 bytes transparency for highlight palette - 1 byte for each 
 	of y, u  and v
 
 0x47    Offset to start of even rows of interlaced image.

@@ -1,0 +1,25 @@
+SOURCES_svcdsub = \
+	common.c \
+	common.h \
+	ogt.c \
+	ogt.h \
+	subtitle.h \
+	ogt_parse.c \
+	render.c \
+	render.h \
+	write_png.c \
+	write_png.h \
+	$(NULL)
+
+SOURCES_cvdsub = \
+	common.c \
+	common.h \
+	cvd.c \
+	cvd.h \
+	subtitle.h \
+	cvd_parse.c \
+	render.c \
+	render.h \
+	write_png.c \
+	write_png.h \
+	$(NULL)

@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.6 2004/01/04 04:56:21 rocky Exp $
+ * $Id: cvd_parse.c,v 1.7 2004/01/04 16:51:59 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -55,12 +55,12 @@ static int  ParseImage         ( decoder_t *, subpicture_t * );
   origin. Thus, this is the result of reading some code whose
   correctness is not known and some experimentation.
   
-  CVD subtitles are different in severl ways from SVCD OGT subtitles.
-  First, the image comes first and the metadata is at the end.  So
-  that the metadata can be found easily, the subtitle packet starts
-  with two bytes (everything is big-endian again) that give the total
-  size of the subtitle data and the offset to the metadata - i.e. size
-  of the image data plus the four bytes at the beginning.
+  CVD subtitles are different in several ways from SVCD OGT subtitles.
+  Image comes first and metadata is at the end.  So that the metadata
+  can be found easily, the subtitle packet starts with two bytes
+  (everything is big-endian again) that give the total size of the
+  subtitle data and the offset to the metadata - i.e. size of the
+  image data plus the four bytes at the beginning.
  
   Image data comes interlaced is run-length encoded.  Each field is a
   four-bit nibble. Each nibble contains a two-bit repeat count and a
@@ -73,11 +73,6 @@ static int  ParseImage         ( decoder_t *, subpicture_t * );
   that the fill-line complete case above is not as described and the
   zero repeat count means fill line.  The sample code never produces
   this, so it may be untested.
- 
-  The metadata section does not follow a fixed pattern, every
-  metadata item consists of a tag byte followed by parameters. In all
-  cases known, the block (including the tag byte) is exactly four
-  bytes in length.  Read the code for the rest.
 */
 
 void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
@@ -108,6 +103,20 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 
 }
 
+#define ExtractXY(x, y)		    \
+  x = ((p[1]&0x0f)<<6) + (p[2]>>2); \
+  y = ((p[2]&0x03)<<8) + p[3];
+
+
+/* 
+  We parse the metadata information here. 
+
+  Although metadata information does not have to come in a fixed field
+  order, every metadata field consists of a tag byte followed by
+  parameters. In all cases known, the size including tag byte is
+  exactly four bytes in length.
+*/
+
 void E_(ParseMetaInfo)( decoder_t *p_dec  )
 {
   /* last packet in subtitle block. */
@@ -126,7 +135,7 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
     
     switch ( p[0] ) {
       
-    case 0x04:	/* Display duration in 1/90000ths of a second */
+    case 0x04:	/* subtitle duration in 1/90000ths of a second */
       
       p_sys->i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
       
@@ -134,25 +143,21 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
 		 "subtitle display duration %u", p_sys->i_duration);
       break;
       
-    case 0x0c:	/* Unknown */
+    case 0x0c:	/* unknown */
       dbg_print( DECODE_DBG_PACKET, 
 		 "subtitle command unknown 0x%0x 0x%0x 0x%0x 0x%0x\n",
 		 p[0], p[1], p[2], p[3]);
       break;
       
-    case 0x17:	/* Position */
-      p_sys->i_x_start = ((p[1]&0x0f)<<6) + (p[2]>>2);
-      p_sys->i_y_start = ((p[2]&0x03)<<8) + p[3];
-      dbg_print( DECODE_DBG_PACKET, 
-		 "start position (%d,%d): %.2x %.2x %.2x", 
-		 p_sys->i_x_start, p_sys->i_y_start,
-		 p[1], p[2], p[3] );
+    case 0x17:	/* coordinates of subtitle upper left x, y position */
+      ExtractXY(p_sys->i_x_start, p_sys->i_y_start);
       break;
       
-    case 0x1f:	/* Coordinates of the image bottom right */
+    case 0x1f:	/* coordinates of subtitle bottom right x, y position */
       {
-	int lastx = ((p[1]&0x0f)<<6) + (p[2]>>2);
-	int lasty = ((p[2]&0x03)<<8) + p[3];
+	int lastx;
+	int lasty;
+	ExtractXY(lastx, lasty);
 	p_sys->i_width  = lastx - p_sys->i_x_start + 1;
 	p_sys->i_height = lasty - p_sys->i_y_start + 1;
 	dbg_print( DECODE_DBG_PACKET, 
@@ -208,7 +213,7 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
       p_sys->p_palette[3].s.t = p[2] >> 4;
       
       dbg_print( DECODE_DBG_PACKET,
-		 "transparancy for primary palette 0..3: "
+		 "transparency for primary palette 0..3: "
 		 "0x%0x 0x%0x 0x%0x 0x%0x",
 		 p_sys->p_palette[0].s.t,
 		 p_sys->p_palette[1].s.t,
@@ -225,7 +230,7 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
       p_sys->p_palette_highlight[3].s.t = p[1] >> 4;
       
       dbg_print( DECODE_DBG_PACKET,
-		 "transparancy for primary palette 0..3: "
+		 "transparency for primary palette 0..3: "
 		 "0x%0x 0x%0x 0x%0x 0x%0x",
 		 p_sys->p_palette_highlight[0].s.t,
 		 p_sys->p_palette_highlight[1].s.t,
@@ -235,8 +240,8 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
       break;
       
     case 0x47:
-      /* offset to first field data, we correct to make it relative
-	 to comp_image_offset (usually 4) */
+      /* offset to start of even rows of interlaced image, we correct
+	 to make it relative to comp_image_offset (usually 4) */
       p_sys->first_field_offset =
 	(p[2] << 8) + p[3] - p_sys->comp_image_offset;
       dbg_print( DECODE_DBG_PACKET, 
@@ -244,8 +249,8 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
       break;
       
     case 0x4f:
-      /* offset to second field data, we correct to make it relative to
-	 comp_image_offset (usually 4) */
+      /* offset to start of odd rows of interlaced image, we correct
+	 to make it relative to comp_image_offset (usually 4) */
       p_sys->second_field_offset =
 	(p[2] << 8) + p[3] - p_sys->comp_image_offset;
       dbg_print( DECODE_DBG_PACKET, 
@@ -309,7 +314,7 @@ E_(ParsePacket)( decoder_t *p_dec)
     p_spu->i_height   = p_sys->i_height;
 
     p_spu->i_start    = p_sys->i_pts;
-    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 5);
+    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration);
     
     p_spu->p_sys->b_crop  = VLC_FALSE;
     p_spu->p_sys->i_debug = p_sys->i_debug;
@@ -516,7 +521,6 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 		     text_ptr, TEXT_COUNT );
     }
 #endif /*HAVE_LIBPNG*/
-
 
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
 
