@@ -513,7 +513,8 @@ STDMETHODIMP CapturePin::Disconnect()
 
     p_connected_pin->Release();
     p_connected_pin = NULL;
-    FreeMediaType( cx_media_type );
+    //FreeMediaType( cx_media_type );
+    //cx_media_type.subtype = GUID_NULL;
 
     return S_OK;
 }
@@ -1102,10 +1103,12 @@ CaptureEnumMediaTypes::CaptureEnumMediaTypes( access_t * _p_input,
     /* Are we creating a new enumerator */
     if( pEnumMediaTypes == NULL )
     {
+	CopyMediaType(&cx_media_type, &p_pin->cx_media_type); 
         i_position = 0;
     }
     else
     {
+	CopyMediaType(&cx_media_type, &pEnumMediaTypes->cx_media_type); 
         i_position = pEnumMediaTypes->i_position;
     }
 }
@@ -1115,6 +1118,7 @@ CaptureEnumMediaTypes::~CaptureEnumMediaTypes()
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureEnumMediaTypes::~CaptureEnumMediaTypes" );
 #endif
+    FreeMediaType(cx_media_type);
     p_pin->Release();
 }
 
@@ -1165,7 +1169,9 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Next " );
 #endif
-    ULONG count;
+    ULONG copied = 0;
+    ULONG offset = 0;
+    ULONG max = p_pin->media_type_count;
 
     if( ! ppMediaTypes ) 
         return E_POINTER;
@@ -1173,33 +1179,51 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
     if( (! pcFetched)  && (cMediaTypes > 1) )
        return E_POINTER;
 
-    count = 0;
+    /*
+    ** use connection media type as first entry in iterator if it exists
+    */
+    copied = 0;
+    if( cx_media_type.subtype != GUID_NULL ) {
+	++max;
+	if( i_position == 0 ) {
+	    ppMediaTypes[copied] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+	    if( CopyMediaType(ppMediaTypes[copied], &cx_media_type) != S_OK )
+		return E_OUTOFMEMORY;
+	    ++i_position; 
+	    ++copied;
+	}
+    }
 
-    while( (count < cMediaTypes) && (i_position < p_pin->media_type_count)  )
+    while( (copied < cMediaTypes) && (i_position < max)  )
     {
-        ppMediaTypes[count] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-        if( CopyMediaType(ppMediaTypes[count], &p_pin->media_types[i_position]) != S_OK )
+        ppMediaTypes[copied] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+        if( CopyMediaType(ppMediaTypes[copied], &p_pin->media_types[i_position-offset]) != S_OK )
             return E_OUTOFMEMORY;
 
-        count++;
-        i_position++; 
+	++copied;
+        ++i_position; 
     }
 
     if( pcFetched ) 
     {
-        *pcFetched = count;
+        *pcFetched = copied;
     }
 
-    return (count == cMediaTypes) ? S_OK : S_FALSE;
+    return (copied == cMediaTypes) ? S_OK : S_FALSE;
 };
 STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
 {
+    ULONG max =  p_pin->media_type_count;
+    if( cx_media_type.subtype != GUID_NULL )
+    {
+	max = 1;
+    }
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Skip" );
 #endif
 
     i_position += cMediaTypes;
-    return (i_position < p_pin->media_type_count) ? S_OK : S_FALSE;
+    return (i_position < max) ? S_OK : S_FALSE;
 };
 STDMETHODIMP CaptureEnumMediaTypes::Reset()
 {
@@ -1207,6 +1231,8 @@ STDMETHODIMP CaptureEnumMediaTypes::Reset()
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Reset" );
 #endif
 
+    FreeMediaType(cx_media_type);
+    CopyMediaType(&cx_media_type, &p_pin->cx_media_type); 
     i_position = 0;
     return S_OK;
 };
