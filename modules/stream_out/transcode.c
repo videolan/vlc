@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.73 2004/01/30 17:51:02 fenrir Exp $
+ * $Id: transcode.c,v 1.74 2004/02/12 23:51:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -605,7 +605,7 @@ static inline int get_ff_chroma( vlc_fourcc_t i_chroma )
         case VLC_FOURCC( 'R', 'V', '1', '6' ):
             return PIX_FMT_RGB565;
         case VLC_FOURCC( 'R', 'V', '2', '4' ):
-            return PIX_FMT_RGB24;
+            return PIX_FMT_BGR24;
         case VLC_FOURCC( 'R', 'V', '3', '2' ):
             return PIX_FMT_RGBA32;
         case VLC_FOURCC( 'G', 'R', 'E', 'Y' ):
