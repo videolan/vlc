@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.38 2003/10/09 11:48:41 gbazin Exp $
+ * $Id: transcode.c,v 1.39 2003/10/09 12:31:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1600,7 +1600,6 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* convert size and crop */
-        if( !id->p_encoder )
         if( id->ff_dec_c->width  != id->f_dst.i_width ||
             id->ff_dec_c->height != id->f_dst.i_height ||
             p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
