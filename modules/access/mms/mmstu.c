@@ -459,8 +459,8 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     /* *** Bind port if UDP protocol is selected *** */
     if( b_udp )
     {
-        struct sockaddr_in name;
-        socklen_t i_namelen = sizeof( struct sockaddr_in );
+        struct sockaddr_storage name;
+        socklen_t i_namelen = sizeof( name );
 
         if( getsockname( p_sys->i_handle_tcp,
                          (struct sockaddr*)&name, &i_namelen ) < 0 )
@@ -468,7 +468,13 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             net_Close( p_sys->i_handle_tcp );
             return VLC_EGENERIC;
         }
-        p_sys->psz_bind_addr = inet_ntoa( name.sin_addr );
+
+        /* FIXME: not thread-safe for IPv4 */
+        /* FIXME: not sure if it works fine for IPv6 */
+        if( name.ss_family == AF_INET )
+            p_sys->psz_bind_addr = inet_ntoa( ((struct sockaddr_in *)&name)->sin_addr );
+        else
+            p_sys->psz_bind_addr = p_url->psz_host;
 
         p_sys->i_handle_udp = net_OpenUDP( p_access, p_sys->psz_bind_addr, 7000, "", 0 );
         if( p_sys->i_handle_udp < 0 )
