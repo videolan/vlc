@@ -998,6 +998,19 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         audio_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Load conversion filters */
+    if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels ||
+        fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
+    {
+        /* We'll have to go through fl32 first */
+        es_format_t fmt_out = id->p_encoder->fmt_in;
+        fmt_out.i_codec = fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
+
+        id->pp_filter[id->i_filter] =
+            transcode_audio_filter_new( p_stream, id, &fmt_last, &fmt_out );
+
+        if( id->pp_filter[id->i_filter] ) id->i_filter++;
+    }
+
     while( i_pass-- )
     {
         if( fmt_last.audio.i_channels !=
@@ -1024,8 +1037,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         return VLC_EGENERIC;
     }
 
-    if( fmt_last.audio.i_channels !=
-        id->p_encoder->fmt_in.audio.i_channels )
+    if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
     {
         msg_Dbg( p_stream, "no audio filter found for mixing from"
                  " %i to %i channels", fmt_last.audio.i_channels,
@@ -1044,7 +1056,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
     if( fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
     {
-        msg_Dbg( p_stream, "no audio filter found resampling from"
+        msg_Dbg( p_stream, "no audio filter found for resampling from"
                  " %iHz to %iHz", fmt_last.audio.i_rate,
                  id->p_encoder->fmt_in.audio.i_rate );
         id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
