@@ -23,8 +23,6 @@
 #ifndef _VLC_CODEC_H
 #define _VLC_CODEC_H 1
 
-#include "ninput.h"
-
 /**
  * \file
  * This file defines the structure and types used by decoders and encoders

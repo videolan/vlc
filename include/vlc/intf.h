@@ -35,9 +35,8 @@ extern "C" {
  * Required internal headers
  *****************************************************************************/
 #include "vlc_interface.h"
+#include "vlc_input.h"
 #include "intf_eject.h"
-#include "stream_control.h"
-#include "input_ext-intf.h"
 #include "vlc_playlist.h"
 
 # ifdef __cplusplus
