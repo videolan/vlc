@@ -434,11 +434,7 @@ char *XURL_GetHead( const char *psz_path )
     }
 
     /* append a trailing / */
-#ifdef XURL_WIN32_PATHING
-    streallocat( psz_path_head, "\\" );
-#else
     streallocat( psz_path_head, "/" );
-#endif
 
     return psz_path_head;
 }
