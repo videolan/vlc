@@ -214,6 +214,14 @@ void Timer::Notify()
                     }
                 }
             }
+            /* Take care of the volume */
+            audio_volume_t i_volume;
+            aout_VolumeGet( p_intf, &i_volume );
+            p_main_interface->volctrl->SetValue( i_volume * 200 *2  /
+                                                 AOUT_VOLUME_MAX );
+            p_main_interface->volctrl->SetToolTip(
+                wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
+                i_volume * 200 / AOUT_VOLUME_MAX ) );
 
             /* Manage Playing status */
             if( i_old_playing_status != p_input->stream.control.i_status )
