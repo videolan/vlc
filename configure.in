@@ -153,9 +153,34 @@ dnl  DVD module: check for DVD ioctls
 dnl
 AC_CHECK_HEADERS(sys/ioctl.h,[
   BUILTINS="${BUILTINS} dvd"
-  AC_CHECK_HEADERS(linux/cdrom.h)
-  AC_EGREP_HEADER(dvd,linux/cdrom.h,[
-    AC_DEFINE(LINUX_DVD,1, DVD support for linux)
+  AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h)
+  BSD_DVD_STRUCT=0
+  dnl
+  dnl Old FreeBSD: sys/cdio.h
+  dnl
+  AC_EGREP_HEADER(dvd_struct,sys/dvdio.h,[
+    AC_DEFINE(DVD_STRUCT_IN_SYS_DVDIO_H, 1,
+              Define if <sys/dvdio.h> defines dvd_struct.)
+    BSD_DVD_STRUCT=1
+  ])
+  dnl
+  dnl Newer FreeBSD: sys/dvdio.h
+  dnl
+  AC_EGREP_HEADER(dvd_struct,sys/cdio.h,[
+    AC_DEFINE(DVD_STRUCT_IN_SYS_CDIO_H, 1,
+              Define if <sys/cdio.h> defines dvd_struct.)
+    BSD_DVD_STRUCT=1
+  ])
+  if test x$BSD_DVD_STRUCT = x1; then
+    AC_DEFINE(HAVE_BSD_DVD_STRUCT, 1,
+              Define if BSD-like dvd_struct is defined.)
+  fi
+  dnl
+  dnl Linux: linux/cdrom.h
+  dnl
+  AC_EGREP_HEADER(dvd_struct,linux/cdrom.h,[
+    AC_DEFINE(DVD_STRUCT_IN_LINUX_CDROM_H, 1,
+              Define if <linux/cdrom.h> defines DVD_STRUCT.)
   ])
 ])
 

@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.6 2001/04/11 04:31:59 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.7 2001/05/02 20:01:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,13 +24,13 @@
 int ioctl_ReadCopyright     ( int, int, int * );
 int ioctl_ReadKey           ( int, int *, u8 * );
 
-int ioctl_LUSendAgid        ( int, int * );
-int ioctl_LUSendChallenge   ( int, int *, u8 * );
-int ioctl_LUSendKey1        ( int, int *, u8 * );
-int ioctl_LUSendASF         ( int, int *, int * );
+int ioctl_ReportAgid        ( int, int * );
+int ioctl_ReportChallenge   ( int, int *, u8 * );
+int ioctl_ReportKey1        ( int, int *, u8 * );
+int ioctl_ReportASF         ( int, int *, int * );
 int ioctl_InvalidateAgid    ( int, int * );
-int ioctl_HostSendChallenge ( int, int *, u8 * );
-int ioctl_HostSendKey2      ( int, int *, u8 * );
+int ioctl_SendChallenge     ( int, int *, u8 * );
+int ioctl_SendKey2          ( int, int *, u8 * );
 
 #ifdef SYS_BEOS
 

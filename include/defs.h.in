@@ -115,6 +115,12 @@
 /* Define if you have the <strings.h> header file.  */
 #undef HAVE_STRINGS_H
 
+/* Define if you have the <sys/cdio.h> header file.  */
+#undef HAVE_SYS_CDIO_H
+
+/* Define if you have the <sys/dvdio.h> header file.  */
+#undef HAVE_SYS_DVDIO_H
+
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
 
@@ -154,8 +160,17 @@
 /* Define if <pthread.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_PTHREAD_H
 
-/* DVD support for linux */
-#undef LINUX_DVD
+/* Define if <sys/dvdio.h> defines dvd_struct. */
+#undef DVD_STRUCT_IN_SYS_DVDIO_H
+
+/* Define if <sys/cdio.h> defines dvd_struct. */
+#undef DVD_STRUCT_IN_SYS_CDIO_H
+
+/* Define if BSD-like dvd_struct is defined. */
+#undef HAVE_BSD_DVD_STRUCT
+
+/* Define if <linux/cdrom.h> defines DVD_STRUCT. */
+#undef DVD_STRUCT_IN_LINUX_CDROM_H
 
 /* Define if you want DVD CSS decryption. */
 #undef HAVE_CSS

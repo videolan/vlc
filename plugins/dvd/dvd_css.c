@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.26 2001/04/22 00:08:25 stef Exp $
+ * $Id: dvd_css.c,v 1.27 2001/05/02 20:01:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ int CSSInit( int i_fd, css_t * p_css )
     {
         intf_WarnMsg( 3, "css info: requesting AGID %d", i );
 
-        i_ret = ioctl_LUSendAgid( i_fd, &i_agid );
+        i_ret = ioctl_ReportAgid( i_fd, &i_agid );
 
         if( i_ret != -1 )
         {
@@ -128,7 +128,7 @@ int CSSInit( int i_fd, css_t * p_css )
             break;
         }
 
-        intf_ErrMsg( "css error: ioctl_LUSendAgid failed, invalidating" );
+        intf_ErrMsg( "css error: ioctl_ReportAgid failed, invalidating" );
 
         i_agid = 0;
         ioctl_InvalidateAgid( i_fd, &i_agid );
@@ -137,7 +137,7 @@ int CSSInit( int i_fd, css_t * p_css )
     /* Unable to authenticate without AGID */
     if( i_ret == -1 )
     {
-        intf_ErrMsg( "css error: ioctl_LUSendAgid failed, fatal" );
+        intf_ErrMsg( "css error: ioctl_ReportAgid failed, fatal" );
         return -1;
     }
 
@@ -153,16 +153,16 @@ int CSSInit( int i_fd, css_t * p_css )
     }
 
     /* Send challenge to LU */
-    if( ioctl_HostSendChallenge( i_fd, &i_agid, p_buffer ) < 0 )
+    if( ioctl_SendChallenge( i_fd, &i_agid, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: ioctl_HostSendChallenge failed" );
+        intf_ErrMsg( "css error: ioctl_SendChallenge failed" );
         return -1;
     }
 
     /* Get key1 from LU */
-    if( ioctl_LUSendKey1( i_fd, &i_agid, p_buffer ) < 0)
+    if( ioctl_ReportKey1( i_fd, &i_agid, p_buffer ) < 0)
     {
-        intf_ErrMsg( "css error: ioctl_LUSendKey1 failed" );
+        intf_ErrMsg( "css error: ioctl_ReportKey1 failed" );
         return -1;
     }
 
@@ -193,9 +193,9 @@ int CSSInit( int i_fd, css_t * p_css )
     }
 
     /* Get challenge from LU */
-    if( ioctl_LUSendChallenge( i_fd, &i_agid, p_buffer ) < 0 )
+    if( ioctl_ReportChallenge( i_fd, &i_agid, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: ioctl_LUSendKeyChallenge failed" );
+        intf_ErrMsg( "css error: ioctl_ReportKeyChallenge failed" );
         return -1;
     }
 
@@ -215,9 +215,9 @@ int CSSInit( int i_fd, css_t * p_css )
     }
 
     /* Send key2 to LU */
-    if( ioctl_HostSendKey2( i_fd, &i_agid, p_buffer ) < 0 )
+    if( ioctl_SendKey2( i_fd, &i_agid, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: ioctl_HostSendKey2 failed" );
+        intf_ErrMsg( "css error: ioctl_SendKey2 failed" );
         return -1;
     }
 
@@ -456,7 +456,7 @@ static int CSSGetASF( int i_fd )
 
     for( i_agid = 0 ; i_agid < 4 ; i_agid++ )
     {
-        if( ioctl_LUSendASF( i_fd, &i_agid, &i_asf ) == 0 )
+        if( ioctl_ReportASF( i_fd, &i_agid, &i_asf ) == 0 )
         {
             intf_WarnMsg( 3, "css info: GetASF %sauthenticated",
                           i_asf ? "":"not " );

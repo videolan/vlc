@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.10 2001/04/11 04:46:18 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.11 2001/05/02 20:01:44 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,21 +31,20 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-#ifdef HAVE_SYS_DVDIO_H
-#   include <sys/ioctl.h>
+#include <sys/ioctl.h>
+
+#ifdef DVD_STRUCT_IN_SYS_CDIO_H
+#   include <sys/cdio.h>
+#endif
+#ifdef DVD_STRUCT_IN_SYS_DVDIO_H
 #   include <sys/dvdio.h>
 #endif
-#ifdef LINUX_DVD
-#   include <sys/ioctl.h>
+#ifdef DVD_STRUCT_IN_LINUX_CDROM_H
 #   include <linux/cdrom.h>
 #endif
 #ifdef SYS_BEOS
-#   include <sys/ioctl.h>
 #   include <malloc.h>
 #   include <scsi.h>
-#endif
-#ifdef SYS_DARWIN1_3
-#   include <sys/ioctl.h>
 #endif
 
 #include "common.h"
@@ -77,7 +76,7 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_COPYRIGHT;
@@ -86,6 +85,16 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     i_ret = ioctl( i_fd, DVD_READ_STRUCT, &dvd );
 
     *pi_copyright = dvd.copyright.cpst;
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_struct dvd;
+
+    dvd.format = DVD_STRUCT_COPYRIGHT;
+    dvd.layer_num = i_layer;
+
+    i_ret = ioctl( i_fd, DVDIOCREADSTRUCTURE, &dvd );
+
+    *pi_copyright = dvd.cpst;
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_READ_DVD_STRUCTURE, 8 );
@@ -120,12 +129,11 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_DISCKEY;
     dvd.disckey.agid = *pi_agid;
-
     memset( dvd.disckey.value, 0, 2048 );
 
     i_ret = ioctl( i_fd, DVD_READ_STRUCT, &dvd );
@@ -136,6 +144,22 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
     }
 
     memcpy( p_key, dvd.disckey.value, 2048 );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_struct dvd;
+
+    dvd.format = DVD_STRUCT_DISCKEY;
+    dvd.agid = *pi_agid;
+    memset( dvd.data, 0, 2048 );
+
+    i_ret = ioctl( i_fd, DVDIOCREADSTRUCTURE, &dvd );
+
+    if( i_ret < 0 )
+    {
+        return i_ret;
+    }
+
+    memcpy( p_key, dvd.data, 2048 );
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_READ_DVD_STRUCTURE, 2048 + 4 );
@@ -161,13 +185,13 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 }
 
 /*****************************************************************************
- * ioctl_LUSendAgid: get AGID from the drive
+ * ioctl_ReportAgid: get AGID from the drive
  *****************************************************************************/
-int ioctl_LUSendAgid( int i_fd, int *pi_agid )
+int ioctl_ReportAgid( int i_fd, int *pi_agid )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_AGID;
@@ -176,6 +200,16 @@ int ioctl_LUSendAgid( int i_fd, int *pi_agid )
     i_ret = ioctl( i_fd, DVD_AUTH, &auth_info );
 
     *pi_agid = auth_info.lsa.agid;
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_REPORT_AGID;
+    auth_info.agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, DVDIOCREPORTKEY, &auth_info );
+
+    *pi_agid = auth_info.agid;
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 8 );
@@ -195,13 +229,13 @@ int ioctl_LUSendAgid( int i_fd, int *pi_agid )
 }
 
 /*****************************************************************************
- * ioctl_LUSendChallenge: get challenge from the drive
+ * ioctl_ReportChallenge: get challenge from the drive
  *****************************************************************************/
-int ioctl_LUSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
+int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_CHALLENGE;
@@ -210,6 +244,16 @@ int ioctl_LUSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
     i_ret = ioctl( i_fd, DVD_AUTH, &auth_info );
 
     memcpy( p_challenge, auth_info.lsc.chal, sizeof(dvd_challenge) );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_REPORT_CHALLENGE;
+    auth_info.agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, DVDIOCREPORTKEY, &auth_info );
+
+    memcpy( p_challenge, auth_info.keychal, 10 );
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 16 );
@@ -229,13 +273,13 @@ int ioctl_LUSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 }
 
 /*****************************************************************************
- * ioctl_LUSendASF: get ASF from the drive
+ * ioctl_ReportASF: get ASF from the drive
  *****************************************************************************/
-int ioctl_LUSendASF( int i_fd, int *pi_agid, int *pi_asf )
+int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_ASF;
@@ -245,6 +289,17 @@ int ioctl_LUSendASF( int i_fd, int *pi_agid, int *pi_asf )
     i_ret = ioctl( i_fd, DVD_AUTH, &auth_info );
 
     *pi_asf = auth_info.lsasf.asf;
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_REPORT_ASF;
+    auth_info.agid = *pi_agid;
+    auth_info.asf = *pi_asf;
+
+    i_ret = ioctl( i_fd, DVDIOCREPORTKEY, &auth_info );
+
+    *pi_asf = auth_info.asf;
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 8 );
@@ -278,13 +333,13 @@ int ioctl_LUSendASF( int i_fd, int *pi_agid, int *pi_asf )
 }
 
 /*****************************************************************************
- * ioctl_LUSendKey1: get the first key from the drive
+ * ioctl_ReportKey1: get the first key from the drive
  *****************************************************************************/
-int ioctl_LUSendKey1( int i_fd, int *pi_agid, u8 *p_key )
+int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_KEY1;
@@ -293,6 +348,16 @@ int ioctl_LUSendKey1( int i_fd, int *pi_agid, u8 *p_key )
     i_ret = ioctl( i_fd, DVD_AUTH, &auth_info );
 
     memcpy( p_key, auth_info.lsk.key, sizeof(dvd_key) );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_REPORT_KEY1;
+    auth_info.agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, DVDIOCREPORTKEY, &auth_info );
+
+    memcpy( p_key, auth_info.keychal, 8 );
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 12 );
@@ -318,7 +383,7 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 {
     int i_ret;
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_INVALIDATE_AGID;
@@ -327,6 +392,16 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
     i_ret = ioctl( i_fd, DVD_AUTH, &auth_info );
 
     *pi_agid = auth_info.lsa.agid;
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_INVALIDATE_AGID;
+    auth_info.agid = *pi_agid;
+
+    i_ret = ioctl( i_fd, DVDIOCREPORTKEY, &auth_info );
+
+    *pi_agid = auth_info.agid;
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_REPORT_KEY, 0 );
@@ -344,11 +419,11 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 }
 
 /*****************************************************************************
- * ioctl_HostSendChallenge: send challenge to the drive
+ * ioctl_SendChallenge: send challenge to the drive
  *****************************************************************************/
-int ioctl_HostSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
+int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_HOST_SEND_CHALLENGE;
@@ -357,6 +432,16 @@ int ioctl_HostSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
     memcpy( auth_info.hsc.chal, p_challenge, sizeof(dvd_challenge) );
 
     return ioctl( i_fd, DVD_AUTH, &auth_info );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_SEND_CHALLENGE;
+    auth_info.agid = *pi_agid;
+
+    memcpy( auth_info.keychal, p_challenge, 12 );
+
+    return ioctl( i_fd, DVDIOCSENDKEY, &auth_info );
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_SEND_KEY, 16 );
@@ -376,11 +461,11 @@ int ioctl_HostSendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 }
 
 /*****************************************************************************
- * ioctl_HostSendKey2: send the second key to the drive
+ * ioctl_SendKey2: send the second key to the drive
  *****************************************************************************/
-int ioctl_HostSendKey2( int i_fd, int *pi_agid, u8 *p_key )
+int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_HOST_SEND_KEY2;
@@ -389,6 +474,16 @@ int ioctl_HostSendKey2( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( auth_info.hsk.key, p_key, sizeof(dvd_key) );
 
     return ioctl( i_fd, DVD_AUTH, &auth_info );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    struct dvd_authinfo auth_info;
+
+    auth_info.format = DVD_SEND_KEY2;
+    auth_info.agid = *pi_agid;
+
+    memcpy( auth_info.keychal, p_key, 8 );
+
+    return ioctl( i_fd, DVDIOCSENDKEY, &auth_info );
 
 #elif defined( SYS_BEOS )
     INIT_RDC( GPCMD_SEND_KEY, 12 );

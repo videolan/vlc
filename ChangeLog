@@ -3,6 +3,7 @@
 #===================#
 
 HEAD
+  * FreeBSD CSS decryption support.
   * Fixed a segfault in TS input (psi packets with adaptation field).
   * Corrected vlc-howto.sgml thanks to Arnaud Gomes-do-Vale
     <arnaud@carrosse.frmug.org>.
