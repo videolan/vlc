@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.8 2002/03/21 07:11:57 gbazin Exp $
+ * $Id: configuration.c,v 1.9 2002/03/26 22:02:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -373,6 +373,8 @@ int config_LoadConfigFile( const char *psz_module_name )
                     {
                     case MODULE_CONFIG_ITEM_BOOL:
                     case MODULE_CONFIG_ITEM_INTEGER:
+                        if( !*psz_option_value )
+                            break;                    /* ignore empty option */
                         p_module->p_config[i].i_value =
                             atoi( psz_option_value);
                         intf_WarnMsg( 7, "config: found <%s> option %s=%i",
@@ -382,6 +384,9 @@ int config_LoadConfigFile( const char *psz_module_name )
                         break;
 
                     default:
+                        if( !*psz_option_value )
+                            break;                    /* ignore empty option */
+
                         vlc_mutex_lock( p_module->p_config[i].p_lock );
 
                         /* free old string */
@@ -593,20 +598,19 @@ int config_SaveConfigFile( const char *psz_module_name )
             case MODULE_CONFIG_ITEM_BOOL:
             case MODULE_CONFIG_ITEM_INTEGER:
                 if( p_module->p_config[i].psz_text )
-                    fprintf( file, "# %s\n", p_module->p_config[i].psz_text );
+                    fprintf( file, "# %s %s\n", p_module->p_config[i].psz_text,
+                             MODULE_CONFIG_ITEM_BOOL?"<boolean>":"<integer>" );
                 fprintf( file, "%s=%i\n", p_module->p_config[i].psz_name,
                          p_module->p_config[i].i_value );
                 break;
 
             default:
-                if( p_module->p_config[i].psz_value )
-                {
-                    if( p_module->p_config[i].psz_text )
-                        fprintf( file, "# %s\n",
-                                 p_module->p_config[i].psz_text );
-                    fprintf( file, "%s=%s\n", p_module->p_config[i].psz_name,
-                             p_module->p_config[i].psz_value );
-                }
+                if( p_module->p_config[i].psz_text )
+                    fprintf( file, "# %s <string>\n",
+                             p_module->p_config[i].psz_text );
+                fprintf( file, "%s=%s\n", p_module->p_config[i].psz_name,
+                         p_module->p_config[i].psz_value?
+                         p_module->p_config[i].psz_value:"" );
             }
         }
 
