@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.12 2003/11/23 03:55:01 fenrir Exp $
+ * $Id: subsdec.c,v 1.13 2003/12/14 19:18:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -106,7 +106,7 @@ vlc_module_begin();
                  VLC_TRUE );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
 #if defined(HAVE_ICONV)
-    add_string( "subsdec-encoding", "UTF-8", NULL,
+    add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_encodings, 0, 0 );
 #endif
