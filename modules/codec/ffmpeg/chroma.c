@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.7 2004/02/27 14:02:05 fenrir Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,6 +51,8 @@ struct chroma_sys_t
     int i_src_ffmpeg_chroma;
     int i_dst_vlc_chroma;
     int i_dst_ffmpeg_chroma;
+    AVPicture tmp_pic;
+    ImgReSampleContext *p_rsc;
 };
 
 /*****************************************************************************
@@ -145,6 +147,26 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     p_vout->chroma.p_sys->i_dst_vlc_chroma = p_vout->output.i_chroma;
     p_vout->chroma.p_sys->i_src_ffmpeg_chroma = i_ffmpeg_chroma[0];
     p_vout->chroma.p_sys->i_dst_ffmpeg_chroma = i_ffmpeg_chroma[1];
+    if( ( p_vout->render.i_height != p_vout->output.i_height ||
+          p_vout->render.i_width != p_vout->output.i_width ) &&
+        ( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('I','4','2','0')  ||
+          p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('Y','V','1','2') ))
+        
+    {
+        msg_Dbg( p_vout, "preparing to resample picture" );
+        p_vout->chroma.p_sys->p_rsc = img_resample_init( p_vout->output.i_width,
+                                                         p_vout->output.i_height,
+                                                         p_vout->render.i_width,
+                                                         p_vout->render.i_height );
+        avpicture_alloc( &p_vout->chroma.p_sys->tmp_pic,
+                         p_vout->chroma.p_sys->i_dst_ffmpeg_chroma,
+                         p_vout->render.i_width, p_vout->render.i_height );
+    }
+    else
+    {
+        msg_Dbg( p_vout, "no resampling" );
+        p_vout->chroma.p_sys->p_rsc = NULL;
+    }
 
     /* libavcodec needs to be initialized for some chroma conversions */
     E_(InitLibavcodec)(p_this);
@@ -189,10 +211,21 @@ static void ChromaConversion( vout_thread_t *p_vout,
         dest_pic.data[1] = p_dest->p[2].p_pixels;
         dest_pic.data[2] = p_dest->p[1].p_pixels;
     }
-
-    img_convert( &dest_pic, p_vout->chroma.p_sys->i_dst_ffmpeg_chroma,
-                 &src_pic, p_vout->chroma.p_sys->i_src_ffmpeg_chroma,
-                 p_vout->render.i_width, p_vout->render.i_height );
+    if( p_vout->chroma.p_sys->p_rsc )
+    {
+        img_convert( &p_vout->chroma.p_sys->tmp_pic,
+                     p_vout->chroma.p_sys->i_dst_ffmpeg_chroma,
+                     &src_pic, p_vout->chroma.p_sys->i_src_ffmpeg_chroma,
+                     p_vout->render.i_width, p_vout->render.i_height );
+        img_resample( p_vout->chroma.p_sys->p_rsc, &dest_pic,
+                      &p_vout->chroma.p_sys->tmp_pic );
+    }
+    else
+    {
+        img_convert( &dest_pic, p_vout->chroma.p_sys->i_dst_ffmpeg_chroma,
+                     &src_pic, p_vout->chroma.p_sys->i_src_ffmpeg_chroma,
+                     p_vout->render.i_width, p_vout->render.i_height );
+    }
 }
 
 /*****************************************************************************
@@ -203,6 +236,10 @@ static void ChromaConversion( vout_thread_t *p_vout,
 void E_(CloseChroma)( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
+    if( p_vout->chroma.p_sys->p_rsc )
+    {
+        img_resample_close( p_vout->chroma.p_sys->p_rsc );
+        avpicture_free( &p_vout->chroma.p_sys->tmp_pic );
+    }
     free( p_vout->chroma.p_sys );
 }
