@@ -287,9 +287,11 @@ static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
 {
 #if defined(HAVE_PTHREAD_H)    
     return pthread_mutex_destroy( p_mutex );
-
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    return 0;
+    if( p_mutex->init == 9999 )
+        delete_sem( p_mutex->lock );
+    p_mutex->init = 0;
+    return B_OK;
 #endif    
 }
 
@@ -346,27 +348,27 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 
     if( p_condvar->init < 2000 )
         return B_NO_INIT;
-
     while( p_condvar->thread != -1 )
     {
         thread_info info;
         if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
             return 0;
 
-        // is the thread sleeping ?
         if( info.state != B_THREAD_SUSPENDED )
         {
-            // wait a little
+            // The  waiting thread is not suspended so it could
+            // have been interrupted beetwen the unlock and the
+            // suspend_thread line. That is why we sleep a little
+            // before retesting p_condver->thread.
             snooze( 10000 );
         }
         else
         {
-            // ok, we have to wake up that thread
+            // Ok, we have to wake up that thread
             resume_thread( p_condvar->thread );
             return 0;
         }
     }
-    
     return 0;
 
 #endif
@@ -394,6 +396,9 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     if( p_condvar->init < 2000 )
         return B_NO_INIT;
 
+    // The p_condvar->thread var is initialized before the unlock because
+    // it enables to identify when the thread is interrupted beetwen the
+    // unlock line and the suspend_thread line
     p_condvar->thread = find_thread( NULL );
     vlc_mutex_unlock( p_mutex );
     suspend_thread( p_condvar->thread );
@@ -412,9 +417,8 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 {
 #if defined(HAVE_PTHREAD_H)
     return pthread_cond_destroy( p_condvar );
-
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+    p_condvar->init = 0;
     return 0;
 #endif    
 }
-
