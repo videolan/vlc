@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.178 2004/02/10 17:36:45 gbazin Exp $
+dnl $Id: configure.ac,v 1.179 2004/02/10 17:59:10 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -2922,6 +2922,15 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
   if test "${XML2_CONFIG}" != "no"; then
     AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
     AX_ADD_LDFLAGS([skins2],[`${XML2_CONFIG} --libs`])
+    dnl skins2 depends on the xmlTextReader extension
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_skins2}"
+    AC_CHECK_LIB(xml2,xmlTextReaderConstName,[],[
+      skins2_missing_lib="yes"
+      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
+      if test "${enable_skins2}" = "yes"; then
+        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension (required for skins2)])
+      fi])
+    LDFLAGS="${LDFLAGS_save}"
   else
     skins2_missing_lib="yes"
     if test "${enable_skins2}" = "yes"; then
