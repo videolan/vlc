@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_open.c: MacOS X plugin for vlc
+ * intf_open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.m,v 1.4 2002/06/02 22:31:52 massiot Exp $
+ * $Id: intf_open.m,v 1.5 2002/06/08 19:32:19 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_controller.c: MacOS X plugin for vlc
+ * intf_controller.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.8 2002/06/02 22:31:52 massiot Exp $
+ * $Id: intf_controller.m,v 1.9 2002/06/08 19:32:19 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>

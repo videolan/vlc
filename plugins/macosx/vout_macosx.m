@@ -39,8 +39,6 @@
 
 struct picture_sys_s
 {
-    intf_thread_t *p_intf;
-
     void *p_info;
     unsigned int i_size;
 
@@ -103,7 +101,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     if( p_intf->p_module == NULL
-         || strcmp( p_intf->p_module->psz_name, MODULE_STRING ) != 0 )
+         || strcmp( p_intf->p_module->psz_object_name, MODULE_STRING ) != 0 )
     {
         msg_Err( p_vout, "MacOS X interface module required" );
         vlc_object_release( p_intf );

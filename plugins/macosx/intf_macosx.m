@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_macosx.c: MacOS X interface plugin
+ * intf_macosx.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_macosx.m,v 1.4 2002/06/02 12:16:31 massiot Exp $
+ * $Id: intf_macosx.m,v 1.5 2002/06/08 19:32:19 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>

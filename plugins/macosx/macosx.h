@@ -2,7 +2,7 @@
  * macosx.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.h,v 1.12 2002/06/02 12:16:31 massiot Exp $
+ * $Id: macosx.h,v 1.13 2002/06/08 19:32:19 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -67,6 +67,8 @@ struct vout_sys_s
     MatrixRecordPtr p_matrix;
     DecompressorComponent img_dc;
     ImageDescriptionHandle h_img_descr;
+
+    intf_thread_t *p_intf;
 };
 
 /*****************************************************************************

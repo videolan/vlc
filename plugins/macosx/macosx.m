@@ -1,8 +1,8 @@
 /*****************************************************************************
- * macosx.c: MacOS X plugin for vlc
+ * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.m,v 1.2 2002/06/01 12:32:00 sam Exp $
+ * $Id: macosx.m,v 1.3 2002/06/08 19:32:19 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
