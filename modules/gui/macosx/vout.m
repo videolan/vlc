@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.80 2004/02/09 17:42:12 titer Exp $
+ * $Id: vout.m,v 1.81 2004/02/12 17:35:05 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -46,8 +46,9 @@
 #define QT_MAX_DIRECTBUFFERS 10
 #define VL_MAX_DISPLAYS 16
 
-#define OPENGL_EFFECT_NONE 1
-#define OPENGL_EFFECT_CUBE 2
+#define OPENGL_EFFECT_NONE             1
+#define OPENGL_EFFECT_CUBE             2
+#define OPENGL_EFFECT_TRANSPARENT_CUBE 4
 
 struct picture_sys_t
 {
@@ -1286,6 +1287,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAColorSize, 24,
+        NSOpenGLPFAAlphaSize, 8,
+        NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAWindow,
         0
     };
@@ -1304,7 +1308,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [[self openGLContext] makeCurrentContext];
     [[self openGLContext] update];
 
-
     /* Black background */
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
@@ -1319,30 +1322,13 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         i_effect = OPENGL_EFFECT_CUBE;
 
         glEnable( GL_DEPTH_TEST );
-        glPolygonMode( GL_FRONT, GL_FILL );
-        glPolygonMode( GL_BACK, GL_POINT );
-
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
-        glTranslatef( 0.0, 0.0, - 5.0 );
     }
     else if( !strcmp( psz_effect, "transparent-cube" ) )
     {
-        i_effect = OPENGL_EFFECT_CUBE;
+        i_effect = OPENGL_EFFECT_TRANSPARENT_CUBE;
 
-        glEnable( GL_BLEND );
-        glEnable( GL_POLYGON_SMOOTH );
         glDisable( GL_DEPTH_TEST );
-
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
-        glTranslatef( 0.0, 0.0, - 5.0 );
+        glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE );
     }
     else
@@ -1350,6 +1336,18 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         msg_Warn( p_vout, "no valid opengl effect provided, using "
                   "\"none\"" );
         i_effect = OPENGL_EFFECT_NONE;
+    }
+
+    if( i_effect & ( OPENGL_EFFECT_CUBE |
+                OPENGL_EFFECT_TRANSPARENT_CUBE ) )
+    {
+        /* Set the perpective */
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glFrustum( -1.0, 1.0, -1.0, 1.0, 3.0, 20.0 );
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+        glTranslatef( 0.0, 0.0, - 5.0 );
     }
 
     b_init_done = 0;
@@ -1461,6 +1459,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (void) drawCube
 {
     glBegin( GL_QUADS );
+        /* Front */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( - 1.0, 1.0, 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1470,8 +1469,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glVertex3f( 1.0, - 1.0, 1.0 );
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex3f( 1.0, 1.0, 1.0 );
-    glEnd();
-    glBegin( GL_QUADS );
+
+        /* Left */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( - 1.0, 1.0, - 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1481,8 +1480,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glVertex3f( - 1.0, - 1.0, 1.0 );
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex3f( - 1.0, 1.0, 1.0 );
-    glEnd();
-    glBegin( GL_QUADS );
+
+        /* Back */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( 1.0, 1.0, - 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1492,8 +1491,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glVertex3f( - 1.0, - 1.0, - 1.0 );
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex3f( - 1.0, 1.0, - 1.0 );
-    glEnd();
-    glBegin( GL_QUADS );
+
+        /* Right */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( 1.0, 1.0, 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1503,8 +1502,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glVertex3f( 1.0, - 1.0, - 1.0 );
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex3f( 1.0, 1.0, - 1.0 );
-    glEnd();
-    glBegin( GL_QUADS );
+
+        /* Top */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( - 1.0, 1.0, - 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1514,8 +1513,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glVertex3f( 1.0, 1.0, 1.0 );
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
         glVertex3f( 1.0, 1.0, - 1.0 );
-    glEnd();
-    glBegin( GL_QUADS );
+
+        /* Bottom */
         glTexCoord2f( 0.0, 0.0 );
         glVertex3f( - 1.0, - 1.0, 1.0 );
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
@@ -1550,7 +1549,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Draw */
     glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
-    if( i_effect == OPENGL_EFFECT_CUBE )
+    if( i_effect & ( OPENGL_EFFECT_CUBE |
+                OPENGL_EFFECT_TRANSPARENT_CUBE ) )
     {
         glRotatef( 1.0, 0.3, 0.5, 0.7 );
         [self drawCube];
