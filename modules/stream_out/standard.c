@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.2 2003/05/20 16:20:33 zorglub Exp $
+ * $Id: standard.c,v 1.3 2003/05/26 13:45:52 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -77,6 +77,8 @@ static int Open( vlc_object_t *p_this )
 
     char                *psz_sap = NULL;
 
+    char                *psz_port = "1234";
+    
     sap_session_t       *p_sap = NULL;
     
     sout_access_out_t *p_access;
@@ -126,7 +128,7 @@ static int Open( vlc_object_t *p_this )
     if(p_sys->b_sap)
     {        
         msg_Dbg( p_sout , "Creating SAP" );
-        p_sap = sout_SAPNew( p_sout , psz_url , psz_sap );
+        p_sap = sout_SAPNew( p_sout , psz_url , psz_port , psz_sap );
     }   
     
     /* XXX beurk */

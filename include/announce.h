@@ -2,7 +2,7 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.1 2003/05/20 16:20:33 zorglub Exp $
+ * $Id: announce.h,v 1.2 2003/05/26 13:45:51 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -51,6 +51,7 @@ struct sap_session_t
 {
         char psz_url[256];
         char psz_name[1024];
+        char psz_port[8];
         module_t p_network;
         unsigned int socket;
         unsigned int sendnow;
@@ -62,6 +63,6 @@ struct sap_session_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * ) );
+VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , char * ) );
 VLC_EXPORT( void,            sout_SAPSend,        ( sout_instance_t *,sap_session_t * ) );
 VLC_EXPORT( void,            sout_SAPDelete,      ( sap_session_t * ) );
