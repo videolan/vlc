@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf_open.h: MacOS X plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.h,v 1.3 2002/06/02 22:31:52 massiot Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: intf_open.h,v 1.4 2002/07/15 01:54:03 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -21,44 +21,51 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#import <Cocoa/Cocoa.h>
-
 NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 /*****************************************************************************
  * Intf_Open interface
  *****************************************************************************/
-@interface Intf_Open : NSObject
+@interface VLCOpen : NSObject
 {
+    IBOutlet id o_playlist;
+
     IBOutlet id o_disc_panel;
+    IBOutlet id o_disc_btn_ok;
+    IBOutlet id o_disc_btn_cancel;
+    IBOutlet id o_disc_lbl_type;
+    IBOutlet id o_disc_lbl_sp;
     IBOutlet id o_disc_type;
     IBOutlet id o_disc_title;
     IBOutlet id o_disc_chapter;
     IBOutlet id o_disc_device;
     
     IBOutlet id o_net_panel;
-    IBOutlet id o_net_protocol;
-    IBOutlet id o_net_server_addr;
-    IBOutlet id o_net_server_addr_label;
-    IBOutlet id o_net_server_port;
-    IBOutlet id o_net_server_port_label;
-    IBOutlet id o_net_server_pstepper;
+    IBOutlet id o_net_btn_ok;
+    IBOutlet id o_net_btn_cancel;
+    IBOutlet id o_net_box_mode;
+    IBOutlet id o_net_box_addr;
+    IBOutlet id o_net_mode;
+    IBOutlet id o_net_address;
+    IBOutlet id o_net_port;
+    IBOutlet id o_net_port_lbl;
+    IBOutlet id o_net_port_stp;
+
+    IBOutlet id o_quickly_panel;
+    IBOutlet id o_quickly_btn_ok;
+    IBOutlet id o_quickly_btn_cancel;
+    IBOutlet id o_quickly_source;
 }
 
-- (id)init;
-+ (Intf_Open *)instance;
-- (void)awakeFromNib;
+- (IBAction)openFile:(id)sender;
 
 - (IBAction)openDisc:(id)sender;
 - (IBAction)openDiscTypeChanged:(id)sender;
 
-- (IBAction)openFile:(id)sender;
-
 - (IBAction)openNet:(id)sender;
-- (IBAction)openNetProtocol:(id)sender;
+- (IBAction)openNetModeChanged:(id)sender;
+
+- (IBAction)openQuickly:(id)sender;
 
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;

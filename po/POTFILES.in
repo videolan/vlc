@@ -52,6 +52,10 @@ plugins/kde/kde.cpp
 plugins/lirc/lirc.c
 plugins/lpcm_adec/lpcm_adec.c
 plugins/macosx/macosx.m
+plugins/macosx/intf_macosx.m
+plugins/macosx/intf_controls.m
+plugins/macosx/intf_playlist.m
+plugins/macosx/intf_open.m
 plugins/mad/mad_adec.c
 plugins/memcpy/memcpy.c
 plugins/memcpy/memcpyaltivec.c

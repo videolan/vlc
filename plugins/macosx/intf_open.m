@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf_open.m: MacOS X plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.m,v 1.5 2002/06/08 19:32:19 sam Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: intf_open.m,v 1.6 2002/07/15 01:54:03 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -24,6 +24,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <sys/param.h>                                    /* for MAXPATHLEN */
+#include <string.h>
+
 #include <paths.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/IOBSD.h>
@@ -31,8 +35,16 @@
 #include <IOKit/storage/IOCDMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
 
+#import <Cocoa/Cocoa.h>
+
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
+#include "netutils.h"
+
+#import "intf_macosx.h"
+#import "intf_playlist.h"
 #import "intf_open.h"
-#import "intf_vlc_wrapper.h"
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 
@@ -116,35 +128,28 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 }
 
 /*****************************************************************************
- * Intf_Open implementation 
+ * VLCOpen implementation 
  *****************************************************************************/
-@implementation Intf_Open
-
-static Intf_Open *o_open = nil;
-
-- (id)init
-{
-    if( o_open == nil )
-    {
-        o_open = [super init];
-    }
-
-    return( o_open );
-}
-
-+ (Intf_Open *)instance
-{
-    return( o_open );
-}
+@implementation VLCOpen
 
 - (void)awakeFromNib
 {
-    [o_net_server_addr setEnabled: NSOffState];
-    [o_net_server_addr_label setStringValue: @"Address"];
-    [o_net_server_port setEnabled: NSOnState];
-    [o_net_server_port setIntValue: 1234];
-    [o_net_server_pstepper setEnabled: NSOnState];
-    [o_net_server_pstepper setIntValue: [o_net_server_port intValue]];
+    [o_disc_panel setTitle: _NS("Open Disc")];
+    [o_disc_btn_ok setTitle: _NS("OK")];
+    [o_disc_btn_cancel setTitle: _NS("Cancel")];
+    [o_disc_lbl_type setTitle: _NS("Disc type")];
+    [o_disc_lbl_sp setTitle: _NS("Starting position")];
+    [o_disc_title setTitle: _NS("Title")];
+    [o_disc_chapter setTitle: _NS("Chapter")];
+
+    [o_net_panel setTitle: _NS("Open Network")];
+    [o_net_box_mode setTitle: _NS("Network mode")];
+    [o_net_box_addr setTitle: _NS("Address")];
+    [o_net_port_lbl setStringValue: _NS("Port")];
+
+    [o_quickly_panel setTitle: _NS("Open Quickly")];
+    [o_quickly_btn_ok setTitle: _NS("OK")];
+    [o_quickly_btn_cancel setTitle: _NS("Cancel")];
 }
 
 - (IBAction)openDisc:(id)sender
@@ -159,13 +164,18 @@ static Intf_Open *o_open = nil;
 
     if( i_result )
     {
+        NSString *o_source;
+
         NSString *o_type = [[o_disc_type selectedCell] title];
         NSString *o_device = [o_disc_device stringValue];
         int i_title = [o_disc_title intValue];
         int i_chapter = [o_disc_chapter intValue];
-        
-        [[Intf_VLCWrapper instance] openDisc: [o_type lowercaseString]
-            device: o_device title: i_title chapter: i_chapter];
+
+        o_source = [NSString stringWithFormat: @"%@:%@@%d,%d",
+            [o_type lowercaseString], o_device, i_title, i_chapter];
+
+        [o_playlist appendArray: 
+            [NSArray arrayWithObject: o_source] atPos: -1];
     }
 }
 
@@ -204,11 +214,13 @@ static Intf_Open *o_open = nil;
             }
             
             [o_disc_device selectItemAtIndex: 0];
+            [o_disc_btn_ok setEnabled: TRUE];
         }
         else
         {
             [o_disc_device setStringValue: 
                 [NSString stringWithFormat: @"No %@s found", o_type]];
+            [o_disc_btn_ok setEnabled: FALSE];
         }
     }
 }
@@ -222,13 +234,14 @@ static Intf_Open *o_open = nil;
     if( [o_panel runModalForDirectory: nil 
             file: nil types: nil] == NSOKButton )
     {
-        [[Intf_VLCWrapper instance] openFiles: [o_panel filenames]];
+        [o_playlist appendArray: [o_panel filenames] atPos: -1];
     }
 }
 
 - (IBAction)openNet:(id)sender
 {
     int i_result;
+    intf_thread_t * p_intf = [NSApp getIntf];
 
     [o_net_panel makeKeyAndOrderFront: self];
     i_result = [NSApp runModalForWindow: o_net_panel];
@@ -236,70 +249,124 @@ static Intf_Open *o_open = nil;
 
     if( i_result )
     {
-        NSString *o_protocol;
-        int i_port = [o_net_server_port intValue];
-        NSString *o_addr = [o_net_server_addr stringValue];
+        NSString * o_source = nil;
+        UInt32 i_port = [o_net_port intValue];
+        NSString * o_addr = [o_net_address stringValue];
+        NSString * o_mode = [[o_net_mode selectedCell] title];
 
-        o_protocol = [[o_net_protocol selectedCell] title];
+        if( i_port > 65536 )
+        {
+            NSBeep();
+            return;
+        }
 
-        if( [o_protocol isEqualToString: @"UDP"] )
+        if( [o_mode isEqualToString: @"UDP"] )
         {
-            [[Intf_VLCWrapper instance] openNet: @"" port: i_port]; 
+            o_source = [NSString 
+                stringWithFormat: @"udp:@:%i", i_port];
+        } 
+        else if( [o_mode isEqualToString: @"UDP Multicase"] )
+        {
+            o_source = [NSString 
+                stringWithFormat: @"udp:@%@:%i", o_addr, i_port];
         }
-        else if( [o_protocol isEqualToString: @"UDP - multicast"] ) 
+        else if( [o_mode isEqualToString: @"Channel server"] )
         {
-            [[Intf_VLCWrapper instance] openNet: o_addr port: i_port]; 
+            if( p_intf->p_vlc->p_channel == NULL )
+            {
+                network_ChannelCreate( p_intf );
+            }
+
+            config_PutPsz( p_intf, "channel-server", 
+                           (char *)[o_addr lossyCString] );
+            config_PutInt( p_intf, "channel-port", i_port );
+
+            p_intf->p_sys->b_playing = 1;
         }
-        else if( [o_protocol isEqualToString: @"Channel server"] ) 
+        else if( [o_mode isEqualToString: @"HTTP"] )
         {
-            [[Intf_VLCWrapper instance] openNetChannel: o_addr port: i_port]; 
+            o_source = o_addr;
         }
-        else if( [o_protocol isEqualToString: @"HTTP"] ) 
+
+        if( o_source != nil )
         {
-            [[Intf_VLCWrapper instance] openNetHTTP: o_addr]; 
+            [o_playlist appendArray:
+                [NSArray arrayWithObject: o_source] atPos: -1];
         }
     }
 }
 
-- (IBAction)openNetProtocol:(id)sender
+- (IBAction)openNetModeChanged:(id)sender
 {
-    NSString *o_protocol;
+    NSString * o_mode;
+    SInt32 i_port = 1234;
+    NSString * o_addr = nil;
 
-    o_protocol = [[o_net_protocol selectedCell] title];
-    
-    if( [o_protocol isEqualToString: @"UDP"] )
+    o_mode = [[o_net_mode selectedCell] title];
+
+    if( [o_mode isEqualToString: @"UDP Multicast"] )
     {
-        [o_net_server_addr setEnabled: NSOffState];
-        [o_net_server_port setEnabled: NSOnState];
-        [o_net_server_port setIntValue: 1234];
-        [o_net_server_pstepper setEnabled: NSOnState];
+        o_addr = @"";
     }
-    else if( [o_protocol isEqualToString: @"UDP - multicast"] ) 
+    else if( [o_mode isEqualToString: @"Channel server"] )
     {
-        [o_net_server_addr setEnabled: NSOnState];
-        [o_net_server_addr_label setStringValue: @"Mult. addr."];
-        [o_net_server_port setEnabled: NSOnState];
-        [o_net_server_port setIntValue: 1234];
-        [o_net_server_pstepper setEnabled: NSOnState];
+        o_addr = @"localhost";
+        i_port = 6010;
     }
-    else if( [o_protocol isEqualToString: @"Channel server"] ) 
+    else if( [o_mode isEqualToString: @"HTTP"] )
     {
-        [o_net_server_addr setEnabled: NSOnState];
-        [o_net_server_addr_label setStringValue: @"Server"];
-        [o_net_server_addr setStringValue: @"vlcs"];
-        [o_net_server_port setEnabled: NSOnState];
-        [o_net_server_port setIntValue: 6010];
-        [o_net_server_pstepper setEnabled: NSOnState];
+        o_addr = @"http://";
+        i_port = -1;
     }
-    else if( [o_protocol isEqualToString: @"HTTP"] ) 
+
+    if( o_addr != nil )
     {
-        [o_net_server_addr setEnabled: NSOnState];
-        [o_net_server_addr_label setStringValue: @"URL"];
-        [o_net_server_addr setStringValue: @"http://"];
-        [o_net_server_port setEnabled: NSOffState];
-        [o_net_server_pstepper setEnabled: NSOffState];
+        [o_net_address setEnabled: TRUE];
+        [o_net_address setStringValue: o_addr];
     }
-    [o_net_server_pstepper setIntValue: [o_net_server_port intValue]];
+    else
+    {
+        [o_net_address setEnabled: FALSE];
+    }
+
+    if( i_port > -1 )
+    {
+        [o_net_port setEnabled: TRUE];
+        [o_net_port_stp setEnabled: TRUE];
+        [o_net_port setIntValue: i_port];
+    }
+    else
+    {
+        [o_net_port setEnabled: FALSE];
+        [o_net_port_stp setEnabled: FALSE];
+    }
+}
+
+- (IBAction)openQuickly:(id)sender
+{
+    int i_result;
+
+    [o_quickly_source setStringValue: @""];
+    [o_quickly_panel makeKeyAndOrderFront: self];
+    i_result = [NSApp runModalForWindow: o_quickly_panel];
+    [o_quickly_panel close];
+
+    if( i_result )
+    {
+        NSString * o_source;
+
+        o_source = [o_quickly_source stringValue];
+
+        if( [o_source length] > 0 )
+        {
+            [o_playlist appendArray: 
+                [NSArray arrayWithObject: o_source] atPos: -1];
+        }
+        else
+        {
+            NSBeep();
+        }
+    }
 }
 
 - (IBAction)panelCancel:(id)sender

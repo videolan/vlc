@@ -3,42 +3,24 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 34;
+	objectVersion = 38;
 	objects = {
-		F510A6CC01738ED001A80A1F = {
-			isa = PBXFileReference;
-			name = intf_vlc_wrapper.h;
-			path = plugins/macosx/intf_vlc_wrapper.h;
-			refType = 4;
+		014CEA410018CDE011CA2923 = {
+			isa = PBXBundleReference;
+			path = vlc.bundle;
+			refType = 3;
 		};
-		F510A6CD01738ED001A80A1F = {
-			isa = PBXFileReference;
-			name = intf_vlc_wrapper.m;
-			path = plugins/macosx/intf_vlc_wrapper.m;
-			refType = 4;
-		};
-		F511306E0170620B01A80A1F = {
-			buildStyles = (
-				F51130710170620B01A80A1F,
+		014CEA420018CDE011CA2923 = {
+			buildRules = (
 			);
-			isa = PBXProject;
-			mainGroup = F511306F0170620B01A80A1F;
-			productRefGroup = F511306F0170620B01A80A1F;
-			projectDirPath = "";
-			targets = (
-				F52EEB23017E3F0701A80A1F,
-			);
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				OPTIMIZATION_CFLAGS = "-O0";
+			};
+			isa = PBXBuildStyle;
+			name = Development;
 		};
-		F511306F0170620B01A80A1F = {
-			children = (
-				F5121224017062C501A80A1F,
-				F5121225017062C501A80A1F,
-				F52EEB22017E3F0701A80A1F,
-			);
-			isa = PBXGroup;
-			refType = 4;
-		};
-		F51130710170620B01A80A1F = {
+		014CEA430018CDE011CA2923 = {
 			buildRules = (
 			);
 			buildSettings = {
@@ -47,145 +29,69 @@
 			isa = PBXBuildStyle;
 			name = Deployment;
 		};
-		F51212220170627901A80A1F = {
-			children = (
-				F51212230170627901A80A1F,
+//010
+//011
+//012
+//013
+//014
+//080
+//081
+//082
+//083
+//084
+		089C1669FE841209C02AAC07 = {
+			buildStyles = (
+				014CEA420018CDE011CA2923,
+				014CEA430018CDE011CA2923,
 			);
-			isa = PBXVariantGroup;
-			name = MainMenu.nib;
-			path = "";
-			refType = 4;
+			isa = PBXProject;
+			mainGroup = 089C166AFE841209C02AAC07;
+			projectDirPath = "";
+			targets = (
+				089C1673FE841209C02AAC07,
+			);
 		};
-		F51212230170627901A80A1F = {
-			isa = PBXFileReference;
-			name = English;
-			path = English.lproj/MainMenu.nib;
-			refType = 4;
-		};
-		F5121224017062C501A80A1F = {
+		089C166AFE841209C02AAC07 = {
 			children = (
-				F512122B0170635601A80A1F,
-				F512122C0170635601A80A1F,
-				F512122D0170635601A80A1F,
-				F51212300170635601A80A1F,
-				F51212310170635601A80A1F,
-				F51212320170635601A80A1F,
-				F510A6CC01738ED001A80A1F,
-				F510A6CD01738ED001A80A1F,
-				F6799746020DCC2A01A80112,
-				F6799747020DCC2A01A80112,
-				F6799748020DCC2A01A80112,
-				F6799749020DCC2A01A80112,
-				F679974A020DCC2A01A80112,
-				F6EA76F5024171E201A80112,
-				F6EA76F6024171E201A80112,
-				F66B34EC0271A5AF01A80112,
-				F66B34ED0271A5AF01A80112,
+				08FB77AFFE84173DC02AAC07,
+				089C167CFE841241C02AAC07,
+				089C1671FE841209C02AAC07,
+				19C28FB8FE9D52D311CA2CBB,
 			);
 			isa = PBXGroup;
-			name = Files;
-			path = ../..;
-			refType = 2;
+			name = vlc;
+			refType = 4;
 		};
-		F5121225017062C501A80A1F = {
+		089C1671FE841209C02AAC07 = {
 			children = (
-				F51212220170627901A80A1F,
-				F51352740170655D01A80A1F,
-				F513527F0170659801A80A1F,
-				F51352800170659801A80A1F,
-				F51352810170659801A80A1F,
-				F51352820170659801A80A1F,
-				F52EEB2F017E3F8C01A80A1F,
-				F5C6804202B407B701B7B2C9,
-				F5C6804302B407B701B7B2C9,
-				F5C6804402B407B701B7B2C9,
-				F5C6804502B407B701B7B2C9,
-				F5C6804602B407B701B7B2C9,
-				F5C6804702B407B701B7B2C9,
+				1058C7ACFEA557BF11CA2CBB,
+				1058C7AEFEA557BF11CA2CBB,
 			);
 			isa = PBXGroup;
-			path = Resources;
-			refType = 2;
-		};
-		F512122B0170635601A80A1F = {
-			isa = PBXFileReference;
-			name = aout_macosx.m;
-			path = plugins/macosx/aout_macosx.m;
+			name = "Frameworks and Libraries";
 			refType = 4;
 		};
-		F512122C0170635601A80A1F = {
-			isa = PBXFileReference;
-			name = intf_controller.m;
-			path = plugins/macosx/intf_controller.m;
-			refType = 4;
+		089C1672FE841209C02AAC07 = {
+			isa = PBXFrameworkReference;
+			name = Foundation.framework;
+			path = /System/Library/Frameworks/Foundation.framework;
+			refType = 0;
 		};
-		F512122D0170635601A80A1F = {
-			isa = PBXFileReference;
-			name = intf_controller.h;
-			path = plugins/macosx/intf_controller.h;
-			refType = 4;
-		};
-		F51212300170635601A80A1F = {
-			isa = PBXFileReference;
-			name = macosx.m;
-			path = plugins/macosx/macosx.m;
-			refType = 4;
-		};
-		F51212310170635601A80A1F = {
-			isa = PBXFileReference;
-			name = macosx.h;
-			path = plugins/macosx/macosx.h;
-			refType = 4;
-		};
-		F51212320170635601A80A1F = {
-			isa = PBXFileReference;
-			name = vout_macosx.m;
-			path = plugins/macosx/vout_macosx.m;
-			refType = 4;
-		};
-		F51352740170655D01A80A1F = {
-			isa = PBXFileReference;
-			path = pause.png;
-			refType = 4;
-		};
-		F513527F0170659801A80A1F = {
-			isa = PBXFileReference;
-			path = play.png;
-			refType = 4;
-		};
-		F51352800170659801A80A1F = {
-			isa = PBXFileReference;
-			path = stepf.png;
-			refType = 4;
-		};
-		F51352810170659801A80A1F = {
-			isa = PBXFileReference;
-			path = stepr.png;
-			refType = 4;
-		};
-		F51352820170659801A80A1F = {
-			isa = PBXFileReference;
-			path = stop.png;
-			refType = 4;
-		};
-		F52EEB22017E3F0701A80A1F = {
-			isa = PBXBundleReference;
-			path = vlc.bundle;
-			refType = 3;
-		};
-		F52EEB23017E3F0701A80A1F = {
+		089C1673FE841209C02AAC07 = {
 			buildPhases = (
-				F52EEB24017E3F0701A80A1F,
-				F52EEB25017E3F0701A80A1F,
-				F52EEB2C017E3F0701A80A1F,
-				F52EEB2D017E3F0701A80A1F,
-				F52EEB2E017E3F0701A80A1F,
+				089C1674FE841209C02AAC07,
+				089C1675FE841209C02AAC07,
+				089C1676FE841209C02AAC07,
+				089C1677FE841209C02AAC07,
+				089C1679FE841209C02AAC07,
 			);
 			buildSettings = {
-				DEBUGGING_SYMBOLS = NO;
-				OPTIMIZATION_CFLAGS = "-O3";
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bundle -undefined suppress";
+				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = vlc;
 				SECTORDER_FLAGS = "";
@@ -196,9 +102,9 @@
 			);
 			isa = PBXBundleTarget;
 			name = vlc;
-			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
-			productName = vlc.app;
-			productReference = F52EEB22017E3F0701A80A1F;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = vlc;
+			productReference = 014CEA410018CDE011CA2923;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
 <plist version=\"0.9\">
@@ -213,7 +119,7 @@
 				<string>vob</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>vlc.icns</string>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>VOB File (DVD Video)</string>
 			<key>CFBundleTypeRole</key>
@@ -226,7 +132,7 @@
 				<string>mpeg</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>vlc.icns</string>
+			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG File</string>
 			<key>CFBundleTypeRole</key>
@@ -240,7 +146,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>divx.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>DivX File</string>
+			<string>DivX file</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -268,261 +174,314 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mp4</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg4.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-4 File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>vlc</string>
-	<key>CFBundleGetInfoString</key>
-	<string>VideoLAN Client, © 1996-2002 VideoLAN project</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.videolan.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>vlc</string>
 	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.4.2</string>
+	<string>BNDL</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleVersion</key>
-	<string>0.4.2</string>
+	<string>0.5.0</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>VLCApplication</string>
 </dict>
 </plist>
 ";
-			shouldUseHeadermap = 0;
+			shouldUseHeadermap = 1;
 		};
-		F52EEB24017E3F0701A80A1F = {
+		089C1674FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXHeadersBuildPhase;
-			name = Headers;
 		};
-		F52EEB25017E3F0701A80A1F = {
+		089C1675FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
 			files = (
-				F52EEB26017E3F0701A80A1F,
-				F52EEB27017E3F0701A80A1F,
-				F52EEB28017E3F0701A80A1F,
-				F52EEB29017E3F0701A80A1F,
-				F52EEB2A017E3F0701A80A1F,
-				F52EEB2B017E3F0701A80A1F,
-				F52EEB30017E3F8C01A80A1F,
-				F5C6804802B407B701B7B2C9,
-				F5C6804902B407B701B7B2C9,
-				F5C6804A02B407B701B7B2C9,
-				F5C6804B02B407B701B7B2C9,
-				F5C6804C02B407B701B7B2C9,
-				F5C6804D02B407B701B7B2C9,
+				F74F13E002C2A53401EE194C,
+				F74F13EC02C2A79C01EE194C,
+				F6E4F91002D2648B01A80112,
+				F6E4F91102D2648B01A80112,
+				F6E4F91202D2648B01A80112,
+				F6E4F91302D2648B01A80112,
+				F6E4F91402D2648B01A80112,
+				F6E4F91502D2648B01A80112,
+				F69B0CA802E24F6401A80112,
 			);
 			isa = PBXResourcesBuildPhase;
-			name = "Bundle Resources";
 		};
-		F52EEB26017E3F0701A80A1F = {
-			fileRef = F51212220170627901A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB27017E3F0701A80A1F = {
-			fileRef = F51352740170655D01A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB28017E3F0701A80A1F = {
-			fileRef = F513527F0170659801A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB29017E3F0701A80A1F = {
-			fileRef = F51352800170659801A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB2A017E3F0701A80A1F = {
-			fileRef = F51352810170659801A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB2B017E3F0701A80A1F = {
-			fileRef = F51352820170659801A80A1F;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F52EEB2C017E3F0701A80A1F = {
+		089C1676FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXSourcesBuildPhase;
-			name = Sources;
 		};
-		F52EEB2D017E3F0701A80A1F = {
+		089C1677FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
 			files = (
+				1058C7AFFEA557BF11CA2CBB,
 			);
 			isa = PBXFrameworksBuildPhase;
-			name = "Frameworks & Libraries";
 		};
-		F52EEB2E017E3F0701A80A1F = {
+		089C1679FE841209C02AAC07 = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
-			name = "ResourceManager Resources";
 		};
-		F52EEB2F017E3F8C01A80A1F = {
-			isa = PBXFileReference;
-			path = vlc.icns;
+		089C167CFE841241C02AAC07 = {
+			children = (
+				F74F13EA02C2A79C01EE194C,
+				F74F13DF02C2A53401EE194C,
+				F6E4F90A02D2648B01A80112,
+				F6E4F90B02D2648B01A80112,
+				F6E4F90C02D2648B01A80112,
+				F6E4F90D02D2648B01A80112,
+				F6E4F90E02D2648B01A80112,
+				F6E4F90F02D2648B01A80112,
+				F69B0CA602E24F6401A80112,
+			);
+			isa = PBXGroup;
+			name = Resources;
 			refType = 4;
 		};
-		F52EEB30017E3F8C01A80A1F = {
-			fileRef = F52EEB2F017E3F8C01A80A1F;
+		089C167FFE841241C02AAC07 = {
+			isa = PBXFrameworkReference;
+			name = AppKit.framework;
+			path = /System/Library/Frameworks/AppKit.framework;
+			refType = 0;
+		};
+		08FB77AFFE84173DC02AAC07 = {
+			children = (
+			);
+			isa = PBXGroup;
+			name = Classes;
+			refType = 4;
+		};
+//080
+//081
+//082
+//083
+//084
+//100
+//101
+//102
+//103
+//104
+		1058C7ACFEA557BF11CA2CBB = {
+			children = (
+				1058C7ADFEA557BF11CA2CBB,
+			);
+			isa = PBXGroup;
+			name = "Linked Frameworks";
+			refType = 4;
+		};
+		1058C7ADFEA557BF11CA2CBB = {
+			isa = PBXFrameworkReference;
+			name = Cocoa.framework;
+			path = /System/Library/Frameworks/Cocoa.framework;
+			refType = 0;
+		};
+		1058C7AEFEA557BF11CA2CBB = {
+			children = (
+				089C1672FE841209C02AAC07,
+				089C167FFE841241C02AAC07,
+			);
+			isa = PBXGroup;
+			name = "Other Frameworks";
+			refType = 4;
+		};
+		1058C7AFFEA557BF11CA2CBB = {
+			fileRef = 1058C7ADFEA557BF11CA2CBB;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		F5C6804202B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = divx.icns;
+//100
+//101
+//102
+//103
+//104
+//190
+//191
+//192
+//193
+//194
+		19C28FB8FE9D52D311CA2CBB = {
+			children = (
+				014CEA410018CDE011CA2923,
+			);
+			isa = PBXGroup;
+			name = Products;
 			refType = 4;
 		};
-		F5C6804302B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = mpeg2.icns;
-			refType = 4;
-		};
-		F5C6804402B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = mpeg.icns;
-			refType = 4;
-		};
-		F5C6804502B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = generic.icns;
-			refType = 4;
-		};
-		F5C6804602B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = mpeg1.icns;
-			refType = 4;
-		};
-		F5C6804702B407B701B7B2C9 = {
-			isa = PBXFileReference;
-			path = mpeg4.icns;
-			refType = 4;
-		};
-		F5C6804802B407B701B7B2C9 = {
-			fileRef = F5C6804202B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5C6804902B407B701B7B2C9 = {
-			fileRef = F5C6804302B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5C6804A02B407B701B7B2C9 = {
-			fileRef = F5C6804402B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5C6804B02B407B701B7B2C9 = {
-			fileRef = F5C6804502B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5C6804C02B407B701B7B2C9 = {
-			fileRef = F5C6804602B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5C6804D02B407B701B7B2C9 = {
-			fileRef = F5C6804702B407B701B7B2C9;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-//F50
-//F51
-//F52
-//F53
-//F54
+//190
+//191
+//192
+//193
+//194
 //F60
 //F61
 //F62
 //F63
 //F64
-		F66B34EC0271A5AF01A80112 = {
-			isa = PBXFileReference;
-			name = intf_open.m;
-			path = plugins/macosx/intf_open.m;
+		F69B0CA602E24F6401A80112 = {
+			children = (
+				F69B0CA702E24F6401A80112,
+			);
+			isa = PBXVariantGroup;
+			name = InfoPlist.strings;
+			path = "";
 			refType = 4;
 		};
-		F66B34ED0271A5AF01A80112 = {
+		F69B0CA702E24F6401A80112 = {
 			isa = PBXFileReference;
-			name = intf_open.h;
-			path = plugins/macosx/intf_open.h;
+			name = English;
+			path = Resources/English.lproj/InfoPlist.strings;
 			refType = 4;
 		};
-		F6799746020DCC2A01A80112 = {
+		F69B0CA802E24F6401A80112 = {
+			fileRef = F69B0CA602E24F6401A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F90A02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = intf_macosx.m;
-			path = plugins/macosx/intf_macosx.m;
+			name = divx.icns;
+			path = Resources/divx.icns;
 			refType = 4;
 		};
-		F6799747020DCC2A01A80112 = {
+		F6E4F90B02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = vout_qdview.m;
-			path = plugins/macosx/vout_qdview.m;
+			name = generic.icns;
+			path = Resources/generic.icns;
 			refType = 4;
 		};
-		F6799748020DCC2A01A80112 = {
+		F6E4F90C02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = vout_qdview.h;
-			path = plugins/macosx/vout_qdview.h;
+			name = mpeg.icns;
+			path = Resources/mpeg.icns;
 			refType = 4;
 		};
-		F6799749020DCC2A01A80112 = {
+		F6E4F90D02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = vout_window.m;
-			path = plugins/macosx/vout_window.m;
+			name = mpeg1.icns;
+			path = Resources/mpeg1.icns;
 			refType = 4;
 		};
-		F679974A020DCC2A01A80112 = {
+		F6E4F90E02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = vout_window.h;
-			path = plugins/macosx/vout_window.h;
+			name = mpeg2.icns;
+			path = Resources/mpeg2.icns;
 			refType = 4;
 		};
-		F6EA76F5024171E201A80112 = {
+		F6E4F90F02D2648B01A80112 = {
 			isa = PBXFileReference;
-			name = vout_vlc_wrapper.m;
-			path = plugins/macosx/vout_vlc_wrapper.m;
+			name = mpeg4.icns;
+			path = Resources/mpeg4.icns;
 			refType = 4;
 		};
-		F6EA76F6024171E201A80112 = {
+		F6E4F91002D2648B01A80112 = {
+			fileRef = F6E4F90A02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F91102D2648B01A80112 = {
+			fileRef = F6E4F90B02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F91202D2648B01A80112 = {
+			fileRef = F6E4F90C02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F91302D2648B01A80112 = {
+			fileRef = F6E4F90D02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F91402D2648B01A80112 = {
+			fileRef = F6E4F90E02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F6E4F91502D2648B01A80112 = {
+			fileRef = F6E4F90F02D2648B01A80112;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//F60
+//F61
+//F62
+//F63
+//F64
+//F70
+//F71
+//F72
+//F73
+//F74
+		F74F13DF02C2A53401EE194C = {
 			isa = PBXFileReference;
-			name = vout_vlc_wrapper.h;
-			path = plugins/macosx/vout_vlc_wrapper.h;
+			name = vlc.icns;
+			path = Resources/vlc.icns;
 			refType = 4;
+		};
+		F74F13E002C2A53401EE194C = {
+			fileRef = F74F13DF02C2A53401EE194C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F74F13EA02C2A79C01EE194C = {
+			children = (
+				F74F13EB02C2A79C01EE194C,
+			);
+			isa = PBXVariantGroup;
+			name = MainMenu.nib;
+			path = "";
+			refType = 4;
+		};
+		F74F13EB02C2A79C01EE194C = {
+			isa = PBXFileReference;
+			name = English;
+			path = Resources/English.lproj/MainMenu.nib;
+			refType = 4;
+		};
+		F74F13EC02C2A79C01EE194C = {
+			fileRef = F74F13EA02C2A79C01EE194C;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 	};
-	rootObject = F511306E0170620B01A80A1F;
+	rootObject = 089C1669FE841209C02AAC07;
 }

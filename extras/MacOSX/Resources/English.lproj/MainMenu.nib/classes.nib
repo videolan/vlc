@@ -3,36 +3,85 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
-                deinterlace = id; 
-                eject = id; 
                 faster = id; 
                 fullscreen = id; 
                 loop = id; 
-                maxvolume = id; 
                 mute = id; 
                 next = id; 
-                nextChannel = id; 
                 pause = id; 
                 play = id; 
                 prev = id; 
-                prevChannel = id; 
-                quit = id; 
                 slower = id; 
                 stop = id; 
-                timesliderUpdate = id; 
+                toggleChapter = id; 
+                toggleLanguage = id; 
+                toggleProgram = id; 
+                toggleSubtitle = id; 
+                toggleTitle = id; 
+                volumeDown = id; 
+                volumeUp = id; 
             }; 
-            CLASS = Intf_Controller; 
+            CLASS = VLCControls; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {o_open = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {clearRecentItems = id; }; 
+            CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                o_pause = NSButton; 
-                o_play = NSButton; 
-                o_playlistds = Intf_PlaylistDS; 
-                o_stepf = NSButton; 
-                o_stepr = NSButton; 
-                o_stop = NSButton; 
-                o_time = NSTextField; 
-                o_timeslider = NSSlider; 
-                o_window = NSWindow; 
+                o_controls = id; 
+                o_dmi_pause = id; 
+                o_dmi_play = id; 
+                o_dmi_stop = id; 
+                o_messages = id; 
+                o_mi_about = id; 
+                o_mi_bring_atf = id; 
+                o_mi_chapter = id; 
+                o_mi_clear = id; 
+                o_mi_copy = id; 
+                o_mi_cut = id; 
+                o_mi_faster = id; 
+                o_mi_fullscreen = id; 
+                o_mi_hide = id; 
+                o_mi_hide_others = id; 
+                o_mi_language = id; 
+                o_mi_loop = id; 
+                o_mi_messages = id; 
+                o_mi_minimize = id; 
+                o_mi_mute = id; 
+                o_mi_next = id; 
+                o_mi_open_disc = id; 
+                o_mi_open_file = id; 
+                o_mi_open_net = id; 
+                o_mi_open_quickly = id; 
+                o_mi_open_recent = id; 
+                o_mi_open_recent_cm = id; 
+                o_mi_paste = id; 
+                o_mi_pause = id; 
+                o_mi_play = id; 
+                o_mi_playlist = id; 
+                o_mi_previous = id; 
+                o_mi_program = id; 
+                o_mi_quit = id; 
+                o_mi_select_all = id; 
+                o_mi_show_all = id; 
+                o_mi_slower = id; 
+                o_mi_stop = id; 
+                o_mi_subtitle = id; 
+                o_mi_title = id; 
+                o_mi_vol_down = id; 
+                o_mi_vol_up = id; 
+                o_msgs_btn_ok = id; 
+                o_msgs_panel = id; 
+                o_mu_controls = id; 
+                o_mu_edit = id; 
+                o_mu_file = id; 
+                o_mu_view = id; 
+                o_mu_window = id; 
+                o_playlist = id; 
+                o_window = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
@@ -42,34 +91,48 @@
                 openDiscTypeChanged = id; 
                 openFile = id; 
                 openNet = id; 
-                openNetProtocol = id; 
+                openNetModeChanged = id; 
+                openQuickly = id; 
                 panelCancel = id; 
                 panelOk = id; 
             }; 
-            CLASS = Intf_Open; 
+            CLASS = VLCOpen; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                o_disc_btn_cancel = id; 
+                o_disc_btn_ok = id; 
                 o_disc_chapter = id; 
                 o_disc_device = id; 
+                o_disc_lbl_sp = id; 
+                o_disc_lbl_type = id; 
                 o_disc_panel = id; 
                 o_disc_title = id; 
                 o_disc_type = id; 
+                o_net_address = id; 
+                o_net_box_addr = id; 
+                o_net_box_mode = id; 
+                o_net_btn_cancel = id; 
+                o_net_btn_ok = id; 
+                o_net_mode = id; 
                 o_net_panel = id; 
-                o_net_protocol = id; 
-                o_net_server_addr = id; 
-                o_net_server_addr_label = id; 
-                o_net_server_port = id; 
-                o_net_server_port_label = id; 
-                o_net_server_pstepper = id; 
+                o_net_port = id; 
+                o_net_port_lbl = id; 
+                o_net_port_stp = id; 
+                o_playlist = id; 
+                o_quickly_btn_cancel = id; 
+                o_quickly_btn_ok = id; 
+                o_quickly_panel = id; 
+                o_quickly_source = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
         {
-            CLASS = Intf_PlaylistDS; 
+            CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
-            OUTLETS = {o_table = NSTableView; }; 
+            OUTLETS = {o_btn_close = id; o_panel = id; o_table_view = id; }; 
             SUPERCLASS = NSObject; 
-        }
+        }, 
+        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }
     ); 
     IBVersion = 1; 
 }

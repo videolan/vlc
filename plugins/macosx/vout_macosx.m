@@ -1,7 +1,8 @@
 /*****************************************************************************
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
+ * Copyright (C) 2001, 2002 VideoLAN
+ * $Id: vout_macosx.m,v 1.8 2002/07/15 01:54:04 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -33,7 +34,11 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-#include "macosx.h"
+#include <Cocoa/Cocoa.h>
+#include <QuickTime/QuickTime.h>
+
+#include "intf_macosx.h"
+#include "vout_macosx.h"
 
 #define QT_MAX_DIRECTBUFFERS 10
 
@@ -91,34 +96,34 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
 static int vout_Create( vout_thread_t *p_vout )
 {
     OSErr err;
-    intf_thread_t *p_intf;
-
-    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, FIND_ANYWHERE );
-    if( p_intf == NULL )
-    {
-        msg_Err( p_vout, "no interface present" );
-        return 1;
-    }
-
-    if( p_intf->p_module == NULL
-         || strcmp( p_intf->p_module->psz_object_name, MODULE_STRING ) != 0 )
-    {
-        msg_Err( p_vout, "MacOS X interface module required" );
-        vlc_object_release( p_intf );
-        return 1;
-    }
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
-        vlc_object_release( p_intf );
-        return 1;
+        return( 1 );
     }
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    p_vout->p_sys->p_intf = p_intf;
+    p_vout->p_sys->p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, 
+                                             FIND_ANYWHERE );
+    if( p_vout->p_sys->p_intf == NULL )
+    {
+        msg_Err( p_vout, "no interface present" );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
+
+    if( p_vout->p_sys->p_intf->p_module == NULL || 
+        strcmp( p_vout->p_sys->p_intf->p_module->psz_object_name, 
+                MODULE_STRING ) != 0 )
+    {
+        msg_Err( p_vout, "MacOS X interface module required" );
+        vlc_object_release( p_vout->p_sys->p_intf );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
 
     p_vout->p_sys->h_img_descr = 
         (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
@@ -135,9 +140,8 @@ static int vout_Create( vout_thread_t *p_vout )
         msg_Err( p_vout, "EnterMovies failed: %d", err );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_intf );
         free( p_vout->p_sys );
-        return 1;
+        return( 1 );
     } 
 
     if( vout_ChromaCmp( p_vout->render.i_chroma, FOURCC_I420 ) )
@@ -164,9 +168,8 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_intf );
         free( p_vout->p_sys );
-        return 1;        
+        return( 1 );        
     }
 
     if( CoCreateWindow( p_vout ) )
@@ -174,12 +177,11 @@ static int vout_Create( vout_thread_t *p_vout )
         msg_Err( p_vout, "unable to create window" );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-        vlc_object_release( p_intf );
         free( p_vout->p_sys ); 
-        return 1;
+        return( 1 );
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -205,7 +207,7 @@ static int vout_Init( vout_thread_t *p_vout )
     if( QTCreateSequence( p_vout ) )
     {
         msg_Err( p_vout, "unable to create sequence" );
-        return 1;
+        return( 1 );
     }
 
     /* Try to initialize up to QT_MAX_DIRECTBUFFERS direct buffers */
@@ -237,7 +239,7 @@ static int vout_Init( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -271,7 +273,9 @@ static void vout_Destroy( vout_thread_t *p_vout )
 
     free( p_vout->p_sys->p_matrix );
     DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+
     vlc_object_release( p_vout->p_sys->p_intf );
+
     free( p_vout->p_sys );
 }
 
@@ -287,7 +291,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         if( CoToggleFullscreen( p_vout ) )  
         {
-            return 1;
+            return( 1 );
         }
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
@@ -332,7 +336,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -386,11 +390,11 @@ static int CoSendRequest( vout_thread_t *p_vout, long i_request )
     o_array = [NSArray arrayWithObject:
         [NSData dataWithBytes: &p_req length: sizeof(void *)]];
     o_msg = [[NSPortMessage alloc]
-        initWithSendPort: p_vout->p_sys->p_intf->p_sys->o_port
-        receivePort: recvPort
-        components: o_array];
+        initWithSendPort: p_vout->p_sys->p_intf->p_sys->o_sendport
+        receivePort: recvPort components: o_array]; 
 
     [o_msg sendBeforeDate: [NSDate distantPast]];
+
     [req.o_lock lockWhenCondition: 1];
     [req.o_lock unlock];
 
@@ -400,7 +404,7 @@ static int CoSendRequest( vout_thread_t *p_vout, long i_request )
     [recvPort release];
     [o_pool release];
 
-    return !req.i_result;
+    return( !req.i_result );
 }
 
 /*****************************************************************************
@@ -413,10 +417,10 @@ static int CoCreateWindow( vout_thread_t *p_vout )
     if( CoSendRequest( p_vout, VOUT_REQ_CREATE_WINDOW ) )
     {
         msg_Err( p_vout, "CoSendRequest (CREATE_WINDOW) failed" );
-        return 1;
+        return( 1 );
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -435,10 +439,10 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
     if( CoSendRequest( p_vout, VOUT_REQ_DESTROY_WINDOW ) )
     {
         msg_Err( p_vout, "CoSendRequest (DESTROY_WINDOW) failed" );
-        return 1;
+        return( 1 );
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -453,15 +457,24 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     if( CoDestroyWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to destroy window" );
-        return 1;
+        return( 1 );
     }
     
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
+    if( p_vout->b_fullscreen )
+    {
+        HideMenuBar();
+    }
+    else
+    {
+        ShowMenuBar();
+    }
+
     if( CoCreateWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to create window" );
-        return 1;
+        return( 1 );
     }
 
     SetPort( p_vout->p_sys->p_qdport );
@@ -470,10 +483,10 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     if( QTCreateSequence( p_vout ) )
     {
         msg_Err( p_vout, "unable to create sequence" );
-        return 1; 
+        return( 1 ); 
     } 
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -571,10 +584,10 @@ static int QTCreateSequence( vout_thread_t *p_vout )
                               p_vout->p_sys->img_dc ) ) )
     {
         msg_Err( p_vout, "DecompressSequenceBeginS failed: %d", err );
-        return 1;
+        return( 1 );
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -601,7 +614,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_pic->p_sys == NULL )
     {
-        return -1;
+        return( -1 );
     }
 
     switch( p_vout->output.i_chroma )
@@ -660,10 +673,10 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
                  p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
         p_pic->i_planes = 0;
-        return -1;
+        return( -1 );
     }
 
-    return 0;
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -681,3 +694,82 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     free( p_pic->p_sys );
 }
 
+/*****************************************************************************
+ * VLCWindow implementation
+ *****************************************************************************/
+@implementation VLCWindow
+
+- (void)setVout:(vout_thread_t *)_p_vout
+{
+    p_vout = _p_vout;
+}
+
+- (void)toggleFullscreen
+{
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+}
+
+- (BOOL)isFullscreen
+{
+    return( p_vout->b_fullscreen );
+}
+
+- (BOOL)canBecomeKeyWindow
+{
+    return( YES );
+}
+
+- (void)keyDown:(NSEvent *)o_event
+{
+    unichar key = 0;
+
+    if( [[o_event characters] length] )
+    {
+        key = [[o_event characters] characterAtIndex: 0];
+    }
+
+    switch( key )
+    {
+        case 'f': case 'F':
+            [self toggleFullscreen];
+            break;
+
+        case (unichar)0x1b: /* escape */
+            if( [self isFullscreen] )
+            {
+                [self toggleFullscreen];
+            }
+            break;
+
+        case 'q': case 'Q':
+            p_vout->p_vlc->b_die = 1;
+            break;
+
+        default:
+            [super keyDown: o_event];
+            break;
+    }
+}
+
+@end
+
+/*****************************************************************************
+ * VLCView implementation
+ *****************************************************************************/
+@implementation VLCView
+
+- (void)setVout:(vout_thread_t *)_p_vout
+{
+    p_vout = _p_vout;
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    [[NSColor blackColor] set];
+    NSRectFill( rect );
+    [super drawRect: rect];
+
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+}
+
+@end

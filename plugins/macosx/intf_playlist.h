@@ -1,11 +1,10 @@
 /*****************************************************************************
- * vout_qdview.m: MacOS X plugin for vlc
+ * intf_playlist.h: MacOS X interface plugin
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: vout_qdview.m,v 1.4 2002/06/08 19:32:19 sam Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: intf_playlist.h,v 1.1 2002/07/15 01:54:03 jlj Exp $
  *
- * Authors: Florian G. Pflug <fgp@phlo.org>
- *          Jon Lech Johansen <jon-vl@nanocrew.net>
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,34 +22,26 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Preamble
+ * VLCPlaylistView interface 
  *****************************************************************************/
-#import <Cocoa/Cocoa.h>
-
-#import "vout_qdview.h"
-
-/*****************************************************************************
- * VLCView implementation 
- *****************************************************************************/
-@implementation VLCView
-
-- (id)initWithWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout
+@interface VLCPlaylistView : NSTableView
 {
-    if( [super init] == nil )
-        return nil;
 
-    p_vout = _p_vout;
-    o_wrapper = _o_wrapper;
-
-    return( self );
-}
-
-- (void)drawRect:(NSRect)rect
-{
-    [[NSColor blackColor] set];
-    NSRectFill(rect);
-    [super drawRect: rect];
-    [o_wrapper voutDidResize: p_vout ];
 }
 
 @end
+
+/*****************************************************************************
+ * VLCPlaylist interface 
+ *****************************************************************************/
+@interface VLCPlaylist : NSObject
+{
+    IBOutlet id o_panel; 
+    IBOutlet id o_btn_close;
+    IBOutlet id o_table_view;
+}
+
+- (void)appendArray:(NSArray*)o_array atPos:(int)i_pos;
+
+@end
+

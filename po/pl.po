@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-07-12 18:49+0200\n"
+"POT-Creation-Date: 2002-07-15 03:18+0200\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -692,12 +692,12 @@ msgid "Audio"
 msgstr "D¼wiêk"
 
 #. Video options
-#: plugins/directx/directx.c:53 plugins/dummy/dummy.c:51 src/libvlc.h:339
+#: src/libvlc.h:339 plugins/directx/directx.c:53 plugins/dummy/dummy.c:51
 msgid "Video"
 msgstr "Obraz"
 
 #. Input options
-#: plugins/satellite/satellite.c:66 src/libvlc.h:352
+#: src/libvlc.h:352 plugins/satellite/satellite.c:66
 msgid "Input"
 msgstr "Wej¶cie"
 
@@ -712,21 +712,21 @@ msgid "CPU"
 msgstr "CPU"
 
 #. Playlist options
-#: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:2073
-#: plugins/gtk/gnome_interface.c:2098 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2342 src/libvlc.h:384
+#: src/libvlc.h:384 plugins/gtk/gtk_interface.c:611
+#: plugins/gtk/gtk_interface.c:2342 plugins/gtk/gnome_interface.c:506
+#: plugins/gtk/gnome_interface.c:2073 plugins/gtk/gnome_interface.c:2098
+#: plugins/macosx/intf_macosx.m:210 plugins/macosx/intf_playlist.m:69
 msgid "Playlist"
 msgstr "Lista odtwarzania"
 
 #. Misc options
-#: plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
-#: plugins/fb/fb.c:70 plugins/filter/deinterlace.c:63
+#: src/libvlc.h:390 plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72
+#: plugins/dsp/dsp.c:81 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:63
 #: plugins/filter/distort.c:55 plugins/filter/transform.c:56
-#: plugins/filter/wall.c:57 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
-#: plugins/gtk/gtk.c:71 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
+#: plugins/filter/wall.c:57 plugins/ggi/ggi.c:64 plugins/gtk/gtk.c:71
+#: plugins/gtk/gnome.c:73 plugins/mad/mad_adec.c:66 plugins/mga/xmga.c:106
 #: plugins/mpeg_vdec/video_parser.c:96 plugins/text/logger.c:86
 #: plugins/win32/win32.cpp:48 plugins/x11/x11.c:64 plugins/x11/xvideo.c:74
-#: src/libvlc.h:390
 msgid "Miscellaneous"
 msgstr "Ró¿ne"
 
@@ -1069,19 +1069,19 @@ msgstr "modu³ 3dfx Glide"
 #. ****************************************************************************
 #. * Building configuration tree
 #. ****************************************************************************
-#: plugins/gtk/gnome.c:61 plugins/gtk/gtk.c:62
+#: plugins/gtk/gtk.c:62 plugins/gtk/gnome.c:61
 msgid "show tooltips"
 msgstr "wy¶wietlanie podpowiedzi"
 
-#: plugins/gtk/gnome.c:62 plugins/gtk/gtk.c:63
+#: plugins/gtk/gtk.c:63 plugins/gtk/gnome.c:62
 msgid "Show tooltips for configuration options."
 msgstr "Wy¶wietlanie podpowiedzi dla opcji konfiguracji."
 
-#: plugins/gtk/gnome.c:67 plugins/gtk/gtk.c:65
+#: plugins/gtk/gtk.c:65 plugins/gtk/gnome.c:67
 msgid "maximum height for the configuration windows"
 msgstr "maksymalna wysoko¶æ okien konfiguracji"
 
-#: plugins/gtk/gnome.c:69 plugins/gtk/gtk.c:67
+#: plugins/gtk/gtk.c:67 plugins/gtk/gnome.c:69
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
@@ -1105,8 +1105,8 @@ msgstr "Wy¶wietlanie tekstu pod ikonami paska narzêdziowego."
 msgid "Gnome interface module"
 msgstr "modu³ interfejsu Gnome"
 
-#: plugins/gtk/gnome_interface.c:202 plugins/gtk/gtk_interface.c:109
-#: plugins/gtk/gtk_interface.c:1337
+#: plugins/gtk/gtk_interface.c:109 plugins/gtk/gtk_interface.c:1337
+#: plugins/gtk/gnome_interface.c:202
 msgid "VideoLAN Client"
 msgstr "Klient VideoLAN"
 
@@ -1114,45 +1114,45 @@ msgstr "Klient VideoLAN"
 msgid "_File"
 msgstr "_Plik"
 
-#: plugins/gtk/gnome_interface.c:19 plugins/gtk/gnome_interface.c:800
 #: plugins/gtk/gtk_interface.c:153 plugins/gtk/gtk_interface.c:1155
+#: plugins/gtk/gnome_interface.c:19 plugins/gtk/gnome_interface.c:800
 msgid "_Open File..."
 msgstr "_Otwórz plik..."
 
-#: plugins/gtk/gnome_interface.c:20 plugins/gtk/gnome_interface.c:367
-#: plugins/gtk/gnome_interface.c:801 plugins/gtk/gtk_interface.c:161
-#: plugins/gtk/gtk_interface.c:483 plugins/gtk/gtk_interface.c:1163
+#: plugins/gtk/gtk_interface.c:161 plugins/gtk/gtk_interface.c:483
+#: plugins/gtk/gtk_interface.c:1163 plugins/gtk/gnome_interface.c:20
+#: plugins/gtk/gnome_interface.c:367 plugins/gtk/gnome_interface.c:801
 msgid "Open a File"
 msgstr "Otwiera plik"
 
-#: plugins/gtk/gnome_interface.c:26 plugins/gtk/gnome_interface.c:807
 #: plugins/gtk/gtk_interface.c:168 plugins/gtk/gtk_interface.c:1167
+#: plugins/gtk/gnome_interface.c:26 plugins/gtk/gnome_interface.c:807
 msgid "Open _Disc..."
 msgstr "Otwórz _p³ytê..."
 
-#: plugins/gtk/gnome_interface.c:27 plugins/gtk/gnome_interface.c:379
-#: plugins/gtk/gnome_interface.c:808 plugins/gtk/gtk_interface.c:176
-#: plugins/gtk/gtk_interface.c:494 plugins/gtk/gtk_interface.c:1175
+#: plugins/gtk/gtk_interface.c:176 plugins/gtk/gtk_interface.c:494
+#: plugins/gtk/gtk_interface.c:1175 plugins/gtk/gnome_interface.c:27
+#: plugins/gtk/gnome_interface.c:379 plugins/gtk/gnome_interface.c:808
 msgid "Open a DVD or VCD"
 msgstr "Otwiera DVD lub VCD"
 
-#: plugins/gtk/gnome_interface.c:33 plugins/gtk/gnome_interface.c:814
 #: plugins/gtk/gtk_interface.c:183 plugins/gtk/gtk_interface.c:1179
+#: plugins/gtk/gnome_interface.c:33 plugins/gtk/gnome_interface.c:814
 msgid "_Network Stream..."
 msgstr "_Strumieñ sieciowy..."
 
-#: plugins/gtk/gnome_interface.c:34 plugins/gtk/gnome_interface.c:391
-#: plugins/gtk/gnome_interface.c:815 plugins/gtk/gtk_interface.c:191
-#: plugins/gtk/gtk_interface.c:505 plugins/gtk/gtk_interface.c:1187
+#: plugins/gtk/gtk_interface.c:191 plugins/gtk/gtk_interface.c:505
+#: plugins/gtk/gtk_interface.c:1187 plugins/gtk/gnome_interface.c:34
+#: plugins/gtk/gnome_interface.c:391 plugins/gtk/gnome_interface.c:815
 msgid "Select a Network Stream"
 msgstr "Wybiera strumieñ sieciowy"
 
-#: plugins/gtk/gnome_interface.c:41 plugins/gtk/gtk_interface.c:206
+#: plugins/gtk/gtk_interface.c:206 plugins/gtk/gnome_interface.c:41
 msgid "_Eject Disc"
 msgstr "_Wysuñ p³ytê"
 
-#: plugins/gtk/gnome_interface.c:42 plugins/gtk/gnome_interface.c:442
-#: plugins/gtk/gtk_interface.c:214
+#: plugins/gtk/gtk_interface.c:214 plugins/gtk/gnome_interface.c:42
+#: plugins/gtk/gnome_interface.c:442
 msgid "Eject disc"
 msgstr "Wysuwa p³ytê"
 
@@ -1168,7 +1168,7 @@ msgstr "Wychodzi z programu"
 msgid "_View"
 msgstr "_Widok"
 
-#: plugins/gtk/gnome_interface.c:55 plugins/gtk/gtk_interface.c:259
+#: plugins/gtk/gtk_interface.c:259 plugins/gtk/gnome_interface.c:55
 msgid "_Hide interface"
 msgstr "U_kryj interfejs"
 
@@ -1176,20 +1176,20 @@ msgstr "U_kryj interfejs"
 msgid "Hide the main interface window"
 msgstr "Ukrywa g³ówne okno interfejsu"
 
-#: plugins/gtk/gnome_interface.c:62 plugins/gtk/gnome_interface.c:878
 #: plugins/gtk/gtk_interface.c:271 plugins/gtk/gtk_interface.c:1049
+#: plugins/gtk/gnome_interface.c:62 plugins/gtk/gnome_interface.c:878
 msgid "_Fullscreen"
 msgstr "Pe³_ny ekran"
 
-#: plugins/gtk/gnome_interface.c:70 plugins/gtk/gtk_interface.c:290
+#: plugins/gtk/gtk_interface.c:290 plugins/gtk/gnome_interface.c:70
 msgid "Progr_am"
 msgstr "Progr_am"
 
-#: plugins/gtk/gnome_interface.c:71 plugins/gtk/gtk_interface.c:299
+#: plugins/gtk/gtk_interface.c:299 plugins/gtk/gnome_interface.c:71
 msgid "Choose the program"
 msgstr "Wybiera program"
 
-#: plugins/gtk/gnome_interface.c:77 plugins/gtk/gtk_interface.c:303
+#: plugins/gtk/gtk_interface.c:303 plugins/gtk/gnome_interface.c:77
 msgid "_Title"
 msgstr "_Tytu³"
 
@@ -1197,31 +1197,31 @@ msgstr "_Tytu³"
 msgid "Navigate through the stream"
 msgstr "Nawigacja w strumieniu"
 
-#: plugins/gtk/gnome_interface.c:84 plugins/gtk/gtk_interface.c:316
+#: plugins/gtk/gtk_interface.c:316 plugins/gtk/gnome_interface.c:84
 msgid "_Chapter"
 msgstr "_Rozdzia³"
 
-#: plugins/gtk/gnome_interface.c:92 plugins/gtk/gtk_interface.c:336
+#: plugins/gtk/gtk_interface.c:336 plugins/gtk/gnome_interface.c:92
 msgid "_Playlist..."
 msgstr "_Lista odtwarzania..."
 
-#: plugins/gtk/gnome_interface.c:93 plugins/gtk/gtk_interface.c:344
+#: plugins/gtk/gtk_interface.c:344 plugins/gtk/gnome_interface.c:93
 msgid "Open the playlist window"
 msgstr "Otwiera okno listy odtwarzania"
 
-#: plugins/gtk/gnome_interface.c:99 plugins/gtk/gtk_interface.c:348
+#: plugins/gtk/gtk_interface.c:348 plugins/gtk/gnome_interface.c:99
 msgid "_Modules..."
 msgstr "_Modu³y..."
 
-#: plugins/gtk/gnome_interface.c:100 plugins/gtk/gtk_interface.c:357
+#: plugins/gtk/gtk_interface.c:357 plugins/gtk/gnome_interface.c:100
 msgid "Open the module manager"
 msgstr "Otwiera mened¿era modu³ów"
 
-#: plugins/gtk/gnome_interface.c:106 plugins/gtk/gtk_interface.c:359
+#: plugins/gtk/gtk_interface.c:359 plugins/gtk/gnome_interface.c:106
 msgid "Messages..."
 msgstr "Komunikaty..."
 
-#: plugins/gtk/gnome_interface.c:107 plugins/gtk/gtk_interface.c:365
+#: plugins/gtk/gtk_interface.c:365 plugins/gtk/gnome_interface.c:107
 msgid "Open the messages window"
 msgstr "Otwiera okno komunikatów"
 
@@ -1233,18 +1233,18 @@ msgstr "U_stawienia"
 msgid "A_udio"
 msgstr "A_udio"
 
-#: plugins/gtk/gnome_interface.c:119 plugins/gtk/gnome_interface.c:922
-#: plugins/gtk/gtk_interface.c:396
+#: plugins/gtk/gtk_interface.c:396 plugins/gtk/gnome_interface.c:119
+#: plugins/gtk/gnome_interface.c:922
 msgid "Select audio channel"
 msgstr "Wybiera kana³ d¼wiêkowy"
 
-#: plugins/gtk/gnome_interface.c:125 plugins/gtk/gnome_interface.c:928
 #: plugins/gtk/gtk_interface.c:400 plugins/gtk/gtk_interface.c:1125
+#: plugins/gtk/gnome_interface.c:125 plugins/gtk/gnome_interface.c:928
 msgid "_Subtitles"
 msgstr "_Podtytu³y"
 
-#: plugins/gtk/gnome_interface.c:126 plugins/gtk/gnome_interface.c:929
-#: plugins/gtk/gtk_interface.c:409
+#: plugins/gtk/gtk_interface.c:409 plugins/gtk/gnome_interface.c:126
+#: plugins/gtk/gnome_interface.c:929
 msgid "Select subtitles channel"
 msgstr "Wybiera kana³ podtytu³ów"
 
@@ -1268,123 +1268,131 @@ msgstr "_Informacje o..."
 msgid "About this application"
 msgstr "Informacje dotycz±ce tej aplikacji"
 
+#: plugins/gtk/gtk_interface.c:482 plugins/gtk/gtk_interface.c:1596
+#: plugins/gtk/gtk_interface.c:2378 plugins/gtk/gtk_interface.c:2495
 #: plugins/gtk/gnome_interface.c:366 plugins/gtk/gnome_interface.c:1317
-#: plugins/gtk/gnome_interface.c:1963 plugins/gtk/gtk_interface.c:482
-#: plugins/gtk/gtk_interface.c:1596 plugins/gtk/gtk_interface.c:2378
-#: plugins/gtk/gtk_interface.c:2495
+#: plugins/gtk/gnome_interface.c:1963 plugins/macosx/intf_macosx.m:194
 msgid "File"
 msgstr "Plik"
 
-#: plugins/gtk/gnome_interface.c:378 plugins/gtk/gnome_interface.c:581
-#: plugins/gtk/gnome_interface.c:1428 plugins/gtk/gnome_interface.c:1956
 #: plugins/gtk/gtk_interface.c:493 plugins/gtk/gtk_interface.c:680
 #: plugins/gtk/gtk_interface.c:1707 plugins/gtk/gtk_interface.c:2371
+#: plugins/gtk/gnome_interface.c:378 plugins/gtk/gnome_interface.c:581
+#: plugins/gtk/gnome_interface.c:1428 plugins/gtk/gnome_interface.c:1956
 msgid "Disc"
 msgstr "Dysk"
 
-#: plugins/gtk/gnome_interface.c:390 plugins/gtk/gtk_interface.c:504
+#: plugins/gtk/gtk_interface.c:504 plugins/gtk/gnome_interface.c:390
 msgid "Net"
 msgstr "Sieæ"
 
-#: plugins/gtk/gnome_interface.c:402 plugins/gtk/gtk_interface.c:515
+#: plugins/gtk/gtk_interface.c:515 plugins/gtk/gnome_interface.c:402
 msgid "Sat"
 msgstr "Satelita"
 
-#: plugins/gtk/gnome_interface.c:403 plugins/gtk/gtk_interface.c:516
+#: plugins/gtk/gtk_interface.c:516 plugins/gtk/gnome_interface.c:403
 msgid "Open a Satellite Card"
 msgstr "Otwiera kartê satelitarn±"
 
-#: plugins/gtk/gnome_interface.c:416 plugins/gtk/gnome_interface.c:849
 #: plugins/gtk/gtk_interface.c:528 plugins/gtk/gtk_interface.c:1004
+#: plugins/gtk/gnome_interface.c:416 plugins/gtk/gnome_interface.c:849
 msgid "Back"
 msgstr "Wstecz"
 
-#: plugins/gtk/gnome_interface.c:417 plugins/gtk/gtk_interface.c:529
+#: plugins/gtk/gtk_interface.c:529 plugins/gtk/gnome_interface.c:417
 msgid "Go Backward"
 msgstr "Przechodzi wstecz"
 
-#: plugins/gtk/gnome_interface.c:429 plugins/gtk/gnome_interface.c:842
 #: plugins/gtk/gtk_interface.c:540 plugins/gtk/gtk_interface.c:997
+#: plugins/gtk/gnome_interface.c:429 plugins/gtk/gnome_interface.c:842
+#: plugins/macosx/intf_macosx.m:216 plugins/macosx/intf_macosx.m:239
+#: plugins/macosx/intf_controls.m:392
 msgid "Stop"
 msgstr "Zatrzymaj"
 
-#: plugins/gtk/gnome_interface.c:430 plugins/gtk/gtk_interface.c:541
+#: plugins/gtk/gtk_interface.c:541 plugins/gtk/gnome_interface.c:430
 msgid "Stop Stream"
 msgstr "Zatrzymuje strumieñ"
 
-#: plugins/gtk/gnome_interface.c:441 plugins/gtk/gtk_interface.c:551
+#: plugins/gtk/gtk_interface.c:551 plugins/gtk/gnome_interface.c:441
 msgid "Eject"
 msgstr "Wysuñ"
 
-#: plugins/gtk/gnome_interface.c:453 plugins/gtk/gnome_interface.c:828
-#: plugins/gtk/gtk_interface.c:562
+#. dock menu
+#: plugins/gtk/gtk_interface.c:562 plugins/gtk/gnome_interface.c:453
+#: plugins/gtk/gnome_interface.c:828 plugins/macosx/intf_macosx.m:214
+#: plugins/macosx/intf_macosx.m:237
 msgid "Play"
 msgstr "Odtwórz"
 
-#: plugins/gtk/gnome_interface.c:454 plugins/gtk/gtk_interface.c:563
+#: plugins/gtk/gtk_interface.c:563 plugins/gtk/gnome_interface.c:454
 msgid "Play Stream"
 msgstr "Odtwarza strumieñ"
 
-#: plugins/gtk/gnome_interface.c:465 plugins/gtk/gnome_interface.c:835
 #: plugins/gtk/gtk_interface.c:573 plugins/gtk/gtk_interface.c:989
+#: plugins/gtk/gnome_interface.c:465 plugins/gtk/gnome_interface.c:835
+#: plugins/macosx/intf_macosx.m:215 plugins/macosx/intf_macosx.m:238
+#: plugins/macosx/intf_controls.m:375
 msgid "Pause"
 msgstr "Wstrzymaj"
 
-#: plugins/gtk/gnome_interface.c:466 plugins/gtk/gtk_interface.c:574
+#: plugins/gtk/gtk_interface.c:574 plugins/gtk/gnome_interface.c:466
 msgid "Pause Stream"
 msgstr "Wstrzymuje strumieñ"
 
-#: plugins/gtk/gnome_interface.c:480 plugins/gtk/gnome_interface.c:856
 #: plugins/gtk/gtk_interface.c:587 plugins/gtk/gtk_interface.c:1012
+#: plugins/gtk/gnome_interface.c:480 plugins/gtk/gnome_interface.c:856
 msgid "Slow"
 msgstr "Zwolnij"
 
-#: plugins/gtk/gnome_interface.c:481 plugins/gtk/gtk_interface.c:588
+#: plugins/gtk/gtk_interface.c:588 plugins/gtk/gnome_interface.c:481
 msgid "Play Slower"
 msgstr "Zwalnia odtwarzanie"
 
-#: plugins/gtk/gnome_interface.c:493 plugins/gtk/gnome_interface.c:863
 #: plugins/gtk/gtk_interface.c:599 plugins/gtk/gtk_interface.c:1020
+#: plugins/gtk/gnome_interface.c:493 plugins/gtk/gnome_interface.c:863
 msgid "Fast"
 msgstr "Przyspiesz"
 
-#: plugins/gtk/gnome_interface.c:494 plugins/gtk/gtk_interface.c:600
+#: plugins/gtk/gtk_interface.c:600 plugins/gtk/gnome_interface.c:494
 msgid "Play Faster"
 msgstr "Przyspiesza odtwarzanie"
 
-#: plugins/gtk/gnome_interface.c:507 plugins/gtk/gtk_interface.c:612
+#: plugins/gtk/gtk_interface.c:612 plugins/gtk/gnome_interface.c:507
 msgid "Open Playlist"
 msgstr "Otwórz listê"
 
-#: plugins/gtk/gnome_interface.c:518 plugins/gtk/gnome_interface.c:893
 #: plugins/gtk/gtk_interface.c:622 plugins/gtk/gtk_interface.c:708
 #: plugins/gtk/gtk_interface.c:752 plugins/gtk/gtk_interface.c:1073
+#: plugins/gtk/gnome_interface.c:518 plugins/gtk/gnome_interface.c:893
+#: plugins/macosx/intf_macosx.m:219 plugins/macosx/intf_controls.m:396
 msgid "Prev"
 msgstr "Poprz"
 
-#: plugins/gtk/gnome_interface.c:519 plugins/gtk/gtk_interface.c:623
+#: plugins/gtk/gtk_interface.c:623 plugins/gtk/gnome_interface.c:519
 msgid "Previous File"
 msgstr "Poprzedni plik"
 
-#: plugins/gtk/gnome_interface.c:530 plugins/gtk/gnome_interface.c:886
 #: plugins/gtk/gtk_interface.c:633 plugins/gtk/gtk_interface.c:716
 #: plugins/gtk/gtk_interface.c:760 plugins/gtk/gtk_interface.c:1066
+#: plugins/gtk/gnome_interface.c:530 plugins/gtk/gnome_interface.c:886
+#: plugins/macosx/intf_macosx.m:220 plugins/macosx/intf_controls.m:397
 msgid "Next"
 msgstr "Nast"
 
-#: plugins/gtk/gnome_interface.c:531 plugins/gtk/gtk_interface.c:634
+#: plugins/gtk/gtk_interface.c:634 plugins/gtk/gnome_interface.c:531
 msgid "Next File"
 msgstr "Nastêpny plik"
 
-#: plugins/gtk/gnome_interface.c:595 plugins/gtk/gtk_interface.c:694
+#: plugins/gtk/gtk_interface.c:694 plugins/gtk/gnome_interface.c:595
 msgid "Title:"
 msgstr "Tytu³:"
 
-#: plugins/gtk/gnome_interface.c:638 plugins/gtk/gtk_interface.c:738
+#: plugins/gtk/gtk_interface.c:738 plugins/gtk/gnome_interface.c:638
 msgid "Chapter:"
 msgstr "Rozdzia³:"
 
-#: plugins/gtk/gnome_interface.c:674 plugins/gtk/gtk_interface.c:775
+#: plugins/gtk/gtk_interface.c:775 plugins/gtk/gnome_interface.c:674
 msgid "No server"
 msgstr "Brak serwera"
 
@@ -1392,7 +1400,7 @@ msgstr "Brak serwera"
 msgid "Channel:"
 msgstr "Kana³:"
 
-#: plugins/gtk/gnome_interface.c:703 plugins/gtk/gtk_interface.c:804
+#: plugins/gtk/gtk_interface.c:804 plugins/gtk/gnome_interface.c:703
 msgid "Go!"
 msgstr "Naprzód!"
 
@@ -1400,28 +1408,29 @@ msgstr "Naprzód!"
 msgid "_Play"
 msgstr "_Odtwarzaj"
 
-#: plugins/gtk/gnome_interface.c:871 plugins/gtk/gtk_interface.c:1038
+#: plugins/gtk/gtk_interface.c:1038 plugins/gtk/gnome_interface.c:871
 msgid "Toggle _Interface"
 msgstr "Prze³±cz _Interfejs"
 
-#: plugins/gtk/gnome_interface.c:900 plugins/gtk/gtk_interface.c:1082
+#: plugins/gtk/gtk_interface.c:1082 plugins/gtk/gnome_interface.c:900
 msgid "_Jump..."
 msgstr "_Skocz..."
 
-#: plugins/gtk/gnome_interface.c:907 plugins/gtk/gtk_interface.c:1091
+#: plugins/gtk/gtk_interface.c:1091 plugins/gtk/gnome_interface.c:907
+#: plugins/macosx/intf_macosx.m:226
 msgid "Program"
 msgstr "Program"
 
-#: plugins/gtk/gnome_interface.c:914 plugins/gtk/gtk_interface.c:1101
+#: plugins/gtk/gtk_interface.c:1101 plugins/gtk/gnome_interface.c:914
 msgid "_Navigation"
 msgstr "_Nawigacja"
 
-#: plugins/gtk/gnome_interface.c:118 plugins/gtk/gnome_interface.c:921
-#: plugins/gtk/gtk_interface.c:1113
+#: plugins/gtk/gtk_interface.c:1113 plugins/gtk/gnome_interface.c:118
+#: plugins/gtk/gnome_interface.c:921
 msgid "_Audio"
 msgstr "_D¼wiêk"
 
-#: plugins/gtk/gnome_interface.c:937 plugins/gtk/gtk_interface.c:1208
+#: plugins/gtk/gtk_interface.c:1208 plugins/gtk/gnome_interface.c:937
 msgid "Playlist..."
 msgstr "Lista odtwarzania..."
 
@@ -1429,7 +1438,7 @@ msgstr "Lista odtwarzania..."
 msgid "About"
 msgstr "Informacje o..."
 
-#: plugins/gtk/gnome_interface.c:1118 plugins/gtk/gtk_interface.c:1345
+#: plugins/gtk/gtk_interface.c:1345 plugins/gtk/gnome_interface.c:1118
 #: plugins/kde/kde.cpp:123
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
 msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - Zespó³ VideoLAN"
@@ -1446,7 +1455,7 @@ msgstr ""
 "Zespó³ VideoLAN <videolan@videolan.org>\n"
 "http://www.videolan.org/"
 
-#: plugins/gtk/gnome_interface.c:1120 plugins/gtk/gtk_interface.c:1371
+#: plugins/gtk/gtk_interface.c:1371 plugins/gtk/gnome_interface.c:1120
 #: plugins/kde/kde.cpp:120
 msgid ""
 "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
@@ -1458,6 +1467,7 @@ msgstr ""
 #: plugins/gtk/gtk_interface.c:1386 plugins/gtk/gtk_interface.c:2058
 #: plugins/gtk/gtk_interface.c:2283 plugins/gtk/gtk_interface.c:2514
 #: plugins/gtk/gtk_interface.c:2621 plugins/gtk/gtk_preferences.c:540
+#: plugins/macosx/intf_open.m:138 plugins/macosx/intf_open.m:151
 msgid "OK"
 msgstr "OK"
 
@@ -1466,118 +1476,124 @@ msgstr "OK"
 msgid "Open Target"
 msgstr "Otwórz strumieñ"
 
-#: plugins/gtk/gnome_interface.c:1224 plugins/gtk/gtk_interface.c:1503
+#: plugins/gtk/gtk_interface.c:1503 plugins/gtk/gnome_interface.c:1224
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:1246 plugins/gtk/gtk_interface.c:1525
+#: plugins/gtk/gtk_interface.c:1525 plugins/gtk/gnome_interface.c:1246
 #, fuzzy
 msgid "Open Target:"
 msgstr "Otwiera plik"
 
-#: plugins/gtk/gnome_interface.c:1266 plugins/gtk/gtk_interface.c:1545
+#: plugins/gtk/gtk_interface.c:1545 plugins/gtk/gnome_interface.c:1266
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:1310 plugins/gtk/gtk_interface.c:1589
+#: plugins/gtk/gtk_interface.c:1589 plugins/gtk/gnome_interface.c:1310
 msgid "Browse..."
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:1334 plugins/gtk/gtk_interface.c:1613
+#: plugins/gtk/gtk_interface.c:1613 plugins/gtk/gnome_interface.c:1334
 #: plugins/gtk/gtk_menu.c:904 plugins/gtk/gtk_menu.c:925
+#: plugins/macosx/intf_macosx.m:227 plugins/macosx/intf_open.m:142
 msgid "Title"
 msgstr "Tytu³"
 
-#: plugins/gtk/gnome_interface.c:1344 plugins/gtk/gtk_interface.c:1623
+#: plugins/gtk/gtk_interface.c:1623 plugins/gtk/gnome_interface.c:1344
 #: plugins/gtk/gtk_menu.c:799 plugins/gtk/gtk_menu.c:934
+#: plugins/macosx/intf_macosx.m:228 plugins/macosx/intf_open.m:143
 msgid "Chapter"
 msgstr "Rozdzia³"
 
-#: plugins/gtk/gnome_interface.c:1364 plugins/gtk/gtk_interface.c:1643
+#: plugins/gtk/gtk_interface.c:1643 plugins/gtk/gnome_interface.c:1364
+#: plugins/macosx/intf_open.m:140
 msgid "Disc type"
 msgstr "Typ p³yty"
 
-#: plugins/gtk/gnome_interface.c:1383 plugins/gtk/gtk_interface.c:1662
+#: plugins/gtk/gtk_interface.c:1662 plugins/gtk/gnome_interface.c:1383
 msgid "DVD"
 msgstr "DVD"
 
-#: plugins/gtk/gnome_interface.c:1391 plugins/gtk/gtk_interface.c:1670
+#: plugins/gtk/gtk_interface.c:1670 plugins/gtk/gnome_interface.c:1391
 msgid "VCD"
 msgstr "VCD"
 
-#: plugins/gtk/gnome_interface.c:1399 plugins/gtk/gtk_interface.c:1678
+#: plugins/gtk/gtk_interface.c:1678 plugins/gtk/gnome_interface.c:1399
 msgid "Device name"
 msgstr "Nazwa urz±dzenia"
 
-#: plugins/gtk/gnome_interface.c:1445 plugins/gtk/gtk_interface.c:1724
+#: plugins/gtk/gtk_interface.c:1724 plugins/gtk/gnome_interface.c:1445
 msgid "UDP"
 msgstr "UDP"
 
-#: plugins/gtk/gnome_interface.c:1455 plugins/gtk/gtk_interface.c:1734
+#: plugins/gtk/gtk_interface.c:1734 plugins/gtk/gnome_interface.c:1455
 msgid "UDP Multicast"
 msgstr "UDP Multicast"
 
-#: plugins/gtk/gnome_interface.c:1465 plugins/gtk/gtk_interface.c:1744
+#: plugins/gtk/gtk_interface.c:1744 plugins/gtk/gnome_interface.c:1465
 msgid "Channel server "
 msgstr "Serwer kana³u "
 
-#: plugins/gtk/gnome_interface.c:1475 plugins/gtk/gtk_interface.c:1754
+#: plugins/gtk/gtk_interface.c:1754 plugins/gtk/gnome_interface.c:1475
 msgid "HTTP"
 msgstr "HTTP"
 
-#: plugins/gtk/gnome_interface.c:1485 plugins/gtk/gnome_interface.c:1560
-#: plugins/gtk/gnome_interface.c:1571 plugins/gtk/gtk_interface.c:1764
-#: plugins/gtk/gtk_interface.c:1839 plugins/gtk/gtk_interface.c:1850
+#: plugins/gtk/gtk_interface.c:1764 plugins/gtk/gtk_interface.c:1839
+#: plugins/gtk/gtk_interface.c:1850 plugins/gtk/gnome_interface.c:1485
+#: plugins/gtk/gnome_interface.c:1560 plugins/gtk/gnome_interface.c:1571
+#: plugins/macosx/intf_open.m:148
 msgid "Port"
 msgstr "Port"
 
-#: plugins/gtk/gnome_interface.c:1495 plugins/gtk/gnome_interface.c:1507
 #: plugins/gtk/gtk_interface.c:1774 plugins/gtk/gtk_interface.c:1786
+#: plugins/gtk/gnome_interface.c:1495 plugins/gtk/gnome_interface.c:1507
+#: plugins/macosx/intf_open.m:147
 msgid "Address"
 msgstr "Adres"
 
-#: plugins/gtk/gnome_interface.c:1517 plugins/gtk/gtk_interface.c:1796
+#: plugins/gtk/gtk_interface.c:1796 plugins/gtk/gnome_interface.c:1517
 msgid "URL"
 msgstr "URL"
 
-#: plugins/gtk/gnome_interface.c:1627 plugins/gtk/gnome_interface.c:1970
 #: plugins/gtk/gtk_interface.c:1906 plugins/gtk/gtk_interface.c:2385
+#: plugins/gtk/gnome_interface.c:1627 plugins/gtk/gnome_interface.c:1970
 msgid "Network"
 msgstr "Sieæ"
 
-#: plugins/gtk/gnome_interface.c:1644 plugins/gtk/gtk_interface.c:1923
+#: plugins/gtk/gtk_interface.c:1923 plugins/gtk/gnome_interface.c:1644
 msgid "Symbol Rate"
 msgstr "Szybko¶æ symboliczna"
 
-#: plugins/gtk/gnome_interface.c:1654 plugins/gtk/gtk_interface.c:1933
+#: plugins/gtk/gtk_interface.c:1933 plugins/gtk/gnome_interface.c:1654
 msgid "Frequency"
 msgstr "Czêstotliwo¶æ"
 
-#: plugins/gtk/gnome_interface.c:1664 plugins/gtk/gtk_interface.c:1943
+#: plugins/gtk/gtk_interface.c:1943 plugins/gtk/gnome_interface.c:1664
 msgid "Polarization"
 msgstr "Polaryzacja"
 
-#: plugins/gtk/gnome_interface.c:1684 plugins/gtk/gtk_interface.c:1963
+#: plugins/gtk/gtk_interface.c:1963 plugins/gtk/gnome_interface.c:1684
 msgid "FEC"
 msgstr "FEC"
 
-#: plugins/gtk/gnome_interface.c:1703 plugins/gtk/gtk_interface.c:1982
+#: plugins/gtk/gtk_interface.c:1982 plugins/gtk/gnome_interface.c:1703
 msgid "Vertical"
 msgstr "Pionowa"
 
-#: plugins/gtk/gnome_interface.c:1711 plugins/gtk/gtk_interface.c:1990
+#: plugins/gtk/gtk_interface.c:1990 plugins/gtk/gnome_interface.c:1711
 msgid "Horizontal"
 msgstr "Pozioma"
 
-#: plugins/gtk/gnome_interface.c:1753 plugins/gtk/gtk_interface.c:2032
+#: plugins/gtk/gtk_interface.c:2032 plugins/gtk/gnome_interface.c:1753
 #, fuzzy
 msgid "Satellite"
 msgstr "Otwórz kartê satelitarn±"
 
 #: plugins/gtk/gtk_interface.c:2065 plugins/gtk/gtk_interface.c:2290
 #: plugins/gtk/gtk_interface.c:2521 plugins/gtk/gtk_preferences.c:552
+#: plugins/macosx/intf_open.m:139 plugins/macosx/intf_open.m:152
 msgid "Cancel"
 msgstr "Anuluj"
 
@@ -1593,32 +1609,32 @@ msgstr "Skocz"
 msgid "Go to:"
 msgstr "Przejd¼ do:"
 
-#: plugins/gtk/gnome_interface.c:2294 plugins/gtk/gtk_interface.c:2233
+#: plugins/gtk/gtk_interface.c:2233 plugins/gtk/gnome_interface.c:2294
 msgid "s."
 msgstr "s."
 
-#: plugins/gtk/gnome_interface.c:2309 plugins/gtk/gtk_interface.c:2248
+#: plugins/gtk/gtk_interface.c:2248 plugins/gtk/gnome_interface.c:2309
 msgid "m:"
 msgstr "m:"
 
-#: plugins/gtk/gnome_interface.c:2324 plugins/gtk/gtk_interface.c:2263
+#: plugins/gtk/gtk_interface.c:2263 plugins/gtk/gnome_interface.c:2324
 msgid "h:"
 msgstr "h:"
 
-#: plugins/gtk/gnome_interface.c:2034 plugins/gtk/gtk_interface.c:2357
+#: plugins/gtk/gtk_interface.c:2357 plugins/gtk/gnome_interface.c:2034
 msgid "Add"
 msgstr "Dodaj"
 
-#: plugins/gtk/gnome_interface.c:1977 plugins/gtk/gnome_interface.c:2118
-#: plugins/gtk/gtk_interface.c:2392
+#: plugins/gtk/gtk_interface.c:2392 plugins/gtk/gnome_interface.c:1977
+#: plugins/gtk/gnome_interface.c:2118
 msgid "Url"
 msgstr "Url"
 
-#: plugins/gtk/gnome_interface.c:2041 plugins/gtk/gtk_interface.c:2399
+#: plugins/gtk/gtk_interface.c:2399 plugins/gtk/gnome_interface.c:2041
 msgid "Delete"
 msgstr "Usuñ"
 
-#: plugins/gtk/gnome_interface.c:1989 plugins/gtk/gtk_interface.c:2413
+#: plugins/gtk/gtk_interface.c:2413 plugins/gtk/gnome_interface.c:1989
 msgid "All"
 msgstr "Wszysko"
 
@@ -1626,7 +1642,7 @@ msgstr "Wszysko"
 msgid "Selected"
 msgstr "Zaznaczone"
 
-#: plugins/gtk/gnome_interface.c:2048 plugins/gtk/gtk_interface.c:2427
+#: plugins/gtk/gtk_interface.c:2427 plugins/gtk/gnome_interface.c:2048
 msgid "Selection"
 msgstr "Wybór"
 
@@ -1642,11 +1658,12 @@ msgstr "_Odwróæ"
 msgid "_Select"
 msgstr "_Wybierz"
 
-#: plugins/gtk/gnome_interface.c:2125 plugins/gtk/gtk_interface.c:2502
+#: plugins/gtk/gtk_interface.c:2502 plugins/gtk/gnome_interface.c:2125
 msgid "Duration"
 msgstr "Czas trwania"
 
-#: plugins/gtk/gnome_interface.c:2381 plugins/gtk/gtk_interface.c:2592
+#: plugins/gtk/gtk_interface.c:2592 plugins/gtk/gnome_interface.c:2381
+#: plugins/macosx/intf_macosx.m:185 plugins/macosx/intf_macosx.m:211
 msgid "Messages"
 msgstr "Komunikaty"
 
@@ -1694,7 +1711,7 @@ msgstr "Nawigacja przez tytu³y i rozdzia³y"
 msgid "Open Stream"
 msgstr "Otwórz strumieñ"
 
-#: plugins/gtk/gnome_interface.c:1868
+#: plugins/gtk/gnome_interface.c:1868 plugins/macosx/intf_macosx.m:195
 msgid "Open File"
 msgstr "Otwórz plik"
 
@@ -1816,6 +1833,157 @@ msgstr "dekoder liniowy PCM d¼wiêku"
 #: plugins/macosx/macosx.m:49
 msgid "MacOS X interface, sound and video module"
 msgstr "modu³ interfejsu MacOS X, d¼wiêku i obrazu"
+
+#: plugins/macosx/intf_macosx.m:186 plugins/macosx/intf_playlist.m:70
+msgid "Close"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:188
+#, fuzzy
+msgid "About vlc"
+msgstr "Informacje o..."
+
+#: plugins/macosx/intf_macosx.m:189
+msgid "Hide vlc"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:190
+#, fuzzy
+msgid "Hide Others"
+msgstr "U_kryj interfejs"
+
+#: plugins/macosx/intf_macosx.m:191
+msgid "Show All"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:192
+msgid "Quit vlc"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:196 plugins/macosx/intf_open.m:137
+msgid "Open Disc"
+msgstr "Otwóz p³ytê"
+
+#: plugins/macosx/intf_macosx.m:197 plugins/macosx/intf_open.m:145
+msgid "Open Network"
+msgstr "Otwórz sieæ"
+
+#: plugins/macosx/intf_macosx.m:198
+#, fuzzy
+msgid "Open Quickly..."
+msgstr "_Otwórz plik..."
+
+#: plugins/macosx/intf_macosx.m:199
+#, fuzzy
+msgid "Open Recent"
+msgstr "Otwórz strumieñ"
+
+#. Recent Items Menu
+#: plugins/macosx/intf_macosx.m:200 plugins/macosx/intf_macosx.m:755
+msgid "Clear Menu"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:202
+#, fuzzy
+msgid "Edit"
+msgstr "W_yjd¼"
+
+#: plugins/macosx/intf_macosx.m:203
+msgid "Cut"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:204
+#, fuzzy
+msgid "Copy"
+msgstr "Usuñ"
+
+#: plugins/macosx/intf_macosx.m:205
+#, fuzzy
+msgid "Paste"
+msgstr "Wstrzymaj"
+
+#: plugins/macosx/intf_macosx.m:206
+msgid "Clear"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:207
+#, fuzzy
+msgid "Select All"
+msgstr "Wybierz plik"
+
+#: plugins/macosx/intf_macosx.m:209
+#, fuzzy
+msgid "View"
+msgstr "_Widok"
+
+#: plugins/macosx/intf_macosx.m:213
+msgid "Controls"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:217 plugins/macosx/intf_controls.m:376
+#, fuzzy
+msgid "Faster"
+msgstr "Przyspiesz"
+
+#: plugins/macosx/intf_macosx.m:218 plugins/macosx/intf_controls.m:377
+#, fuzzy
+msgid "Slower"
+msgstr "Zwolnij"
+
+#: plugins/macosx/intf_macosx.m:221
+msgid "Loop"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:222 plugins/macosx/intf_controls.m:414
+msgid "Volume Up"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:223 plugins/macosx/intf_controls.m:415
+msgid "Volume Down"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:224 plugins/macosx/intf_controls.m:419
+msgid "Mute"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:225 plugins/macosx/intf_controls.m:451
+#, fuzzy
+msgid "Fullscreen"
+msgstr "Pe³_ny ekran"
+
+#: plugins/macosx/intf_macosx.m:229
+msgid "Language"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:230
+#, fuzzy
+msgid "Subtitles"
+msgstr "_Podtytu³y"
+
+#: plugins/macosx/intf_macosx.m:232
+msgid "Window"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:233
+msgid "Minimize"
+msgstr ""
+
+#: plugins/macosx/intf_macosx.m:234
+msgid "Bring All to Front"
+msgstr ""
+
+#: plugins/macosx/intf_open.m:141
+msgid "Starting position"
+msgstr "Pozycja pocz±tkowa"
+
+#: plugins/macosx/intf_open.m:146
+msgid "Network mode"
+msgstr "Tryb sieci"
+
+#: plugins/macosx/intf_open.m:150
+#, fuzzy
+msgid "Open Quickly"
+msgstr "Otwórz plik"
 
 #. ****************************************************************************
 #. * Build configuration tree.
@@ -2166,18 +2334,6 @@ msgstr ""
 #: plugins/x11/xvideo.c:86
 msgid "XVideo extension module"
 msgstr "modu³ rozszerzenia XVideo"
-
-#~ msgid "Open Disc"
-#~ msgstr "Otwóz p³ytê"
-
-#~ msgid "Starting position"
-#~ msgstr "Pozycja pocz±tkowa"
-
-#~ msgid "Open Network"
-#~ msgstr "Otwórz sieæ"
-
-#~ msgid "Network mode"
-#~ msgstr "Tryb sieci"
 
 #~ msgid "Transponder settings"
 #~ msgstr "Ustawienia transpondera"
