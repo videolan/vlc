@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.24 2003/06/14 22:14:16 hartman Exp $
+ * $Id: decoder.c,v 1.25 2003/06/22 08:49:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -120,14 +120,17 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     return( 0 );
 }
 
-static unsigned int pi_channels_maps[6] =
+static unsigned int pi_channels_maps[7] =
 {
     0,
-    AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+     /* FIXME */
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER,
+
 };
 
 #define FREE( p ) if( p != NULL ) free( p ); p = NULL
@@ -316,6 +319,7 @@ static void DecodeThread( adec_thread_t *p_adec )
     faacDecFrameInfo faad_frame;
     int  i_frame_size;
     pes_packet_t *p_pes;
+    int  i_used;
 
     /* **** Get a new frames from streams **** */
     do
@@ -346,104 +350,110 @@ static void DecodeThread( adec_thread_t *p_adec )
         input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
 
-    /* **** decode this frame **** */
+
+    i_used = 0;
+    while( i_used < i_frame_size )
+    {
+        /* **** decode this frame **** */
 #ifdef HAVE_OLD_FAAD2
-    p_faad_buffer = faacDecDecode( p_adec->p_handle,
-                                   &faad_frame,
-                                   p_adec->p_buffer );
+        p_faad_buffer = faacDecDecode( p_adec->p_handle,
+                                       &faad_frame,
+                                       &p_adec->p_buffer[i_used] );
 #else
-    p_faad_buffer = faacDecDecode( p_adec->p_handle,
-                                   &faad_frame,
-                                   p_adec->p_buffer,
-                                   i_frame_size );
+        p_faad_buffer = faacDecDecode( p_adec->p_handle,
+                                       &faad_frame,
+                                       &p_adec->p_buffer[i_used],
+                                       i_frame_size - i_used );
 #endif
 
-    /* **** some sanity checks to see if we have samples to out **** */
-    if( faad_frame.error > 0 )
-    {
-        msg_Warn( p_adec->p_fifo, "%s",
-                  faacDecGetErrorMessage(faad_frame.error) );
-        return;
-    }
-    if( ( faad_frame.channels <= 0 )||
-        ( faad_frame.channels > AAC_MAXCHANNELS) ||
-        ( faad_frame.channels > 5 ) )
-    {
-        msg_Warn( p_adec->p_fifo,
-                  "invalid channels count(%d)", faad_frame.channels );
-        return;
-    }
-    if( faad_frame.samples <= 0 )
-    {
-        msg_Warn( p_adec->p_fifo, "decoded zero sample !" );
-        return;
-    }
-
-#if 0
-    msg_Dbg( p_adec->p_fifo,
-             "decoded frame samples:%d, channels:%d, consumed:%d",
-             faad_frame.samples,
-             faad_frame.channels,
-             faad_frame.bytesconsumed );
-#endif
-
-    /* **** Now we can output these samples **** */
-
-    /* **** First check if we have a valid output **** */
-    if( ( !p_adec->p_aout_input )||
-        ( p_adec->output_format.i_original_channels !=
-             pi_channels_maps[faad_frame.channels] ) )
-    {
-        if( p_adec->p_aout_input )
+        /* **** some sanity checks to see if we have samples to out **** */
+        if( faad_frame.error > 0 )
         {
-            /* **** Delete the old **** */
-            aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+            msg_Warn( p_adec->p_fifo, "%s",
+                      faacDecGetErrorMessage(faad_frame.error) );
+            return;
+        }
+        if( ( faad_frame.channels <= 0 )||
+            ( faad_frame.channels > AAC_MAXCHANNELS) ||
+            ( faad_frame.channels > 6 ) )
+        {
+            msg_Warn( p_adec->p_fifo,
+                      "invalid channels count(%d)", faad_frame.channels );
+            return;
+        }
+        if( faad_frame.samples <= 0 )
+        {
+            msg_Warn( p_adec->p_fifo, "decoded zero sample !" );
+            return;
         }
 
-        /* **** Create a new audio output **** */
-        p_adec->output_format.i_physical_channels =
-            p_adec->output_format.i_original_channels =
-                pi_channels_maps[faad_frame.channels];
+#if 0
+        msg_Dbg( p_adec->p_fifo,
+                 "decoded frame samples:%d, channels:%d, consumed:%d",
+                 faad_frame.samples,
+                 faad_frame.channels,
+                 faad_frame.bytesconsumed );
+#endif
+        i_used += faad_frame.bytesconsumed;
 
-        aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
-        p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
-                                            &p_adec->p_aout,
-                                            &p_adec->output_format );
-    }
+        /* **** Now we can output these samples **** */
 
-    if( !p_adec->p_aout_input )
-    {
-        msg_Err( p_adec->p_fifo, "cannot create aout" );
-        return;
-    }
+        /* **** First check if we have a valid output **** */
+        if( ( !p_adec->p_aout_input )||
+            ( p_adec->output_format.i_original_channels !=
+                 pi_channels_maps[faad_frame.channels] ) )
+        {
+            if( p_adec->p_aout_input )
+            {
+                /* **** Delete the old **** */
+                aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+            }
 
-    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
-    {
-        aout_DateSet( &p_adec->date, p_adec->pts );
-    }
-    else if( !aout_DateGet( &p_adec->date ) )
-    {
-        return;
-    }
+            /* **** Create a new audio output **** */
+            p_adec->output_format.i_physical_channels =
+                p_adec->output_format.i_original_channels =
+                    pi_channels_maps[faad_frame.channels];
 
-    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
-                                       p_adec->p_aout_input,
-                                       faad_frame.samples / faad_frame.channels );
-    if( !p_aout_buffer )
-    {
-        msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-        p_adec->p_fifo->b_error = 1;
-        return;
-    }
-    p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-    p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                  faad_frame.samples /
-                                                      faad_frame.channels );
-    memcpy( p_aout_buffer->p_buffer,
-            p_faad_buffer,
-            p_aout_buffer->i_nb_bytes );
+            aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
+            p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
+                                                &p_adec->p_aout,
+                                                &p_adec->output_format );
+        }
 
-    aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+        if( !p_adec->p_aout_input )
+        {
+            msg_Err( p_adec->p_fifo, "cannot create aout" );
+            return;
+        }
+
+        if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+        {
+            aout_DateSet( &p_adec->date, p_adec->pts );
+        }
+        else if( !aout_DateGet( &p_adec->date ) )
+        {
+            return;
+        }
+
+        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
+                                           p_adec->p_aout_input,
+                                           faad_frame.samples / faad_frame.channels );
+        if( !p_aout_buffer )
+        {
+            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
+        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
+                                                      faad_frame.samples /
+                                                          faad_frame.channels );
+        memcpy( p_aout_buffer->p_buffer,
+                p_faad_buffer,
+                p_aout_buffer->i_nb_bytes );
+
+        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+    }
 }
 
 
