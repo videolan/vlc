@@ -2,7 +2,7 @@
  * var_text.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_text.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_text.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -39,6 +39,9 @@ class VarText: public Variable, public Subject<VarText>,
         VarText( intf_thread_t *pIntf );
         virtual ~VarText();
 
+        /// Get the variable type
+        virtual const string &getType() const { return m_type; }
+
         /// Set the internal value
         virtual void set( const UString &rText );
         virtual const UString get() const;
@@ -48,6 +51,8 @@ class VarText: public Variable, public Subject<VarText>,
         virtual void onUpdate( Subject<VarText> &rVariable );
 
     private:
+        /// Variable type
+        static const string m_type;
         /// The text of the variable
         UString m_text;
         /// Actual text after having replaced the variables

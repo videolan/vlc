@@ -2,7 +2,7 @@
  * volume.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: volume.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: volume.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,7 +37,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 }
 
 
-void Volume::set( double percentage )
+void Volume::set( float percentage )
 {
     // Avoid looping forever...
     if( (int)(get() * AOUT_VOLUME_MAX) !=

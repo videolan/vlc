@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: builder.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -48,15 +48,14 @@
 
 
 Builder::Builder( intf_thread_t *pIntf, BuilderData &rData):
-    SkinObject( pIntf ), m_rData( rData ), m_interpreter( pIntf ),
-    m_pTheme( NULL )
+    SkinObject( pIntf ), m_rData( rData ), m_pTheme( NULL )
 {
 }
 
 
 CmdGeneric *Builder::parseAction( const string &rAction )
 {
-    return m_interpreter.parseAction( rAction, m_pTheme );
+    return Interpreter::instance( getIntf() )->parseAction( rAction, m_pTheme );
 }
 
 
@@ -275,7 +274,8 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     }
 
     // Get the state variable
-    VarBool *pVar = m_interpreter.getVarBool( rData.m_state, m_pTheme );
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVar = pInterpreter->getVarBool( rData.m_state, m_pTheme );
     if( pVar == NULL )
     {
         // TODO: default state
@@ -402,7 +402,8 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     }
 
     // Get the variable associated to the slider
-    VarPercent *pVar = m_interpreter.getVarPercent( rData.m_value, m_pTheme );
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarPercent *pVar = pInterpreter->getVarPercent( rData.m_value, m_pTheme );
     if( pVar == NULL )
     {
         msg_Err( getIntf(), "Unknown slider value: %s", rData.m_value.c_str() );
@@ -458,10 +459,11 @@ void Builder::addSlider( const BuilderData::Slider &rData )
 
     // Get the visibility variable
     // XXX check when it is null
-    VarBool *pVisible = m_interpreter.getVarBool( rData.m_visible, m_pTheme );
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
     // Get the variable associated to the slider
-    VarPercent *pVar = m_interpreter.getVarPercent( rData.m_value, m_pTheme );
+    VarPercent *pVar = pInterpreter->getVarPercent( rData.m_value, m_pTheme );
     if( pVar == NULL )
     {
         msg_Err( getIntf(), "Unknown slider value: %s", rData.m_value.c_str() );
@@ -510,7 +512,8 @@ void Builder::addList( const BuilderData::List &rData )
     }
 
     // Get the list variable
-    VarList *pVar = m_interpreter.getVarList( rData.m_var, m_pTheme );
+    Interpreter *pInterpreter = Interpreter::instance( getIntf() );
+    VarList *pVar = pInterpreter->getVarList( rData.m_var, m_pTheme );
     if( pVar == NULL )
     {
         msg_Err( getIntf(), "No such list variable: %s", rData.m_var.c_str() );
@@ -645,7 +648,7 @@ const Position Builder::makePosition( const string &rLeftTop,
 
 Bezier *Builder::getPoints( const char *pTag ) const
 {
-    vector<double> xBez, yBez;
+    vector<float> xBez, yBez;
     int x, y, n;
     while( 1 )
     {

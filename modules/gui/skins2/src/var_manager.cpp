@@ -2,7 +2,7 @@
  * var_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_manager.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_manager.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,7 +26,7 @@
 
 
 VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_tooltip( pIntf ), m_help( pIntf )
+    m_tooltipText( pIntf ), m_helpText( pIntf )
 {
 }
 
@@ -52,6 +52,50 @@ void VarManager::destroy( intf_thread_t *pIntf )
     {
         delete pIntf->p_sys->p_varManager;
         pIntf->p_sys->p_varManager = NULL;
+    }
+}
+
+
+void VarManager::registerVar( const VariablePtr &rcVar, const string &rName )
+{
+    m_varMap[rName] = rcVar;
+}
+
+
+Variable *VarManager::getVar( const string &rName )
+{
+    if( m_varMap.find( rName ) != m_varMap.end() )
+    {
+        return m_varMap[rName].get();
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+
+Variable *VarManager::getVar( const string &rName, const string &rType )
+{
+    if( m_varMap.find( rName ) != m_varMap.end() )
+    {
+        Variable *pVar = m_varMap[rName].get();
+        // Check the variable type
+        if( pVar->getType() != rType )
+        {
+            msg_Warn( getIntf(), "Variable %s has incorrect type (%s instead"
+                      " of (%s)", rName.c_str(), pVar->getType().c_str(),
+                      rType.c_str() );
+            return NULL;
+        }
+        else
+        {
+            return pVar;
+        }
+    }
+    else
+    {
+        return NULL;
     }
 }
 

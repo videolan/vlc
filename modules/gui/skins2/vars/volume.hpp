@@ -2,7 +2,7 @@
  * volume.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: volume.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: volume.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,7 +37,7 @@ class Volume: public VarPercent
         Volume( intf_thread_t *pIntf );
         virtual ~Volume() {}
 
-        virtual void set( double percentage );
+        virtual void set( float percentage );
 
         virtual string getAsStringPercent() const;
 };

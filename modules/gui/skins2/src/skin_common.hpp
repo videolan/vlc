@@ -2,7 +2,7 @@
  * skin_common.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: skin_common.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -33,6 +33,7 @@ using namespace std;
 class AsyncQueue;
 class Logger;
 class Dialogs;
+class Interpreter;
 class OSFactory;
 class OSLoop;
 class VarManager;
@@ -74,6 +75,8 @@ struct intf_sys_t
     AsyncQueue *p_queue;
     /// Dialog provider
     Dialogs *p_dialogs;
+    /// Script interpreter
+    Interpreter *p_interpreter;
     /// Factory for OS specific classes
     OSFactory *p_osFactory;
     /// Main OS specific message loop

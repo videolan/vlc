@@ -2,7 +2,7 @@
  * var_percent.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_percent.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_percent.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -25,12 +25,15 @@
 #include "var_percent.hpp"
 
 
+const string VarPercent::m_type = "percent";
+
+
 VarPercent::VarPercent( intf_thread_t *pIntf ): Variable( pIntf ), m_value( 0 )
 {
 }
 
 
-void VarPercent::set( double percentage )
+void VarPercent::set( float percentage )
 {
     if( percentage < 0 )
     {

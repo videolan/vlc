@@ -2,7 +2,7 @@
  * var_percent.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_percent.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_percent.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -36,12 +36,18 @@ class VarPercent: public Variable, public Subject<VarPercent>
         VarPercent( intf_thread_t *pIntf );
         virtual ~VarPercent() {}
 
+        /// Get the variable type
+        virtual const string &getType() const { return m_type; }
+
         /// Set the internal value
-        virtual void set( double percentage );
-        virtual double get() const { return m_value; }
+        virtual void set( float percentage );
+        virtual float get() const { return m_value; }
 
     private:
-        double m_value;
+        /// Variable type
+        static const string m_type;
+        /// Percent value
+        float m_value;
 };
 
 #endif

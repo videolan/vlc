@@ -2,7 +2,7 @@
  * var_list.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_list.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_list.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -25,10 +25,14 @@
 #include "var_list.hpp"
 
 
-VarList::VarList( intf_thread_t *pIntf ): Variable( pIntf ),
-    m_position( pIntf )
+const string VarList::m_type = "list";
+
+
+VarList::VarList( intf_thread_t *pIntf ): Variable( pIntf )
 {
-    m_position.set( 1.0 );
+    // Create the position variable
+    m_cPosition = VariablePtr( new VarPercent( pIntf ) );
+    getPositionVar().set( 1.0 );
 }
 
 

@@ -2,7 +2,7 @@
  * vlcproc.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.hpp,v 1.2 2004/01/11 00:21:22 asmax Exp $
+ * $Id: vlcproc.hpp,v 1.3 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -45,23 +45,23 @@ class VlcProc: public SkinObject
         static void destroy( intf_thread_t *pIntf );
 
         /// Getter for the playlist variable
-        Playlist &getPlaylistVar() { return m_playlist; }
+        Playlist &getPlaylistVar() { return *((Playlist*)m_cPlaylist.get()); }
 
         /// Getter for the time variable
-        Time &getTimeVar() { return m_varTime; }
+        Time &getTimeVar() { return *((Time*)(m_cVarTime.get())); }
 
         /// Getter for the volume variable
-        Volume &getVolumeVar() { return m_varVolume; }
+        Volume &getVolumeVar() { return *((Volume*)(m_cVarVolume.get())); }
 
         /// Getter for the mute variable
-        VlcIsMute &getIsMuteVar() { return m_varMute; }
+        VarBool &getIsMuteVar() { return *((VarBool*)(m_cVarMute.get())); }
 
         /// Getter for the playing variable
-        VlcIsPlaying &getIsPlayingVar() { return m_varPlaying; }
+        VarBool &getIsPlayingVar() { return *((VarBool*)(m_cVarPlaying.get())); }
 
         /// Getter for the seekable/playing variable
-        VlcIsSeekablePlaying &getIsSeekablePlayingVar()
-            { return m_varSeekablePlaying; }
+        VarBool &getIsSeekablePlayingVar()
+            { return *((VarBool*)(m_cVarSeekablePlaying.get())); }
 
     protected:
         // Protected because it is a singleton
@@ -72,16 +72,16 @@ class VlcProc: public SkinObject
         /// Timer to call manage() regularly (via doManage())
         OSTimer *m_pTimer;
         /// Playlist variable
-        Playlist m_playlist;
-        /// Variable for the position in the stream
-        Time m_varTime;
+        VariablePtr m_cPlaylist;
+        /// Variable for current position of the stream
+        VariablePtr m_cVarTime;
         /// Variable for audio volume
-        Volume m_varVolume;
+        VariablePtr m_cVarVolume;
         /// Variable for the "mute" state
-        VlcIsMute m_varMute;
+        VariablePtr m_cVarMute;
         /// Variables related to the input
-        VlcIsPlaying m_varPlaying;
-        VlcIsSeekablePlaying m_varSeekablePlaying;
+        VariablePtr m_cVarPlaying;
+        VariablePtr m_cVarSeekablePlaying;
 
         /// Poll VLC internals to update the status (volume, current time in
         /// the stream, current filename, play/pause/stop status, ...)

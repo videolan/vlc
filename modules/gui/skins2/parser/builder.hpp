@@ -2,7 +2,7 @@
  * builder.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: builder.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,7 +26,6 @@
 #define BUILDER_HPP
 
 #include "builder_data.hpp"
-#include "interpreter.hpp"
 #include "../src/os_graphics.hpp"
 #include "../src/generic_window.hpp"
 #include "../src/generic_layout.hpp"
@@ -61,9 +60,6 @@ class Builder: public SkinObject
     private:
         /// Data from the XML
         BuilderData &m_rData;
-
-        /// Script interpreter
-        Interpreter m_interpreter;
 
         /// Theme under construction
         Theme *m_pTheme;

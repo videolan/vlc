@@ -2,7 +2,7 @@
  * var_list.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_list.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_list.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -39,6 +39,9 @@ class VarList: public Variable, public Subject<VarList>
     public:
         VarList( intf_thread_t *pIntf );
         virtual ~VarList();
+
+        /// Get the variable type
+        virtual const string &getType() const { return m_type; }
 
         /// Add a pointer on a string in the list
         virtual void add( const UStringPtr &rcString );
@@ -84,16 +87,22 @@ class VarList: public Variable, public Subject<VarList>
         /// Execute the action associated to this item
         virtual void action( Elem_t *pItem ) {}
 
-        /// Get the position variable
-        VarPercent &getPositionVar() { return m_position; }
+        /// Get a reference on the position variable
+        VarPercent &getPositionVar() const
+            { return *((VarPercent*)m_cPosition.get()); }
+
+        /// Get a counted pointer on the position variable
+        const VariablePtr &getPositionVarPtr() const { return m_cPosition; }
 
     protected:
         /// List of elements
         list<Elem_t> m_list;
 
     private:
+        /// Variable type
+        static const string m_type;
         /// Position variable
-        VarPercent m_position;
+        VariablePtr m_cPosition;
 };
 
 

@@ -2,7 +2,7 @@
  * interpreter.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: interpreter.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: interpreter.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,6 +26,7 @@
 #define INTERPRETER_HPP
 
 #include "../commands/cmd_generic.hpp"
+#include <map>
 
 class Theme;
 class VarBool;
@@ -37,8 +38,11 @@ class VarPercent;
 class Interpreter: public SkinObject
 {
     public:
-        Interpreter( intf_thread_t *pIntf );
-        virtual ~Interpreter() {}
+        /// Get the instance of Interpreter
+        static Interpreter *instance( intf_thread_t *pIntf );
+
+        /// Delete the instance of Interpreter
+        static void destroy( intf_thread_t *pIntf );
 
         /// Parse an action tag and returns a pointer on a command
         /// (the intepreter takes care of deleting it, don't do it
@@ -54,6 +58,14 @@ class Interpreter: public SkinObject
 
         /// Returns the list variable corresponding to the given name
         VarList *getVarList( const string &rName, Theme *pTheme );
+
+    private:
+        /// Map of global commands
+        map<string, CmdGenericPtr> m_commandMap;
+
+        // Private because it is a singleton
+        Interpreter( intf_thread_t *pIntf );
+        virtual ~Interpreter() {}
 };
 
 #endif

@@ -2,7 +2,7 @@
  * ctrl_slider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_slider.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -133,7 +133,7 @@ bool CtrlSliderCursor::mouseOver( int x, int y ) const
         m_curve.getPoint( m_rVariable.get(), xPos, yPos );
 
         // Compute the resize factors
-        double factorX = 0, factorY = 0;
+        float factorX = 0, factorY = 0;
         getResizeFactors( factorX, factorY );
         xPos = (int)(xPos * factorX);
         yPos = (int)(yPos * factorY);
@@ -157,7 +157,7 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
         m_curve.getPoint( m_rVariable.get(), xPos, yPos );
 
         // Compute the resize factors
-        double factorX = 0, factorY = 0;
+        float factorX = 0, factorY = 0;
         getResizeFactors( factorX, factorY );
         xPos = (int)(xPos * factorX);
         yPos = (int)(yPos * factorY);
@@ -190,7 +190,7 @@ void CtrlSliderCursor::transOverDown( SkinObject *pCtrl )
     EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
 
     // Compute the resize factors
-    double factorX = 0, factorY = 0;
+    float factorX = 0, factorY = 0;
     pThis->getResizeFactors( factorX, factorY );
 
     // Compute the offset
@@ -245,7 +245,7 @@ void CtrlSliderCursor::transMove( SkinObject *pCtrl )
     const Position *pPos = pThis->getPosition();
 
     // Compute the resize factors
-    double factorX = 0, factorY = 0;
+    float factorX = 0, factorY = 0;
     pThis->getResizeFactors( factorX, factorY );
 
     // XXX: This could be optimized a little bit
@@ -253,7 +253,7 @@ void CtrlSliderCursor::transMove( SkinObject *pCtrl )
         (int)((pEvtMouse->getXPos() - pPos->getLeft()) / factorX),
         (int)((pEvtMouse->getYPos() - pPos->getTop()) / factorY) ) < RANGE )
     {
-        double percentage = pThis->m_curve.getNearestPercent(
+        float percentage = pThis->m_curve.getNearestPercent(
             (int)((pEvtMouse->getXPos() - pThis->m_xOffset) / factorX),
             (int)((pEvtMouse->getYPos() - pThis->m_yOffset) / factorY) );
         pThis->m_rVariable.set( percentage );
@@ -271,7 +271,7 @@ void CtrlSliderCursor::transScroll( SkinObject *pCtrl )
 
     int direction = pEvtScroll->getDirection();
 
-    double percentage = pThis->m_rVariable.get();
+    float percentage = pThis->m_rVariable.get();
     if( direction == EvtScroll::kUp )
     {
         percentage += SCROLL_STEP;
@@ -285,8 +285,8 @@ void CtrlSliderCursor::transScroll( SkinObject *pCtrl )
 }
 
 
-void CtrlSliderCursor::getResizeFactors( double &rFactorX,
-                                         double &rFactorY ) const
+void CtrlSliderCursor::getResizeFactors( float &rFactorX,
+                                         float &rFactorY ) const
 {
     // Get the position of the control
     const Position *pPos = getPosition();
@@ -297,11 +297,11 @@ void CtrlSliderCursor::getResizeFactors( double &rFactorX,
     // Compute the resize factors
     if( m_width > 0 )
     {
-        rFactorX = (double)pPos->getWidth() / (double)m_width;
+        rFactorX = (float)pPos->getWidth() / (float)m_width;
     }
     if( m_height > 0 )
     {
-        rFactorY = (double)pPos->getHeight() / (double)m_height;
+        rFactorY = (float)pPos->getHeight() / (float)m_height;
     }
 }
 
@@ -326,7 +326,7 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
     }
 
     // Compute the resize factors
-    double factorX = 0, factorY = 1.0;
+    float factorX = 0, factorY = 1.0;
     getResizeFactors( factorX, factorY );
 
     return (m_curve.getMinDist( (int)(x / factorY),
@@ -339,7 +339,7 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
     if( rEvent.getAsString().find( "mouse:left:down" ) != string::npos )
     {
         // Compute the resize factors
-        double factorX = 0, factorY = 1.0;
+        float factorX = 0, factorY = 1.0;
         getResizeFactors( factorX, factorY );
 
         // Get the position of the control
@@ -368,7 +368,7 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
     {
         int direction = ((EvtScroll&)rEvent).getDirection();
 
-        double percentage = m_rVariable.get();
+        float percentage = m_rVariable.get();
         if( direction == EvtScroll::kUp )
         {
             percentage += SCROLL_STEP;
@@ -390,7 +390,7 @@ void CtrlSliderBg::onUpdate( Subject<VarBool> &rVariable )
 }
 
 
-void CtrlSliderBg::getResizeFactors( double &rFactorX, double &rFactorY ) const
+void CtrlSliderBg::getResizeFactors( float &rFactorX, float &rFactorY ) const
 {
     // Get the position of the control
     const Position *pPos = getPosition();
@@ -401,11 +401,11 @@ void CtrlSliderBg::getResizeFactors( double &rFactorX, double &rFactorY ) const
     // Compute the resize factors
     if( m_width > 0 )
     {
-        rFactorX = (double)pPos->getWidth() / (double)m_width;
+        rFactorX = (float)pPos->getWidth() / (float)m_width;
     }
     if( m_height > 0 )
     {
-        rFactorY = (double)pPos->getHeight() / (double)m_height;
+        rFactorY = (float)pPos->getHeight() / (float)m_height;
     }
 }
 

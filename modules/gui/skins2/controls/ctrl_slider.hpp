@@ -2,7 +2,7 @@
  * ctrl_slider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_slider.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -86,7 +86,7 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
         /// Position of the cursor
         int m_xPosition, m_yPosition;
         /// Last saved position of the cursor (stored as a percentage)
-        double m_lastPercentage;
+        float m_lastPercentage;
         /// Offset between the mouse pointer and the center of the cursor
         int m_xOffset, m_yOffset;
         /// The last received event
@@ -113,7 +113,7 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>,
         virtual void onUpdate( Subject<VarBool> &rVariable );
 
         /// Methode to compute the resize factors
-        void getResizeFactors( double &rFactorX, double &rFactorY ) const;
+        void getResizeFactors( float &rFactorX, float &rFactorY ) const;
 };
 
 
@@ -148,7 +148,7 @@ class CtrlSliderBg: public CtrlGeneric
         int m_width, m_height;
 
         /// Methode to compute the resize factors
-        void getResizeFactors( double &rFactorX, double &rFactorY ) const;
+        void getResizeFactors( float &rFactorX, float &rFactorY ) const;
 
         /// Method called when the visibility variable is modified
         virtual void onUpdate( Subject<VarBool> &rVariable );

@@ -2,7 +2,7 @@
  * var_manager.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_manager.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_manager.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,6 +26,7 @@
 #define VAR_MANAGER_HPP
 
 #include "../utils/var_text.hpp"
+#include <map>
 
 
 class VarManager: public SkinObject
@@ -37,17 +38,28 @@ class VarManager: public SkinObject
         /// Delete the instance of VarManager
         static void destroy( intf_thread_t *pIntf );
 
+        /// Register a variable in the manager
+        void registerVar( const VariablePtr &rcVar, const string &rName );
+
+        /// Get a variable by its name (NULL if not found)
+        Variable *getVar( const string &rName );
+
+        /// Get a variable by its name and check the type (NULL if not found)
+        Variable *getVar( const string &rName, const string &rType );
+
         /// Get the tooltip text variable
-        VarText &getTooltipText() { return m_tooltip; }
+        VarText &getTooltipText() { return m_tooltipText; }
 
         /// Get the help text variable
-        VarText &getHelpText() { return m_help; }
+        VarText &getHelpText() { return m_helpText; }
 
     private:
         /// Tooltip text
-        VarText m_tooltip;
+        VarText m_tooltipText;
         /// Help text
-        VarText m_help;
+        VarText m_helpText;
+        /// Map of registerd variables
+        map<string, VariablePtr> m_varMap;
 
         /// Private because it is a singleton
         VarManager( intf_thread_t *pIntf );

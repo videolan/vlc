@@ -2,7 +2,7 @@
  * bezier.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: bezier.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,8 +26,8 @@
 #include <math.h>
 
 
-Bezier::Bezier( intf_thread_t *p_intf, const vector<double> &rAbscissas,
-                const vector<double> &rOrdinates, Flag_t flag )
+Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
+                const vector<float> &rOrdinates, Flag_t flag )
     : SkinObject( p_intf )
 {
     // We expect rAbscissas and rOrdinates to have the same size, of course
@@ -55,8 +55,8 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<double> &rAbscissas,
     m_topVect[0]  = oldy;
 
     // Compute the number of different points
-    double percentage;
-    for( double j = 1; j <= MAX_BEZIER_POINT; j++ )
+    float percentage;
+    for( float j = 1; j <= MAX_BEZIER_POINT; j++ )
     {
         percentage = j / MAX_BEZIER_POINT;
         getPoint( percentage, cx, cy );
@@ -74,14 +74,14 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<double> &rAbscissas,
 }
 
 
-double Bezier::getNearestPercent( int x, int y ) const
+float Bezier::getNearestPercent( int x, int y ) const
 {
     int nearest = findNearestPoint( x, y );
-    return (double)nearest / (double)(m_nbPoints - 1);
+    return (float)nearest / (float)(m_nbPoints - 1);
 }
 
 
-double Bezier::getMinDist( int x, int y ) const
+float Bezier::getMinDist( int x, int y ) const
 {
     // XXX: duplicate code with findNearestPoint
     int minDist = (m_leftVect[0] - x) * (m_leftVect[0] - x) +
@@ -101,13 +101,13 @@ double Bezier::getMinDist( int x, int y ) const
 }
 
 
-void Bezier::getPoint( double t, int &x, int &y ) const
+void Bezier::getPoint( float t, int &x, int &y ) const
 {
     // See http://astronomy.swin.edu.au/~pbourke/curves/bezier/ for a simple
     // explanation of the algorithm
-    double xPos = 0;
-    double yPos = 0;
-    double coeff;
+    float xPos = 0;
+    float yPos = 0;
+    float coeff;
     for( int i = 0; i < m_nbCtrlPt; i++ )
     {
         coeff = computeCoeff( i, m_nbCtrlPt - 1, t );
@@ -115,7 +115,7 @@ void Bezier::getPoint( double t, int &x, int &y ) const
         yPos += m_pty[i] * coeff;
     }
 
-    // Double cast to avoid strange truncatures
+    // float cast to avoid strange truncatures
     // XXX: not very nice...
     x = (int)(float)xPos;
     y = (int)(float)yPos;
@@ -174,14 +174,14 @@ int Bezier::findNearestPoint( int x, int y ) const
 }
 
 
-inline double Bezier::computeCoeff( int i, int n, double t ) const
+inline float Bezier::computeCoeff( int i, int n, float t ) const
 {
     return (power( t, i ) * power( 1 - t, (n - i) ) *
         (m_ft[n] / m_ft[i] / m_ft[n - i]));
 }
 
 
-inline double Bezier::power( double x, int n ) const
+inline float Bezier::power( float x, int n ) const
 {
     if( n > 0 )
         return x * power( x, n - 1);

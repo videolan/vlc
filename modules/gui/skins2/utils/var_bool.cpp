@@ -2,7 +2,7 @@
  * var_bool.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_bool.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,6 +23,9 @@
  *****************************************************************************/
 
 #include "var_bool.hpp"
+
+
+const string VarBool::m_type = "bool";
 
 
 VarBool::VarBool( intf_thread_t *pIntf ): Variable( pIntf ), m_value( false )

@@ -2,7 +2,7 @@
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder_data.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: builder_data.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -227,7 +227,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_fontId( fontId ), m_text( text ), 
     /// Type definition
     struct RadialSlider
     {
-        RadialSlider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & sequence, int nbImages, double minAngle, double maxAngle, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+        RadialSlider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & sequence, int nbImages, float minAngle, float maxAngle, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_sequence( sequence ), m_nbImages( nbImages ), m_minAngle( minAngle ), m_maxAngle( maxAngle ), m_value( value ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
@@ -238,8 +238,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
         const string m_rightBottom;
         const string m_sequence;
         int m_nbImages;
-        double m_minAngle;
-        double m_maxAngle;
+        float m_minAngle;
+        float m_maxAngle;
         const string m_value;
         const string m_tooltip;
         const string m_help;

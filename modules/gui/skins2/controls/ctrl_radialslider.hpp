@@ -2,7 +2,7 @@
  * ctrl_radialslider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_radialslider.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_radialslider.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -42,8 +42,8 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         /// Create a radial slider with the given image, which must be
         /// composed of numImg subimages of the same size
         CtrlRadialSlider( intf_thread_t *pIntf, const GenericBitmap &rBmpSeq,
-                          int numImg, VarPercent &rVariable, double minAngle,
-                          double maxAngle, const UString &rHelp );
+                          int numImg, VarPercent &rVariable, float minAngle,
+                          float maxAngle, const UString &rHelp );
 
         virtual ~CtrlRadialSlider();
 
@@ -64,7 +64,7 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         /// Variable associated to the slider
         VarPercent &m_rVariable;
         /// Min and max angles of the button
-        double m_minAngle, m_maxAngle;
+        float m_minAngle, m_maxAngle;
         /// Callbacks objects
         Callback m_cmdUpDown;
         Callback m_cmdDownUp;

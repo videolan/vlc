@@ -2,7 +2,7 @@
  * bezier.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: bezier.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -46,22 +46,22 @@ class Bezier: public SkinObject
         } Flag_t;
 
         Bezier( intf_thread_t *p_intf,
-                const vector<double> &pAbscissas,
-                const vector<double> &pOrdinates,
+                const vector<float> &pAbscissas,
+                const vector<float> &pOrdinates,
                 Flag_t flag = kCoordsBoth );
         ~Bezier() {}
 
         /// Return the percentage (between 0 and 1) of the curve point nearest
         /// from (x, y)
 
-        double getNearestPercent( int x, int y ) const;
+        float getNearestPercent( int x, int y ) const;
 
         /// Return the distance of (x, y) to the curve
-        double getMinDist( int x, int y ) const;
+        float getMinDist( int x, int y ) const;
 
         /// Get the coordinates of the point at t precent of
         /// the curve (t must be between 0 and 1)
-        void getPoint( double t, int &x, int &y ) const;
+        void getPoint( float t, int &x, int &y ) const;
 
         /// Get the width (maximum abscissa) of the curve
         int getWidth() const;
@@ -73,10 +73,10 @@ class Bezier: public SkinObject
         /// Number of control points
         int m_nbCtrlPt;
         /// vectors containing the coordinates of the control points
-        vector<double> m_ptx;
-        vector<double> m_pty;
+        vector<float> m_ptx;
+        vector<float> m_pty;
         /// Vector containing precalculated factoriels
-        vector<double> m_ft;
+        vector<float> m_ft;
 
         /// Number of points (=pixels) used by the curve
         int m_nbPoints;
@@ -87,9 +87,9 @@ class Bezier: public SkinObject
         /// Return the index of the curve point that is the nearest from (x, y)
         int findNearestPoint( int x, int y ) const;
         /// Helper function to compute a coefficient of the curve
-        inline double computeCoeff( int i, int n, double t ) const;
+        inline float computeCoeff( int i, int n, float t ) const;
         /// x^n
-        inline double power( double x, int n ) const;
+        inline float power( float x, int n ) const;
 };
 
 

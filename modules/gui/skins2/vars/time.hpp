@@ -2,7 +2,7 @@
  * time.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: time.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: time.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -25,10 +25,8 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
-
 #include "../utils/var_percent.hpp"
 #include <string>
-
 
 /// Variable for VLC volume
 class Time: public VarPercent
@@ -37,15 +35,14 @@ class Time: public VarPercent
         Time( intf_thread_t *pIntf ): VarPercent( pIntf ) {}
         virtual ~Time() {}
 
-        virtual void set( double percentage, bool updateVLC );
+        virtual void set( float percentage, bool updateVLC );
 
-        virtual void set( double percentage ) { set( percentage, true ); }
+        virtual void set( float percentage ) { set( percentage, true ); }
 
         /// Return a string containing a value from 0 to 100
         virtual string getAsStringPercent() const;
         /// Return a string formatted as a time display (h:mm:ss)
         virtual string getAsStringTime() const;
 };
-
 
 #endif

@@ -2,7 +2,7 @@
  * ctrl_radialslider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_radialslider.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_radialslider.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -35,8 +35,8 @@
 
 CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
                                     const GenericBitmap &rBmpSeq, int numImg,
-                                    VarPercent &rVariable, double minAngle,
-                                    double maxAngle, const UString &rHelp ):
+                                    VarPercent &rVariable, float minAngle,
+                                    float maxAngle, const UString &rHelp ):
     CtrlGeneric( pIntf, rHelp ), m_fsm( pIntf ), m_numImg( numImg ),
     m_rVariable( rVariable ), m_minAngle( minAngle ), m_maxAngle( maxAngle ),
     m_cmdUpDown( this, &transUpDown ), m_cmdDownUp( this, &transDownUp ),
@@ -150,12 +150,12 @@ void CtrlRadialSlider::setCursor( int posX, int posY, bool blocking )
     int y = posY - pPos->getTop() - m_width / 2;
 
     // Compute the polar coordinates. angle is -(-j,OM)
-    double r = sqrt(x*x + y*y);
+    float r = sqrt(x*x + y*y);
     if( r == 0 )
     {
         return;
     }
-    double angle = acos(y/r);
+    float angle = acos(y/r);
     if( x > 0 )
     {
         angle = 2*M_PI - angle;
@@ -163,7 +163,7 @@ void CtrlRadialSlider::setCursor( int posX, int posY, bool blocking )
 
     if( angle >= m_minAngle && angle <= m_maxAngle )
     {
-        double newVal = (angle - m_minAngle) / (m_maxAngle - m_minAngle);
+        float newVal = (angle - m_minAngle) / (m_maxAngle - m_minAngle);
         // Avoid too fast moves of the cursor if blocking mode
         if( !blocking || fabs( m_rVariable.get() - newVal ) < 0.5 )
         {

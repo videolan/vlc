@@ -2,7 +2,7 @@
  * var_bool.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: var_bool.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -36,11 +36,17 @@ class VarBool: public Variable, public Subject<VarBool>
         VarBool( intf_thread_t *pIntf );
         virtual ~VarBool() {}
 
+        /// Get the variable type
+        virtual const string &getType() const { return m_type; }
+
         /// Set the internal value
         virtual void set( bool value );
         virtual bool get() const { return m_value; }
 
     private:
+        /// Variable type
+        static const string m_type;
+        /// Boolean value
         bool m_value;
 };
 

@@ -2,7 +2,7 @@
  * variable.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: variable.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: variable.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,6 +27,7 @@
 
 #include "../src/skin_common.hpp"
 #include "pointer.hpp"
+#include <string>
 
 
 /// Base class for variable objects
@@ -34,6 +35,9 @@ class Variable: public SkinObject
 {
     public:
         virtual ~Variable() {}
+
+        /// Get the variable type
+        virtual const string &getType() const = 0;
 
     protected:
         Variable( intf_thread_t *pIntf ): SkinObject( pIntf ) {}

@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: skin_main.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,6 +32,7 @@
 #include "vlcproc.hpp"
 #include "theme.hpp"
 #include "theme_loader.hpp"
+#include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
 
 
@@ -85,6 +86,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_logger = NULL;
     p_intf->p_sys->p_queue = NULL;
     p_intf->p_sys->p_dialogs = NULL;
+    p_intf->p_sys->p_interpreter = NULL;
     p_intf->p_sys->p_osFactory = NULL;
     p_intf->p_sys->p_osLoop = NULL;
     p_intf->p_sys->p_varManager = NULL;
@@ -97,6 +99,11 @@ static int Open( vlc_object_t *p_this )
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot initialize AsyncQueue" );
+        return VLC_EGENERIC;
+    }
+    if( Interpreter::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "Cannot instanciate Interpreter" );
         return VLC_EGENERIC;
     }
     if( OSFactory::instance( p_intf ) == NULL )
@@ -131,6 +138,7 @@ static void Close( vlc_object_t *p_this )
     OSFactory::instance( p_intf )->destroyOSLoop();
     OSFactory::destroy( p_intf );
     Dialogs::destroy( p_intf );
+    Interpreter::destroy( p_intf );
     AsyncQueue::destroy( p_intf );
     VarManager::destroy( p_intf );
 
