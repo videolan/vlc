@@ -406,3 +406,16 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<walken> tiens, j'ai une idee pour les gens qui se plaignent que le site web
+         est pas traduit en grec antique
+<walken> a chacun qui se plaint, tu lui proposes de le faire. s'il demande
+         encore pourquoi videolan ne le fait pas, tu lui files l'email du
+         precedent en disant c'est parce qu'il ne l'a pas fait :)
+
+  -- #videolan
+%
+<sam> KKI: I was merely joking, ignore me :)
+<Meuuh> it is generally a good idea to ignore sam
+
+  -- #videolan
+%
