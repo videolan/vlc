@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.19 2002/04/23 14:16:21 sam Exp $
+ * $Id: configuration.c,v 1.20 2002/04/24 23:08:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -946,6 +946,45 @@ char *config_GetHomeDir( void )
 
 #if defined(HAVE_GETPWUID)
     struct passwd *p_pw = NULL;
+#endif
+
+#ifdef WIN32
+    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
+                                               LPTSTR );
+#   define CSIDL_FLAG_CREATE 0x8000
+#   define CSIDL_APPDATA 0x1A
+#   define SHGFP_TYPE_CURRENT 0
+
+    HINSTANCE shell32_dll;
+    SHGETFOLDERPATH SHGetFolderPath ;
+
+    /* load the shell32 dll to retreive SHGetFolderPath */
+    if( ( shell32_dll = LoadLibrary("shell32.dll") ) != NULL )
+    {
+        SHGetFolderPath = (void *)GetProcAddress( shell32_dll,
+                                                  "SHGetFolderPathA" );
+        if ( SHGetFolderPath != NULL )
+        {
+            p_homedir = (char *)malloc( MAX_PATH );
+            if( !p_homedir )
+            {
+                intf_ErrMsg( "config error: couldn't malloc p_homedir" );
+                return NULL;
+            }
+
+            /* get the "Application Data" folder for the current user */
+            if( S_OK == SHGetFolderPath( NULL,
+                                         CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                         NULL, SHGFP_TYPE_CURRENT,
+                                         p_homedir ) )
+            {
+                FreeLibrary( shell32_dll );
+                return p_homedir;
+            }
+            free( p_homedir );
+        }
+        FreeLibrary( shell32_dll );
+    }
 #endif
 
 #if defined(HAVE_GETPWUID)
