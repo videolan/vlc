@@ -1,5 +1,3 @@
-# Generated automatically from Makefile.in by configure.
-# Generated automatically from Makefile.in by configure.
 ################################################################################
 # vlc (VideoLAN Client) main makefile
 # (c)1998 VideoLAN
@@ -71,12 +69,14 @@ DEBUG=0
 
 #----------------- do not change anything below this line ----------------------
 
-prefix=/usr/local
-INSTALL=/bin/install -c
+prefix=@prefix@
+INSTALL=@INSTALL@
 
 ################################################################################
 # Configuration pre-processing
 ################################################################################
+
+SNAPSHOTDIR=vlc-@VLC_VERSION@
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(SYS) $(ARCH)

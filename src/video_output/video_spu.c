@@ -43,10 +43,10 @@ typedef struct vout_spu_s
     int i_id;
     byte_t *p_data;
 
-    /* coordinates inside the spu */
+    /* drawing coordinates inside the spu */
     int x;
     int y;
-    /* size of the spu */
+    /* target size */
     int width;
     int height;
 
@@ -102,13 +102,18 @@ void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
     int i_bytes_per_pixel = p_vout->i_bytes_per_pixel;
     int i_bytes_per_line = p_vout->i_bytes_per_line;
 
-    int i_width = 720;
-    int i_pic_width = p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_width;
-    int i_height = 576;
-    int i_pic_height = p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height;
+    /* FIXME: we need a way to get this information from the stream */
+    #define TARGET_WIDTH     720
+    #define TARGET_HEIGHT    576
+    int i_x_scale =
+        ( p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_width << 6 )
+            / TARGET_WIDTH;
+    int i_y_scale =
+        ( p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height << 6 )
+            / TARGET_HEIGHT;
 
     /* FIXME: fake palette - the real one has to be sought in the .IFO */
-    static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
+    static int p_palette[4] = { 0x0000, 0x0000, 0x5555, 0xffff };
 
     boolean_t b_aligned = 1;
     byte_t *p_from[2];
@@ -119,8 +124,8 @@ void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
 
     vspu.x = 0;
     vspu.y = 0;
-    vspu.width = 720;
-    vspu.height = 576;
+    vspu.width = TARGET_WIDTH;
+    vspu.height = TARGET_HEIGHT;
     vspu.p_data = p_vout->p_buffer[ p_vout->i_buffer_index ].p_data
                     /* go to the picture coordinates */
                     + p_vout->p_buffer->i_pic_x * p_vout->i_bytes_per_pixel
@@ -151,10 +156,25 @@ void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
             {
                 if( (i_color = i_code & 0x3) )
                 {
-                    u8 *p_target = &vspu.p_data[ i_bytes_per_pixel * (vspu.x * i_pic_width / i_width)
-                                        + ( vspu.y * i_pic_height / i_height) * i_bytes_per_line ];
+                    u8 *p_target = &vspu.p_data[
+                        i_bytes_per_pixel * ((vspu.x * i_x_scale) >> 6)
+                        + i_bytes_per_line * ((vspu.y * i_y_scale) >> 6) ];
+
                     memset( p_target, p_palette[i_color],
-                            ((i_code * i_pic_width / i_width) >> 2) * i_bytes_per_pixel );
+                            ((((i_code - 1) * i_x_scale) >> 8) + 1)
+                            * i_bytes_per_pixel );
+
+                    /* if we need some horizontal scaling (unlikely )
+                     * we only scale up to 2x, someone watching a DVD
+                     * with more than 2x zoom must be braindead */
+                    if( i_y_scale >= (1 << 6) )
+                    {
+                        p_target += i_bytes_per_line;
+
+                        memset( p_target, p_palette[i_color],
+                                ((((i_code - 1) * i_x_scale) >> 8) + 1)
+                                * i_bytes_per_pixel );
+                    }
                 }
                 vspu.x += i_code >> 2;
             }

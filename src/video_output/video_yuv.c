@@ -180,7 +180,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         (((*p_y + dither10[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither20[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither20[i_real_y])   >> 5) ];                             \
-    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv += *p_offset;                                                   \
     p_y += *p_offset;                                                         \
     p_u += *p_offset   & b_jump_uv;                                           \
     p_v += *p_offset++ & b_jump_uv;                                           \
@@ -188,7 +188,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         (((*p_y + dither11[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither21[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither21[i_real_y])   >> 5) ];                             \
-    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv += *p_offset;                                                   \
     p_y += *p_offset;                                                         \
     p_u += *p_offset   & b_jump_uv;                                           \
     p_v += *p_offset++ & b_jump_uv;                                           \
@@ -196,7 +196,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         (((*p_y + dither12[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither22[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither22[i_real_y])   >> 5) ];                             \
-    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv += *p_offset;                                                   \
     p_y += *p_offset;                                                         \
     p_u += *p_offset   & b_jump_uv;                                           \
     p_v += *p_offset++ & b_jump_uv;                                           \
@@ -204,7 +204,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
         (((*p_y + dither13[i_real_y]) >> 4) << 7)                             \
         + ((*p_u + dither23[i_real_y])   >> 5) * 9                            \
         + ((*p_v + dither23[i_real_y])   >> 5) ];                             \
-    b_jump_uv = (b_jump_uv + *p_offset) & 0x1;                                \
+    b_jump_uv += *p_offset;                                                   \
     p_y += *p_offset;                                                         \
     p_u += *p_offset   & b_jump_uv;                                           \
     p_v += *p_offset++ & b_jump_uv;                                           \
@@ -1102,15 +1102,16 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
     int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
-    /* other matrices that can be interesting, either for debugging or for effects */
-#if 0
+    #if 0
+    /* other matrices that can be interesting, either for debugging or for
+     * various effects */
     int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
     int dither[4][4] = { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } };
     int dither[4][4] = { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } };
     int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
     int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
     int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
-#endif
+    #endif
 
     /*
      * Initialize some values  - i_pic_line_width will store the line skip

@@ -1089,49 +1089,12 @@ last_display_date = display_date;
             {
                 RenderInterface( p_vout );
             }
-            if( p_subpic )
+            if( b_display && p_subpic )
             {
-                if( b_display )
-                {
-                    RenderSubPicture( p_vout, p_subpic );
-                }
-
-                /* Remove subpicture from heap */
-                /*vlc_mutex_lock( &p_vout->subpicture_lock );
-                p_subpic->i_status = DESTROYED_SUBPICTURE;
-                vlc_mutex_unlock( &p_vout->subpicture_lock );*/
-            }
-
-        }
-#if 0
-        else if( p_subpic )                              /* subpicture alone */
-        {
-            b_display = p_vout->b_active;
-            p_vout->last_display_date = display_date;
-
-            if( b_display )
-            {
-                /* Clear buffer */
-                SetBufferPicture( p_vout, NULL );
-
-                /* Render informations, interface and subpicture */
-                if( p_vout->b_info )
-                {
-                    RenderInfo( p_vout );
-                }
-                if( p_vout->b_interface )
-                {
-                    RenderInterface( p_vout );
-                }
                 RenderSubPicture( p_vout, p_subpic );
             }
 
-            /* Remove subpicture from heap */
-            /*vlc_mutex_lock( &p_vout->subpicture_lock );
-            p_subpic->i_status = DESTROYED_SUBPICTURE;
-            vlc_mutex_unlock( &p_vout->subpicture_lock );*/
         }
-#endif
         else if( p_vout->b_active )        /* idle or interface screen alone */
         {
             if( p_vout->b_interface && 0 /* && XXX?? intf_change */ )
@@ -1851,6 +1814,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
             /* test if the picture really has to be displayed */
             if( mdate() < p_subpic->begin_date )
             {
+                /* not yet, see you later */
                 break;
             }
             if( mdate() > p_subpic->end_date )
