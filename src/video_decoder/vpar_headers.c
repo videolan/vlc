@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.5 2001/07/25 18:06:27 massiot Exp $
+ * $Id: vpar_headers.c,v 1.6 2001/07/26 11:36:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -624,7 +624,22 @@ static void PictureHeader( vpar_thread_t * p_vpar )
          * have decoded the first field. */
         if( b_parsable )
         {
-            b_parsable = (p_vpar->picture.p_picture != NULL);
+            if( p_vpar->picture.p_picture == NULL )
+            {
+                if( (p_vpar->picture.i_coding_type == I_CODING_TYPE
+                      && p_vpar->sequence.p_backward == NULL) )
+                {
+                    /* Exceptionnally, parse the picture if it is I. We need
+                     * this in case of an odd number of field pictures, if the
+                     * previous picture is not intra, we desperately need a
+                     * new reference picture. OK, this is kind of kludgy. */
+                    p_vpar->picture.i_current_structure = 0;
+                }
+                else
+                {
+                    b_parsable = 0;
+                }
+            }
         }
     }
     else
@@ -673,14 +688,14 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             if( (p_vpar->picture.i_current_structure | i_structure)
                     == FRAME_STRUCTURE )
             {
-                p_vpar->picture.i_current_structure = i_structure;
-            }
-            else
-            {
                 /* The frame is complete. */
                 p_vpar->picture.i_current_structure = 0;
 
                 vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
+            }
+            else
+            {
+                p_vpar->picture.i_current_structure = i_structure;
             }
         }
         else
