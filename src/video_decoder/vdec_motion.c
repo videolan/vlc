@@ -79,8 +79,11 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
             {
                 for( i_x = 0; i_x < i_width; i_x += 8 )
                 {
-                     memcpy( &p_dest[i_x], &p_src[i_x], 8 * sizeof(yuv_data_t) );
-		}
+                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                     {
+                         p_dest[i_x+i_x1] = p_src[i_x+i_x1];
+                     }
+                }
                 p_dest += i_x_step;
                 p_src += i_x_step;
             }
@@ -219,7 +222,6 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
             }
         }
         break;
-
     }
 }
 
@@ -445,6 +447,7 @@ void vdec_MotionFrameDMV( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
+    p_motion->i_mv_x = p_motion->i_mv_y = 0;
     /* Luminance */
     MotionComponent( /* source */
                      p_motion->p_source->p_y
@@ -495,6 +498,7 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)
                        | ((p_motion->i_mv_x/2) & 1) );
+
 }
 
 /*****************************************************************************

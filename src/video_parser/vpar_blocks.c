@@ -587,11 +587,14 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->pf_chroma_motion = pf_chroma_motion[p_vpar->sequence.i_chroma_format];
     p_mb->b_P_coding_type = ( p_vpar->picture.i_coding_type == P_CODING_TYPE );
 
-    p_mb->p_forward = p_vpar->sequence.p_forward;
-    p_mb->p_backward = p_vpar->sequence.p_backward;
+    if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) ||
+        (p_vpar->picture.i_coding_type == B_CODING_TYPE) )
+       p_mb->p_forward = p_vpar->sequence.p_forward;
+    if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
+        p_mb->p_backward = p_vpar->sequence.p_backward;
 
     p_mb->i_addb_l_stride = (p_mb->i_l_stride = p_vpar->picture.i_l_stride) - 8;
-    p_mb->i_addb_c_stride = (p_mb->i_c_stride = p_vpar->picture.i_c_stride) - 9;
+    p_mb->i_addb_c_stride = (p_mb->i_c_stride = p_vpar->picture.i_c_stride) - 8;
 
     /* Update macroblock real position. */
     p_vpar->mb.i_l_x += 16;
@@ -754,7 +757,7 @@ i_count++;
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
         static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionFieldField,
                                 vdec_MotionFieldField, vdec_MotionFrameFrame};
-
+fprintf(stderr, "On sauuuute !\n");
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
             = p_vpar->slice.pi_dc_dct_pred[2]
@@ -785,6 +788,7 @@ i_count++;
 
         /* Motion type is picture structure. */
         p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
+        p_mb->i_mb_type = MB_MOTION_FORWARD;
 
         /* Set the field we use for motion compensation */
         p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
@@ -946,6 +950,12 @@ if( 0 )
         /* Reset MV predictors. */
         memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
     }
+
+    if( p_mb->b_P_coding_type && !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD|MB_INTRA)) )
+    {
+        p_mb->i_mb_type |= MB_MOTION_FORWARD;
+    }
+    
  if( 0 )        
     //i_count == 249)
     // i_count != *pi_mb_address)

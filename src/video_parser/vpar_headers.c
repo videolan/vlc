@@ -614,23 +614,23 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         intf_DbgMsg("vpar debug: odd number of field picture.\n");
     }
 
-    if( p_vpar->picture.i_current_structure )
-    {
-        /* Second field of a frame. We will decode it if, and only if we
-         * have decoded the first frame. */
-        b_parsable = (p_vpar->picture.p_picture != NULL);
-    }
-    else
-    {
-        /* Do we have the reference pictures ? */
-        b_parsable = !((p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
-                       (p_vpar->sequence.p_backward == NULL)) ||
-                        /* p_backward will become p_forward later */
-                      ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
-                       (p_vpar->sequence.p_forward == NULL ||
-                        p_vpar->sequence.p_backward == NULL));
+    /* Do we have the reference pictures ? */
+    b_parsable = !(((p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
+                    (p_vpar->sequence.p_backward == NULL)) ||
+                     /* p_backward will become p_forward later */
+                   ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
+                    (p_vpar->sequence.p_forward == NULL ||
+                     p_vpar->sequence.p_backward == NULL)));
 
-        if( b_parsable )
+    if( b_parsable )
+    {
+        if( p_vpar->picture.i_current_structure )
+        {
+            /* Second field of a frame. We will decode it if, and only if we
+            * have decoded the first frame. */
+            b_parsable = (p_vpar->picture.p_picture != NULL);
+        }
+        else
         {
             /* Does synchro say we have enough time to decode it ? */
             b_parsable = vpar_SynchroChoose( p_vpar,
@@ -688,6 +688,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         memset( p_vpar->picture.pp_mb, 0, MAX_MB );
+memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
@@ -761,16 +762,16 @@ fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
 
         /* Link referenced pictures for the decoder 
          * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
-#if 0
-        if( p_vpar->sequence.p_forward != NULL )
+        if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
+            p_vpar->picture.i_coding_type == B_CODING_TYPE )
         {
             vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         }
-        if( p_vpar->sequence.p_backward != NULL )
+        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
         {
             vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
         } 
-#endif
+
         /* Send signal to the video_decoder. */
         vlc_mutex_lock( &p_vpar->vfifo.lock );
         vlc_cond_signal( &p_vpar->vfifo.wait );

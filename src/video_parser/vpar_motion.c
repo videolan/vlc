@@ -104,13 +104,13 @@ static __inline__ void vpar_DecodeMotionVector( int * pi_prediction, int i_r_siz
     i_limit = 16 << i_r_size;
     i_vector = *pi_prediction >> i_full_pel;
 
-    if( i_motion_code < 0 )
+    if( i_motion_code > 0 )
     {
         i_vector += ((i_motion_code-1) << i_r_size) + i_motion_residual + 1;
         if( i_vector >= i_limit )
             i_vector -= i_limit << 1;
     }
-    else if( i_motion_code > 0 )
+    else if( i_motion_code < 0 )
     {
         i_vector -= ((-i_motion_code-1) << i_r_size) + i_motion_residual + 1;
         if( i_vector < i_limit )

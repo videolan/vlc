@@ -302,7 +302,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
 void vdec_AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
 {
     int i_x, i_y;
-    
+ 
     for( i_y = 0; i_y < 8; i_y++ )
     {
         for( i_x = 0; i_x < 8; i_x++ )

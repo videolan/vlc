@@ -155,14 +155,14 @@ fprintf(stderr, "Image decodee\n");
         vpar_SynchroEnd( p_fifo->p_vpar );
      
         /* Unlink referenced pictures */
-/*        if( p_mb->p_forward != NULL )
+        if( p_mb->p_forward != NULL )
         {
 	        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
         }
         if( p_mb->p_backward != NULL )
         {
             vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
-        }*/
+        }
     }
 
     /* Release the macroblock_t structure */
@@ -197,14 +197,14 @@ fprintf(stderr, "Image trashee\n");
         vpar_SynchroEnd( p_fifo->p_vpar );
 
         /* Unlink referenced pictures */
-/*        if( p_mb->p_forward != NULL )
+        if( p_mb->p_forward != NULL )
         {
-                vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
+            vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
         }
         if( p_mb->p_backward != NULL )
         {
             vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
-        }*/
+        }
     }
 
     /* Release the macroblock_t structure */

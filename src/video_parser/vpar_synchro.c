@@ -148,7 +148,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    return( 1 );
+//    return( 1 );
     return( i_coding_type == I_CODING_TYPE || i_coding_type == P_CODING_TYPE );
     //return( i_coding_type == I_CODING_TYPE );
 }
@@ -171,7 +171,7 @@ mtime_t vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
 {
     vpar_SynchroUpdateStructures (p_vpar, i_coding_type);
 
-    return mdate() + 3000000;
+    return mdate() + 700000;
 }
 
 /*****************************************************************************
