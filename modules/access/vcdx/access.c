@@ -240,20 +240,28 @@ VCDSeek( access_t * p_access, int64_t i_pos )
       p_access->info.i_pos = i_pos;
       p_vcd->i_lsn = (i_pos / (int64_t)M2F2_SECTOR_SIZE) +
 	p_vcd->track_lsn;
+
+      switch (p_vcd->play_item.type) {
+      case VCDINFO_ITEM_TYPE_TRACK:
+      case VCDINFO_ITEM_TYPE_ENTRY:
+	break ;
+      default:
+	p_vcd->b_valid_ep = VLC_FALSE;
+      }
       
       /* Find entry */
       if( p_vcd->b_valid_ep )
-	{
+      {
 	  for( i_entry = 0 ; i_entry < p_vcd->i_entries ; i_entry ++ )
-	    {
+	  {
 	      if( p_vcd->i_lsn < p_vcd->p_entries[i_entry] )
-		{
+	      {
 		  VCDUpdateVar( p_access, i_entry, VLC_VAR_SETVALUE,
 				"chapter", _("Entry"), "Setting entry" );
 		  break;
-		}
-	    }
-
+	      }
+	  }
+	  
 	  { 
 	      vcdinfo_itemid_t itemid;
 	      itemid.num  = i_entry;
