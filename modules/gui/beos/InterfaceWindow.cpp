@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.44 2003/12/22 02:24:52 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.45 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -244,7 +244,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open Subtitles")),
                                       new BMessage( LOAD_SUBFILE ) ) );
-    
+
     fileMenu->AddSeparatorItem();
     BMenuItem* item = new BMenuItem( _AddEllipsis(_("About")),
                                      new BMessage( B_ABOUT_REQUESTED ), 'A');
@@ -301,19 +301,19 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     /* Add the Show menu */
     fShowMenu = new BMenu( _("Window") );
-    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Play List")),
+    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Playlist")),
                                        new BMessage( OPEN_PLAYLIST ), 'P') );
     fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Messages")),
                                        new BMessage( OPEN_MESSAGES ), 'M' ) );
     fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Preferences")),
                                        new BMessage( OPEN_PREFERENCES ), 'S' ) );
-    fMenuBar->AddItem( fShowMenu );                            
+    fMenuBar->AddItem( fShowMenu );
 
     /* Prepare fow showing */
     _SetMenusEnabled( false );
     p_mediaControl->SetEnabled( false );
 
-	_RestoreSettings();    
+    _RestoreSettings();
 
     Show();
 }
@@ -367,7 +367,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         }
         case TOGGLE_ON_TOP:
             break;
-            
+
         case OPEN_FILE:
         	_ShowFilePanel( B_REFS_RECEIVED, _("VLC Media Player: Open Media Files") );
             break;
@@ -398,7 +398,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 _UpdatePlaylist();
             }
             break;
-        
+
         case SUBFILE_RECEIVED:
         {
             entry_ref ref;
@@ -410,7 +410,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             break;
         }
-    
+
         case STOP_PLAYBACK:
             // this currently stops playback not nicely
             if (playback_status > UNDEF_S)
@@ -1108,7 +1108,7 @@ int CDMenu::GetCD( const char *directory )
 /*****************************************************************************
  * LanguageMenu::LanguageMenu
  *****************************************************************************/
-LanguageMenu::LanguageMenu( const char *name, int menu_kind, 
+LanguageMenu::LanguageMenu( const char *name, int menu_kind,
                             VlcWrapper *p_wrapper )
     :BMenu(name)
 {

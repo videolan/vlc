@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.11 2003/05/18 22:30:33 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.12 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -47,7 +47,7 @@ void MessagesView::Pulse()
         if( fScrollBar->Value() != max )
             isScrolling = true;
         fScrollBar->UnlockLooper();
-        
+
     }
 
     int i_start, oldLength;

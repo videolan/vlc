@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.15 2003/06/22 00:40:18 titer Exp $
+ * $Id: Interface.cpp,v 1.16 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -105,7 +105,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    
+
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy the interface window */
@@ -127,7 +127,7 @@ static void Run( intf_thread_t *p_intf )
     {
         /* Update VlcWrapper internals (p_input, etc) */
         p_intf->p_sys->p_wrapper->UpdateInput();
-        
+
         /* Manage the slider */
         p_intf->p_sys->p_window->UpdateInterface();
 

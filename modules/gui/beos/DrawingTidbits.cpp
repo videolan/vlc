@@ -2,7 +2,7 @@
  * DrawingTidbits.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.cpp,v 1.3 2003/01/24 06:31:56 titer Exp $
+ * $Id: DrawingTidbits.cpp,v 1.4 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -34,12 +34,12 @@
 inline uchar
 ShiftComponent(uchar component, float percent)
 {
-	// change the color by <percent>, make sure we aren't rounding
-	// off significant bits
-	if (percent >= 1)
-		return (uchar)(component * (2 - percent));
-	else
-		return (uchar)(255 - percent * (255 - component));
+    // change the color by <percent>, make sure we aren't rounding
+    // off significant bits
+    if (percent >= 1)
+        return (uchar)(component * (2 - percent));
+    else
+        return (uchar)(255 - percent * (255 - component));
 }
 
 // ShiftColor

@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.9 2003/04/22 16:36:16 titer Exp $
+ * $Id: PlayListWindow.cpp,v 1.10 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -70,7 +70,7 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
 	p_intf = p_interface;
     p_wrapper = p_intf->p_sys->p_wrapper;
     
-    SetName( "playlist" );
+    SetName( _("playlist") );
 
     // set up the main menu bar
 	fMenuBar = new BMenuBar( BRect(0.0, 0.0, frame.Width(), 15.0), "main menu",

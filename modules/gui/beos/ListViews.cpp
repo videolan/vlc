@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.cpp,v 1.5 2003/02/03 17:18:48 stippi Exp $
+ * $Id: ListViews.cpp,v 1.6 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.14 2003/05/30 17:30:54 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.15 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -72,7 +72,7 @@ class TitleMenu : public BMenu
     virtual                 ~TitleMenu();
 
     virtual void            AttachedToWindow();
-    
+
     intf_thread_t  *p_intf;
 };
 
@@ -127,7 +127,7 @@ class InterfaceWindow : public BWindow
     PlayListWindow*         fPlaylistWindow;
     PreferencesWindow*      fPreferencesWindow;
     BMenuBar*               fMenuBar;
-    BMenuItem*				fGotoMenuMI;
+    BMenuItem*              fGotoMenuMI;
     BMenuItem*              fNextTitleMI;
     BMenuItem*              fPrevTitleMI;
     BMenuItem*              fNextChapterMI;

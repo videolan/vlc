@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.29 2003/05/08 10:40:31 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.30 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,7 +50,7 @@ typedef struct aout_sys_t
 {
     BSoundPlayer * p_player;
     mtime_t        latency;
-    
+
 } aout_sys_t;
 
 /*****************************************************************************
@@ -69,7 +69,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     p_aout->output.p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
     if( p_aout->output.p_sys == NULL )
     {
-        msg_Err( p_aout, "Not enough memory" );
+        msg_Err( p_aout, "out of memory" );
         return -1;
     }
     aout_sys_t * p_sys = p_aout->output.p_sys;
@@ -84,13 +84,13 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
- 
+
     media_raw_audio_format * p_format;
     p_format = (media_raw_audio_format*)
         malloc( sizeof( media_raw_audio_format ) );
-    
+
     p_format->channel_count = i_nb_channels;
-    p_format->frame_rate = p_aout->output.output.i_rate;    
+    p_format->frame_rate = p_aout->output.output.i_rate;
     p_format->format = media_raw_audio_format::B_AUDIO_FLOAT;
 #ifdef WORDS_BIGENDIAN
     p_format->byte_order = B_MEDIA_BIG_ENDIAN;
@@ -167,7 +167,7 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
 }
 
 /*****************************************************************************
- * DoNothing 
+ * DoNothing
  *****************************************************************************/
 static void DoNothing( aout_instance_t *p_aout )
 {

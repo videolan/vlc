@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.13 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: BeOS.cpp,v 1.14 2004/01/26 16:52:31 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -49,16 +49,17 @@ void E_(CloseVideo)   ( vlc_object_t * );
 static char * ppsz_screenshotformat[] = { "TGA", "PPM", "PNG", "JPEG", "BMP" };
 
 vlc_module_begin();
-    add_bool( "beos-dvdmenus", 0, NULL, "Use DVD Menus", "", VLC_TRUE );
-    add_string( "beos-screenshotpath", "/boot/home/", NULL, "Screenshot Path", "", VLC_TRUE );
-    add_string( "beos-screenshotformat", "PNG",  NULL, "Screenshot Format",
-                "", VLC_TRUE );
-        change_string_list( ppsz_screenshotformat, 0, 0 );
+    add_bool( "beos-dvdmenus", 0, NULL, _("Use DVD Menus"), "", VLC_TRUE );
+    add_string( "beos-screenshotpath", "/boot/home/", NULL,
+                _("Screenshot Path"), "", VLC_TRUE );
+    add_string( "beos-screenshotformat", "PNG",  NULL,
+                _("Screenshot Format"),"", VLC_TRUE );
+    change_string_list( ppsz_screenshotformat, 0, 0 );
     set_description( _("BeOS standard API interface") );
     set_capability( "interface", 100 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
 
-    add_submodule();                                     
+    add_submodule();
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
     add_submodule();
