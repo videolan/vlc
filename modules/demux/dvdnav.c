@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.6 2004/01/19 20:31:21 fenrir Exp $
+ * $Id: dvdnav.c,v 1.7 2004/01/19 21:30:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -110,7 +110,8 @@ struct demux_sys_t
     event_thread_t *p_ev;
 
     /* FIXME */
-    uint8_t alpha[4];
+    uint8_t     alpha[4];
+    uint32_t    clut[16];
 
     /* */
     int i_aspect;
@@ -279,7 +280,7 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
 
     msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
              psz_source, *i_title, *i_chapter, *i_angle );
-    
+
     return psz_source;
 }
 
@@ -641,6 +642,7 @@ static int DemuxDemux( demux_t *p_demux )
     case DVDNAV_SPU_CLUT_CHANGE:
         msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
         /* Update color lookup table (16 *uint32_t in packet) */
+        memcpy( p_sys->clut, packet, 16 * sizeof( uint32_t ) );
         break;
 
     case DVDNAV_HOP_CHANNEL:
@@ -692,10 +694,10 @@ static void ButtonUpdate( demux_t *p_demux )
 
             /* I fear it is plain wrong */
             //val.p_address = (void *)&hl.palette;
-            p_sys->alpha[0] = 0x00;
-            p_sys->alpha[1] = 0x0f;
-            p_sys->alpha[2] = 0x0f;
-            p_sys->alpha[3] = 0x0f;
+            p_sys->alpha[0] = hl.palette&0x0f;
+            p_sys->alpha[1] = (hl.palette>>4)&0x0f;
+            p_sys->alpha[2] = (hl.palette>>8)&0x0f;
+            p_sys->alpha[3] = (hl.palette>>12)&0x0f;
 
             vlc_mutex_lock( p_mutex );
             val.i_int = hl.sx; var_Set( p_sys->p_input, "x-start", val );
@@ -929,6 +931,9 @@ static void ESNew( demux_t *p_demux, int i_id )
     {
         tk->fmt.psz_language =
             LangCode2String( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f ) );
+        /* palette */
+        tk->fmt.subs.spu.palette[0] = 0xBeef;
+        memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut, 16 * sizeof( uint32_t ) );
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
