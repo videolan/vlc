@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.165 2004/01/28 15:25:53 bigben Exp $
+dnl $Id: configure.ac,v 1.166 2004/01/28 20:53:21 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -2781,45 +2781,66 @@ dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
   [  --enable-skins2         Skins2 interface module (experimental)])
-if test "${enable_skins2}" != "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}" != "beos" && "${enable_skins2}" != "no"); then
 
+  dnl test for the required libraries
+  skins2_missing_lib="no"
+
+  dnl freetype
+  if test "${FREETYPE_CONFIG}" != "no"; then
+    AX_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs`])
+  else
+    skins2_missing_lib="yes"
+    if test "${enable_skins2}" = "yes"; then
+      AC_MSG_ERROR([Could not find freetype (required for skins2)])
+    fi
+  fi
+
+  dnl iconv
+  if test "$am_cv_func_iconv" = "yes"; then
+    AX_ADD_CPPFLAGS([skins2],[${INCICONV}])
+    AX_ADD_LDFLAGS([skins2],[${LIBICONV} -lpng])
+  else
+    skins2_missing_lib="yes"
+    if test "${enable_skins2}" = "yes"; then
+      AC_MSG_ERROR([Could not find iconv (required for skins2)])
+    fi
+  fi
+
+  dnl libxml2
+  XML2_PATH="${PATH}"
+  AC_ARG_WITH(xml2-config-path,
+    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
+    [ if test "${with_xml2_config_path}" != "no"; then
+        XML2_PATH="${with_xml2_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
+  if test "${XML2_CONFIG}" != "no"; then
+    AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([skins2],[`${XML2_CONFIG} --libs`])
+  else
+    skins2_missing_lib="yes"
+    if test "${enable_skins2}" = "yes"; then
+      AC_MSG_ERROR([Could not find libxml2 (required for skins2)])
+    fi
+  fi
+
+  if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"); then
     AX_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
     AX_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
 
-  else if ( test "${SYS}" != "darwin" && "${SYS}" != "beos") || test "${enable_skins2}" = "yes"; then
+  else if test "${skins2_missing_lib}" = "no"; then
     AX_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
     AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11])
-  fi fi
-
-  if test "${FREETYPE_CONFIG}" != "no"
-  then
-    AX_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags`])
-    AX_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs`])
   fi
-
-  XML2_PATH="${PATH}"
-  AC_ARG_WITH(xml2-config-path,
-    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
-    [ if test "${with_xml2_config_path}" != "no"
-      then
-        XML2_PATH="${with_xml2_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
-  if test "${XML2_CONFIG}" != "no"
-  then
-    AX_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
-    AX_ADD_LDFLAGS([skins2],[`${XML2_CONFIG} --libs`])
   fi
-
-  AX_ADD_CPPFLAGS([skins2],[${INCICONV}])
-  AX_ADD_LDFLAGS([skins2],[${LIBICONV} -lpng])
 fi
 
 
