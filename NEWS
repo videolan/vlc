@@ -13,7 +13,7 @@ Core support:
  * Daemon mode
 
 Input:
- * New screen capture input plugin for X11
+ * New screen capture input plugin for X11 and Win32
  * Improved DVD support:
     - uses libdvdnav for playing DVDs with menus support
     - uses libdvdread for simple playback with menus (eg. for streaming)
@@ -55,6 +55,8 @@ Interfaces:
  * OSD icons for Play and Pause
  * New Streaming Wizard for Windows and Linux default interfaces
  * A few skins2 improvements
+ * The remote control interface can now listen for commands on sockets
+ * Improved CORBA control module
 
 Mac OS X port:
  * Fixed the "cannot set buffersize:[nope]" coreaudio problem
