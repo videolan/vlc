@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.1 2002/06/01 10:12:10 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -153,6 +153,11 @@ VideoWindow::~VideoWindow()
     delete bitmap[2];
 }
 
+bool VideoWindow::QuitRequested()
+{
+    return true;
+}
+
 void VideoWindow::drawBuffer(int bufferIndex)
 {
     status_t status;
@@ -178,7 +183,7 @@ void VideoWindow::drawBuffer(int bufferIndex)
                             &key, B_FOLLOW_ALL,
 		                    B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
 		                    B_OVERLAY_TRANSFER_CHANNEL);
-		   view->SetViewColor(key);
+		   //view->SetViewColor(key);
 	   }
        else
        {
@@ -284,7 +289,7 @@ int VideoWindow::SelectDrawingMode(int width, int height)
     {
         if (noOverlay) break;
         bitmap[0] = new BBitmap ( BRect( 0, 0, width, height ), 
-                                  B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+                                  B_BITMAP_WILL_OVERLAY,
                                   colspace[i].colspace);
 
         if(bitmap[0] && bitmap[0]->InitCheck() == B_OK) 
@@ -573,8 +578,8 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_window = new VideoWindow( p_vout->p_sys->i_width - 1,
                                                p_vout->p_sys->i_height - 1,
                                                BRect( 20, 50,
-                                                      20 + p_vout->i_window_width -1, 
-                                                      50 + p_vout->i_window_height ));
+                                                      20 + p_vout->i_window_width - 1, 
+                                                      50 + p_vout->i_window_height - 1 ));
 
     if( p_vout->p_sys->p_window == NULL )
     {
@@ -602,6 +607,7 @@ static void BeosCloseDisplay( vout_thread_t *p_vout )
         p_win->Hide();
         p_win->Quit();
     }
+    p_win = NULL;
 }
 
 
