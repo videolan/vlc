@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.148 2001/11/01 15:30:50 sam Exp $
+ * $Id: input.c,v 1.149 2001/11/02 13:30:38 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -87,6 +87,7 @@
 static void RunThread       ( input_thread_t *p_input );
 static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
+static void CloseThread     ( input_thread_t *p_input );
 static void DestroyThread   ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 

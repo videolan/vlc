@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
@@ -67,8 +67,8 @@
 /* Define if you have the </sys/dev/scsi/scsi_ioctl.h> header file.  */
 #undef HAVE__SYS_DEV_SCSI_SCSI_IOCTL_H
 
-/* Define if you have the <Carbon/Carbon.h> header file.  */
-#undef HAVE_CARBON_CARBON_H
+/* Define if you have the <Cocoa/Cocoa.h> header file.  */
+#undef HAVE_COCOA_COCOA_H
 
 /* Define if you have the <Ph.h> header file.  */
 #undef HAVE_PH_H
@@ -234,6 +234,9 @@
 
 /* Define if Linux-like dvd_struct is defined. */
 #undef HAVE_LINUX_DVD_STRUCT
+
+/* Define if OpenBSD-like dvd_struct is defined. */
+#undef HAVE_OPENBSD_DVD_STRUCT
 
 /* Define if FreeBSD-like dvd_struct is defined. */
 #undef HAVE_BSD_DVD_STRUCT

@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.7 2001/10/13 15:34:21 stef Exp $
+ * $Id: ioctl.h,v 1.8 2001/11/02 13:30:38 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -112,6 +112,17 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 #   define DVD_SEND_KEY2            0x03
 #   define DVD_REPORT_ASF           0x05
 #   define DVD_INVALIDATE_AGID      0x3f
+#endif
+
+#if defined( HAVE_OPENBSD_DVD_STRUCT )
+
+/*****************************************************************************
+ * OpenBSD ioctl specific
+ *****************************************************************************/
+typedef union dvd_struct dvd_struct;
+typedef union dvd_authinfo dvd_authinfo;
+typedef u_int8_t dvd_key[5];
+typedef u_int8_t dvd_challenge[10];
 #endif
 
 #if defined( WIN32 )
