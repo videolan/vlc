@@ -641,6 +641,11 @@ static struct
     { VLC_FOURCC('i','v','3','2'), CODEC_ID_INDEO3,
       VIDEO_ES, "Indeo Video v3" },
 
+#if LIBAVCODEC_BUILD >= 4721
+    { VLC_FOURCC('t','s','c','c'), CODEC_ID_TSCC,
+      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
+#endif
+
     /* Huff YUV */
     { VLC_FOURCC('H','F','Y','U'), CODEC_ID_HUFFYUV,
       VIDEO_ES, "Huff YUV Video" },
