@@ -72,7 +72,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                                 FIND_PARENT );
     if( !p_input)
     {
-        return VLC_EGENERIC;
+        return;
     }
 
     var_Get( p_input, "demuxed-id3", &val );

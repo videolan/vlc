@@ -37,6 +37,8 @@
 #   include <avformat.h>
 #endif
 
+#include "ffmpeg.h"
+
 /* Version checking */
 #if (LIBAVFORMAT_BUILD >= 4611) && defined(HAVE_LIBAVFORMAT)
 
@@ -134,9 +136,11 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     p_sys->url.prot = &p_sys->prot;
     p_sys->url.prot->name = "VLC I/O wrapper";
     p_sys->url.prot->url_open = 0;
-    p_sys->url.prot->url_read = IORead;
+    p_sys->url.prot->url_read =
+                    (int (*) (URLContext *, unsigned char *, int))IORead;
     p_sys->url.prot->url_write = 0;
-    p_sys->url.prot->url_seek = IOSeek;
+    p_sys->url.prot->url_seek =
+                    (offset_t (*) (URLContext *, offset_t, int))IOSeek;
     p_sys->url.prot->url_close = 0;
     p_sys->url.prot->next = 0;
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
