@@ -79,7 +79,7 @@ dropped.
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="ps.eps" format="EPS" scalefit="1" scale="95" />
+        <imagedata fileref="ps.png" format="PNG" scalefit="1" scale="95" />
       </imageobject>
       <imageobject>
         <imagedata fileref="ps.gif" format="GIF" />
@@ -97,7 +97,7 @@ dropped.
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="ts.eps" format="EPS" scalefit="1" scale="95" />
+        <imagedata fileref="ts.png" format="PNG" scalefit="1" scale="95" />
       </imageobject>
       <imageobject>
         <imagedata fileref="ts.gif" format="GIF" />

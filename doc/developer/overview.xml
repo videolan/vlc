@@ -43,7 +43,7 @@
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="modules.eps" format="EPS" scalefit="1" scale="80"/>
+        <imagedata fileref="modules.png" format="PNG" scalefit="1" scale="80"/>
       </imageobject>
       <imageobject>
         <imagedata fileref="modules.gif" format="GIF" />

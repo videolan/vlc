@@ -34,7 +34,7 @@ manual.pdf: *.xml
 manual.txt:  *.xml
 	$(JADE) -t sgml -d stylesheet-txt.dsl $(XML_DECL) manual.xml > text.html
 	$(LYNX) -force_html -dump text.html > manual.txt
-	rm -f text.html
+#	rm -f text.html
 
 clean:
 	rm -f manual.txt manual.pdf

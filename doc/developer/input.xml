@@ -171,7 +171,7 @@ for satellite and cable broadcasting).
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="stream.eps" format="EPS" scalefit="1" scale="80"/>
+        <imagedata fileref="stream.png" format="PNG" scalefit="1" scale="80"/>
       </imageobject>
       <imageobject>
         <imagedata fileref="stream.gif" format="GIF" />
