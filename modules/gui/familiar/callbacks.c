@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.16 2002/12/16 22:06:59 jpsaman Exp $
+ * $Id: callbacks.c,v 1.17 2002/12/17 21:04:49 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -47,8 +47,6 @@
 #include "interface.h"
 #include "support.h"
 #include "familiar.h"
-
-/*#include "netutils.h"*/
 
 static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 static char* get_file_perm(const char *path);
@@ -288,7 +286,6 @@ on_toolbar_rewind_clicked              (GtkButton       *button,
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
-    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
@@ -302,7 +299,6 @@ on_toolbar_pause_clicked               (GtkButton       *button,
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
-    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
@@ -364,7 +360,6 @@ on_toolbar_forward_clicked             (GtkButton       *button,
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
-    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
@@ -388,7 +383,9 @@ void
 on_comboURL_entry_changed              (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-//    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(editable) );
+#if 0
+    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(editable) );
+#endif
     gchar *       psz_url;
     struct stat st;
 

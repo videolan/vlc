@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.16 2002/12/16 21:48:17 jpsaman Exp $
+ * $Id: familiar.c,v 1.17 2002/12/17 21:04:49 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -48,10 +48,10 @@
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-
 static void Run          ( intf_thread_t * );
 
-void GtkAutoPlayFile( vlc_object_t * );
+void GtkAutoPlayFile     ( vlc_object_t * );
+static int Manage        ( intf_thread_t *p_intf );
 
 /*****************************************************************************
  * Module descriptor
@@ -86,14 +86,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-//#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK_MAIN
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
         return VLC_ENOMOD;
     }
-//#endif
+#endif
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
@@ -116,9 +116,9 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
-//#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK_MAIN
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
-//#endif
+#endif
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -132,33 +132,30 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-#ifdef HAVE_GPE_INIT_H
-    char  *p_args[] = { "" };
-    char **pp_args  = p_args;
-    int    i_args   = 1;
-
-    /* Initialize GPE interface */
-    if (gpe_application_init(&i_args, &pp_args) == FALSE)
-        exit (1);
-#else
-# ifdef NEED_GTK_MAIN
-    /* Initialize Gtk+ */
-    gtk_set_locale ();
-    gdk_threads_enter();
-# else
+#ifndef NEED_GTK_MAIN
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
     char  *p_args[] = { "" };
     char **pp_args  = p_args;
     int    i_args   = 1;
-    int    i_dummy;
-
-    gtk_set_locale ();
-    gtk_init( &i_args, &pp_args );
-# endif
+	int    i_dummy;
 #endif
-    /* Create some useful widgets that will certainly be used */
 
+#ifdef HAVE_GPE_INIT_H
+    /* Initialize GPE interface */
+    if (gpe_application_init(&i_args, &pp_args) == FALSE)
+        exit (1);
+#else
+    gtk_set_locale ();
+ #ifndef NEED_GTK_MAIN
+    gtk_init( &i_args, &pp_args );
+ #else
+    /* Initialize Gtk+ */
+    gdk_threads_enter();
+ #endif
+#endif
+
+    /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
     add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/vlc");
@@ -175,7 +172,6 @@ static void Run( intf_thread_t *p_intf )
 
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
-//    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
 
     p_intf->p_sys->p_progess = GTK_PROGRESS_BAR( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "progress" ) );
@@ -195,24 +191,35 @@ static void Run( intf_thread_t *p_intf )
     gtk_widget_show( p_intf->p_sys->p_window );
     ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
 
-//#ifdef NEED_GTK_MAIN
-    /* Sleep to avoid using all CPU - since some interfaces need to
-     * access keyboard events, a 100ms delay is a good compromise */
+#ifdef NEED_GTK_MAIN
     while( !p_intf->b_die )
     {
+        Manage( p_intf );
+
+        /* Sleep to avoid using all CPU - since some interfaces need to
+         * access keyboard events, a 100ms delay is a good compromise */
         gdk_threads_leave();
         msleep( INTF_IDLE_SLEEP );
         gdk_threads_enter();
     }
-//#endif
+#else
+    /* Sleep to avoid using all CPU - since some interfaces needs to access
+     * keyboard events, a 100ms delay is a good compromise */
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage,
+                               p_intf );
+    /* Enter Gtk mode */
+    gtk_main();
+    /* Remove the timeout */
+    gtk_timeout_remove( i_dummy );
+#endif
 
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
-//#ifdef NEED_GTK_MAIN
+#ifdef NEED_GTK_MAIN
     gdk_threads_leave();
 //#else
-    gtk_main_quit();
-//#endif
+//    gtk_main_quit();
+#endif
 }
 
 /*****************************************************************************
@@ -255,3 +262,43 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
     vlc_list_release( &list );
 }
 
+/* following functions are local */
+
+/*****************************************************************************
+ * Manage: manage main thread messages
+ *****************************************************************************
+ * In this function, called approx. 10 times a second, we check what the
+ * main program wanted to tell us.
+ *****************************************************************************/
+static int Manage( intf_thread_t *p_intf )
+{
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    /* Update the input */
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                          FIND_ANYWHERE );
+    }
+    else if( p_intf->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
+
+#ifndef NEED_GTK_MAIN
+    if( p_intf->b_die )
+    {
+        vlc_mutex_unlock( &p_intf->change_lock );
+
+        /* Prepare to die, young Skywalker */
+        gtk_main_quit();
+
+        return FALSE;
+    }
+#endif
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return TRUE;
+}
