@@ -46,6 +46,66 @@
 #define SAP_IPV6_ADDR_1 "FF0"
 #define SAP_IPV6_ADDR_2 "::2:7FFE"
 
+/****************************************************************************
+ *  Split : split a string into two parts: the one which is before the delim
+ *               and the one which is after.
+ *               NULL is returned if delim is not found
+ ****************************************************************************/
+
+static char * split( char *p_in, char *p_out1, char *p_out2, char delim)
+{
+    unsigned int i_count=0; /*pos in input string*/
+    unsigned int i_pos1=0; /*pos in out2 string */
+    unsigned int i_pos2=0; 
+    char *p_cur; /*store the pos of the first delim found */
+    
+    /*skip spaces at the beginning*/
+    while(p_in[i_count] == ' ' && i_count < strlen(p_in))
+    {
+        i_count++;
+    }
+    if(i_count == strlen(p_in))
+        return NULL;
+    
+    /*Look for delim*/
+    while(p_in[i_count] != delim && i_count < strlen(p_in))
+    {
+        p_out1[i_pos1] = p_in[i_count];
+        i_count++;
+        i_pos1++;
+    }
+    /* Mark the end of out1 */
+    p_out1[i_pos1] = 0;
+    
+    if(i_count == strlen(p_in))
+        return NULL;
+    
+    /*store pos of the first delim*/
+    p_cur = &p_in[i_count];
+    
+    
+    
+    /*skip all delim and all spaces*/
+    while((p_in[i_count] == ' ' || p_in[i_count] == delim) && i_count < strlen(p_in))
+    {
+        i_count++;
+    }
+    
+    if(i_count == strlen(p_in))
+        return p_cur;
+    
+    /*Store the second string*/
+    while(i_count < strlen(p_in))
+    {
+        p_out2[i_pos2] = p_in[i_count];
+        i_pos2++;
+        i_count++;
+    }
+    p_out2[i_pos2] = 0;
+    
+    return p_cur;
+}
+
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
@@ -67,12 +127,14 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
         msg_Err( p_sout, "No memory left" );
         return NULL;
     }
-
+    
     /* Fill the information in the structure */
-    sprintf ( p_new->psz_url , "%s" , psz_url_arg );
+    split(psz_url_arg,p_new->psz_url,p_new->psz_port,':');   
+    // sprintf ( p_new->psz_url , "%s" , psz_url_arg );
     sprintf ( p_new->psz_name , "%s" , psz_name_arg );
+
     /* Port is not implemented in sout */
-    sprintf ( p_new->psz_port, "%s" , psz_port_arg );
+    //sprintf ( p_new->psz_port, "%s" , psz_port_arg );
 
     p_new->i_ip_version = ip_version;
 
@@ -221,10 +283,11 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
                           "u=VideoLAN\n"
                           "t=0 0\n"
                           "m=audio %s udp 14\n"
-                          "c=IN IP4 %s/15\n"
+                          "c=IN IP4 @%s/15\n"
                           "a=type:test\n",
                  p_this->psz_name , p_this->psz_port , p_this->psz_url );
-
+        
+        fprintf(stderr,"Sending : <%s>\n",sap_msg);
         i_msg_size = strlen( sap_msg );
         i_size = i_msg_size + i_header_size;
 
