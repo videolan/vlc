@@ -119,6 +119,7 @@ install: build
 
 	# Package: vlc
 	mv debian/vlc/$(VIDDIR)/vlc48x48.png debian/vlc/$(PIXDIR)/vlc.png
+	mv debian/vlc/$(VIDDIR)/vlc32x32.xpm debian/vlc/$(VIDDIR)/vlc.xpm
 	cp debian/gvlc.desktop debian/gvlc/$(GNOMEDIR)
 	cp debian/gnome-vlc.desktop debian/gnome-vlc/$(GNOMEDIR)
 
