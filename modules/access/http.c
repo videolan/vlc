@@ -304,6 +304,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->psz_location && *p_sys->psz_location )
     {
         playlist_t * p_playlist;
+        input_item_t *p_input_item;
 
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
@@ -314,13 +315,37 @@ static int Open( vlc_object_t *p_this )
             msg_Err( p_access, "redirection failed: can't find playlist" );
             goto error;
         }
-        p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-        playlist_Add( p_playlist, p_sys->psz_location, p_sys->psz_location,
-                      PLAYLIST_INSERT,
-                      p_playlist->i_index + 1 );
+
+        /* Change the uri */
+        vlc_mutex_lock( &p_playlist->object_lock );
+        p_input_item = &p_playlist->status.p_item->input;
+        vlc_mutex_lock( &p_input_item->lock );
+        free( p_input_item->psz_uri );
+        free( p_access->psz_path );
+        p_input_item->psz_uri = strdup( p_sys->psz_location );
+        p_access->psz_path = strdup( p_sys->psz_location );
+        vlc_mutex_unlock( &p_input_item->lock );
+        vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
 
-        p_access->info.i_size = 0;  /* Force to stop reading */
+        /* Clean up current Open() run */
+        vlc_UrlClean( &p_sys->url );
+        vlc_UrlClean( &p_sys->proxy );
+        if( p_sys->psz_mime ) free( p_sys->psz_mime );
+        if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
+        if( p_sys->psz_location ) free( p_sys->psz_location );
+        if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
+        if( p_sys->psz_user ) free( p_sys->psz_user );
+        if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
+
+        if( p_sys->fd > 0 )
+        {
+            net_Close( p_sys->fd );
+        }
+        free( p_sys );
+
+        /* Do new Open() run with new data */
+        return Open( p_this );
     }
 
     if( p_sys->b_mms )
@@ -329,13 +354,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( p_sys->b_icecast )
-    {
-        if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
-            p_access->psz_demux = strdup( "mp3" );
-    }
-
-    if( !strcmp( p_sys->psz_protocol, "ICY" ) )
+    if( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast )
     {
         if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
             p_access->psz_demux = strdup( "nsv" );
@@ -343,10 +362,12 @@ static int Open( vlc_object_t *p_this )
                  ( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
                    !strcasecmp( p_sys->psz_mime, "audio/aacp" ) ) )
             p_access->psz_demux = strdup( "m4a" );
-        else
+        else if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
+            p_access->psz_demux = strdup( "mp3" );
+        else /* assume mp3, though this is definetly not certain */
             p_access->psz_demux = strdup( "mp3" );
 
-        msg_Info( p_access, "ICY server found, %s demuxer selected",
+        msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
                   p_access->psz_demux );
 
 #if 0   /* Doesn't work really well because of the pre-buffering in shoutcast
@@ -767,7 +788,6 @@ static int Connect( access_t *p_access, int64_t i_tell )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
-    char           *psz;
 
     /* Clean info */
     if( p_sys->psz_location ) free( p_sys->psz_location );
@@ -1007,10 +1027,10 @@ static int Request( access_t *p_access, int64_t i_tell )
                 !strncasecmp( p, "Nanocaster", 10 ) )
             {
                 /* Remember if this is Icecast
-                 * we need to force mp3 in some cases without breaking
+                 * we need to force demux in this case without breaking
                  *  autodetection */
 
-                /* Let live 65 streams (nanocaster) piggyback on the icecast
+                /* Let live 365 streams (nanocaster) piggyback on the icecast
                  * routine. They look very similar */
 
                 p_sys->b_reconnect = VLC_TRUE;
@@ -1040,6 +1060,10 @@ static int Request( access_t *p_access, int64_t i_tell )
             if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
             p_sys->psz_icy_name = strdup( p );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
+
+            p_sys->b_icecast = VLC_TRUE; /* be on the safeside. set it here as well. */
+            p_sys->b_reconnect = VLC_TRUE;
+            p_sys->b_pace_control = VLC_FALSE;
         }
         else if( !strcasecmp( psz, "Icy-Genre" ) )
         {
