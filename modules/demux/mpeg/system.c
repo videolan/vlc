@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.28 2004/01/09 00:30:29 gbazin Exp $
+ * $Id: system.c,v 1.29 2004/01/24 03:48:29 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1120,7 +1120,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         p_es = ParsePS( p_input, p_data );
 
         /* Call the pace control. 
-         * FIXME: see hack note about cur_scr_time above. 
+         * FIXME: see hack note about cur_scr_time in system.h. 
          */
         if( p_mpeg_demux->cur_scr_time != -1 )
         {
