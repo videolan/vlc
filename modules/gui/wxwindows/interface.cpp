@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.14 2003/01/26 10:36:10 gbazin Exp $
+ * $Id: interface.cpp,v 1.15 2003/01/26 13:37:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -514,9 +514,11 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
 {
     vlc_mutex_lock( &p_intf->change_lock );
 
+#ifdef WIN32
     if( event.GetEventType() == wxEVT_SCROLL_THUMBRELEASE
 	|| event.GetEventType() == wxEVT_SCROLL_ENDSCROLL )
     {
+#endif
 	if( p_intf->p_sys->i_slider_pos != event.GetPosition()
 	    && p_intf->p_sys->p_input )
 	{
@@ -526,6 +528,7 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
 			INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
 	}
 
+#ifdef WIN32
         p_intf->p_sys->b_slider_free = VLC_TRUE;
     }
     else
@@ -546,6 +549,7 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
 #undef p_area
 	}
     }
+#endif
 
     vlc_mutex_unlock( &p_intf->change_lock );
 }

@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.30 2003/01/16 21:14:23 babal Exp $
+ * $Id: input.c,v 1.31 2003/01/26 13:37:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -241,6 +241,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   "clearing out", mdate() - start_date );
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
+        p_input->p_first_byte_to_mix = NULL;
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
