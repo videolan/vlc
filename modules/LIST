@@ -262,6 +262,8 @@ $Id$
 
  * mga: video output module for Matrox cards using the Linux mga kernel driver.
 
+ * mjpeg: a demuxer for multipart and concatenated JPEG data.
+
  * mkv: Matroska demuxer
 
  * mod: MOD demuxer
@@ -339,8 +341,6 @@ $Id$
  * qnx: QNX RTOS plugin
 
  * qt: interface module using the Qt widget set.
-
- * qt_video: video output module for Qt.
 
  * qte: video output module for Qt Embedded.
  
