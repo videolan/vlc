@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.13 2003/05/03 14:33:35 fenrir Exp $
+ * $Id: transcode.c,v 1.14 2003/05/03 18:11:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -81,6 +81,9 @@ struct sout_stream_sys_t
     int             i_width;
     int             i_height;
     int             i_key_int;
+    int             i_qmin;
+    int             i_qmax;
+    vlc_bool_t      b_hq;
     vlc_bool_t      b_deinterlace;
 
     int             i_crop_top;
@@ -112,6 +115,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_width      = 0;
     p_sys->i_height     = 0;
     p_sys->i_key_int    = -1;
+    p_sys->i_qmin       = 2;
+    p_sys->i_qmax       = 31;
+    p_sys->b_hq         = VLC_FALSE;
     p_sys->b_deinterlace= VLC_FALSE;
 
     p_sys->i_crop_top   = 0;
@@ -200,6 +206,18 @@ static int Open( vlc_object_t *p_this )
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "keyint" ) ) )
         {
             p_sys->i_key_int    = atoi( val );
+        }
+        if( sout_cfg_find( p_stream->p_cfg, "hq" ) )
+        {
+            p_sys->b_hq = VLC_TRUE;
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "qmin" ) ) )
+        {
+            p_sys->i_qmin   = atoi( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "qmax" ) ) )
+        {
+            p_sys->i_qmax   = atoi( val );
         }
 
         msg_Dbg( p_stream, "codec video=%4.4s %dx%d %dkb/s",
@@ -891,8 +909,12 @@ static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
     {
         id->ff_enc_c->bit_rate_tolerance = p_sys->i_vtolerance;
     }
-    id->ff_enc_c->qmin           = 2;
-    id->ff_enc_c->qmax           = 31;
+    id->ff_enc_c->qmin           = p_sys->i_qmin;
+    id->ff_enc_c->qmax           = p_sys->i_qmax;
+    if( p_sys->b_hq )
+    {
+        id->ff_enc_c->flags      |= CODEC_FLAG_HQ;
+    }
 
     if( i_ff_codec == CODEC_ID_RAWVIDEO )
     {
