@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.129 2001/12/04 13:47:46 massiot Exp $
+ * $Id: main.c,v 1.130 2001/12/05 10:30:25 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1288,7 +1288,10 @@ static int CPUCapabilities( void )
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {
-        asm volatile ("mtspr 256,%0" : : "r" (-1));
+        asm volatile ("mtspr 256, %0\n\t"
+                      "vand %v0, %v0, %v0"
+                      :
+                      : "r" (-1));
     }
 
     if( i_illegal == 0 )
