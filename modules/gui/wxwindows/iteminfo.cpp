@@ -166,8 +166,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     wxStaticText *author_label =
            new wxStaticText( info_panel, -1, wxU(_("Author")) );
 
-    author_text =
-                   new wxTextCtrl( info_panel, Uri_Event,
+    author_text = new wxTextCtrl( info_panel, Uri_Event,
                                    wxU( playlist_ItemGetInfo( p_item,
                                           _("General"), _("Author") ) ),
                                    wxDefaultPosition, wxSize( 300, -1 ),
@@ -225,8 +224,7 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
 
     group_combo = new wxComboBox( group_subpanel, -1,
                                  wxT(""),wxDefaultPosition, wxDefaultSize,
-                                 0, NULL,
-                                 wxCB_READONLY );
+                                 0, NULL, wxCB_READONLY );
 
     wxButton *newgroup_button = new wxButton( group_subpanel, New_Event,
                                     wxU(_("New Group")));
@@ -291,6 +289,8 @@ void ItemInfoDialog::UpdateInfo()
                wxT(": ") +
                wxU(p_item->input.pp_categories[i]->pp_infos[j]->psz_value) );
         }
+
+        info_tree->Expand( cat );
     }
 }
 
