@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.6 2002/11/06 14:44:30 sam Exp $
+ * $Id: libavi.c,v 1.7 2002/11/08 10:26:53 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -270,7 +270,7 @@ static int AVI_ChunkReadCommon( input_thread_t *p_input,
     p_chk->common.p_next = NULL;
 #ifdef AVI_DEBUG
     msg_Dbg( p_input, 
-             "Found Chunk fourcc:%c%c%c%c size:%lld pos:%lld",
+             "Found Chunk fourcc:%c%c%c%c size:"I64Fd" pos:"I64Fd,
              AVIFOURCC_PRINT( p_chk->common.i_chunk_fourcc ),
              p_chk->common.i_chunk_size,
              p_chk->common.i_chunk_pos );
@@ -971,7 +971,7 @@ static void AVI_ChunkDumpDebug_level( input_thread_t *p_input,
         p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST )
     {
         sprintf( str + i_level * 5, 
-                 "%c %c%c%c%c-%c%c%c%c size:%lld pos:%lld",
+                 "%c %c%c%c%c-%c%c%c%c size:"I64Fu" pos:"I64Fu,
                  i_level ? '+' : '*',
                  AVIFOURCC_PRINT( p_chk->common.i_chunk_fourcc ),
                  AVIFOURCC_PRINT( p_chk->list.i_type ),
@@ -981,7 +981,7 @@ static void AVI_ChunkDumpDebug_level( input_thread_t *p_input,
     else
     {
         sprintf( str + i_level * 5, 
-                 "+ %c%c%c%c size:%lld pos:%lld",
+                 "+ %c%c%c%c size:"I64Fu" pos:"I64Fu,
                  AVIFOURCC_PRINT( p_chk->common.i_chunk_fourcc ),
                  p_chk->common.i_chunk_size,
                  p_chk->common.i_chunk_pos );

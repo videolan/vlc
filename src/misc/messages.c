@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.19 2002/11/07 19:31:08 gbazin Exp $
+ * $Id: messages.c,v 1.20 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,10 +49,6 @@ static void QueueMsg ( vlc_object_t *, int , const char *,
                        const char *, va_list );
 static void FlushMsg ( msg_bank_t * );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
-
-#if defined( WIN32 )
-static char *ConvertPrintfFormatString ( const char *psz_format );
-#endif
 
 /*****************************************************************************
  * msg_Create: initialize messages interface
@@ -236,9 +232,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     char *       psz_str = NULL;                 /* formatted message string */
     msg_item_t * p_item = NULL;                        /* pointer to message */
     msg_item_t   item;                    /* message in case of a full queue */
-#ifdef WIN32
-    char *       psz_temp;
-#endif
+
 #if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
@@ -262,18 +256,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
 
 #if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
-#   ifdef WIN32
-    psz_temp = ConvertPrintfFormatString( psz_format );
-    if( !psz_temp )
-    {
-        fprintf( stderr, "main warning: couldn't print message\n" );
-        return;
-    }
-    vsnprintf( psz_str, i_size, psz_temp, args );
-    free( psz_temp );
-#   else
     vsnprintf( psz_str, i_size, psz_format, args );
-#   endif
     psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif
 
@@ -461,67 +444,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
                          p_item->psz_msg );
     }
 
-#if defined(WIN32) && defined(DEBUG)
+#if defined(WIN32)
     fflush( stderr );
 #endif
 }
-
-/*****************************************************************************
- * ConvertPrintfFormatString: replace all occurrences of %ll with %I64 in the
- *                            printf format string.
- *****************************************************************************
- * Win32 doesn't recognize the "%ll" format in a printf string, so we have
- * to convert this string to something that win32 can handle.
- * This is a REALLY UGLY HACK which won't even work in every situation,
- * but hey I don't want to put an ifdef WIN32 each time I use printf with
- * a "long long" type!!!
- * By the way, if we don't do this we can sometimes end up with segfaults.
- *****************************************************************************/
-#if defined( WIN32 )
-static char *ConvertPrintfFormatString( const char *psz_format )
-{
-  int i, i_counter=0, i_pos=0;
-  char *psz_dest;
-
-  /* We first need to check how many occurences of %ll there are in the
-   * psz_format string. Once we'll know that we'll be able to malloc the
-   * destination string */
-
-  if( strlen( psz_format ) <= 3 )
-      return strdup( psz_format );
-
-  for( i=0; i <= (strlen(psz_format) - 3); i++ )
-  {
-      if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
-      {
-          i_counter++;
-      }
-  }
-
-  /* malloc the destination string */
-  psz_dest = malloc( strlen(psz_format) + i_counter + 1 );
-  if( psz_dest == NULL )
-  {
-      fprintf( stderr, "main warning: ConvertPrintfFormatString failed\n" );
-      return NULL;
-  }
-
-  /* Now build the modified string */
-  i_counter = 0;
-  for( i=0; i <= (strlen(psz_format) - 3); i++ )
-  {
-      if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
-      {
-          memcpy( psz_dest+i_pos+i_counter, psz_format+i_pos, i-i_pos+1);
-          *(psz_dest+i+i_counter+1)='I';
-          *(psz_dest+i+i_counter+2)='6';
-          *(psz_dest+i+i_counter+3)='4';
-          i_pos = i+3;
-          i_counter++;
-      }
-  }
-  strcpy( psz_dest+i_pos+i_counter, psz_format+i_pos );
-
-  return psz_dest;
-}
-#endif

@@ -2,7 +2,7 @@
  * ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.c,v 1.2 2002/08/08 00:35:10 sam Exp $
+ * $Id: ifo.c,v 1.3 2002/11/08 10:26:52 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -529,7 +529,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     for( i = 0 ; i < 8 ; i++ )
     {
         i_temp = ReadQuad( p_ifo, p_buf, &p_tmp );
-        /*fprintf( stderr, "Audio %d: %llx\n", i, i_temp ); */
+        /*fprintf( stderr, "Audio %d: "I64Fx"\n", i, i_temp ); */
         i_temp >>= 8;
         MGINF.p_audio_attr[i].i_bar = i_temp & 0xff;
         i_temp >>= 8;
@@ -564,7 +564,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     {
         ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
         i_temp = hton64( i_temp ) >> 16;
-        /*fprintf( stderr, "Subpic %d: %llx\n", i, i_temp ); */
+        /*fprintf( stderr, "Subpic %d: "I64Fx"\n", i, i_temp ); */
         MGINF.p_spu_attr[i].i_caption = i_temp & 0xff;
         i_temp >>= 8;
         MGINF.p_spu_attr[i].i_foo = i_temp & 0xff;

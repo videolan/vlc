@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.194 2002/11/02 11:53:17 gbazin Exp $
+ * $Id: video_output.c,v 1.195 2002/11/08 10:26:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -494,7 +494,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                msg_Warn( p_vout, "late picture skipped (%lld)",
+                msg_Warn( p_vout, "late picture skipped ("I64Fd")",
                                   current_date - display_date );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
@@ -518,8 +518,8 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                intf_WarnMsg( 1, "vout warning: early picture skipped (%lld)",
-                              display_date - current_date );
+                intf_WarnMsg( 1, "vout warning: early picture skipped "
+                              "("I64Fd")", display_date - current_date );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;

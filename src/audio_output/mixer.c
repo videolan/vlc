@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.18 2002/10/20 12:23:48 massiot Exp $
+ * $Id: mixer.c,v 1.19 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,7 +113,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         /* The output is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "output PTS is out of range (%lld), clearing out",
+        msg_Warn( p_aout, "output PTS is out of range ("I64Fd"), clearing out",
                   mdate() - start_date );
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         aout_DateSet( &exact_start_date, 0 );
@@ -138,8 +138,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             p_buffer = p_fifo->p_first;
             while ( p_buffer != NULL && p_buffer->start_date < mdate() )
             {
-                msg_Warn( p_aout, "input PTS is out of range (%lld), trashing",
-                          mdate() - p_buffer->start_date );
+                msg_Warn( p_aout, "input PTS is out of range ("I64Fd"), "
+                          "trashing", mdate() - p_buffer->start_date );
                 aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
                 p_buffer = p_fifo->p_first;
             }
@@ -192,7 +192,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         while ( p_buffer != NULL && p_buffer->end_date < start_date )
         {
             aout_buffer_t * p_next = p_buffer->p_next;
-            msg_Err( p_aout, "the mixer got a packet in the past (%lld)",
+            msg_Err( p_aout, "the mixer got a packet in the past ("I64Fd")",
                      start_date - p_buffer->end_date );
             aout_BufferFree( p_buffer );
             p_fifo->p_first = p_buffer = p_next;
@@ -255,7 +255,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                 if ( prev_date != p_buffer->start_date )
                 {
                     msg_Warn( p_aout,
-                              "buffer hole, dropping packets (%lld)",
+                              "buffer hole, dropping packets ("I64Fd")",
                               p_buffer->start_date - prev_date );
                     b_drop_buffers = 1;
                     break;

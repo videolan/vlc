@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.40 2002/07/31 20:56:52 sam Exp $
+ * $Id: input_ext-intf.c,v 1.41 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -194,7 +194,7 @@ void __input_Seek( vlc_object_t * p_this, off_t i_position, int i_whence )
         A->i_seek = A->i_size;
     }
 
-    msg_Dbg( p_input, "seeking position %lld/%lld (%s/%s)",
+    msg_Dbg( p_input, "seeking position "I64Fd"/"I64Fd" (%s/%s)",
              A->i_seek, A->i_size,
              input_OffsetToTime( p_input, psz_time1, i_position ),
              input_OffsetToTime( p_input, psz_time2, A->i_size ) );
@@ -281,7 +281,7 @@ void input_DumpStream( input_thread_t * p_input )
     msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,
              S.c_packets_read, S.c_packets_trashed );
     if( S.b_seekable )
-        msg_Dbg( p_input, "seekable stream, position: %lld/%lld (%s/%s)",
+        msg_Dbg( p_input, "seekable stream, position: "I64Fd"/"I64Fd" (%s/%s)",
                  S.p_selected_area->i_tell, S.p_selected_area->i_size,
                  input_OffsetToTime( p_input, psz_time1,
                                      S.p_selected_area->i_tell ),

@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.14 2002/10/20 12:23:47 massiot Exp $
+ * $Id: arts.c,v 1.15 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -201,7 +201,7 @@ fprintf(stderr, "after sleep: can write %i\n", arts_stream_get( p_sys->stream, A
 
         if ( p_buffer != NULL )
         {
-fprintf(stderr, "buffer duration %lld, bytes %i\n", p_buffer->end_date - p_buffer->start_date, p_buffer->i_nb_bytes);
+fprintf(stderr, "buffer duration "I64Fd", bytes %i\n", p_buffer->end_date - p_buffer->start_date, p_buffer->i_nb_bytes);
             p_bytes = p_buffer->p_buffer;
             i_size = p_buffer->i_nb_bytes;
         }
@@ -214,7 +214,7 @@ fprintf(stderr, "buffer duration %lld, bytes %i\n", p_buffer->end_date - p_buffe
 
 fprintf(stderr, "WRITING %i bytes\n", i_size);
         i_tmp = arts_write( p_sys->stream, p_bytes, i_size );
-fprintf(stderr, "mdate: %lld\n", mdate() - calldate);
+fprintf(stderr, "mdate: "I64Fd"\n", mdate() - calldate);
 calldate = mdate();
 fprintf(stderr, "can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
 

@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: synchro.c,v 1.3 2002/10/20 12:23:47 massiot Exp $
+ * $Id: synchro.c,v 1.4 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -241,7 +241,7 @@ vlc_bool_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
             if( !b_decode )
                 msg_Warn( p_vpar->p_fifo,
-                          "synchro trashing I (%lld)", pts - now );
+                          "synchro trashing I ("I64Fd")", pts - now );
             break;
 
         case P_CODING_TYPE:
@@ -386,7 +386,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 
         if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
-            msg_Dbg( p_vpar->p_fifo, "I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : trashed %d:%d/%d",
+            msg_Dbg( p_vpar->p_fifo, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
+                  "[%d] YUV("I64Fd") : trashed %d:%d/%d",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
                   p_vpar->synchro.p_tau[P_CODING_TYPE],
                   p_vpar->synchro.i_n_p,
@@ -437,8 +438,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                  || p_vpar->synchro.current_pts - p_vpar->sequence.next_pts
                     > PTS_THRESHOLD )
             {
-                msg_Warn( p_vpar->p_fifo,
-                          "vpar synchro warning: pts != current_date (%lld)",
+                msg_Warn( p_vpar->p_fifo, "vpar synchro warning: pts != "
+                          "current_date ("I64Fd")",
                           p_vpar->synchro.current_pts
                               - p_vpar->sequence.next_pts );
             }
@@ -459,7 +460,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
               || p_vpar->synchro.backward_pts - p_vpar->sequence.next_dts
                     > PTS_THRESHOLD) )
             {
-                msg_Warn( p_vpar->p_fifo, "backward_pts != dts (%lld)",
+                msg_Warn( p_vpar->p_fifo, "backward_pts != dts ("I64Fd")",
                            p_vpar->sequence.next_dts
                                - p_vpar->synchro.backward_pts );
             }
@@ -469,7 +470,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                     > PTS_THRESHOLD )
             {
                 msg_Warn( p_vpar->p_fifo,
-                          "backward_pts != current_pts (%lld)",
+                          "backward_pts != current_pts ("I64Fd")",
                           p_vpar->synchro.current_pts
                               - p_vpar->synchro.backward_pts );
             }
@@ -483,7 +484,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                  || p_vpar->synchro.current_pts - p_vpar->sequence.next_dts
                     > PTS_THRESHOLD )
             {
-                msg_Warn( p_vpar->p_fifo, "dts != current_pts (%lld)",
+                msg_Warn( p_vpar->p_fifo, "dts != current_pts ("I64Fd")",
                           p_vpar->synchro.current_pts
                               - p_vpar->sequence.next_dts );
             }
@@ -507,7 +508,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     {
         /* We cannot be _that_ late, something must have happened, reinit
          * the dates. */
-        msg_Warn( p_vpar->p_fifo, "PTS << now (%lld), resetting",
+        msg_Warn( p_vpar->p_fifo, "PTS << now ("I64Fd"), resetting",
                    now - p_vpar->synchro.current_pts - DEFAULT_PTS_DELAY );
         p_vpar->synchro.current_pts = now + DEFAULT_PTS_DELAY;
     }

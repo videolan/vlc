@@ -2,7 +2,7 @@
  * libasf.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.3 2002/10/26 19:14:45 fenrir Exp $
+ * $Id: libasf.c,v 1.4 2002/11/08 10:26:53 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -178,7 +178,7 @@ int  ASF_ReadObjectCommon( input_thread_t *p_input,
     p_common->p_next = NULL;
 #ifdef ASF_DEBUG
     msg_Dbg(p_input,
-            "Found Object guid: " GUID_FMT " size:%lld",
+            "Found Object guid: " GUID_FMT " size:"I64Fd,
             GUID_PRINT( p_common->i_object_id ),
             p_common->i_object_size );
 #endif
@@ -293,7 +293,8 @@ int  ASF_ReadObject_Data( input_thread_t *p_input,
     p_data->i_reserved = GetWLE( p_peek + 48 );
 #ifdef ASF_DEBUG
     msg_Dbg( p_input,
-            "Read \"Data Object\" file_id:" GUID_FMT " total data packet:%lld reserved:%d",
+            "Read \"Data Object\" file_id:" GUID_FMT " total data packet:"
+            I64Fd" reserved:%d",
             GUID_PRINT( p_data->i_file_id ),
             p_data->i_total_data_packets,
             p_data->i_reserved );
@@ -320,7 +321,9 @@ int  ASF_ReadObject_Index( input_thread_t *p_input,
 
 #ifdef ASF_DEBUG
     msg_Dbg( p_input,
-            "Read \"Index Object\" file_id:" GUID_FMT " index_entry_time_interval:%lld max_packet_count:%d index_entry_count:%d",
+            "Read \"Index Object\" file_id:" GUID_FMT
+            " index_entry_time_interval:"I64Fd" max_packet_count:%d "
+            "index_entry_count:%d",
             GUID_PRINT( p_index->i_file_id ),
             p_index->i_max_packet_count,
             p_index->i_index_entry_count );
@@ -360,7 +363,11 @@ int  ASF_ReadObject_file_properties( input_thread_t *p_input,
         
 #ifdef ASF_DEBUG
     msg_Dbg( p_input,
-            "Read \"File Properties Object\" file_id:" GUID_FMT " file_size:%lld creation_date:%lld data_packets_count:%lld play_duration:%lld send_duration:%lld preroll:%lld flags:%d min_data_packet_size:%d max_data_packet_size:%d max_bitrate:%d",
+            "Read \"File Properties Object\" file_id:" GUID_FMT
+            " file_size:"I64Fd" creation_date:"I64Fd" data_packets_count:"
+            I64Fd" play_duration:"I64Fd" send_duration:"I64Fd" preroll:"
+            I64Fd" flags:%d min_data_packet_size:%d max_data_packet_size:%d "
+            "max_bitrate:%d",
             GUID_PRINT( p_fp->i_file_id ),
             p_fp->i_file_size,
             p_fp->i_creation_date,
@@ -463,7 +470,10 @@ int  ASF_ReadObject_stream_properties( input_thread_t *p_input,
 
 #ifdef ASF_DEBUG
     msg_Dbg( p_input,
-            "Read \"Stream Properties Object\" stream_type:" GUID_FMT " error_correction_type:" GUID_FMT " time_offset:%lld type_specific_data_length:%d error_correction_data_length:%d flags:0x%x stream_number:%d",
+            "Read \"Stream Properties Object\" stream_type:" GUID_FMT
+            " error_correction_type:" GUID_FMT " time_offset:"I64Fd
+            " type_specific_data_length:%d error_correction_data_length:%d"
+            " flags:0x%x stream_number:%d",
             GUID_PRINT( p_sp->i_stream_type ),
             GUID_PRINT( p_sp->i_error_correction_type ),
             p_sp->i_time_offset,

@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.17 2002/10/20 12:23:48 massiot Exp $
+ * $Id: input.c,v 1.18 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -163,8 +163,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         /* The decoder is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
-        msg_Warn( p_aout, "computed PTS is out of range (%lld), clearing out",
-                  mdate() - start_date );
+        msg_Warn( p_aout, "computed PTS is out of range ("I64Fd"), "
+                  "clearing out", mdate() - start_date );
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
@@ -175,7 +175,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */
-        msg_Warn( p_aout, "PTS is out of range (%lld), dropping buffer",
+        msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
                   mdate() - p_buffer->start_date );
         aout_BufferFree( p_buffer );
 
@@ -202,7 +202,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         mtime_t old_duration;
         mtime_t drift = p_buffer->start_date - start_date;
 
-        msg_Warn( p_aout, "buffer is %lld %s, resampling",
+        msg_Warn( p_aout, "buffer is "I64Fd" %s, resampling",
                          drift > 0 ? drift : -drift,
                          drift > 0 ? "in advance" : "late" );
         old_duration = p_buffer->end_date - p_buffer->start_date;

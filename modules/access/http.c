@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.6 2002/11/07 16:54:39 gbazin Exp $
+ * $Id: http.c,v 1.7 2002/11/08 10:26:52 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -118,7 +118,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
          snprintf( psz_buffer, sizeof(psz_buffer),
                    "%s"
-                   "Range: bytes=%lld-\r\n"
+                   "Range: bytes="I64Fd"-\r\n"
                    HTTP_USERAGENT HTTP_END,
                    p_access_data->psz_buffer, i_tell );
     }
@@ -506,7 +506,7 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 {
     _input_socket_t *p_access_data = (_input_socket_t*)p_input->p_access_data;
     close( p_access_data->_socket.i_handle );
-    msg_Dbg( p_input, "seeking to position %lld", i_pos );
+    msg_Dbg( p_input, "seeking to position "I64Fd, i_pos );
     HTTPConnect( p_input, i_pos );
 }
 

@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.3 2002/11/06 18:07:57 sam Exp $
+ * $Id: intf.c,v 1.4 2002/11/08 10:26:52 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -330,7 +330,7 @@ int dvdIntfStillTime( intf_thread_t *p_intf, int i_sec )
         if( i_sec == 0xff )
         {
             p_intf->p_sys->m_still_time = (mtime_t)(-1);
-            msg_Warn( p_intf, "%lld", p_intf->p_sys->m_still_time );
+            msg_Warn( p_intf, I64Fd, p_intf->p_sys->m_still_time );
         }
         else
         {

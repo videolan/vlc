@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.17 2002/11/07 19:31:08 gbazin Exp $
+ * $Id: win32_specific.c,v 1.18 2002/11/08 10:26:53 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -71,6 +71,8 @@ void system_Configure( vlc_t *p_this )
 	else
 	    msg_Dbg( p_this, "raised process priority" );
     }
+    else
+	msg_Dbg( p_this, "raised process priority" );
 }
 
 /*****************************************************************************

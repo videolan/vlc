@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.3 2002/10/26 15:24:19 gbazin Exp $
+ * $Id: access.c,v 1.4 2002/11/08 10:26:52 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -628,7 +628,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_input->stream.p_selected_area->i_tell = DVDTell;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    msg_Dbg( p_input, "program cell: %d cell: %d chapter: %d tell %lld",
+    msg_Dbg( p_input, "program cell: %d cell: %d chapter: %d tell "I64Fd,
              p_dvd->i_prg_cell, p_dvd->i_map_cell, p_dvd->i_chapter, DVDTell );
 
     return;

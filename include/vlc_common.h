@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.34 2002/11/07 22:56:08 sam Exp $
+ * $Id: vlc_common.h,v 1.35 2002/11/08 10:26:52 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -472,8 +472,29 @@ static inline uint64_t U64_AT( void * _p )
 char * strndup( const char *s, size_t n );
 #endif
 
+/* Format type specifiers for 64 bits numbers */
+#if !defined(WIN32)
+#   define I64Fd "%lld"
+#   define I64Fi "%lli"
+#   define I64Fo "%llo"
+#   define I64Fu "%llu"
+#   define I64Fx "%llx"
+#   define I64FX "%llX"
+#else
+#   define I64Fd "%I64d"
+#   define I64Fi "%I64i"
+#   define I64Fo "%I64o"
+#   define I64Fu "%I64u"
+#   define I64Fx "%I64x"
+#   define I64FX "%I64X"
+#endif /* defined(WIN32) */
 
-#define I64C(x)         x##LL
+/* 64 bits integer constant suffix */
+#if !defined(WIN32)
+#   define I64C(x)         x##LL
+#else
+#   define I64C(x)         x##i64
+#endif /* defined(WIN32) */
 
 #ifdef WIN32
 /* win32, cl and icl support */
@@ -487,8 +508,6 @@ char * strndup( const char *s, size_t n );
 #       define S_ISCHR(m)      (0)
 #       define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
 #       define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#       undef I64C
-#       define I64C(x)         x##i64
 #   endif
 
 /* several type definitions */

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.7 2002/11/05 18:25:43 gbazin Exp $
+ * $Id: input.c,v 1.8 2002/11/08 10:26:52 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -555,7 +555,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_end_block = p_pgc->cell_playback[ i_cell ].last_sector;
         p_area->i_size = LB2OFF( p_dvd->i_end_block )- p_area->i_start;
 
-        msg_Dbg( p_input, "start %lld size %lld end %d",
+        msg_Dbg( p_input, "start "I64Fd" size "I64Fd" end %d",
                   p_area->i_start , p_area->i_size, p_dvd->i_end_block );
 
         /*

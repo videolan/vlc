@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.10 2002/11/06 14:44:30 sam Exp $
+ * $Id: avi.c,v 1.11 2002/11/08 10:26:53 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -710,7 +710,7 @@ static mtime_t  AVI_MovieGetLength( input_thread_t *p_input, demux_sys_t *p_avi 
         }
 
         msg_Dbg( p_input, 
-                 "stream[%d] length:%lld (based on index)",
+                 "stream[%d] length:"I64Fd" (based on index)",
                  i_stream,
                  i_length );
         i_maxlength = __MAX( i_maxlength, i_length );
@@ -1357,7 +1357,7 @@ static int AVI_StreamSeek( input_thread_t *p_input,
                 
         /* search key frame */
         msg_Dbg( p_input, 
-                 "old:%lld %s new %lld",
+                 "old:"I64Fd" %s new "I64Fd,
                  i_oldpts, 
                  i_oldpts > i_date ? ">" : "<",
                  i_date );
@@ -1416,7 +1416,7 @@ static int    AVISeek   ( input_thread_t *p_input,
     demux_sys_t *p_avi = p_input->p_demux_data;
     int         i_stream;
     msg_Dbg( p_input, 
-             "seek requested: %lld secondes %d%%", 
+             "seek requested: "I64Fd" secondes %d%%", 
              i_date / 1000000,
              i_percent );
 
@@ -1481,7 +1481,7 @@ static int    AVISeek   ( input_thread_t *p_input,
             }
             i_date = AVI_GetPTS( p_stream );
             /* TODO better support for i_samplesize != 0 */
-            msg_Dbg( p_input, "estimate date %lld", i_date );
+            msg_Dbg( p_input, "estimate date "I64Fd, i_date );
         }
 
 #define p_stream    p_avi->pp_info[i_stream]
@@ -1511,7 +1511,7 @@ static int    AVISeek   ( input_thread_t *p_input,
 //                p_avi->i_time = __MAX( AVI_GetPTS( p_stream ), p_avi->i_time );
             }
         }
-        msg_Dbg( p_input, "seek: %lld secondes", p_avi->i_time /1000000 );
+        msg_Dbg( p_input, "seek: "I64Fd" secondes", p_avi->i_time /1000000 );
         /* set true movie time */
 #endif
         if( !p_avi->i_time )
