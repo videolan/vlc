@@ -1,3 +1,564 @@
+2003-12-05 Friday 05:01  rocky
+
+ A little cleanup on wait timing. No bug fixes yet, though.
+
+2003-12-05 Friday 04:24  rocky
+
+ Slightly better handling of stills and toggling pause by using the
+ different threads better.
+
+ Still has stream still/to MPEG bug and duplicate video window bug though.
+ (And could use lots of cleanup.)
+
+2003-12-05 Friday 02:33  rocky
+
+ Remove interface thread. It was a crock anyway -- any good stuff
+ should be put into the visualization plugins instead.
+
+ Besides, there are bigger crocks that need fixing (like VCD navigation).
+
+2003-12-05 Friday 02:12  rocky
+
+ Okay microseconds, then.
+
+2003-12-05 Friday 01:56  rocky
+
+ Fix duration that input_AddInfo uses milliseconds.
+ Add some more meta debugging.
+
+2003-12-05 Friday 01:52  rocky
+
+ Spelling.
+
+2003-12-05 Friday 00:03  gbazin
+
+ * modules/stream_out/transcode.c: proper order for downmixed channels.
+
+2003-12-04 Thursday 23:15  gbazin
+
+ * modules/codec/ffmpeg/encoder.c, modules/codec/speex.c: fixed stupid bug in audio encoding.
+
+2003-12-04 Thursday 22:48  anil
+
+ regenerated from a clean tree
+
+2003-12-04 Thursday 22:37  gbazin
+
+ * modules/codec/flac.c: several fixes to the flac decoder and encoder.
+ * modules/mux/ogg.c: fixed flac in ogg.
+ * modules/demux/ogg.c: fix for flac seeking.
+
+2003-12-04 Thursday 18:26  gbazin
+
+ * modules/gui/wxwindows/playlist.cpp: unicode fix.
+
+2003-12-04 Thursday 18:13  gbazin
+
+ * modules/demux/livedotcom.cpp: compilation fix.
+
+2003-12-04 Thursday 17:15  gbazin
+
+ * ALL: another bunch of MSVC compilation fixes.
+
+2003-12-04 Thursday 16:49  sam
+
+   * modules/misc/dummy/renderer.c:
+     + Removed evil ^Ms from the file.
+   * modules/video_output/caca.c:
+     + Support for new dithering modes (libcaca HEAD only).
+   * modules/* src/*:
+     + Grammar and spelling fixes.
+     + Coding style fixes.
+   * po/fr.po:
+     + Spelling fixes.
+     + Updated a few translations.
+   * po/en_GB.po:
+     + Updated a few translations.
+
+2003-12-04 Thursday 16:02  sam
+
+   * include/vlc_common.h:
+     + Introduced intptr_t and uintptr_t.
+   * Fixed compilation warnings here and there.
+
+2003-12-04 Thursday 15:54  sam
+
+   * configure.ac: Fixed an old bug that caused vlc-config to be sometimes
+     not set executable when regenerated.
+
+2003-12-04 Thursday 14:48  gbazin
+
+ * modules/video_output/wingdi.c: fixed gdi output for 24 and 32 bits color depth.
+
+2003-12-04 Thursday 12:33  gbazin
+
+ * toolbox: use the "Output_Dir" property when generating the msvc project files so we don't end-up with name conflicts when compiling.
+ * msvc/config.h.in, modules/access_output/file.c: MSVC fixes.
+ * modules/video_chroma/i420_rgb.c: don't use our RV24 conversion routine on win32 because it assumes 32 bits per pixel.
+
+2003-12-04 Thursday 10:25  gbazin
+
+ * modules/gui/*: use MSTRTIME_MAX_SIZE instead of OFFSETTOTIME_MAX_SIZE.
+
+2003-12-04 Thursday 05:14  rocky
+
+ Guard against invalid p_vcd in dbg_print.
+
+2003-12-03 Wednesday 23:01  sigmunau
+
+ all:
+  * doxygenated parts of the messages system
+
+2003-12-03 Wednesday 22:14  sigmunau
+
+ src/input/input.c:
+  * fill in the duration field of the playlist item when starting playback of
+    a file, if the demuxer supports it.
+
+2003-12-03 Wednesday 21:58  sigmunau
+
+ all:
+  * in vlc, times are stored in microseconds. playlist_item_t::i_duration
+    shouldn't be an exception
+ modules/gui/wxwindows/playlist.cpp:
+  * fixed indentation
+
+2003-12-03 Wednesday 21:55  rocky
+
+ Make more like the French translation which is more correct. :-\
+
+2003-12-03 Wednesday 21:50  sigmunau
+
+ src/misc/mtime.c:
+  * Coding style fixes
+  * Comment cleanups
+  * Doxygenization
+ include/vlc_common.h:
+  * doxygenized the comments for mtime_t and vlc_fourcc_t
+
+2003-12-03 Wednesday 20:47  jpsaman
+
+ Syncing with current CVS.
+
+2003-12-03 Wednesday 15:46  zorglub
+
+ Update of the french localization file
+
+2003-12-03 Wednesday 13:52  anil
+
+ compilation fix
+
+2003-12-03 Wednesday 13:49  rocky
+
+ Fixed-width 2-column track number. Should help in sorting titles.
+
+2003-12-03 Wednesday 13:41  rocky
+
+ Update date. Remove boilerplate includes that I think are (or should
+ be) pulled in from one of the other includes.
+
+2003-12-03 Wednesday 13:35  rocky
+
+ Reinstate Duration column - perhaps it's time to get more plugins
+ using it.
+
+2003-12-03 Wednesday 13:27  rocky
+
+ Add more uses of msecstotimestr. Remove OFFSETTOTIME_MAX_SIZE -
+ Use MSTRTIME_MAX_SIZE instead.
+
+2003-12-03 Wednesday 12:33  sam
+
+   include/vlc_help.h: Grammar and spelling fixes.
+
+2003-12-03 Wednesday 12:19  fenrir
+
+  * increase priority (the wrapper from ffmpeg is buggy).
+
+2003-12-03 Wednesday 04:19  rocky
+
+ Fix bug in not updating playlist when hitting next/previous control
+ buttons (and simplify code at the same time).
+
+2003-12-03 Wednesday 00:27  rocky
+
+ Add a few more fields in the stream info.
+
+2003-12-03 Wednesday 00:24  rocky
+
+ "File Info" renamed "Stream/Media Info"
+
+2003-12-02 Tuesday 23:03  gbazin
+
+ * modules/access/dshow/*: PVR support contributed by Marc Nolette.
+    I took the liberty to modify a few things so it might currently be broken (sorry Marc).
+ * THANKS: added Marc Nolette.
+
+2003-12-02 Tuesday 18:47  gbazin
+
+ * msvc/config.h.in: cleaned-up and updated.
+
+2003-12-02 Tuesday 16:01  geshp
+
+ - Added fribidi support
+ - Added configure-line options for mkv and fribidi
+
+2003-12-02 Tuesday 13:31  gbazin
+
+ * ALL: more MSVC compilation fixes.
+ * msvc/vlc.dsw: removed non-existant plugins.
+
+2003-12-02 Tuesday 12:57  gbazin
+
+ ALL: MSVC compilation fixes to libvlc.
+
+2003-12-02 Tuesday 10:55  gbazin
+
+ * modules/demux/mp4/mp4.c: find out aspect ratio from display size.
+ * modules/codec/ffmpeg/video.c: respect aspect ratio given by demux if any.
+
+2003-12-02 Tuesday 04:22  rocky
+
+ Populate VCD info in "File Info" window.
+
+2003-12-02 Tuesday 04:16  rocky
+
+ Change some printf's to debugging-only output.
+
+2003-12-02 Tuesday 03:33  rocky
+
+ Separate title format string into cases where CDDB is enabled and where
+ it is is not. Now have callback for CDDB enabled boolean.
+
+2003-12-02 Tuesday 01:54  rocky
+
+ Add secstotimestr and msecstotimestr to convert (milli)seconds to a
+ time string.
+
+2003-12-01 Monday 23:39  gbazin
+
+ * ALL: fixed DTS audio support.
+ * modules/demux/dts.c: added raw DTS audio demuxer.
+
+2003-12-01 Monday 09:39  fenrir
+
+  * video: display "more than 5 seconds of late video..." only once.
+
+2003-12-01 Monday 04:07  rocky
+
+ Make sure we distribute the CD-DA plugin info.
+
+2003-12-01 Monday 04:05  rocky
+
+ Add a copyright.
+
+2003-12-01 Monday 04:05  rocky
+
+ Add more verbiage.
+
+2003-12-01 Monday 04:04  geshp
+
+ - Updated matroska/ebml fix
+ - Updated mozilla plugin fix
+
+2003-12-01 Monday 03:57  rocky
+
+ Some basic CDDA plugin documentation.
+
+2003-12-01 Monday 03:37  rocky
+
+ Another typo.
+
+2003-12-01 Monday 03:34  rocky
+
+ Bugs in calculating duration. Thanks Sigmund for fixing the GTK+
+ interface!
+
+ Some doc improvements. CDDARead: Let playlist now cycle through
+ entries rather than intercept.
+
+2003-12-01 Monday 01:08  rocky
+
+ Add CDDB CD Info in File Info section (via input_AddInfo and
+ input_InfoCategory.
+
+2003-11-30 Sunday 23:19  jpsaman
+
+ PDA Interface:
+ - Coding Style
+ - Added SAP/SLP to transcode tabpage
+ - Reworking transcoding options for playlist
+
+2003-11-30 Sunday 23:07  rocky
+
+ Forgot to add demux.c here.
+
+2003-11-30 Sunday 22:59  gbazin
+
+ * modules/packetizer/mpeg4video.c: oops
+
+2003-11-30 Sunday 22:47  gbazin
+
+ * include/input_ext-plugins.h: export input_DecodeBlock().
+ * modules/stream_out/display.c: simplifications.
+ * modules/stream_out/transcode.c: memset of sout_stream_sys_t.
+ * modules/packetizer/mpeg4video.c: not all containers provide a pts info, in which case we use the dts.
+
+2003-11-30 Sunday 22:26  rocky
+
+ Customizable playlist title.
+
+2003-11-30 Sunday 22:14  fenrir
+
+  * all: added dx50 fourcc (just mpeg4 video).
+
+2003-11-30 Sunday 21:21  jpsaman
+
+ PDA Interface:
+ - Fixed resource leak with playlists
+ - VLC coding style cleanup
+ - Rework v4l and stream out interface code to use  VLC playlists as it should be used.
+ - Remove dead wood
+
+2003-11-30 Sunday 19:42  sigmunau
+
+ modules/gui/gtk/playlist.c:
+  * show duration in playlist window if available
+
+2003-11-30 Sunday 18:14  rocky
+
+ Add CD-DA CDDB support via libcddb.
+
+2003-11-30 Sunday 18:10  gbazin
+
+ * share/http/admin/browse.html: hmmm, the browse feature was reenabled by mistake.
+
+2003-11-30 Sunday 17:29  fenrir
+
+  * es_out: implement ES_OUT_SET_PCR and reset but don't use them !
+  * demux: added demux2_New/Delete.
+
+2003-11-30 Sunday 17:29  fenrir
+
+  * all: added demux_t structure and some demux2_* functions.
+  Anyway, don't use them for now.
+
+2003-11-30 Sunday 16:00  fenrir
+
+  *all: added a --minimize-thread options to make all decoders and
+        packetizers running in the input thread. (Usefull with sout)
+
+2003-11-30 Sunday 14:49  fenrir
+
+  * ninput: added 2 ES_OUT* command (do nothing for now)
+
+2003-11-30 Sunday 14:28  fenrir
+
+  * all: added a TCP access input module.
+
+2003-11-30 Sunday 13:53  rocky
+
+ Go over options: Add hooks for internationalization, some typos,
+ display some of these even when not "advanced"
+
+2003-11-30 Sunday 11:22  jpsaman
+
+ PDA Interface:
+ - Removing obsolete files.
+ - Remove debug messages.
+
+2003-11-30 Sunday 11:19  jpsaman
+
+ Bumped up version number to 0.7.0
+
+2003-11-30 Sunday 10:26  jpsaman
+
+ PDA Interface:
+ - Updating, removing and clearing playlist works.
+
+2003-11-30 Sunday 02:41  rocky
+
+ Break out demux into its own thing.
+
+2003-11-29 Saturday 18:36  massiot
+
+ * input: new cr-average option, allowing to configure the
+   CR_AVERAGE #define in input_clock.c (useful for PVR input)
+ * modules/codec/ffmpeg/encoder.c, modules/stream_out/transcode.c : fixes
+   for older version of ffmpeg
+ * modules/stream_out/transrate/transrate.c : misc optimizations
+
+2003-11-29 Saturday 18:06  fenrir
+
+  * all: - increased avcodec version needed to 4680 (latest release)
+         - open the codec after that p_context has been fully initialisated.
+         (fix ASV1)
+
+2003-11-29 Saturday 17:14  fenrir
+
+  * mp4: another fix for another buggy file.
+
+2003-11-29 Saturday 16:36  gbazin
+
+ * modules/gui/wxwindows/menus.cpp: moved audio/video track menu to the top.
+
+2003-11-29 Saturday 16:29  gbazin
+
+ * modules/access/cdda.c: removed double ';'
+
+2003-11-29 Saturday 13:39  gbazin
+
+ * modules/gui/wxwindows/*: got rid of the Misc menu and moved everything in the Settings one.
+
+2003-11-29 Saturday 13:12  fenrir
+
+  * all: - fixed non I420 input
+         - added raw output support.(in a pure hack way but allow
+         transcode{vcodec=I420} )
+
+2003-11-29 Saturday 12:03  fenrir
+
+  * encoder: added a memset.
+
+2003-11-29 Saturday 11:12  fenrir
+
+  * all: better handling of multiple (video) tracks.
+     - now vout are checked for release every 300ms
+     - when *-es are triggered, all same es are unselect not only the
+     last selected. (more intuitive) The only problems are that it's not
+     possible to select again all ES, and the checkbox can show only one
+     selected ES.
+
+2003-11-29 Saturday 00:41  gbazin
+
+ * modules/codec/ffmpeg/encoder.c: fixed compilation problem with ffmpeg 0.4.8
+
+2003-11-28 Friday 23:40  gbazin
+
+ * modules/codec/ffmpeg/*: fixed the code to disable cpu features.
+
+2003-11-28 Friday 22:23  fenrir
+
+  * mkv: fixed a buffer overflow.
+
+2003-11-28 Friday 22:16  gbazin
+
+ * modules/misc/dummy/input.c: use p_input->psz_demux = "vlc,none" to force the demux.
+
+2003-11-28 Friday 18:19  geshp
+
+ - Update to 0.7.0-test1
+ - Updated version numbers on dependancies
+ - Removed ALSA support until RH/FC turns to kernel 2.6
+ - Added --enable-speex and --enable-pp
+ - Mozilla plugin now built for 1.4.1
+ - Currently broken (Matroska/EBML problems)
+
+2003-11-28 Friday 17:30  hartman
+
+ * Fix text subtitles which were missing their last char since the API port.
+ * Track Name is now stored in fmt.psz_description
+
+2003-11-28 Friday 17:04  fenrir
+
+  * input: avoid double free/release when InitStream fail.
+
+2003-11-28 Friday 16:09  fenrir
+
+  * ffmpeg: added h264 codec.
+
+2003-11-28 Friday 16:06  fenrir
+
+  * input_dec: does pass empty block to the decoder.
+
+2003-11-28 Friday 13:24  fenrir
+
+  * avi: fix end of file...
+
+2003-11-28 Friday 10:36  massiot
+
+ Forgot that yesterday...
+
+2003-11-27 Thursday 22:44  massiot
+
+ * modules/stream_out/transcode.c: new options
+    - strict_rc : strict rate control mode for CBR streams
+    - pre_me : add a pre-motion estimation pass
+    - hurry_up : allow to discard the hq mode in real-time if we're late
+ * modules/mux/mpeg/ts.c: useful debug messages
+ * modules/packetizer/mpegvideo.c: useless debug message
+
+2003-11-27 Thursday 21:24  fenrir
+
+  * item: lalalala... (remove a debug change -> psz_auther set to "Arg")
+
+2003-11-27 Thursday 20:51  fenrir
+
+  * faad: drop packets with b_discontinuity set.
+
+2003-11-27 Thursday 20:50  fenrir
+
+  * mp4: ported to stream_*
+
+2003-11-27 Thursday 19:39  fenrir
+
+ copy: set pts to dts if pts <= 0. (Needed to make div3 streaming working
+  again)
+ ts: use one stream_id for mpeg video (and one for mpeg audio).
+
+2003-11-27 Thursday 12:32  fenrir
+
+  * mp4: converted to es_out* and partialy to stream_*
+
+2003-11-27 Thursday 12:32  fenrir
+
+  * all: drop block(s) with b_discontinuity set.
+
+2003-11-27 Thursday 12:22  fenrir
+
+  * bug fixes.
+
+2003-11-27 Thursday 10:34  gbazin
+
+ * modules/stream_out/transcode.c: don't crash when the user specifies a acodec/vcodec with more the 4 characters in length.
+ * modules/gui/wxwindows/streamout.cpp: grrr, thought I add committed this stuff.
+
+2003-11-27 Thursday 10:13  hartman
+
+ * hu.po was missing here.
+
+2003-11-27 Thursday 10:06  hartman
+
+ * updated translation
+
+2003-11-27 Thursday 06:37  adn
+
+ * Fixes for MRL Updates
+ * SetToolTips
+
+2003-11-27 Thursday 05:46  fenrir
+
+  * all: added an sout-all option to stream all es (does work only with
+  demuxer using es_out_* ie everyone but TS and PS).
+
+2003-11-27 Thursday 05:41  fenrir
+
+  * livedotcom.cpp: added call to input_InitStream.
+
+2003-11-27 Thursday 04:11  fenrir
+
+  * all: implement more es_out_* control, audio-channel and spu-channel are
+  implemented.
+
+2003-11-27 Thursday 00:57  gbazin
+
+ * mozilla/Makefile.am: don't forget mozilla/npvlc_rc.rc in make dist.
+
+2003-11-27 Thursday 00:05  sam
+
+   * toolbox: more cvs2cl fixes.
+   * ChangeLog: updated changelog.
+
 2003-11-26 Wednesday 23:32  sam
 
    * toolbox: Attempt to fix a strange cvs2cl behaviour.
@@ -3404,6 +3965,10 @@
 
  Removed useless stuff for icecast
 
+2003-09-10 Wednesday 15:03  hartman
+
+ * Fixed the subsdec variables
+
 2003-09-10 Wednesday 13:39  zorglub
 
  * Workaround for buggy IceCast servers who identify themselves as HTTP
@@ -3435,9 +4000,18 @@
 
  Fixed list of muxers. QT and mp4 might need to be disabled at a later point.
 
+2003-09-09 Tuesday 13:28  hartman
+
+ We no longer need this.
+
 2003-09-09 Tuesday 12:54  jpsaman
 
  Fix detection of dvb headerfiles and fix GTK2_MAIN selection for PDA interface.
+
+2003-09-09 Tuesday 12:36  hartman
+
+ Fix the condition for old faad.
+ Incorrect placing of logical operator
 
 2003-09-08 Monday 22:00  zorglub
 
@@ -3873,6 +4447,10 @@
   * asf: added an alias "asfh" : it creates special stream to allow using
  http output as mmsh server (see next commits).
 
+2003-08-24 Sunday 23:22  gbazin
+
+ * modules/codec/faad/decoder.c: for some reason my libfaad the frame samplerate to 0. I guess I should update it but anyway a sanity check avoids a segfault in this case.
+
 2003-08-24 Sunday 22:20  fenrir
 
   * asf: more stuff (bitrate and time).
@@ -3918,6 +4496,10 @@
 
   * sub.c : fixed a warning.
 
+2003-08-24 Sunday 00:34  hartman
+
+ * backwards compatibilty with older faad2 lib
+
 2003-08-24 Sunday 00:29  lool
 
    * Makefile.am:
@@ -3961,6 +4543,10 @@
 2003-08-23 Saturday 17:23  fenrir
 
   * goom: visual effects using goom. (Not yet enabled)
+
+2003-08-23 Saturday 16:15  fenrir
+
+  * faad: fix SBR handling.
 
 2003-08-23 Saturday 15:35  lool
 
@@ -4573,6 +5159,14 @@
 
  Added glade2 project file.
 
+2003-08-05 Tuesday 11:51  jpsaman
+
+ Removing file.
+
+2003-08-05 Tuesday 11:49  jpsaman
+
+ Removing files for Familiar interface (Gtk+1.2 and GPE).
+
 2003-08-05 Tuesday 10:39  jpsaman
 
  Fixed superflous tuning ;-)
@@ -4776,6 +5370,10 @@
      + We now recommend gnome-vlc | wxvlc.
      + We now suggest fortune-mod.
 
+2003-08-01 Friday 00:55  fenrir
+
+  * wav: forgot this one.
+
 2003-08-01 Friday 00:40  fenrir
 
   * configure.ac: audio -> mpga
@@ -4788,6 +5386,14 @@
 2003-08-01 Friday 00:26  fenrir
 
   * configure.ac: remove old wav and aac directories.
+
+2003-08-01 Friday 00:18  fenrir
+
+  * wav: remove old wav demuxer.
+
+2003-08-01 Friday 00:18  fenrir
+
+  * aac/* remove old aac demuxer.
 
 2003-08-01 Friday 00:16  fenrir
 
@@ -4849,6 +5455,10 @@
 
  * modules/access/http.c :
  	- using new var_Create/var_Get method to get parametters.
+
+2003-07-31 Thursday 20:47  reno
+
+ * Make vlc compiling !
 
 2003-07-31 Thursday 19:24  fenrir
 
@@ -5141,6 +5751,10 @@
  * configure.ac: libpng (logo plugin) needs to be linked with zlib.
  * modules/gui/wxwindows/*: a couple of compilation fixes for wxWindows cvs.
 
+2003-07-25 Friday 01:11  hartman
+
+ * subsdec now uses the new options code.
+
 2003-07-25 Friday 01:09  hartman
 
  * Updated it.po
@@ -5182,6 +5796,11 @@
  ignore CR characters wherever they might be.
  A little better line spaceing, but I still don't understand what this is all
  about.
+
+2003-07-24 Thursday 19:07  sigmunau
+
+ fixed a nasty code duplication where the same function call was two places
+ with just a few lines in between, but in separate #if cases.
 
 2003-07-24 Thursday 18:30  bigben
 
@@ -6480,6 +7099,10 @@
  * src/playlist/playlist.c
    include/vlc_playlist.h   : Added the playlist_AddName function to add an item with its name without filling an item structure.
 
+2003-06-26 Thursday 19:36  gbazin
+
+ * modules/codec/mpeg_video/parser.c: fixed broken file.
+
 2003-06-26 Thursday 18:14  sam
 
    * modules/demux/util/sub.c,
@@ -6779,6 +7402,10 @@
   frame, ...)
          clean up.
 
+2003-06-22 Sunday 08:49  fenrir
+
+  * faad: can read stream with multiple frames per pes_packet_t (for mkv).
+
 2003-06-22 Sunday 07:39  fenrir
 
   * mkv.cpp : begin of a matroska demuxer
@@ -7023,6 +7650,10 @@
  * Removed the ugly dependancy on glibc in the ipv6 module.
  * po/fr.po: French translation courtesy of Jean-Pierre Kuypers.
  * Miscellaneous clean-ups.
+
+2003-06-14 Saturday 22:14  hartman
+
+ * We should be compatible with older versions of faad again
 
 2003-06-14 Saturday 22:12  gbazin
 
@@ -7581,6 +8212,10 @@
    This will generate less bugreports, yet keep them visible to those who
    should and will care.
 
+2003-05-27 Tuesday 22:08  gbazin
+
+ * modules/gui/win32/Modules.am: strings.cpp has been removed.
+
 2003-05-27 Tuesday 21:48  gbazin
 
  * ALL: bumped version to 0.6.0-test2
@@ -7709,6 +8344,11 @@
   modules/gui/beos/PreferencesWindow.* :
    * added a BBox around each panel (looks nicer)
    * now use BSliders for {integer,float}_with_range
+
+2003-05-25 Sunday 15:05  alexis
+
+ ALL : VLC FAQ transformed into VideoLAN FAQ, which is hosted in the CVS
+ under www.videolan.org/doc/faq/
 
 2003-05-25 Sunday 11:31  gbazin
 
@@ -7927,6 +8567,10 @@
 2003-05-21 Wednesday 13:10  sigmunau
 
  removed the --playlist option as it doesn't seem to be used
+
+2003-05-21 Wednesday 10:02  fenrir
+
+ * wav: fix a parsing bug.
 
 2003-05-20 Tuesday 23:17  gbazin
 
@@ -8190,6 +8834,10 @@
    * ./debian/control: Debian packages now build with an mpeg2dec CVS tree in
      the extras/ directory.
 
+2003-05-14 Wednesday 14:58  fenrir
+
+  * aac: use extention based detection.
+
 2003-05-14 Wednesday 14:57  hartman
 
  * Forgot one
@@ -8405,6 +9053,10 @@
 
  France 1 - Italy 0
 
+2003-05-09 Friday 19:53  fenrir
+
+  * faad: better support of AAC without ESDS.
+
 2003-05-09 Friday 19:30  titer
 
   Updated POTFILES.in for BeOS' i18n
@@ -8514,6 +9166,10 @@
 2003-05-07 Wednesday 23:13  hartman
 
  * changed "Gayscale video output" option back into "Grayscale video output"
+
+2003-05-07 Wednesday 23:07  alexis
+
+ Makefile : Minor changes.
 
 2003-05-07 Wednesday 19:20  titer
 
@@ -9111,6 +9767,10 @@
 
   * mp4: select only first enabled track.
 
+2003-04-24 Thursday 14:38  asmax
+
+ * get screen size with gtk2
+
 2003-04-23 Wednesday 15:18  titer
 
   modules/gui/beos/VlcWrapper.cpp: fixed the issue with untranslated
@@ -9214,6 +9874,10 @@
 
  * added a preferences button in the default skin
 
+2003-04-21 Monday 03:37  asmax
+
+ * fixed the previous commit for linux
+
 2003-04-21 Monday 02:50  asmax
 
  * fixed a timing issue under windows ?
@@ -9243,6 +9907,14 @@
 
  * modules/codec/libmpeg2.c: fixed a problem with some frame rates (thx
    gibalou)
+
+2003-04-20 Sunday 23:09  asmax
+
+ * fixed a segfault at exit
+
+2003-04-20 Sunday 22:52  asmax
+
+ * a few segfaults but wxwindows works under linux !
 
 2003-04-20 Sunday 22:52  gbazin
 
@@ -9290,6 +9962,10 @@
 
  * Fixed mouse wheel
 
+2003-04-20 Sunday 16:16  asmax
+
+ * fixed the "always on top" bug
+
 2003-04-20 Sunday 15:06  karibu
 
  * Added support of wheel with win32
@@ -9326,10 +10002,22 @@
  * Added a 'opaqueness' configoption to macosx-vout. Yeah i know, useles.
    But it's coooooool. http://sidekick.student.utwente.nl/videolan/transparent.jpg
 
+2003-04-19 Saturday 12:39  karibu
+
+ * Font fixed
+
 2003-04-19 Saturday 12:33  hartman
 
  * There was a problem where deinterlace could not be turned off via it's
    corresponding menu. On thy fly filter changes are still not possible.
+
+2003-04-19 Saturday 11:46  asmax
+
+ * fixed a segfault
+
+2003-04-19 Saturday 11:16  asmax
+
+ * drag&drop works ! (at least with mozilla)
 
 2003-04-19 Saturday 02:34  karibu
 
@@ -9383,6 +10071,10 @@
 
  * Ask tooney to know ! (fix minor bug)
 
+2003-04-17 Thursday 17:45  asmax
+
+ * small fix
+
 2003-04-17 Thursday 16:34  karibu
 
  * Scrolling text now works on linux
@@ -9390,6 +10082,15 @@
 2003-04-17 Thursday 16:32  karibu
 
  * Fixed kludge
+
+2003-04-17 Thursday 16:30  karibu
+
+ * Added AddEllipse: the slider now works ! :)
+
+2003-04-17 Thursday 16:11  karibu
+
+ * Added clip region to graphics
+ * Added functionnality to region
 
 2003-04-17 Thursday 15:43  karibu
 
@@ -9402,6 +10103,10 @@
 2003-04-17 Thursday 14:00  anil
 
  * We now use hide/show for the file info window
+
+2003-04-17 Thursday 13:46  karibu
+
+ * Can get size of a text
 
 2003-04-17 Thursday 13:08  karibu
 
@@ -9417,6 +10122,10 @@
 
  * Fixed dewtructor
 
+2003-04-17 Thursday 10:42  asmax
+
+ * beginning of font support !
+
 2003-04-16 Wednesday 21:50  karibu
 
  * gtk2_theme.cpp: window are not automatically visibled
@@ -9431,6 +10140,10 @@
 2003-04-16 Wednesday 21:39  karibu
 
  * Removed debug calls
+
+2003-04-16 Wednesday 21:30  karibu
+
+ * Can now quit the interface
 
 2003-04-16 Wednesday 19:22  karibu
 
@@ -9478,9 +10191,21 @@
   * remove a small kludge
   * tried to add transparency, but it doesn't work :(
 
+2003-04-15 Tuesday 20:54  karibu
+
+ * GTK2 events work even better
+
+2003-04-15 Tuesday 20:42  karibu
+
+ * Fixed GTK2 events
+
 2003-04-15 Tuesday 20:33  karibu
 
  * Events are even better, not yet perfect !
+
+2003-04-15 Tuesday 17:55  ipkiss
+
+  * event broadcasting should work
 
 2003-04-15 Tuesday 16:49  karibu
 
@@ -9513,6 +10238,10 @@
 
  * reselect current playlist item when reordering items.
 
+2003-04-15 Tuesday 11:46  ipkiss
+
+  * compilation fix
+
 2003-04-15 Tuesday 01:19  ipkiss
 
   * basic event handling
@@ -9535,6 +10264,14 @@
  * Implementation of a frame-dropping algorithm for the libmpeg2 plug-in
    (incomplete).
 
+2003-04-14 Monday 21:38  asmax
+
+ * implemented OSAPI_GetTime() with glib
+
+2003-04-14 Monday 20:17  asmax
+
+ * it works event better !!
+
 2003-04-14 Monday 20:07  asmax
 
  * it works !
@@ -9543,12 +10280,24 @@
 
    * ./configure.ac.in: skins _disabled_ by default on [!win32].
 
+2003-04-14 Monday 18:05  asmax
+
+ * better window size
+
+2003-04-14 Monday 17:56  karibu
+
+ * Controls coordinate are available
+
 2003-04-14 Monday 17:16  sam
 
    * ./debian/rules: we now build the static objects twice: once the normal
      way before we link them with VLC, and once with -fPIC so that they can
      be linked to the Mozilla plugin. Don't worry, it's Debian-specific, and
      we don't need it on x86.
+
+2003-04-14 Monday 17:03  asmax
+
+ * get the size of a bitmap
 
 2003-04-14 Monday 10:18  asmax
 
@@ -9576,6 +10325,12 @@
 2003-04-13 Sunday 22:55  asmax
 
  * at last an image !!
+
+2003-04-13 Sunday 22:15  zorglub
+
+ * the file generated is not article1.html anymore but faq.html. This should fix the 404 problems with the builds.
+ * /doc/faq/Makefile: now use "onehtml" output.
+ * /doc/faq/faq-alone.sgml: added id="faq" to make generated files coherent
 
 2003-04-13 Sunday 20:07  asmax
 
@@ -10610,6 +11365,10 @@
 
  fixed up http redirects when there are other items in the playlist.
 
+2003-03-17 Monday 13:49  marcari
+
+   * familiar.c: added pixmap directory for linupy2 /usr/share/pixmaps/vlc
+
 2003-03-17 Monday 12:14  massiot
 
  Fixed aspect ratio's tooltip.
@@ -10642,6 +11401,13 @@
 2003-03-15 Saturday 22:10  jlj
 
  Another attempt at fixing the soundstick issue (unconfirmed).
+
+2003-03-15 Saturday 20:17  lool
+
+   * attempt at a docbook-xml version of the FAQ with XSL
+     customizations, if people want to help or just have a look
+   (use "xsltproc faq-alone.xsl faq-alone.xml" with the
+    docbook-xml-simple package installed or saxon if you feel bored)
 
 2003-03-15 Saturday 19:26  fenrir
 
@@ -10757,6 +11523,11 @@
      - a network tab next to te file tab inside the media tab
      - MRL-Combo behaviour changed a bit
      - apply handling in preferences
+
+2003-03-13 Thursday 10:33  ipkiss
+
+ We don't segfault anymore when trying to go fullscreen with no input
+ (closes #477)
 
 2003-03-12 Wednesday 23:59  marcari
 
@@ -10884,6 +11655,10 @@
 
   modules/misc/network/ipv4.c: BeOS compile fix
 
+2003-03-11 Tuesday 13:12  alexis
+
+ Added sout.* and subtitles.*
+
 2003-03-11 Tuesday 07:03  fenrir
 
   * au.c : added au demuxer. Only ulaw/alaw/raw pcm data are supported.
@@ -10897,6 +11672,10 @@
 
   * ffmpeg.h: added missing fourcc.
   * araw.c: fixed a warning.
+
+2003-03-11 Tuesday 06:45  fenrir
+
+  * wav: Support for alaw/ulaw data. (untested)
 
 2003-03-11 Tuesday 06:14  fenrir
 
@@ -11293,6 +12072,16 @@
  * src/misc/threads.c, include/vlc_threads_funcs.h: fixed gnu-pth thread
     implementation and fixed an initialization bug in libvlc.
 
+2003-03-01 Saturday 21:32  ipkiss
+
+  - about.dfm: the layout of the "About" dialog box is slightly different
+  - misc.cpp: toolbar buttons are translated too
+  - mainframe.dfm: removed the "Back" and "Eject" toolbar buttons, which
+    were rather useless, and added an "Eject disc" menu entry
+    Also hid the caption for all the toolbar buttons
+  - win32.cpp: Added a config option to display or not these captions
+  - preferences.cpp: small modification to support non-advanced mode
+
 2003-03-01 Saturday 19:25  gbazin
 
  * install-win32, Makefile.am: added the html faq to the win32 package.
@@ -11313,6 +12102,10 @@
  Internationalization now works for the win32 interface (thanks Gildas).
  I've voluntarily disabled the translation of the toolbar buttons
  strings, because it looks really awful...
+
+2003-02-27 Thursday 22:09  ipkiss
+
+ A few modifications to get closer to i18n in the win32 interface
 
 2003-02-27 Thursday 16:38  gbazin
 
@@ -11350,6 +12143,21 @@
 2003-02-26 Wednesday 18:15  massiot
 
  * Added sanity checks for PTS in the future.
+
+2003-02-26 Wednesday 15:47  marcari
+
+ * implementation of the 'autoplay file' button callback
+ * when clicking a link : follows the link and don't try to open it
+ * yopy does not always sees the '.' and '..', so workaround :
+     - all the hidden files are not displayed
+     - the '..' directory is each time added by hand
+
+2003-02-26 Wednesday 15:44  marcari
+
+ * small modification for linupy :
+     - added a pixmpa directory
+     - added a set_usize (how do we maximize cleanly a gtk-window ?)
+     - chdir to '.' instead of '/mnt' (should it be '~' or '/' ?)
 
 2003-02-26 Wednesday 13:51  gbazin
 
@@ -11439,6 +12247,10 @@
 
   * asf: fix seek for http.
 
+2003-02-24 Monday 09:18  fenrir
+
+  * wav: proper seek handling. (wav file readable over http).
+
 2003-02-23 Sunday 22:35  fenrir
 
   * enable httpd(by default) and http.
@@ -11476,6 +12288,10 @@
 
  * Destroy audio-device and audio-channels when no output plug-in is
    available.
+
+2003-02-22 Saturday 16:10  fenrir
+
+  * fix compilation.
 
 2003-02-22 Saturday 14:11  sigmunau
 
@@ -11735,6 +12551,10 @@
    * ./debian/rules: the deprecated vlc-* packages have a proper link to
      /usr/share/doc/vlc/.
 
+2003-02-16 Sunday 16:58  ipkiss
+
+  * added an entry for the "subtitles don"t work on windows" problem
+
 2003-02-16 Sunday 16:22  jpsaman
 
  Updated release numbering for all ipk's
@@ -11920,6 +12740,12 @@
  i_continuity_counter,
  * access/udp.c: Fixed win32 behavior when --mtu is set to a too small value,
  * demux/mpeg/ts.c: Fixed detection of PAT/PMT change.
+
+2003-02-12 Wednesday 02:11  ipkiss
+
+  * compilation fix
+  * all files are stored in dos mode, or Borland won't compile some of
+    them...
 
 2003-02-11 Tuesday 18:05  massiot
 
@@ -12126,6 +12952,11 @@
 
   Simplified volume functions
 
+2003-02-09 Sunday 02:01  ipkiss
+
+  * modules/gui/win32/mainframe.cpp: simplifications using the new
+    aout_Volume* API
+
 2003-02-09 Sunday 01:56  massiot
 
  Fixed GTK compilation.
@@ -12202,11 +13033,25 @@
    - position of top left corner should not change
    - more efficient code
 
+2003-02-07 Friday 20:49  alexis
+
+ - FAQ : the first question of the "troubleshooting" section now tells the
+ user to delete VLC's configuration file.
+
 2003-02-07 Friday 20:23  hartman
 
  * added half, normal and full size videowindow menuitems.
    there seems to be a bug though somewhere. you end up with black bars in
    half and double size.
+
+2003-02-07 Friday 18:43  ipkiss
+
+  * Fixed the "RichEdit line insertion error" bug (closes #246)
+  * Added a popup menu to copy log messages to the clipboard
+
+2003-02-07 Friday 16:51  massiot
+
+ Fixed a buffer leak with slice-I streams (thanks sam).
 
 2003-02-07 Friday 09:17  yves
 
@@ -12289,6 +13134,10 @@
    * ./configure.ac.in: libmad and liba52 need to be explicitely disabled,
      otherwise we fail with an error when they are not found.
 
+2003-02-06 Thursday 00:45  sam
+
+   * ./doc/faq/faq.sgml: updated config file location for OS X.
+
 2003-02-05 Wednesday 22:48  hartman
 
  * Changed the wrong property in my recent commit. FIXED
@@ -12325,6 +13174,11 @@
 2003-02-04 Tuesday 20:45  hartman
 
  * We released an array that was in a autorelease pool. That's not necesarry
+
+2003-02-04 Tuesday 11:51  massiot
+
+ * modules/codec/mpeg_video/*: Support for Slice-I (aka intra slice refresh)
+   streams.
 
 2003-02-04 Tuesday 11:07  massiot
 
@@ -12377,6 +13231,15 @@
  	- added reverse sort command to edit menu
  	- added view menu, to allow the user to display paths
  		or only names in the list
+
+2003-02-03 Monday 16:07  alexis
+
+ Small fix.
+
+2003-02-03 Monday 11:25  alexis
+
+ Article format, instead of book format.
+ Few typos.
 
 2003-02-03 Monday 02:26  sam
 
@@ -12567,6 +13430,11 @@
    * ./INSTALL.libmad: removed that file; if one does not know how to build
      and install a library, he'd better not fiddle with VLC.
 
+2003-02-01 Saturday 22:21  ipkiss
+
+  * modules/gui/win32/win32.cpp: fixed a stupid bug (closes #155)
+  * modules/gui/win32/menu.cpp: removed some ^M chars
+
 2003-02-01 Saturday 22:03  babal
 
  - Win32 preference dialog box
@@ -12641,6 +13509,12 @@
 
  Changes done since Feb 28 2003:
 
+2003-02-01 Saturday 11:48  alexis
+
+ * common/stylesheet-print-noicones.dsl : stylesheet for PS/PDF/RTF output
+ * faq/Makefile: added PS/PDF/RTF targets
+ * faq/faq.sgml: SGML enhancements and few modifications
+
 2003-02-01 Saturday 09:40  babal
 
  - fixed a compilation issue with C compilers
@@ -12666,6 +13540,13 @@
 
    * ./configure.ac.in: I was told some versions of mingw32 support neither
      -mms-bitfields nor -fnative-struct.
+
+2003-01-31 Friday 15:24  zorglub
+
+ * doc/faq/Makefile: added "text" and "clean" targets.
+ * doc/faq/faq-alone.sgml: Fixed build issues, added FDL, and legal notice.
+ * doc/faq/faq.sgml: Fixed build issues, improved the SGML translation.
+ * doc/faq/fdl.sgml: text of the FSF Free Documentation License.
 
 2003-01-31 Friday 13:52  sam
 
@@ -12714,6 +13595,10 @@
    * ./modules/gui/macosx: Defeated some deadlocks.
                            World domination ... is at hand.
 
+2003-01-30 Thursday 21:35  babal
+
+ - fixed a segfault occuring when the preference dialog box was destroyed
+
 2003-01-30 Thursday 20:59  sam
 
    * ./src/misc/configuration.c: when an invalid short option is found, use
@@ -12759,6 +13644,12 @@
 2003-01-30 Thursday 10:44  massiot
 
  Keep -O2 in --disable-optimizations mode, cause it can't harm...
+
+2003-01-30 Thursday 02:16  gbazin
+
+ * modules/codec/mpeg_video/headers.c: fixed non-initialized variable in
+     PictureDisplayExtension(). This does also fix problems with the dvdplay
+     plugin and menus with still pictures.
 
 2003-01-30 Thursday 00:39  massiot
 
@@ -13057,6 +13948,15 @@
  * modules/gui/gtk/gnome.c, modules/gui/gtk/gtk.c: input_Seek() was incorrectly triggered while playing some
  DVD menus.
 
+2003-01-26 Sunday 18:31  babal
+
+ - menu checkbox outside of title/chapter groupbox
+
+2003-01-26 Sunday 18:02  babal
+
+ - buttons are left aligned and their size comforms to Windows XP visual
+   guidelines
+
 2003-01-26 Sunday 16:37  gbazin
 
  * modules/audio_output/waveout.c: multichannel and spdif support (spdif untested).
@@ -13092,12 +13992,23 @@
 
   Added some colors.
 
+2003-01-26 Sunday 03:55  ipkiss
+
+  * modules/gui/win32: replaced BitBtns with Buttons everywhere, and
+    put "OK" and "Cancel" buttons in an horizontal layout.
+    Also updated a few properties here and there.
+
 2003-01-26 Sunday 02:22  ipkiss
 
   * modules/video_output/directx: added a configuration variable and a
     "normal" one to set the vout window on top of ther windows
   * modules/gui/win32: the interface can use these variables
     (almost closes #84)
+
+2003-01-26 Sunday 00:51  sam
+
+   * ./modules/gui/win32/menu.cpp: fixed a crash in the navigation menu
+     generation.
 
 2003-01-25 Saturday 21:34  hartman
 
@@ -13114,6 +14025,10 @@
    - Added .wma filetype
    - Added README, COPYING etc. to resources
  * ALL: Added a Help menu.
+
+2003-01-25 Saturday 18:09  fenrir
+
+  * faad : clean up.
 
 2003-01-25 Saturday 17:57  fenrir
 
@@ -13202,6 +14117,11 @@
    is somewhat unclean. We should fix this on a higher level but i don't see
    how we could/should.
 
+2003-01-24 Friday 00:57  babal
+
+ - added a NULL pointer test
+ - cosmetic changes
+
 2003-01-24 Friday 00:53  hartman
 
  * the volume slider could only be dragged, not clicked. removed some
@@ -13256,10 +14176,19 @@
  * modules/gui/macosx/open.m: "Open File" is back,
  * modules/codec/mpeg_video/synchro.c: Fixed a counting bug.
 
+2003-01-23 Thursday 17:18  babal
+
+ - menus disabled by default
+ - cosmetic changes
+
 2003-01-23 Thursday 17:13  massiot
 
  Fixed a segfault with quitting when no audio output plug-in was found
  (closes #108).
+
+2003-01-23 Thursday 16:17  ipkiss
+
+  * use 'dvdold' instead of 'dvd'
 
 2003-01-23 Thursday 15:53  sam
 
@@ -13316,12 +14245,30 @@
 
   * demux: fix segfault while trying to opening files without extention...
 
+2003-01-23 Thursday 04:50  babal
+
+ - allow the user to choose (and sort) several plugins for the same
+   category.
+
+2003-01-23 Thursday 03:33  ipkiss
+
+  * The stream output can't use PS with UDP
+  * Added tooltips for the subtitles dialog box
+  * Added a missing "delete"
+  * Added a menu entry to spawn new interfaces (but it's currently
+    disabled, due to a problem with the vlc_list_t struct)
+
 2003-01-22 Wednesday 22:19  sigmunau
 
   added an new config variable that takes an comma separated list of
  interface modules to be loaded in the background when vlc starts. This is
  usefull for lirc, logger and xosd. Also got rid of the hacky way the sap
  module was inserted, as this just needs to be added to this list now.
+
+2003-01-22 Wednesday 21:42  ipkiss
+
+  * Added a dialog box for subtitles selection
+  * Cosmetic here and there
 
 2003-01-22 Wednesday 19:37  lool
 
@@ -13409,10 +14356,19 @@
 
   * gtk: fixed a segfault with deinterlace.
 
+2003-01-21 Tuesday 21:20  ipkiss
+
+  * Dropped files and files added using the playlist are now enqueued
+    according to the "enqueue" config option
+
 2003-01-21 Tuesday 21:19  lool
 
    * use of service attributes to get the name of the session, insert it in
      the playlist
+
+2003-01-21 Tuesday 19:49  ipkiss
+
+  * Added a dialog box for the stream output
 
 2003-01-21 Tuesday 18:43  lool
 
@@ -13494,6 +14450,10 @@
 
   * asf : more msg_Err -> msg_Warn
 
+2003-01-20 Monday 13:03  fenrir
+
+  * aac: some msg_Err -> msg_Warn
+
 2003-01-20 Monday 13:01  fenrir
 
   * all: changed some msg_Err into msg_Warn.
@@ -13530,6 +14490,10 @@
 2003-01-19 Sunday 22:16  jpsaman
 
  New "qte_main" module. It should be used by all plugins/modules that need QT embedded. Also ported modules/qte/qte.{cpp,h} to use it.
+
+2003-01-19 Sunday 17:55  ipkiss
+
+  * Compilation fix
 
 2003-01-19 Sunday 16:57  massiot
 
@@ -13580,6 +14544,11 @@
 2003-01-17 Friday 19:36  sam
 
    * ./modules/gui/ncurses/ncurses.c: added locks and checks in navigation code.
+
+2003-01-17 Friday 19:35  sam
+
+   * ./modules/gui/win32/mainframe.cpp, ./modules/gui/win32/menu.cpp: applied
+     navigation fixes from the Gtk+ interface.
 
 2003-01-17 Friday 19:22  sam
 
@@ -13921,6 +14890,10 @@
 
  Fixed some paths.
 
+2003-01-12 Sunday 19:08  jpsaman
+
+ Use gtk_main_quit only in one place (the function Manage()).
+
 2003-01-12 Sunday 18:26  fenrir
 
   * avi: partial fix for non interleaved file with incorrect( I'm not sure
@@ -14054,6 +15027,10 @@
    * configure.ac.in, modules/access/slp.c: New SLP access module,
          see <http://www.openslp.org/>
 
+2003-01-10 Friday 01:09  ipkiss
+
+  * ./modules/gui/win32: fixed a bug in the preferences (closes #60)
+
 2003-01-09 Thursday 23:43  massiot
 
  * OS X: Fixed a segfault with empty configuration strings (closes #65),
@@ -14155,6 +15132,11 @@
   * mp4.c: allowed multiple moov headers by taking the first one
  (multiple moov headers is strictly forbidden but I 've seen such file)
 
+2003-01-08 Wednesday 10:43  fenrir
+
+  * faad: fixed a segfault when faad initialisation failed.(anyway it
+ doesn't solve the real problem).
+
 2003-01-08 Wednesday 10:41  fenrir
 
   * ffmpeg/video.c: in case of mpeg4 stream search in p_bitmapinfo for
@@ -14191,6 +15173,12 @@
 2003-01-08 Wednesday 02:32  titer
 
   Minor GUI fixes in the prefs window.
+
+2003-01-08 Wednesday 02:16  ipkiss
+
+  * Added sound volume management and changed a bit the menus
+  * Added audio channels selection, but it's currently disabled since
+    it's quite buggy :)
 
 2003-01-08 Wednesday 02:09  titer
 
@@ -14250,6 +15238,11 @@
  - libvlc0-devel provides libvlc-devel.
  - mmx/3dn plugins are only for x86 arch (use %ifarch %ix86 to list them)
    ie. fix rpm building on ppc thx Olivier Thauvin <olivier.thauvin@aerov.jussieu.fr>
+
+2003-01-06 Monday 15:39  ipkiss
+
+  * modules/gui/win32/network.cpp: added support for ftp and mms
+  * modules/gui/win32/disc.cpp: cosmetic
 
 2003-01-06 Monday 02:45  massiot
 
@@ -14313,6 +15306,10 @@
  * src/audio_output/output.c: don't forget to free the audio buffer when
  we are trashing it.
 
+2003-01-04 Saturday 13:50  jpsaman
+
+ Cosmetic changes.
+
 2003-01-04 Saturday 13:30  jpsaman
 
  Removed define in favor of (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU) for detection of FPU hardware support.
@@ -14333,6 +15330,10 @@
 2003-01-03 Friday 21:38  jlj
 
    * ./Makefile.am: Meuuh, did you mean TAB instead of 8 spaces? :-)
+
+2003-01-03 Friday 20:55  jpsaman
+
+ Slider functionality for Familiar interface.
 
 2003-01-03 Friday 14:44  sam
 

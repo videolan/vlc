@@ -48,6 +48,10 @@
  no time to fix the playlist save&restore issue before the release (and
  wouldn't be wise anyway), so deactivated it in the win32 interface.
 
+2002-12-29 Sunday 01:33  massiot
+
+ PTS calculation fix for the mad plug-in, courtesy of KKI_ on IRC.
+
 2002-12-29 Sunday 01:16  massiot
 
  OS X port :
@@ -621,6 +625,12 @@
 
   * fixed one or two things (thanks sam)
 
+2002-12-11 Wednesday 22:56  gbazin
+
+ * modules/codec/mad/*: don't let mad drop corrupted mpeg frames without telling us. When
+ this happens, we miscalculate the pts of the next valid frame, which in turn causes heavy
+ resampling. This fix should be most useful for web radios.
+
 2002-12-11 Wednesday 21:50  jpsaman
 
  Fixed qte video output segmentation fault during initialization.
@@ -899,21 +909,17 @@
 
  Build and packaging files for Opie and GPE.
 
+2002-12-04 Wednesday 20:52  jpsaman
+
+ Small updates.
+
 2002-12-04 Wednesday 20:51  jlj
 
    * ./modules/gui/macosx/vout.m: mouse coordinates support.
 
 2002-12-04 Wednesday 20:51  jpsaman
 
- file rules.opie was initially added on branch v0_4_1_branch.
-
-2002-12-04 Wednesday 20:51  jpsaman
-
  Build scripts for building cross-compiling vlc for Opie and GPE.
-
-2002-12-04 Wednesday 20:51  jpsaman
-
- file rules.gpe was initially added on branch v0_4_1_branch.
 
 2002-12-04 Wednesday 20:41  jpsaman
 
@@ -1138,6 +1144,14 @@
    * ./modules/video_chroma/i420_rgb.h: fixed slanted picture output with odd
      widths (Closes: #28).
 
+2002-11-26 Tuesday 19:55  jpsaman
+
+ Remove file that caused namespace clash. It is replaced by vout_qte.cpp
+
+2002-11-26 Tuesday 19:54  jpsaman
+
+ Fix namespace clash of source files for Qte video output module. It currently only display video in landscape orientation.
+
 2002-11-26 Tuesday 19:52  jpsaman
 
  Packaging for Opie and Qt Embedded support.
@@ -1322,6 +1336,10 @@
      doesn't work under Win2k. Any hints welcome.
    * ./configure.ac.in: activated the wingdi plugin by default.
 
+2002-11-22 Friday 19:44  titer
+
+  * now --fullscreen works with BeOS video output
+
 2002-11-22 Friday 19:37  titer
 
   * AudioOutput.cpp : compilation fix.
@@ -1401,6 +1419,10 @@
 2002-11-20 Wednesday 21:27  jpsaman
 
  Fix detection of AR and LD
+
+2002-11-20 Wednesday 21:26  jpsaman
+
+ Final cleanup before release.
 
 2002-11-20 Wednesday 21:23  jpsaman
 
@@ -1764,6 +1786,11 @@
     flag to the playlist item structure. If this flag is set then the playlist
     item will be deleted automatically after it has been played.
 
+2002-11-12 Tuesday 20:35  gbazin
+
+ * plugins/a52/a52.c: is now the default ac3/a52 decoder (because it has a
+    nicer audio quality than ac3_adec).
+
 2002-11-12 Tuesday 16:02  gbazin
 
  * modules/gui/gtk/gtk_callbacks.c: fixed deadlocks.
@@ -2112,6 +2139,11 @@
 
  Fixed plug-in compilation on OS X.
 
+2002-10-30 Wednesday 22:42  jpsaman
+
+ Bug in ReadDirectory() it results in empty file/directory names in the user interface. It makes the file list box unusable.
+ The strange thing is that routine scandir() returns the correct number of entries in the directory, but namelist[i]->d_name is empty (??) ;-(
+
 2002-10-30 Wednesday 06:37  titer
 
    - Fixed an enormous memory leak (forgot to aout_BufferFree ;)
@@ -2133,6 +2165,10 @@
 2002-10-29 Tuesday 20:58  jpsaman
 
  Solved merge conflicts
+
+2002-10-29 Tuesday 20:53  jpsaman
+
+ ?
 
 2002-10-29 Tuesday 20:52  jpsaman
 
@@ -2181,9 +2217,19 @@
 
  * modules/codec/ffmpeg/audio.c: compilation fix for ffmpeg builds < 4618
 
+2002-10-28 Monday 23:49  jobi
+
+   * plugins/dsp/aout_dsp.c: replaced O_NONBLOCK by O_NDELAY, and put the device
+     back in blocking mode once open (the xine way)
+
 2002-10-28 Monday 23:00  massiot
 
  * Bumped up revision number to 0.4.6.
+
+2002-10-28 Monday 22:48  jobi
+
+   * plugins/dsp/aout_dsp.c: Added O_NONBLOCK flag to the open command,
+     so that if /dev/dsp is used, vlc tries with other plugins (like esd).
 
 2002-10-28 Monday 22:31  gbazin
 
@@ -2210,6 +2256,10 @@
 2002-10-28 Monday 20:57  sam
 
    * ./include/variables.h, ./src/misc/variables.c: list variables.
+
+2002-10-28 Monday 20:03  gbazin
+
+ * plugins/directx/vout_directx.c: fixed a nasty segfault on initialization.
 
 2002-10-28 Monday 19:42  titer
 
@@ -2499,6 +2549,10 @@
  where the user can point and click on the file to select. It also drops down
  a list of possible completions as the user types.
 
+2002-10-16 Wednesday 23:13  massiot
+
+ * Fixed a warning.
+
 2002-10-16 Wednesday 23:12  massiot
 
  * Fixed AOUT_CHAN_CHANNEL2 trivial mixer,
@@ -2537,6 +2591,10 @@
 2002-10-15 Tuesday 23:00  massiot
 
  Fixed VCD detection under MacOS X.
+
+2002-10-15 Tuesday 20:26  gbazin
+
+ * plugins/mpeg_system/mpeg_ts.c: grmbl... fixed a stupid include problem.
 
 2002-10-15 Tuesday 19:56  gbazin
 
@@ -2640,6 +2698,11 @@
      integer between 1 and 200 (the bigger, the heavier the tests; it may hang
      your machine at around 150, be careful).
 
+2002-10-14 Monday 16:27  gbazin
+
+ * plugins/lpcm_adec/lpcm_adec.c: fix for broken lpcm plugin on little endian
+    machines (from Meuuh).
+
 2002-10-13 Sunday 23:01  massiot
 
  Imported Changelog from 0.4.5.
@@ -2656,10 +2719,18 @@
 
  Updated Mac OS X README.
 
+2002-10-13 Sunday 20:20  jpsaman
+
+ Removed dead-code.
+
 2002-10-13 Sunday 15:39  titer
 
  Now BeOS sound is (almost) clean.
  It is kludgy, but it works ;)
+
+2002-10-13 Sunday 14:27  jpsaman
+
+ Added missing url prefix.
 
 2002-10-13 Sunday 14:26  sigmunau
 
@@ -2740,7 +2811,7 @@
      code portions not part of libvlc; it was just required for the
      COPYRIGHT_MESSAGE string which is now available from VLC_Version().
 
-2002-10-11 Friday 21:17  sam
+2002-10-11 Friday 21:14  sam
 
    * ./plugins/filter/deinterlace.c: fixed the green bottom line in the
      linear deinterlace mode, thanks to Marian Durkovic <md@bts.sk>.
@@ -2749,6 +2820,10 @@
 
  * INSTALL.win32: removed note about running in administrator mode to play
     a DVD. Updated doc about using cygwin for compiling.
+
+2002-10-11 Friday 14:18  stippi
+
+ video output has better handling of settings. it remembers flags like fullscreen, aspect ratio correction and on-top-all-windows fell across multiple files in the playlist and also across program launches
 
 2002-10-11 Friday 12:50  sigmunau
 
@@ -2773,6 +2848,10 @@
  * INSTALL.win32: removed note about running in administrator mode to play
     a DVD.
 
+2002-10-11 Friday 00:46  stippi
+
+ user can now drop a DVD disk icon onto the interface or playlist window to open a DVD
+
 2002-10-10 Thursday 23:11  titer
 
  Some clean-up. Playlist works again.
@@ -2787,6 +2866,10 @@
 
  Do not use vasprintf under Mac OS X because OS X.1 doesn't have that (how
  lame...).
+
+2002-10-10 Thursday 20:33  jpsaman
+
+ Handling of URL is now fixed.
 
 2002-10-10 Thursday 19:34  sigmunau
 
@@ -2834,6 +2917,14 @@
  * HACKING : documentation for the automake crash
  * http.c : fixed a problem with seeking with large files
 
+2002-10-07 Monday 21:49  jpsaman
+
+ Forgot to remove progressbar code.
+
+2002-10-07 Monday 21:37  jpsaman
+
+ Fixes for for Familiar Linux.
+
 2002-10-07 Monday 21:28  jpsaman
 
  Dependencies for SDLAudio (esd/esddsp) and instalation script fixes.
@@ -2842,21 +2933,9 @@
 
  Patch for using libgpewidget library for full GPE support.
 
-2002-10-06 Sunday 20:23  jpsaman
-
- file gpe-configure.in.patch was initially added on branch v0_4_1_branch.
-
-2002-10-06 Sunday 19:59  jpsaman
-
- file gpe.patch was initially added on branch v0_4_1_branch.
-
 2002-10-06 Sunday 19:59  jpsaman
 
  Adding patch for using GPE specific libraries.
-
-2002-10-06 Sunday 19:39  jpsaman
-
- file control.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-06 Sunday 19:39  jpsaman
 
@@ -2883,10 +2962,6 @@
 
 2002-10-06 Sunday 19:23  jpsaman
 
- file sdl.patch was initially added on branch v0_4_1_branch.
-
-2002-10-06 Sunday 19:23  jpsaman
-
  Rename ipkg/patch to sdl.patch
 
 2002-10-06 Sunday 19:15  jpsaman
@@ -2899,23 +2974,11 @@
 
 2002-10-06 Sunday 18:56  jpsaman
 
- file postinst.gpe was initially added on branch v0_4_1_branch.
-
-2002-10-06 Sunday 18:56  jpsaman
-
  More GPE packaging stuff for Familiar Linux distribution.
-
-2002-10-06 Sunday 18:56  jpsaman
-
- file postrm.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-06 Sunday 11:47  jpsaman
 
  GPE menu launch script for iPaq port.
-
-2002-10-06 Sunday 11:47  jpsaman
-
- file vlc.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-05 Saturday 19:26  jlj
 
@@ -2985,10 +3048,6 @@
 2002-10-03 Thursday 21:10  jpsaman
 
  vlc launch script for opie.
-
-2002-10-03 Thursday 21:10  jpsaman
-
- file vlc.opie was initially added on branch v0_4_1_branch.
 
 2002-10-03 Thursday 21:01  jpsaman
 
@@ -3082,6 +3141,19 @@
  * Mac OS X audio device discovery and selection, patch courtesy of
  Heiko Panther <heiko.panther@web.de>.
 
+2002-10-02 Wednesday 21:41  jpsaman
+
+ Familiar interface works (tested on Intel).
+
+2002-10-02 Wednesday 20:12  jpsaman
+
+ Preference option automatic playing of selected files works.
+
+2002-10-02 Wednesday 19:58  jpsaman
+
+ Directory browsing and files from file list works. There is one caveat left when vlc is built with --enable-plugins then when browsing directories and run from the source-tree it suddenly cannot find it's plugins anymore.
+ When installed everything is fine.
+
 2002-10-02 Wednesday 16:02  sam
 
    * ./bootstrap: added a check for automake bug #326. No easy workaround is
@@ -3126,15 +3198,46 @@
 
  Finally fixed A/52 TS input.
 
+2002-10-01 Tuesday 21:17  jpsaman
+
+ Playing of files is not working yet! But it is getting closer.
+
 2002-10-01 Tuesday 20:43  ipkiss
 
  * modules/video_output/directx/events.c: added an "Always on top" entry
    in the system menu.
 
+2002-10-01 Tuesday 20:17  ipkiss
+
+ * plugins/directs/vout_events.c: added an "Always on top" option in the
+   system menu
+
+2002-10-01 Tuesday 19:46  jpsaman
+
+ Interface for Familiar Linux does not segfault anymore. Still to fix playing of files.
+
+2002-10-01 Tuesday 19:13  jpsaman
+
+ Interface exits cleanly now.
+
+2002-09-30 Monday 22:01  jpsaman
+
+ BUGS to solve:
+ - interface does not exit
+ - selecting a directory produces segmentation fault in function ReadDirectory()
+
 2002-09-30 Monday 21:32  massiot
 
  * Made audio_sample_format->i_format a FOURCC to allow the creation of
  new ones.
+
+2002-09-30 Monday 20:37  jpsaman
+
+ Familiar Linux Gtk+ based interface backported from vlc-0.5.0 cvs. This is not a working version, it segfaults open selecting a directory.
+
+2002-09-30 Monday 20:32  jpsaman
+
+ Adding Qt Embedded video output module from original author Gerald Hansink (gerald.hansikn@ordina.nl). Thanks Gerald!
 
 2002-09-30 Monday 20:13  jpsaman
 
@@ -3189,6 +3292,10 @@
 2002-09-29 Sunday 15:39  jpsaman
 
  Updating ipkg files for X and QT Embedded packages of vlc.
+
+2002-09-29 Sunday 12:06  titer
+
+ Forgot to `cvs add' ;)
 
 2002-09-29 Sunday 12:04  titer
 
@@ -3743,6 +3850,10 @@
    * ./modules/codec/faad/decoder.c: the AAC decoder is in sync with aout3.
    * ./modules/codec/a52old/a52old.c: the a52old decoder as well.
 
+2002-08-22 Thursday 21:41  sam
+
+   Forgot one file in my previous commit.
+
 2002-08-22 Thursday 17:14  sam
 
    * ./modules/audio_filter/converter/fixed32tofloat32.c: fixed conversion.
@@ -3849,6 +3960,11 @@
    * ./modules/control/rc/rc.c: implemented a few new functions. For instance,
      run "vlc -I rc" and then type "intf gtk" or "intf gnome". You can even
      launch several of them. "segfault" works, too.
+
+2002-08-20 Tuesday 12:43  sam
+
+    Removed obsolete files which suddenly reappeared.. THE FILES THAT WOULD
+  NEVER DIE ! MUUAHAHAHAHAHAAAA !!
 
 2002-08-20 Tuesday 12:32  sam
 
@@ -3973,6 +4089,11 @@
 
    * ./modules/video_output/x11/xcommon.c: we include Xmd.h before dpms.h
      (compilation fix for Solaris).
+
+2002-08-16 Friday 16:25  sam
+
+   * ./plugins/x11/xcommon.c: we include Xmd.h before dpms.h (compilation fix
+     for Solaris).
 
 2002-08-16 Friday 14:30  bozo
 
@@ -4230,6 +4351,14 @@
 
  * S/PDIF output should now be working (untested, though).
 
+2002-08-11 Sunday 21:59  massiot
+
+ Ported fix from STABLE.
+
+2002-08-11 Sunday 21:56  massiot
+
+ * ./plugins/lpcm_adec/lpcm_adec.c: Endianness fix.
+
 2002-08-11 Sunday 12:27  sam
 
    * ./modules/misc/memcpy/memcpyaltivec.c: added a missing AltiVec requirement.
@@ -4292,6 +4421,10 @@
 
  It's really amazing how much aout3 simplifies these plugins :)
 
+2002-08-10 Saturday 17:54  jpsaman
+
+ Allocation of New buffers seems alright now.
+
 2002-08-10 Saturday 17:53  jpsaman
 
  Enabled mad plugin again.
@@ -4300,6 +4433,11 @@
 
    * ./modules/gui/win32/Makefile: fixed the Win32 interface compilation.
    * ./modules/gui/win32/win32.cpp: merged intfwin.cpp into this file.
+
+2002-08-10 Saturday 13:40  jpsaman
+
+ Adapted mad codec plugin to new aout3. Not tested yet.`
+ Plugin is not being build by new built structure, this needs to be fixed first.
 
 2002-08-10 Saturday 11:35  jpsaman
 
@@ -4314,6 +4452,10 @@
  * Trivial resampler plug-in (resampling still non-functional)
  * Begun writing some hooks for forthcoming S/PDIF support
  * ./modules/access/vcd/cdrom.c: compile fix for Darwin
+
+2002-08-09 Friday 22:25  sam
+
+   * Removed the plugins/ directory.
 
 2002-08-09 Friday 16:39  sam
 
@@ -4389,6 +4531,10 @@
 
  Sam I hate you ;-)
 
+2002-08-06 Tuesday 19:12  jpsaman
+
+ Playing video from within the interface works.
+
 2002-08-06 Tuesday 10:54  tcastley
 
  Fixed include call.  Now compiles and BeOS version runs :)
@@ -4412,6 +4558,12 @@
    * ./Makefile.opts.in: fixed the builtins_LDFLAGS regexp so that it works
      with the Solaris sed.
    * ./src/misc/modules.c: fixed a warning caused by misuse of const.
+
+2002-08-04 Sunday 23:03  fenrir
+
+  * oups, removed 'include vdec_ext-plugins.h'. And I set
+ ffmpeg-error-resilience to -1 by default ( I've found to many files that
+ didn't like error resilience...)
 
 2002-08-04 Sunday 22:16  fenrir
 
@@ -4468,6 +4620,33 @@
 
    * ./configure.in, ./mozilla/Makefile: we link the Mozilla plugin with libXt.
 
+2002-08-04 Sunday 08:28  sam
+
+   * ./plugins/memcpy/memcpy.c: fixed an include position which prevented
+     fast_memcpy to be exported with its proper builtin symbol name.
+
+2002-08-02 Friday 04:31  tcastley
+
+ Forgot new file in Makefile :)
+
+2002-08-01 Thursday 22:58  jlj
+
+   * ./plugins/idct/idctaltivec.c: compile fix
+
+2002-08-01 Thursday 17:55  fenrir
+
+  avi.c: remove an old debug purpose printf :)
+
+2002-08-01 Thursday 12:58  gbazin
+
+ * Added a --dvd-css-method config option to the dvd plugin. This is implemented with
+ putenv() and is IMHO a quick hack (leads to memory leaks) as libdvdcss should rather
+ allow us to change this value using the API!
+
+2002-08-01 Thursday 12:36  tcastley
+
+ Compilation fixes.
+
 2002-08-01 Thursday 11:04  tcastley
 
  Compilation fixes for C++ environments like BeOS.
@@ -4477,6 +4656,11 @@
    * ./include/configuration.h, ./include/modules_inner.h: compilation fix for
      compilers which don't support constructor expressions. I hate Borland.
 
+2002-07-31 Wednesday 22:37  sam
+
+   * ./plugins/win32/*, ./plugins/directx/*: Win32 compilation fixes (but
+     still not working under Borland).
+
 2002-07-31 Wednesday 20:56  sam
 
    * ALL: new module API. Makes a few things a lot simpler, and we gain
@@ -4484,6 +4668,11 @@
 
      I could not test everything on every architecture, so please report
      any module breakage (especially on BeOS, OSX and QNX).
+
+2002-07-30 Tuesday 17:14  gbazin
+
+ * plugins/directx/vout_directx.h: removed unused variables.
+ * plugins/directx/vout_events.c: fixed resizing bug.
 
 2002-07-30 Tuesday 07:56  gbazin
 
@@ -4493,6 +4682,14 @@
 
  * include/threads_funcs.h: fixed the --fast-mutex option.
 
+2002-07-29 Monday 19:07  gbazin
+
+ * plugins/directx/vout_directx.*: the directx vout plugin now uses the
+ IID_IDirectDrawSurface2 interface, this shouldn't break anything and we should now
+ support WinNT4+DirectX3.
+ Some code cleanup too.
+ * plugins/directx/vout_events.c: small bugfix.
+
 2002-07-29 Monday 19:05  gbazin
 
  * include/vlc_threads.h,include/main.h,src/misc/threads.c,src/misc/win32_specific.c:
@@ -4501,6 +4698,27 @@
  * src/libvlc.h: renamed --fast_pthread option into --fast-mutex. Added a
  --win9x-cv-method option to choose which vlc_cond_* implementation we want on Win9x.
 
+2002-07-29 Monday 19:01  gbazin
+
+ * plugins/network/ipv6.c: attempt to fix the win32 implementation. Multicast should even
+ work (untested) although we'll need to find a way to replace if_nametoindex() to have a
+ fully functionnal win32 port.
+
+2002-07-29 Monday 16:22  gbazin
+
+ * plugins/directx/vout_directx.*: the directx vout plugin now uses the
+ IID_IDirectDrawSurface2 interface, this shouldn't break anything and we should now
+ support WinNT4+DirectX3.
+ Added support for YUY2 overlays because a few graphics cards only support this.
+ Some code cleanup too.
+ * plugins/directx/vout_events.c: small bugfix.
+
+2002-07-29 Monday 16:15  gbazin
+
+ * plugins/network/ipv6.c: attempt to fix the win32 implementation. Multicast should even
+ work (untested) although we'll need to find a way to replace if_nametoindex() to have a
+ fully functionnal win32 port.
+
 2002-07-29 Monday 16:12  gbazin
 
  * include/threads.h,include/threads_funcs.h: reverted Win32 pthread implementation to
@@ -4508,6 +4726,16 @@
  implementations for Win9x.
  * src/interface/main.c: renamed --fast_pthread option into --fast-mutex. Added a
  --win9x-cv-method option to choose which vlc_cond_* implementation we want on Win9x.
+
+2002-07-28 Sunday 01:46  tcastley
+
+ Fixed lockup on some overlay enabled cards.
+ Fixed on top function.
+
+2002-07-26 Friday 19:39  fenrir
+
+  Backport my little kludge to play avi created by ffmpeg. ( I've forgotten
+ to do this ).
 
 2002-07-26 Friday 00:06  massiot
 
@@ -4524,6 +4752,12 @@
  * ./README.MacOSX.rtf : updated README.
  * ./plugins/macosx/vout_macosx.c : additional QuickTime fix, thanks to
    David Eldred <*******@apple.com>.
+
+2002-07-25 Thursday 22:46  massiot
+
+ * ./README.MacOSX.rtf : updated README.
+ * ./plugins/macosx/vout_macosx.c : additional QuickTime fix, thanks to
+   David Eldred <skipper@apple.com>.
 
 2002-07-25 Thursday 22:34  lool
 
@@ -4546,9 +4780,27 @@
    plugin/access/http.c: cosmetic fixes in an error message
    src/input/*: removed some testcode and some unnecessary debug messages
 
+2002-07-25 Thursday 21:51  massiot
+
+ Ported QuickTime 6 fix.
+
+2002-07-25 Thursday 21:49  massiot
+
+ * Fixed f*cking QuickTime 6 bug (which in turn happened to be our fault
+ :*-((((((((((((()
+
 2002-07-25 Thursday 21:02  sam
 
    * Updated ChangeLog.
+
+2002-07-25 Thursday 20:34  stef
+
+ *Use dvdplay after it has completed initialisation. It should avoid
+ some corruption leading to evil crash :)
+
+2002-07-25 Thursday 20:22  sigmunau
+
+   plugins/access/http.c: backported my last commit on request from sam
 
 2002-07-25 Thursday 19:55  sam
 
@@ -4566,6 +4818,23 @@
  * ./configure : better detection of IPv6, fixed solaris handling
  * ./src/input/* : fixed a memory leak
 
+2002-07-24 Wednesday 20:46  jpsaman
+
+ Working on functionality.
+
+2002-07-24 Wednesday 18:31  sigmunau
+
+   * ./plugins/access/http.c: we are now parsing the http return code and
+ failing cleanly if it is >= 400
+
+2002-07-24 Wednesday 16:21  sam
+
+   * ./plugins/mpeg_system/mpeg_es.c: reverted an unnecessary fix.
+
+2002-07-24 Wednesday 15:59  jpsaman
+
+ Used buttons instead of pixmaps. Just looks a lot better ;-).
+
 2002-07-24 Wednesday 15:58  jpsaman
 
  XPM version of VideoLAN logo.
@@ -4582,10 +4851,41 @@
  Swedish translation, courtesy of Joel Arvidsson <dogai@privat.utfors.se>
  (incomplete and untested).
 
+2002-07-23 Tuesday 22:42  fenrir
+
+  * ffmpeg : add a new fourcc, ( 3IV2 you shoudln't be able to decode it
+ but sometimes it's in fact MPEG-4, thx titer ).
+
+  * mp4 : add capability to read mov with mp3 track. But it seems that
+ mad doesn't like too much fragmented data packets, and thus breaks the
+ audio.( since with '--codec dummy' I'm able to read resulting audio file
+ without any problem :)
+
+2002-07-23 Tuesday 20:50  massiot
+
+ Fixed a compile issue.
+
+2002-07-23 Tuesday 20:32  massiot
+
+ Fixed a bug with HTTP/1.0 servers (thanks sigmund !)
+
+2002-07-23 Tuesday 20:32  massiot
+
+ Fixed a bug with HTTP/1.0 servers.
+
 2002-07-23 Tuesday 20:16  sam
 
    * ./mozilla/Makefile: fixed dependencies on .h files.
    * ./plugins/filter/distort.c: fixed a typo in option names.
+
+2002-07-23 Tuesday 20:15  sam
+
+   * ./plugins/dummy/dec_dummy.c: new dummy decoder, for testing purposes.
+
+    Usage: "--codec dummy" will use the dummy decoder for all streams, and
+   save the stream to a stream.1242 file (where 1242 is the internal vlc
+   object ID). If the input file was for instance an mpeg file, you can
+   play one of the resulting files using an mp3 player.
 
 2002-07-23 Tuesday 20:12  sam
 
@@ -4631,6 +4931,33 @@
 
  The plugin is not guaranteed to work anywhere outside my computer. If it break your, don't come and complain to me :).
 
+2002-07-23 Tuesday 19:28  stef
+
+ *Allow 0 for title selection as it is the area for first play pgc in DVDs
+
+2002-07-23 Tuesday 18:39  jpsaman
+
+ Interface neatly exits now.
+
+2002-07-23 Tuesday 17:19  fenrir
+
+  * cinepak: add a new fourcc
+
+  * ffmpeg and mp4: some clean up and change the way ffmpeg is
+ initialised.
+
+2002-07-23 Tuesday 13:16  tcastley
+
+ Fixed code for subtitle and audio selection, still probs but looking.
+ Implemented muting
+
+2002-07-23 Tuesday 12:42  tcastley
+
+ Changes to ensure BeOS plugins compile and function
+ Implemented a intf_vlc_wrapper to "shield" the BeOS code from the underlying
+ vlc structurs, yet to be completed.
+ Attempted to fix subtitle and audio selection, currently not working.
+
 2002-07-23 Tuesday 00:39  sam
 
    * ALL: decoders now use a fourcc as a probe value.
@@ -4675,6 +5002,22 @@
 
  win32 compilation fixes
 
+2002-07-22 Monday 21:04  jpsaman
+
+ Fixed gtk core-dump on exit. Used code from gtk plugin for this.
+
+2002-07-22 Monday 20:52  jpsaman
+
+ Non-functional Familiar Linux user interface.
+
+2002-07-22 Monday 19:49  jpsaman
+
+ Now "vlc --intf familiar" spawns interface.
+
+2002-07-22 Monday 13:49  jpsaman
+
+ Familiar Linux interface (non functional yet).
+
 2002-07-22 Monday 13:49  jpsaman
 
  VCR icon buttons for Familiar Linux interface.
@@ -4683,11 +5026,30 @@
 
  Added --enable-familiar to configure.in, the default is disabled.
 
+2002-07-22 Monday 13:09  jpsaman
+
+ Updated TODO list.
+
+2002-07-22 Monday 11:39  tcastley
+
+ Implemented simple right click menu
+ Improved Overlay bitmap handling
+ Removed switch workplace bug
+
 2002-07-21 Sunday 23:40  sam
 
    * ./src/input/input_ext-plugins.c: reverted my previous fix which wasn't
      really a fix.
    * ./plugins/memcpy/fastmemcpy.h: commented out suspicious code.
+
+2002-07-21 Sunday 21:18  fenrir
+
+  * mp4 : improve mp4a detection/handling.
+
+2002-07-21 Sunday 19:57  fenrir
+
+  * all : can now read mp4 file with mp3 audio declared in mp4a box
+ Thanks to jlj to show me this and to tell me what to check to solve it.
 
 2002-07-21 Sunday 19:26  sigmunau
 
@@ -4704,6 +5066,12 @@
 
  Sigmund
 
+2002-07-21 Sunday 18:47  fenrir
+
+  * mp4 : use same endian for fourcc than one used in vlc (video.h if I'm
+ right).
+  * cinepak : take care of grayscale option.
+
 2002-07-21 Sunday 15:27  sam
 
    * ./debian/control: changed "interface plugin" occurences to "frontend" to
@@ -4714,6 +5082,19 @@
 2002-07-21 Sunday 15:18  fenrir
 
   * all : enable cinepak decoder, I hope I haven't break anything.
+
+2002-07-21 Sunday 15:13  fenrir
+
+  * all : enable cinepak, clean some functions, fix some memory leaks
+
+2002-07-21 Sunday 15:11  fenrir
+
+  * all : a cinepak (cvid) video decoder ( codec found in old .mov ).
+
+2002-07-21 Sunday 15:07  fenrir
+
+  * all : try to add an option to allow frame droppping (
+ --enable-hurry-up ). Begin to work.
 
 2002-07-21 Sunday 14:37  sam
 
@@ -4728,6 +5109,13 @@
 
  * Added -lrt for HP/UX port.
 
+2002-07-20 Saturday 18:53  fenrir
+
+  * ffmpeg : add a new option, it set the level of error resilience.
+ It allows to play mpeg4 file badly encoded(illegal VLC code).(Sam you
+ should be able to play your .mp4 file by setting it to -1, with recent
+ ffmpeg cvs).
+
 2002-07-20 Saturday 18:01  sam
 
    * ALL: changed "struct foo_s" into "struct foo_t" to make greppers happy.
@@ -4736,6 +5124,12 @@
    * ./src/vlc.c: vlc uses the non-reentrant libvlc functions.
    * ./mozilla/vlcplugin.c: the mozilla plugin uses the reentrant functions.
    * ./debian/*: created packages for libvlc0-dev.
+
+2002-07-19 Friday 22:04  massiot
+
+ * ./plugins/a52/a52.c : Added a global lock to prevent two VLC threads to
+   call a liba52 function simultaneously (liba52 isn't reentrant) ;
+ * ./plugins/a52/a52.c : Made liba52 the default AC3 decoder.
 
 2002-07-19 Friday 21:14  massiot
 
@@ -4793,6 +5187,27 @@
 
  Fixed nanosleep detection on some platforms.
 
+2002-07-17 Wednesday 21:37  fenrir
+
+  * all : preliminary mp4 (and some mov) demux plugin. I've not enabled
+ it ( add by hand to Makefile ... and link it with zlib -lz ) as I will
+ probably break it too many times. It work for some mp4(but without
+ audio, need aac decoder) and mov with sorenson v1(ffmpeg :).
+
+2002-07-17 Wednesday 21:34  stef
+
+ Fixed a bug in the computation of the mouse coordinates sent to interface.
+
+2002-07-17 Wednesday 21:28  stef
+
+ Added a 'dvdold' shortcut to force the use of the dvd plugin in case
+ another plugin with higher priority wants to use 'dvd' as shortcut.
+
+2002-07-17 Wednesday 21:24  stef
+
+ The loop in lpcm decoder DecodeFrame() could not exit after b_die
+ in some case
+
 2002-07-17 Wednesday 12:21  sam
 
    * ./configure.in: plugin compilation fix for HP-UX.
@@ -4829,9 +5244,28 @@
 
    * MacOS X: added deinterlace submenu
 
+2002-07-15 Monday 23:05  jlj
+
+   * ./plugins/access/http.c: fixed memory leak.
+
+2002-07-15 Monday 22:45  fenrir
+
+  ffmpeg.c : fix my previous commit( I've forgotten one #if ... #endif )
+ (Thx sam)
+
+2002-07-15 Monday 22:20  jlj
+
+   * ./plugins/access/http.c: fixed double free bug.
+
 2002-07-15 Monday 22:05  sam
 
    * ./configure.in: fixed a typo in my previous commit (thx fenrir).
+
+2002-07-15 Monday 20:09  sam
+
+   * ./plugins/*: interface plugins set p_vlc->b_die to quit vlc, but check
+     for p_intf->b_die to know when they are supposed to terminate p_intf. This
+     will allow to spawn interface plugins on the fly.
 
 2002-07-15 Monday 19:33  fenrir
 
@@ -4849,6 +5283,14 @@
    * ./configure.in: we now look for XvPutImage instead of XvSetPortAttribute
      because XvSetPortAttribute isn't always available.
 
+2002-07-15 Monday 19:04  jlj
+
+   * ./plugins/macosx/vout_macosx.m: added missing arrow up/down handling.
+
+2002-07-15 Monday 02:09  jlj
+
+   * ./plugins/macosx/vout_macosx.m: added missing keyDown(space) = pause
+
 2002-07-15 Monday 01:54  jlj
 
    * MacOS X changes:
@@ -4861,6 +5303,12 @@
 2002-07-13 Saturday 12:22  jpsaman
 
  Add package sdl to package dependency list.
+
+2002-07-13 Saturday 11:33  tcastley
+
+ Created a wrapper class for VLC functions and interaction.  Improved file
+ and disk opening.  Fixed drag and drop.  Added right click menu and always
+ on top mode.
 
 2002-07-12 Friday 23:53  sam
 
@@ -4891,6 +5339,11 @@
    * ./README: removed much outdated data.
    * ./debian/*: great package renaming - names should make more sense now.
 
+2002-07-11 Thursday 19:44  sam
+
+   * ./plugins/mad/mad_libmad.c: prevent the MAD decoder from looping endlessly
+     when the audio output fifo could not be created.
+
 2002-07-11 Thursday 19:28  sam
 
    * ./plugins/gtk/*: new generic "Open Target" window. Please test and
@@ -4900,14 +5353,35 @@
 
    * ./debian/rules: the Debian package creation script builds ffmpeg.
 
+2002-07-11 Thursday 18:57  fenrir
+
+  I commit a patch from Sigmund Augdal to skip ID3 tag at the begining
+ of a file, so more files can be read :))
+
+  However with current cvs this demux ( with and without the patch )
+ segfaults after a few seconds, I can't find why, anybody has an idea ?
+
 2002-07-11 Thursday 18:44  sam
 
    * ./src/vlc.c: reduced the amount of default simultaneous interfaces.
    * ./src/libvlc.c: removed calls to vlc_mutex_lock in sighandlers.
 
+2002-07-11 Thursday 18:41  sam
+
+   * ./plugins/qt/intf_qt.cpp: fixed Qt interface termination.
+
+2002-07-11 Thursday 12:24  tcastley
+
+ Fixed pop-up menu's radio mode.
+
 2002-07-11 Thursday 07:58  tcastley
 
  New Bug on SPU decoder
+
+2002-07-11 Thursday 07:21  tcastley
+
+ Fixed changing workspaces problem.
+ Added a popup menu to enable changing output sizes.
 
 2002-07-10 Wednesday 17:00  sam
 
@@ -4917,11 +5391,29 @@
 
    * ./FAQ: new entry for RTP
 
+2002-07-10 Wednesday 05:17  tcastley
+
+ Changed default bitmap to 16bit to fix green distortion problem.
+ thanks Eric and Sam
+
 2002-07-09 Tuesday 23:40  lool
 
    * ./FAQ: minor updates, new sections: uninstall/reinstall,
      DirectX-blackscreen, device permissions, debug messages,
      config file, (un)planned ports/features, sources.list
+
+2002-07-09 Tuesday 22:18  fenrir
+
+  plugins/avi/avi.c : now you can see avi over http (true interleaved
+ file only), and seek is allowed (but with great unsynchronisation,
+ and sometimes it fails). But in order to make it working, I have to
+ limit the number of bytes I read at a time. It's strange since in
+ previous version of vlc, I don't need to do that ... ( it segfaults in
+ input_SplitBuffer but not always on the same frame )
+
+2002-07-09 Tuesday 22:15  ipkiss
+
+  * ./plugins/win32/about.*: Added the version number in the About box
 
 2002-07-07 Sunday 22:05  sam
 
@@ -4958,6 +5450,58 @@
    * darwin_specific.[ch]: added strndup needed by video_output.c.
    * configure.in: added -lintl to plugins_LDFLAGS.
 
+2002-07-02 Tuesday 19:16  sam
+
+   * ./plugins/gnome/gtk.c, ./plugins/gnome/gnome.c: prevent older versions
+     of vlc from crashing when trying to open a recent module.
+
+2002-07-02 Tuesday 19:14  sam
+
+   * ./plugins/x11/xcommon.c: to enter fullscreen mode, we create a new window
+     instead of moving the current window, which saves us the hassle of
+     remembering size and position.
+   * ./plugins/x11/x11.c, ./plugins/x11/xvideo.c: added --no-x11-shm and
+     --no-xvideo-shm options.
+
+2002-07-02 Tuesday 17:54  fenrir
+
+  * all : begin to support VOD, but it segfault very quickly (unless you
+ disable audio or video !)and cannot support seeking( will just stop ).
+ Moreover it can't work for all files, only interleaved ones.
+
+2002-07-01 Monday 17:40  sam
+
+   * ./plugins/lirc/lirc.c: the lirc interface now works again.
+
+2002-07-01 Monday 17:39  sam
+
+   * ./plugins/qt/*: the Qt interface now works again.
+
+2002-07-01 Monday 17:39  sam
+
+   * ./plugins/kde/*: the KDE interface now works again.
+
+2002-07-01 Monday 17:39  sam
+
+   * ./plugins/gtk/gtk_callbacks.c: fixed a segfault when hitting Eject with
+     an emtpy playlist.
+
+2002-06-30 Sunday 15:07  fenrir
+
+  *all : now can find key frame even with broken avi.
+
+2002-06-30 Sunday 03:51  fenrir
+
+   all: ameliorations.
+
+2002-06-29 Saturday 14:16  fenrir
+
+  plugins/avi/avi.c : fix some problems with broken avi
+
+2002-06-28 Friday 19:31  fenrir
+
+  plugins/avi/avi.c : audio seems to be better.
+
 2002-06-27 Thursday 19:46  sam
 
    * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
@@ -4986,6 +5530,21 @@
      don't launch the rc interface.
    * ./plugins/access/http.c: fixed a compilation warning.
    * ./src/misc/messages.c: cosmetic enhancements in the message output.
+
+2002-06-27 Thursday 19:01  sam
+
+   * ./plugins/x11/*: added the --x11-drawable and --xvideo-drawable options to
+     tell vlc to draw in an existing drawable instead of creating a new window.
+
+2002-06-27 Thursday 18:10  fenrir
+
+  * all : I've forgotten theses ...
+
+2002-06-26 Wednesday 23:11  fenrir
+
+  * all : I rewrite the way to read, in order to minimize seeking (
+ faster and in prevision of VOD by http, but not yet functionnal ). But
+ sound becomes horrible, I will try to fix it as soon as possible.
 
 2002-06-19 Wednesday 22:47  massiot
 
@@ -5024,6 +5583,11 @@
    * ./include/threads.h, ./include/threads_funcs.h: backported the new Win32
      cond_wait implementation from MAIN. Please report problems.
 
+2002-06-11 Tuesday 13:11  gbazin
+
+ * ./plugins/gtk/gtk_preferences.c: backported a fix from HEAD which
+ prevents a crash when closing the preferences windows.
+
 2002-06-11 Tuesday 09:44  gbazin
 
  * ./include/configuration.h: renamed MODULE_CONFIG_* macros into
@@ -5051,6 +5615,10 @@
      also a bit slower, so I also kept the old version, optimized it, and
      called it "mean".
 
+2002-06-09 Sunday 23:35  massiot
+
+ * Fixed some compile issues with what I checked in.
+
 2002-06-09 Sunday 22:57  massiot
 
  * IPv6 multicast support, courtesy of Remco Poortinga <poortinga@telin.nl> ;
@@ -5058,37 +5626,40 @@
 
 2002-06-09 Sunday 22:33  massiot
 
- file mpeg4.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file generic.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file mpeg.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file mpeg2.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file divx.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
  * IPv6 multicast support, courtesy of Remco Poortinga <poortinga@telin.nl> ;
  * Mac OS X icons and fixes, courtesy of Benjamin Mironer <bmironer@noos.fr>.
 
-2002-06-09 Sunday 22:33  massiot
+2002-06-09 Sunday 16:52  sam
 
- file mpeg1.icns was initially added on branch v0_4_1_branch.
+   * ./plugins/filter/deinterlace.c: added two new deinterlacing methods,
+     "discard" which is very CPU efficient, and "blend" (yes there used to be
+     a "blend" method but it's now called "linear". Don't ask) which loses some
+     vertical resolution but discards the mice teeth effect. Information was
+     found on http://www.100fps.com/index.htm.
+
+     We now have "discard", "blend", "bob" and "linear".
+
+2002-06-08 Saturday 20:25  sam
+
+   * ./plugins/mad/mad_libmad.c: changed error messages to warning/debug.
+
+2002-06-08 Saturday 19:32  sam
+
+   * ./plugins/macosx/*: additional minor fixes.
+
+2002-06-08 Saturday 18:52  sam
+
+   * ./plugins/macosx/vout_macosx.m, ./plugins/macosx/aout_macosx.m,
+     ./plugins/macosx/intf_vlc_wrapper.m: preliminary OS X compilation fixes.
 
 2002-06-08 Saturday 14:08  sam
 
    * ./include/vlc_threads.h, ./src/misc/threads.c: improved the cond_wait
      implementation to avoid races, by using SetEvent instead of PulseEvent.
+
+2002-06-08 Saturday 02:50  lool
+
+   * ./plugins/xosd/xosd.c: a couple more options, better defaults
 
 2002-06-08 Saturday 01:41  lool
 
@@ -5099,6 +5670,11 @@
 
    * ./plugins/win32/*: tried to port the Win32 interface to the new API. Seems
      to be still crashing.
+
+2002-06-07 Friday 23:05  sam
+
+   * ./plugins/gtk/gtk_callbacks.c: some code cleaning.
+   * ./plugins/text/rc.c: fixed the "a" command.
 
 2002-06-07 Friday 22:41  lool
 
@@ -5120,6 +5696,10 @@
 
    * ./plugins/gtk/*: the Gnome/Gtk+ interfaces have all their features back.
    * ./src/playlist/playlist.c: fixed an off-by-one loop error.
+
+2002-06-07 Friday 18:03  bozo
+
+   * plugins/a52_system/.cvsignore: What about a little .cvsignore ?
 
 2002-06-07 Friday 16:06  sam
 
@@ -5154,10 +5734,22 @@
 
  * Set object pointer to NULL after destroy.
 
+2002-06-05 Wednesday 18:18  stef
+
+ * Release vout when we close spudec.
+
+2002-06-05 Wednesday 18:15  stef
+
+ *Only report initiliazation error when it is really an error.
+
 2002-06-05 Wednesday 18:07  stef
 
  * Added mouse coordinates to vout struct. They are only update from x11 for now,
  and they are used nowhere.
+
+2002-06-05 Wednesday 18:01  stef
+
+ *Check if p_vpar->p_vout is available before detaching it.
 
 2002-06-04 Tuesday 20:33  sam
 
@@ -5174,6 +5766,18 @@
 
    * ./plugins/gtk/gnome_callbacks.c: fixed a crash when activating preferences
      from the popup menu.
+
+2002-06-04 Tuesday 14:30  sam
+
+   * Forgot to run fixfiles.sh.
+    ___        _  _   _ _____ ___         ___ _      _   ___  ___   _ _
+   |_ _| _/\_ | || | /_\_   _| __| _/\_  / __| |    /_\ |   \| __| | | |
+    | |  >  < | __ |/ _ \| | | _|  >  < | (_ | |__ / _ \| |) | _|  |_|_|
+   |___|  \/  |_||_/_/ \_\_| |___|  \/   \___|____/_/ \_\___/|___| (_|_)
+
+2002-06-04 Tuesday 14:18  sam
+
+   * Updated gnome files.
 
 2002-06-04 Tuesday 13:16  sam
 
@@ -5229,6 +5833,16 @@
    * ./plugins/avi/avi.c, ./plugins/mpeg_system/mpeg_audio.c: ES will be
      selected only once.
    * updated TODO list.
+
+2002-06-03 Monday 16:33  fenrir
+
+     * ALL : ES will be selected only once (thx sam ).
+
+2002-06-03 Monday 07:22  gbazin
+
+ * ./plugins/win32/waveout.c: waveOutUnprepareHeader() was never being
+ called. This should fix the memory leak some people reported when using
+ the waveout plugin.
 
 2002-06-03 Monday 00:28  sam
 
@@ -5392,6 +6006,12 @@
        --filter crop --crop-geometry 640x480
        --filter crop --crop-geometry 320x200+10+10
 
+2002-06-01 Saturday 23:41  massiot
+
+ Mac OS X interface :
+ * fixed a bug in the chapter handling ;
+ * more keystrokes ;
+
 2002-06-01 Saturday 18:04  sam
 
    * ALL: got rid of p_object->p_this which is now useless.
@@ -5433,6 +6053,11 @@
    * ./ChangeLog: imported the 0_4_1_branch changelog.
    * ./plugins/chroma/i420_yuy2.h: imported a 0_4_1_branch fix.
 
+2002-06-01 Saturday 13:23  sam
+
+   * ./plugins/chroma/i420_yuy2.h: simplified the chroma code. Please test
+     under BeOS and QNX.
+
 2002-06-01 Saturday 12:31  sam
 
    * ALL: the first libvlc commit.
@@ -5471,9 +6096,90 @@
 
    * Backported fixes from MAIN.
 
+2002-06-01 Saturday 11:11  sam
+
+   * ./plugins/macosx/intf_vlc_wrapper.m: fix for non-ASCII filenames in the
+     MacOS X interface, courtesy of Watanabe Go <go@dsl.gr.jp>.
+
+2002-06-01 Saturday 11:08  sam
+
+   * ./plugins/chroma/i420_yuy2.h: fixed an old overflow bug spotted by
+     Rudolf Cornelissen.
+
+2002-06-01 Saturday 10:47  sam
+
+   * ./plugins/chroma/i420_rgb16.c: fix for skewed display in software RV32
+     mode, courtesy of Pascal Levesque.
+
+2002-06-01 Saturday 10:43  sam
+
+   * ./plugins/chroma/i420_rgb16.c: fix for skewed display in software RV32
+     mode, courtesy of Pascal Levesque.
+
 2002-06-01 Saturday 10:36  sam
 
    * ./ChangeLog: updated changelog.
+
+2002-06-01 Saturday 10:12  tcastley
+
+ Stopped more than one playlist being opened.
+ Fixed segfault on exit with playlist open.
+ Corrected size of output window.
+
+2002-06-01 Saturday 09:21  tcastley
+
+ Fixes for preventing multiple playlist windows
+ and improvements and corrections in videoout.
+
+2002-06-01 Saturday 09:20  tcastley
+
+ Fix to prevent multiple Playlist windows
+
+2002-06-01 Saturday 08:54  tcastley
+
+ Fixes for Playlist window
+
+2002-06-01 Saturday 08:54  tcastley
+
+ * Fixes for Playlist window.  Now only creates one and destroys correctly.
+ * Fixed the height of the output video, was one to big.
+
+2002-05-31 Friday 21:57  massiot
+
+ * Backported my two previous commits.
+
+2002-05-31 Friday 21:56  massiot
+
+ * Compilation fixes for Solaris ;
+
+2002-05-31 Friday 21:37  massiot
+
+ * plugins/sdl/aout_sdl.c : Fixed an endianness issue created by a
+   brain-dead developer :p
+
+2002-05-31 Friday 01:34  ipkiss
+
+  * backported my previous commit
+
+2002-05-31 Friday 01:09  ipkiss
+
+ Win32 interface:
+  * The "Eject" button is enabled only after we played a dvd or vcd.
+  * The toolbar is now flat and less cubist.
+  * Got rid of the ugly slider with some winXP skins.
+  * Added a config option to limit the number of messages in the log
+    window (default is set to 500).
+
+2002-05-30 Thursday 13:58  gbazin
+
+ * ./plugins/mpeg_vdec/vpar_headers.c: don't try to deference a null
+ pointer (fix from sam).
+
+2002-05-30 Thursday 13:39  asmax
+
+ - gnome.c didn't compile
+   (Gildas you forgot the default value for gnome-toolbartext, I assume
+    it was 1 ;)
 
 2002-05-30 Thursday 13:22  asmax
 
@@ -5504,10 +6210,31 @@
      be useful for DVD menus, but also solves the "picture becomes black when
      vlc is paused" issue.
 
+2002-05-29 Wednesday 10:08  gbazin
+
+ * ./plugins/dummy/dummy.c: added a CATEGORY_HINT to the config.
+ * ./plugins/x11/xcommon.c: small change to the ToggleFullscreen routine
+ to avoid a flickering during the switch.
+
+2002-05-28 Tuesday 22:49  sam
+
+   * ./plugins/filters/*: fixed inconsistencies.
+
+2002-05-28 Tuesday 21:44  ipkiss
+
+  * New icons for the toolbar buttons
+  * URL can now start with "http://" in the Network dialog box
+  * Updated the About dialog box
+
 2002-05-28 Tuesday 18:34  stef
 
  *Added a b_force flag to picture_t so that we can force the display
  of an image even if it is late.
+
+2002-05-27 Monday 19:35  sam
+
+   * ./plugins/filter/*: filters are now configurable through the configuration
+     system. Patch from Sigmund Augdal <sigmunau@stud.ntnu.no>.
 
 2002-05-27 Monday 18:35  sam
 
@@ -5522,6 +6249,15 @@
 2002-05-27 Monday 18:33  sam
 
    * ./debian/control: updated Debian package descriptions.
+
+2002-05-27 Monday 18:26  sam
+
+   * ./plugins/aa/aa.c: removed all palette code as it was unused.
+   * ./plugins/aa/aa.c: moved the aa_fastrender call from vout_Display to
+     vout_Render.
+   * ./plugins/aa/aa.c: added support for resizing and right-click menu.
+
+    (patch courtesy of Sigmund Augdal <sigmunau@stud.ntnu.no>)
 
 2002-05-27 Monday 16:01  fenrir
 
@@ -5543,6 +6279,10 @@
    * src/misc/netutils.c: tests if message from vlcs begins with 'E:' or 'I:'
    instead of testing 'E: ' and 'I: ' (to simplify miniVLCS)
 
+2002-05-25 Saturday 16:23  fenrir
+
+     * all: avi file is a piece of sh*t, make more test.
+
 2002-05-24 Friday 12:42  gbazin
 
  * ./include/inpu_ext-dec.h added a check to fifo->b_die after the call
@@ -5561,6 +6301,11 @@
    * ./src/video_output/video_output.c: the video output thread was never
      joined! A pretty old bug...
 
+2002-05-23 Thursday 22:18  jlj
+
+   * ./plugins/macosx/intf_open.m: Remember last open file panel location,
+     thanks to <ssudre2@wanadoo.fr>
+
 2002-05-23 Thursday 21:42  massiot
 
  Updated Mac OS X readme, courtesy of The DJ <d.hartman@student.utwente.nl>.
@@ -5573,6 +6318,30 @@
 2002-05-22 Wednesday 23:11  massiot
 
  Fixed HTTP input under Win32 (thanks ipkiss).
+
+2002-05-22 Wednesday 21:42  sam
+
+   * ./plugins/dvd/dvd_seek.c: reverted a previous change in DVD input which
+     caused input to get stuck in interleaved cells.
+
+2002-05-22 Wednesday 21:30  sam
+
+   * ./plugins/gtk/gnome.glade: removed bevel from title and chapter buttons.
+
+2002-05-22 Wednesday 21:15  sam
+
+   * ./plugins/mad/mad_adec.c, ./plugins/mad/mad_libmad.c: use intf_WarnMsg for
+     debug messages instead of intf_ErrMsg.
+
+2002-05-22 Wednesday 21:08  sam
+
+   * ./plugins/win32/network.dfm, plugins/macosx/intf_open.m: updated channel
+     server default hostname.
+
+2002-05-22 Wednesday 21:05  sam
+
+   * ./plugins/chroma/i420_yuy2.h: bugfix for the I420 to YUY2 MMX chroma
+     transformations, with the help of Pascal Levesque.
 
 2002-05-22 Wednesday 19:31  gbazin
 
@@ -5595,6 +6364,30 @@
    * ./Makefile: the vlc rule depends on modules_builtin.h.
    * ./include/modules_inner.h: removed useless code.
 
+2002-05-22 Wednesday 17:12  ipkiss
+
+  * ALL: replaced TUpDown components by TCSpinEdit ones, which allow
+    values greater than 32767. It fixes the audio bug ocurring when a
+    configuration file is saved under the win32 interface
+
+  * ./plugins/win32/mainframe.cpp: Added some extra space between
+    statusbar and toolbar when nothing is displayed. I find it nicer :)
+
+2002-05-22 Wednesday 14:20  gbazin
+
+ * ./plugins/text/logger.c: on win32 the logger interface shows up a dos
+   command box.
+ * ./plugins/gtk/gnome.c: fixed uninitialized variable. (from Sam)
+ * ./plugins/gtk/gtk_playlist.c: simplified GtkRebuildCList(). (from Sam)
+
+2002-05-22 Wednesday 12:50  jobi
+
+     * plugins/vcd/vcd.c: added svcd shortcut to the vcd input
+
+2002-05-22 Wednesday 12:23  tcastley
+
+ Changes to reduce segfaults on exit, and also allow only one Playlist window.
+
 2002-05-22 Wednesday 11:23  lool
 
    * ./include/modules_inner.h: fixed a crash when reopening a hidden
@@ -5604,10 +6397,45 @@
 
  * Updated spec for ffmpeg.
 
+2002-05-21 Tuesday 13:34  gbazin
+
+ * On Win32 the DVD access plugin has to be explicitly requested. This
+   avoids crashes when the input thread tries to open files as dvds.
+
+2002-05-21 Tuesday 13:27  lool
+
+   * fixed a side-effect bug causing crashes on DVD title change
+
+2002-05-21 Tuesday 07:48  gbazin
+
+ * ./plugins/directx/aout_directx.c: fixed compile warnings.
+
+2002-05-21 Tuesday 06:55  gbazin
+
+ * ./plugins/network/ipv6.c: fixed a stupid bug.
+
+2002-05-21 Tuesday 03:37  sam
+
+   * ./plugins/chroma/i420_yuy2.c: margin support for the 420 planar to 422
+     packed chroma transformations.
+
+2002-05-21 Tuesday 02:46  sam
+
+   * ./plugins/chroma/i420_yuy2.h: fixed the BeOS crash. Margin handling isn't
+     done yet, though.
+
 2002-05-21 Tuesday 01:40  sam
 
    * ./src/input/input.c: fixed a bug with the input remaining stuck when no
      network data was present.
+
+2002-05-21 Tuesday 01:29  ipkiss
+
+  * Fixed a stupid bug in the Network dialog.
+
+2002-05-21 Tuesday 01:27  sam
+
+   * ./plugins/mpeg_system/mpeg_ts.c: fixed a warning.
 
 2002-05-21 Tuesday 00:34  sam
 
@@ -5618,6 +6446,12 @@
 
    * src/input/input_ext-plugins.c, src/input/input_ext-intf.c: boundary checks
      on seek.
+
+2002-05-20 Monday 22:45  sam
+
+   * ./plugins/dvd/*: fixed a few inconsistences.
+   * ./plugins/dvd/*: renamed i_start/i_end couples when they actually
+     meant i_first/i_last.
 
 2002-05-20 Monday 22:39  sam
 
@@ -5699,6 +6533,23 @@
      rebuild anything to Makefile.config, so that editing it will not cause
      a complete rebuild.
 
+2002-05-20 Monday 11:21  tcastley
+
+ Improved Overlay and Bitmap output modes.
+ Due to existing bug in some Chroma's the Overlay does not work for nVidia
+ cards.  Sorry.
+
+2002-05-20 Monday 10:44  massiot
+
+ Removed unused headers.
+
+2002-05-20 Monday 05:20  jlj
+
+   * ./plugins/macosx/intf_controller.[mh]: you can now drag & drop files onto
+     the vlc dock icon. CFBundleDocumentTypes in Info.plist doesn't seem to have
+     any effect, so you'll have to hold down command-option when dropping until
+     this is resolved.
+
 2002-05-19 Sunday 23:51  massiot
 
  Mac OS X-specific :
@@ -5716,9 +6567,37 @@
 
  * OS X intf is now more consistent with Apple guidelines.
 
+2002-05-19 Sunday 20:26  gbazin
+
+ * fixed a segfault I introduced lately in gtk_preferences.
+
+2002-05-19 Sunday 19:16  jlj
+
+   * ./plugins/macosx/intf_vlc_wrapper.m: don't try to eject unless there is
+     a disc to eject.
+
+2002-05-19 Sunday 17:27  massiot
+
+ * Fixed a segfault in the Mac OS X interface.
+
+2002-05-19 Sunday 16:45  jobi
+
+     * plugins/satellite/input_satellite.c: cosmetic changes in error messages
+     * plugins/gtk/*: gtk and gnome interfaces now uses frequency and
+                      symbol rates default values
+
 2002-05-19 Sunday 16:01  massiot
 
  Removed fixed entries.
+
+2002-05-19 Sunday 15:50  stef
+
+ *Initialize p_spudec->p_vout to NULL to prevent segfault if InitThread does
+ not complete.
+
+2002-05-19 Sunday 15:23  gbazin
+
+ * on win32 the rc plugin opens a new console.
 
 2002-05-19 Sunday 12:57  gbazin
 
@@ -5742,6 +6621,12 @@
 
  Updated long descriptions.
 
+2002-05-19 Sunday 10:06  gbazin
+
+ * on win32 the dummy interface plugin will open a dos command box. With
+ this fix, vlc should never fail silently and leave a ghost process
+ running in the background when there isn't any working GUI plugin.
+
 2002-05-19 Sunday 09:37  gbazin
 
  * moved the mpeg-motion and mpeg-idct options to the mpeg_vdec plugin
@@ -5754,6 +6639,10 @@
  If someone also wants to review and change the already existing
  *_LONGTEXT descriptions, he is welcome as well because there are not
  really high quality descriptions :(
+
+2002-05-19 Sunday 01:07  stef
+
+ *Mark subpictures destroyed when we end spudec thread.
 
 2002-05-19 Sunday 00:43  massiot
 
@@ -5769,6 +6658,10 @@
  * updated INSTALL.win32
  * a little bit of clean-up in the directx video output plugin
 
+2002-05-18 Saturday 18:48  massiot
+
+ * Fixed Mac OS X resizing.
+
 2002-05-18 Saturday 17:53  massiot
 
  * Warning levels are no longer additive, patch courtesy of Arnaud de
@@ -5782,6 +6675,12 @@
 2002-05-18 Saturday 15:51  gbazin
 
  * fixed deadlock in NextFrame() in aout_pcm.c
+
+2002-05-18 Saturday 15:34  gbazin
+
+ * fixed a bug in the directx window creation function. We register a window
+    class once per process so we must be careful not to free the associated
+    resources.
 
 2002-05-18 Saturday 14:03  gbazin
 
@@ -5824,6 +6723,26 @@
 
  *A lock was not released;
 
+2002-05-18 Saturday 07:30  sam
+
+   * ./plugins/text/rc.c: added a safety lock.
+
+2002-05-18 Saturday 02:32  ipkiss
+
+  * Fixed my previous commit
+
+2002-05-18 Saturday 02:12  ipkiss
+
+  * New Network dialog box for Gtk and Gnome interfaces
+
+2002-05-17 Friday 23:01  fenrir
+
+     * plugins/mpeg_system/mpeg_audio.c : you can now force this plugin( mpegaudio ).
+
+2002-05-17 Friday 18:12  stef
+
+ *Update reference in case of sequence end code.
+
 2002-05-17 Friday 18:06  stef
 
  *Don't keep the control lock during the pause
@@ -5836,6 +6755,10 @@
 2002-05-17 Friday 16:38  sam
 
    * ./src/misc/mtime.c: we use nanosleep whenever possible (patch from Meuuh).
+
+2002-05-17 Friday 15:47  fenrir
+
+     * plugins/avi/avi.c : it will not segfault with broken avi with an unknown stream.
 
 2002-05-17 Friday 15:14  lool
 
@@ -5850,6 +6773,13 @@
    * ./src/interface/intf_msg.c, src/interface/intf_playlist.c: disabled
      calls to realloc(_,0) in a similar way to input_programs.c.
 
+2002-05-16 Thursday 16:51  gbazin
+
+ Another fix from Sam:
+
+ * fix random segfaults on title change.
+   (cell.i_cell_nb should be tested _before_ we access the structures)
+
 2002-05-16 Thursday 13:20  gbazin
 
  * src/input/input_programs.c: fixed memory corruption by setting a few
@@ -5858,9 +6788,42 @@
 
  This patch comes from sam, so if you want to blame someone blame him ;-)
 
+2002-05-16 Thursday 12:47  tcastley
+
+ Fixed segfault in last checkin.
+
+2002-05-16 Thursday 11:38  tcastley
+
+ Improved overlay and bitmap support, not tested on nVidia cards.
+ Lower CPU usage and no thread created per frame.
+
+2002-05-15 Wednesday 23:53  sam
+
+   * ./plugins/dvd/dvd_summary.c: added a sanity check.
+
+2002-05-15 Wednesday 22:53  jobi
+
+     * plugins/vcd/* : vcd access plugin now uses mpeg_ps demux instead
+                      of its own one.
+
+2002-05-15 Wednesday 21:14  massiot
+
+ Attempt to fix the video output with QuickTime 6.
+
+2002-05-15 Wednesday 19:36  sam
+
+   * ./plugins/ac3_adec/ac3_adec.c: probably fixed most "crash when changing
+     audio track" problems by zeroing the p_ac3dec structure.
+   * ./plugins/ac3_adec/ac3_adec.c: fixed a "INPUT_MAX_ALLOCATION reached"
+     crash.
+
 2002-05-15 Wednesday 15:46  asmax
 
  - check size to avoid realloc(0)
+
+2002-05-15 Wednesday 14:43  ipkiss
+
+  * plugins/win32/network.*: new Network dialog box
 
 2002-05-15 Wednesday 13:36  marcari
 
@@ -5891,6 +6854,15 @@
    * ./src/misc/configuration.c: fixed an issue with long options from
      modules where option arguments and playlist entries were mixed.
 
+2002-05-15 Wednesday 00:40  sam
+
+   * ./plugins/spudec/spu_decoder.c: fixed endianness issue; subtitles colors
+     should be OK now.
+
+2002-05-15 Wednesday 00:39  sam
+
+   * ./plugins/satellite/input_satellite.c: fixed a compilation warning.
+
 2002-05-15 Wednesday 00:04  sam
 
    * ./configure.in: added libdvbpsi version check.
@@ -5899,6 +6871,10 @@
 
    * ./include/modules_inner.h: fixed a bug in module reinitialization,
      which should fix crashes after a long pause.
+
+2002-05-14 Tuesday 21:57  bozo
+
+ [no log message]
 
 2002-05-14 Tuesday 21:23  massiot
 
@@ -5918,6 +6894,10 @@
 
  It should now be possible to quit when reading a bogus file.
 
+2002-05-14 Tuesday 20:13  massiot
+
+ Do not eject when we're reading from the disc...
+
 2002-05-14 Tuesday 19:47  sam
 
    * ./src/misc/modules.c: if a module has a zero-scored capability, we don't
@@ -5935,10 +6915,25 @@
   * ./include/mmx.h, ./plugins/imdct/*: gcc-3.1 compilation fixes courtesy
     of Yves Duret and other Mandrakesoft guys I don't know.
 
+2002-05-14 Tuesday 17:31  sam
+
+   * ./plugins/sdl/vout_sdl.c: fixed an aspect ratio issue (thanks Meuuh).
+
 2002-05-14 Tuesday 16:45  jobi
 
      * src/input/mpeg_system.c: fixed an old old bug in TS demux, thank you
                                 Meuuh.
+
+2002-05-14 Tuesday 14:13  fenrir
+
+     Sorry, fix a mistake.
+
+2002-05-14 Tuesday 14:10  fenrir
+
+     * plugins/mpeg_system/mpeg_audio.c : to avoid problem with PS, test
+ only the first 4 bytes for mpeg header so some broken files, and all
+ web radio will not work. You can change this by changing value
+ of MPEGAUDIO_MAXTESTPOS.
 
 2002-05-14 Tuesday 01:14  jobi
 
@@ -5950,6 +6945,11 @@
 
  * New OS X icon, courtesy of Joeri van Dooren <joeri@van.dooren.be> ;
  * Mac OS X fix.
+
+2002-05-13 Monday 23:12  fenrir
+
+     * plugins/mpeg_system/mpeg_audio.c : you should again be able to
+ play PS stream (I hope it will be enougth). Sorry .
 
 2002-05-13 Monday 21:55  fenrir
 
@@ -5963,6 +6963,19 @@
    * ./plugins/filter/clone.c: New filter, `--filter clone', duplicates
      display. To duplicate 12 times, use `--filter clone:12'.
 
+2002-05-13 Monday 17:58  sam
+
+   * ./plugins/x11/xcommon.c, ./plugins/x11/xvideo.c: --xvideo-chroma flag to
+     force the XVimage format used.
+
+2002-05-13 Monday 17:57  sam
+
+   * ./plugins/text/ncurses.c: ncurses interface improvements by Thomas Graf.
+
+2002-05-13 Monday 16:28  fenrir
+
+     * mpeg_audio.c : don't use any more U32_AT. Thanks Meuuh.
+
 2002-05-12 Sunday 20:56  massiot
 
  * Fixed menus [Mac OS X port]
@@ -5971,9 +6984,17 @@
  * Disabled auto-hiding of mouse cursor since it doesn't work when browsing
    menus ; instead, click in the video window
 
+2002-05-12 Sunday 06:51  fenrir
+
+     * All: simplifications.
+
 2002-05-12 Sunday 01:39  massiot
 
  * Mac OS X port : menus for Program/Title/Chapter/Languages.
+
+2002-05-10 Friday 04:06  fenrir
+
+     * All: use input_ClockManageRef to do synchro.
 
 2002-05-10 Friday 02:04  fenrir
 
@@ -5987,9 +7008,25 @@
      reason, user just needs to hit Ctrl-C again 1 second later and we'll
      exit disgustingly instead of freezing.
 
+2002-05-09 Thursday 16:15  jlj
+
+   * ./plugins/macosx/intf_vlc_wrapper.c: menu code fixes.
+
 2002-05-09 Thursday 14:52  jobi
 
      * doc/vlc-howto.sgml : URL fix for libdvdcss
+
+2002-05-07 Tuesday 20:17  massiot
+
+ Fixed Mac OS X VOUT_SIZE_CHANGE signal.
+
+2002-05-07 Tuesday 13:55  fenrir
+
+     * corrected some bad lock/unlock
+
+2002-05-07 Tuesday 13:53  fenrir
+
+     * plugins/avi/avi.c : can now use --novideo
 
 2002-05-06 Monday 23:18  jlj
 
@@ -5998,6 +7035,15 @@
 2002-05-06 Monday 22:59  massiot
 
  Improvements of the OS X GUI.
+
+2002-05-06 Monday 22:09  jpsaman
+
+ Added mad plugin downscale config option for selecting downscaling routine. Choices are: fast, mpg321. Default the fast version is used. The downscale option mpg321 uses an algorithm that adapts to dither errors. This routine is borrowed from MPG321 code.
+ Mono audio streams get now duplicated on the right channel instead of silencing the right channel (untested).
+
+2002-05-06 Monday 22:02  fenrir
+
+     *ALL : ameliorations ( i hope ;)
 
 2002-05-06 Monday 21:05  gbazin
 
@@ -6010,22 +7056,56 @@
 
  * xmga and sdl now switch to fullscreen on double-click.
 
+2002-05-05 Sunday 17:20  fenrir
+
+     * plugins/avi/avi.c try to not freeze when reach end file
+
 2002-05-05 Sunday 08:25  gbazin
 
  * fixed the resizing and scaling of the X11 video output.
  * clicking on the video doesn't pause it anymore (use spacebar for this), but
    double-clicking will now switch between fullscreen and window mode.
 
+2002-05-04 Saturday 16:51  fenrir
+
+ [no log message]
+
+2002-05-04 Saturday 16:17  gbazin
+
+ * The Apply button in the preferences menu is grayed out unless there's a
+   change to apply.
+ * GtkConfigApply() now clears the list of config changes before returning.
+
 2002-05-04 Saturday 15:49  sam
 
    * ./plugins/network/ipv4.c: fixed ipv4.so compilation under QNX.
    * ./configure.in: deactivated ipv6.so under QNX for now.
+
+2002-05-04 Saturday 13:48  massiot
+
+ More stable audio output [Mac OS X port] with more output buffering.
 
 2002-05-04 Saturday 03:36  lool
 
    * ./BUGS :
      - no text in the status bar with gtk intf
      - no window title in gtk intf on some machines, correct title on another
+
+2002-05-04 Saturday 03:32  lool
+
+   * ./plugins/gtk/*.glade, ./plugins/gtk/*_interface.*: fix for interface
+     autoshrink when toolbar text isn't displayed
+
+2002-05-04 Saturday 02:05  lool
+
+   * ./plugins/gtk/gnome.c, ./plugins/gtk/gtk.c, ./plugins/gtk/gtk_display.*:
+     callbacks for the hide tooltips and toolbar text options
+
+2002-05-03 Friday 22:30  jpsaman
+
+ Aout fifo adapts it size according to the length of the first frame.
+ The change is needed for MPEG1/2 layer III, because the size of output pcm from mad_decoder is different.
+ Sadly, the buffer underruns are back ;-(.
 
 2002-05-03 Friday 20:49  sam
 
@@ -6042,6 +7122,11 @@
 
    * ./configure.in: we check support for variadic macros (screw Borland!).
 
+2002-05-03 Friday 17:37  lool
+
+   * ./plugins/gtk/gnome.c: new option lets you hide the text of the
+     GNOME interface toolbar
+
 2002-05-02 Thursday 23:06  massiot
 
  Small FAQ update. Please note that everyone can update this FAQ if they
@@ -6050,6 +7135,16 @@
 2002-05-02 Thursday 23:02  massiot
 
  Added quite a few missing names.
+
+2002-05-02 Thursday 22:37  sam
+
+   * ./plugins/qnx/vout_qnx.c: port of the QNX vout plugin to the vout4 API,
+     courtesy of Pascal Levesque <Pascal.Levesque@mindready.com>.
+
+2002-05-02 Thursday 10:54  fenrir
+
+     * plugins/avi/avi.c : you can now use slow and fast reading.
+                           After seeking, audio and video synchro is better.
 
 2002-05-01 Wednesday 22:32  massiot
 
@@ -6066,12 +7161,49 @@
 
  * added a --with-a52-tree option to the configure script.
 
+2002-05-01 Wednesday 19:18  sam
+
+   * ./plugins/spudec/spu_decoder.c: FOURCC_YUY2 subtitles support (for NVidia
+     overlay) courtesy of Rudolf Cornelissen <rag.cornelissen@inter.nl.net>.
+
+2002-05-01 Wednesday 19:05  sam
+
+   * ./plugins/kde/*: configuration dialog for the KDE interface, courtesy
+     of Sigmund Augdal <sigmunau@stud.ntnu.no>.
+
+2002-04-30 Tuesday 20:21  sam
+
+   * Humpfff. A typo in my previous commit.
+
+2002-04-30 Tuesday 20:19  sam
+
+   * ./plugins/chroma/i420_yuy2.h: workaround for yet another annoying gcc
+     behaviour with inline assembly (seems to be BeOS-specific). If anyone has
+     a better idea than the huge "memory" constraint, please have a look at
+     the MMX_CALL() macro!
+
+2002-04-30 Tuesday 16:42  fenrir
+
+     * plugins/avi/avi.c : corrected a bug with broken avi file.
+
 2002-04-30 Tuesday 12:56  gbazin
 
  * added config_Get/PutFloatVariable to p_sysmbols. Thanks to Sigmund Augdal
  for pointing this bug out.
  * on Win32 the aout_pcm thread is given a high priority. This helps avoiding
  lots of audio underruns, especially when moving around the video window.
+
+2002-04-30 Tuesday 12:35  fenrir
+
+     * plugins/avi/avi.c : changed in order to read more avi file, Meuuh
+ you can now read your file ;) (but audio is awfull,perhaps because of mad
+ plugin ? ). Fix a bug for audio with some avi file.
+
+2002-04-30 Tuesday 00:38  jobi
+
+     * ALL: fixed a compilation issue in satellite input. It now uses common
+            or libdvbpsi ts demux. Untested cause I can't get our Nova Card
+            work again.
 
 2002-04-29 Monday 23:57  massiot
 
@@ -6084,6 +7216,10 @@
      underrun problems.
  * A little bit of DirectX plugin clean-up.
 
+2002-04-29 Monday 19:38  ipkiss
+
+ Compilation fix.
+
 2002-04-28 Sunday 19:09  jpsaman
 
  Added more information in ipkg control file.
@@ -6092,6 +7228,12 @@
 
    * ./include/modules_inner.h: the module name is now a default shortcut, for
      it, no need to manually add it.
+
+2002-04-28 Sunday 11:56  sam
+
+   * ./plugins/sdl/vout_sdl.c, ./plugins/x11/xcommon.c: when in fullscreen
+     mode, the Esc key does not quit immediately, but first escapes from
+     fullscreen mode. User-requested feature.
 
 2002-04-28 Sunday 09:05  sam
 
@@ -6105,12 +7247,25 @@
 
    * ./include/os_specific.h: fixed a C++ compilation issue.
 
+2002-04-28 Sunday 01:26  sam
+
+   * Removed the main() declaration because SDL defines it as a macro.
+
+2002-04-27 Saturday 22:54  fenrir
+
+     * plugins/avi/avi.c : with some broken avi file, will not freeze, and
+ try to detect end of file.
+
 2002-04-27 Saturday 22:11  gbazin
 
  * moved the function definitions from threads.h into threads_funcs.h. This
     allows us to move p_main_sys into p_main (p_main->p_sys).
  * fixed the --with-gtk-config-path and --with-sdl-config-path options in
     configure.in
+
+2002-04-27 Saturday 16:13  fenrir
+
+     * plugins/avi/avi.c : seek is faster
 
 2002-04-27 Saturday 02:20  jobi
 
@@ -6128,6 +7283,10 @@
 
  * updated win32 compilation instructions.
 
+2002-04-26 Friday 20:18  jobi
+
+     * plugins/mpeg_system/mpeg_ts.c : fixed --program option
+
 2002-04-26 Friday 18:12  jlj
 
    * Fixed my fix for the fix for vlc_memalign. Sorry O:-)
@@ -6135,6 +7294,10 @@
 2002-04-26 Friday 17:07  jlj
 
    * ./include/common.h: Fixed vlc_memalign.
+
+2002-04-26 Friday 14:29  fenrir
+
+     * plugins/avi/avi.c : now it can play broken file with seek enable but it's very slow (will be fixed soon ).
 
 2002-04-26 Friday 05:43  sam
 
@@ -6147,6 +7310,10 @@
 2002-04-26 Friday 00:20  jlj
 
    * ./src/misc/darwin_specific.c: added system_Configure().
+
+2002-04-25 Thursday 23:52  jlj
+
+   * Cleaned up QTScaleMatrix().
 
 2002-04-25 Thursday 23:07  massiot
 
@@ -6175,11 +7342,26 @@
    * ./configure.in: dropped usage of $withval and $enableval in favor of the
      safer variants $with_foo and $enable_foo.
 
+2002-04-25 Thursday 11:41  fenrir
+
+     * plugins/avi/avi.c: will not segfault when no audio is found/supported.
+
+2002-04-25 Thursday 03:01  fenrir
+
+     * plugins/ffmpeg/ffmpeg.c : with empty frame(data_packet) it won't segfault
+     * plugins/avi/avi.c : use KeyFrame to seek, so video will not be bad as
+         before
+
 2002-04-25 Thursday 02:10  jobi
 
  * Moved Program Specific Information decoder to the ts demux module
  * Added a mpeg_ts_dvbpsi module tha uses libdvbpsi to decode PSIs. It is
    used by default if the lib is found. It shares much code with mpeg_ts
+
+2002-04-24 Wednesday 23:49  gbazin
+
+ * fixed typo. You have to double click on the video window to switch to
+   fullscreen.
 
 2002-04-24 Wednesday 23:08  gbazin
 
@@ -6204,10 +7386,30 @@
  * ./plugins/avi a light  avi demux
  * ./plugins/ffmpeg a video decoder for divx v3 and opendivx
 
+2002-04-23 Tuesday 23:37  ipkiss
+
+  * plugins/win32/preferences.cpp: fixed a compilation bug
+
 2002-04-23 Tuesday 23:06  sam
 
    * ./plugins/avi, ./plugins/ffmpeg: created empty directories for fenrir's
      upcoming work.
+
+2002-04-23 Tuesday 22:07  gbazin
+
+ * DirectX video output plugin now uses triple buffering for YUV overlay. This
+   improves the video quality a lot (no tearing) without affecting performance.
+   (I knew double buffering sucked but I just discovered why triple buffering
+    is better: you don't have to wait for the vsync to flip the buffers).
+
+ * Fixed the DirectX video output for non-overlay modes. It was only working
+   in RGB16 before.
+
+ * Fixed the mouse autohidding feature in the DirectX plugin
+  (at least partially).
+
+ * Fixed the spu decoder to take the pitch of the destination picture into
+   account when rendering the subtitles (Implemented only for the YUV modes).
 
 2002-04-23 Tuesday 20:58  sam
 
@@ -6277,6 +7479,10 @@
 
    . Url & mailing-lists corrections
 
+2002-04-20 Saturday 15:40  gbazin
+
+ * the last category from the config options wasn't displayed.
+
 2002-04-20 Saturday 15:12  jpsaman
 
  Updated Netherlands translation of interface.
@@ -6291,6 +7497,10 @@
    * ./src/interface/main.c: we now set LC_CTYPE to get the right charset.
    * ./src/misc/configuration.c: lots of simplifications in the code.
    * ./po/vlc/pot: updated translations.
+
+2002-04-18 Thursday 21:32  massiot
+
+ Fixed typos.
 
 2002-04-18 Thursday 19:38  sam
 
@@ -6333,6 +7543,13 @@
    * ./src/misc/configuration.c: disabled the AltiVec warning message on the
      PowerPC platform because it was misleading.
 
+2002-04-16 Tuesday 23:00  massiot
+
+ * Have dvdread plug-in respond to dvd: URLs ;
+ * MacOS X interface shouldn't take as much CPU as it used to ;
+ * Fixed a bug in Altivec-enabled MC (thanks walken) ;
+ * Fixed a case of segfault in Altivec-enabled memcpy.
+
 2002-04-16 Tuesday 22:13  jobi
 
  * big update of Henri's howto
@@ -6349,16 +7566,46 @@
    sat_lnb_slof and sat_diseqc). They only appear if satellite input
    is compiled.
 
+2002-04-15 Monday 04:36  jobi
+
+ * removed a totally useless switch in my last commit
+   (switch i {case 1: i=1;break; case 2: i=2: ...
+   I'd better got to bed ;)
+
+2002-04-15 Monday 04:28  jobi
+
+ * fixed a few bugs in satellite input (device was not closed in every
+ failure case, symbol rate limits in gnome interface were wrong)
+
+ * added FEC choice in command line, gtk and gnome interfaces. Command
+ line is now
+ satellite:<frequency(Hz)>,<polarization(0=V,1=H)>,<fec(1=1/2,2=2/3...)>,
+ <symbol rate(kbyte/s)>
+
+2002-04-11 Thursday 09:25  tcastley
+
+ Implemented a fix for nVidia overlays thanks to Bertil.
+
 2002-04-11 Thursday 08:55  sam
 
    * ./Makefile: fixed the Win32 interface under Win2k/XP.
    * ./src/misc/modules_plugins.h: implemented a dlerror()-like wrapper
      for the Win32 API.
 
+2002-04-10 Wednesday 17:47  jobi
+
+ * fixed another bug in PS demux : the first program added was at the
+ same time declared as the current program and as a new program, which
+ made the ES be selected two times.
+
 2002-04-10 Wednesday 16:26  jobi
 
  * fixed a bug in input_SetProgram, that made the ps file input
  launch without video. Sorry about this.
+
+2002-04-10 Wednesday 10:08  tcastley
+
+ Fixed code to close vout window, does not segfault anymore.
 
 2002-04-10 Wednesday 02:48  lool
 
@@ -6422,6 +7669,10 @@
 2002-04-05 Friday 21:26  sam
 
    * ./Makefile, ./configure.in: misc BeOS build fixes.
+
+2002-04-05 Friday 21:03  jlj
+
+   * ./plugins/macosx/vout_macosx.c: memalign -> vlc_memalign
 
 2002-04-05 Friday 20:44  sam
 
@@ -6527,6 +7778,10 @@
      libdvdcss and link vlc with it.
    * ./plugins/dvdread/input_dvdread.c: removed inclusion of dvd_udf.h.
 
+2002-04-03 Wednesday 13:18  ipkiss
+
+  * ./plugins/win32/*: Added management for secondary config dialogs
+
 2002-04-03 Wednesday 06:45  sam
 
    * ./plugins/ogg/*: added preliminary files for an Ogg/Vorbis decoder a
@@ -6603,9 +7858,20 @@
  * ./src/interface/main.c: check that channels have been created before
    the call to network_ChannelJoin
 
+2002-04-02 Tuesday 15:18  ipkiss
+
+  * ./plugins/win32:
+         - fixed a few bugs in the preferences
+         - better auto-resizing of the main window
+         - the disc dialog now respects the preferences settings
+
 2002-04-02 Tuesday 11:31  ipkiss
 
   * ./src/misc/configuration.c: small compilation fix
+
+2002-04-02 Tuesday 10:44  tcastley
+
+ Added a test for the nooverlay option.
 
 2002-04-02 Tuesday 10:43  tcastley
 
@@ -6619,9 +7885,30 @@
    * ./src/misc/configuration.c: Solaris fixes by Meuuh.
    * ./FAQ: removed outdated stuff.
 
+2002-04-02 Tuesday 06:31  gbazin
+
+ * Fixed yet another bug related to the event thread creation
+ * Removed a few debug messages
+
 2002-04-01 Monday 21:54  gbazin
 
  * Fixes for the Win32_msvc build
+
+2002-04-01 Monday 21:39  gbazin
+
+ * Microsof Visual Studio C++ 6 project files.
+   This is usefull mainly for debugging as the hardware accelerated plugins
+     can't be compiled with msvc.
+
+ I won't be maintaining this msvc project as I don't have MSVC myself, but
+ maybe this will encourage people to try to develop for vlc (or maybe just
+ discourage them ;-)
+
+2002-04-01 Monday 16:08  gbazin
+
+ * Win32 compilation fixes when downmixsse and downmix3dn are declared as
+     plugins.
+ * Fixed the waiting on the event thread creation in the directx plugin.
 
 2002-04-01 Monday 10:47  gbazin
 
@@ -6635,6 +7922,47 @@
 2002-04-01 Monday 09:59  gbazin
 
  * updated INSTALL.win32
+
+2002-04-01 Monday 07:37  tcastley
+
+ Fixed the color_space problem.  Overlays now work.
+ Still problem with nVidia cards.
+
+2002-04-01 Monday 05:49  tcastley
+
+ Improved overlay detection, default colour space selection.
+ Has bad output color need some work.
+
+2002-03-31 Sunday 22:59  gbazin
+
+ * allow the user to resize the configuration windows
+ * moved config_GetIntVariable out of the loop
+
+2002-03-31 Sunday 22:35  gbazin
+
+ * You can now set a maximum height for the configuration windows in the gtk
+     and gnome plugins. This patch _doesn't change_ the look of the interface
+     unless this interface tries to use more space than allowed, in which case
+     scrollbars are added to make the navigation easy.
+     Note that this setting only affects the default size the interface will
+     use, the user is then free to change the size of the window as he wants.
+
+ * Tooltips are now triggered only in specific places. This is a lot less
+    intrusive and annoying for the users.
+
+2002-03-31 Sunday 17:59  ipkiss
+
+  * ./plugins/win32: fixed the bug on exiting the vout pressing 'q'
+
+2002-03-31 Sunday 08:13  tcastley
+
+ Implemented an "always-on-top" feature for the interface window.
+ RGB16 Overlay supported again.
+ Resizing is now implemented consistantly.
+
+2002-03-31 Sunday 05:10  ipkiss
+
+  * plugins/win32: subtitles should work, now
 
 2002-03-29 Friday 00:14  massiot
 
@@ -6668,6 +7996,11 @@
  programs
  * Audio and video output go to time-constrained scheduling [OS X port]
 
+2002-03-27 Wednesday 21:01  lool
+
+ Some dirty ifdefs for a nicer gnome interface (gnome buttons, gnome
+ dialogs).
+
 2002-03-27 Wednesday 19:54  jpsaman
 
  Translation of user interface messages to Netherlands.
@@ -6675,6 +8008,14 @@
 2002-03-27 Wednesday 19:53  jpsaman
 
  Added Netherlands translation (nl) to configure.in
+
+2002-03-27 Wednesday 18:43  lool
+
+ plugins/gtk/gnome.c, plugins/gtk/gtk.c:
+     new options "gtk_hide_toltips" or "gnome_hide_tooltips"
+
+  Tooltips are enabled by default. This option is only considered on
+ module initialization.
 
 2002-03-26 Tuesday 23:39  massiot
 
@@ -6701,6 +8042,22 @@
    we cannot pass an empty string as a <string> config option. (this shouldn't
    matter anyway)
 
+2002-03-26 Tuesday 17:33  lool
+
+ plugins/gtk/gtk_preferences.c:
+   . save button (inadvertently suppressed)
+
+2002-03-26 Tuesday 16:06  ipkiss
+
+  * plugins/win32:
+         - added toolbar icons (thanks xav)
+         - we can no longer edit plugin names in the preferences :)
+         - the tool button for playlist is now a toggle button
+
+2002-03-26 Tuesday 10:29  tcastley
+
+ Disabled controls if the playlist was empty.
+
 2002-03-25 Monday 23:36  ipkiss
 
   * Added a win32 interface plugin, developed with Borland C++ Builder.
@@ -6722,6 +8079,13 @@
     interface, binary files are available here:
     http://www.via.ecp.fr/~ipkiss/intfwin/vlc.zip
     Enjoy!
+
+2002-03-25 Monday 22:38  lool
+
+ plugins/gtk/gtk_preferences.c:
+   . fixed an ugly structure
+   . the tabs are not verticaly expanded as they were
+   . small enhancements
 
 2002-03-25 Monday 20:37  lool
 
@@ -6750,9 +8114,21 @@
  * Added gtk and gnome interfaces for satellite input. We should find a
    way to hide the button if satellite support is not compiled.
 
+2002-03-22 Friday 13:16  tcastley
+
+ Implemented correct scaling and used new window size variables.
+ Beta always on top for the interface window.  New cursor handling.
+
 2002-03-22 Friday 00:55  xav
 
   - Updated INSTALL-win32.txt
+
+2002-03-22 Friday 00:47  jlj
+
+   * Fixed a problem in the MacOS X aout which caused the previously
+     played audio frames to be played when there were no new frames
+     available.
+   * MacOS X vout now uses the height/width calculated in video_output.c
 
 2002-03-22 Friday 00:24  xav
 
@@ -6784,6 +8160,10 @@
     some problems on solaris. This function now uses getpwuid and is called
     only once to store the home directory into the p_main structure.
 
+2002-03-21 Thursday 02:28  jobi
+
+ Forgot to add the input files.
+
 2002-03-21 Thursday 02:27  jobi
 
  [no log message]
@@ -6798,6 +8178,15 @@
 
    * ./src/input/mpeg_system.c: fixed a bus error on UltraSparc.
 
+2002-03-20 Wednesday 14:08  sam
+
+   * Win32 and Solaris compilation fix.
+
+2002-03-20 Wednesday 10:33  tcastley
+
+ Improved scaling, correct aspect ratio even in full screen mode.
+ Duplicate code reduces and framework for Overlay and OpenGL modes in place.
+
 2002-03-20 Wednesday 03:43  sam
 
    * ./src/misc/modules_plugin.h: kludge to allow the ALSA module to be
@@ -6807,6 +8196,10 @@
 2002-03-20 Wednesday 03:12  ipkiss
 
   * Added 3 bugs of the win32 port to the BUGS file
+
+2002-03-20 Wednesday 01:32  jobi
+
+ * Raw device fix, courtesy of Steven Schultz
 
 2002-03-19 Tuesday 23:47  massiot
 
@@ -6828,6 +8221,11 @@
    * ./configure.in: fixed a few bashisms.
    * ./src/misc/configuration.c: fixed build under Solaris.
    * ./TODO: updated todo list.
+
+2002-03-19 Tuesday 12:48  gbazin
+
+ * fixed two memory leaks
+ * fixed typo in waveout.c
 
 2002-03-19 Tuesday 05:49  sam
 
@@ -6899,6 +8297,16 @@
    * ./plugins/x11/xcommon.c: support for 8 bpp displays.
    * ./src/video_output/video_output.c: fixed a segfault.
 
+2002-03-17 Sunday 13:53  gbazin
+
+ * added an alternate fullscreen method. With this method, _nothing_ is allowed
+ to be displayed on top of the video (especially not taskbars, etc...).
+ Of course this can also be annoying sometimes, this is why it's an option.
+
+ PS: does anybody know how not to propagate the Ctrl-Alt-Tab key event to the
+ window manager. I tryed XChangeWindowAttributes with do_not_propagate_mask but
+ it doesn't seem to work.
+
 2002-03-17 Sunday 11:12  gbazin
 
  * small fix for the config file. The parser assumes that the config file is
@@ -6911,6 +8319,12 @@
  - exit from vlc and remove for example the dsp plugin (rm plugins/dsp.so)
  - resave vlc's config
  and now look at the end of the config file, it's all screwed up.
+
+2002-03-17 Sunday 05:48  tcastley
+
+ Tidied code and prevented curruption on window not containing the video.
+ Video window now returns to correct size and position after toggling
+ full screen.
 
 2002-03-16 Saturday 23:03  sam
 
@@ -6928,6 +8342,16 @@
  It's not quite yet finished (well there are a few small details to sort out),
  but I'm going away for the week-end and I wanted to commit this before so you
  can all have a play with it :)
+
+2002-03-15 Friday 18:20  sam
+
+   * ./plugins/spudec/spu_decoder.c: we now analyze the subtitle image
+     data to find the border color and the inner colors when there was
+     no way to find the palette data (network stream).
+
+2002-03-15 Friday 17:17  sam
+
+   * ./plugins/mpeg_system: fixed a parsing bug I introduced yesterday.
 
 2002-03-15 Friday 04:41  sam
 
@@ -6948,6 +8372,10 @@
 
  *Remove an ugly loop in aout_spdif.
 
+2002-03-15 Friday 00:57  stef
+
+ -Fixed chapter selection at startup.
+
 2002-03-14 Thursday 01:35  stef
 
  *p_es->p_demux_data is available in p_config->p_demux_data so that the input
@@ -6961,9 +8389,22 @@
 
  *Removed duplicate code and useless lock in gtk.
 
+2002-03-13 Wednesday 12:46  jobi
+
+ * Fixed EOF and Stop segfault in VCD input : input_BuffersEnd was being
+   called two times
+
 2002-03-13 Wednesday 08:41  tcastley
 
  Updated Tony Castley's e-mail.
+
+2002-03-13 Wednesday 08:39  tcastley
+
+ New resizing and scaling code.  More in line with BeOS standards.
+
+2002-03-12 Tuesday 20:39  gbazin
+
+ * a52 plugin updated to use liba52-0.7.3 ( which is now available on debian :)
 
 2002-03-12 Tuesday 18:37  stef
 
@@ -6977,6 +8418,15 @@
 
  *Return the option name in error message for unknown option intead of the
  argument.
+
+2002-03-11 Monday 20:14  gbazin
+
+ * gtk config interface modified so you can only have one instance of a plugin
+     config dialog box displayed at one time.
+
+2002-03-11 Monday 18:10  gbazin
+
+ * oops, forgot to check the gnome interface before my last commit.
 
 2002-03-11 Monday 07:23  gbazin
 
@@ -7000,21 +8450,55 @@
  (PS: Translations will also be appreciated but not right now as the interface
  will likely change again in the few coming days)
 
+2002-03-10 Sunday 23:36  massiot
+
+ Missing include (MacOS X port).
+
 2002-03-09 Saturday 16:48  stef
 
  *Fixed EOF segfault at end of DVD
 
  *Buffer manager is renintialised at area change.
 
+2002-03-09 Saturday 13:42  sam
+
+   * ./plugins/dvd/dvd_access.c ./plugins/vcd/input_vcd.c: we now exit more
+     cleanly on initialization error.
+
+2002-03-08 Friday 22:58  stef
+
+ Rewrite most functions in DVD plugin. Some old bugs might have been
+ solved in the operation. The plugin some be more readable now, and
+ should produce fewaer segfaults (I hope so :p)
+
+2002-03-08 Friday 18:05  jobi
+
+ * added some tests in open
+
 2002-03-08 Friday 00:26  bozo
 
  Audio output ALSA: spdif support.
+
+2002-03-07 Thursday 14:01  jobi
+
+ * When reaching the end of a track, moves to the following one.
 
 2002-03-06 Wednesday 23:54  sam
 
    * ./src/interface/main.c: disabled the GNOME segfault dialog in debug
      mode. We want nice, clean segfaults, with huge core files and a lot
      of rattle noise.
+
+2002-03-06 Wednesday 16:39  stef
+
+ I hope you liked this bug: DVD demux was always used.
+
+2002-03-06 Wednesday 12:26  stef
+
+ *Fixed demux plugin selection.
+
+ *Take the lock on stream in VCDInit. PLease test, as I don't have any VCD
+ to do it.
 
 2002-03-06 Wednesday 03:27  sam
 
@@ -7056,6 +8540,10 @@
 
   Note that chapter support is not yet implemented.
 
+2002-03-05 Tuesday 18:17  stef
+
+ Dvd demux was no longer selected under win32
+
 2002-03-05 Tuesday 17:46  stef
 
  * Dvd angle is now handled through a program structure, so that the interface
@@ -7073,6 +8561,10 @@
 
  * fixed typo in the win32 change to the input parser.
 
+2002-03-05 Tuesday 00:50  stef
+
+ *More complete command line parsing for DVD, hopefully working this time.
+
 2002-03-04 Monday 23:56  massiot
 
  * IPv6 network module, courtesy of Alexis Guillard <alexis.guillard@bt.com>,
@@ -7085,6 +8577,10 @@
  easily reused by plug-ins other than mpeg_ps and mpeg_ts.
 
  That's all for tonight.
+
+2002-03-04 Monday 23:34  stef
+
+ -fixed a typo.
 
 2002-03-04 Monday 22:20  gbazin
 
@@ -7101,6 +8597,20 @@
  * simplified the win32 specific changes to the input parser. ( I think
  we can safely assume that no access plugin name will have a length of
  one character)
+
+2002-03-04 Monday 03:44  stef
+
+ -DVD access plugin is only called if specified under windows (no automatic detection)
+
+2002-03-04 Monday 02:50  stef
+
+ [no log message]
+
+2002-03-04 Monday 02:26  stef
+
+ -replaced setenv with putenv
+
+ -fixed a bug in gtk.
 
 2002-03-04 Monday 01:53  stef
 
@@ -7139,6 +8649,10 @@
     * ./plugins/dummy/input_dummy.c: fixed `vlc vlc:quit'.
     * ./src/input/input.c: initialized uninitialized variables.
 
+2002-03-02 Saturday 03:29  stef
+
+ *Forgot a header.
+
 2002-03-02 Saturday 03:15  stef
 
  *Initiliaze p_access_module & p_demux_modules to NULL when input thread
@@ -7150,6 +8664,14 @@
    * ./src/misc/modules.c: shortcuts for --intf work again, gvlc launches the
      Gtk interface, qvlc launches the Qt interface, etc.
    * ./plugins/fx/scope.c: we now have sound together with --aout scope.
+
+2002-03-01 Friday 14:17  stef
+
+ *Removed numerous deadlocks.
+
+2002-03-01 Friday 01:59  xav
+
+ Multicast under Win32 now works with the new input.
 
 2002-03-01 Friday 01:12  stef
 
@@ -7229,6 +8751,10 @@
 
  *Adaptation to new configuration scheme for dvd, dvdread and spdif
 
+2002-02-25 Monday 11:25  sam
+
+   * ./plugins/lirc/lirc.c: removed CVS garbage.
+
 2002-02-25 Monday 04:30  sam
 
    * ./plugins/gtk/gtk_menu.c: fixed a compile issue on IA64.
@@ -7244,6 +8770,10 @@
 2002-02-24 Sunday 22:12  sam
 
    * Replacement header for aout_common.h.
+
+2002-02-24 Sunday 22:12  sam
+
+   * Forgot one fix in my previous commit. As usual.
 
 2002-02-24 Sunday 22:06  sam
 
@@ -7296,6 +8826,12 @@
    * ./src/misc/modules_plugin.h: if symbol foo isn't found in the
      plugin, we always try to open _foo, whatever the architecture.
 
+2002-02-21 Thursday 21:55  sam
+
+   * ./plugins/lirc/lirc.c: non-blocking patch from Sigmund Augdal
+     <sigmunau@stud.ntnu.no>; hope this time my enhancements don't break
+     everything :-)
+
 2002-02-21 Thursday 00:54  sam
 
    * ./configure.in: gtk*-config detection fix for FreeBSD.
@@ -7320,6 +8856,10 @@
 2002-02-20 Wednesday 05:50  jlj
 
    * MacOS X VCD support.
+
+2002-02-20 Wednesday 01:47  sam
+
+   * ./plugins/lirc/lirc.c: fixed my mistakes from yesterday.
 
 2002-02-19 Tuesday 03:54  sam
 
@@ -7391,6 +8931,11 @@
    * ./src/video_output/vout_subpictures.c: fixed subtitles under BeOS and
      other architectures which don't support overlay.
 
+2002-02-13 Wednesday 21:54  gbazin
+
+ * compilation fix (include stdint.h)
+ * fixed a SEGV
+
 2002-02-08 Friday 15:57  sam
 
    * ./plugins/beos/vout_beos.cpp: ported the BeOS RGB video output to
@@ -7418,6 +8963,10 @@
 
    * ./src/misc/modules.c: changed module_Need to make it possible to
      have several modules with the same shortcut name.
+
+2002-01-31 Thursday 23:18  massiot
+
+ Fixed a bug in the network dialog.
 
 2002-01-30 Wednesday 23:41  fgp
 
@@ -7452,9 +9001,26 @@
  Note that audio output currently suffers from frequent underruns.
  This has not been fixed here.
 
+2002-01-28 Monday 21:31  stef
+
+ .Fixed a segfault a dvdread exit (my fault).
+
 2002-01-28 Monday 16:51  sam
 
    * ./plugins/chroma/i420_rgb16.c: MMX YUV to RGB transformation for 15bpp.
+
+2002-01-27 Sunday 22:14  gbazin
+
+ * Added double-buffering for the directx plugin in overlay mode.
+ * Several directx bug-fixes:
+     - implemented the right behaviour on exit.
+     - fixed bug preventing the creation of several windows.
+         (the wall filter is working now :-))
+     - fixed unnecessary background redraws (it made the video flicker).
+     - fixed bug where we were losing the video display because of lost
+         surfaces in video memory.
+     - when using hardware overlay, the output window will now specify:
+         "(using hardware overlay)".
 
 2002-01-26 Saturday 01:18  tcastley
 
@@ -7501,6 +9067,25 @@
      which made decoder plugins segfault in GetChunk calls.
    * ./configure.in: proper soundcard.h check from Yves Duret.
 
+2002-01-23 Wednesday 23:14  massiot
+
+ Fixed a bug introduced yesterday.
+
+2002-01-23 Wednesday 20:19  stef
+
+ I checked in bad header files yesterday.
+
+2002-01-23 Wednesday 12:02  asmax
+
+ * enabled --stereo option for streams that pretend to be mono while they
+  are not!
+
+2002-01-23 Wednesday 03:56  stef
+
+ -removed some useless printf
+
+ -replaced dvdcss_title(,) with dvdcss_seek( ,,DVDCSS_SEEK_KEY )
+
 2002-01-23 Wednesday 03:15  stef
 
  *Merged hh patch in libdvdcss from main tree.
@@ -7508,11 +9093,35 @@
  *Updated local libdvdread, so that it does not depend on libdvdcss
  (ala dummy_dvdcss) and modified configure to reflect changes.
 
+2002-01-23 Wednesday 01:59  sam
+
+   * Darwin compilation fix.
+
+2002-01-22 Tuesday 23:14  massiot
+
+ * Fixed an alignment issue in the ac3 decoder.
+
 2002-01-21 Monday 23:57  massiot
 
  * Decoders do not necessarily use bit stream (see mad plug-in)
  * mad PTS should finally be accurate
  * Some configure changes.
+
+2002-01-21 Monday 22:34  jpsaman
+
+ Oops, lucky to catch this one (deleted function name s24_to_s16_pcm accidently)
+
+2002-01-21 Monday 22:28  jpsaman
+
+ Changes made to mad plugin:
+ + libmad_input now takes one frame at a time (see mad_adec.h for defines)
+ + audio_linear_dither() gives better sound quality then s24_to_s16_pcm(),
+   but also makes audio artefacts louder so disabled it for now (see file
+   mad_libmad.c)
+ + cleaned up libmad_output (see file mad_libmad.c)
+ + cleaned up InitThread (see file mad_adec.c)
+ + Made buffer size match libmad's expectations (see file mad_adec.h)
+ + updated documentation
 
 2002-01-21 Monday 07:00  gbazin
 
@@ -7540,6 +9149,12 @@
    * ./src/interface/main.c: --spumargin flag; use this to force displaying
      subtitles at the bottom of the screen instead of putting them in the
      middle, for instance: `--spumargin 5'.
+
+2002-01-19 Saturday 19:54  gbazin
+
+ * Converted the plugin initialization code of the macosx, beos and qnx
+     code. (please note that they should still not compile as they need
+     to be adapted to the new Vout4 architecture)
 
 2002-01-17 Thursday 23:02  gbazin
 
@@ -7578,6 +9193,14 @@
  - The sound is very dirty in U8 mode. I don't know if it comes from the
  8 bit mode itself or from the S16->U8 conversion.
 
+2002-01-15 Tuesday 05:22  stef
+
+ -Patch of libdvdread to do readv on regular files (dvd copied on hard drive).
+ Not completed, and little tested yet ; when it is completed, this patch should
+ be submitted to libdvdread developers.
+
+ -Patch of libdvdcss to decrypt vobs when they are not on a block device.
+
 2002-01-15 Tuesday 01:01  sam
 
    * ./debian/control: fixed Debian build-depends.
@@ -7589,9 +9212,27 @@
  * More precise way to retrieve a PTS from the bit stream.
  * Fixed issues in the PTS handling of the mad plug-in (incomplete).
 
+2002-01-14 Monday 22:26  massiot
+
+ Attempt to fix the INPUT_MAX_ALLOCATION error.
+
+2002-01-14 Monday 22:06  stef
+
+ *With DVDCSS_METHOD=disc or key, the keys are no longer buffered on start.
+ The title key is still read at each block but it is checked for change
+ before decryption.
+
 2002-01-14 Monday 21:00  jpsaman
 
  Configure, build and install instructions for libmad library and mad plugin.
+
+2002-01-14 Monday 20:57  jpsaman
+
+ Updated BUGS list
+
+2002-01-14 Monday 20:53  jpsaman
+
+ Smooth sound (not tested on iPaq)
 
 2002-01-14 Monday 19:54  asmax
 
@@ -7638,6 +9279,10 @@
    * ./src/video_output/vout_pictures.c: we create more Xv pictures to
      get smoother rendering.
 
+2002-01-11 Friday 22:05  jpsaman
+
+ Removed aout_CreateFifo from mad_adec.c InitThread() and added it to mad_libmad.c in mad_libmad.c
+
 2002-01-11 Friday 03:07  sam
 
    * BSD compilation fix suggested by Steven M. Schultz.
@@ -7655,6 +9300,13 @@
      DecoderError.
    * ./plugins/x11/xcommon.c: replaced XFlush with XSync. This must be the
      fourth time someone has to commit this, so I added a reminder :-)
+
+2002-01-09 Wednesday 23:32  stef
+
+ Hopefully fixed a bug in TS input, that caused a segfault when there was
+ no network stream.
+
+ Please, have a look at the fix to check it doesn't break anything else.
 
 2002-01-09 Wednesday 10:22  sam
 
@@ -7679,6 +9331,16 @@
  ac3_adec, not tested with mad)
  - first attempt to implement mono output (doesn't work yet)
 
+2002-01-08 Tuesday 23:34  stef
+
+ DVDRead plugins works again more or less ; major bugs remain but it is usable.
+ It is selected by default if you have it compiled.
+
+2002-01-08 Tuesday 23:06  massiot
+
+ Fixed a bug in QuantMatrixExtension, many thanks to "Thomas L. Wood"
+ <twood@lucent.com> !
+
 2002-01-07 Monday 17:02  sam
 
    ./debian/control: updated list of supported architectures.
@@ -7702,10 +9364,22 @@
      they just use the first available input for now. This may break other
      things, but I promise I'll eventually repair everything :-)
 
+2002-01-06 Sunday 18:01  sam
+
+   * ./plugins/mga/mga.c: pipeline and cache optimizations.
+
 2002-01-06 Sunday 17:18  sam
 
    * ./plugins/mga/mga.c: MMX-accelerated version of the MGA plugin.
    * ./plugins/mpeg_vdec/Makefile: Little workaround for PA-Risc compilation.
+
+2002-01-06 Sunday 14:46  jpsaman
+
+ Optimized libmad_output() for smoother sound. It is still not optimal.
+
+2002-01-06 Sunday 00:07  sam
+
+   * ./plugins/fb/fb.c: ported the framebuffer video output to vout4.
 
 2002-01-05 Saturday 18:25  sam
 
@@ -7729,6 +9403,22 @@
      for the moment, and there is a strange bug with some streams which gives
      only a green image. Needs to be looked at.
    * ./plugins/x11/xcommon.c: fixed a few typos.
+
+2002-01-05 Saturday 14:32  jpsaman
+
+ Updated documentation.
+
+2002-01-05 Saturday 14:30  jpsaman
+
+ Updated TODO list.
+
+2002-01-05 Saturday 14:28  jpsaman
+
+ Updated documentation
+
+2002-01-05 Saturday 13:57  jpsaman
+
+ Removed unused function prototype from headerfile.
 
 2002-01-05 Saturday 03:49  sam
 
@@ -7792,6 +9482,21 @@
      describe picture types (see http://www.webartz.com/fourcc/).
    * ./plugins/dvdread/input_dvdread.c: compilation fix by Eyal Lebedinsky.
    * ./plugins/x11/xcommon.c: fixed the XShm operations order.
+
+2002-01-02 Wednesday 06:46  gbazin
+
+ * Small optimizations
+ * Removed unused code
+ * Your old window position and size are now restored when you come out
+     of fullscreen mode.
+
+2002-01-01 Tuesday 11:35  massiot
+
+ Another fix.
+
+2002-01-01 Tuesday 11:30  massiot
+
+ Delete a remaining ErrorThread :p.
 
 2002-01-01 Tuesday 07:42  sam
 

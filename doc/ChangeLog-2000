@@ -16,6 +16,10 @@
 
  Happy new year !
 
+2000-12-29 Friday 12:49  massiot
+
+ Fixed THX Cimmarron bug (it was _not_ a synchro bug).
+
 2000-12-29 Friday 10:52  massiot
 
  * Fixed a bug in the DTS/PTS parsing ;
@@ -34,6 +38,10 @@
 
  We now read the DTS (but we don't use it for the moment).
  NB : b_has_pts has disappeared for brevity reasons, use i_pts != 0 instead.
+
+2000-12-27 Wednesday 18:09  massiot
+
+ New synchro statistics and warnings.
 
 2000-12-27 Wednesday 09:54  sam
 
@@ -73,10 +81,18 @@
   . message queue is flushed before we spawn input.
   . fixed so that it compiles with VDEC_SMP (no good sync yet though).
 
+2000-12-22 Friday 18:57  bozo
+
+   - sdl resising rulze, still buggy
+
 2000-12-22 Friday 17:53  massiot
 
  * Using i_id instead of i_stream_id whenever possible ;
  * Fixed a bug in -c and -s options.
+
+2000-12-22 Friday 17:34  sam
+
+  . (stable version) - fixed SPU decoding
 
 2000-12-22 Friday 15:34  massiot
 
@@ -190,6 +206,10 @@
 
  Correction of a compilation bug with --enable-debug
 
+2000-12-19 Tuesday 23:06  bozo
+
+ new sdl backport to stable version, enjoy.
+
 2000-12-19 Tuesday 22:34  reno
 
  Move #define from audio_output.h to config.h
@@ -201,10 +221,20 @@
  Change vlan_server_ip to 138.195.139.95
  Creating lib directory by Makefile
 
+2000-12-19 Tuesday 20:01  bozo
+
+   - one typo.
+   - one line deleted (it was for debug, bozo.)
+
 2000-12-19 Tuesday 19:55  massiot
 
  GetChunk() : reads n bytes from the elementary stream and places them
  in a big buffer (a gift for Sam).
+
+2000-12-19 Tuesday 19:44  bozo
+
+ sdl plugin :
+   - Quantic start in fullscreen fixed.
 
 2000-12-19 Tuesday 19:08  massiot
 
@@ -214,6 +244,11 @@
 
   . split the audio decoder into adec_generic, adec_layer1 and adec_layer2
      (no new code added)
+
+2000-12-19 Tuesday 18:09  octplane
+
+ - Added SDLYUV support,
+ - please test.
 
 2000-12-19 Tuesday 17:51  octplane
 
@@ -226,6 +261,32 @@
 2000-12-18 Monday 10:40  massiot
 
  We can now read from stdin.
+
+2000-12-18 Monday 10:02  sam
+
+  . additional fix for Layer 1 mono
+
+    now vlc plays all of my 125 sample mpeg1 movies !
+
+    Please try it with yours, and report non-working streams.
+     (`file foo.mpeg' must report "system stream", not "video stream" in
+        order to be playable with the vlc)
+
+2000-12-18 Monday 07:56  sam
+
+  . indentation fixes
+
+  . fixed audio syncword detection for mpeg 1 streams (hopefully)
+     FIXME: can anyone confirm we can get rid of adec_byte_stream_next
+     in audio_decoder_thread.c now that we have the new input ?
+
+  . fixed Layer 2 Mono decoding.
+     FIXME: who created freq_table ? what was the rationale for it, and
+     where does it come from ?
+     FIXME: how can we spare the extra DCT in audio_decoder.c:707 ? I'm too
+     tired to think about it.
+
+  . proposal: splitting audio_decoder.c in one file per layer.
 
 2000-12-18 Monday 02:47  bozo
 
@@ -241,6 +302,13 @@
  know what is the problem and I have to work today. Help me!
 
  Good night suckers. I love you too :p
+
+2000-12-17 Sunday 15:05  octplane
+
+ - partial SDL YUV support (green stream for now, please help me !)
+ - "y" key switch between SDL and vlc YUV
+ - autodetection of Overlay support
+ - soon to come, colors :P
 
 2000-12-16 Saturday 16:31  stef
 
@@ -299,9 +367,25 @@
 
  Fixed a bug with DVD's SCR (too close from the PTS).
 
+2000-12-11 Monday 17:04  massiot
+
+ Another attempt for the audio bug...
+
 2000-12-11 Monday 15:29  massiot
 
  Prototypes for netlist functions.
+
+2000-12-11 Monday 15:06  massiot
+
+ Another attempt for the same bug...
+
+2000-12-11 Monday 14:58  massiot
+
+ Mmmmh an endianness bug ?
+
+2000-12-11 Monday 14:45  massiot
+
+ Attempt to fix the audio.
 
 2000-12-11 Monday 14:34  massiot
 
@@ -351,6 +435,10 @@
 
  Add channel support with VLAN
 
+2000-12-06 Wednesday 16:42  massiot
+
+ * Fixed a bug in the synchro with non-P5/B1 streams.
+
 2000-12-06 Wednesday 16:41  massiot
 
  * Support for MPEG-1 .mpg files.
@@ -367,6 +455,27 @@
 2000-12-05 Tuesday 19:36  massiot
 
  The input-II. (more info by mail in about an hour)
+
+2000-12-01 Friday 07:35  sam
+
+  . re-changement de vout_sdl.c pour que ça fonctionne en woody.
+
+2000-11-30 Thursday 20:57  stef
+
+ . J'en ai oublié un morceau avant :)
+
+ NB: je ne pense pas que l'ouverture en mode non-bloquant soit un
+ problème, mais ne fait je ne sais pas. Chez moi ça marche !
+
+2000-11-30 Thursday 20:43  stef
+
+ . Test non bloquant de l'ouverture du dsp à l'initialisation du plugin
+  pour le cas où il est utilisé par esd
+
+2000-11-30 Thursday 17:37  octplane
+
+ . Fixed a segfault
+ . Fixed a SDL API change about clipping (?).
 
 2000-11-29 Wednesday 19:02  stef
 
@@ -397,6 +506,10 @@
  * Added debug messages in the video synchro
  * Fixed a bug in the video synchro time scheduling
  * Made the vout more precise on display dates
+
+2000-11-29 Wednesday 11:34  massiot
+
+ Enhancement for very slooow machines.
 
 2000-11-28 Tuesday 19:58  massiot
 
@@ -498,6 +611,16 @@
 
   . le mode framebuffer vide l'écran quand on quitte.
 
+2000-10-29 Sunday 00:07  stef
+
+ .Added window title in sdl output
+ .Removed mouse cursor in fullscreen mode
+ .Changed bits-per-pixel during window creation to X11 current depth
+
+ Although bits-per-pixel was initialized to 15 in every cases, the quality
+ changed when we switched X11 depth; so I don't know the real effect of this
+ constant in SDL.
+
 2000-10-26 Thursday 15:00  sam
 
   . ajout de l'option --broadcast en ligne de commande
@@ -505,6 +628,24 @@
 2000-10-26 Thursday 12:00  reno
 
  Une légère modification pour le passage B&W à C
+
+2000-10-25 Wednesday 23:14  stef
+
+ . Fixed segmentation fault when sdl output exits.
+
+ Actually, I don't know why SDLclose was commented out.
+
+2000-10-25 Wednesday 20:54  stef
+
+ . Fixed the sdl plugins to match the changes in the version 1.1.5
+
+ The vlc gives a segfault when exiting if you use sdl. I still don't know why
+
+2000-10-25 Wednesday 18:40  jeanphi
+
+ vout_glide.c: donne une taille correcte a l'affichage (800x600)
+
+ yuvmmx: conv. Y4Gray16, les autres sont a venir
 
 2000-10-25 Wednesday 12:18  reno
 
@@ -542,14 +683,29 @@
 
  --Meuuh
 
+2000-10-18 Wednesday 02:42  stef
+
+ * Modification du module gnome pour l'output sous Xfree4 (detection
+ 16bits).
+
 2000-10-18 Wednesday 02:17  sam
 
   . correction d'une faute de frappe dans configure.in (ça répond à ta
    question, Stef ? :)
 
+2000-10-17 Tuesday 23:42  stef
+
+ .Fix du problème de detection de la profondeur en 16 bits sous XFree 4
+
+ J'espère que ça marche encore avec XFree 3.3
+
 2000-08-30 Wednesday 17:06  henri
 
  Oui, bon,  j'ai oublié le changelog, ça peut arriver einh !
+
+2000-08-30 Wednesday 16:24  henri
+
+ Fixed a 100% CPU use bug while no stream is received
 
 2000-08-29 Tuesday 00:03  octplane
 
@@ -580,9 +736,18 @@
 
   . rajout du fix de Meuuh dans la todolist.
 
+2000-08-27 Sunday 21:52  massiot
+
+ Correction d'un bug de synchro pour les images monotrames.
+
 2000-08-27 Sunday 16:31  massiot
 
  Oublié d'en committer un bout...
+
+2000-08-27 Sunday 16:21  massiot
+
+ Un bug cette fois-ci avec le parseur et un traitement erroné des macroblocs
+ sautés dans les images B qui provoquait des carrés.
 
 2000-08-27 Sunday 12:32  sam
 
@@ -598,6 +763,16 @@
    Henri, il y a du nouveau boulot pour toi, regarde la task 0x38,
   ça ne devrait pas être trop dur, ça t'obligera à lire le code de
   l'audio_output, et surtout ça te fera la bite.
+
+2000-08-27 Sunday 01:03  massiot
+
+ J'avais oublié de faire les mêmes modifs dans le motion MMX.
+
+2000-08-26 Saturday 14:48  massiot
+
+ Fixé une bonne partie du putain de bug des carrés qui font chier à chaque
+ changement de plan. Si c'est encore moche, c'est pas de ma faute, c'est le
+ scaling.
 
 2000-08-26 Saturday 13:07  henri
 
@@ -723,6 +898,11 @@
    * fixed the input_file exit bug.
    * fixed a Makefile bug which removed the CVS directory.
    * removed the frame statistics output.
+
+2000-08-18 Friday 22:35  polux
+
+ Correction d'un bug dans l'audio output de beos, ce dernier causait des
+ plantages aléatoires au lancement (i_buffer_pos n'était pas initialisé).
 
 2000-08-18 Friday 17:02  sam
 
@@ -1174,6 +1354,11 @@
   - rajout du flag b_active dans la structure audio_decoder
   - le bouton pause fonctionne
 
+2000-04-05 Wednesday 20:43  henri
+
+ Ajout du layer II mono (non testé) et début de mise en conformité avec
+ les règles de formattage du code
+
 2000-03-30 Thursday 12:54  polux
 
  - Correction du bug de la synchro.
@@ -1273,6 +1458,22 @@
  de la doc sur le sujet donc je me dis que ca peut pas faire de mal de
  rassembler ce qu'on a...
 
+2000-03-15 Wednesday 02:10  walken
+
+ reecriture du deco mpeg audio
+
+ * support du layer 1 mono et stereo
+ * support du layer 2 stereo (j'ai pas encore fait le mono)
+ * support des low bitrates proposes par le mpeg2 (non teste)
+ * passage des tests de compliance mpeg :)
+ * moins de macros qu'avant, mais je dois encore propriser un peu le code.
+
+2000-03-13 Monday 21:55  stef
+
+ * Correction du Bug introduit lors de mon commit.
+
+ Chez moi, ça marche avec Taxi, Matrix et la ba de twine.
+
 2000-03-13 Monday 21:32  sam
 
   . gestion de la souris sous X (essentiellement le bouton du milieu
@@ -1296,6 +1497,13 @@
    et dans /usr/share/videolan/vlc/
   . le message précédent était l'ajout du répertoire share/ mais
    les scripts CVS semblent avoir déconné
+
+2000-03-13 Monday 03:20  stef
+
+ * Proprification de decodeMPEG2 (+optim)
+ * Ecriture de decodeMPEG1
+
+ Le Mpeg1 n'est pas encore testé.
 
 2000-03-12 Sunday 22:45  walken
 
@@ -1456,6 +1664,12 @@
 
    . quelques #ifdef SYS_BSD çà et là.
 
+2000-03-03 Friday 01:26  walken
+
+ modification du deco ac3 pour le rendre plus robuste.
+
+ normalement le client ne devrait plus segfaulter... enfin, normalement :)
+
 2000-03-03 Friday 00:59  sam
 
   . portage des vlc_threads aux cthreads de Mach pour GNU/Hurd
@@ -1550,6 +1764,10 @@
     . suppression de video_x11.h
     . correction d'un warning dans intf_ctrl.c
 
+2000-02-22 Tuesday 22:55  walken
+
+ oops, j'ai oublie un fichier
+
 2000-02-22 Tuesday 22:54  walken
 
  travail sur l'ac3_decoder : debut de separation de ce qui est specifique a
@@ -1559,6 +1777,13 @@
 
  Le probleme des includes n'est pas non plus regle, mais c'est a cause des
  bit_streams :) patience.
+
+2000-02-22 Tuesday 14:09  walken
+
+ Modification mineure MotionComponent : changement d'une boucle imbriquee
+ sur i_y et i_y1 en une boucle simple sur i_y... Le changement en vitesse comme
+ en taille est chouillatique mais neanmoins positif. Ca n'a pas d'effet sur
+ l'unrolling de boucle car celui-ci est effectue sur une boucle plus interne...
 
 2000-02-21 Monday 09:15  sam
 
@@ -1866,6 +2091,12 @@
   . suppression de quelques #@@#@!!#@@#!@#@#! d'espaces en fin de ligne
   . quelques reformatages à 79 colonnes au lieu de @@#@!!#@@#!@#@#!# 81.
 
+2000-02-04 Friday 22:03  maxx
+
+ * ac3_decoder/ac3_decoder.c, audio_decoder/audio_decoder.c :
+ - `msleep' de `INPUT_PTS_DELAY' et non `(3 * INPUT_PTS_DELAY) / 4'
+ avant le démarrage des décodeurs audio ;
+
 2000-02-04 Friday 20:52  maxx
 
  * ac3_decoder/ac3_decoder.c :
@@ -1931,6 +2162,11 @@
  Correction du bug de calcul du masque (fontes outlines, point sous les ]).
  Vive les ^ qui suivent les ].
 
+2000-02-03 Thursday 04:46  maxx
+
+ * spu_decoder/spu_decoder.c :
+ - ça devrait bien se passer maintenant :-)
+
 2000-02-03 Thursday 03:37  maxx
 
  * audio_output/audio_output.c :
@@ -1961,6 +2197,13 @@
 
  Scaling vertical dans les 2 sens en YUV walken.
 
+2000-02-01 Tuesday 03:00  jimmy
+
+ * Fonctions addblock et copyblock en inline MMX (pour ceux qui en ont...
+   du MMX).
+ * Pour tout defaut supposé d'affichage à la suite du changement,
+   mailez-moi.
+
 2000-02-01 Tuesday 02:16  massiot
 
  Rajout de #define SAM_SYNCHRO si sam veut reprendre son code.
@@ -1977,6 +2220,10 @@
 
  Temporaire (ça segfaulte si on le chatouille un peu).
  YUV walken avec resize. Y et + seulement pour le moment.
+
+2000-02-01 Tuesday 00:13  massiot
+
+ Tentative d'amelioration de la synchro.
 
 2000-01-31 Monday 23:11  massiot
 
@@ -2009,6 +2256,11 @@
 
   . initialisation du décodeur de sous-titres
   . correction du bug de quit
+
+2000-01-31 Monday 03:42  sam
+
+  . remis le kludge du i_coding_type == I_CODING_TYPE en attendant qu'on
+   comprenne pourquoi ça merde (ça doit être tout con, mais je trouve pas)
 
 2000-01-31 Monday 02:29  stef
 
@@ -2063,9 +2315,18 @@
  * Correction d'un message d'erreur erronné dans l'input ;
  * Correction d'un bug de synchro ;
 
+2000-01-28 Friday 01:20  massiot
+
+ Fix pour le bug de la chrominance qui saute.
+
 2000-01-28 Friday 00:12  stef
 
  . Déplacement de deux structures de lookup dans le parseur
+
+2000-01-27 Thursday 23:12  massiot
+
+ Tentative de fix pour le segfault du décodeur (qui est en fait une erreur
+ du parseur).
 
 2000-01-27 Thursday 18:30  seguin
 
@@ -2110,6 +2371,10 @@
  * Réactivation du motion DMV ;
 
  Pour info, on torche largement le décodeur de référence (50 %).
+
+2000-01-26 Wednesday 01:25  sam
+
+  . synchro qui marchouille de plus en plus
 
 2000-01-25 Tuesday 19:02  maxx
 
@@ -2195,9 +2460,26 @@
 
  --Meuuh
 
+2000-01-22 Saturday 22:48  polux
+
+ Petites corrections de bug dans le motion compensation et le parsage des
+ blocks non intra.
+
 2000-01-22 Saturday 22:22  sam
 
   . ajout des flags pour Linux Sparc (au fait, jimmy, t'es con :p)
+
+2000-01-22 Saturday 22:02  jimmy
+
+ Correction du bug de la premiere image verte (putain mais quel con)
+
+2000-01-21 Friday 23:18  massiot
+
+ Corrections de bugs mineurs divers et variés, dont :
+ * video_parser.c : déplacement de l'initialisation de la synchro dans
+   InitThread(), correction d'un memory leak ;
+ * vpar_headers.c : correction d'un segfault potentiel, erreur dans une
+   en-tête dont on se bat les couilles.
 
 2000-01-21 Friday 11:31  sam
 
@@ -2232,6 +2514,11 @@
 
  Gras de parametres en ligne de commande ou en variables d'environnement,
  afin de ne pas avoir a recompiler le client en cas de loose.
+
+2000-01-20 Thursday 18:12  massiot
+
+ Correction d'un bug, mais pas DU bug.
+ (putain quel con)
 
 2000-01-20 Thursday 17:17  seguin
 
@@ -2299,6 +2586,14 @@
   . ajout des patches ac3 de MaXX dans le nouveau décodeur
   . fixé ce #@!#@! de idct.c.new qui fait _chier_
 
+2000-01-19 Wednesday 20:27  polux
+
+ Avancement du debuggage du motion.
+
+2000-01-19 Wednesday 19:48  sam
+
+  commit du chti patch de Meuuh, sinon il est écrasé à chaque update
+
 2000-01-19 Wednesday 18:43  seguin
 
  Début du changement de chaine.
@@ -2323,6 +2618,10 @@
 
  Resize qui fonctionne.
 
+2000-01-19 Wednesday 16:17  massiot
+
+ Support pour les chrominances 422 et 444.
+
 2000-01-19 Wednesday 13:38  sam
 
   . augmentation de VOUT_FPS_SAMPLES pour un calcul un peu plus réaliste
@@ -2337,6 +2636,10 @@
 
  API vout_DateImage (mais ça ne marche pas)
  Suite nettoyage
+
+2000-01-19 Wednesday 12:25  polux
+
+ Avancement du motion.
 
 2000-01-19 Wednesday 10:52  seguin
 
@@ -2361,15 +2664,40 @@
   . ultimisation des calculs de prédiction dans la synchro
   . squelette du subtitle_decoder
 
+2000-01-19 Wednesday 02:49  sam
+
+  . initialisation propre de la synchro
+  . messages de debug à la con pour essayer de voir où j'en suis
+
+2000-01-19 Wednesday 02:24  jimmy
+
+ * Le bug des pixels inversés de la dct mmx à été corrigé (et non plus sau-
+   vagement kludgé).
+
+ * La sparse idct fonctionne.
+
+ * Plusieurs versions de la dct ont été inclues dans vdec_idct pour pou-
+   voir choisir la plus performante quand tout marchera.
+
 2000-01-19 Wednesday 02:15  seguin
 
  Toujours du nettoyage.
  Une API pour les sous titres.
 
+2000-01-19 Wednesday 01:57  polux
+
+ Avancement du debuggage du motion.
+
+ --Meuuh+Stef+Polux+Jimmy
+
 2000-01-19 Wednesday 00:01  maxx
 
  * ac3_decoder/ac3_decoder.c, audio_output/audio_output.c :
  - modification de la synkro, détection de la fréquence du flux ac3 ;
+
+2000-01-18 Tuesday 23:48  sam
+
+ ah ben forcément, ça risquait pas de compiler si j'inversais new et old
 
 2000-01-18 Tuesday 23:43  seguin
 
@@ -2399,6 +2727,23 @@
 
  Le parser fonctionne maintenant avec les I, les P et les B.
  Reste a implementer la synchro et finir le decodeur.
+
+2000-01-18 Tuesday 18:42  maxx
+
+ * ac3_downmix.c :
+ - suppression des gros scrountchs immondes (c) (qui sont également des
+ pouics parfois) ;
+
+ * ac3_bit_allocate.c, ac3_exponent.c, ac3_mantissa.c :
+ - suppression de tests et messages de debug ;
+
+ * ac3_decoder/ac3_decoder.c :
+ - implémentation de la synkro qui punix ;
+
+2000-01-18 Tuesday 16:33  maxx
+
+ * ac3_decoder/ac3_bit_allocate.c, ac3_decoder/ac3_decoder.c :
+ - ac3-alpha rewlz :-)
 
 2000-01-18 Tuesday 16:22  sam
 
@@ -2484,6 +2829,11 @@
 2000-01-17 Monday 13:49  massiot
 
  Fin du parsage des I.
+
+2000-01-17 Monday 13:44  stef
+
+ Rajout de la quantification ,élimination de plusieurs warning,
+ plus decodage des blocks non intra.
 
 2000-01-17 Monday 12:54  massiot
 
@@ -2596,6 +2946,10 @@
 
  Suppression de vlc.h
 
+2000-01-12 Wednesday 18:50  stef
+
+ * Fonction de décodage des blocs MPEG2 non intra
+
 2000-01-12 Wednesday 15:35  seguin
 
  Ajout du framebuffer (initialisation/terminaison) - ne fonctionne pas en VESA.
@@ -2615,6 +2969,10 @@
 
  Encore une petite modif pour permettre au parser de compiler.
 
+2000-01-11 Tuesday 21:32  polux
+
+ Le video parser compile mais n'est pas termine, n'est-ce pas stef ? ;)
+
 2000-01-11 Tuesday 18:01  seguin
 
  Modifs diverses et variees. Le mode FB compile (mais ne fait rien).
@@ -2622,6 +2980,10 @@
 2000-01-11 Tuesday 14:45  polux
 
  Encore du debuggage.
+
+2000-01-11 Tuesday 14:43  polux
+
+ Debuggage.
 
 2000-01-11 Tuesday 11:05  seguin
 
@@ -2653,6 +3015,13 @@
 2000-01-10 Monday 22:45  jimmy
 
    Et le petit toast qui va avec...
+
+2000-01-10 Monday 20:32  jimmy
+
+   Du rififi dans la DCT.
+
+ --
+ jimmy
 
 2000-01-10 Monday 01:09  stef
 

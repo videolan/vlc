@@ -60,6 +60,11 @@
  - suppression des messages de debug, à la demande de Polux, qui veut
  squatter seul la console de debug avec ses messages de fps ;
 
+1999-12-15 Wednesday 18:23  maxx
+
+ * audio_decoder/audio_decoder.c :
+ - Test d'une nouvelle méthode de synchro ;
+
 1999-12-14 Tuesday 23:37  maxx
 
  * .cvsignore :
@@ -445,6 +450,26 @@
  * AUTO_SPAWN n'est plus necessaire pour lancer l'init script.
 
  --Meuuh
+
+1999-09-23 Thursday 08:53  maxx
+
+ * audio_decoder/audio_decoder.c :
+ - Tout est pret pour accueillir la synchro :-)
+ - Les passages modifiés sont encore en commentaire, parce qu'avec ma
+ synchro simulée le %CPU du décodeur audio passe de 0.1% à 9.7%, alors
+ que les opérations sont toutes simples et pas appelées tant que ça
+ (il faudra encore essayer en -Oqqch si ça change qqch) ;
+ - Reste à modifier l'audio output pour la synchro... coming soon ;
+
+ -- MaXX
+
+1999-09-22 Wednesday 21:39  maxx
+
+ * audio_decoder/audio_decoder.c :
+ - Correction d'un bug concernant la décision de décoder ou non une
+ nouvelle frame audio ;
+
+ -- MaXX
 
 1999-09-22 Wednesday 15:53  maxx
 
