@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.14 2003/01/20 13:01:53 fenrir Exp $
+ * $Id: libavi.c,v 1.15 2003/01/25 16:58:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -520,6 +520,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
     switch( p_strh->strh.i_type )
     {
         case( AVIFOURCC_auds ):
+            p_chk->strf.auds.i_cat = AUDIO_ES;
             p_chk->strf.auds.p_wf = malloc( p_chk->common.i_chunk_size );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->wFormatTag );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->nChannels );
@@ -561,6 +562,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             break;
         case( AVIFOURCC_vids ):
             p_strh->strh.i_samplesize = 0; // XXX for ffmpeg avi file
+            p_chk->strf.vids.i_cat = VIDEO_ES;
             p_chk->strf.vids.p_bih = malloc( p_chk->common.i_chunk_size );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biSize );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biWidth );
@@ -597,6 +599,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             break;
         default:
             msg_Warn( p_input, "unknown stream type" );
+            p_chk->strf.common.i_cat = UNKNOWN_ES;
             break;
     }
     AVI_READCHUNK_EXIT( VLC_SUCCESS );
@@ -604,7 +607,18 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
 static void AVI_ChunkFree_strf( input_thread_t *p_input,
                                avi_chunk_t *p_chk )
 {
-
+    avi_chunk_strf_t *p_strf = (avi_chunk_strf_t*)p_chk;
+    switch( p_strf->common.i_cat )
+    {
+        case AUDIO_ES:
+            FREE( p_strf->auds.p_wf );
+            break;
+        case VIDEO_ES:
+            FREE( p_strf->vids.p_bih );
+            break;
+        default:
+            break;
+    }
 }
 
 static int AVI_ChunkRead_strd( input_thread_t *p_input,

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.12 2003/01/08 10:46:30 fenrir Exp $
+ * $Id: mp4.c,v 1.13 2003/01/25 16:58:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -441,6 +441,7 @@ static void __MP4End ( vlc_object_t * p_this )
                FREE(p_demux->track[i_track].chunk[i_chunk].p_sample_delta_dts );
             }
         }
+        FREE( p_demux->track[i_track].chunk );
 
         if( !p_demux->track[i_track].i_sample_size )
         {
@@ -448,6 +449,8 @@ static void __MP4End ( vlc_object_t * p_this )
         }
     }
     FREE( p_demux->track );
+
+    FREE( p_input->p_demux_data );
 #undef FREE
 }
 
@@ -1057,7 +1060,8 @@ static void MP4_StartDecoder( input_thread_t *p_input,
         case( VIDEO_ES ):    
             /* now create a bitmapinfoheader_t for decoder and 
                add information found in p_esds */
-            p_init = malloc( sizeof( BITMAPINFOHEADER ) + i_decoder_specific_info_len );
+            /* XXX XXX + 16 are for avoid segfault when ffmpeg access beyong the data */
+            p_init = malloc( sizeof( BITMAPINFOHEADER ) + i_decoder_specific_info_len + 16 );
             p_bih = (BITMAPINFOHEADER*)p_init;
 
             p_bih->biSize     = sizeof( BITMAPINFOHEADER ) + i_decoder_specific_info_len;
@@ -1117,7 +1121,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             break;
 
         case( AUDIO_ES ):
-            p_init = malloc( sizeof( WAVEFORMATEX ) + i_decoder_specific_info_len);
+            p_init = malloc( sizeof( WAVEFORMATEX ) + i_decoder_specific_info_len + 16 );
             p_wf = (WAVEFORMATEX*)p_init;
 
             p_wf->wFormatTag = 0;

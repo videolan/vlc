@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.6 2002/12/06 16:34:06 sam Exp $
+ * $Id: libavi.h,v 1.7 2003/01/25 16:58:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -237,12 +237,14 @@ typedef struct avi_chunk_strh_s
 typedef struct avi_chunk_strf_auds_s
 {
     AVI_CHUNK_COMMON
+    int             i_cat;
     WAVEFORMATEX    *p_wf;
 } avi_chunk_strf_auds_t;
 
 typedef struct avi_chunk_strf_vids_s
 {
     AVI_CHUNK_COMMON
+    int              i_cat;
     BITMAPINFOHEADER *p_bih;
 } avi_chunk_strf_vids_t;
 
@@ -250,6 +252,11 @@ typedef union avi_chunk_strf_u
 {
     avi_chunk_strf_auds_t   auds;
     avi_chunk_strf_vids_t   vids;
+    struct
+    {
+        AVI_CHUNK_COMMON
+        int i_cat;
+    }                       common;
 } avi_chunk_strf_t;
 
 typedef struct avi_chunk_strd_s

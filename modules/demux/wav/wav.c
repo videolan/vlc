@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.9 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: wav.c,v 1.10 2003/01/25 16:58:35 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -60,18 +60,18 @@ vlc_module_end();
 #define __EVEN( x ) ( (x)%2 != 0 ) ? ((x)+1) : (x)
 
 /* Some functions to manipulate memory */
-static u16 GetWLE( u8 *p_buff )
+static uint16_t GetWLE( uint8_t *p_buff )
 {
     return( (p_buff[0]) + ( p_buff[1] <<8 ) );
 }
 
-static u32 GetDWLE( u8 *p_buff )
+static uint32_t GetDWLE( uint8_t *p_buff )
 {
     return( p_buff[0] + ( p_buff[1] <<8 ) +
             ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
 }
 
-static u32 CreateDWLE( int a, int b, int c, int d )
+static uint32_t CreateDWLE( int a, int b, int c, int d )
 {
     return( a + ( b << 8 ) + ( c << 16 ) + ( d << 24 ) );
 }
@@ -116,13 +116,13 @@ static int SkipBytes( input_thread_t *p_input, int i_skip )
 }
 
 /* return 1 if success, 0 if fail */
-static int ReadData( input_thread_t *p_input, u8 *p_buff, int i_size )
+static int ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
 {
     data_packet_t *p_data;
 
     int i_read;
 
-                
+
     if( !i_size )
     {
         return( 1 );
@@ -137,12 +137,12 @@ static int ReadData( input_thread_t *p_input, u8 *p_buff, int i_size )
         }
         memcpy( p_buff, p_data->p_payload_start, i_read );
         input_DeletePacket( p_input->p_method_data, p_data );
-        
+
         p_buff += i_read;
         i_size -= i_read;
-                
+
     } while( i_size );
-    
+
     return( 1 );
 }
 
@@ -154,7 +154,7 @@ static int ReadPES( input_thread_t *p_input,
     pes_packet_t *p_pes;
 
     *pp_pes = NULL;
-        
+
     if( !(p_pes = input_NewPES( p_input->p_method_data )) )
     {
         msg_Err( p_input, "cannot allocate new PES" );
@@ -192,11 +192,11 @@ static int ReadPES( input_thread_t *p_input,
     return( 1 );
 }
 
-static int FindTag( input_thread_t *p_input, u32 i_tag )
+static int FindTag( input_thread_t *p_input, uint32_t i_tag )
 {
-    u32   i_id;
-    u32   i_size;
-    u8    *p_peek;
+    uint32_t   i_id;
+    uint32_t   i_size;
+    uint8_t    *p_peek;
 
     for( ;; )
     {
@@ -226,10 +226,10 @@ static int FindTag( input_thread_t *p_input, u32 i_tag )
 static int LoadTag_fmt( input_thread_t *p_input, 
                         demux_sys_t *p_demux )
 {
-    u8  *p_peek;
-    u32 i_size;
+    uint8_t  *p_peek;
+    uint32_t i_size;
     WAVEFORMATEX *p_wf;
-            
+
 
     if( input_Peek( p_input, &p_peek , 8 ) < 8 )
     {
@@ -277,14 +277,14 @@ static int PCM_GetFrame( input_thread_t *p_input,
 
     /* read samples for 50ms of */
     i_samples = __MAX( p_wf->nSamplesPerSec / 20, 1 );
-        
-    
+
+
     *pi_length = (mtime_t)1000000 * 
                  (mtime_t)i_samples / 
                  (mtime_t)p_wf->nSamplesPerSec;
 
     i_bytes = i_samples * p_wf->nChannels * ( (p_wf->wBitsPerSample + 7) / 8 );
-    
+
     if( p_wf->nBlockAlign > 0 )
     {
         if( ( i_modulo = i_bytes % p_wf->nBlockAlign ) != 0 )
@@ -305,7 +305,7 @@ static int MS_ADPCM_GetFrame( input_thread_t *p_input,
 
     i_samples = 2 + 2 * ( p_wf->nBlockAlign - 
                                 7 * p_wf->nChannels ) / p_wf->nChannels;
-    
+
     *pi_length = (mtime_t)1000000 *
                  (mtime_t)i_samples /
                  (mtime_t)p_wf->nSamplesPerSec;
@@ -336,8 +336,8 @@ static int IMA_ADPCM_GetFrame( input_thread_t *p_input,
 static int WAVInit( vlc_object_t * p_this )
 {   
     input_thread_t *p_input = (input_thread_t *)p_this;
-    u8  *p_peek;
-    u32 i_size;
+    uint8_t  *p_peek;
+    uint32_t i_size;
     
     demux_sys_t *p_demux;
     
@@ -380,7 +380,7 @@ static int WAVInit( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-       
+
     /* Load WAVEFORMATEX header */
     if( !LoadTag_fmt( p_input, p_demux ) )
     {
@@ -396,7 +396,7 @@ static int WAVInit( vlc_object_t * p_this )
             p_demux->p_wf->nBlockAlign,
             p_demux->p_wf->wBitsPerSample,
             p_demux->p_wf->cbSize );
-           
+
     if( !FindTag( p_input, CreateDWLE( 'd', 'a', 't', 'a' ) ) )
     {
         msg_Err( p_input, "cannot find \"data\" tag" );
@@ -593,12 +593,12 @@ static int WAVDemux( input_thread_t *p_input )
         }
         if( p_demux->p_wf->nBlockAlign != 0 )
         {
-            i_offset += p_demux->p_wf->nBlockAlign - 
+            i_offset += p_demux->p_wf->nBlockAlign -
                                 i_offset % p_demux->p_wf->nBlockAlign;
         }
         SeekAbsolute( p_input, p_demux->i_data_pos + i_offset );
     }
-    
+
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
                           p_demux->i_pcr );
@@ -615,11 +615,11 @@ static int WAVDemux( input_thread_t *p_input )
         return( 0 );
     }
 
-    p_pes->i_dts = 
-        p_pes->i_pts = input_ClockGetTS( p_input, 
+    p_pes->i_dts =
+        p_pes->i_pts = input_ClockGetTS( p_input,
                                          p_input->stream.p_selected_program,
                                          p_demux->i_pcr );
-   
+
     if( !p_demux->p_es->p_decoder_fifo )
     {
         msg_Err( p_input, "no audio decoder" );
@@ -630,7 +630,7 @@ static int WAVDemux( input_thread_t *p_input )
     {
         input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
     }
-    
+
     p_demux->i_pcr += i_length * 9 / 100;
     return( 1 );
 }
@@ -639,17 +639,33 @@ static int WAVDemux( input_thread_t *p_input )
  * WAVEnd: frees unused data
  *****************************************************************************/
 static void __WAVEnd ( vlc_object_t * p_this )
-{   
+{
     input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_sys_t *p_demux = p_input->p_demux_data;
-    
+
     FREE( p_demux->p_wf );
     FREE( p_demux->psz_demux );
-    
+
     if( p_demux->p_demux )
     {
+        char *psz_sav;
+
+        /* save context */
+        psz_sav = p_input->psz_demux;
+
+        /* switch context */
+        p_input->pf_demux = p_demux->pf_demux;
+        p_input->p_demux_data = p_demux->p_demux_data;
+        p_input->psz_demux = p_demux->psz_demux;
+
+        /* unload module */
         module_Unneed( p_input, p_demux->p_demux );
+
+        /* switch back */
+        p_input->psz_demux = psz_sav;
+        p_input->p_demux_data = p_demux;
     }
 
+    FREE( p_input->p_demux_data );
 }
 

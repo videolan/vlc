@@ -2,7 +2,7 @@
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.2 2002/12/18 14:17:10 sam Exp $
+ * $Id: demuxdump.c,v 1.3 2003/01/25 16:58:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -113,7 +113,7 @@ static int Activate( vlc_object_t * p_this )
                   psz_name );
         p_demux->psz_name = psz_name;
     }
-    
+
     p_demux->i_write = 0;
     p_demux->p_demux_data_sav = p_input->p_demux_data;
 
@@ -124,7 +124,7 @@ static int Activate( vlc_object_t * p_this )
     }
     else
     {
-    
+
         if( input_InitStream( p_input, 0 ) == -1 )
         {
             fclose( p_demux->p_file );
@@ -133,7 +133,7 @@ static int Activate( vlc_object_t * p_this )
         }
         input_AddProgram( p_input, 0, 0 );
         p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-        
+
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.p_selected_area->i_tell = 0;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -155,12 +155,12 @@ static void Desactivate ( vlc_object_t *p_this )
 {
     input_thread_t      *p_input = (input_thread_t *)p_this;
     demux_sys_t         *p_demux = (demux_sys_t*)p_input->p_demux_data;
-    
-    msg_Info( p_input, 
-              "closing %s ("I64Fd" Kbytes dumped)", 
+
+    msg_Info( p_input,
+              "closing %s ("I64Fd" Kbytes dumped)",
               p_demux->psz_name,
               p_demux->i_write / 1024 );
-   
+
     if( p_demux->p_file )
     {
         fclose( p_demux->p_file );
@@ -168,7 +168,7 @@ static void Desactivate ( vlc_object_t *p_this )
     }
     if( p_demux->psz_name )
     {
-        free( p_demux->psz_name );    
+        free( p_demux->psz_name );
     }
     p_input->p_demux_data = p_demux->p_demux_data_sav;
     free( p_demux );

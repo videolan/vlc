@@ -2,15 +2,15 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.4 2003/01/20 13:03:03 fenrir Exp $
+ * $Id: demux.c,v 1.5 2003/01/25 16:58:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,9 +35,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
-static int  Demux ( input_thread_t * );
-
+static int  Activate    ( vlc_object_t * );
+static int  Demux       ( input_thread_t * );
+static void Deactivate  ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -50,9 +50,9 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Definitions of structures  and functions used by this plugins 
+ * Definitions of structures  and functions used by this plugins
  *****************************************************************************/
-
+#define FREE( p ) if( p ) { free( p );  (p) = NULL; }
 /* XXX set this to 0 to avoid problem with PS XXX */
 /* but with some file or web radio will failed to detect */
 /* it's you to choose */
@@ -84,22 +84,22 @@ typedef struct adts_header_s
     int i_adts_buffer_fullness;
     int i_no_raw_data_blocks_in_frame;
     int i_crc_check;
-                    
+
 } adts_header_t;
 
 /* Not yet used */
 typedef struct adif_header_s
 {
-    int b_copyright_id_present;
-    u8  i_copyright_id[10];
-    
-    int b_original_copy;
+    int     b_copyright_id_present;
+    uint8_t i_copyright_id[10];
 
-    int i_home;
-    int i_bitstream_type;
-    int i_bitrate;
-    int i_num_program_config_elements;
-    int adif_buffer_fullness;
+    int     b_original_copy;
+
+    int     i_home;
+    int     i_bitstream_type;
+    int     i_bitrate;
+    int     i_num_program_config_elements;
+    int     adif_buffer_fullness;
 
 //    program_config_element
 
@@ -131,16 +131,16 @@ struct demux_sys_t
  * bit_* : function to get a bitstream from a memory buffer
  ****************************************************************************
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 typedef struct bit_s
 {
-    u8 *p_buffer;
+    uint8_t *p_buffer;
     int i_buffer;
     int i_mask;
 } bit_t;
 
 static void bit_init( bit_t *p_bit,
-                      u8    *p_buffer,
+                      uint8_t    *p_buffer,
                       int   i_buffer )
 {
     p_bit->p_buffer = p_buffer;
@@ -148,15 +148,15 @@ static void bit_init( bit_t *p_bit,
     p_bit->i_mask = 0x80;
 }
 
-static u32 bit_get( bit_t *p_bit )
+static uint32_t bit_get( bit_t *p_bit )
 {
-    u32 i_bit;
+    uint32_t i_bit;
     if( p_bit->i_buffer <= 0 )
     {
         return( 0 );
     }
     i_bit = ( p_bit->p_buffer[0]&p_bit->i_mask ) ? 1 : 0;
-    
+
     p_bit->i_mask >>= 1;
     if( !p_bit->i_mask )
     {
@@ -167,9 +167,9 @@ static u32 bit_get( bit_t *p_bit )
     return( i_bit );
 }
 
-static u32 bit_gets( bit_t *p_bit, int i_count )
+static uint32_t bit_gets( bit_t *p_bit, int i_count )
 {
-    u32 i_bits;
+    uint32_t i_bits;
     i_bits = 0;
     for( ; i_count > 0; i_count-- )
     {
@@ -185,7 +185,7 @@ static u32 bit_gets( bit_t *p_bit, int i_count )
  * SkipBytes : skip bytes :) not yet uoptimised ( read bytes to be skipped )
  *
  * ReadPes : read data and make a PES
- * 
+ *
  *****************************************************************************/
 static int SkipBytes( input_thread_t *p_input, int i_size )
 {
@@ -205,14 +205,14 @@ static int SkipBytes( input_thread_t *p_input, int i_size )
     return( 1 );
 }
 
-static int ReadPES( input_thread_t *p_input, 
-                    pes_packet_t **pp_pes, 
+static int ReadPES( input_thread_t *p_input,
+                    pes_packet_t **pp_pes,
                     int i_size )
 {
     pes_packet_t *p_pes;
 
     *pp_pes = NULL;
-        
+
     if( !(p_pes = input_NewPES( p_input->p_method_data )) )
     {
         msg_Err( p_input, "cannot allocate new PES" );
@@ -224,8 +224,8 @@ static int ReadPES( input_thread_t *p_input,
         data_packet_t   *p_data;
         int i_read;
 
-        if( (i_read = input_SplitBuffer( p_input, 
-                                         &p_data, 
+        if( (i_read = input_SplitBuffer( p_input,
+                                         &p_data,
                                          __MIN( i_size, 1024 ) ) ) <= 0 )
         {
             input_DeletePES( p_input->p_method_data, p_pes );
@@ -256,7 +256,7 @@ static int ReadPES( input_thread_t *p_input,
 static int GetADIF( input_thread_t *p_input,
                     adif_header_t  *p_adif )
 {
-    u8  *p_peek;
+    uint8_t  *p_peek;
     int i_size;
 
     if( ( i_size = input_Peek( p_input, &p_peek, 60 ) ) < 60  )
@@ -269,9 +269,9 @@ static int GetADIF( input_thread_t *p_input,
     {
         return( 0 );
     }
-    
+
     /* we now that we have an adif header */
-    
+
 //    return( 1 );
     return( 0 ); /* need some work */
 }
@@ -285,7 +285,7 @@ static int GetADTS( input_thread_t  *p_input,
                     int             i_max_pos,
                     int             *pi_skip )
 {
-    u8  *p_peek;
+    uint8_t  *p_peek;
     int i_size;
     bit_t bit;
 
@@ -315,7 +315,7 @@ static int GetADTS( input_thread_t  *p_input,
 
     bit_init( &bit, p_peek, i_size );
     bit_gets( &bit, 12 ); /* synchro bits */
-    
+
     p_adts->i_id        = bit_get( &bit );
     p_adts->i_layer     = bit_gets( &bit, 2);
     p_adts->i_protection_absent = bit_get( &bit );
@@ -354,7 +354,7 @@ static void ExtractConfiguration( demux_sys_t *p_aac )
         p_aac->i_samplerate_index = p_aac->adts_header.i_samplerate_index;
         p_aac->i_object_type = p_aac->adts_header.i_profile;
         p_aac->i_samplerate  = i_aac_samplerate[p_aac->i_samplerate_index];
-        p_aac->i_channels    = p_aac->adts_header.i_channel_configuration;       
+        p_aac->i_channels    = p_aac->adts_header.i_channel_configuration;
         if( p_aac->i_channels > 6 )
         {
             /* I'm not sure of that, got from faad */
@@ -381,7 +381,7 @@ static void ExtractConfiguration( demux_sys_t *p_aac )
 
 static int CheckPS( input_thread_t *p_input )
 {
-    u8 *p_peek;
+    uint8_t *p_peek;
     int i_size = input_Peek( p_input, &p_peek, 8196 );
 
     while( i_size >  4 )
@@ -406,7 +406,7 @@ static int Activate( vlc_object_t * p_this )
     demux_sys_t * p_aac;
     input_info_category_t * p_category;
     module_t * p_id3;
-    
+
     int i_skip;
     int b_forced;
 
@@ -422,19 +422,19 @@ static int Activate( vlc_object_t * p_this )
 
     b_forced = ( ( *p_input->psz_demux )&&
                  ( !strncmp( p_input->psz_demux, "aac", 10 ) ) ) ? 1 : 0;
-    
+
     /* check if it can be a ps stream */
     if( !b_forced && CheckPS(  p_input ) )
     {
         return( -1 );
     }
 
-    /* skip possible id3 header */    
+    /* skip possible id3 header */
     p_id3 = module_Need( p_input, "id3", NULL );
     if ( p_id3 ) {
         module_Unneed( p_input, p_id3 );
     }
-    
+
     /* allocate p_aac */
     if( !( p_aac = malloc( sizeof( demux_sys_t ) ) ) )
     {
@@ -442,7 +442,7 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     memset( p_aac, 0, sizeof( demux_sys_t ) );
-    
+
     /* Now check for adif/adts header */
     i_skip = 0;
     if( GetADIF( p_input, &p_aac->adif_header ) )
@@ -454,8 +454,8 @@ static int Activate( vlc_object_t * p_this )
         return( -1 );
     }
     else
-    if( GetADTS( p_input, 
-                 &p_aac->adts_header, 
+    if( GetADTS( p_input,
+                 &p_aac->adts_header,
                  b_forced ? 8000 : 0,
                  &i_skip  ) )
     {
@@ -478,7 +478,7 @@ static int Activate( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
         return( -1 );
-    }    
+    }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -487,9 +487,9 @@ static int Activate( vlc_object_t * p_this )
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    
-    /* create our ES */ 
-    p_aac->p_es = input_AddES( p_input, 
+
+    /* create our ES */
+    p_aac->p_es = input_AddES( p_input,
                                p_input->stream.p_selected_program, 
                                1, /* id */
                                0 );
@@ -499,7 +499,7 @@ static int Activate( vlc_object_t * p_this )
         msg_Err( p_input, "out of memory" );
         return( -1 );
     }
-    
+
     p_aac->p_es->i_stream_id = 1;
     p_aac->p_es->i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
     p_aac->p_es->i_cat = AUDIO_ES;
@@ -509,7 +509,7 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( p_aac->b_adif_header )
     {
@@ -547,7 +547,7 @@ static int Activate( vlc_object_t * p_this )
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_category = input_InfoCategory( p_input, "aac" );
-    
+
         input_AddInfo( p_category, "input type", "MPEG-%d AAC",
                        p_aac->adts_header.i_id == 1 ? 2 : 4 );
 
@@ -562,7 +562,7 @@ static int Activate( vlc_object_t * p_this )
     }
 
     p_input->p_demux_data = p_aac;
-    
+
 
     return( 0 );
 }
@@ -576,7 +576,7 @@ static int Demux( input_thread_t * p_input )
 {
     int i_skip;
     int i_found;
-    
+
     pes_packet_t    *p_pes;
     demux_sys_t *p_aac = p_input->p_demux_data;
 
@@ -589,7 +589,7 @@ static int Demux( input_thread_t * p_input )
     else
     if( p_aac->b_adts_header )
     {
-        i_found = GetADTS( p_input, 
+        i_found = GetADTS( p_input,
                            &p_aac->adts_header,
                            8000,
                            &i_skip );
@@ -599,7 +599,7 @@ static int Demux( input_thread_t * p_input )
         return( -1 );
     }
     ExtractConfiguration( p_aac );
-   
+
     /* skip garbage bytes */
     if( i_skip > 0 )
     {
@@ -614,11 +614,11 @@ static int Demux( input_thread_t * p_input )
         msg_Info( p_input, "can't find next frame" );
         return( 0 );
     }
-    
+
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
                           p_aac->i_pts );
-   
+
     if( !ReadPES( p_input, &p_pes, p_aac->i_aac_frame_length ) )
     {
         msg_Warn( p_input,
@@ -642,10 +642,18 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Update date information */
-    p_aac->i_pts += (mtime_t)90000 * 
+    p_aac->i_pts += (mtime_t)90000 *
                     (mtime_t)p_aac->i_framelength /
                     (mtime_t)p_aac->i_samplerate;
 
     return( 1 );
+}
+
+static void Deactivate( vlc_object_t * p_this )
+{
+    input_thread_t *p_input = (input_thread_t*)p_this;
+//    demux_sys_t    *p_aac = p_input->p_demux_data;
+
+    FREE( p_input->p_demux_data );
 }
 

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.30 2003/01/25 03:12:20 fenrir Exp $
+ * $Id: avi.c,v 1.31 2003/01/25 16:58:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ static int    AVIDemux_Seekable  ( input_thread_t * );
 static int    AVIDemux_UnSeekable( input_thread_t *p_input );
 
 #define AVIEnd(a) __AVIEnd(VLC_OBJECT(a))
-
+#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -793,6 +793,8 @@ static void __AVIEnd ( vlc_object_t * p_this )
     }
 #endif
     AVI_ChunkFreeRoot( p_input, &p_avi->ck_root );
+
+    FREE( p_input->p_demux_data );
 }
 
 /*****************************************************************************
