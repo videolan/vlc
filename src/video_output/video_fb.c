@@ -106,7 +106,7 @@ void vout_SysEnd( vout_thread_t *p_vout )
 /******************************************************************************
  * vout_SysDestroy: destroy FB video thread output method
  ******************************************************************************
- * Terminate an output method created by vout_FBCreateOutputMethod
+ * Terminate an output method created by vout_CreateOutputMethod
  ******************************************************************************/
 void vout_SysDestroy( vout_thread_t *p_vout )
 {

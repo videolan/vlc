@@ -112,6 +112,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Initialize idle screen */
     p_vout->last_display_date   = mdate();
+    p_vout->last_display_date   = 0;
     p_vout->last_idle_date      = 0;
 
 #ifdef STATS
@@ -1631,7 +1632,7 @@ static int RenderIdle( vout_thread_t *p_vout )
     int         i_x = 0, i_y = 0;                            /* text position */    
     int         i_width, i_height;                               /* text size */    
     mtime_t     current_date;                                 /* current date */
-    const char *psz_text = "no stream";                    /* text to display */
+    const char *psz_text = "waiting for stream ...";       /* text to display */
     
     
     current_date = mdate();    
