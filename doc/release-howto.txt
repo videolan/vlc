@@ -49,12 +49,8 @@
 
  * Packages BeOS
 
-    tar xvzf vlc-XXX.tar.gz
-    cd vlc-XXX
-    ./configure --with-dvdcss-tree=../libdvdcss --enable-release
-    make
-    make package-beos
-    # copier le .zip créé sur brahma, dans /opt/ftp/pub/vlc/XXX/beos/
+    builder: http://developers.videolan.org/vlc/beos-compile.html
+    # copier les .zip créés sur brahma, dans /opt/ftp/pub/vlc/XXX/beos/
 
  * Packages Win32
 

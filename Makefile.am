@@ -610,8 +610,8 @@ package-beos:
 # Create package with debug symbols
 	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*
 	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION}
-	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
-	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/
+	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-debug.zip vlc-${VERSION} )
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-debug.zip $(srcdir)/
 
 # Create package without debug symbols
 	strip $(srcdir)/tmp/vlc-${VERSION}/vlc
@@ -620,8 +620,8 @@ package-beos:
 	fi
 	xres -o $(srcdir)/tmp/vlc-${VERSION}/vlc $(srcdir)/share/vlc_beos.rsrc
 	mimeset -f $(srcdir)/tmp/vlc-${VERSION}/* $(srcdir)/tmp/vlc-${VERSION}/*/*
-	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-stripped.zip vlc-${VERSION} )
-	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-stripped.zip $(srcdir)/
+	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS.zip $(srcdir)/
 
 # Clean up
 	rm -Rf $(srcdir)/tmp
