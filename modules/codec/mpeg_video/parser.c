@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.14 2003/06/11 10:42:33 gbazin Exp $
+ * $Id: parser.c,v 1.15 2003/06/26 19:36:44 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -143,7 +143,7 @@ static int RunDecoder ( decoder_fifo_t * p_fifo )
     {
         free( p_vpar );
         return( -1 );
-    )
+    }
 
     /*
      * Main loop - it is not executed if an error occured during
