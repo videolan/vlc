@@ -56,6 +56,7 @@ typedef struct vpar_thread_s
     picture_parsing_t       picture;
     slice_parsing_t         slice;
     macroblock_parsing_t    mb;
+    video_synchro_t         synchro;
 
 #ifdef STATS
     /* Statistics */

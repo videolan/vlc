@@ -38,6 +38,7 @@
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
 #include "video_fifo.h"
+#include "vpar_synchro.h"
 #include "video_parser.h"
 
 /*

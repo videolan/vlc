@@ -44,17 +44,28 @@
  */
 
 /*****************************************************************************
- * vpar_MPEG1MotionVector : Parse the next MPEG-1 motion vector
+ * vpar_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-void vpar_MPEG1MotionVector( vpar_thread_t * p_vpar, int i_mv )
+void vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
+                         int i_structure )
 {
 
 }
 
 /*****************************************************************************
- * vpar_MPEG2MotionVector : Parse the next MPEG-2 motion vector
+ * vpar_SynchroTrash : Update timers when we trash a picture
  *****************************************************************************/
-void vpar_MPEG2MotionVector( vpar_thread_t * p_vpar, int i_mv )
+void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
+                        int i_structure )
+{
+
+}
+
+/*****************************************************************************
+ * vpar_SynchroDecode : Update timers when we decide to decode a picture
+ *****************************************************************************/
+mtime_t vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
+                            int i_structure )
 {
 
 }
