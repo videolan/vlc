@@ -5,13 +5,13 @@
 
 VERSION=0.7.1
 
-# export PATH="$PATH:/usr/local/arm/2.95.3/bin"
+export VIDDIR="usr/share/vlc"
+export PIXDIR="usr/share/pixmaps"
+export DESTDIR=${HOME}/arm-linux
+export PKGDIR=${HOME}/packages/zaurus-vlc-$(VERSION)
+export QTDIR=${HOME}/arm-linux/opt/QtPalmtop
+
 # Compilation options
-export CC=arm-linux-gcc
-export LD=arm-linux-ld
-export AR=arm-linux-ar
-export RANLIB=arm-linux-ranlib
-export STRIP=arm-linux-strip
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
@@ -32,7 +32,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-v4l \
 	--enable-sout \
 	--enable-fb \
-	--enable-sdl \
+	--disable-sdl \
 	--enable-oss \
 	--disable-alsa \
 	--disable-dvd \
@@ -50,24 +50,15 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--enable-ffmpeg \
 	--disable-pda \
 	--with-tuning=strongarm1100 \
-	--with-libiconv-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-mad-tree=/home/jpsaman/iPaq/src/libmad-0.15.0b \
-	--with-a52-tree=/home/jpsaman/iPaq/src/a52dec-0.7.4 \
-	--with-faad2-tree=/home/jpsaman/iPaq/src/faad2-20030612 \
-	--with-flac-tree=/home/jpsaman/iPaq/src/flac-1.1.0 \
-	--with-libmpeg2-tree=/home/jpsaman/iPaq/src/mpeg2dec-20030612 \
-	--with-libdvbpsi-tree=/home/jpsaman/iPaq/src/libdvbpsi-0.1.2 \
-	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
-	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
-	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
-	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg-20030622"
-
-export VIDDIR="usr/share/vlc"
-export PIXDIR="usr/share/pixmaps"
-#export DESTDIR=/tmp/vlc
-export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-$(VERSION)
-export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
+	--with-libiconv-prefix=${HOME}/arm-linux/usr \
+	--with-mad-tree=${HOME}/arm-linux/vlc-${VERSION}/libmad-0.15.0b \
+	--with-a52-tree=${HOME}/arm-linux/vlc-${VERSION}/a52dec-0.7.4 \
+	--with-faad2-tree=${HOME}/arm-linux/vlc-${VERSION}/faad2-20030612 \
+	--with-flac-tree=${HOME}/arm-linux/vlc-${VERSION}/flac-1.1.0 \
+	--with-libmpeg2-tree=${HOME}/arm-linux/vlc-${VERSION}/mpeg2dec-20030612 \
+	--with-libdvbpsi-tree=${HOME}/arm-linux/vlc-${VERSION}/libdvbpsi-0.1.2 \
+	--with-qte=${QTDIR} \
+	--with-ffmpeg-tree=${HOME}/arm-linux/vlc-${VERSION}/ffmpeg-20030622"
 
 build: build-stamp
 config:
@@ -76,8 +67,11 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/lib -L/home/jpsaman/iPaq/src/libid3tag-0.15.0b" \
-	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/include -I/home/jpsaman/iPaq/src/libid3tag-0.15.0b"
+	LDFLAGS="-L${HOME}/arm-linux/lib \
+		 -L${HOME}/arm-linux/opt/QtPalmtop/lib \
+		 -L${HOME}/arm-linux/vlc-${VERSION}/libid3tag-0.15.0b" \
+	CPPFLAGS="-I${HOME}/arm-linux/opt/QtPalmtop/include \
+		  -I${HOME}/arm-linux/vlc-${VERSION}/libid3tag-0.15.0b"
 
 build-stamp:
 # This is ugly -- I know
