@@ -15,6 +15,8 @@ config.rpath
 config.status
 config.guess
 config.sub
+confdefs.h
+conftest.cc
 autom4te.cache
 Makefile
 Makefile.in

@@ -1,5 +1,3 @@
-.dep
-*.lo
-*.o.*
-*.lo.*
+.deps
+.dirstamp
 *.moc.*

@@ -1,7 +1,2 @@
-Makefile
-Makefile.in
 .deps
 .dirstamp
-*.lo
-*.o.*
-*.lo.*

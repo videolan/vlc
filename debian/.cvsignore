@@ -3,6 +3,7 @@ Makefile.in
 tmp
 vlc
 vlc-plugin-*
+vlc-*
 mozilla-plugin-vlc
 libvlc0-dev
 gvlc*

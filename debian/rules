@@ -93,6 +93,8 @@ install: build
 	# Package: gnome-vlc
 	mv debian/vlc/usr/bin/gnome-vlc debian/gnome-vlc/usr/bin/
 	ln -s vlc debian/gnome-vlc/usr/share/doc/gnome-vlc
+	mv debian/vlc/usr/lib/vlc/gui/libgnome_main_plugin.so \
+		debian/gnome-vlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libgnome_plugin.so \
 		debian/gnome-vlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/gnome-vlc/usr/share/man/man1/gnome-vlc.1.gz
@@ -102,6 +104,8 @@ install: build
 	# Package: gvlc
 	mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/
 	ln -s vlc debian/gvlc/usr/share/doc/gvlc
+	mv debian/vlc/usr/lib/vlc/gui/libgtk_main_plugin.so \
+		debian/gvlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libgtk_plugin.so \
 		debian/gvlc/usr/lib/vlc/gui/
 	mv debian/vlc/usr/lib/vlc/gui/libfamiliar_plugin.so \
