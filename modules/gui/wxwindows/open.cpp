@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.47 2003/12/09 19:15:03 yoann Exp $
+ * $Id: open.cpp,v 1.48 2003/12/10 11:04:25 courmisch Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -685,27 +685,30 @@ void OpenDialog::UpdateMRL( int i_access_method )
         switch( i_net_type )
         {
         case 0:
+            mrltemp = wxT("udp") + demux + wxT("://");
             if( i_net_ports[0] !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrltemp = wxT("udp") + demux +
-                          wxString::Format( wxT("://@:%d"),
-                                            i_net_ports[0] );
-            }
-            else
-            {
-                mrltemp = wxT("udp") + demux + wxT("://");
+                mrltemp += wxString::Format( wxT("@:%d"), i_net_ports[0] );
             }
             break;
 
         case 1:
-            mrltemp = wxT("udp") + demux + wxT("://@") +
-                      net_addrs[1]->GetLineText(0);
-            if( i_net_ports[1] !=
-                config_GetInt( p_intf, "server-port" ) )
+            mrltemp = wxT("udp") + demux + wxT("://@");
+            if ((net_addrs[1]->GetLineText(0).Find (':') != -1)
+                && (net_addrs[1]->GetLineText(0)[0u] != '['))
             {
-                mrltemp = mrltemp + wxString::Format( wxT(":%d"),
-                                              i_net_ports[1] );
+                /* automatically adds '[' and ']' to IPv6 addresses */
+                mrltemp += wxT("[") + net_addrs[1]->GetLineText(0)
+                         + wxT("]");
+            }
+            else
+            {
+                mrltemp += net_addrs[1]->GetLineText(0);
+            }
+            if( i_net_ports[1] != config_GetInt( p_intf, "server-port" ) )
+            {
+                mrltemp += wxString::Format( wxT(":%d"), i_net_ports[1] );
             }
             break;
 
