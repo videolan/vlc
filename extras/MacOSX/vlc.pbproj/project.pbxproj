@@ -874,18 +874,18 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = equalizer.h;
-			path = "../../modules/gui/macosx/equalizer.h";
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../modules/gui/macosx/equalizer.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		2A16E04006C4F08700C87B09 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.objc;
 			name = equalizer.m;
-			path = "../../modules/gui/macosx/equalizer.m";
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../modules/gui/macosx/equalizer.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		2A16E04106C4F08700C87B09 = {
 			fileRef = 2A16E03F06C4F08700C87B09;
