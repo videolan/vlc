@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.16 2004/02/23 20:35:42 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.17 2004/02/23 20:45:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -888,10 +888,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     demux_sys_t    *p_sys = p_input->p_demux_data;
     block_t        *p_block;
 
-    mtime_t i_pts = (uint64_t)pts.tv_sec * 1000000ULL + (uint64_t)pts.tv_usec;
+    mtime_t i_pts = (uint64_t)pts.tv_sec * UI64C(1000000) + (uint64_t)pts.tv_usec;
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */
-    i_pts &= 0x00ffffffffffffffULL;
+    i_pts &= UI64C(0x00ffffffffffffff);
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {
