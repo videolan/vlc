@@ -450,7 +450,10 @@ static void AStreamPrebufferBlock( stream_t *s )
         }
 
         if( i_first == 0 )
+        {
             i_first = mdate();
+            msg_Dbg( s, "received first data for our buffer");
+        }
 
         /* Append the block */
         p_sys->block.i_size += b->i_buffer;
@@ -1139,7 +1142,10 @@ static void AStreamPrebufferStream( stream_t *s )
         }
 
         if( i_first == 0 )
+        {
             i_first = mdate();
+            msg_Dbg( s, "received first data for our buffer");
+        }
 
         tk->i_end += i_read;
 
