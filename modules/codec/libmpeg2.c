@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.41 2003/12/24 09:46:08 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.42 2004/01/16 09:39:57 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -100,6 +100,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
+    uint32_t i_accel = 0;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','v') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','1') &&
@@ -133,6 +134,37 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_garbage_pic = 0;
     p_sys->b_slice_i  = 0;
     p_sys->b_skip     = 0;
+
+#if defined( __i386__ )
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
+    {
+        i_accel |= MPEG2_ACCEL_X86_MMX;
+    }
+
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_3DNOW )
+    {
+        i_accel |= MPEG2_ACCEL_X86_3DNOW;
+    }
+
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+    {
+        i_accel |= MPEG2_ACCEL_X86_MMXEXT;
+    }
+
+#elif defined( __powerpc__ ) || defined( SYS_DARWIN )
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC )
+    {
+        i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
+    }
+
+#else
+    /* If we do not know this CPU, trust libmpeg2's feature detection */
+    i_accel = MPEG2_ACCEL_DETECT;
+
+#endif
+
+    /* Set CPU acceleration features */
+    mpeg2_accel( i_accel );
 
     /* Initialize decoder */
     p_sys->p_mpeg2dec = mpeg2_init();
