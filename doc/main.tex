@@ -1,0 +1,60 @@
+%
+% main.tex: structure of the vlc LaTeX documentation
+% (c)1999 VideoLAN
+%
+\documentclass[a4paper]{report}
+
+%
+% Packages and definitions
+%
+\usepackage{graphicx}
+
+\include{common}
+
+\newcommand{\VideoLAN}{\textit{Video}\textsc{lan}}
+
+%
+% Document
+%
+\begin{document}
+
+% Title page and table of contents
+\begin{titlepage}
+
+\VideoLAN project
+
+\begin{center}
+\resizebox{\textwidth}{!}{vlc: the \VideoLAN\ client}
+\bigskip
+a real-time MPEG-2 software decoder and player
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+% General description of the project
+\part{General description}
+
+\chapter{The goal}
+
+\chapter{??}
+
+\chapter{vlc: the \VideoLAN\ client}
+
+\chapter{Continuation of the project}
+
+% Project organization
+\part{Project organization}
+
+\chapter{Team and communication}
+
+\chapter{Source control}
+
+\chapter{Coding conventions}
+\include{threads}
+
+% Code description
+\part{Code description}
+
+\end{document}

@@ -1,0 +1,255 @@
+%
+% threads.tex: description of threads interface for VideoLAN client
+% (c)1999 VideoLAN
+%
+\section{A common thread interface}
+
+This document describes how the different threads in the VideoLAN client are
+organized, their API and functionnment.
+
+%
+% Thread properties
+%
+\subsection{Thread properties}
+
+A thread is described by a \csymbol{X\_thread\_t} structure (i.e. 
+\csymbol{vout\_thread\_t}), which is used to reference the thread in calls to 
+its API. This structure includes beside following thread-specific data the 
+following fields:
+
+\begin{csource}
+typedef struct X_thread_s \{
+    pthread_t   thread_id;          /* thread id for pthreads */
+    boolean_t   b_die;              /* `die' flag */
+    boolean_t   b_run;              /* `run' flag */
+    boolean_t   b_error;            /* `error' flag */
+    boolean_t   b_active;           /* `active' flag */
+
+    ... other fields ...
+\} X_thread_t;
+\end{csource}
+
+%
+% Meaning of common flags
+%
+\subsection{Meaning of common flags}
+
+\begin{description}
+\item[\csymbol{die}]:
+The \csymbol{die} flag means that the thread received a destruction request 
+from  another thread. It must terminate as soon as possible. This field is 
+written (set to 1) by other threads and read by the thread itself. It cannot 
+be reset to 0 once it has been set.
+
+Note that when the \csymbol{die} flag is set, no other thread should feed the 
+dying one, and all shared structures should have been freed (i.e. the images 
+and video streams for the video output thread).
+
+\item[\csymbol{run}]:
+The \csymbol{run} flag tells the other threads that the concerned thread is 
+ready to receive data. It is set to 1 by the thread itself when the second 
+phase of the initialization has succeeded, and set to 0 again by the thread 
+once it exited.
+
+\item[\csymbol{error}]:
+The \csymbol{error} flag tells the other threads that a fatal error occured in
+the concerned thread. It can be set by all threads, and is read by the thread
+itself and the controlling thread.
+
+When a thread is in \csymbol{error} state, it runs in a special loop, 
+accepting feed from other threads, but trashing eveything, waiting for a 
+\csymbol{die} signal.
+
+Therefore, the controlling thread should check periodically if a thread has an
+\csymbol{error} set and, if yes, set its \csymbol{die} flag after having 
+destroyed all depending threads.
+
+This flag is optionnal, but recommanded if an error can be envisaged in a later
+extension.
+
+\item[\csymbol{active}]:
+This flag's purpose is to avoid using useless resources. An in-\csymbol{active}
+thread must accept input as if it was inactive, but can treat its input 
+differently.
+In example: the video output thread will set itself as in-\csymbol{active} 
+when it is unmapped, and continue to sort and trash images, but will not 
+render or display them to avoid consumming useless CPU. When a video decoder 
+thread will detect that its related output thread is inactive, it will set 
+itself inactive and trash everything except I images.
+
+The \csymbol{active} flag can be set and read by anyone. Precautions should be
+taken to avoid too long wake-up times.
+
+This flag is optionnal, but recommanded if its use can be envisaged in a later
+extension.
+\end{description}
+
+%
+% API
+%
+\subsection{API}
+
+This API is only a recommandation.
+
+% Creation
+\subsubsection{Creation}
+
+\begin{csource}
+X_thread_t * X_CreateThread( X_cfg_t *p_cfg )
+\end{csource}
+
+This function will allocate thread descriptor, perform basic (and fast)
+initialization steps, and create the thread itself using 
+\csymbol{pthread\_create}.
+
+Once it has been called, all flags are set to 0. It will return the thread 
+descriptor or \csymbol{NULL} on failure.
+
+% Termination
+\subsubsection{Termination}
+
+\begin{csource}
+void X_TerminateThread( X_thread_t * p_X );
+\end{csource}
+
+This function will set the \csymbol{die} flag of the thread and and return 
+immediately.
+
+% Destruction
+\subsubsection{Destruction}
+
+\begin{csource}
+int X_DestroyThread( X_thread_t *p_X );
+\end{csource}
+
+This function will try to destroy the thread descriptor, if it is possible
+(if the \csymbol{run} flag is not set). It will return 0 if it succeeded, 
+and non 0 if the thread was still active.
+
+%
+% Local functions names
+%
+\subsection{Local functions names}
+
+The following functions names are recommanded to implement the different
+parts of the thread creation and destruction:
+
+\begin{csource}
+int InitThread();       /* second phase of initialization */
+int RunThread();        /* main loop */
+int RunError();         /* error loop */
+int DestroyThread();    /* thread destruction */
+\end{csource}
+
+\csymbol{X\_CreateThread()} will spawn a thread using \csymbol{RunThread()} 
+function, which will call \csymbol{InitThread()}, enter its main loop, 
+eventually call \csymbol{RunError()} and finally calls \csymbol{DestroyThread}
+when \csymbol{die} is received.
+
+%
+% Order of operations
+%
+\subsection{Order of operations}
+
+% Creation
+\subsubsection{Creation}
+
+\begin{tabular}{l|l}
+Controlling thread                              &   Thread \\
+\hline
+
+\csymbol{p\_X = X\_CreateThread( p\_cfg )}:     & \\
+    descriptor allocation and initialization    & \\
+    all flags are set to 0                      & \\
+    base structures initialization              & \\
+If \csymbol{p\_X == NULL}: error                & \\
+    \csymbol{X\_DestroyThread( p\_X )}:         & \\
+        destruction of the descriptor           & \\
+    end...
+Else, continuation....                          & \csymbol{pthread\_create()} \\
+                                                & Second step of initialization \\
+                                                & On error: \\
+                                                &   \csymbol{b\_error = 1} \\
+                                                &   destruction of structures \\
+                                                & Else: \\
+                                                &   \csymbol{b\_run = 1} \\
+                                                &   beginning of main loop \\
+
+\hline
+
+Wait for \csymbol{b\_run} or \csymbol{b\_error}...& main loop... \\
+If \csymbol{b\_error}:                          & \\
+    \csymbol{X\_DestroyThread( p\_X )}          & \\
+    end...                                      & \\
+Else (\csymbol{b\_run == 1}):                   & \\
+    the thread is ready and can be feeded...    & \\
+
+\hline
+\end{tabular}
+
+Notes:
+\begin{enumerate}
+\item The configuration structure can have been destroyed just after 
+    \csymbol{X\_CreateThread()}. Therefore, it should not be used during second 
+    initialization step.
+
+\item When an error occurs during second initialization step, the allocated structures
+    are automatically destroyed (except the thread descriptor). Therefore, a call to
+    \csymbol{X\_TerminateThread} is not required.
+\end{enumerate}
+
+% Main loop
+\subsubsection{Main loop}
+
+\begin{tabular}{l|l}
+Controlling thread                              &   Thread \\
+\hline
+
+Periodically check for \csymbol{b\_error}        & Periodically check for \\
+If set, then:                                   & \csymbol{b\_error} and \csymbol{b\_die}\\
+    terminate all dependant threads             & \\
+    destroy all dependant threads               & \\
+    terminate and destroy thread                & \\
+
+\hline
+\end{tabular}
+ 
+% Destruction
+\subsubsection{Destruction}
+
+\begin{tabular}{l|l}
+Controlling thread                              &   Thread \\
+\hline
+
+\csymbol{X\_TerminateThread( p\_X )}:           & \\
+    set \csymbol{b\_die}                         & \\
+    all flags are set to 0                      & If \csymbol{DEBUG}, check if  \\
+                                                & all shared structures are ok. \\
+                                                & Destroy and close everything, but  \\
+                                                & keep descriptor. \\
+                                                & Set \csymbol{b\_run} to 0. \\
+                                                & Exit thread. \\
+
+\hline
+
+Loop until \csymbol{X\_DestroyThread} is 0:      & \\
+    check if \csymbol{b\_run == 0}                & \\
+    if yes:                                     & \\
+        destroy descriptor                      & \\
+        return 0                                & \\
+    else:                                       & \\
+        return 1                                & \\
+
+\hline
+\end{tabular}
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+################################################################################
+# vlc (VideoLAN Client) dependancies makefile
+# (c)1998 VideoLAN
+################################################################################
+# This Makefile is dedicated to build of .d files. It should not be called
+# directly by user, but only through main Makefile.
+# See notes at the end of the main makefile for explanations.
+################################################################################
+
+# All settings and options are passed through main Makefile
+
+################################################################################
+# Default target
+################################################################################
+
+default:
+	@echo "This Makefile should not be called directly - see notes at end of"
+	@echo "main Makefile."
+
+################################################################################
+# Dependancies creation
+################################################################################
+
+# A dependancies file needs to be rebuilt if the .c  changed or if one of the 
+# dependancies files have been changed. In other words, it depends from the
+# .c and from itself.
+
+-include $(MAKECMDGOALS)
+$(dependancies): dep/%.d: %.c
+	@test -d dep/$(dir $*) || mkdir -p dep/$(dir $*)
+	@echo "generating dependancies for $*.c"
+	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $< \
+		| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
+		dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
+		[ -s $@ ] || rm -f $@'
+
+

@@ -1,0 +1,1188 @@
+/*******************************************************************************
+ * input.c: input thread 
+ * (c)1998 VideoLAN
+ *******************************************************************************
+ * Read an MPEG2 stream, demultiplex and parse it before sending it to
+ * decoders.
+ *******************************************************************************/
+
+/*******************************************************************************
+ * Preamble
+ *******************************************************************************/
+#include <errno.h>
+#include <pthread.h>
+#include <sys/uio.h>                                                 /* iovec */
+#include <string.h>
+
+#include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
+#include <sys/soundcard.h>
+
+#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <stdio.h>
+#include <sys/ioctl.h>                                             /* ioctl() */
+#include <net/if.h>                                                  /* ifreq */
+#include <netinet/in.h>
+
+#include "common.h"
+#include "config.h"
+#include "mtime.h"
+#include "intf_msg.h"
+#include "debug.h"
+
+#include "input.h"
+#include "input_psi.h"
+#include "input_pcr.h"
+#include "input_netlist.h"
+#include "decoder_fifo.h"
+#include "input_file.h"
+#include "input_network.h"
+
+#include "audio_output.h"
+#include "audio_decoder.h"
+
+#include "video.h"
+#include "video_output.h"
+#include "video_decoder.h"
+
+/******************************************************************************
+ * Local prototypes
+ ******************************************************************************/
+static void input_Thread( input_thread_t *p_input );
+static __inline__ int input_ReadPacket( input_thread_t *p_input );
+static __inline__ void input_SortPacket( input_thread_t *p_input,
+                                         ts_packet_t *ts_packet );
+static __inline__ void input_DemuxTS( input_thread_t *p_input,
+                                      ts_packet_t *ts_packet,
+                                      es_descriptor_t *es_descriptor );
+static __inline__ void input_DemuxPES( input_thread_t *p_input,
+                                       ts_packet_t *ts_packet,
+                                       es_descriptor_t *p_es_descriptor,
+                                       boolean_t b_unit_start, boolean_t b_packet_lost );
+static __inline__ void input_DemuxPSI( input_thread_t *p_input,
+                                       ts_packet_t *ts_packet,
+                                       es_descriptor_t *p_es_descriptor,
+                                       boolean_t b_unit_start, boolean_t b_packet_lost );
+
+/*******************************************************************************
+ * input_CreateThread: initialize and spawn an input thread
+ *******************************************************************************
+ * This function initializes and spawns an input thread. It returns NULL on
+ * failure. If you want a better understanding of the input thread, don't start
+ * by reading this function :-).
+ *******************************************************************************/
+input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
+{
+    input_thread_t *    p_input;
+    int i_index;
+    
+    intf_DbgMsg("input debug 1-1: creating thread (cfg : %p)\n", p_cfg );
+
+    /* Allocate input_thread_t structure. */
+    if( !( p_input = (input_thread_t *)malloc(sizeof(input_thread_t)) ) )
+    {
+        intf_ErrMsg("input error: can't allocate input thread structure (%s)\n",
+                    strerror(errno));
+        return( NULL );
+    }
+    /* Init it */
+    bzero( p_input, sizeof(input_thread_t));
+    for( i_index = 0; i_index < INPUT_MAX_ES; i_index++ )
+    {
+        p_input->p_es[i_index].i_id = EMPTY_PID;
+    }
+
+    /* Find out which method we are gonna use and retrieve pointers. */
+    if( !((p_cfg->i_properties) & INPUT_CFG_METHOD) )
+    {
+        /* i_method is not set. */
+        intf_DbgMsg("input debug: using default method (%d)\n",
+                    INPUT_DEFAULT_METHOD);
+        p_cfg->i_method = INPUT_DEFAULT_METHOD;
+        p_cfg->i_properties |= INPUT_CFG_METHOD;
+    }
+    p_input->i_method = p_cfg->i_method;
+    switch( p_cfg->i_method )
+    {
+        /* File methods */
+        case INPUT_METHOD_TS_FILE:
+            p_input->p_open = &input_FileCreateMethod;
+            p_input->p_read = &input_FileRead;
+            p_input->p_clean = &input_FileDestroyMethod;
+            break;
+
+        /* Network methods */
+        case INPUT_METHOD_TS_UCAST:
+        case INPUT_METHOD_TS_MCAST:
+        case INPUT_METHOD_TS_BCAST:
+        case INPUT_METHOD_TS_VLAN_BCAST:
+            p_input->p_open = &input_NetworkCreateMethod;
+            p_input->p_read = &input_NetworkRead;
+            p_input->p_clean = &input_NetworkDestroyMethod;
+            break;
+
+        case INPUT_METHOD_NONE:
+        default:
+#ifdef DEBUG
+            /* Internal error, which should never happen */
+            intf_DbgMsg("input debug: unknow method type %d\n",
+                            p_cfg->i_method);
+            return( NULL );
+#endif
+            break;
+    }
+
+    /* Initialize PSI decoder. */
+    intf_DbgMsg("Initializing PSI decoder\n");
+    if( input_PsiInit( p_input ) == -1 )
+    {
+        free( p_input );
+        return( NULL );
+    }
+
+    /* Initialize PCR decoder. */
+    intf_DbgMsg("Initializing PCR decoder\n");
+    if( input_PcrInit( p_input ) == -1 )
+    {
+        input_PsiClean( p_input );
+        free( p_input );
+        return( NULL );
+    }
+
+    /* Initialize netlists. */
+    if( input_NetlistOpen( p_input ) )
+    {
+        input_PsiClean( p_input );
+        input_PcrClean( p_input );
+        free( p_input );
+        return( NULL );
+    }
+
+#ifdef STATS
+    /* Initialize counters. */
+    p_input->c_bytes = 0;
+    p_input->c_payload_bytes = 0;
+    p_input->c_ts_packets_read = 0;
+    p_input->c_ts_packets_trashed = 0;
+#ifdef DEBUG
+    p_input->c_loops = 0;
+#endif
+#endif
+
+    /* Let the appropriate method open the socket. */
+    if( (*(p_input->p_open))( p_input, p_cfg ) == -1 )
+    {
+        input_NetlistClean( p_input );
+        input_PsiClean( p_input );
+        input_PcrClean( p_input );
+        free( p_input );
+        return( NULL );
+    }
+
+    intf_DbgMsg("input debug: method %d properly initialized the socket\n",
+                p_input->i_method);
+
+    /* Create thread and set locks. */
+    p_input->b_die = 0;
+    pthread_mutex_init( &p_input->netlist.lock, NULL );
+    pthread_mutex_init( &p_input->programs_lock, NULL );
+    pthread_mutex_init( &p_input->es_lock, NULL );
+#ifdef NO_THREAD
+    input_Thread( p_input );
+#else
+    if( pthread_create(&p_input->thread_id, NULL, (void *) input_Thread, 
+                       (void *) p_input) )
+    {
+        intf_ErrMsg("input error: can't spawn input thread (%s)\n", 
+                    strerror(errno) );
+        (*p_input->p_clean)( p_input );
+        input_NetlistClean( p_input );;
+        input_PsiClean( p_input );
+        input_PcrClean( p_input );
+        free( p_input );
+        return( NULL );
+    }
+#endif
+
+    /* Default setting for new decoders */
+    p_input->p_aout = p_cfg->p_aout;
+
+    return( p_input );
+}
+
+/******************************************************************************
+ * input_DestroyThread: mark an input thread as zombie
+ ******************************************************************************
+ * This function should not return until the thread is effectively cancelled.
+ ******************************************************************************/
+void input_DestroyThread( input_thread_t *p_input )
+{
+    int i_es_loop;
+
+    intf_DbgMsg("input debug: requesting termination of input thread\n");
+    p_input->b_die = 1;                          /* ask thread to kill itself */
+    pthread_join( p_input->thread_id, NULL );         /* wait until it's done */
+
+    (*p_input->p_clean)( p_input );           /* close input method */
+
+    /* Destroy all decoder threads. */
+    for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
+    {
+        if( p_input->pp_selected_es[i_es_loop] )
+        {
+            switch( p_input->pp_selected_es[i_es_loop]->i_type )
+            {
+                case MPEG1_VIDEO_ES:
+                case MPEG2_VIDEO_ES:
+                    vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec), NULL );
+                    break;
+                case MPEG1_AUDIO_ES:
+                case MPEG2_AUDIO_ES:
+                    adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+                    break;
+                default:
+#ifdef DEBUG
+                    /* This should never happen. */
+                    intf_DbgMsg("input debug: unknown stream type ! (%d, %d)\n",
+                             p_input->pp_selected_es[i_es_loop]->i_id,
+                             p_input->pp_selected_es[i_es_loop]->i_type);
+#endif
+                    break;
+            }
+        }
+        else
+        {
+            /* pp_selected_es should not contain any hole. */
+            break;
+        }
+    }
+
+    input_NetlistClean( p_input );                           /* clean netlist */
+    input_PsiClean( p_input );                       /* clean PSI information */
+    input_PcrClean( p_input );                       /* clean PCR information */
+    free( p_input );                           /* free input_thread structure */
+}
+
+#if 0
+/*******************************************************************************
+ * input_OpenAudioStream: open an audio stream
+ *******************************************************************************
+ * This function spawns an audio decoder and plugs it on the audio output
+ * thread.
+ *******************************************************************************/
+int input_OpenAudioStream( input_thread_t *p_input, int i_id )
+{
+    /* ?? */
+}
+
+/*******************************************************************************
+ * input_CloseAudioStream: close an audio stream
+ *******************************************************************************
+ * This function destroys an audio decoder.
+ *******************************************************************************/
+void input_CloseAudioStream( input_thread_t *p_input, int i_id )
+{
+    /* ?? */
+}
+
+/*******************************************************************************
+ * input_OpenVideoStream: open a video stream
+ *******************************************************************************
+ * This function spawns a video decoder and plugs it on a video output thread.
+ *******************************************************************************/
+int input_OpenVideoStream( input_thread_t *p_input, 
+                           struct vout_thread_s *p_vout, struct video_cfg_s * p_cfg )
+{
+    /* ?? */
+}
+
+/*******************************************************************************
+ * input_CloseVideoStream: close a video stream
+ *******************************************************************************
+ * This function destroys an video decoder.
+ *******************************************************************************/
+void input_CloseVideoStream( input_thread_t *p_input, int i_id )
+{
+    /* ?? */
+}
+#endif
+
+/* following functions are local */
+
+/*******************************************************************************
+ * input_Thread: input thread
+ *******************************************************************************
+ * Thread in charge of processing the network packets and demultiplexing.
+ *******************************************************************************/
+static void input_Thread( input_thread_t *p_input )
+{
+    intf_DbgMsg("input debug 11-1: thread %p is active\n", p_input);
+    while( !p_input->b_die )
+    {
+        /* Scatter read the UDP packet from the network or the file. */
+        if( (input_ReadPacket( p_input )) == (-1) )
+        {
+            /* ??? Normally, a thread can't kill itself, but we don't have
+             * any method in case of an error condition ... */
+            p_input->b_die = 1;
+        }
+
+#ifdef DEBUG
+        p_input->c_loops++;
+#endif
+    }
+
+    /* Ohoh, we have to die as soon as possible. */
+    intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
+    pthread_exit( 0 );
+}
+
+/*******************************************************************************
+ * input_ReadPacket: reads a packet from the network or the file
+ *******************************************************************************/
+static __inline__ int input_ReadPacket( input_thread_t *p_input )
+{
+    int                 i_base_index; /* index of the first free iovec */
+    int                 i_current_index;
+    int                 i_packet_size;
+#ifdef INPUT_LIFO_TS_NETLIST
+    int                 i_meanwhile_released;
+    int                 i_currently_removed;
+#endif
+    ts_packet_t *       p_ts_packet;
+
+    /* In this function, we only care about the TS netlist. PES netlist
+     * is for the demultiplexer. */
+#ifdef INPUT_LIFO_TS_NETLIST
+    i_base_index = p_input->netlist.i_ts_index;
+
+    /* Verify that we still have packets in the TS netlist */
+    if( (INPUT_MAX_TS + INPUT_TS_READ_ONCE - 1 - p_input->netlist.i_ts_index) <= INPUT_TS_READ_ONCE )
+    {
+        intf_ErrMsg("input error: TS netlist is empty !\n");
+        return( -1 );
+    }
+
+#else /* FIFO netlist */
+    i_base_index = p_input->netlist.i_ts_start;
+    if( p_input->netlist.i_ts_start + INPUT_TS_READ_ONCE -1 > INPUT_MAX_TS )
+    {
+        /* The netlist is splitted in 2 parts. We must gather them to consolidate
+           the FIFO (we make the loop easily in having the same iovec at the far
+           end and in the beginning of netlist_free).
+           That's why the netlist is (INPUT_MAX_TS +1) + (INPUT_TS_READ_ONCE -1)
+           large. */
+        memcpy( p_input->netlist.p_ts_free + INPUT_MAX_TS + 1,
+                p_input->netlist.p_ts_free,
+                (p_input->netlist.i_ts_start + INPUT_TS_READ_ONCE - 1 - INPUT_MAX_TS)
+                  * sizeof(struct iovec) );
+    }
+
+    /* Verify that we still have packets in the TS netlist */
+    if( ((p_input->netlist.i_ts_end -1 - p_input->netlist.i_ts_start) & INPUT_MAX_TS) <= INPUT_TS_READ_ONCE )
+    {
+        intf_ErrMsg("input error: TS netlist is empty !\n");
+	return( -1 );
+    }
+#endif /* FIFO netlist */
+
+    /* Scatter read the buffer. */
+    i_packet_size = (*p_input->p_read)( p_input,
+                           &p_input->netlist.p_ts_free[i_base_index],
+                           INPUT_TS_READ_ONCE );
+    if( i_packet_size == (-1) )
+    {
+	intf_DbgMsg("Read packet %d %p %d %d\n", i_base_index,
+			&p_input->netlist.p_ts_free[i_base_index],
+			p_input->netlist.i_ts_start,
+			p_input->netlist.i_ts_end);
+        intf_ErrMsg("input error: readv() failed (%s)\n", strerror(errno));
+        return( -1 );
+    }
+
+    if( i_packet_size == 0 )
+    {
+        /* No packet has been received, so stop here. */
+        return( 0 );
+    }
+     
+    /* Demultiplex the TS packets (1..INPUT_TS_READ_ONCE) received. */
+    for( i_current_index = i_base_index;
+         (i_packet_size -= TS_PACKET_SIZE) >= 0;
+         i_current_index++ )
+    {
+        /* BTW, something REALLY bad could happen if we receive packets with
+           a wrong size. */
+        p_ts_packet = (ts_packet_t*)(p_input->netlist.p_ts_free[i_current_index].iov_base);
+        /* Don't cry :-), we are allowed to do that cast, because initially,
+           our buffer was malloc'ed with sizeof(ts_packet_t) */
+
+        /* Find out if we need this packet and demultiplex. */
+        input_SortPacket( p_input /* for current PIDs and netlist */,
+                          p_ts_packet);
+    }
+
+    if( i_packet_size > 0 )
+    {
+        intf_ErrMsg("input error: wrong size\n");
+        return( -1 );
+    }
+
+    /* Remove the TS packets we have just filled from the netlist */
+#ifdef INPUT_LIFO_TS_NETLIST
+    /* We need to take a lock here while we're calculating index positions. */
+    pthread_mutex_lock( &p_input->netlist.lock );
+
+    i_meanwhile_released = i_base_index - p_input->netlist.i_ts_index;
+    if( i_meanwhile_released )
+    {
+        /* That's where it becomes funny :-). Since we didn't take locks for
+           efficiency reasons, other threads (including ourselves, with
+           input_DemuxPacket) might have released packets to the netlist.
+           So we have to copy these iovec where they should go.
+           
+           BTW, that explains why the TS netlist is
+           (INPUT_MAX_TS +1) + (TS_READ_ONCE -1) large. */
+
+        i_currently_removed = i_current_index - i_base_index;
+        if( i_meanwhile_released < i_currently_removed )
+        {
+            /* Copy all iovecs in that case */
+            memcpy( &p_input->netlist.p_ts_free[p_input->netlist.i_ts_index]
+                     + i_currently_removed,
+                    &p_input->netlist.p_ts_free[p_input->netlist.i_ts_index],
+                    i_meanwhile_released * sizeof(struct iovec) );
+        }
+        else
+        {
+            /* We have fewer places than items, so we only move
+               i_currently_removed of them. */
+            memcpy( &p_input->netlist.p_ts_free[i_base_index],
+                    &p_input->netlist.p_ts_free[p_input->netlist.i_ts_index],
+                    i_currently_removed * sizeof(struct iovec) );
+        }
+
+        /* Update i_netlist_index with the information gathered above. */
+        p_input->netlist.i_ts_index += i_currently_removed;
+    }
+    else
+    {
+        /* Nothing happened. */
+        p_input->netlist.i_ts_index = i_current_index;
+    }
+
+    pthread_mutex_unlock( &p_input->netlist.lock );
+
+#else /* FIFO netlist */
+    /* & is modulo ; that's where we make the loop. */
+    p_input->netlist.i_ts_start = i_current_index & INPUT_MAX_TS;
+#endif
+
+#ifdef STATS
+    p_input->c_ts_packets_read += i_current_index - i_base_index;
+    p_input->c_bytes += (i_current_index - i_base_index) * TS_PACKET_SIZE;
+#endif
+	return( 0 );
+}
+
+/*******************************************************************************
+ * input_SortPacket: find out whether we need that packet
+ *******************************************************************************/
+static __inline__ void input_SortPacket( input_thread_t *p_input,
+                                         ts_packet_t *p_ts_packet )
+{
+    int             i_current_pid;
+    int             i_es_loop;
+
+    /* Verify that sync_byte, error_indicator and scrambling_control are
+       what we expected. */
+    if( !(p_ts_packet->buffer[0] == 0x47) || (p_ts_packet->buffer[1] & 0x80) ||
+        (p_ts_packet->buffer[3] & 0xc0) )
+    {
+        intf_DbgMsg("input debug: invalid TS header (%p)\n", p_ts_packet);
+    }
+    else
+    {
+        /* Get the PID of the packet. Note that ntohs is needed, for endianness
+           purposes (see man page). */
+        i_current_pid = U16_AT(&p_ts_packet->buffer[1]) & 0x1fff;
+
+//	intf_DbgMsg("input debug: pid %d received (%p)\n",
+//                    i_current_pid, p_ts_packet);
+
+        /* Lock current ES state. */
+        pthread_mutex_lock( &p_input->es_lock );
+        
+	/* Verify that we actually want this PID. */
+        for( i_es_loop = 0; i_es_loop < INPUT_MAX_SELECTED_ES; i_es_loop++ )
+        {
+            if( p_input->pp_selected_es[i_es_loop] != NULL)
+            {
+                if( (*p_input->pp_selected_es[i_es_loop]).i_id
+                     == i_current_pid )
+                {
+                    /* Don't need the lock anymore, since the value pointed
+                       out by p_input->pp_selected_es[i_es_loop] can only be
+                       modified from inside the input_thread (by the PSI
+                       decoder): interface thread is only allowed to modify
+                       the pp_selected_es table */
+                    pthread_mutex_unlock( &p_input->es_lock );
+
+                    /* We're interested. Pass it to the demultiplexer. */
+                    input_DemuxTS( p_input, p_ts_packet,
+                                   p_input->pp_selected_es[i_es_loop] );
+                    return;
+		}
+            }
+            else
+            {
+                /* pp_selected_es should not contain any hole. */
+                break;
+            }
+        }
+        pthread_mutex_unlock( &p_input->es_lock );
+    }
+
+    /* We weren't interested in receiving this packet. Give it back to the
+       netlist. */
+//    intf_DbgMsg("SortPacket: freeing unwanted TS %p (pid %d)\n", p_ts_packet,
+//                     U16_AT(&p_ts_packet->buffer[1]) & 0x1fff);
+    input_NetlistFreeTS( p_input, p_ts_packet );
+#ifdef STATS
+    p_input->c_ts_packets_trashed++;
+#endif
+}
+
+/*******************************************************************************
+ * input_DemuxTS: first step of demultiplexing: the TS header
+ *******************************************************************************
+ * Stream must also only contain PES and PSI, so PID must have been filtered
+ *******************************************************************************/
+static __inline__ void input_DemuxTS( input_thread_t *p_input,
+                                      ts_packet_t *p_ts_packet,
+                                      es_descriptor_t *p_es_descriptor )
+{
+    int         i_dummy;
+    boolean_t   b_adaption;                       /* Adaption field is present */
+    boolean_t   b_payload;                           /* Packet carries payload */
+    boolean_t   b_unit_start;            /* A PSI or a PES start in the packet */
+    boolean_t   b_trash = 0;                   /* Must the packet be trashed ? */
+    boolean_t   b_lost = 0;                      /* Was there a packet lost ? */
+
+    ASSERT(p_input);
+    ASSERT(p_ts_packet);
+    ASSERT(p_es_descriptor);
+
+#define p (p_ts_packet->buffer)
+
+//    intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d, number %d\n",
+//                p_ts_packet, U16_AT(&p[1]) & 0x1fff, p[3] & 0x0f);
+
+#ifdef STATS
+    p_es_descriptor->c_packets++;
+    p_es_descriptor->c_bytes += TS_PACKET_SIZE;
+#endif
+
+    /* Extract flags values from TS common header. */
+    b_unit_start = (p[1] & 0x40);
+    b_adaption = (p[3] & 0x20);
+    b_payload = (p[3] & 0x10);
+    
+    /* Extract adaption field informations if any */
+    if( !b_adaption )
+    {
+        /* We don't have any adaptation_field, so payload start immediately
+         after the 4 byte TS header */
+        p_ts_packet->i_payload_start = 4;
+    }
+    else
+    {
+        /* p[4] is adaptation_field_length minus one */
+        p_ts_packet->i_payload_start = 5 + p[4];
+
+        /* The adaption field can be limited to the adaptation_field_length byte,
+           so that there is nothing to do: skip this possibility */
+        if( p[4] )
+        {
+            /* If the packet has both adaptation_field and payload, adaptation_field
+               cannot be more than 182 bytes long; if there is only an adaptation_field,
+               it must fill the next 183 bytes. */
+            if( b_payload ? (p[4] > 182) : (p[4] != 183) )
+            {
+                intf_DbgMsg("input debug: invalid TS adaptation field (%p)\n",
+                            p_ts_packet);
+#ifdef STATS
+                p_es_descriptor->c_invalid_packets++;
+#endif
+                b_trash = 1;
+            }
+
+            /* No we are sure that the byte containing flags is present: read it */
+            else
+            {
+                /* discontinuity_indicator */
+                if( p[5] & 0x80 )
+                {
+                    intf_DbgMsg("discontinuity_indicator encountered by TS demux " \
+                                "(position read: %d, saved: %d)\n", p[5] & 0x80,
+                                p_es_descriptor->i_continuity_counter);
+
+                    /* If the PID carries the PCR, there will be a system time-base
+                       discontinuity. We let the PCR decoder handle that. */
+                    p_es_descriptor->b_discontinuity = 1;
+                    
+                    /* There also may be a continuity_counter discontinuity: resynchronise
+                       our counter with the one of the stream */
+                    p_es_descriptor->i_continuity_counter = (p[3] & 0x0f) - 1;
+                }
+
+                /* random_access_indicator */
+                p_es_descriptor->b_random |= p[5] & 0x40;
+
+                /* If this is a PCR_PID, and this TS packet contains a PCR, we pass it
+                   along to the PCR decoder. */
+                if( (p_es_descriptor->b_pcr) && (p[5] & 0x10) )
+                {
+                    /* There should be a PCR field in the packet, check if the adaption
+                       field is long enough to carry it */
+                    if( p[4] >= 7 )
+                    {
+                        /* Call the PCR decoder */
+                        input_PcrDecode( p_input, p_es_descriptor, &p[6] );
+                    }
+                }
+            }
+        }
+    }
+
+    /* Check the continuity of the stream. */
+    i_dummy = ((p[3] & 0x0f) - p_es_descriptor->i_continuity_counter) & 0x0f;
+    if( i_dummy == 1 )
+    {
+        /* Everything is ok, just increase our counter */
+        p_es_descriptor->i_continuity_counter++;
+    }
+    else
+    {
+        if( !b_payload && i_dummy == 0 )
+        {
+            /* This is a packet without payload, this is allowed by the draft
+               As there is nothing interessant in this packet (except PCR that
+               have already been handled), we can trash the packet. */
+            intf_DbgMsg("Packet without payload received by TS demux\n");
+            b_trash = 1;
+        }
+        else if( i_dummy <= 0 )
+        {
+            /* Duplicate packet: mark it as being to be trashed. */
+            intf_DbgMsg("Duplicate packet received by TS demux\n");
+            b_trash = 1;
+        }
+        else
+        {
+            /* This can indicate that we missed a packet or that the
+               continuity_counter wrapped and we received a dup packet: as we
+               don't know, do as if we missed a packet to be sure to recover
+               from this situation */
+            intf_DbgMsg("Packet lost by TS demux: current %d, packet %d\n",
+                        p_es_descriptor->i_continuity_counter & 0x0f,
+                        p[3] & 0x0f);
+            b_lost = 1;
+            p_es_descriptor->i_continuity_counter = p[3] & 0x0f;
+        }
+    }
+
+    /* Trash the packet if it has no payload or if it is bad */
+    if( b_trash )
+    {
+        input_NetlistFreeTS( p_input, p_ts_packet );
+#ifdef STATS
+        p_input->c_ts_packets_trashed++;
+#endif
+    }
+    else
+    {
+        if( p_es_descriptor->b_psi )
+        {
+            /* The payload contains PSI tables */
+            input_DemuxPSI( p_input, p_ts_packet, p_es_descriptor,
+                            b_unit_start, b_lost );
+        }
+        else
+        {
+            /* The payload carries a PES stream */ 
+            input_DemuxPES( p_input, p_ts_packet, p_es_descriptor,
+                            b_unit_start, b_lost );
+        }
+    }
+
+#undef p
+}
+
+
+
+
+/*******************************************************************************
+ * input_DemuxPES: 
+ *******************************************************************************
+ * Gather a PES packet and analyzes its header.
+ *******************************************************************************/
+static __inline__ void input_DemuxPES( input_thread_t *p_input,
+                                       ts_packet_t *p_ts_packet,
+                                       es_descriptor_t *p_es_descriptor,
+                                       boolean_t b_unit_start,
+                                       boolean_t b_packet_lost )
+{
+    decoder_fifo_t *            p_fifo;
+    u8                          i_pes_header_size;
+    int                         i_dummy;
+    pes_packet_t*               p_last_pes;
+    ts_packet_t *               p_ts;
+    int                         i_ts_payload_size;
+    
+
+#define p_pes (p_es_descriptor->p_pes_packet)
+
+    ASSERT(p_input);
+    ASSERT(p_ts_packet);
+    ASSERT(p_es_descriptor);
+
+//    intf_DbgMsg("PES-demultiplexing %p (%p)\n", p_ts_packet, p_pes);
+
+    /* If we lost data, discard the PES packet we are trying to reassemble
+       if any and wait for the beginning of a new one in order to synchronise
+       again */
+    if( b_packet_lost && p_pes != NULL )
+    {
+        intf_DbgMsg("PES %p trashed because of packet lost\n", p_pes);
+        input_NetlistFreePES( p_input, p_pes );
+        p_pes = NULL;
+    }
+
+    /* If the TS packet contains the begining of a new PES packet, and if we
+       were reassembling a PES packet, then the PES should be complete now,
+       so parse its header and give it to the decoders */
+    if( b_unit_start && p_pes != NULL )
+    {
+//        intf_DbgMsg("End of PES packet %p\n", p_pes);
+
+        /* Parse the header. The header has a variable length, but in order 
+           to improve the algorithm, we will read the 14 bytes we may be
+           interested in */
+        p_ts = p_pes->p_first_ts;
+        i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+        i_dummy = 0;
+
+        if(i_ts_payload_size >= PES_HEADER_SIZE)
+        {
+            /* This part of the header entirely fits in the payload of   
+               the first TS packet */
+            p_pes->p_pes_header = &(p_ts->buffer[p_ts->i_payload_start]);
+        }
+        else
+        {
+            /* This part of the header does not fit in the current TS packet:
+               copy the part of the header we are interested in to the
+               p_pes_header_save buffer */
+            intf_DbgMsg("Code never tested encourtered, WARNING ! (benny)\n");
+            do
+            {
+                memcpy(p_pes->p_pes_header_save + i_dummy,
+                       &p_ts->buffer[p_ts->i_payload_start], i_ts_payload_size);
+                i_dummy += i_ts_payload_size;
+            
+                p_ts = p_ts->p_next_ts;
+                if(!p_ts)
+                {
+                  /* The payload of the PES packet is shorter than the 14 bytes
+                     we would read. This means that high packet lost occured
+                     so the PES won't be usefull for any decoder. Moreover,
+                     this should never happen so we can trash the packet and
+                     exit roughly without regrets */
+                  intf_DbgMsg("PES packet too short: trashed\n");
+                  input_NetlistFreePES( p_input, p_pes );
+                  p_pes = NULL;
+                  /* Stats ?? */
+                  return;
+                }
+                
+                i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+            }
+            while(i_ts_payload_size + i_dummy < PES_HEADER_SIZE);
+
+            /* This last TS packet is partly header, partly payload, so just
+               copy the header part */
+            memcpy(p_pes->p_pes_header_save + i_dummy,
+                   &p_ts->buffer[p_ts->i_payload_start],
+                   PES_HEADER_SIZE - i_dummy);
+
+            /* The header must be read in the buffer not in any TS packet */
+           p_pes->p_pes_header = p_pes->p_pes_header_save;
+        }
+        
+        /* Now we have the part of the PES header we were interested in:
+           parse it */
+
+        /* First read the 6 header bytes common to all PES packets:
+           use them to test the PES validity */
+        if( (p_pes->p_pes_header[0] || p_pes->p_pes_header[1] ||
+            (p_pes->p_pes_header[2] != 1)) ||
+                                     /* packet_start_code_prefix != 0x000001 */
+            ((i_dummy = U16_AT(p_pes->p_pes_header + 4)) &&
+             (i_dummy + 6 != p_pes->i_pes_size)) )
+                   /* PES_packet_length is set and != total received payload */
+        {
+          /* Trash the packet and set p_pes to NULL to be sure the next PES
+             packet will have its b_data_lost flag set */
+          intf_DbgMsg("Corrupted PES packet received: trashed\n");
+          input_NetlistFreePES( p_input, p_pes );
+          p_pes = NULL;
+          /* Stats ?? */
+        }
+        else
+        {
+            /* The PES packet is valid. Check its type to test if it may
+               carry additional informations in a header extension */
+            p_pes->i_stream_id =  p_pes->p_pes_header[3];
+
+            switch( p_pes->i_stream_id )
+            {
+            case 0xBE:  /* Padding */
+            case 0xBC:  /* Program stream map */
+            case 0xBF:  /* Private stream 2 */
+            case 0xB0:  /* ECM */
+            case 0xB1:  /* EMM */
+            case 0xFF:  /* Program stream directory */
+            case 0xF2:  /* DSMCC stream */
+            case 0xF8:  /* ITU-T H.222.1 type E stream */
+                /* The payload begins immediatly after the 6 bytes header, so
+                   we have finished with the parsing */
+                i_pes_header_size = 6;
+                break;
+
+            default:
+                /* The PES header contains at least 3 more bytes: parse them */
+                p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x10;
+                p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x4;
+                i_pes_header_size = 9 + p_pes->p_pes_header[8];
+                
+                /* Now parse the optional header extensions (in the limit of
+                   the 14 bytes */
+                if( p_pes->b_has_pts )
+                {
+                   /* The PTS field is split in 3 bit records. We have to add
+                      them, and thereafter we substract the 2 marker_bits */
+                    p_pes->i_pts = ( (p_pes->p_pes_header[9] << 29) +
+                                     (U16_AT(p_pes->p_pes_header + 10) << 14) +
+                                     (U16_AT(p_pes->p_pes_header + 12) >> 1) -
+                                     (1 << 14) - (1 << 29) );
+                }
+                break;
+            }
+
+            /* Now we've parsed the header, we just have to indicate in some
+               specific TS packets where the PES payload begins (renumber
+               i_payload_start), so that the decoders can find the beginning
+               of their data right out of the box. */
+            p_ts = p_pes->p_first_ts;
+            i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+            while( i_pes_header_size > i_ts_payload_size )
+            {
+                /* These packets are entirely filled by the PES header. */
+                i_pes_header_size -= i_ts_payload_size;
+                p_ts->i_payload_start = p_ts->i_payload_end;
+                /* Go to the next TS packet: here we won't have to test it is
+                   not NULL because we trash the PES packets when packet lost
+                   occurs */
+                p_ts = p_ts->p_next_ts;
+                i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+            }
+            /* This last packet is partly header, partly payload. */
+            p_ts->i_payload_start += i_pes_header_size;
+
+            /* Now we can eventually put the PES packet in the decoder's
+               PES fifo */
+            switch( p_es_descriptor->i_type )
+            {
+            case MPEG1_VIDEO_ES:
+            case MPEG2_VIDEO_ES:
+                p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+                break;
+            case MPEG1_AUDIO_ES:
+            case MPEG2_AUDIO_ES:
+                p_fifo = &(((adec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+                break;
+            default:
+                /* This should never happen. */
+                intf_DbgMsg("Unknown stream type (%d, %d): PES trashed\n",
+                            p_es_descriptor->i_id, p_es_descriptor->i_type);
+                p_fifo = NULL;
+                break;
+            }
+
+            if( p_fifo != NULL )
+            {
+                pthread_mutex_lock( &p_fifo->data_lock );
+                if( DECODER_FIFO_ISFULL( *p_fifo ) )
+                {
+                    /* The FIFO is full !!! This should not happen. */
+#ifdef STATS
+                    p_input->c_ts_packets_trashed += p_pes->i_ts_packets;
+                    p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
+#endif
+                    input_NetlistFreePES( p_input, p_pes );
+                    intf_DbgMsg("PES trashed - fifo full ! (%d, %d)\n",
+                               p_es_descriptor->i_id, p_es_descriptor->i_type);
+                }
+		else
+                {
+//                    intf_DbgMsg("Putting %p into fifo %p/%d\n",
+//                                p_pes, p_fifo, p_fifo->i_end);
+                    p_fifo->buffer[p_fifo->i_end] = p_pes;
+                    DECODER_FIFO_INCEND( *p_fifo );
+
+                    /* Warn the decoder that it's got work to do. */
+                    pthread_cond_signal( &p_fifo->data_wait );
+                }
+                pthread_mutex_unlock( &p_fifo->data_lock );
+            }
+            else
+            {
+                intf_DbgMsg("No fifo to receive PES %p: trash\n", p_pes);
+#ifdef STATS
+                p_input->c_ts_packets_trashed += p_pes->i_ts_packets;
+                p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
+#endif
+                input_NetlistFreePES( p_input, p_pes );
+            }
+        }
+    }
+
+
+    /* If we are at the beginning of a new PES packet, we must fetch a new
+       PES buffer to begin with the reassembly of this PES packet. This is
+       also here that we can synchronise with the stream if we we lost
+       packets or if the decoder has just started */ 
+    if( b_unit_start )
+    {
+        p_last_pes = p_pes;
+
+        /* Get a new one PES from the PES netlist. */
+        if( (p_pes = input_NetlistGetPES( p_input )) == (NULL) )
+        {
+            /* PES netlist is empty ! */
+            p_input->b_error = 1;
+        }
+        else
+        {
+//           intf_DbgMsg("New PES packet %p (first TS: %p)\n", p_pes, p_ts_packet);
+
+            /* Init the PES fields so that the first TS packet could be correctly
+               added to the PES packet (see below) */
+            p_pes->p_first_ts = p_ts_packet;
+            p_pes->p_last_ts = NULL;
+
+            /* If the last pes packet was null, this means that the synchronisation
+               was lost and so warn the decoder that he will have to find a way to
+               recover */
+            if( !p_last_pes )
+                p_pes->b_data_loss = 1;
+
+            /* Read the b_random_access flag status and then reinit it */     
+            p_pes->b_random_access = p_es_descriptor->b_random;
+            p_es_descriptor->b_random = 0;
+        }
+    }
+
+
+    /* If we are synchronised with the stream, and so if we are ready to
+       receive correctly the data, add the TS packet to the current PES
+       packet */
+    if( p_pes != NULL )
+    {
+//      intf_DbgMsg("Adding TS %p to PES %p\n", p_ts_packet, p_pes);
+
+        /* Size of the payload carried in the TS packet */
+        i_ts_payload_size = p_ts_packet->i_payload_end -
+                            p_ts_packet->i_payload_start;
+
+        /* Update the relations between the TS packets */
+        p_ts_packet->p_prev_ts = p_pes->p_last_ts;
+        p_ts_packet->p_next_ts = NULL;
+        if( p_pes->i_ts_packets != 0 )
+        {
+            /* Regarder si il serait pas plus efficace de ne creer que les liens
+               precedent->suivant pour le moment, et les liens suivant->precedent
+               quand le paquet est termine */
+            /* Otherwise it is the first TS packet. */
+            p_pes->p_last_ts->p_next_ts = p_ts_packet;
+        }
+        /* Now add the TS to the PES packet */
+        p_pes->p_last_ts = p_ts_packet;
+        p_pes->i_ts_packets++;
+        p_pes->i_pes_size += i_ts_payload_size;
+
+        /* Stats */
+#ifdef STATS
+        i_dummy = p_ts_packet->i_payload_end - p_ts_packet->i_payload_start;
+        p_es_descriptor->c_payload_bytes += i_dummy;
+#endif
+    }
+    else
+    {
+        /* Since we don't use the TS packet to build a PES packet, we don't
+           need it anymore, so give it back to the netlist */
+//        intf_DbgMsg("Trashing TS %p: no PES being build\n", p_ts_packet);
+        input_NetlistFreeTS( p_input, p_ts_packet );     
+    }
+    
+#undef p_pes
+}
+
+
+
+
+/*******************************************************************************
+ * input_DemuxPSI:
+ *******************************************************************************
+ * Notice that current ES state has been locked by input_SortPacket. (No more true,
+ * changed by benny - See if it'a ok, and definitely change the code ???????? )
+ *******************************************************************************/
+static __inline__ void input_DemuxPSI( input_thread_t *p_input,
+                                       ts_packet_t *p_ts_packet,
+                                       es_descriptor_t *p_es_descriptor,
+                                       boolean_t b_unit_start, boolean_t b_packet_lost )
+{
+    int i_data_offset;      /* Offset of the interesting data in the TS packet */
+    u16 i_data_length;                                 /* Length of those data */
+    boolean_t b_first_section; /* Was there another section in the TS packet ? */
+    
+    ASSERT(p_input);
+    ASSERT(p_ts_packet);
+    ASSERT(p_es_descriptor);
+
+#define p_psi (p_es_descriptor->p_psi_section)
+
+//    intf_DbgMsg( "input debug: PSI demultiplexing %p (%p)\n", p_ts_packet, p_input);
+
+//    intf_DbgMsg( "Packet: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x (unit start: %d)\n", p_ts_packet->buffer[p_ts_packet->i_payload_start], p_ts_packet->buffer[p_ts_packet->i_payload_start+1], p_ts_packet->buffer[p_ts_packet->i_payload_start+2], p_ts_packet->buffer[p_ts_packet->i_payload_start+3], p_ts_packet->buffer[p_ts_packet->i_payload_start+4], p_ts_packet->buffer[p_ts_packet->i_payload_start+5], p_ts_packet->buffer[p_ts_packet->i_payload_start+6], p_ts_packet->buffer[p_ts_packet->i_payload_start+7], p_ts_packet->buffer[p_ts_packet->i_payload_start+8], p_ts_packet->buffer[p_ts_packet->i_payload_start+9], p_ts_packet->buffer[p_ts_packet->i_payload_start+10], p_ts_packet->buffer[p_ts_packet->i_payload_start+11], p_ts_packet->buffer[p_ts_packet->i_payload_start+12], p_ts_packet->buffer[p_ts_packet->i_payload_start+13], p_ts_packet->buffer[p_ts_packet->i_payload_start+14], p_ts_packet->buffer[p_ts_packet->i_payload_start+15], p_ts_packet->buffer[p_ts_packet->i_payload_start+16], p_ts_packet->buffer[p_ts_packet->i_payload_start+17], p_ts_packet->buffer[p_ts_packet->i_payload_start+18], p_ts_packet->buffer[p_ts_packet->i_payload_start+19], p_ts_packet->buffer[p_ts_packet->i_payload_start+20], b_unit_start);
+
+    /* The section we will deal with during the first iteration of the following
+       loop is the first one contained in the TS packet */
+    b_first_section = 1;
+
+    /* Reassemble the pieces of sections contained in the TS packet and decode
+       the sections that could have been completed */
+    do
+    {
+        /* Has the reassembly of a section already began in a previous packet ? */
+        if( p_psi->b_running_section )
+        {
+            /* Was data lost since the last TS packet ? */
+            if( b_packet_lost )
+            {
+                /* Discard the section and wait for the begining of a new one to resynch */
+                p_psi->b_running_section = 0;
+                intf_DbgMsg( "Section discarded due to packet loss\n" );
+            }
+            else
+            {
+                /* The data that complete a previously began section are always at
+                   the beginning of the TS payload... */
+                i_data_offset = p_ts_packet->i_payload_start;
+                /* ...Unless there is a pointer field, that we have to bypass */
+                if( b_unit_start )
+                    i_data_offset ++;
+//                intf_DbgMsg( "New part of the section received at offset %d\n", i_data_offset );
+            }
+        }
+        /* We are looking for the beginning of a new section */
+        else
+        {
+            if( !b_unit_start )
+            {
+                /* Cannot do anything with those data: trash both PSI section and TS packet */
+                p_psi->b_running_section = 0;
+                break;
+            }
+            else
+            {
+                /* Get the offset at which the data for that section can be found */
+                if( b_first_section )
+                {
+                    /* The offset is stored in the pointer_field since we are interested in
+                       the first section of the TS packet. Note that the +1 is to bypass
+                       the pointer field */
+                    i_data_offset = p_ts_packet->i_payload_start +
+                     p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
+                }
+                else
+                {
+                    /* Since no gap is allowed between 2 sections in a TS packet, the
+                       offset is given by the end of the previous section. In fact, there
+                       is nothing to do, i_offset was set to the right value in the
+                       previous iteration */
+                }
+//                intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
+
+                /* Read the length of that section */
+                p_psi->i_length = (U16_AT(&p_ts_packet->buffer[i_data_offset+1]) & 0xFFF) + 3;
+//                intf_DbgMsg( "Section length %d\n", p_psi->i_length );
+                if( p_psi->i_length > PSI_SECTION_SIZE )
+                {
+                  /* The TS packet is corrupted, stop here to avoid possible a seg fault */
+                  intf_DbgMsg( "Section size is too big, aborting its reception\n" );
+                  break;
+                }
+
+                /* Init the reassembly of that section */
+                p_psi->b_running_section = 1;
+                p_psi->i_current_position = 0;
+            }
+        }
+
+        /* Compute the length of data related to the section in this TS packet */
+        if( p_psi->i_length - p_psi->i_current_position > TS_PACKET_SIZE - i_data_offset)
+            i_data_length = TS_PACKET_SIZE - i_data_offset;
+        else
+          i_data_length = p_psi->i_length - p_psi->i_current_position;
+
+        /* Copy those data in the section buffer */
+        memcpy( &p_psi->buffer[p_psi->i_current_position], &p_ts_packet->buffer[i_data_offset],
+                i_data_length );
+    
+        /* Interesting data are now after the ones we copied */
+        i_data_offset += i_data_length;
+
+        /* Decode the packet if it is now complete */
+        if (p_psi->i_length == p_psi->i_current_position + i_data_length)
+        {
+            /* Packet is complete, decode it */
+//            intf_DbgMsg( "SECTION COMPLETE: starting decoding of its data\n" );
+            input_PsiDecode( p_input, p_psi );
+
+            /* Prepare the buffer to receive a new section */
+            p_psi->i_current_position = 0;
+            p_psi->b_running_section = 0;
+        
+            /* The new section won't be the first anymore */
+            b_first_section = 0;
+        }
+        else
+        {
+            /* Prepare the buffer to receive the next part of the section */
+          p_psi->i_current_position += i_data_length;
+//          intf_DbgMsg( "Section not complete, waiting for the end\n" );
+        }
+    
+//        intf_DbgMsg( "Must loop ? Next data offset: %d, stuffing: %d\n",
+//                     i_data_offset, p_ts_packet->buffer[i_data_offset] );
+    }
+    /* Stop if we reached the end of the packet or stuffing bytes */
+    while( i_data_offset < TS_PACKET_SIZE && p_ts_packet->buffer[i_data_offset] != 0xFF );
+
+    /* Relase the TS packet, we don't need it anymore */
+    input_NetlistFreeTS( p_input, p_ts_packet );
+
+#undef p_psi  
+}

@@ -1,0 +1,15 @@
+- Pas de tabulations dans les sources
+
+- Pas de include dans les headers sauf all.h
+
+- Utiliser systématiquement NULL pour les pointeurs nuls, et non pas 0
+
+- Eviter le if( (a=toto()) != b ), preferer l'ecriture sur 2 lignes, en
+  particulier pour les malloc(s):
+    a = toto();
+    if( a != b )
+
+- A propos des mallocs, plus une remarque qu'une convention: il n'est
+  spécifié nul part que errno est mis à jour si malloc renvoie NULL.
+  Préférez donc strerror(ENOMEM) à strerror(errno) !
+

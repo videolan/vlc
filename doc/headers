@@ -1,0 +1,96 @@
+Schéma de dépendance des headers et règles d'écriture
+=====================================================
+
+Ce document décrit les dépendances entre les différents headers utilisés
+par le projet, ainsi que l'ordre dans lequel ils devraient être appelés.
+La totalité de ces headers, dans l'ordre, est regroupé dans le fichier
+"all.h", pour faciliter la mise en place de nouvelles structures.
+
+Les headers inscrits entre parenthèses sont nécessaires indirectement.
+
+Merci de maintenir ce fichier à jour.
+
+Headers systèmes (appelés par ordre de repertoire et alphabetique)
+------------------------------------------------------------------
+
+#include <pthread.h>
+#include <netinet/in.h>
+#include <sys/soundcard.h>
+#include <sys/uio.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
+#include <X11/xpm.h>
+
+Headers communs
+---------------
+
+#include "config.h"
+#include "common.h"         -> may depend of "config.h"
+#include "mtime.h"
+#include "netutils.h"       -> <netinet/in.h>
+#include "xutils.h"         -> <X11/Xlib.h>
+
+
+Input
+-----
+
+#include "input.h"          -> <pthread.h>, <sys/uio.h>, "config.h", "common.h"
+#include "input_vlan.h"     -> <pthread>, <netinet/in.h>
+#include "decoder_fifo.h"   -> <pthread.h>, (<sys/uio.h>), ("config.h"), ("common.h"), "input.h"
+#include "netlist.h"        -> <prhtread.h>, (<sys/uio.h>), "config.h", ("common.h"), "input.h" 
+#include "pcr.h"            -> (<pthread.h>), (<sys/uio.h>), ("config.h"), ("common.h"), "input.h"
+#include "psi.h"            -> (<pthread.h>), (<sys/uio.h>), ("config.h"), ("common.h"), "input.h"
+
+Audio
+-----
+
+#include "audio_decoder.h"  -> *le néant :)*
+#include "audio_output.h"   -> <pthread.h>, <sys/soundcard.h>, "config.h", "common.h", "mtime.h"
+#include "audio_dsp.h"      -> (<pthread.h>), (<sys/soundcard.h>), ("config.h"), ("common.h"), 
+                                ("mtime.h"), "audio_output.h"
+
+Video
+-----
+
+#include "video.h"          -> ("config.h"), "common.h", "mtime.h"
+#include "video_graphics.h" -> ("config.h"), ("common.h"), ("mtime.h"), "video.h"
+#include "video_output.h"   -> <pthread.h>, "config.h", "common.h", ("mtime.h"), "video.h"
+#include "video_x11.h"      -> (<pthread.h>) <X11/Xlib.h>, <X11/extensions/XShm.h>,
+                                ("config.h"), ("common.h"), ("mtime.h"), "video.h", "video_output.h"
+#include "video_decoder.h"  -> <pthread.h>, (<sys/uio.h>), ("config.h"), "common.h", ("mtime.h"), 
+                                "input.h", "decoder_fifo.h", ("video.h"), "video_output.h"
+
+Interface
+---------
+
+#include "xconsole.h"       -> <X11/Xlib.h>, "config.h"
+#include "interface.h"      -> (<pthread.h>), (<sys/uio.h>), (<X11/Xlib.h>), 
+                                (<X11/extensions/XShm.h>), "config.h", "common.h", ("mtime.h"),
+                                "input.h", ("video.h"), "video_output.h", "xconsole.h"
+#include "intf_msg.h"       -> <pthread.h>, "config.h", "common.h", "mtime.h"
+#include "intf_cmd.h"
+#include "control.h"        -> ??
+#include "intf_ctrl.h"      -> "intf_cmd.h"
+
+Ressources partagées
+--------------------
+
+#include "pgm_data.h"       -> (<pthread.h>), (<netinet/in.h>), (<sys/soundcard.h>), (<sys/uio.h>),  
+                                (<X11/Xlib.h>),  
+                                (<X11/extensions/XShm.h>), ("config.h"), "common.h", ("mtime.h"), 
+                                "input.h", "input_vlan.h", "audio_output.h" , "video.h", 
+                                ("video_output.h"), "xconsole.h", "interface.h", "intf_msg.h"
+
+Autres headers, qui sont condamnés à disparaitre ou ne sont pas utilisés
+------------------------------------------------------------------------
+
+#include "network.h"    illisible, uniquement utilisé dans network.c
+#include "rsc_files.h"
+xconsole will also change
+
+
+
+
+
+
+

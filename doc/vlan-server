@@ -1,0 +1,116 @@
+Vlan server protocol and library *draft*
+========================================
+
+telnet-based protocol. Client commands are text, server responses are numbers followed by
+an explicative text (like irc). Common messages number should probalbly be grouped.
+
+Two different notions: session and connexion
+    session has a long timeout (several hours), and should not use server-side resources
+    connexion has a short timeout (a few minutes) and can use server-side resources (thread)
+
+A vlan resource (switch+port) is identified by a unique id. Changes can obviously be done
+with this id, but also, for administrative facilities, with other identifiers.
+
+Client commands:
+
+LOGIN <login> [<application>]
+    -> open connexion, required before any communication with server. Login and password should
+    correspond to groups (admin, users...) rather than individual ids. Application is for stats.
+    answers:    100: ok
+                101: rejected, invalid login
+                102: rejected, too many connexions
+                103: rejected, forbidden source 
+                104: rejected, already logged in
+                109: rejected, other reason    
+                password required
+
+PASS <password>
+
+LOGOUT -> close connexion
+    answer:     200: ok, session closed
+
+OPEN <client-session-id>
+    -> open session. required before any write operations
+    answers:    300: <server-session-id>
+                301: rejected, not authorized
+                302: rejected, too many sessions
+                399: rejected, other reason
+
+RECOVER <client-session-id> <server-session-id>
+    -> recover session. Both id are required for security.
+    answer:     400: ok
+                401: rejected, not authorized (invalid login or something else)
+                402: rejected, invalid ids
+                403: rejected, session already active on another connexion
+                499: rejected, other reason
+
+CLOSE [<server-session-id>]
+    -> close session. Session must be active for normal users.
+    answer:     500: ok, session closed
+                501: error, not loged in
+                502: error: active session
+                503: error: not authorized
+
+STATUS ME
+STATUS MAC <mac>
+STATUS IP <ip>
+STATUS ID <rsc-id>
+    give informations about something
+    answer:     600: mark beginning of status info
+                601: mark end of status info
+                602: error, not authorized
+                603: error, unknown
+                604: error, request failed             
+                610: <rsc-id>
+                611: <vlan>
+                612: <ip>
+                613: <mac>
+                614: <switch-ip>
+                615: <switch-port>
+                616: <number of interfaces dependant of this resource>
+                617: <lock info>
+                699: error, other reason
+
+LOCK ME
+LOCK MAC <mac>
+LOCK IP <ip>
+LOCK ID <rsc-id>
+    lock a resource id (session required)
+    answers:
+     
+UNLOCK ME
+UNLOCK MAC <mac>
+UNLOCK IP <ip>
+UNLOCK ID <id>
+    unlock a resource id (session required)
+    answers:
+
+CHANGE ME <vlan>
+CHANGE MAC <mac> <vlan>
+CHANGE IP <ip> <vlan>
+CHANGE ID <id> <vlan>
+    change a vlan (session required)
+
+Administrative commands:
+
+HELP
+    print list of commands
+    answer:     
+
+KICK
+
+RESET
+
+LIST IDS
+LIST MACS
+LIST IPS
+LIST SESSIONS
+LIST CONNECTIONS
+LIST LOGINS
+
+QUIT
+
+CONFIRM
+
+
+
