@@ -339,6 +339,7 @@ N: Christophe Massiot
 E: massiot@via.ecp.fr
 C: massiot
 D: decoder and input core functions
+D: audio output
 D: MPEG video decoder
 D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
 D: documentation
