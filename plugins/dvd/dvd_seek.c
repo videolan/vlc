@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.3 2002/03/09 16:48:33 stef Exp $
+ * $Id: dvd_seek.c,v 1.4 2002/04/03 06:23:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -46,7 +46,7 @@
 #ifdef GOD_DAMN_DMCA
 #   include "dummy_dvdcss.h"
 #else
-#   include <videolan/dvdcss.h>
+#   include <dvdcss/dvdcss.h>
 #endif
 
 #include "stream_control.h"

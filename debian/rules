@@ -10,14 +10,10 @@ export DH_COMPAT=3
 
 # Compilation options
 export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-kde --enable-aa"
-export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
+export DVDCSS_FLAGS="--enable-dvd"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
-
-# Library options
-version=$(shell grep '^ *LIBDVDCSS_VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
-major=$(shell echo "$(version)" | cut -f1 -d.)
 
 build: build-stamp
 build-stamp:
@@ -31,7 +27,7 @@ build-stamp:
 	esac ;\
 	./configure $$ARCH_FLAGS --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info \
-		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(LIBDVDCSS_FLAGS))
+		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(DVDCSS_FLAGS))
 
 	$(MAKE)
 
@@ -91,16 +87,6 @@ install: build
 	ln -s vlc.1.gz debian/vlc-qt/usr/share/man/man1/qvlc.1.gz
 	ln -s vlc.1.gz debian/vlc-kde/usr/share/man/man1/kvlc.1.gz
 
-# libdvdcss start
-	mv debian/vlc/usr/include/videolan/dvdcss.h \
-				debian/libdvdcss$(major)-dev/usr/include/videolan
-	rm -Rf debian/vlc/usr/include
-	mv debian/vlc/usr/lib/*.a debian/libdvdcss$(major)-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so debian/libdvdcss$(major)-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss$(major)/usr/lib
-	ln -s libdvdcss$(major) debian/libdvdcss$(major)-dev/usr/share/doc/libdvdcss$(major)-dev
-# libdvdcss stop
-
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
@@ -122,9 +108,6 @@ binary-arch: build install
 #	dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde -Nvlc-aa ChangeLog
-# libdvdcss start
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 -Nvlc-kde -Nvlc-aa ChangeLog.libdvdcss
-# libdvdcss stop
 	dh_link
 	dh_strip
 	dh_compress

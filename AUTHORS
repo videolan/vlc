@@ -35,10 +35,6 @@ C: gbazin
 D: mingw32 port, various win32 fixes
 D: DirectX audio and video output
 
-N: Billy Biggs 
-E: vektor@dumbterm.net
-D: libdvdcss enhancements
-
 N: Johan Bilien
 E: jobi@via.ecp.fr
 C: jobi
@@ -141,11 +137,6 @@ E: jimmy@via.ecp.fr
 C: jimmy
 D: IDCT and YUV transformations
 
-N: Håkan Hjort
-E: d95hjort@dtek.chalmers.se
-D: Solaris port of the DVD ioctls
-D: libdvdcss enhancements
-
 N: Samuel Hocevar
 E: sam@zoy.org
 C: sam
@@ -165,7 +156,7 @@ D: patch for module options handling
 N: Eugenio Jarosiewicz
 E: ej0@cise.ufl.edu
 C: ej
-D: MacOS X interface, DVD ioctls, and various fixes
+D: MacOS X interface, and various fixes
 
 N: Brieuc Jeunhomme
 E: bbp@via.ecp.fr
@@ -203,10 +194,6 @@ D: KDE interface
 N: Mathias Kretschmer
 E: mathias@research.att.com
 D: IP Multicast support
-
-N: Markus Kuespert
-E: ltlBeBoy@beosmail.com
-D: BeOS port of the DVD ioctls
 
 N: Michel Lespinasse
 E: walken@zoy.org
@@ -275,10 +262,6 @@ E: richard@rshepherd.demon.co.uk
 C: richards
 D: BeOS video output (BBitmap and Overlay)
 
-N: David Siebörger
-E: drs-videolan@rucus.ru.ac.za
-D: HP-UX port of the DVD ioctls
-
 N: Espen Skoglund
 E: esk@ira.uka.de
 D: FreeBSD autoconf and Makefile patches
@@ -292,8 +275,4 @@ D: network input
 N: Peter Surda
 E: shurdeek@panorama.sth.ac.at
 D: rc plugin for vlc control through /dev/stdin
-
-N: German Tischler
-E: tanis@gaspode.franken.de
-D: FreeBSD DVD input patch
 

@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.15 2002/03/08 22:58:12 stef Exp $
+ * $Id: dvd_summary.c,v 1.16 2002/04/03 06:23:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -50,7 +50,7 @@
 #ifdef GOD_DAMN_DMCA
 #   include "dummy_dvdcss.h"
 #else
-#   include <videolan/dvdcss.h>
+#   include <dvdcss/dvdcss.h>
 #endif
 
 #include "dvd.h"

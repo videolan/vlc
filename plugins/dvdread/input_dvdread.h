@@ -2,7 +2,7 @@
  * input_dvdread.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvdread.h,v 1.6 2002/03/04 01:53:56 stef Exp $
+ * $Id: input_dvdread.h,v 1.7 2002/04/03 06:23:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -26,12 +26,12 @@
  *****************************************************************************/
 
 /* dvdread includes */
-#include "dvd_reader.h"
-#include "ifo_types.h"
-#include "ifo_read.h"
-#include "dvd_udf.h"
-#include "nav_read.h"
-#include "nav_print.h"
+#include <dvdread/dvd_reader.h>
+#include <dvdread/ifo_types.h>
+#include <dvdread/ifo_read.h>
+#include <dvdread/dvd_udf.h>
+#include <dvdread/nav_read.h>
+#include <dvdread/nav_print.h>
 
 /* Logical block size for DVD-VIDEO */
 #define LB2OFF(x) ((off_t)(x) * (off_t)(DVD_VIDEO_LB_LEN))

@@ -12,14 +12,12 @@
   - updater le numéro de version partout où c'est nécessaire
      · configure.in (relancer autoconf)
      · vlc.spec
-     · extras/libdvdcss/libdvdcss.spec (si nécessaire)
      · ipkg/control
      · debian/changelog
   - mettre à jour les ChangeLog et la TODO list pour ceux qui auraient
     étourdiment oublié de l'updater à chaque commit
   - updater le numéro de version et le timestamp dans :
      · ChangeLog
-     · ChangeLog.libdvdcss (si nécessaire)
   - updater debian/changelog (laissez faire sam si vous ne savez pas
     comment faire)
 
@@ -30,9 +28,6 @@
   - créer le tar.gz et le tar.bz2 du vlc avec `make snapshot'.
   - copier le tar.gz et le tar.bz2 sur brahma, dans le répertoire
     /opt/ftp/pub/videolan/vlc/<n° de version>/
-  - créer le tar.gz et le tar.bz2 de libdvdcss avec `make libdvdcss-snapshot'.
-  - copier le tar.gz et le tar.bz2 sur brahma, dans le répertoire
-    /opt/ftp/pub/videolan/libdvdcss/<n° de version>/
   - si les répertoires créés ne sont pas en g+w, corriger cela
 
  * Packages Debian pour videolan.org
@@ -44,7 +39,7 @@
  * Packages Debian officiels pour debian.org
 
   - normalement il n'y a que sam qui touche à ça.
-  - créer un tar.gz sans libdvdcss avec `make snapshot-nocss'
+  - créer un tar.gz sans support dvdcss avec `make snapshot-nocss'
   - `dpkg-buildpackage -rfakeroot'
   - `debupload'
 
@@ -72,7 +67,6 @@
 
   - le web se trouve dans /opt/www/videolan/htdocs/
   - éditer vlc/download.html pour mettre à jour les tarballs
-  - éditer libdvdcss/download.html si nécessaire
   - éditer news.msg pour mettre une petite bafouille sur la release, en
     s'inspirant des releases précédentes et du changelog quand on n'a pas
     d'idées
@@ -92,7 +86,6 @@
   - cliquer sur la branche de la release, par exemple Ourumov
   - choisir "add release" dans le menu déroulant
   - remplir tout le bazar, et submit
-  - refaire pareil avec http://www.freshmeat.net/projects/libdvdcss/
   - l'update peut mettre plusieurs heures
 
  * Mail d'annonce

@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.5 2002/03/14 01:35:28 stef Exp $
+ * $Id: dvd_es.c,v 1.6 2002/04/03 06:23:08 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -46,7 +46,7 @@
 #ifdef GOD_DAMN_DMCA
 #   include "dummy_dvdcss.h"
 #else
-#   include <videolan/dvdcss.h>
+#   include <dvdcss/dvdcss.h>
 #endif
 
 #include "stream_control.h"

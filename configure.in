@@ -1,25 +1,11 @@
-dnl Autoconf settings for vlc and libdvdcss
+dnl Autoconf settings for vlc
 AC_INIT(include/main.h)
 AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_SYSTEM
 
-HAVE_VLC=0
-if test -r src/interface/main.c; then
-  HAVE_VLC=1
-  VLC_VERSION="0.2.92-dev"
-  VLC_CODENAME=Ourumov
-fi
-
-HAVE_LIBDVDCSS=0
-if test -r extras/libdvdcss/libdvdcss.c; then
-  HAVE_LIBDVDCSS=1
-  LIBDVDCSS_VERSION="1.0.1-dev"
-  AC_SUBST(LIBDVDCSS_VERSION)
-  if test -r extras/libdvdcss/csskeys.h; then
-    AC_DEFINE(HAVE_CSSKEYS,1,css decryption with player keys)
-  fi
-fi
+VERSION="0.2.92-dev"
+CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS
 save_CFLAGS="${CFLAGS}"
@@ -53,8 +39,8 @@ fi
 dnl Gettext stuff
 ALL_LINGUAS="de fr ja no ru nl"
 
-AC_DEFINE_UNQUOTED(PACKAGE, "vlc")
-AC_DEFINE_UNQUOTED(VERSION, "$VLC_VERSION")
+AC_DEFINE_UNQUOTED(PACKAGE, "vlc", [Package name])
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Package version])
 AM_GNU_GETTEXT
 
 dnl AM_PROG_LIBTOOL
@@ -326,33 +312,6 @@ if test x"$ac_cv_ld_plugins" != x"no"; then
     PLDFLAGS="${PLDFLAGS} -shared"
 fi
         
-dnl Check for soname setting
-if test x"${SOFLAGS}" = x; then
-    AC_CACHE_CHECK([for soname setting],
-        [ac_cv_ld_soname],
-        [
-        # Standard
-        try_SOFLAGS="-Wl,-soname -Wl,"
-        LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
-        AC_TRY_LINK([],,ac_cv_ld_soname="${try_SOFLAGS}", [
-            # SunOS
-            try_SOFLAGS="-Wl,-h -Wl,"
-            LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
-            AC_TRY_LINK([],,ac_cv_ld_soname="${try_SOFLAGS}",
-                ac_cv_ld_soname=none)
-        ])])
-    if test x"$ac_cv_ld_soname" != x"none"; then
-        SOFLAGS=$ac_cv_ld_soname
-    else
-        echo "
-------------
-Your system doesn't seem to have support for dynamic linking. You may
-have problems using libdvdcss.
-------------
-"
-    fi
-fi
-
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
     [ac_cv_c_attribute_aligned],
@@ -521,106 +480,6 @@ fi
 fi # end if mingw32
 
 
-dnl
-dnl  libdvdcss: check for DVD ioctls
-dnl
-
-dnl  default is no
-CAN_BUILD_LIBDVDCSS=0
-
-dnl  for windoze
-AC_CHECK_HEADERS(winioctl.h,[
-  CAN_BUILD_LIBDVDCSS="${HAVE_LIBDVDCSS}"
-])
-
-dnl  for Un*x and BeOS
-AC_CHECK_HEADERS(sys/ioctl.h,[
-  CAN_BUILD_LIBDVDCSS="${HAVE_LIBDVDCSS}"
-  AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h dvd.h)
-  BSD_DVD_STRUCT=0
-  LINUX_DVD_STRUCT=0
-  OPENBSD_DVD_STRUCT=0
-  dnl
-  dnl Old FreeBSD: sys/cdio.h
-  dnl
-  AC_EGREP_HEADER(dvd_struct,sys/cdio.h,[
-    AC_DEFINE(DVD_STRUCT_IN_SYS_CDIO_H, 1,
-              Define if <sys/cdio.h> defines dvd_struct.)
-    AC_EGREP_HEADER(struct dvd_struct,sys/cdio.h,[
-                    BSD_DVD_STRUCT=1],[LINUX_DVD_STRUCT=1; OPENBSD_DVD_STRUCT=1])
-  ])
-  dnl
-  dnl Newer FreeBSD: sys/dvdio.h
-  dnl
-  AC_EGREP_HEADER(dvd_struct,sys/dvdio.h,[
-    AC_DEFINE(DVD_STRUCT_IN_SYS_DVDIO_H, 1,
-              Define if <sys/dvdio.h> defines dvd_struct.)
-    AC_EGREP_HEADER(struct dvd_struct,sys/dvdio.h,[
-                    BSD_DVD_STRUCT=1],[LINUX_DVD_STRUCT=1])
-  ])
-  dnl
-  dnl Linux: linux/cdrom.h
-  dnl
-  AC_EGREP_HEADER(dvd_struct,linux/cdrom.h,[
-    AC_DEFINE(DVD_STRUCT_IN_LINUX_CDROM_H, 1,
-              Define if <linux/cdrom.h> defines DVD_STRUCT.)
-    LINUX_DVD_STRUCT=1
-  ])
-  dnl
-  dnl BSDI: dvd.h
-  dnl
-  NEED_BSDI_LIBDVD=0
-  AC_EGREP_HEADER(dvd_struct,dvd.h,[
-    AC_DEFINE(DVD_STRUCT_IN_DVD_H, 1,
-              Define if <dvd.h> defines DVD_STRUCT.)
-    LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd"
-    LINUX_DVD_STRUCT=1
-  ],[
-    dnl
-    dnl BSDI: /sys/dev/scsi/scsi_ioctl.h, using our own libdvd
-    dnl
-    AC_CHECK_HEADERS(/sys/dev/scsi/scsi_ioctl.h,[
-      NEED_BSDI_LIBDVD=1
-      AC_DEFINE(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H, 1,
-                Define if <extras/BSDI_dvdioctl/dvd.h> defines DVD_STRUCT.)
-      SRC_DVDCSS_EXTRA="${SRC_DVDCSS_EXTRA} bsdi_dvdioctl.c"
-      LINUX_DVD_STRUCT=1
-    ])
-  ])
-  dnl
-  dnl Solaris: sys/scsi/scsi_types.h, sys/scsi/impl/uscsi.h
-  dnl
-  AC_CHECK_HEADER(sys/scsi/scsi_types.h,[
-    AC_CHECK_HEADER(sys/scsi/impl/uscsi.h,[
-      AC_DEFINE(SOLARIS_USCSI, 1, Have userspace SCSI headers.)
-    ])
-  ])
-  dnl
-  dnl HP-UX: sys/scsi.h
-  dnl
-  AC_CHECK_HEADER(sys/scsi.h,[
-    AC_EGREP_HEADER(sctl_io,sys/scsi.h,[
-      AC_DEFINE(HPUX_SCTL_IO, 1, Define if <sys/scsi.h> defines sctl_io.)
-    ])
-  ])
-  dnl
-  dnl Final tests to check what was detected
-  dnl
-  if test x$LINUX_DVD_STRUCT = x1; then
-    AC_DEFINE(HAVE_LINUX_DVD_STRUCT, 1,
-              Define if Linux-like dvd_struct is defined.)
-    if test x$OPENBSD_DVD_STRUCT = x1; then
-      AC_DEFINE(HAVE_OPENBSD_DVD_STRUCT, 1,
-                Define if OpenBSD-like dvd_struct is defined.)
-    fi
-  else
-    if test x$BSD_DVD_STRUCT = x1; then
-      AC_DEFINE(HAVE_BSD_DVD_STRUCT, 1,
-                Define if FreeBSD-like dvd_struct is defined.)
-    fi
-  fi
-])
-
 AC_ARG_WITH(,[])
 AC_ARG_WITH(,[Optimization options:])
 
@@ -680,8 +539,7 @@ dnl
 AC_ARG_ENABLE(release,
 [  --enable-release        activate extra optimizations (default disabled)],
 [ if test x$enableval = xyes; then RELEASE=1; fi ],
-[ VLC_VERSION="${VLC_VERSION}_`date +%Y-%m-%d`";
-  LIBDVDCSS_VERSION="${LIBDVDCSS_VERSION}_`date +%Y-%m-%d`"; ])
+[ VERSION="${VERSION}_`date +%Y-%m-%d`" ])
 
 dnl
 dnl  Input plugins
@@ -690,136 +548,77 @@ dnl
 AC_ARG_WITH(,[Input plugins:])
 
 dnl
-dnl  DVD module: check for installed libdvdcss or local libdvdcss
+dnl  DVD module: optionally check for installed libdvdcss
 dnl
-NEED_LIBDVDCSS=0
-STATIC_LIBDVDCSS=0
-DUMMY_LIBDVDCSS=0
-AC_ARG_WITH(dvdcss,
-  [  --with-dvdcss[=name]    use libdvdcss, either 'yes', 'no', 'local-static',
-                          'local-shared', or a path to another libdvdcss such
-                          as '/usr/local' (default 'local-static')],
-  [ case "x${withval}" in
-    xlocal-static|xyes)
-      # local libdvdcss, statically linked
-      BUILTINS="${BUILTINS} dvd"
-      if test x${CAN_BUILD_LIBDVDCSS} = x1
-      then
-        NEED_LIBDVDCSS=1
-        STATIC_LIBDVDCSS=1
-        CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-        LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-      fi
-    ;;
-    xlocal-shared)
-      # local libdvdcss, dynamically linked
-      PLUGINS="${PLUGINS} dvd"
-      if test x${CAN_BUILD_LIBDVDCSS} = x1
-      then
-        NEED_LIBDVDCSS=1
-        CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-        LIB_DVD="${LIB_DVD} -L../../lib -ldvdcss"
-      fi
-    ;;
-    xno)
-      # don't use libdvdcss at all, build a DVD module that can dlopen() it
-      PLUGINS="${PLUGINS} dvd"
-      DUMMY_LIBDVDCSS=1
-      SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
-      CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
-      CFLAGS_DVD="${CFLAGS_DVD} -DLIBDVDCSS_VERSION=\"${LIBDVDCSS_VERSION}\""
-      LIB_DVD="${LIB_DVD} -ldl"
-    ;;
-    *)
-      # existing libdvdcss
-      PLUGINS="${PLUGINS} dvd"
-      if test "x$withval" != "xyes"
-      then
-        LIB_DVD="${LIB_DVD} -L"$withval"/lib"
-        CFLAGS_DVD="${CFLAGS_DVD} -I"$withval"/include"
-      fi
-      LIB_DVD="${LIB_DVD} -ldvdcss"
-    esac ],
-  # user didn't decide, we choose to use local libdvdcss and link statically
-  # if libdvdcss is in the archive, or to use the dummy replacement otherwise.
-  [ if test x${CAN_BUILD_LIBDVDCSS} = x1
+AC_ARG_ENABLE(dvd,
+[  --enable-dvd            DVD input module (default enabled)])
+if test "x$enableval" != "xno"
+then
+  AC_ARG_WITH(dvdcss, 
+  [    --with-dvdcss=PATH    libdvdcss headers and libraries])
+  case "x$with_dvdcss" in
+  x)
+    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
+      [ PLUGINS="${PLUGINS} dvd"
+        LIB_DVD="${LIB_DVD} -ldvdcss" ])
+  ;;
+  xno)
+    PLUGINS="${PLUGINS} dvd"
+    CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
+    LIB_DVD="${LIB_DVD} -ldl"
+  ;;
+  *)
+    AC_MSG_CHECKING(for dvdcss headers in ${withval})
+    if test -f ${withval}/include/dvdcss/dvdcss.h
     then
-      BUILTINS="${BUILTINS} dvd"
-      NEED_LIBDVDCSS=1
-      STATIC_LIBDVDCSS=1
-      CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-      LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
-    else
-      # XXX: no check for libdl is done, don't try this at home !
+      AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvd"
-      DUMMY_LIBDVDCSS=1
-      SRC_DVD_EXTRA="${SRC_DVD_EXTRA} dummy_dvdcss.c"
-      CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
-      LIB_DVD="${LIB_DVD} -ldl"
-    fi ])
+      LIB_DVD="${LIB_DVD} -L${withval}/lib -ldvd"
+      CFLAGS_DVD="${CFLAGS_DVD} -I${withval}/include"
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([Cannot find ${withval}/dvdcss/dvdcss.h])
+    fi
+  ;;
+  esac
+fi
 
 dnl
-dnl DVDREAD module: check for libdvdread plugin
+dnl dvdread module: check for libdvdread plugin
 dnl
-if test x${DUMMY_LIBDVDCSS} = x1; then STATIC_LIBDVDREAD=1; fi
-if test x${STATIC_LIBDVDCSS} = x1; then STATIC_LIBDVDREAD=1; fi
-AC_ARG_WITH(dvdread,
-  [  --with-dvdread[=name]   use libdvdread, same options as dvdcss (default 'no')],
-  [ case "x${withval}" in
-    xlocal-static|xyes)
-      if test x${STATIC_LIBDVDREAD} = x1
-      then
-        BUILTINS="${BUILTINS} dvdread" 
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD} -I../../extras/libdvdread"
-        LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a ${LIB_DVD}"
-      else
-        AC_MSG_ERROR([Can't link static dvdread with shared dvdcss])
-      fi
-    ;;
-    xno)
-    ;;
-    x)
-      if test x${STATIC_LIBDVDREAD} = x1
-      then
-        #BUILTINS="${BUILTINS} dvdread" 
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD} -I../../extras/libdvdread"
-        LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a ${LIB_DVD}"
-      else
-        #PLUGINS="${PLUGINS} dvdread"
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread  ${CFLAGS_DVD}"
-        LIB_DVDREAD="${LIB_DVDREAD} -Llib -ldvdread ${LIB_DVD}"
-      fi 
-    ;;
-    *)
-      if test "x$withval" != "xlocal-shared"
-      then
-        LIB_DVDREAD="${LIB_DVDREAD} -L"$withval"/lib"
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I"$withval"/include"
-      else
-        LIB_DVDREAD="${LIB_DVDREAD} -L../../lib"
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread"
-      fi
-      if test x${STATIC_LIBDVDCSS} = x1
-      then
-        AC_MSG_ERROR([Can't link shared dvdread with static dvdcss])
-      else
-        #PLUGINS="${PLUGINS} dvdread"
-        CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD}"
-        LIB_DVDREAD="${LIB_DVDREAD} -ldvdread ${LIB_DVD}"
-      fi
-    esac
-    if test x${DUMMY_LIBDVDCSS} = x1
+AC_ARG_ENABLE(dvdread,
+[  --enable-dvdread        dvdread input module (default disabled)])
+if test "x$enableval" != "xno"
+then
+  AC_ARG_WITH(dvdread, 
+  [    --with-dvdread=PATH   libdvdread headers and libraries])
+  case "x$with_dvdread" in
+  x)
+    AC_CHECK_HEADERS(dvdread/dvd_reader.h,
+      [ PLUGINS="${PLUGINS} dvdread"
+        LIB_DVDREAD="${LIB_DVDREAD} -ldvdread" ])
+  ;;
+  *)
+    AC_MSG_CHECKING(for dvdread headers in ${withval})
+    if test -f ${withval}/include/dvdread/dvd_reader.h
     then
-      LIB_LIBDVDREAD="${LIB_LIBDVDREAD} -ldl"
+      AC_MSG_RESULT(yes)
+      PLUGINS="${PLUGINS} dvdread"
+      LIB_DVDREAD="${LIB_DVDREAD} -L${withval}/lib -ldvdread"
+      CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I${withval}/include"
     else
-      LIB_LIBDVDREAD="${LIB_LIBDVDREAD} -L../../lib -ldvdcss"
-    fi ])
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([Cannot find ${withval}/dvdread/dvd_reader.h])
+    fi
+  ;;
+  esac
+fi
 
 dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            VCD support for Linux (default enabled)])
+  [  --enable-vcd            VCD support for Linux and MacOS X (default enabled)])
 
 if test x$enable_vcd != xno
 then
@@ -843,7 +642,7 @@ dnl
 dnl  Satellite input module
 dnl
 AC_ARG_ENABLE(satellite,
-  [  --enable-satellite       Satellite card support (default disabled)],
+  [  --enable-satellite      satellite card support (default disabled)],
   [ if test x$enable_satellite = xyes
     then
       BUILTINS="${BUILTINS} satellite"
@@ -1548,12 +1347,12 @@ fi
 dnl
 dnl  Stuff used by the program
 dnl
-AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "vlc $VLC_VERSION $VLC_CODENAME Copyright 1996-2001 VideoLAN\n")
-AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VideoLAN Client - version $VLC_VERSION $VLC_CODENAME - (c) 1996-2002 VideoLAN")
+AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "vlc $VERSION $CODENAME Copyright 1996-2002 VideoLAN\n", [Simple version string])
+AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VideoLAN Client - version $VERSION $CODENAME - (c) 1996-2002 VideoLAN", [Copyright string])
 
-VLC_SYMBOL="`echo ${VLC_VERSION} | tr .- __`"
-AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__MODULE_$VLC_SYMBOL")
-AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $VLC_SYMBOL)
+VLC_SYMBOL="`echo ${VERSION} | tr .- __`"
+AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__MODULE_$VLC_SYMBOL", [String suffix for module functions])
+AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $VLC_SYMBOL, [Symbol suffix for module functions])
 
 DATA_PATH="${ac_tool_prefix}/share/videolan"
 AC_SUBST(DATA_PATH)
@@ -1584,7 +1383,6 @@ AC_SUBST(VERSION)
 
 AC_SUBST(LDFLAGS)
 AC_SUBST(PLDFLAGS)
-AC_SUBST(SOFLAGS)
 
 AC_SUBST(LIB_COMMON)
 AC_SUBST(LIB_VLC)
@@ -1613,8 +1411,6 @@ AC_SUBST(LIB_IMDCTSSE)
 AC_SUBST(LIB_IPV4)
 AC_SUBST(LIB_IPV6)
 AC_SUBST(LIB_KDE)
-AC_SUBST(LIB_LIBDVDCSS)
-AC_SUBST(LIB_LIBDVDREAD)
 AC_SUBST(LIB_LIRC)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_MAD)
@@ -1643,7 +1439,6 @@ AC_SUBST(CFLAGS_GNOME)
 AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_KDE)
 AC_SUBST(CFLAGS_IDCTALTIVEC)
-AC_SUBST(CFLAGS_LIBDVDCSS)
 AC_SUBST(CFLAGS_MACOSX)
 AC_SUBST(CFLAGS_MAD)
 AC_SUBST(CFLAGS_MOTIONALTIVEC)
@@ -1655,61 +1450,29 @@ AC_SUBST(CFLAGS_WIN32)
 AC_SUBST(CFLAGS_X11)
 AC_SUBST(CFLAGS_XVIDEO)
 
-AC_SUBST(SRC_DVD_EXTRA)
-AC_SUBST(SRC_DVDCSS_EXTRA)
-
 AC_SUBST(NEED_GETOPT)
-AC_SUBST(NEED_LIBDVDCSS)
 
 AC_OUTPUT([Makefile.opts po/Makefile.in])
 
 echo "
-global configuration
+vlc configuration
 --------------------
+vlc version           : ${VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
 optimizations         : ${OPTIMS}
-tuning:               : ${TUNING}
-release:              : ${RELEASE}"
-
-if test x${HAVE_VLC} = x1
-then
-  echo "
-vlc configuration
------------------
-vlc version           : ${VLC_VERSION}
+tuning                : ${TUNING}
 debug mode            : ${DEBUG}
+release               : ${RELEASE}
 cprof/gprof support   : ${CPROF}/${GPROF}
 need builtin getopt   : ${NEED_GETOPT}
 built-in modules      :${BUILTINS}
 plug-in modules       :${PLUGINS}
-vlc aliases           :${ALIASES}"
-fi
+vlc aliases           :${ALIASES}
 
-echo "
-libdvdcss configuration
------------------------
-can be built          : ${CAN_BUILD_LIBDVDCSS}
-will be built         : ${NEED_LIBDVDCSS}"
-if test x${NEED_LIBDVDCSS} = x1
-then
-  echo "need BSDI libdvd      : ${NEED_BSDI_LIBDVD}"
-  echo "link statically       : ${STATIC_LIBDVDCSS}"
-else
-  echo "use dummy replacement : ${DUMMY_LIBDVDCSS}"
-fi
-
-echo "
 You may now tune Makefile.opts at your convenience, for instance to choose
 which modules get compiled as plugins.
+
+To build vlc and its plugins, type \`$VLC_MAKE'.
 "
-if test x${HAVE_VLC} = x1
-then
-  echo "To build vlc and its plugins, type \`$VLC_MAKE'."
-fi
-if test x${NEED_LIBDVDCSS} = x1
-then
-  echo "To build libdvdcss only, type \`$VLC_MAKE libdvdcss'."
-fi
-echo ""
 

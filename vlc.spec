@@ -1,21 +1,6 @@
-# The source tarball must be free of deCSS code..
-# ask me <yduret@mandrakesoft.com> before uploading
-
 %define name 		vlc
 %define vlc_ver 	0.2.92
 %define version		%vlc_ver
-
-%define css		0
-%if %{css}
-%define css_src		%nil
-%else
-%define css_src         -nocss
-%endif 
-%define css_name	libdvdcss
-%define css_version	1.0.0
-%define css_release	1mdk
-%define css_major	1
-%define css_lib_name	%{css_name}%{css_major}
 
 %define cvs     	0
 %if %{cvs}
@@ -37,7 +22,7 @@ Release:	%{release}
 %if %{cvs} 
 Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
 %else
-Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}%{css_src}.tar.bz2
+Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.bz2
 %endif
 License:	GPL
 Group:		Video
@@ -61,8 +46,8 @@ arbitrary, seeking in the stream, pause, fast forward and slow motion,
 hardware YUV acceleration and a few new interface features 
 including drag'n'drop.
 You may install vlc-gnome, vlc-gtk and vlc-qt vlc-gnome vlc-ncurses.
-This package contains no deCSS functionality.
-You need the decss library available from http://www.videolan.org
+This package contains no CSS unscrambling functionality.
+You need the libdvdcss library available from http://www.videolan.org/libdvdcss/
 
 %package gtk
 Summary: Gtk plug-in for VideoLAN, a DVD and MPEG2 player
@@ -138,43 +123,6 @@ Requires: %{name} = %{version}
 The vlc-alsa packages includes the Advanced Linux Sound Architecture plug-in for the VideoLAN client.
 If you are going to watch DVD with the ALSA plugin, you should install vlc-alsa
 
-%package -n %{css_lib_name}
-Summary:        A library for accessing a DVD like a block device using CSS decryption if needed.
-Version:	%{css_version}
-Release:	%{css_release}
-Group:          System/Libraries
-Provides:       %{css_name} = %{css_version}-%{css_release}
-
-%description -n %{css_lib_name}
-libdvdcss is a simple library designed for accessing a DVD like a block device
-without having to bother about the decryption. The important features are:
- * Portability. Currently supported platforms are GNU/Linux, FreeBSD, BeOS
-   and Windows. The MacOS X version is being worked on as well.
- * Simplicity. There are currently 7 functions in the API, and we intend to
-   keep this number low.
- * Freedom. libdvdcss is released under the General Public License, ensuring
-   it will stay free, and used only for free software products.
- * Just better. Unlike most similar projects, libdvdcss doesn't require the
-   region of your drive to be set.
-
-%package -n %{css_lib_name}-devel
-Summary:        Development tools for programs which will use the libdvdcss library.
-Version:        %{css_version}
-Release:        %{css_release}
-Group:          Development/C
-Requires:       %{css_lib_name} = %{css_version}
-Provides:       %{css_name}-devel = %{css_version}-%{css_release}
-
-%description -n %{css_lib_name}-devel
-The %{css_name}-devel package includes the header files and static libraries
-necessary for developing programs which will manipulate DVDs files using
-the %{css_name} library.
-
-If you are going to develop programs which will manipulate DVDs,
-you should install %{css_name}-devel.  You'll also need to have the %css_name
-package installed.
-
-
 %prep
 %if %{cvs}
 %setup -q -n %{cvs_name}
@@ -187,7 +135,6 @@ package installed.
 # Dadou - 0.1.99h-mdk - Don't use configure here. It breaks build at present
 #                       time.
 ./configure --enable-release \
-            --with-dvdcss=local-shared \
 	    --prefix=%_prefix \
 	    --enable-gnome --enable-x11 --enable-gtk --enable-qt \
 	    --enable-esd \
@@ -199,7 +146,6 @@ perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
 %else
 #export CC="gcc-3.0.1" CXX="g++-3.0.1"
 %configure --enable-release \
-           --with-dvdcss=local-shared \
            --enable-gnome --enable-gtk \
 	   --enable-x11 --disable-qt --enable-ncurses \
 	   --enable-esd --enable-alsa \
@@ -349,22 +295,6 @@ rm -fr %buildroot
 %defattr(-,root,root)
 %doc README
 %{_libdir}/videolan/vlc/alsa.so
-%endif
-
-%if %{css}
-%files -n %{css_lib_name}
-%defattr(-,root,root,-)
-%doc COPYING AUTHORS
-%{_libdir}/*.so.*
-%post   -n %{css_lib_name} -p /sbin/ldconfig
-%postun -n %{css_lib_name} -p /sbin/ldconfig
-
-%files -n %{css_lib_name}-devel
-%defattr(-,root,root)
-%doc COPYING
-%{_libdir}/*.a
-%{_libdir}/*.so
-%{_includedir}/*
 %endif
 
 %changelog

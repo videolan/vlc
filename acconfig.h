@@ -1,8 +1,0 @@
-#undef PACKAGE
-#undef VERSION
-#undef DVD_DEVICE
-#undef VCD_DEVICE
-#undef COPYRIGHT_MESSAGE
-#undef MODULE_SUFFIX
-#undef MODULE_SYMBOL
-#undef VERSION_MESSAGE

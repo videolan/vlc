@@ -46,15 +46,6 @@
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
 #undef TIME_WITH_SYS_TIME
 
-#undef PACKAGE
-#undef VERSION
-#undef DVD_DEVICE
-#undef VCD_DEVICE
-#undef COPYRIGHT_MESSAGE
-#undef MODULE_SUFFIX
-#undef MODULE_SYMBOL
-#undef VERSION_MESSAGE
-
 /* Define if you have the __argz_count function.  */
 #undef HAVE___ARGZ_COUNT
 
@@ -163,9 +154,6 @@
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF
 
-/* Define if you have the </sys/dev/scsi/scsi_ioctl.h> header file.  */
-#undef HAVE__SYS_DEV_SCSI_SCSI_IOCTL_H
-
 /* Define if you have the <Cocoa/Cocoa.h> header file.  */
 #undef HAVE_COCOA_COCOA_H
 
@@ -199,8 +187,11 @@
 /* Define if you have the <dlfcn.h> header file.  */
 #undef HAVE_DLFCN_H
 
-/* Define if you have the <dvd.h> header file.  */
-#undef HAVE_DVD_H
+/* Define if you have the <dvdcss/dvdcss.h> header file.  */
+#undef HAVE_DVDCSS_DVDCSS_H
+
+/* Define if you have the <dvdread/dvd_reader.h> header file.  */
+#undef HAVE_DVDREAD_DVD_READER_H
 
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
@@ -231,9 +222,6 @@
 
 /* Define if you have the <limits.h> header file.  */
 #undef HAVE_LIMITS_H
-
-/* Define if you have the <linux/cdrom.h> header file.  */
-#undef HAVE_LINUX_CDROM_H
 
 /* Define if you have the <linux/fb.h> header file.  */
 #undef HAVE_LINUX_FB_H
@@ -280,15 +268,6 @@
 /* Define if you have the <strings.h> header file.  */
 #undef HAVE_STRINGS_H
 
-/* Define if you have the <sys/cdio.h> header file.  */
-#undef HAVE_SYS_CDIO_H
-
-/* Define if you have the <sys/dvdio.h> header file.  */
-#undef HAVE_SYS_DVDIO_H
-
-/* Define if you have the <sys/ioctl.h> header file.  */
-#undef HAVE_SYS_IOCTL_H
-
 /* Define if you have the <sys/param.h> header file.  */
 #undef HAVE_SYS_PARAM_H
 
@@ -313,9 +292,6 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
-/* Define if you have the <winioctl.h> header file.  */
-#undef HAVE_WINIOCTL_H
-
 /* Define if you have the mad library (-lmad).  */
 #undef HAVE_LIBMAD
 
@@ -325,8 +301,11 @@
 /* Define if you have the st library (-lst).  */
 #undef HAVE_LIBST
 
-/* css decryption with player keys */
-#undef HAVE_CSSKEYS
+/* Package name */
+#undef PACKAGE
+
+/* Package version */
+#undef VERSION
 
 /* Define if you have the iconv() function. */
 #undef HAVE_ICONV
@@ -389,36 +368,6 @@
 /* Define if your compiler groks C altivec extensions. */
 #undef CAN_COMPILE_C_ALTIVEC
 
-/* Define if <sys/cdio.h> defines dvd_struct. */
-#undef DVD_STRUCT_IN_SYS_CDIO_H
-
-/* Define if <sys/dvdio.h> defines dvd_struct. */
-#undef DVD_STRUCT_IN_SYS_DVDIO_H
-
-/* Define if <linux/cdrom.h> defines DVD_STRUCT. */
-#undef DVD_STRUCT_IN_LINUX_CDROM_H
-
-/* Define if <dvd.h> defines DVD_STRUCT. */
-#undef DVD_STRUCT_IN_DVD_H
-
-/* Define if <extras/BSDI_dvdioctl/dvd.h> defines DVD_STRUCT. */
-#undef DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H
-
-/* Have userspace SCSI headers. */
-#undef SOLARIS_USCSI
-
-/* Define if <sys/scsi.h> defines sctl_io. */
-#undef HPUX_SCTL_IO
-
-/* Define if Linux-like dvd_struct is defined. */
-#undef HAVE_LINUX_DVD_STRUCT
-
-/* Define if OpenBSD-like dvd_struct is defined. */
-#undef HAVE_OPENBSD_DVD_STRUCT
-
-/* Define if FreeBSD-like dvd_struct is defined. */
-#undef HAVE_BSD_DVD_STRUCT
-
 /* define if compiling with satellite card support */
 #undef HAVE_SATELLITE
 
@@ -433,4 +382,16 @@
 
 /* Define if <st.h> defines st_init */
 #undef ST_INIT_IN_ST_H
+
+/* Simple version string */
+#undef VERSION_MESSAGE
+
+/* Copyright string */
+#undef COPYRIGHT_MESSAGE
+
+/* String suffix for module functions */
+#undef MODULE_SUFFIX
+
+/* Symbol suffix for module functions */
+#undef MODULE_SYMBOL
 

@@ -92,8 +92,6 @@ LIB_IMDCTSSE = @LIB_IMDCTSSE@
 LIB_IPV4 = @LIB_IPV4@
 LIB_IPV6 = @LIB_IPV6@
 LIB_KDE = @LIB_KDE@
-LIB_LIBDVDCSS = @LIB_LIBDVDCSS@
-LIB_LIBDVDREAD = @LIB_LIBDVDREAD@
 LIB_LIRC = @LIB_LIRC@
 LIB_MACOSX = @LIB_MACOSX@
 LIB_MAD = @LIB_MAD@
@@ -125,7 +123,6 @@ CFLAGS_GNOME = @CFLAGS_GNOME@
 CFLAGS_GTK = @CFLAGS_GTK@
 CFLAGS_KDE = @CFLAGS_KDE@
 CFLAGS_IDCTALTIVEC = @CFLAGS_IDCTALTIVEC@
-CFLAGS_LIBDVDCSS = @CFLAGS_LIBDVDCSS@
 CFLAGS_MACOSX = @CFLAGS_MACOSX@
 CFLAGS_MAD = @CFLAGS_MAD@
 CFLAGS_MOTIONALTIVEC = @CFLAGS_MOTIONALTIVEC@
@@ -136,16 +133,9 @@ CFLAGS_X11 = @CFLAGS_X11@
 CFLAGS_XVIDEO = @CFLAGS_XVIDEO@
 
 #
-# Additional objects
-#
-SRC_DVD_EXTRA = @SRC_DVD_EXTRA@
-SRC_DVDCSS_EXTRA = @SRC_DVDCSS_EXTRA@
-
-#
 # Other special cases
 #
 NEED_GETOPT = @NEED_GETOPT@
-NEED_LIBDVDCSS = @NEED_LIBDVDCSS@
 
 ###############################################################################
 # Configuration pre-processing
@@ -175,10 +165,6 @@ PROGRAM_BUILD = `date` $(USER)
 else
 PROGRAM_BUILD = `date` $(USER)@`hostname`
 endif
-
-# PROGRAM_VERSION is the current vlc version
-PROGRAM_VERSION=@VLC_VERSION@
-LIBDVDCSS_VERSION=@LIBDVDCSS_VERSION@
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
@@ -303,11 +289,6 @@ endif
 ifneq (,$(findstring mingw32,$(SYS)))
 LDFLAGS += -mwindows -Xlinker --force-exe-suffix
 endif
-
-#
-# C compiler and linker flags: setting soname
-#
-SOFLAGS = @SOFLAGS@
 
 #
 # C compiler flags: plugin compilation
