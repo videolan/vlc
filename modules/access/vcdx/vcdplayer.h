@@ -1,6 +1,6 @@
 /*****************************************************************************
- * Copyright (C) 2003 Rocky Bernstein (for VideoLAN)
- * $Id: vcdplayer.h,v 1.5 2004/01/03 20:43:24 rocky Exp $
+ * Copyright (C) 2003, 2004 Rocky Bernstein (for VideoLAN)
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -76,7 +76,7 @@ typedef struct thread_vcd_data_s
   int          cur_lid;                 /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
                                            not none or not in PBC */
-  PsdListDescriptor pxd;                /* If PBC is on, the relevant 
+  PsdListDescriptor_t pxd;              /* If PBC is on, the relevant 
                                            PSD/PLD */
   int          pdi;                     /* current pld index of pxd. -1 if 
                                            no index*/
