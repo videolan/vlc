@@ -95,9 +95,9 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     clear_button->SetDefault();
 
     /* Create the Save Log button */
-     wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS,
-                                               wxU(_("Save As...")));
-     save_log_button->SetDefault();
+    wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS,
+                                              wxU(_("Save As...")));
+    save_log_button->SetDefault();
 
     /* Place everything in sizers */
     wxBoxSizer *buttons_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -142,6 +142,8 @@ void Messages::UpdateLog()
     vlc_mutex_lock( p_sub->p_lock );
     int i_stop = *p_sub->pi_stop;
     vlc_mutex_unlock( p_sub->p_lock );
+
+    textctrl->SetInsertionPointEnd();
 
     if( p_sub->i_start != i_stop )
     {
