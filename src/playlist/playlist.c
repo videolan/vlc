@@ -184,7 +184,10 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
         {
             input_StopThread( p_playlist->p_input );
             val.i_int = p_playlist->i_index;
+            /* Does not matter if we unlock here */
+            vlc_mutex_unlock( &p_playlist->object_lock );
             var_Set( p_playlist, "item-change",val );
+            vlc_mutex_lock( &p_playlist->object_lock );
         }
         break;
 

@@ -129,7 +129,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 if( p_playlist )
                 {
                     val.i_int = p_playlist->i_index;
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
                     var_Set( p_playlist, "item-change", val );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
                     vlc_object_release( p_playlist );
                 }
             }
@@ -205,7 +207,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 if( p_playlist )
                 {
                     val.i_int = p_playlist->i_index;
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
                     var_Set( p_playlist, "item-change", val );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
                     vlc_object_release( p_playlist );
                 }
             }
