@@ -707,7 +707,6 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
             input_Preparse( p_playlist, p_current );
             var_SetInteger( p_playlist, "item-change", p_current->i_id );
             vlc_mutex_lock( &p_obj->object_lock );
-            fprintf(stderr, "END\n");
         }
         b_sleep = ( p_obj->i_waiting == 0 );
 
@@ -919,10 +918,6 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             playlist_view_t *p_view =
                     playlist_ViewFind( p_playlist,
                                    p_playlist->status.i_view );
-            fprintf(stderr,"Finding next of %s within %s, view %i\n",
-                           p_playlist->status.p_item ?     p_playlist->status.p_item->input.psz_name : "coincoin",
-                                p_playlist->status.p_node->input.psz_name,
-                                p_playlist->status.i_view) ;
             p_new = playlist_FindNextFromParent( p_playlist,
                             p_playlist->status.i_view,
                             p_view->p_root,
