@@ -468,6 +468,15 @@ if test "x${ac_cv_c_omit_frame_pointer}" != "xno"; then
     CFLAGS_i420_yuy2_mmx="${CFLAGS_i420_yuy2_mmx} -fomit-frame-pointer"
 fi
 
+dnl Check for -mdynamic-no-pic
+AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
+    [ac_cv_c_dynamic_no_pic],
+    [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
+     AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
+if test "x${ac_cv_c_dynamic_no_pic}" != "xno"; then
+    CFLAGS_OPTIM="${CFLAGS_OPTIM} -mdynamic-no-pic"
+fi
+
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
     [ac_cv_ld_darwin],

@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.4 2002/10/21 20:00:10 massiot Exp $
+ * $Id: common.c,v 1.5 2002/10/22 23:08:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -205,7 +205,7 @@ static const char * FormatPrintChannels( int i_channels )
  * aout_FormatPrint : print a format in a human-readable form
  *****************************************************************************/
 void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
-                       audio_sample_format_t * p_format )
+                       const audio_sample_format_t * p_format )
 {
     msg_Dbg( p_aout, "%s format='%4.4s' rate=%d channels=%s", psz_text,
              (char *)&p_format->i_format, p_format->i_rate,
@@ -216,8 +216,8 @@ void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
  * aout_FormatsPrint : print two formats in a human-readable form
  *****************************************************************************/
 void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
-                        audio_sample_format_t * p_format1,
-                        audio_sample_format_t * p_format2 )
+                        const audio_sample_format_t * p_format1,
+                        const audio_sample_format_t * p_format2 )
 {
     msg_Dbg( p_aout, "%s format='%4.4s'->'%4.4s' rate=%d->%d channels=%s->%s",
              psz_text,
