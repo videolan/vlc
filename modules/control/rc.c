@@ -115,18 +115,20 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
  * Module descriptor
  *****************************************************************************/
 #define POS_TEXT N_("Show stream position")
-#define POS_LONGTEXT N_("Show the current position in seconds within the stream from time to time.")
+#define POS_LONGTEXT N_("Show the current position in seconds within the " \
+                        "stream from time to time." )
 
 #define TTY_TEXT N_("Fake TTY")
 #define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
 
 #define UNIX_TEXT N_("UNIX socket command input")
-#define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than stdin. " )    
+#define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than " \
+                         "stdin." )
 
-#define HOST_TEXT N_("IP command input")
+#define HOST_TEXT N_("TCP command input")
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
-    "You can set the address and port the interface will bind to." )
-    
+            "You can set the address and port the interface will bind to." )
+
 vlc_module_begin();
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
@@ -444,8 +446,11 @@ static void Run( intf_thread_t *p_intf )
             /* FIXME: it's a global command, but we should pass the
              * local object as an argument, not p_intf->p_libvlc. */
             i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
-            printf( _("%s: returned %i (%s)\n"),
-                    psz_cmd, i_ret, vlc_error( i_ret ) );
+            if( i_ret != 0 )
+            {
+                printf( _("%s: returned %i (%s)\n"),
+                         psz_cmd, i_ret, vlc_error( i_ret ) );
+            }
         }
         else if( !strcmp( psz_cmd, "info" ) )
         {
@@ -474,6 +479,54 @@ static void Run( intf_thread_t *p_intf )
             else
             {
                 printf( _("no input\n") );
+            }
+        }
+        else if( !strcmp( psz_cmd, "is_playing" ) )
+        {
+            if( ! p_input )
+            {
+                printf( "0\n" );
+            }
+            else
+            {
+                printf( "1\n" );
+            }
+        }
+        else if( !strcmp( psz_cmd, "get_time" ) )
+        {
+            if( ! p_input )
+            {
+                printf("0\n");
+            }
+            else
+            {
+                vlc_value_t time;
+                var_Get( p_input, "time", &time );
+                printf( "%i\n", time.i_time / 1000000);
+            }
+        }
+        else if( !strcmp( psz_cmd, "get_length" ) )
+        {
+            if( ! p_input )
+            {
+                printf("0\n");
+            }
+            else
+            {
+                vlc_value_t time;
+                var_Get( p_input, "length", &time );
+                printf( "%i\n", time.i_time / 1000000);
+            }
+        }
+        else if( !strcmp( psz_cmd, "get_title" ) )
+        {
+            if( ! p_input )
+            {
+                printf("\n");
+            }
+            else
+            {
+                printf( "%s\n", p_input->input.p_item->psz_name );
             }
         }
         else switch( psz_cmd[0] )
