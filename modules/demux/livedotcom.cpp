@@ -39,6 +39,10 @@
 #include "GroupsockHelper.hh"
 #include "liveMedia.hh"
 
+extern "C" {
+#include "../access/mms/asf.h"  /* Who said ugly ? */
+}
+
 using namespace std;
 
 /*****************************************************************************
@@ -89,6 +93,7 @@ typedef struct
 
     vlc_bool_t   b_quicktime;
     vlc_bool_t   b_muxed;
+    vlc_bool_t   b_asf;
 
     es_format_t  fmt;
     es_out_id_t  *p_es;
@@ -115,11 +120,17 @@ struct demux_sys_t
     UsageEnvironment *env ;
     RTSPClient       *rtsp;
 
+    /* */
     int              i_track;
     live_track_t     **track;   /* XXX mallocated */
     mtime_t          i_pcr;
     mtime_t          i_pcr_start;
 
+    /* Asf */
+    asf_header_t     asfh;
+    stream_t         *p_out_asf;
+
+    /* */
     mtime_t          i_length;
     mtime_t          i_start;
 
@@ -128,6 +139,8 @@ struct demux_sys_t
 
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
+
+static int ParseASF( demux_t * );
 
 /*****************************************************************************
  * DemuxOpen:
@@ -182,6 +195,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_pcr_start = 0;
     p_sys->i_length = 0;
     p_sys->i_start = 0;
+    p_sys->p_out_asf = NULL;
 
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
@@ -276,22 +290,22 @@ static int  Open ( vlc_object_t *p_this )
     while( ( sub = iter->next() ) != NULL )
     {
         unsigned int i_buffer = 0;
+        Boolean bInit;
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
-        {
             i_buffer = 100000;
-        }
         else if( !strcmp( sub->mediumName(), "video" ) )
-        {
             i_buffer = 2000000;
-        }
         else
-        {
             continue;
-        }
 
-        if( !sub->initiate() )
+        if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
+            bInit = sub->initiate( 4 ); /* Constant ? */
+        else
+            bInit = sub->initiate();
+
+        if( !bInit )
         {
             msg_Warn( p_demux, "RTP subsession '%s/%s' failed(%s)", sub->mediumName(), sub->codecName(), p_sys->env->getResultMsg() );
         }
@@ -341,6 +355,7 @@ static int  Open ( vlc_object_t *p_this )
         tk->i_pts   = 0;
         tk->b_quicktime = VLC_FALSE;
         tk->b_muxed     = VLC_FALSE;
+        tk->b_asf       = VLC_FALSE;
         tk->b_rtcp_sync = VLC_FALSE;
         tk->p_out_muxed = NULL;
         tk->p_es        = NULL;
@@ -412,6 +427,12 @@ static int  Open ( vlc_object_t *p_this )
                     delete[] p_extra;
                 }
             }
+            else if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
+            {
+                tk->b_asf = VLC_TRUE;
+                if( p_sys->p_out_asf == NULL )
+                    p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf", p_demux->out );;
+            }
         }
         else if( !strcmp( sub->mediumName(), "video" ) )
         {
@@ -463,6 +484,12 @@ static int  Open ( vlc_object_t *p_this )
                 tk->b_muxed = VLC_TRUE;
                 tk->p_out_muxed = stream_DemuxNew( p_demux, "ps", p_demux->out );
             }
+            else if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
+            {
+                tk->b_asf = VLC_TRUE;
+                if( p_sys->p_out_asf == NULL )
+                    p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf", p_demux->out );;
+            }
         }
 
         if( tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
@@ -470,7 +497,7 @@ static int  Open ( vlc_object_t *p_this )
             tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
         }
 
-        if( tk->p_es || tk->b_quicktime || tk->b_muxed )
+        if( tk->p_es || tk->b_quicktime || tk->b_muxed || tk->b_asf )
         {
             tk->readSource = sub->readSource();
             tk->rtpSource  = sub->rtpSource();
@@ -486,6 +513,13 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     delete iter;
+
+    if( p_sys->p_out_asf && ParseASF( p_demux ) )
+    {
+        msg_Err( p_demux, "cannot find a usable asf header" );
+        /* TODO Clean tracks */
+        goto error;
+    }
 
     p_sys->i_length = (mtime_t)(p_sys->ms->playEndTime() * 1000000.0);
     if( p_sys->i_length < 0 )
@@ -507,6 +541,10 @@ static int  Open ( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->p_out_asf )
+    {
+        stream_DemuxDelete( p_sys->p_out_asf );
+    }
     if( p_sys->ms )
     {
         Medium::close( p_sys->ms );
@@ -557,6 +595,10 @@ static void Close( vlc_object_t *p_this )
     {
         free( p_sys->track );
     }
+    if( p_sys->p_out_asf )
+    {
+        stream_DemuxDelete( p_sys->p_out_asf );
+    }
 
     if( p_sys->rtsp && p_sys->ms )
     {
@@ -597,12 +639,16 @@ static int Demux( demux_t *p_demux )
     demux_sys_t    *p_sys = p_demux->p_sys;
     TaskToken      task;
 
+    vlc_bool_t      b_send_pcr = VLC_TRUE;
     mtime_t         i_pcr = 0;
     int             i;
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
+
+        if( tk->b_asf || tk->b_muxed )
+            b_send_pcr = VLC_FALSE;
 
         if( i_pcr == 0 )
         {
@@ -617,7 +663,8 @@ static int Demux( demux_t *p_demux )
     {
         p_sys->i_pcr = i_pcr;
 
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr );
+        if( b_send_pcr )
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr );
         if( p_sys->i_pcr_start <= 0 || p_sys->i_pcr_start > i_pcr ||
             ( p_sys->i_length > 0 && i_pcr - p_sys->i_pcr_start > p_sys->i_length ) )
         {
@@ -841,17 +888,11 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
              i_size,
              pts.tv_sec * 1000000LL + pts.tv_usec );
 #endif
-    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
-    {
-        i_size += 4;
-    }
-
     if( i_size > 65536 )
     {
         msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    p_block = block_New( p_demux, i_size );
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
     {
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
@@ -861,11 +902,20 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
         uint32_t header = 0;
         msg_Warn( p_demux, "need livemedia library >= \"2004.04.09\"" );
 #endif
+        p_block = block_New( p_demux, i_size + 4 );
         memcpy( p_block->p_buffer, &header, 4 );
         memcpy( p_block->p_buffer + 4, tk->buffer, i_size );
     }
+    else if( tk->b_asf )
+    {
+        int i_copy = __MIN( p_sys->asfh.i_min_data_packet_size, i_size );
+        p_block = block_New( p_demux, p_sys->asfh.i_min_data_packet_size );
+
+        memcpy( p_block->p_buffer, tk->buffer, i_copy );
+    }
     else
     {
+        p_block = block_New( p_demux, i_size );
         memcpy( p_block->p_buffer, tk->buffer, i_size );
     }
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') &&
@@ -885,6 +935,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     if( tk->b_muxed )
     {
         stream_DemuxSend( tk->p_out_muxed, p_block );
+    }
+    else if( tk->b_asf )
+    {
+        stream_DemuxSend( p_sys->p_out_asf, p_block );
     }
     else
     {
@@ -930,5 +984,115 @@ static void TaskInterrupt( void *p_private )
 
     /* Avoid lock */
     p_demux->p_sys->event = 0xff;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static int b64_decode( char *dest, char *src );
+
+static int ParseASF( demux_t *p_demux )
+{
+    demux_sys_t    *p_sys = p_demux->p_sys;
+
+    const char *psz_marker = "a=pgmpu:data:application/vnd.ms.wms-hdr.asfv1;base64,";
+    char *psz_asf = strcasestr( p_sys->p_sdp, psz_marker );
+    char *psz_end;
+    block_t *p_header;
+
+    /* Parse the asf header */
+    if( psz_asf == NULL )
+        return VLC_EGENERIC;
+
+    psz_asf += strlen( psz_marker );
+    psz_asf = strdup( psz_asf );    /* Duplicate it */
+    psz_end = strchr( psz_asf, '\n' );
+
+    while( psz_end > psz_asf && ( *psz_end == '\n' || *psz_end == '\r' ) )
+        *psz_end-- = '\0';
+
+    if( psz_asf >= psz_end )
+    {
+        free( psz_asf );
+        return VLC_EGENERIC;
+    }
+
+    /* Always smaller */
+    p_header = block_New( p_demux, psz_end - psz_asf );
+    p_header->i_buffer = b64_decode( (char*)p_header->p_buffer, psz_asf );
+    fprintf( stderr, "Size=%d Hdrb64=%s\n", p_header->i_buffer, psz_asf );
+    if( p_header->i_buffer <= 0 )
+    {
+        free( psz_asf );
+        return VLC_EGENERIC;
+    }
+
+    /* Parse it to get packet size */
+    E_(asf_HeaderParse)( &p_sys->asfh, p_header->p_buffer, p_header->i_buffer );
+
+    /* Send it to demuxer */
+    stream_DemuxSend( p_sys->p_out_asf, p_header );
+
+    free( psz_asf );
+    return VLC_SUCCESS;
+}
+/*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
+static int b64_decode( char *dest, char *src )
+{
+    const char *dest_start = dest;
+    int  i_level;
+    int  last = 0;
+    int  b64[256] = {
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
+        52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,  /* 30-3F */
+        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,  /* 40-4F */
+        15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,  /* 50-5F */
+        -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,  /* 60-6F */
+        41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,  /* 70-7F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 80-8F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 90-9F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* A0-AF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* B0-BF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* C0-CF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* D0-DF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* E0-EF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
+        };
+
+    for( i_level = 0; *src != '\0'; src++ )
+    {
+        int  c;
+
+        c = b64[(unsigned int)*src];
+        if( c == -1 )
+        {
+            continue;
+        }
+
+        switch( i_level )
+        {
+            case 0:
+                i_level++;
+                break;
+            case 1:
+                *dest++ = ( last << 2 ) | ( ( c >> 4)&0x03 );
+                i_level++;
+                break;
+            case 2:
+                *dest++ = ( ( last << 4 )&0xf0 ) | ( ( c >> 2 )&0x0f );
+                i_level++;
+                break;
+            case 3:
+                *dest++ = ( ( last &0x03 ) << 6 ) | c;
+                i_level = 0;
+        }
+        last = c;
+    }
+
+    *dest = '\0';
+
+    return dest - dest_start;
 }
 
