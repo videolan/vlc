@@ -1130,6 +1130,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
+    mtime_t     *i_sk_time;
 
     vlc_meta_t **pp_meta;
 
@@ -1206,6 +1207,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
 
+        case DEMUX_GET_SEEKPOINT_TIME:
+            i_skp = (int)va_arg( args, int );
+            i_sk_time = (mtime_t *)va_arg( args, mtime_t * );
+            if( p_sys->title && i_skp < p_sys->title->i_seekpoint)
+            {
+                *i_sk_time = p_sys->title->seekpoint[i_skp]->i_time_offset;
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
         case DEMUX_GET_FPS:
@@ -1420,7 +1430,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
-		// TODO implement correct timestamping when B frames are used
+        // TODO implement correct timestamping when B frames are used
         if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;

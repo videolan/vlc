@@ -1493,9 +1493,21 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             {
                 demux_t *p_demux = p_input->input.p_demux;
                 int i_seekpoint;
+                mtime_t i_input_time;
+                mtime_t i_seekpoint_time; 
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
-                    i_seekpoint = p_demux->info.i_seekpoint - 1;
+                {
+                    i_seekpoint = p_demux->info.i_seekpoint;
+                    if (demux2_Control( p_demux, DEMUX_GET_SEEKPOINT_TIME, p_demux->info.i_seekpoint, &i_seekpoint_time) == VLC_SUCCESS)
+                    {
+                        demux2_Control( p_demux, INPUT_GET_TIME, &i_input_time );
+                        if ( i_input_time < i_seekpoint_time + 3000000 )
+                            i_seekpoint--;
+                    }
+                    else
+                        i_seekpoint--;
+                }
                 else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
                     i_seekpoint = p_demux->info.i_seekpoint + 1;
                 else

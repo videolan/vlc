@@ -82,6 +82,7 @@ enum demux_query_e
     /* TITLE/SEEKPOINT, only when TITLE_INFO succeed */
     DEMUX_SET_TITLE,            /* arg1= int            can fail */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
+    DEMUX_GET_SEEKPOINT_TIME,   /* arg1= int arg2 = mtime_t *  res = can fail   */
 
     /* DEMUX_SET_GROUP only a hit for demuxer (mainly DVB) to allow not
      * reading everything (you should not use this to call es_out_Control)
