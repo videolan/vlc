@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.21 2003/02/07 21:30:25 hartman Exp $
+ * $Id: controls.m,v 1.22 2003/02/08 17:26:00 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -635,7 +635,7 @@
     if( [o_mi state] == NSOffState )
     {
         const char * psz_variable = (const char *)[o_mi tag];
-        const char * psz_value = [[o_mi title] cString];
+        char * psz_value = [NSApp delocalizeString: [o_mi title]];
         vlc_object_t * p_object = (vlc_object_t *)
             [[o_mi representedObject] pointerValue];
         vlc_value_t val;
@@ -646,6 +646,8 @@
         {
             msg_Warn( p_object, "cannot set variable (%s)", psz_value );
         }
+
+        free( psz_value );
     }
 }
 

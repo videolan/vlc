@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.35 2003/01/28 12:23:40 massiot Exp $
+ * $Id: output.c,v 1.36 2003/02/08 17:26:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -69,25 +69,25 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* The user may have selected a different channels configuration. */
         var_Get( p_aout, "audio-channels", &val );
 
-        if ( !strcmp( val.psz_string, N_("Reverse stereo") ) )
+        if ( !strcmp( val.psz_string, _("Reverse stereo") ) )
         {
             p_aout->output.output.i_original_channels |=
                                         AOUT_CHAN_REVERSESTEREO;
         }
-        else if ( !strcmp( val.psz_string, N_("Both") ) )
+        else if ( !strcmp( val.psz_string, _("Stereo") ) )
         {
             p_aout->output.output.i_original_channels =
                 AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
-        else if ( !strcmp( val.psz_string, N_("Left") ) )
+        else if ( !strcmp( val.psz_string, _("Left") ) )
         {
             p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
         }
-        else if ( !strcmp( val.psz_string, N_("Right") ) )
+        else if ( !strcmp( val.psz_string, _("Right") ) )
         {
             p_aout->output.output.i_original_channels = AOUT_CHAN_RIGHT;
         }
-        else if ( !strcmp( val.psz_string, N_("Dolby Surround") ) )
+        else if ( !strcmp( val.psz_string, _("Dolby Surround") ) )
         {
             p_aout->output.output.i_original_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
@@ -100,17 +100,17 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Mono - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        val.psz_string = N_("Both");
+        val.psz_string = _("Stereo");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        val.psz_string = N_("Left");
+        val.psz_string = _("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        val.psz_string = N_("Right");
+        val.psz_string = _("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
         {
             /* Go directly to the left channel. */
             p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-            val.psz_string = N_("Left");
+            val.psz_string = _("Left");
             var_Set( p_aout, "audio-channels", val );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
@@ -125,24 +125,24 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
         {
-            val.psz_string = N_("Dolby Surround");
+            val.psz_string = _("Dolby Surround");
         }
         else
         {
-            val.psz_string = N_("Both");
+            val.psz_string = _("Stereo");
         }
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        val.psz_string = N_("Left");
+        val.psz_string = _("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        val.psz_string = N_("Right");
+        val.psz_string = _("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        val.psz_string = N_("Reverse stereo");
+        val.psz_string = _("Reverse stereo");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
         {
             /* Go directly to the left channel. */
             p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-            val.psz_string = N_("Left");
+            val.psz_string = _("Left");
             var_Set( p_aout, "audio-channels", val );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,

@@ -2,6 +2,7 @@
 src/libvlc.c
 src/libvlc.h
 src/misc/configuration.c
+src/audio_output/output.c
 include/interface.h
 
 # access modules
