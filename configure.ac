@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.88 2003/10/21 01:05:32 titer Exp $
+dnl $Id: configure.ac,v 1.89 2003/10/21 17:31:36 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -137,7 +137,6 @@ case "${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     AX_ADD_LDFLAGS([vlc beos],[-lbe])
     AX_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
-    AX_ADD_LDFLAGS([mkv],[-lstdc++.r4])
 
     dnl Check for BONE presence
     AC_CHECK_LIB(socket, connect,
@@ -1551,6 +1550,7 @@ AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h matroska/KaxVersion.h, [
     AC_CHECK_HEADERS(matroska/KaxAttachments.h)
     AX_ADD_PLUGINS([mkv])
+    AX_ADD_CXXFLAGS([mkv],[])
     AC_CHECK_LIB(ebml_pic,main,[
       # We have ebml_pic, that's good, we can build an mkv.so plugin !
       AX_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
