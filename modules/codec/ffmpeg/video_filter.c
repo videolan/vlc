@@ -266,6 +266,28 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         img_resample( p_sys->p_rsc, &dest_pic, &src_pic );
     }
 
+    /* Special case for RV32 -> YUVA */
+    if( !p_sys->b_resize &&
+        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('R','V','3','2') &&
+        p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    {
+        uint8_t *p_src = p_pic->p[0].p_pixels;
+        int i_src_pitch = p_pic->p[0].i_pitch;
+        uint8_t *p_dst = p_pic_dst->p[3].p_pixels;
+        int i_dst_pitch = p_pic_dst->p[3].i_pitch;
+        int j;
+
+        for( i = 0; i < p_filter->fmt_out.video.i_height; i++ )
+        {
+            for( j = 0; j < p_filter->fmt_out.video.i_width; j++ )
+            {
+              p_dst[j] = p_src[j*4+3];
+            }
+            p_src += i_src_pitch;
+            p_dst += i_dst_pitch;
+        }
+    }
+
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
     p_pic_dst->i_nb_fields = p_pic->i_nb_fields;

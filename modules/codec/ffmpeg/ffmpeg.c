@@ -343,6 +343,7 @@ static struct
 } chroma_table[] =
 {
     /* Planar YUV formats */
+    { VLC_FOURCC('Y','U','V','A'), PIX_FMT_YUV444P }, /* Hack */
     { VLC_FOURCC('I','4','4','4'), PIX_FMT_YUV444P },
     { VLC_FOURCC('I','4','2','2'), PIX_FMT_YUV422P },
     { VLC_FOURCC('I','4','2','0'), PIX_FMT_YUV420P },
