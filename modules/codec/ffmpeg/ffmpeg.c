@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.74 2004/01/08 23:21:01 sigmunau Exp $
+ * $Id: ffmpeg.c,v 1.75 2004/01/09 00:02:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -565,18 +565,21 @@ static struct
     { VLC_FOURCC('R','V','1','3'), CODEC_ID_RV10,
       VIDEO_ES, "Real Video 13" },
 
-#if LIBAVCODEC_BUILD >= 4683
+#if LIBAVCODEC_BUILD >= 4684
     /* Apple Video */
     { VLC_FOURCC('r','p','z','a'), CODEC_ID_RPZA,
       VIDEO_ES, "Apple Video" },
-#endif
+
     { VLC_FOURCC('s','m','c',' '), CODEC_ID_SMC,
       VIDEO_ES, "Apple graphics" },
 
-#if LIBAVCODEC_BUILD >= 4683
     /* Cinepak */
     { VLC_FOURCC('c','v','i','d'), CODEC_ID_CINEPAK,
       VIDEO_ES, "Cinepak Video" },
+
+    /* Id Quake II CIN */
+    { VLC_FOURCC('I','D','C','I'), CODEC_ID_IDCIN,
+      VIDEO_ES, "Id Quake II CIN Video" },
 #endif
 
     /* 4X Technologies */
@@ -588,6 +591,10 @@ static struct
     { VLC_FOURCC('D','U','C','K'), CODEC_ID_TRUEMOTION1,
       VIDEO_ES, "Duck TrueMotion v1 Video" },
 #endif
+
+    /* Interplay MVE */
+    { VLC_FOURCC('i','m','v','e'), CODEC_ID_INTERPLAY_VIDEO,
+      VIDEO_ES, "Interplay MVE Video" },
 
     /*
      *  Audio Codecs
@@ -644,6 +651,10 @@ static struct
     /* 4X Technologies */
     { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
       AUDIO_ES, "4X Technologies Audio" },
+
+    /* Interplay DPCM */
+    { VLC_FOURCC('i','d','p','c'), CODEC_ID_INTERPLAY_DPCM,
+      AUDIO_ES, "Interplay DPCM Audio" },
 
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,

@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.58 2004/01/08 00:12:50 gbazin Exp $
+ * $Id: video.c,v 1.59 2004/01/09 00:02:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -80,6 +80,9 @@ struct decoder_sys_t
     vlc_bool_t b_pp_async;
     vlc_bool_t b_pp_init;
 };
+
+/* FIXME (dummy palette for now) */
+static AVPaletteControl palette_control;
 
 /*****************************************************************************
  * Local prototypes
@@ -331,6 +334,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
+
+    /* Setup dummy palette to avoid segfaults with some codecs */
+    p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
     vlc_mutex_lock( lockval.p_address );
