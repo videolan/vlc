@@ -2,7 +2,7 @@
  * scaled_bitmap.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: scaled_bitmap.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -42,10 +42,10 @@ ScaledBitmap::ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
     // Algorithm for horizontal enlargement
     if( width > srcWidth )
     {
-        // Decision variables for Bresenham alogrithm
-        int incX1 = 2 * srcWidth;
-        int incX2 = incX1 - 2 * width;
-        int dX = incX1 - width;
+        // Decision variables for Bresenham algorithm
+        int incX1 = 2 * (srcWidth-1);
+        int incX2 = incX1 - 2 * (width-1);
+        int dX = incX1 - (width-1);
 
         for( int y = 0; y < height; y++ )
         {
@@ -71,10 +71,10 @@ ScaledBitmap::ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
     // Algorithm for horizontal reduction
     else
     {
-        // Decision variables for Bresenham alogrithm
-        int incX1 = 2 * width;
-        int incX2 = incX1 - 2 * srcWidth;
-        int dX = incX1 - srcWidth;
+        // Decision variables for Bresenham algorithm
+        int incX1 = 2 * (width-1);
+        int incX2 = incX1 - 2 * (srcWidth-1);
+        int dX = incX1 - (srcWidth-1);
 
         for( int y = 0; y < height; y++ )
         {
