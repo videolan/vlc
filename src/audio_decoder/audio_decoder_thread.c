@@ -216,71 +216,79 @@ static void RunThread (adec_thread_t * p_adec)
     msleep (INPUT_PTS_DELAY);
 
     /* Initializing the audio decoder thread */
-    if (InitThread (p_adec)) {
+    if( InitThread (p_adec) )
+    {
         p_adec->b_error = 1;
     }
 
     sync = 0;
 
     /* Audio decoder thread's main loop */
-    while ((!p_adec->b_die) && (!p_adec->b_error)) {
-	s16 * buffer;
-	adec_sync_info_t sync_info;
+    while( (!p_adec->b_die) && (!p_adec->b_error) )
+    {
+        s16 * buffer;
+        adec_sync_info_t sync_info;
 
-	if (!sync) {	/* have to find a synchro point */
-	    adec_byte_stream_t * p_byte_stream;
+        if (!sync)
+        {	
+            /* have to find a synchro point */
+            adec_byte_stream_t * p_byte_stream;
+            
+            printf ("sync\n");
+            
+            p_adec->align = 0;
+            p_byte_stream = adec_byte_stream (&p_adec->audio_decoder);
+            do 
+            {
+                adec_byte_stream_next (p_byte_stream);
+            } while ((!p_adec->align) && (!p_adec->b_die) &&  (!p_adec->b_error));
 
-	    printf ("sync\n");
+	        sync = 1;
+	    }
 
-	    p_adec->align = 0;
+        if( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
+        {
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
+            DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
+        }
+        else
+        {
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+	    }
 
-	    p_byte_stream = adec_byte_stream (&p_adec->audio_decoder);
-	    do {
-		adec_byte_stream_next (p_byte_stream);
-	    } while ((!p_adec->align) &&
-		     (!p_adec->b_die) && 
-		     (!p_adec->b_error));
+        if( adec_sync_frame (&p_adec->audio_decoder, &sync_info) )
+        {
+            sync = 0;
+            goto bad_frame;
+	    }
 
-	    sync = 1;
-	}
+        p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
 
-	if (DECODER_FIFO_START(p_adec->fifo)->b_has_pts) {
-	    p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
-	    DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
-	} else {
-	    p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-	}
+        buffer = ((s16 *)p_adec->p_aout_fifo->buffer) + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
 
-	if (adec_sync_frame (&p_adec->audio_decoder, &sync_info)) {
-	    sync = 0;
-	    goto bad_frame;
-	}
+	    if( adec_decode_frame (&p_adec->audio_decoder, buffer) )
+        {
+            sync = 0;
+            goto bad_frame;
+        }
 
-	p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
+        vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
 
-	buffer = ((s16 *)p_adec->p_aout_fifo->buffer) + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
+        vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
 
-	if (adec_decode_frame (&p_adec->audio_decoder, buffer)) {
-	    sync = 0;
-	    goto bad_frame;
-	}
-
-	vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
-
-	p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-	vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
-	vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
-
-    bad_frame:
+        bad_frame:
     }
 
     /* If b_error is set, the audio decoder thread enters the error loop */
-    if (p_adec->b_error) {
-        ErrorThread (p_adec);
+    if( p_adec->b_error ) 
+    {
+        ErrorThread( p_adec );
     }
 
     /* End of the audio decoder thread */
-    EndThread (p_adec);
+    EndThread( p_adec );
 }
 
 /*****************************************************************************
