@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.110 2004/02/29 13:08:56 gbazin Exp $
+ * $Id: vlc_common.h,v 1.111 2004/03/03 13:25:00 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -297,6 +297,21 @@ typedef struct iso639_lang_t iso639_lang_t;
 /* block */
 typedef struct block_t      block_t;
 typedef struct block_fifo_t block_fifo_t;
+
+/* httpd */
+typedef struct httpd_t          httpd_t;
+typedef struct httpd_host_t     httpd_host_t;
+typedef struct httpd_url_t      httpd_url_t;
+typedef struct httpd_client_t   httpd_client_t;
+typedef struct httpd_callback_sys_t httpd_callback_sys_t;
+typedef struct httpd_message_t  httpd_message_t;
+typedef int    (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, httpd_message_t *query );
+typedef struct httpd_file_t     httpd_file_t;
+typedef struct httpd_file_sys_t httpd_file_sys_t;
+typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+typedef struct httpd_redirect_t httpd_redirect_t;
+typedef struct httpd_stream_t httpd_stream_t;
+
 
 /*****************************************************************************
  * Variable callbacks
