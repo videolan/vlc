@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.34 2003/12/23 02:11:27 gbazin Exp $
+ * $Id: events.c,v 1.35 2003/12/23 15:27:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -117,12 +117,17 @@ void DirectXEventThread( event_thread_t *p_event )
         switch( msg.message )
         {
 
-        case WM_NCMOUSEMOVE:
         case WM_MOUSEMOVE:
             vout_PlacePicture( p_event->p_vout,
                                p_event->p_vout->p_sys->i_window_width,
                                p_event->p_vout->p_sys->i_window_height,
                                &i_x, &i_y, &i_width, &i_height );
+
+            if( msg.hwnd != p_event->p_vout->p_sys->hwnd )
+            {
+                /* Child window */
+                i_x = i_y = 0;
+            }
 
             val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x )
                          * p_event->p_vout->render.i_width / i_width;
@@ -134,6 +139,7 @@ void DirectXEventThread( event_thread_t *p_event )
             val.b_bool = VLC_TRUE;
             var_Set( p_event->p_vout, "mouse-moved", val );
 
+        case WM_NCMOUSEMOVE:
             if( (abs(GET_X_LPARAM(msg.lParam) - old_mouse_pos.x) > 2 ||
                 (abs(GET_Y_LPARAM(msg.lParam) - old_mouse_pos.y)) > 2 ) )
             {
