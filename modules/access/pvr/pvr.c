@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.11 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: pvr.c,v 1.12 2004/02/20 15:38:40 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -127,14 +127,15 @@ static int Open( vlc_object_t * p_this )
     /* defaults values */
 
     psz_device = 0;
-    p_sys->i_standard = V4L2_STD_SECAM;
-    p_sys->i_width = 720;
-    p_sys->i_height = 576;
-    p_sys->i_frequency = 567250; /* M6 ;) */
-    p_sys->i_framerate = 25;
-    p_sys->i_bitrate = 3000000;
-    p_sys->i_bitrate_peak = 4000000;
-    p_sys->i_input = 4;
+    p_sys->i_standard = V4L2_STD_UNKNOWN;
+    p_sys->i_width = -1;
+    p_sys->i_height = -1;
+    p_sys->i_frequency = -1; /* M6 ;) */
+    p_sys->i_framerate = -1;
+    p_sys->i_bitrate = -1;
+    p_sys->i_bitrate_peak = -1;
+    p_sys->i_bitrate_mode = -1;
+    p_sys->i_input = -1;
 
     /* parse command line options */
     psz_tofree = strdup( p_input->psz_name );
@@ -270,14 +271,12 @@ static int Open( vlc_object_t * p_this )
             {
                 char *psz_parser_init;
                 psz_parser_init = psz_parser;
-                while ( *psz_parser != ':' && *psz_parser != ',' 
-                                                    && *psz_parser != '\0' )
+                while ( *psz_parser != ':' && *psz_parser != ',' && *psz_parser != '\0' )
                 {
                     psz_parser++;
                 }
                 psz_device = calloc( psz_parser - psz_parser_init + 1, 1 );
-                strncpy( psz_device, psz_parser_init, 
-                                    psz_parser - psz_parser_init );
+                strncpy( psz_device, psz_parser_init, psz_parser - psz_parser_init );
             }
             if( *psz_parser )
                 psz_parser++;
@@ -296,97 +295,157 @@ static int Open( vlc_object_t * p_this )
 
     free( psz_tofree );
 
-    msg_Dbg( p_input, "device: %s, input: %d, standard: %x, size: %dx%d, "
-             "frequency: %d, framerate: %d, bitrate: %d/%d/%d",
-             psz_device, p_sys->i_input, p_sys->i_standard, p_sys->i_width,
-             p_sys->i_height, p_sys->i_frequency, p_sys->i_framerate,
-             p_sys->i_bitrate, p_sys->i_bitrate_peak,p_sys->i_bitrate_mode );
-
     /* open the device */
     if( ( p_sys->i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_input, "cannot open device (%s)", strerror( errno ) );
         return VLC_EGENERIC;
     }
+    else
+      msg_Dbg( p_input, "using video device: %s",psz_device);
+
     free( psz_device );
-
+    
     /* set the input */
-    if( ioctl( p_sys->i_fd, VIDIOC_S_INPUT, &p_sys->i_input ) < 0 )
-    {
-        msg_Warn( p_input, "VIDIOC_S_INPUT failed" );
-    }
+    if( p_sys->i_input != -1)
+      {
+	if(ioctl( p_sys->i_fd, VIDIOC_S_INPUT, &p_sys->i_input ) < 0 )
+	  {
+	    msg_Warn( p_input, "VIDIOC_S_INPUT failed" );
+	  }
+	else
+	  msg_Dbg( p_input,"input set to:%d",p_sys->i_input);
+      }
+      
+      /* set the video standard */
+      if(p_sys->i_standard != V4L2_STD_UNKNOWN)
+	{
+	  if(ioctl( p_sys->i_fd, VIDIOC_S_STD, &p_sys->i_standard ) < 0 )
+	    {
+	      msg_Warn( p_input, "VIDIOC_S_STD failed" );
+	    }
+	  else
+	    msg_Dbg( p_input,"video standard set to:%x",p_sys->i_standard);
+	}
 
+      /* set the picture size */
+      if(p_sys->i_width != -1 || p_sys->i_height != -1)
+	{
+	  if(ioctl( p_sys->i_fd, VIDIOC_G_FMT, &vfmt ) < 0 )
+	    {
+	      msg_Warn( p_input, "VIDIOC_G_FMT failed" );
+	    }
+	  else
+	    {
+	      if(p_sys->i_width != -1)
+		vfmt.fmt.pix.width = p_sys->i_width;
+	      
+	      if(p_sys->i_height != -1) 
+		vfmt.fmt.pix.height = p_sys->i_height;
+	      
+	      if( ioctl( p_sys->i_fd, VIDIOC_S_FMT, &vfmt ) < 0 )
+		{
+		  msg_Warn( p_input, "VIDIOC_S_FMT failed" );
+		}
+	      else
+		{
+		  msg_Dbg( p_input,"picture size set to:%dx%d",vfmt.fmt.pix.width, vfmt.fmt.pix.height);
+		}
+	    }
+	}
 
-    /* set the video standard */
-    if( ioctl( p_sys->i_fd, VIDIOC_S_STD, &p_sys->i_standard ) < 0 )
-    {
-        msg_Warn( p_input, "VIDIOC_S_STD failed" );
-    }
+      /* set the frequency */
+      if (p_sys->i_frequency != -1) 
+	{
+	  vf.tuner = 0; /* TODO: let the user choose the tuner */
+	  if( ioctl( p_sys->i_fd, VIDIOC_G_FREQUENCY, &vf ) < 0 )
+	    {
+	      msg_Warn( p_input, "VIDIOC_G_FREQUENCY failed (%s)",
+			strerror( errno ) );
+	    }
+	  else
+	    {
+	      vf.frequency = p_sys->i_frequency * 16 / 1000;
+	      if( ioctl( p_sys->i_fd, VIDIOC_S_FREQUENCY, &vf ) < 0 )
+		{
+		  msg_Warn( p_input, "VIDIOC_S_FREQUENCY failed (%s)",
+			    strerror( errno ) );
+		}
+	      else
+		{
+		  msg_Dbg( p_input,"Tuner frequency set to:%d",p_sys->i_frequency);
+		}
+	    }
+	}
 
-    /* set the picture size */
-    if( ioctl( p_sys->i_fd, VIDIOC_G_FMT, &vfmt ) < 0 )
-    {
-        msg_Warn( p_input, "VIDIOC_G_FMT failed" );
-    }
-    else
-    {
-        vfmt.fmt.pix.width = p_sys->i_width;
-        vfmt.fmt.pix.height = p_sys->i_height;
-        if( ioctl( p_sys->i_fd, VIDIOC_S_FMT, &vfmt ) < 0 )
-        {
-            msg_Warn( p_input, "VIDIOC_S_FMT failed" );
-        }
-    }
+      /* codec parameters */
+      if(p_sys->i_framerate != -1 
+	 || p_sys->i_bitrate_mode != -1 
+	 || p_sys->i_bitrate_peak != -1
+	 || p_sys->i_bitrate != -1
+	 )
+	{
+	  
+	  if( ioctl( p_sys->i_fd, IVTV_IOC_G_CODEC, &codec ) < 0 )
+	    {
+	      msg_Warn( p_input, "IVTV_IOC_G_CODEC failed" );
+	    }
+	  else
+	    {
+	      
+	      if(p_sys->i_framerate != -1)
+		{
+		  switch( p_sys->i_framerate )
+		    {
+		    case 30:
+		      codec.framerate = 0;
+		      break;
+		      
+		    case 25:
+		      codec.framerate = 1;
+		      break;
+		      
+		    default:
+		      msg_Warn( p_input, "invalid framerate, reverting to 25" );
+		      codec.framerate = 1;
+		      break;
+		    }
+		}
 
-    /* set the frequency */
-    vf.tuner = 0; /* TODO: let the user choose the tuner */
-    if( ioctl( p_sys->i_fd, VIDIOC_G_FREQUENCY, &vf ) < 0 )
-    {
-        msg_Warn( p_input, "VIDIOC_G_FREQUENCY failed (%s)",
-                  strerror( errno ) );
-    }
-    else
-    {
-        vf.frequency = p_sys->i_frequency * 16 / 1000;
-        if( ioctl( p_sys->i_fd, VIDIOC_S_FREQUENCY, &vf ) < 0 )
-        {
-            msg_Warn( p_input, "VIDIOC_S_FREQUENCY failed (%s)",
-                      strerror( errno ) );
-        }
-    }
+	      if(p_sys->i_bitrate != -1)
+		codec.bitrate = p_sys->i_bitrate;
 
-    /* codec parameters */
-    if( ioctl( p_sys->i_fd, IVTV_IOC_G_CODEC, &codec ) < 0 )
-    {
-        msg_Warn( p_input, "IVTV_IOC_G_CODEC failed" );
-    }
-    else
-    {
-        switch( p_sys->i_framerate )
-        {
-            case 30:
-                codec.framerate = 0;
-                break;
+	      if(p_sys->i_bitrate_peak != -1)
+		codec.bitrate_peak = p_sys->i_bitrate_peak;
 
-            case 25:
-                codec.framerate = 1;
-                break;
-            
-            default:
-                msg_Warn( p_input, "invalid framerate, reverting to 25" );
-                codec.framerate = 1;
-                break;
-        }
-        codec.bitrate = p_sys->i_bitrate;
-        codec.bitrate_peak = p_sys->i_bitrate_peak;
-        codec.bitrate_mode = p_sys->i_bitrate_mode;
-        if( ioctl( p_sys->i_fd, IVTV_IOC_S_CODEC, &codec ) < 0 )
-        {
-            msg_Warn( p_input, "IVTV_IOC_S_CODEC failed" );
-        }
-    }
+	      if(p_sys->i_bitrate_mode != -1)
+		codec.bitrate_mode = p_sys->i_bitrate_mode;
 
-    return VLC_SUCCESS;
+	      if( ioctl( p_sys->i_fd, IVTV_IOC_S_CODEC, &codec ) < 0 )
+		{
+		  msg_Warn( p_input, "IVTV_IOC_S_CODEC failed" );
+		}
+	      else
+		{
+		  msg_Dbg( p_input, "Setting codec parameters to:  framerate: %d, bitrate: %d/%d/%d",
+			   codec.framerate, codec.bitrate, codec.bitrate_peak, codec.bitrate_mode);
+		}
+      	    }
+	}
+
+      /* do a quick read */
+      if(p_sys->i_fd) 
+	{
+	  if(read(p_sys->i_fd,&"   ",1))
+	    {
+	      msg_Dbg(p_input, "Could read byte from device");
+	    } 
+	  else
+	    {
+	      msg_Warn(p_input, "Could not read byte from device");
+	    }
+	}
+     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
