@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.34 2004/01/25 18:17:08 zorglub Exp $
+ * $Id: configuration.h,v 1.35 2004/01/29 17:04:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -68,12 +68,18 @@ struct module_config_t
     vlc_callback_t pf_callback;
     void          *p_callback_data;
 
+    /* Values list */
     char       **ppsz_list;        /* List of possible values for the option */
     int         *pi_list;          /* Idem for integers */
     char       **ppsz_list_text;   /* Friendly names for list values */
     int          i_list;           /* Options list size */
-    vlc_callback_t pf_list_update; /* Callback that updates the list */
 
+    /* Actions list */
+    vlc_callback_t *ppf_action;    /* List of possible actions for a config */
+    char           **ppsz_action_text;         /* Friendly names for actions */
+    int            i_action;                            /* actions list size */
+
+    /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
     vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
@@ -216,11 +222,24 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define change_string_list( list, list_text, list_update_func ) \
     p_config[i_config].i_list = sizeof(list)/sizeof(char *); \
     p_config[i_config].ppsz_list = list; \
-    p_config[i_config].ppsz_list_text = list_text; \
-    p_config[i_config].pf_list_update = list_update_func;
+    p_config[i_config].ppsz_list_text = list_text;
 
 #define change_integer_list( list, list_text, list_update_func ) \
     p_config[i_config].i_list = sizeof(list)/sizeof(int); \
     p_config[i_config].pi_list = list; \
-    p_config[i_config].ppsz_list_text = list_text; \
-    p_config[i_config].pf_list_update = list_update_func;
+    p_config[i_config].ppsz_list_text = list_text;
+
+#define change_action_add( pf_action, action_text ) \
+    if( !p_config[i_config].i_action ) \
+    { p_config[i_config].ppsz_action_text = 0; \
+      p_config[i_config].ppf_action = 0; } \
+    p_config[i_config].ppf_action = (vlc_callback_t *) \
+      realloc( p_config[i_config].ppf_action, \
+      (p_config[i_config].i_action + 1) * sizeof(void *) ); \
+    p_config[i_config].ppsz_action_text = (char **)\
+      realloc( p_config[i_config].ppsz_action_text, \
+      (p_config[i_config].i_action + 1) * sizeof(void *) ); \
+    p_config[i_config].ppf_action[p_config[i_config].i_action] = pf_action; \
+    p_config[i_config].ppsz_action_text[p_config[i_config].i_action] = \
+      action_text; \
+    p_config[i_config].i_action++;

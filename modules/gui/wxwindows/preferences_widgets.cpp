@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.22 2004/01/25 03:29:01 hartman Exp $
+ * $Id: preferences_widgets.cpp,v 1.23 2004/01/29 17:04:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -386,7 +386,7 @@ END_EVENT_TABLE()
 StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
                                                   module_config_t *p_item,
                                                   wxWindow *parent )
-  : ConfigControl( p_this, p_item, parent ), psz_name( NULL )
+  : ConfigControl( p_this, p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -398,14 +398,12 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
-    if( p_item->pf_list_update )
+    for( int i = 0; i < p_item->i_action; i++ )
     {
-        wxButton *refresh =
-            new wxButton( this, wxID_HIGHEST, wxU(_("Refresh")) );
-        sizer->Add( refresh, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-
-        psz_name = strdup( p_item->psz_name );
-        pf_list_update = p_item->pf_list_update;
+        wxButton *button =
+            new wxButton( this, wxID_HIGHEST+i,
+                          wxU(p_item->ppsz_action_text[i]) );
+        sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
     }
 
     sizer->Layout();
@@ -414,7 +412,6 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
 
 StringListConfigControl::~StringListConfigControl()
 {
-    if( psz_name ) free( psz_name );
 }
 
 void StringListConfigControl::UpdateCombo( module_config_t *p_item )
@@ -442,24 +439,31 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
 
 BEGIN_EVENT_TABLE(StringListConfigControl, wxPanel)
     /* Button events */
-    EVT_BUTTON(wxID_HIGHEST, StringListConfigControl::OnRefresh)
+    EVT_BUTTON(-1, StringListConfigControl::OnAction)
 
     /* Text events */
     EVT_TEXT(-1, StringListConfigControl::OnUpdate)
 END_EVENT_TABLE()
 
-void StringListConfigControl::OnRefresh( wxCommandEvent& event )
+void StringListConfigControl::OnAction( wxCommandEvent& event )
 {
-    if( pf_list_update )
+    int i_action = event.GetId() - wxID_HIGHEST;
+
+    module_config_t *p_item = config_FindConfig( p_this, GetName().mb_str() );
+    if( !p_item ) return;
+
+    if( i_action < 0 || i_action >= p_item->i_action ) return;
+
+    vlc_value_t val;
+    wxString value = GetPszValue();
+    (const char *)val.psz_string = value.mb_str();
+    p_item->ppf_action[i_action]( p_this, GetName().mb_str(), val, val, 0 );
+
+    if( p_item->b_dirty )
     {
-        vlc_value_t val;
-        module_config_t *p_item;
-
-        pf_list_update( p_this, psz_name, val, val, 0 );
-        p_item = config_FindConfig( p_this, psz_name );
-
         combo->Clear();
         UpdateCombo( p_item );
+        p_item->b_dirty = VLC_FALSE;
     }
 }
 
@@ -578,7 +582,7 @@ int IntegerConfigControl::GetIntValue()
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
                                                     module_config_t *p_item,
                                                     wxWindow *parent )
-  : ConfigControl( p_this, p_item, parent ), psz_name( NULL )
+  : ConfigControl( p_this, p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -591,23 +595,12 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
-    if( p_item->pf_list_update )
-    {
-        wxButton *refresh =
-            new wxButton( this, wxID_HIGHEST, wxU(_("Refresh")) );
-        sizer->Add( refresh, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-
-        psz_name = strdup( p_item->psz_name );
-        pf_list_update = p_item->pf_list_update;
-    }
-
     sizer->Layout();
     this->SetSizerAndFit( sizer );
 }
 
 IntegerListConfigControl::~IntegerListConfigControl()
 {
-    if( psz_name ) free( psz_name );
 }
 
 void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
@@ -643,21 +636,28 @@ void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
 
 BEGIN_EVENT_TABLE(IntegerListConfigControl, wxPanel)
     /* Button events */
-    EVT_BUTTON(wxID_HIGHEST, IntegerListConfigControl::OnRefresh)
+    EVT_BUTTON(-1, IntegerListConfigControl::OnAction)
 END_EVENT_TABLE()
 
-void IntegerListConfigControl::OnRefresh( wxCommandEvent& event )
+void IntegerListConfigControl::OnAction( wxCommandEvent& event )
 {
-    if( pf_list_update )
+    int i_action = event.GetId() - wxID_HIGHEST;
+
+    module_config_t *p_item;
+    p_item = config_FindConfig( p_this, GetName().mb_str() );
+    if( !p_item ) return;
+
+    if( i_action < 0 || i_action >= p_item->i_action ) return;
+
+    vlc_value_t val;
+    val.i_int = GetIntValue();
+    p_item->ppf_action[i_action]( p_this, GetName().mb_str(), val, val, 0 );
+
+    if( p_item->b_dirty )
     {
-        vlc_value_t val;
-        module_config_t *p_item;
-
-        pf_list_update( p_this, psz_name, val, val, 0 );
-        p_item = config_FindConfig( p_this, psz_name );
-
         combo->Clear();
         UpdateCombo( p_item );
+        p_item->b_dirty = VLC_FALSE;
     }
 }
 

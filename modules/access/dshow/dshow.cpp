@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: dshow.cpp,v 1.26 2004/01/28 16:46:52 gbazin Exp $
+ * $Id: dshow.cpp,v 1.27 2004/01/29 17:04:01 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,12 +45,15 @@ static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
                                        list<string> *, vlc_bool_t );
 static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                                      int, int, int, int, int, int );
-static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
+static bool ConnectFilters( vlc_object_t *, IFilterGraph *,
+                            IBaseFilter *, IPin * );
 
 static int FindDevicesCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
+static int ConfigDevicesCallback( vlc_object_t *, char const *,
+                                  vlc_value_t, vlc_value_t, void * );
 
-static void PropertiesPage( input_thread_t *, IBaseFilter * );
+static void PropertiesPage( vlc_object_t *, IBaseFilter * );
 
 #if 0
     /* Debug only, use this to find out GUIDs */
@@ -142,9 +145,13 @@ vlc_module_begin();
 
     add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, VLC_FALSE);
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback );
+        change_action_add( FindDevicesCallback, N_("Refresh list") );
+        change_action_add( ConfigDevicesCallback, N_("Configure") );
 
     add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE);
         change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback );
+        change_action_add( FindDevicesCallback, N_("Refresh list") );
+        change_action_add( ConfigDevicesCallback, N_("Configure") );
 
     add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE);
 
@@ -409,23 +416,27 @@ static void AccessClose( vlc_object_t *p_this )
 /****************************************************************************
  * ConnectFilters
  ****************************************************************************/
-static bool ConnectFilters( IFilterGraph *p_graph, IBaseFilter *p_filter,
-                            IPin *p_input_pin )
+static bool ConnectFilters( vlc_object_t *p_this, IFilterGraph *p_graph,
+                            IBaseFilter *p_filter, IPin *p_input_pin )
 {
     IEnumPins *p_enumpins;
-    IPin *p_output_pin;
+    IPin *p_pin;
 
     if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return false;
 
-    while( S_OK == p_enumpins->Next( 1, &p_output_pin, NULL ) )
+    while( S_OK == p_enumpins->Next( 1, &p_pin, NULL ) )
     {
-        if( S_OK == p_graph->ConnectDirect( p_output_pin, p_input_pin, 0 ) )
+        PIN_DIRECTION pin_dir;
+        p_pin->QueryDirection( &pin_dir );
+
+        if( pin_dir == PINDIR_OUTPUT &&
+            S_OK == p_graph->ConnectDirect( p_pin, p_input_pin, 0 ) )
         {
-            p_output_pin->Release();
+            p_pin->Release();
             p_enumpins->Release();
             return true;
         }
-        p_output_pin->Release();
+        p_pin->Release();
     }
 
     p_enumpins->Release();
@@ -482,7 +493,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
 
     /* Attempt to connect one of this device's capture output pins */
     msg_Dbg( p_input, "connecting filters" );
-    if( ConnectFilters( p_sys->p_graph, p_device_filter,
+    if( ConnectFilters( VLC_OBJECT(p_input), p_sys->p_graph, p_device_filter,
                         p_capture_filter->CustomGetPin() ) )
     {
         /* Success */
@@ -702,7 +713,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
         var_Get( p_input, "dshow-config", &val );
 
-        if(val.i_int) PropertiesPage( p_input, p_device_filter );
+        if(val.i_int) PropertiesPage( VLC_OBJECT(p_input), p_device_filter );
 
         /* Add directshow elementary stream to our list */
         dshow_stream.p_device_filter = p_device_filter;
@@ -770,7 +781,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
      * CreateClassEnumerator will succeed, but p_class_enum will be NULL */
     if( p_class_enum == NULL )
     {
-        msg_Err( p_this, "no capture device was detected." );
+        msg_Err( p_this, "no capture device was detected" );
         return NULL;
     }
 
@@ -851,14 +862,35 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
 
     if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return media_type;
 
+    while( S_OK == p_enumpins->Next( 1, &p_output_pin, NULL ) )
+    {
+        PIN_INFO info;
+
+        if( S_OK == p_output_pin->QueryPinInfo( &info ) )
+        {
+            msg_Dbg( p_this, "EnumDeviceCaps: %s pin: %S",
+                     info.dir == PINDIR_INPUT ? "input" : "output",
+                     info.achName );
+            if( info.pFilter ) info.pFilter->Release();
+        }
+
+        p_output_pin->Release();
+    }
+    p_enumpins->Reset();
+
     while( !b_found && p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
     {
         PIN_INFO info;
 
         if( S_OK == p_output_pin->QueryPinInfo( &info ) )
         {
-            msg_Dbg( p_this, "EnumDeviceCaps: pin %S", info.achName );
             if( info.pFilter ) info.pFilter->Release();
+            if( info.dir == PINDIR_INPUT )
+            {
+                p_output_pin->Release();
+                continue;
+            }
+            msg_Dbg( p_this, "EnumDeviceCaps: trying pin %S", info.achName );
         }
 
         /* Probe pin */
@@ -1464,10 +1496,54 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item->ppsz_list[i] = NULL;
     p_item->ppsz_list_text[i] = NULL;
 
+    /* Signal change to the interface */
+    p_item->b_dirty = VLC_TRUE;
+
     return VLC_SUCCESS;
 }
 
-static void PropertiesPage( input_thread_t *p_input,
+static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
+                               vlc_value_t newval, vlc_value_t oldval, void * )
+{
+    module_config_t *p_item;
+    vlc_bool_t b_audio = VLC_FALSE;
+
+    p_item = config_FindConfig( p_this, psz_name );
+    if( !p_item ) return VLC_SUCCESS;
+
+    if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = VLC_TRUE;
+
+    string devicename;
+
+    if( newval.psz_string && *newval.psz_string )
+    {
+        devicename = newval.psz_string;
+    }
+    else
+    {
+        /* If no device name was specified, pick the 1st one */
+        list<string> list_devices;
+
+        /* Enumerate devices */
+        FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+        if( !list_devices.size() ) return VLC_EGENERIC;
+        devicename = *list_devices.begin();
+    }
+
+    IBaseFilter *p_device_filter =
+        FindCaptureDevice( p_this, &devicename, NULL, b_audio );
+    if( p_device_filter )
+        PropertiesPage( p_this, p_device_filter );
+    else
+    {
+        msg_Err( p_this, "didn't find device: %s", devicename.c_str() );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void PropertiesPage( vlc_object_t *p_this,
                             IBaseFilter *p_device_filter )
 {
     ISpecifyPropertyPages *p_spec;
@@ -1486,14 +1562,8 @@ static void PropertiesPage( input_thread_t *p_input,
                                          (IUnknown **)&p_device_filter,
                                          cauuid.cElems,
                                          (GUID *)cauuid.pElems, 0, 0, NULL );
-            if( hr == S_OK )
-            {
-                msg_Dbg( p_input, "made OleCreatePropertyFrame");
-            }
-
             CoTaskMemFree( cauuid.pElems );
         }
-
         p_spec->Release();
     }
 }

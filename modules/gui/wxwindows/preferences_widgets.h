@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.7 2003/11/10 00:14:05 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.8 2004/01/29 17:04:01 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -100,12 +100,9 @@ public:
     virtual wxString GetPszValue();
 private:
     wxComboBox *combo;
-
-    void OnRefresh( wxCommandEvent& );
-    char *psz_name;
-    vlc_callback_t pf_list_update;
-
     void UpdateCombo( module_config_t *p_item );
+
+    void OnAction( wxCommandEvent& );
 
     DECLARE_EVENT_TABLE()
 };
@@ -142,12 +139,9 @@ public:
     virtual int GetIntValue();
 private:
     wxComboBox *combo;
-
-    void OnRefresh( wxCommandEvent& );
-    char *psz_name;
-    vlc_callback_t pf_list_update;
-
     void UpdateCombo( module_config_t *p_item );
+
+    void OnAction( wxCommandEvent& );
 
     DECLARE_EVENT_TABLE()
 };

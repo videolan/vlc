@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: configuration.c,v 1.75 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: configuration.c,v 1.76 2004/01/29 17:04:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -560,6 +560,26 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
             }
         }
 
+        /* duplicate the actions list */
+        if( p_orig[i].i_action )
+        {
+            int j;
+
+            p_module->p_config[i].ppf_action =
+                malloc( p_orig[i].i_action * sizeof(void *) );
+            p_module->p_config[i].ppsz_action_text =
+                malloc( p_orig[i].i_action * sizeof(char *) );
+
+            for( j = 0; j < p_orig[i].i_action; j++ )
+            {
+                p_module->p_config[i].ppf_action[j] =
+                    p_orig[i].ppf_action[j];
+                p_module->p_config[i].ppsz_action_text[j] =
+                    p_orig[i].ppsz_action_text[j] ?
+                    strdup( p_orig[i].ppsz_action_text[j] ) : NULL;
+            }
+        }
+
         p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
     }
 }
@@ -611,6 +631,17 @@ void config_Free( module_t *p_module )
             if( p_item->ppsz_list ) free( p_item->ppsz_list );
             if( p_item->ppsz_list_text ) free( p_item->ppsz_list_text );
             if( p_item->pi_list ) free( p_item->pi_list );
+        }
+
+        if( p_item->i_action )
+        {
+            for( i = 0; i < p_item->i_action; i++ )
+            {
+                if( p_item->ppsz_action_text[i] )
+                    free( p_item->ppsz_action_text[i] );
+            }
+            if( p_item->ppf_action ) free( p_item->ppf_action );
+            if( p_item->ppsz_action_text ) free( p_item->ppsz_action_text );
         }
     }
 
