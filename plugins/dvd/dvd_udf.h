@@ -2,7 +2,7 @@
  * dvd_udf.h: structures for udf filesystem tools.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.h,v 1.1 2001/02/15 21:03:27 stef Exp $
+ * $Id: dvd_udf.h,v 1.2 2001/02/18 01:42:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -23,3 +23,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*
+ * Fonctions in dvd_udf.c
+ */
+u32 UDFFindFile( int, char * );

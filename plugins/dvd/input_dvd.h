@@ -27,7 +27,7 @@
 #define DVD_LB_SIZE 2048
 
 /*****************************************************************************
- * thread_dvd_data_t: extension of input_thread_t for DVD specificity
+ * thread_dvd_data_t: extension of input_thread_t for DVD specificity.
  *****************************************************************************/
 typedef struct thread_dvd_data_s
 {
@@ -36,7 +36,6 @@ typedef struct thread_dvd_data_s
     int                     i_read_once;        // NB of bytes read by DVDRead
     int                     i_title;            // Current Title
 
-    /* FIXME: include these in a struct */
     int                     i_start_byte;
     int                     i_start_cell;
     int                     i_end_cell;

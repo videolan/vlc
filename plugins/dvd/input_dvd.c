@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.12 2001/02/16 09:25:03 sam Exp $
+ * $Id: input_dvd.c,v 1.13 2001/02/18 01:42:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -160,6 +160,16 @@ static int DVDCheckCSS( input_thread_t * p_input )
 }
 
 /*****************************************************************************
+ * DVDSetRegion: initialize input data for title x, chapter y. It should
+ * be called for each user navigation request.
+ *****************************************************************************/
+static int DVDSetRegion( int i_title, int i_chapter )
+{
+    return 0;
+}
+
+
+/*****************************************************************************
  * DVDInit: initializes DVD structures
  *****************************************************************************/
 static void DVDInit( input_thread_t * p_input )
@@ -182,7 +192,6 @@ static void DVDInit( input_thread_t * p_input )
     p_method->i_fd = p_input->i_handle;
     /* FIXME: read several packets once */
     p_method->i_read_once = 1; 
-    p_method->i_title = 0;
     p_method->b_encrypted = DVDCheckCSS( p_input );
 
     lseek( p_input->i_handle, 0, SEEK_SET );
@@ -193,6 +202,9 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
+
+    /* FIXME: kludge */
+    p_method->i_title = p_method->ifo.vmg.ptt_srpt.p_tts[0].i_tts_nb;
 
     /* CSS initialisation */
     if( p_method->b_encrypted )
@@ -217,7 +229,7 @@ static void DVDInit( input_thread_t * p_input )
     IfoRead( &(p_method->ifo) );
     intf_WarnMsg( 3, "Ifo: Initialized" );
 
-    /* CSS title keys */
+    /* CSS title keys decryption */
     if( p_method->b_encrypted )
     {
 
@@ -260,8 +272,8 @@ static void DVDInit( input_thread_t * p_input )
     i_end_cell = 0;
 
     /* Loop on the number of vobs */
-    while( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell].i_vob_id <=
-           p_method->ifo.p_vts[0].c_adt.i_vob_nb )
+    while( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell].i_vob_id <=
+           p_method->ifo.p_vts[p_method->i_title].c_adt.i_vob_nb )
     {
         i_cell_1 = i_cell;
 
@@ -269,17 +281,17 @@ static void DVDInit( input_thread_t * p_input )
         do
         {
             i_cell++;
-            if( i_cell >= p_method->ifo.p_vts[0].c_adt.i_cell_nb )
+            if( i_cell >= p_method->ifo.p_vts[p_method->i_title].c_adt.i_cell_nb )
             {
                 break;
             }
         }
-        while( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell-1].i_cell_id <
-               p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell].i_cell_id );
+        while( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell-1].i_cell_id <
+               p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell].i_cell_id );
 
 
-        if( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_cell-1].i_cell_id >
-            p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_end_cell].i_cell_id )
+        if( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_cell-1].i_cell_id >
+            p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_end_cell].i_cell_id )
         {
             i_start_cell = i_cell_1;
             i_end_cell = i_cell - 1;
@@ -288,7 +300,7 @@ static void DVDInit( input_thread_t * p_input )
 
     /* The preceding does not work with all DVD, so we give the
      * last cell of the title as end */
-    i_end_cell = p_method->ifo.p_vts[0].c_adt.i_cell_nb - 1;
+    i_end_cell = p_method->ifo.p_vts[p_method->i_title].c_adt.i_cell_nb - 1;
 
     intf_WarnMsg( 2, "DVD: Start cell: %d End Cell: %d",
                                             i_start_cell, i_end_cell );
@@ -297,17 +309,17 @@ static void DVDInit( input_thread_t * p_input )
     p_method->i_end_cell = i_end_cell;
 
     /* start is : beginning of vts + offset to vobs + offset to vob x */
-    i_start = p_method->ifo.p_vts[0].i_pos + DVD_LB_SIZE *
-            ( p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector +
-              p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_start_cell].i_ssector );
+    i_start = p_method->ifo.p_vts[p_method->i_title].i_pos + DVD_LB_SIZE *
+            ( p_method->ifo.p_vts[p_method->i_title].mat.i_tt_vobs_ssector +
+              p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_start_cell].i_ssector );
     p_method->i_start_byte = i_start;
                                                     
     i_start = lseek( p_input->i_handle, i_start, SEEK_SET );
     intf_WarnMsg( 3, "DVD: VOBstart at: %lld", i_start );
 
     i_size = (off_t)
-        ( p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_end_cell].i_esector -
-          p_method->ifo.p_vts[0].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
+        ( p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_end_cell].i_esector -
+          p_method->ifo.p_vts[p_method->i_title].c_adt.p_cell_inf[i_start_cell].i_ssector + 1 )
         *DVD_LB_SIZE;
     intf_WarnMsg( 3, "DVD: stream size: %lld", i_size );
 

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.8 2001/02/15 21:03:27 stef Exp $
+ * $Id: dvd_ifo.c,v 1.9 2001/02/18 01:42:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -38,6 +38,7 @@
 
 #include "intf_msg.h"
 #include "dvd_ifo.h"
+#include "dvd_udf.h"
 #include "input_dvd.h"
 
 void CommandRead( ifo_command_t );
@@ -47,72 +48,22 @@ void CommandRead( ifo_command_t );
  */
 
 /*****************************************************************************
- * IfoFindVMG : When reading directly on a device, finds the offset to the
- * beginning of video_ts.ifo.
- *****************************************************************************/
-static int IfoFindVMG( ifo_t* p_ifo )
-{
-    char    psz_ifo_start[12] = "DVDVIDEO-VMG";
-    char    psz_test[12];
-
-    read( p_ifo->i_fd, psz_test, 12 );
-
-    while( strncmp( psz_test, psz_ifo_start, 12 ) != 0 )
-    {
-        /* The start of ifo file is on a sector boundary */
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
-                              p_ifo->i_pos + DVD_LB_SIZE,
-                              SEEK_SET );
-        read( p_ifo->i_fd, psz_test, 12 );
-    }
-    p_ifo->i_off = p_ifo->i_pos;
-
-fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
-
-    return 0;
-}
-
-/*****************************************************************************
- * IfoFindVTS : beginning of vts_*.ifo.
- *****************************************************************************/
-static int IfoFindVTS( ifo_t* p_ifo )
-{
-    char    psz_ifo_start[12] = "DVDVIDEO-VTS";
-    char    psz_test[12];
-
-    read( p_ifo->i_fd, psz_test, 12 );
-
-    while( strncmp( psz_test, psz_ifo_start, 12 ) != 0 )
-    {
-        /* The start of ifo file is on a sector boundary */
-        p_ifo->i_pos = lseek( p_ifo->i_fd,
-                              p_ifo->i_pos + DVD_LB_SIZE,
-                              SEEK_SET );
-        read( p_ifo->i_fd, psz_test, 12 );
-    }
-    p_ifo->i_off = p_ifo->i_pos;
-
-fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
-
-    return 0;
-}
-
-/*****************************************************************************
  * IfoInit : Creates an ifo structure and prepares for parsing directly
  * on DVD device.
  *****************************************************************************/
 ifo_t IfoInit( int i_fd )
 {
     ifo_t       ifo;
+    u32         i_lba;
     
     /* If we are here the dvd device has already been opened */
     ifo.i_fd = i_fd;
-    /* No data at the beginning of the disk
-     * 512000 bytes is just another value :) */
-    ifo.i_pos = lseek( ifo.i_fd, 250 *DVD_LB_SIZE, SEEK_SET );
-    /* FIXME : use udf filesystem to find the beginning of the file */
-    IfoFindVMG( &ifo );
-    
+
+    i_lba = UDFFindFile( i_fd, "/VIDEO_TS/VIDEO_TS.IFO");
+
+    ifo.i_off = (off_t)(i_lba) * DVD_LB_SIZE;
+    ifo.i_pos = lseek( ifo.i_fd, ifo.i_off, SEEK_SET );
+
     return ifo;
 }
 
@@ -648,6 +599,7 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
         GETC( &ptr.p_tts[i].i_tts_nb );
         GETC( &ptr.p_tts[i].i_vts_ttn );
         GETL( &ptr.p_tts[i].i_ssector );
+//fprintf( stderr, "PTR: %d %d %d\n",ptr.p_tts[i].i_tts_nb,ptr.p_tts[i].i_vts_ttn, ptr.p_tts[i].i_ssector );
     }
 
     return ptr;
@@ -1030,56 +982,56 @@ static vts_t ReadVTS( ifo_t* p_ifo )
     vts.mat = ReadVTSInfMat( p_ifo );
     if( vts.mat.i_ptt_srpt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_ptt_srpt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.ptt_srpt = ReadVTSTitlePointer( p_ifo );
     }
     if( vts.mat.i_m_pgci_ut_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_m_pgci_ut_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.pgci_ut = ReadUnitTable( p_ifo );
     }
     if( vts.mat.i_pgcit_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_pgcit_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.pgci_ti = ReadUnit( p_ifo );
     }
     if( vts.mat.i_tmap_ti_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_tmap_ti_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.tmap_ti = ReadVTSTimeMap( p_ifo );
     }
     if( vts.mat.i_m_c_adt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_m_c_adt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.m_c_adt = ReadCellInf( p_ifo );
     }
     if( vts.mat.i_m_vobu_admap_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_m_vobu_admap_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.m_vobu_admap = ReadMap( p_ifo );
     }
     if( vts.mat.i_c_adt_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_c_adt_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.c_adt = ReadCellInf( p_ifo );
     }
     if( vts.mat.i_vobu_admap_ssector )
     {
-        p_ifo->i_pos = lseek( p_ifo->i_fd, p_ifo->i_off +
+        p_ifo->i_pos = lseek( p_ifo->i_fd, vts.i_pos +
                         vts.mat.i_vobu_admap_ssector *DVD_LB_SIZE,
                         SEEK_SET );
         vts.vobu_admap = ReadMap( p_ifo );
@@ -1113,19 +1065,24 @@ void IfoRead( ifo_t* p_ifo )
         p_ifo->b_error = 1;
         return;
     }
+
     for( i=0 ; i<p_ifo->vmg.mat.i_tts_nb ; i++ )
     {
 
         intf_WarnMsg( 2, "ifo: initializing VTS %d", i+1 );
 
-        i_off = (off_t)(p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector) *DVD_LB_SIZE;
-        p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
-fprintf( stderr, "%lld\n" , p_ifo->i_pos );
+        i_off = (off_t)( p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector ) *DVD_LB_SIZE
+                       + p_ifo->i_off;
 
-        /* FIXME : use udf filesystem to avoid this */
-        IfoFindVTS( p_ifo );
+        p_ifo->i_pos = lseek( p_ifo->i_fd, i_off, SEEK_SET );
+
+        /* FIXME : I really don't know why udf find file
+         * does not give the exact beginning of file */
+
         p_ifo->p_vts[i] = ReadVTS( p_ifo );
+
     }
+
     return; 
 }
 
