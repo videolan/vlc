@@ -215,7 +215,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_opacity = __MAX( __MIN( val.i_int, 255 ), 0 );
     var_Create( p_filter, "freetype-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "freetype-color", &val );
-    if ( ( val.i_int > -1 ) && ( val.i_int < 0x00FFFFFF ) )  /* valid range */
+    if ( ( val.i_int > -1 ) && ( val.i_int < 0x01000000 ) )  /* valid range */
     {
 	    p_sys->i_font_color = val.i_int;
     }
