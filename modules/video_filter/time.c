@@ -2,7 +2,7 @@
  * time.c : time display video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: logo.c 8721 2004-09-17 10:21:00Z gbazin $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -175,7 +175,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     p_spu->p_region->psz_text = FormatTime( p_sys->psz_format, &t );
     p_spu->i_start = date;
-    p_spu->i_stop  = date + 1000000;
+    p_spu->i_stop  = 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
     p_spu->i_x = p_sys->i_xoff;
