@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.39 2003/06/12 22:03:36 gbazin Exp $
+ * $Id: interface.cpp,v 1.40 2003/06/13 15:54:42 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -889,7 +889,8 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
  * Definition of wxVolCtrl class.
  *****************************************************************************/
 wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id )
-  : wxGauge( parent, id, 200, wxDefaultPosition, wxDefaultSize, wxGA_VERTICAL )
+  : wxGauge( parent, id, 200, wxDefaultPosition, wxDefaultSize,
+             wxGA_VERTICAL | wxGA_SMOOTH )
 {
     p_intf = _p_intf;
 }
