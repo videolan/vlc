@@ -21,11 +21,27 @@ Status: Todo
 
 Task
 Difficulty: Easy
+Platform: any
+Urgency: Urgent
+Description: proper DVD controls
+Most importantly a proper button that will take you straight to the DVD menu.
+Status: Todo
+
+Task
+Difficulty: Easy
 Platform: Linux, Win32
 Urgency: Normal
 Description: Streaming wizard
  Finish the streaming wizard
 Status: Assigned to zorglub
+
+Task
+Difficulty: Easy
+Platform: all
+Urgency: Normal
+Description: configure overview of modules
+ configure should report what it will and what it won't build, after it is done running.
+Status: Todo
 
 Task
 Difficulty: Hard
@@ -127,6 +143,14 @@ Need I say more?
 Status: Todo
 
 Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: 24 bit LPCM
+Increasingly more DVDs use 24 bit LPCM sound. We should support it.
+Status: Todo
+
+Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
@@ -196,10 +220,13 @@ Difficulty: Guru
 Urgency: Wishlist
 Platform: any
 Description: Vout redesign
-- vout needs distinct splitting into vout_core, vout_window
-- needs 'assistence' vout windows (filters,goom etc)
-- 4:3, 16:9, freeform AR
-- cropping and padding
+- vout needs distinct splitting into vout_core, vout_window, pic_filter, vout_filter
+- needs 'assistence' vout windows (clone filters, goom) etc.
+- 4:3, 16:9, freeform Aspect Ratio
+- cropping and padding (do at OS level, but provide a core call to set it up and configure).
+- OSD at window resolution instead of video res (secondary vout channel)
+- a OSD needs to be bound to a vout stream (no subs on goom vout)
+- Use OS native calls where appropriate, with 'C' fallbacks. (OpenGL, Quartz, DirectX already has many of the funtionalities we seek and sometimes they are a lot faster too).
 Status: Todo
 
 Task
