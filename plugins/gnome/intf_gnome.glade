@@ -581,6 +581,103 @@
 	  <fill>True</fill>
 	</child>
       </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>dvd_box</name>
+	<visible>False</visible>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label_title</name>
+	  <label>Title:</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>hbox6</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>10</spacing>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>False</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>button_chapter_prev</name>
+	    <tooltip>Select previous chapter</tooltip>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>on_button_chapter_prev_clicked</handler>
+	      <last_modification_time>Tue, 03 Apr 2001 00:53:47 GMT</last_modification_time>
+	    </signal>
+	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
+	    <relief>GTK_RELIEF_NONE</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label_chapter</name>
+	    <label>Chapter:   </label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>button_chapter_next</name>
+	    <tooltip>Select next chapter</tooltip>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>on_button_chapter_next_clicked</handler>
+	      <last_modification_time>Tue, 03 Apr 2001 00:53:40 GMT</last_modification_time>
+	    </signal>
+	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
+	    <relief>GTK_RELIEF_NONE</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+	</widget>
+      </widget>
     </widget>
   </widget>
 

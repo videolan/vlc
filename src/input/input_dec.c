@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.8 2001/02/08 13:52:35 massiot Exp $
+ * $Id: input_dec.c,v 1.9 2001/04/03 03:39:41 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -70,7 +70,11 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     /* Waiting for the thread to exit */
+    /* I thought that unlocking was better since thread join can be long
+     * but it actually creates late pictures and freezes --stef */
+//    vlc_mutex_unlock( &p_input->stream.stream_lock );
     vlc_thread_join( p_es->thread_id );
+//    vlc_mutex_lock( &p_input->stream.stream_lock );
 
     /* Freeing all packets still in the decoder fifo. */
     while( !DECODER_FIFO_ISEMPTY( *p_es->p_decoder_fifo ) )
@@ -111,7 +115,7 @@ void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
         /* The FIFO is full !!! This should not happen. */
         p_decoder_fifo->pf_delete_pes( p_decoder_fifo->p_packets_mgt,
                                        p_pes );
-        intf_ErrMsg( "PES trashed - fifo full !" );
+        intf_ErrMsg( "PES trashed - decoder fifo full !" );
     }
     vlc_mutex_unlock( &p_decoder_fifo->data_lock );
 }

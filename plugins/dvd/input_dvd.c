@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.36 2001/04/02 23:30:41 sam Exp $
+ * $Id: input_dvd.c,v 1.37 2001/04/03 03:39:41 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -691,7 +691,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             i_spu += vts.manager_inf.i_audio_nb;
             input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
         }
-    } // i_title >= 0
+    } /* i_title >= 0 */
     else
     {
         p_area = p_input->stream.p_selected_area;
@@ -747,8 +747,11 @@ static void DVDInit( input_thread_t * p_input )
 
     p_dvd->i_fd = p_input->i_handle;
 
-    p_dvd->i_block_once = 32;
-    p_input->i_read_once = 128;
+    /* reading several block once seems to cause lock-up
+     * when using input_ToggleES
+     * who wrote thez damn buggy piece of shit ??? --stef */
+    p_dvd->i_block_once = 1;//32;
+    p_input->i_read_once = 4;//128;
 
     i = CSSTest( p_input->i_handle );
 
@@ -766,7 +769,7 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Reading structures initialisation */
     p_input->p_method_data =
-        DVDNetlistInit( 8192, 16384, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
+        DVDNetlistInit( 2048, 8192, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo initialisation */

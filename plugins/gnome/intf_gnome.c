@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.24 2001/04/01 07:31:38 stef Exp $
+ * $Id: intf_gnome.c,v 1.25 2001/04/03 03:39:41 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -49,6 +49,7 @@
 
 #include "intf_msg.h"
 #include "interface.h"
+#include "intf_playlist.h"
 
 #include "gnome_callbacks.h"
 #include "gnome_interface.h"
@@ -74,6 +75,7 @@ static gint GnomeTitleMenu    ( gpointer, GtkWidget *,
                               void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeSetupMenu    ( intf_thread_t * p_intf );
 static void GnomeDisplayDate  ( GtkAdjustment *p_adj );
+static gint GnomeDVDModeManage( intf_thread_t * p_intf );
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gnome thread to segfault at exit
@@ -149,6 +151,9 @@ static int intf_Open( intf_thread_t *p_intf )
 
     p_intf->p_sys->b_slider_free = 1;
 
+    p_intf->p_sys->b_mode_changed = 0;
+    p_intf->p_sys->i_intf_mode = FILE_MODE;
+
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
 
@@ -198,6 +203,16 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_disc = create_intf_disc( );
     p_intf->p_sys->p_network = create_intf_network( );
 
+    /* Sets the interface mode according to playlist item */
+    if( p_main->p_playlist->p_item != NULL )
+    {
+        if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
+        {
+            p_intf->p_sys->i_intf_mode = DVD_MODE;
+            p_intf->p_sys->b_mode_changed = 1;
+        }
+    }
+
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (Gnome interface)");
@@ -212,6 +227,8 @@ static void intf_Run( intf_thread_t *p_intf )
                          GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
     p_intf->p_sys->p_label_date = P_LABEL( "label_date" );
     p_intf->p_sys->p_label_status = P_LABEL( "label_status" );
+    p_intf->p_sys->p_label_title = P_LABEL( "label_title" );
+    p_intf->p_sys->p_label_chapter = P_LABEL( "label_chapter" );
     #undef P_LABEL
 
     /* Connect the date display to the slider */
@@ -295,6 +312,20 @@ static gint GnomeManage( gpointer p_data )
                                    NULL, NULL, NULL, NULL );
         p_intf->b_menu_change = 0;
     }
+
+    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
+        p_intf->p_sys->b_mode_changed )
+    {
+        switch( p_intf->p_sys->i_intf_mode )
+        {
+            case DVD_MODE:
+                GnomeDVDModeManage( p_intf );
+                break;
+        }
+
+        p_intf->p_sys->b_mode_changed = 0;
+    }
+
 
     /* Update language/chapter menus after user request */
     if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
@@ -445,7 +476,6 @@ static gint GnomeLanguageMenus( gpointer          p_data,
             {
                 /* don't lose p_item when we append into menu */
                 p_item_active = p_item;
-                gtk_object_ref( GTK_OBJECT( p_item_active ) );
             }
 
             gtk_widget_show( p_item );
@@ -470,7 +500,6 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     {
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
-        gtk_object_unref( GTK_OBJECT( p_item_active ) );
     }
 
     /* be sure that menu is sensitive if non empty */
@@ -519,7 +548,7 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
     for( i_chapter = 0 ; i_chapter < i_nb ; i_chapter++ )
     {
         /* we group chapters in packets of ten for small screens */
-        if( ( i_chapter % 10 == 0 ) )// && ( i_nb > 20 ) )
+        if( ( i_chapter % 10 == 0 ) && ( i_nb > 20 ) )
         {
             if( i_chapter != 0 )
             {
@@ -545,7 +574,6 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                      == i_chapter + 1 )
         {
             p_item_selected = p_item;
-            gtk_object_ref( GTK_OBJECT( p_item_selected ) );
         }
         
         gtk_widget_show( p_item );
@@ -556,13 +584,22 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                         GTK_SIGNAL_FUNC( pf_toggle ),
                         (gpointer)(i_chapter + 1) );
 
-        gtk_menu_append( GTK_MENU( p_chapter_submenu ), p_item );
+        if( i_nb > 20 )
+        {
+            gtk_menu_append( GTK_MENU( p_chapter_submenu ), p_item );
+        }
+        else
+        {
+            gtk_menu_append( GTK_MENU( p_chapter_menu ), p_item );
+        }
     }
 
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_menu_item ),
-                               p_chapter_submenu );
-    gtk_menu_append( GTK_MENU( p_chapter_menu ), p_menu_item );
-
+    if( i_nb > 20 )
+    {
+        gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_menu_item ),
+                                   p_chapter_submenu );
+        gtk_menu_append( GTK_MENU( p_chapter_menu ), p_menu_item );
+    }
 
     /* link the new menu to the title menu item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_chapter ),
@@ -573,7 +610,6 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
     {
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_selected ),
                                         TRUE );
-        gtk_object_unref( GTK_OBJECT( p_item_selected ) );
     }
 
     /* be sure that chapter menu is sensitive, if there are several items */
@@ -611,7 +647,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
     GSList *            p_chapter_group;
     gint                i_title;
     gint                i_chapter;
-    gint                i_nb;
+    gint                i_title_nb;
+    gint                i_chapter_nb;
 
     /* cast */
     p_intf = (intf_thread_t*)p_data;
@@ -624,13 +661,13 @@ static gint GnomeTitleMenu( gpointer       p_data,
     p_chapter_submenu = NULL;
     p_chapter_menu_item = NULL;
     p_item_active = NULL;
-    i_nb = p_intf->p_input->stream.i_area_nb;
+    i_title_nb = p_intf->p_input->stream.i_area_nb;
 
     /* loop on titles */
-    for( i_title = 1 ; i_title < i_nb ; i_title++ )
+    for( i_title = 1 ; i_title < i_title_nb ; i_title++ )
     {
         /* we group titles in packets of ten for small screens */
-        if( ( i_title % 10 == 1 ))// && ( i_nb > 20 ) )
+        if( ( i_title % 10 == 1 ) && ( i_title_nb > 20 ) )
         {
             if( i_title != 1 )
             {
@@ -658,7 +695,6 @@ static gint GnomeTitleMenu( gpointer       p_data,
                          p_intf->p_input->stream.p_selected_area )
             {
                 p_item_active = p_title_item;
-                gtk_object_ref( GTK_OBJECT( p_item_active ) );
             }
 
             /* setup signal hanling */
@@ -678,14 +714,13 @@ static gint GnomeTitleMenu( gpointer       p_data,
     
             p_title_item = gtk_menu_item_new_with_label( psz_name );
             p_chapter_menu = gtk_menu_new();
+            i_chapter_nb =
+                    p_intf->p_input->stream.pp_areas[i_title]->i_part_nb;
     
-            for( i_chapter = 0;
-                 i_chapter <
-                        p_intf->p_input->stream.pp_areas[i_title]->i_part_nb ;
-                 i_chapter++ )
+            for( i_chapter = 0 ; i_chapter < i_chapter_nb ; i_chapter++ )
             {
                 /* we group chapters in packets of ten for small screens */
-                if( ( i_chapter % 10 == 0 ) )// && ( i_nb > 20 ) )
+                if( ( i_chapter % 10 == 0 ) && ( i_chapter_nb > 20 ) )
                 {
                     if( i_chapter != 0 )
                     {
@@ -716,7 +751,6 @@ static gint GnomeTitleMenu( gpointer       p_data,
                              == i_chapter + 1 )
                 {
                     p_item_active = p_item;
-                    gtk_object_ref( GTK_OBJECT( p_item_active ) );
                 }
 
                 /* setup signal hanling */
@@ -725,12 +759,23 @@ static gint GnomeTitleMenu( gpointer       p_data,
                            GTK_SIGNAL_FUNC( pf_toggle ),
                            (gpointer)( ( i_title * 100 ) + ( i_chapter + 1) ) );
 
-                gtk_menu_append( GTK_MENU( p_chapter_submenu ), p_item );
+                if( i_chapter_nb > 20 )
+                {
+                    gtk_menu_append( GTK_MENU( p_chapter_submenu ), p_item );
+                }
+                else
+                {
+                    gtk_menu_append( GTK_MENU( p_chapter_menu ), p_item );
+                }
             }
 
-            gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_chapter_menu_item ),
-                                       p_chapter_submenu );
-            gtk_menu_append( GTK_MENU( p_chapter_menu ), p_chapter_menu_item );
+            if( i_chapter_nb > 20 )
+            {
+                gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_chapter_menu_item ),
+                                           p_chapter_submenu );
+                gtk_menu_append( GTK_MENU( p_chapter_menu ),
+                                 p_chapter_menu_item );
+            }
 
             /* link the new menu to the title menu item */
             gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_title_item ),
@@ -744,12 +789,22 @@ static gint GnomeTitleMenu( gpointer       p_data,
         }
         gtk_widget_show( p_title_item );
 
-        gtk_menu_append( GTK_MENU( p_title_submenu ), p_title_item );
+        if( i_title_nb > 20 )
+        {
+            gtk_menu_append( GTK_MENU( p_title_submenu ), p_title_item );
+        }
+        else
+        {
+            gtk_menu_append( GTK_MENU( p_title_menu ), p_title_item );
+        }
     }
 
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_title_menu_item ),
-                               p_title_submenu );
-    gtk_menu_append( GTK_MENU( p_title_menu ), p_title_menu_item );
+    if( i_title_nb > 20 )
+    {
+        gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_title_menu_item ),
+                                   p_title_submenu );
+        gtk_menu_append( GTK_MENU( p_title_menu ), p_title_menu_item );
+    }
 
     /* be sure that menu is sensitive */
     gtk_widget_set_sensitive( p_title_menu, TRUE );
@@ -761,7 +816,6 @@ static gint GnomeTitleMenu( gpointer       p_data,
     {
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_active ),
                                         TRUE );
-        gtk_object_unref( GTK_OBJECT( p_item_active ) );
     }
 
 
@@ -779,8 +833,6 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     GtkWidget *         p_menubar_menu;
     GtkWidget *         p_popup_menu;
     gint                i;
-
-    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
     if( p_intf->p_input->stream.i_area_nb > 1 )
     {
@@ -813,8 +865,6 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
             p_spu_es = p_intf->p_input->stream.pp_selected_es[i];
         }
     }
-
-    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
     /* audio menus */
 
@@ -878,4 +928,34 @@ void GnomeDisplayDate( GtkAdjustment *p_adj )
      }
 }
 
+
+/*****************************************************************************
+ * GnomeDVDModeManage
+ *****************************************************************************/
+static gint GnomeDVDModeManage( intf_thread_t * p_intf )
+{
+    GtkWidget *     p_dvd_box;
+    GtkWidget *     p_toolbar_next;
+    GtkWidget *     p_toolbar_prev;
+
+    p_dvd_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "dvd_box" ) );
+    gtk_widget_show( GTK_WIDGET( p_dvd_box ) );
+
+    p_toolbar_next = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "toolbar_next" ) );
+    gtk_signal_disconnect_by_data( GTK_OBJECT( p_toolbar_next ), NULL );
+    gtk_signal_connect( GTK_OBJECT( p_toolbar_next ), "clicked",
+                        GTK_SIGNAL_FUNC( on_toolbar_next_title_clicked ),
+                        NULL);
+
+    p_toolbar_prev = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "toolbar_prev" ) );
+    gtk_signal_disconnect_by_data( GTK_OBJECT( p_toolbar_prev ), NULL );
+    gtk_signal_connect( GTK_OBJECT( p_toolbar_prev ), "clicked",
+                        GTK_SIGNAL_FUNC( on_toolbar_prev_title_clicked ),
+                        NULL);
+
+    return TRUE;
+}
 

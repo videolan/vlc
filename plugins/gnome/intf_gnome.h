@@ -2,7 +2,7 @@
  * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.h,v 1.4 2001/04/01 07:31:38 stef Exp $
+ * $Id: intf_gnome.h,v 1.5 2001/04/03 03:39:41 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,6 +26,14 @@
  *****************************************************************************/
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
+
+/*****************************************************************************
+ * interface modes
+ *****************************************************************************/
+#define FILE_MODE   0
+#define NET_MODE    1
+#define DVD_MODE    2
+#define VCD_MODE    3
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gnome interface
@@ -57,6 +65,12 @@ typedef struct intf_sys_s
     /* The window labels */
     GtkLabel *          p_label_date;
     GtkLabel *          p_label_status;
+    GtkLabel *          p_label_title;
+    GtkLabel *          p_label_chapter;
+
+    /* input mode management */
+    boolean_t           b_mode_changed;
+    gint                i_intf_mode;      /* interface mode: file, net, disc */
 
     /* XXX: Ugly kludge, see intf_gnome.c */
     void             ( *pf_gtk_callback ) ( void );

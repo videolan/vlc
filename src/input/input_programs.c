@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.42 2001/04/01 07:31:38 stef Exp $
+ * $Id: input_programs.c,v 1.43 2001/04/03 03:39:41 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -730,7 +730,6 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_input->stream.pp_selected_es == NULL )
         {
             intf_ErrMsg( "No more selected ES in input_UnselectES" );
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
             return( 1 );
         }
     }

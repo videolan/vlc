@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.19 2001/04/01 07:31:38 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.20 2001/04/03 03:39:41 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -156,6 +156,44 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
 
         intf_ErrMsg( "intf error: unknown dropped type");
         break;
+    }
+}
+
+
+void
+on_button_chapter_prev_clicked         (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    p_area = p_intf->p_input->stream.p_selected_area;
+
+    if( p_area->i_part - 1 >= 0 )
+    {
+        p_area->i_part--;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
+}
+
+
+void
+on_button_chapter_next_clicked         (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    p_area = p_intf->p_input->stream.p_selected_area;
+
+    if( p_area->i_part + 1 < p_area->i_part_nb )
+    {
+        p_area->i_part++;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -501,6 +539,48 @@ on_toolbar_next_clicked                (GtkButton       *button,
     {
         /* FIXME: temporary hack */
         p_intf->p_input->b_eof = 1;
+    }
+}
+
+
+void
+on_toolbar_prev_title_clicked         (GtkButton       *button,
+                                       gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
+
+    if( i_id >= 0 )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        p_intf->p_sys->b_menus_update = 1;
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
+}
+
+
+void
+on_toolbar_next_title_clicked          (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
+
+    if( i_id < p_intf->p_input->stream.i_area_nb )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];   
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        p_intf->p_sys->b_menus_update = 1;
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -856,6 +936,8 @@ on_disc_ok_clicked                     (GtkButton       *button,
                                           "disc_dvd" ) )->active )
     {
         psz_method = "dvd";
+        p_intf->p_sys->i_intf_mode = DVD_MODE;
+        p_intf->p_sys->b_mode_changed = 1;
     }
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_vcd" ) )->active )
