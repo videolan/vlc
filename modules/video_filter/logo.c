@@ -98,6 +98,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
     vlc_value_t val;
     FILE *file;
     int i, j, i_trans;
+    vlc_bool_t b_alpha = VLC_TRUE;
 
     png_uint_32 i_width, i_height;
     int i_color_type, i_interlace_type, i_compression_type, i_filter_type;
@@ -136,7 +137,13 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
           png_set_gray_to_rgb( p_png );
 
     if( png_get_valid( p_png, p_info, PNG_INFO_tRNS ) )
+    {
         png_set_tRNS_to_alpha( p_png );
+    }
+    else
+    {
+        b_alpha = VLC_FALSE;
+    }
 
     p_row_pointers = malloc( sizeof(png_bytep) * i_height );
     for( i = 0; i < (int)i_height; i++ )
@@ -165,19 +172,22 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
 
     for( j = 0; j < (int)i_height ; j++ )
     {
+        uint8_t *p = (uint8_t *)p_row_pointers[j];
+
         for( i = 0; i < (int)i_width ; i++ )
         {
-            uint8_t (*p)[4];
             int i_offset = i + j * p_pic->p[Y_PLANE].i_pitch;
 
-            p = (void *)p_row_pointers[j];
             p_pic->p[Y_PLANE].p_pixels[i_offset] =
-                (p[i][0] * 257L + p[i][1] * 504 + p[i][2] * 98)/1000 + 16;
+                (p[0] * 257L + p[1] * 504 + p[2] * 98)/1000 + 16;
             p_pic->p[U_PLANE].p_pixels[i_offset] =
-                (p[i][2] * 439L - p[i][0] * 148 - p[i][1] * 291)/1000 + 128;
+                (p[2] * 439L - p[0] * 148 - p[1] * 291)/1000 + 128;
             p_pic->p[V_PLANE].p_pixels[i_offset] =
-                (p[i][0] * 439L - p[i][1] * 368 - p[i][2] * 71)/1000 + 128;
-            p_pic->p[A_PLANE].p_pixels[i_offset] = (p[i][3] * i_trans) / 255;
+                (p[0] * 439L - p[1] * 368 - p[2] * 71)/1000 + 128;
+            p_pic->p[A_PLANE].p_pixels[i_offset] =
+                b_alpha ? (p[3] * i_trans) / 255 : 255;
+
+            p += (b_alpha ? 4 : 3);
         }
     }
 
