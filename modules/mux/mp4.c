@@ -742,7 +742,7 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     int  i_stream_type;
     int  i_object_type_indication;
     int  i_decoder_specific_info_size;
-    int i;
+    unsigned int i;
     int64_t i_bitrate_avg = 0;
     int64_t i_bitrate_max = 0;
 

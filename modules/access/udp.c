@@ -423,7 +423,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         case 33:
             msg_Dbg( p_access, "detected TS over RTP" );
-            p_access->psz_demux = strdup( "ts2" );
+            p_access->psz_demux = strdup( "ts" );
             break;
 
         case 14:
