@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.46 2002/06/07 23:05:03 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.47 2002/07/01 17:39:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -396,6 +396,14 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->i_index < 0 )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+        return FALSE;
+    }
+
     psz_current = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
 
     /*
