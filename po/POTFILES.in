@@ -42,7 +42,6 @@ include/vlc_interface.h
 include/vlc_messages.h
 include/vlc_objects.h
 include/vlc_playlist.h
-include/vlc_symbols.h
 include/vlc_threads.h
 include/vlc_threads_funcs.h
 include/vlc_video.h
@@ -82,8 +81,6 @@ src/misc/iso-639_def.h
 src/misc/iso_lang.c
 src/misc/messages.c
 src/misc/modules.c
-src/misc/modules_builtin.h
-src/misc/modules_plugin.h
 src/misc/mtime.c
 src/misc/objects.c
 src/misc/threads.c
@@ -161,7 +158,6 @@ modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
 modules/access/vcd/vcd.c
-modules/access/vlcs.c
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
