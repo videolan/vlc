@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.12 2003/12/04 16:49:43 sam Exp $
+ * $Id: visual.c,v 1.13 2004/01/26 18:45:45 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -50,29 +50,28 @@
 
 #define NBBANDS_TEXT N_( "Number of bands" )
 #define NBBANDS_LONGTEXT N_( \
-      "Number of bands used by spectrum analyzer, should be 20 or 80" )
+      "Number of bands used by spectrum analyzer, should be 20 or 80." )
 
 #define SEPAR_TEXT N_( "Band separator" )
 #define SEPAR_LONGTEXT N_( \
-        "Number of blank pixels between bands")
+        "Number of blank pixels between bands.")
 
 #define AMP_TEXT N_( "Amplification" )
 #define AMP_LONGTEXT N_( \
-        "This is a coefficient that modifies the height of the bands")
+        "This is a coefficient that modifies the height of the bands.")
 
 #define PEAKS_TEXT N_( "Enable peaks" )
 #define PEAKS_LONGTEXT N_( \
-        "Defines whether to draw peaks" )
+        "Defines whether to draw peaks." )
 
 #define STARS_TEXT N_( "Number of stars" )
 #define STARS_LONGTEXT N_( \
-        "Defines the number of stars to draw with random effect" )
+        "Defines the number of stars to draw with random effect." )
 
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("visualizer") , NULL , VLC_FALSE);
     set_description( _("visualizer filter") );
     add_string("effect-list", "dummy", NULL,
             ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
