@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.15 2004/01/09 19:21:58 gbazin Exp $
+ * $Id: libc.c,v 1.16 2004/02/09 16:12:25 sigmunau Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -225,7 +225,7 @@ int64_t vlc_atoll( const char *str )
 
     while( *str >= '0' && *str <= '9' )
     {
-        i_value = i_value * 10 + ( *str - '0' );
+        i_value = i_value * 10 + ( *str++ - '0' );
     }
 
     return i_value * sign;
