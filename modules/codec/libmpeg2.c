@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.23 2003/07/13 12:15:23 massiot Exp $
+ * $Id: libmpeg2.c,v 1.24 2003/08/08 17:08:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -92,7 +92,7 @@ static picture_t *GetNewPicture( dec_thread_t *, uint8_t ** );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("MPEG I/II video decoder (using libmpeg2)") );
-    set_capability( "decoder", 40 );
+    set_capability( "decoder", 150 );
     set_callbacks( OpenDecoder, NULL );
     add_shortcut( "libmpeg2" );
 vlc_module_end();

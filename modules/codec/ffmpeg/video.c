@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.36 2003/07/26 15:34:43 fenrir Exp $
+ * $Id: video.c,v 1.37 2003/08/08 17:08:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -66,14 +66,12 @@
  *****************************************************************************/
 static void ffmpeg_CopyPicture( picture_t *, AVFrame *, vdec_thread_t * );
 
-/* direct rendering */
-static int  ffmpeg_GetFrameBuf      ( struct AVCodecContext *, AVFrame *);
-static void ffmpeg_ReleaseFrameBuf  ( struct AVCodecContext *, AVFrame *);
+static int  ffmpeg_GetFrameBuf      ( struct AVCodecContext *, AVFrame * );
+static void ffmpeg_ReleaseFrameBuf  ( struct AVCodecContext *, AVFrame * );
 
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
-
 static inline uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
 {
     /* FIXME FIXME some of them are wrong */
@@ -208,7 +206,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     p_vdec->p_ff_pic = avcodec_alloc_frame();
 
     if( ( p_vdec->p_format =
-          (BITMAPINFOHEADER *)p_vdec->p_fifo->p_bitmapinfoheader) != NULL )
+          (BITMAPINFOHEADER *)p_vdec->p_fifo->p_bitmapinfoheader ) != NULL )
     {
         /* ***** Fill p_context with init values ***** */
         p_vdec->p_context->width  = p_vdec->p_format->biWidth;
@@ -320,14 +318,16 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
     if( p_vdec->b_hurry_up ) p_vdec->b_direct_rendering = 0;
 
+    /* Always use our get_buffer wrapper so we can calculate the
+     * PTS correctly */
+    p_vdec->p_context->get_buffer = ffmpeg_GetFrameBuf;
+    p_vdec->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
+    p_vdec->p_context->opaque = p_vdec;
+
     if( p_vdec->b_direct_rendering )
     {
         msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
-        p_vdec->p_context->flags|= CODEC_FLAG_EMU_EDGE;
-        p_vdec->p_context->get_buffer     = ffmpeg_GetFrameBuf;
-        p_vdec->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
-        p_vdec->p_context->opaque = p_vdec;
-
+        p_vdec->p_context->flags |= CODEC_FLAG_EMU_EDGE;
     }
 
     /* ***** init this codec with special data ***** */
@@ -367,14 +367,18 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         else
         {
             p_vdec->p_context->extradata_size = i_size;
-            p_vdec->p_context->extradata      = malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+            p_vdec->p_context->extradata =
+                malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
             memcpy( p_vdec->p_context->extradata,
-                    &p_vdec->p_format[1],
-                    i_size );
-            memset( &((uint8_t*)p_vdec->p_context->extradata)[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+                    &p_vdec->p_format[1], i_size );
+            memset( &((uint8_t*)p_vdec->p_context->extradata)[i_size],
+                    0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
     }
     p_vdec->p_vout = NULL;
+
+    p_vdec->input_pts_previous = 0;
+    p_vdec->input_pts = 0;
 
     return( VLC_SUCCESS );
 }
@@ -392,13 +396,11 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
     int     i_used;
     int     b_drawpicture;
     int     b_gotpicture;
-    picture_t *p_pic;                                    /* videolan picture */
-    mtime_t   i_pts;
-
+    picture_t *p_pic;                                         /* vlc picture */
 
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
-    if( ( p_vdec->b_hurry_up )&& ( p_vdec->i_frame_late > 4 ) )
+    if( p_vdec->b_hurry_up && p_vdec->i_frame_late > 4 )
     {
         b_drawpicture = 0;
         if( p_vdec->i_frame_late < 8 )
@@ -433,10 +435,15 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
                 p_vdec->p_fifo->b_error = 1;
                 return;
             }
-            i_pts = p_pes->i_pts;
+
+            if( p_pes->i_pts > 0 )
+            {
+                p_vdec->input_pts_previous = p_vdec->input_pts;
+                p_vdec->input_pts = p_pes->i_pts;
+            }
             input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
 
-        } while( i_pts <= 0 || i_pts < mdate() );
+        } while( p_vdec->input_pts <= 0 || p_vdec->input_pts < mdate() );
     }
 
     if( !p_vdec->p_context->width || !p_vdec->p_context->height )
@@ -452,28 +459,11 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
             p_vdec->p_fifo->b_error = 1;
             return;
         }
-#if 0
-        if( p_vdec->i_codec_id == CODEC_ID_MPEG1VIDEO )
+
+        if( p_pes->i_pts > 0 )
         {
-            if( p_pes->i_dts )
-            {
-                p_vdec->pts = p_pes->i_dts;
-                p_vdec->i_frame_count = 0;
-            }
-        }
-        else
-        {
-            if( p_pes->i_pts )
-            {
-                p_vdec->pts = p_pes->i_pts;
-                p_vdec->i_frame_count = 0;
-            }
-        }
-#endif
-        if( p_pes->i_pts )
-        {
-            p_vdec->pts = p_pes->i_pts;
-            p_vdec->i_frame_count = 0;
+            p_vdec->input_pts_previous = p_vdec->input_pts;
+            p_vdec->input_pts = p_pes->i_pts;
         }
 
         i_frame_size = p_pes->i_pes_size;
@@ -498,11 +488,13 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
             }
             i_frame_size =
                 E_( GetPESData )( p_vdec->p_buffer + p_vdec->i_buffer,
-                                  i_frame_size ,
-                                  p_pes );
-            memset( p_vdec->p_buffer + p_vdec->i_buffer + i_frame_size, 0, FF_INPUT_BUFFER_PADDING_SIZE );
+                                  i_frame_size , p_pes );
+            memset( p_vdec->p_buffer + p_vdec->i_buffer + i_frame_size,
+                    0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
+
         input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+
     } while( i_frame_size <= 0 );
 
     i_frame_size += p_vdec->i_buffer;
@@ -540,11 +532,6 @@ usenextdata:
     else
     {
         p_vdec->i_buffer = 0;
-    }
-
-    if( b_gotpicture )
-    {
-        p_vdec->i_frame_count++;
     }
 
     /* consumed bytes */
@@ -592,41 +579,34 @@ usenextdata:
         /* fill p_picture_t from AVVideoFrame and do chroma conversion
          * if needed */
         ffmpeg_CopyPicture( p_pic, p_vdec->p_ff_pic, p_vdec );
-
     }
     else
     {
         p_pic = (picture_t *)p_vdec->p_ff_pic->opaque;
     }
 
-    /* fix date calculation */
-    if( p_vdec->pts > 0 )
+    /* Set the PTS */
+    if( p_vdec->p_ff_pic->pts )
     {
-        i_pts = p_vdec->pts;
-
-        if( p_vdec->p_context->frame_rate > 0 )
-        {
-           i_pts += (uint64_t)1000000 *
-                    ( p_vdec->i_frame_count - 1) /
-#if LIBAVCODEC_BUILD >= 4662
-                    DEFAULT_FRAME_RATE_BASE /
-#else
-                    FRAME_RATE_BASE /
-#endif
-                    p_vdec->p_context->frame_rate;
-        }
-    }
-    else
-    {
-        i_pts = mdate() + DEFAULT_PTS_DELAY;  // FIXME
+        p_vdec->pts = p_vdec->p_ff_pic->pts;
     }
 
-    vout_DatePicture( p_vdec->p_vout,
-                      p_pic,
-                      i_pts );
+    if( p_vdec->pts <= 0 )
+    {
+        p_vdec->pts = mdate() + DEFAULT_PTS_DELAY;  // FIXME
+    }
 
     /* Send decoded frame to vout */
+    vout_DatePicture( p_vdec->p_vout, p_pic, p_vdec->pts );
     vout_DisplayPicture( p_vdec->p_vout, p_pic );
+
+    /* interpolate the next PTS */
+    if( p_vdec->p_context->frame_rate > 0 )
+    {
+        p_vdec->pts += I64C(1000000) * (2 + p_vdec->p_ff_pic->repeat_pict) *
+                       p_vdec->p_context->frame_rate_base /
+                       (2 * p_vdec->p_context->frame_rate);
+    }
 
     if( i_frame_size > 0 )
     {
@@ -758,7 +738,9 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
 
 /*****************************************************************************
  * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
- *                     (used for direct rendering)
+ *****************************************************************************
+ * It is used for direct rendering as well as to get the right PTS for each
+ * decoded picture (even in indirect rendering mode).
  *****************************************************************************/
 static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
                                AVFrame *p_ff_pic )
@@ -766,16 +748,32 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     vdec_thread_t *p_vdec = (vdec_thread_t *)p_context->opaque;
     picture_t *p_pic;
 
+    /* Set picture PTS */
+    if( p_context->flags & CODEC_FLAG_TRUNCATED )
+    {
+        p_ff_pic->pts = p_vdec->input_pts_previous;
+        p_vdec->input_pts_previous = 0;
+    }
+    else
+    {
+        p_ff_pic->pts = p_vdec->input_pts;
+        p_vdec->input_pts = 0;
+    }
+
+    /* Not much to do in indirect rendering mode */
+    if( !p_vdec->b_direct_rendering )
+    {
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
+    }
+
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so this check is necessary. */
     if( !ffmpeg_PixFmtToChroma( p_context->pix_fmt ) ||
-        !(p_vdec->p_context->width % 16) || !(p_vdec->p_context->height % 16) )
+        p_vdec->p_context->width % 16 || p_vdec->p_context->height % 16 )
     {
-        p_context->get_buffer = avcodec_default_get_buffer;
-        p_context->release_buffer = avcodec_default_release_buffer;
-        p_vdec->b_direct_rendering = 0;
         msg_Dbg( p_vdec->p_fifo, "disabling direct rendering" );
-        return p_context->get_buffer( p_context, p_ff_pic );
+        p_vdec->b_direct_rendering = 0;
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
     /* Check and (re)create our vout if needed */
@@ -784,9 +782,10 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     {
         msg_Err( p_vdec->p_fifo, "cannot create vout" );
         p_vdec->p_fifo->b_error = 1; /* abort */
-        p_context->get_buffer= avcodec_default_get_buffer;
-        return p_context->get_buffer( p_context, p_ff_pic );
+        p_vdec->b_direct_rendering = 0;
+        return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
+
     p_vdec->p_vout->render.b_allow_modify_pics = 0;
 
     /* Get a new picture */
@@ -794,12 +793,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     {
         if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
         {
-            p_context->get_buffer= avcodec_default_get_buffer;
-            return p_context->get_buffer( p_context, p_ff_pic );
+            p_vdec->b_direct_rendering = 0;
+            return avcodec_default_get_buffer( p_context, p_ff_pic );
         }
         msleep( VOUT_OUTMEM_SLEEP );
     }
-    p_vdec->p_context->draw_horiz_band= NULL;
+    p_vdec->p_context->draw_horiz_band = NULL;
 
     p_ff_pic->opaque = (void*)p_pic;
     p_ff_pic->type = FF_BUFFER_TYPE_USER;
@@ -835,7 +834,6 @@ static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
         return;
     }
 
-    //msg_Dbg( p_vdec->p_fifo, "ffmpeg_ReleaseFrameBuf" );
     p_pic = (picture_t*)p_ff_pic->opaque;
 
     p_ff_pic->data[0] = NULL;

@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.21 2003/07/18 19:26:22 titer Exp $
+ * $Id: ffmpeg.h,v 1.22 2003/08/08 17:08:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -33,6 +33,8 @@
     \
     AVCodecContext      *p_context; \
     AVCodec             *p_codec; \
+    mtime_t input_pts_previous; \
+    mtime_t input_pts; \
     mtime_t pts; \
     \
     /* Private stuff for frame gathering */ \
