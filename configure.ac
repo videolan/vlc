@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.36 2003/07/19 14:14:22 sigmunau Exp $
+dnl $Id: configure.ac,v 1.37 2003/07/20 08:30:41 zorglub Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -2896,6 +2896,19 @@ then
     AX_ADD_LDFLAGS([lirc],[-llirc_client])
   fi
 fi
+
+dnl 
+dnl  Joystick plugin
+dnl
+AC_ARG_ENABLE(joystick,
+  [  --enable-joystick       joystick control (default disabled)])
+if test "${enable_joystick}" = "yes"
+then
+ AC_CHECK_HEADER( linux/joystick.h, 
+		[AX_ADD_PLUGINS([joystick])]
+	        )
+fi
+
 
 dnl
 dnl corba (ORBit) plugin
