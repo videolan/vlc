@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.4 2001/07/24 12:03:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -123,7 +123,7 @@
 static int  SynchroType( void );
 
 /* Error margins */
-#define DELTA                   (int)(0.040*CLOCK_FREQ)
+#define DELTA                   (int)(0.075*CLOCK_FREQ)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
