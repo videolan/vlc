@@ -681,7 +681,7 @@ DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
 goom-macosx-altivec-bin.tar.gz:
 	$(WGET) $(GOOM_URL)
 
-goom: goom-mascosx-altivec-bin.tar.gz
+goom: goom-macosx-altivec-bin.tar.gz
 	$(EXTRACT_GZ)
 
 .goom: goom
