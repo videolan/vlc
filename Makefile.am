@@ -483,6 +483,93 @@ share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
 endif
 
 ###############################################################################
+# Building architecture-specific binary packages
+###############################################################################
+
+# XXX: this rule is probably only useful to you if you have exactly
+# the same setup as me. Contact sam@zoy.org if you need to use it.
+#
+# Check that tmp isn't in the way
+package-win32:
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+# Create installation script
+	cp install-win32 tmp/nsi
+# Copy relevant files
+	cp vlc.exe tmp/ 
+	$(STRIP) tmp/vlc.exe
+	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
+	for file in AUTHORS COPYING ChangeLog README FAQ TODO ; \
+			do cp $$file tmp/$${file}.txt ; \
+			unix2dos tmp/$${file}.txt ; done
+	mkdir tmp/plugins
+	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
+		$(INSTALL) $$i tmp/plugins/ ; \
+	fi ; done
+# don't include these two
+#rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
+	for i in dummy tmp/plugins/*.so ; do if test $$i != tmp/plugins/intfwin.so -a $$i != dummy ; then $(STRIP) $$i ; fi ; done
+	mkdir tmp/share
+	for file in default8x16.psf default8x9.psf ; \
+		do cp share/$$file tmp/share/ ; done
+# Create package 
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} /CD tmp/nsi
+# Clean up
+	rm -Rf tmp
+
+package-beos:
+# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+	
+# Create dir
+	mkdir -p tmp/vlc/share
+# Copy relevant files
+	cp vlc tmp/vlc/
+	$(STRIP) tmp/vlc/vlc
+	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
+	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
+	for file in default8x16.psf default8x9.psf ; \
+		do cp share/$$file tmp/vlc/share/ ; done
+	mkdir tmp/vlc/plugins
+	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
+		$(INSTALL) $$i tmp/vlc/plugins/ ; \
+	fi ; done
+	for i in dummy tmp/vlc/plugins/*.so ; do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
+# Create package 
+	mv tmp/vlc tmp/vlc-${VERSION}
+	(cd tmp ; find vlc-${VERSION} | \
+	zip -9 -@ vlc-${VERSION}-BeOS-x86.zip )
+	mv tmp/vlc-${VERSION}-BeOS-x86.zip .
+# Clean up
+	rm -Rf tmp
+
+package-macosx:
+# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+
+# Copy relevant files 
+	cp -R vlc.app tmp/
+	$(STRIP) tmp/vlc.app/Contents/MacOS/vlc
+	cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf FAQ TODO tmp/
+
+# Create disk image 
+	./macosx-dmg 15 "vlc-${VERSION}" tmp/* 
+
+# Clean up
+	rm -Rf tmp
+
+###############################################################################
 # Building the Mozilla plugin
 ###############################################################################
 

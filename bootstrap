@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.34 2002/12/17 14:39:05 sam Exp $
+##  $Id: bootstrap,v 1.35 2002/12/25 21:02:35 massiot Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -293,6 +293,9 @@ fi
 PERLSUCKS=no
 AUTOMAKESUCKS=no
 INSTALLSUCKS=no
+
+# Mac OS X stacksize sucks
+if test x`uname -s` = xDarwin; then ulimit -s 20000; fi
 
 ##
 ## Generate the modules makefile, by parsing modules/**/Modules.am

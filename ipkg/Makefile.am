@@ -14,5 +14,5 @@ EXTRA_DIST = \
 	postrm.opie \
 	vlc.desktop \
 	vlc.gpe \
-	vlc.opie \
-	$(NULL)
+	vlc.opie
+
