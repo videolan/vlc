@@ -206,11 +206,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->dsp_mask |= FF_MM_SSE2;
     }
 
-    /* Make sure we get extradata filled by the encoder */
-    p_context->extradata_size = 0;
-    p_context->extradata = NULL;
-    p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
         if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
