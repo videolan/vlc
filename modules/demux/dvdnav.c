@@ -130,11 +130,6 @@ enum
     AR_221_1_PICTURE  = 4,                 /* 2.21:1 picture (movie) */
 };
 
-#if 0
-static int MenusCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
-#endif
-
 static void DemuxTitles( demux_t *p_demux );
 static void ESSubtitleUpdate( demux_t * );
 static void ButtonUpdate( demux_t * );
@@ -189,6 +184,23 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_name );
 
+    if( 1 )
+    {
+        // Hack for libdvdnav CVS.
+        // Without it dvdnav_get_number_of_titles() fails.
+        // Remove when fixed in libdvdnav CVS.
+        uint8_t buffer[DVD_VIDEO_LB_LEN];
+        int i_event, i_len;
+
+        if( dvdnav_get_next_block( p_sys->dvdnav, buffer, &i_event, &i_len )
+              == DVDNAV_STATUS_ERR )
+        {
+            msg_Warn( p_demux, "dvdnav_get_next_block failed" );
+        }
+
+        dvdnav_sector_search( p_sys->dvdnav, 0, SEEK_SET );
+    }
+
     /* Configure dvdnav */
     if( dvdnav_set_readahead_flag( p_sys->dvdnav, DVD_READ_CACHE ) !=
           DVDNAV_STATUS_OK )
@@ -210,8 +222,6 @@ static int Open( vlc_object_t *p_this )
                   dvdnav_err_to_string( p_sys->dvdnav ) );
     }
 
-    // FIXME: Doesn't work with libdvdnav CVS!
-    // Bah don't use CVS ;) --fenrir (anyway it's needed now)
     DemuxTitles( p_demux );
 
     /* Set forced title/chapter */
@@ -231,7 +241,8 @@ static int Open( vlc_object_t *p_this )
 
     if( i_chapter != 0 && i_title != 0 )
     {
-        if( dvdnav_part_play( p_sys->dvdnav, i_title, i_chapter ) != DVDNAV_STATUS_OK )
+        if( dvdnav_part_play( p_sys->dvdnav, i_title, i_chapter ) !=
+            DVDNAV_STATUS_OK )
         {
             msg_Warn( p_demux, "cannot set chapter" );
             i_chapter = 0;
@@ -249,7 +260,7 @@ static int Open( vlc_object_t *p_this )
     /* For simple mode (no menus), we're done */
     if( p_sys->b_simple ) return VLC_SUCCESS;
 
-    /* FIXME hack hack hack hachk FIXME */
+    /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
     p_sys->p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     var_Create( p_sys->p_input, "x-start", VLC_VAR_INTEGER );
@@ -345,7 +356,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
         {
             uint32_t pos, len;
-            f = (double) va_arg( args, double );
+            f = (double)va_arg( args, double );
             if( dvdnav_get_position( p_sys->dvdnav, &pos, &len ) ==
                   DVDNAV_STATUS_OK && len > 0 )
             {
@@ -386,8 +397,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TITLE:
             i = (int)va_arg( args, int );
-            if( ( i == 0 && dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )  != DVDNAV_STATUS_OK ) ||
-                ( i != 0 && dvdnav_title_play( p_sys->dvdnav, i ) != DVDNAV_STATUS_OK ) )
+            if( ( i == 0 && dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
+                  != DVDNAV_STATUS_OK ) ||
+                ( i != 0 && dvdnav_title_play( p_sys->dvdnav, i )
+                  != DVDNAV_STATUS_OK ) )
             {
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
@@ -405,34 +418,37 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 /* Special case */
                 switch( i )
                 {
-                    case 0:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Escape );
-                        break;
-                    case 1:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root );
-                        break;
-                    case 2:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title );
-                        break;
-                    case 3:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Part );
-                        break;
-                    case 4:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Subpicture );
-                        break;
-                    case 5:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Audio );
-                        break;
-                    case 6:
-                        i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Angle );
-                        break;
-                    default:
-                        return VLC_EGENERIC;
+                case 0:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Escape );
+                    break;
+                case 1:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root );
+                    break;
+                case 2:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title );
+                    break;
+                case 3:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Part );
+                    break;
+                case 4:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav,
+                                              DVD_MENU_Subpicture );
+                    break;
+                case 5:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Audio );
+                    break;
+                case 6:
+                    i_ret = dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Angle );
+                    break;
+                default:
+                    return VLC_EGENERIC;
                 }
+
                 if( i_ret != DVDNAV_STATUS_OK )
                     return VLC_EGENERIC;
             }
-            else if( dvdnav_part_play( p_sys->dvdnav, p_demux->info.i_title, i ) != DVDNAV_STATUS_OK )
+            else if( dvdnav_part_play( p_sys->dvdnav, p_demux->info.i_title,
+                                       i ) != DVDNAV_STATUS_OK )
             {
                 msg_Warn( p_demux, "cannot set title/chapter" );
                 return VLC_EGENERIC;
@@ -443,7 +459,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (int64_t)var_GetInteger( p_demux, "dvdnav-caching" ) * I64C(1000);
+            *pi64 = (int64_t)var_GetInteger( p_demux, "dvdnav-caching" ) *1000;
             return VLC_SUCCESS;
 
         /* TODO implement others */
@@ -479,9 +495,11 @@ static int Demux( demux_t *p_demux )
     }
 
 #if DVD_READ_CACHE
-    if( dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event, &i_len ) == DVDNAV_STATUS_ERR )
+    if( dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event, &i_len )
+        == DVDNAV_STATUS_ERR )
 #else
-    if( dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event, &i_len )  == DVDNAV_STATUS_ERR )
+    if( dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event, &i_len )
+        == DVDNAV_STATUS_ERR )
 #endif
     {
         msg_Warn( p_demux, "cannot get next block (%s)",
@@ -935,7 +953,6 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     }
 }
 
-
 /*****************************************************************************
  * DemuxBlock: demux a given block
  *****************************************************************************/
@@ -1293,16 +1310,3 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
 
     return VLC_SUCCESS;
 }
-
-#if 0
-static int MenusCallback( vlc_object_t *p_this, char const *psz_name,
-                          vlc_value_t oldval, vlc_value_t newval, void *p_arg )
-{
-    demux_t *p_demux = (demux_t*)p_arg;
-
-    /* FIXME, not thread safe */
-    dvdnav_menu_call( p_demux->p_sys->dvdnav, newval.i_int );
-
-    return VLC_SUCCESS;
-}
-#endif
