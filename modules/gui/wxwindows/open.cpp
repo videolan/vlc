@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.60 2003/12/22 02:24:52 sam Exp $
+ * $Id: open.cpp,v 1.61 2003/12/22 15:42:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -297,7 +297,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         {
             sout_checkbox->SetValue(TRUE);
             sout_button->Enable();
-            subsfile_mrl.Add( wxString(wxT("sout=")) + wxU(psz_sout) );
+            subsfile_mrl.Add( wxString(wxT("sout=")) + wxL2U(psz_sout) );
         }
         if( psz_sout ) free( psz_sout );
 
@@ -446,7 +446,7 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
     {
         subsfile_checkbox->SetValue(TRUE);
         subsfile_button->Enable();
-        subsfile_mrl.Add( wxString(wxT("sub-file=")) + wxU(psz_subsfile) );
+        subsfile_mrl.Add( wxString(wxT("sub-file=")) + wxL2U(psz_subsfile) );
     }
     if( psz_subsfile ) free( psz_subsfile );
 
@@ -1053,7 +1053,7 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
 
     if ( !psz_device ) psz_device = "";
 
-    if( disc_device->GetValue().Cmp( wxU( psz_device ) ) )
+    if( disc_device->GetValue().Cmp( wxL2U( psz_device ) ) )
     {
         b_disc_device_changed = true;
     }
@@ -1078,7 +1078,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         psz_device = config_GetPsz( p_intf, "dvd" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
             disc_title_label->SetLabel ( wxT("Title") );
         }
         disc_title->SetRange( i_selection, 255 );
@@ -1090,7 +1090,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         psz_device = config_GetPsz( p_intf, "vcd" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
         }
 
         /* There are at most 98, tracks in a VCD, 999 Segments, 500 entries
@@ -1116,7 +1116,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         psz_device = config_GetPsz( p_intf, "cd-audio" );
         if( !b_disc_device_changed )
         {
-            disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+            disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
         }
         disc_title_label->SetLabel ( wxT("Track") );
 #ifdef HAVE_CDDAX

@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.17 2003/12/22 02:24:52 sam Exp $
+ * $Id: preferences_widgets.cpp,v 1.18 2003/12/22 15:42:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -304,7 +304,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     module_t *p_parser;
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-    combo = new wxComboBox( this, -1, wxU(p_item->psz_value),
+    combo = new wxComboBox( this, -1, wxL2U(p_item->psz_value),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY | wxCB_SORT );
 
@@ -355,7 +355,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     textctrl = new wxTextCtrl( this, -1,
-                               wxU(p_item->psz_value),
+                               wxL2U(p_item->psz_value),
                                wxDefaultPosition,
                                wxDefaultSize,
                                wxTE_PROCESS_ENTER);
@@ -425,7 +425,7 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
         combo->Append( ( p_item->ppsz_list_text &&
                          p_item->ppsz_list_text[i_index] ) ?
                        wxU(p_item->ppsz_list_text[i_index]) :
-                       wxU(p_item->ppsz_list[i_index]) );
+                       wxL2U(p_item->ppsz_list[i_index]) );
         combo->SetClientData( i_index, (void *)p_item->ppsz_list[i_index] );
         if( ( p_item->psz_value &&
               !strcmp( p_item->psz_value, p_item->ppsz_list[i_index] ) ) ||
@@ -435,7 +435,7 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
             combo->SetValue( ( p_item->ppsz_list_text &&
                                p_item->ppsz_list_text[i_index] ) ?
                              wxU(p_item->ppsz_list_text[i_index]) :
-                             wxU(p_item->ppsz_list[i_index]) );
+                             wxL2U(p_item->ppsz_list[i_index]) );
         }
     }
 }
@@ -485,7 +485,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *p_this,
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     textctrl = new wxTextCtrl( this, -1,
-                               wxU(p_item->psz_value),
+                               wxL2U(p_item->psz_value),
                                wxDefaultPosition,
                                wxDefaultSize,
                                wxTE_PROCESS_ENTER);
