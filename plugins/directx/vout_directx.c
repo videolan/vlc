@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.9 2001/07/30 00:53:04 sam Exp $
+ * $Id: vout_directx.c,v 1.10 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -202,7 +202,7 @@ static int vout_Create( vout_thread_t *p_vout )
      * DirectXEventThread will take care of the creation of the video
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
-    intf_WarnMsg( 3, "vout : vout_Create creating DirectXEventThread" );
+    intf_WarnMsg( 3, "vout: vout_Create creating DirectXEventThread" );
     if( vlc_thread_create( &p_vout->p_sys->event_thread_id,
                            "DirectX Events Thread",
                            (void *) DirectXEventThread, (void *) p_vout) )
@@ -475,6 +475,7 @@ static void vout_Display( vout_thread_t *p_vout )
 {
     DDSURFACEDESC ddsd;
     HRESULT       dxresult;
+
     int           i;
     int           i_image_width;
     int           i_image_height;
@@ -503,8 +504,9 @@ static void vout_Display( vout_thread_t *p_vout )
 
     if( p_vout->b_need_render )
     {
-        RECT  rect_window;
-        POINT point_window;
+        RECT     rect_window;
+        POINT    point_window;
+        DDBLTFX  ddbltfx;
   
         /* Nothing yet */
         if( p_vout->p_sys->p_surface == NULL )
@@ -539,17 +541,24 @@ static void vout_Display( vout_thread_t *p_vout )
         rect_window.bottom = point_window.y;
 
         /* We want to keep the aspect ratio of the video */
-        if( !p_vout->b_scale ) /* kuldge */
+#if 0
+        if( p_vout->b_scale )
         {
             DirectXKeepAspectRatio( p_vout, &rect_window );
         }
+#endif
+
+        /* We ask for the "NOTEARING" option */
+        memset( &ddbltfx, 0, sizeof(DDBLTFX) );
+        ddbltfx.dwSize = sizeof(DDBLTFX);
+        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
 
         /* Blit video surface to display */
         dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
                                            &rect_window,
                                            p_vout->p_sys->p_surface,
                                            NULL,
-                                           0, NULL );
+                                           0, &ddbltfx );
         if( dxresult != DD_OK )
         {
             intf_WarnMsg( 3, "vout: could not Blit the surface" );

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.8 2001/07/30 18:56:36 gbazin Exp $
+ * $Id: aout_directx.c,v 1.9 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -23,12 +23,6 @@
 
 #define MODULE_NAME directx
 #include "modules_inner.h"
-
-/* The most important thing to do for now is to fix the audio bug we've got
- * on startup: the audio will start later than the video (sometimes) and
- * is trying to catching up with it.
- * At first sight it seems to be a scheduling problem
- */
 
 
 /*****************************************************************************
@@ -81,12 +75,24 @@ typedef struct aout_sys_s
                                        * takes care of mixing all the
                                        * secondary buffers into the primary) */
 
+    LPDIRECTSOUNDNOTIFY p_dsnotify;         /* the position notify interface */
+
     HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
 
     long l_buffer_size;                       /* secondary sound buffer size */
     long l_write_position;             /* next write position for the buffer */
 
-    boolean_t b_active;
+    volatile boolean_t b_buffer_underflown;    /* buffer underflow detection */
+    volatile long l_data_played_from_beginning;   /* for underflow detection */
+    volatile long l_data_written_from_beginning;  /* for underflow detection */
+
+    vlc_mutex_t buffer_lock;                            /* audio buffer lock */
+
+    vlc_thread_t notification_thread_id;             /* DirectSoundThread id */
+
+    DSBPOSITIONNOTIFY notification_events[2];    /* play notification events */
+
+    boolean_t b_notification_thread_die;          /* flag to kill the thread */
 
 } aout_sys_t;
 
@@ -102,8 +108,10 @@ static void    aout_Play        ( aout_thread_t *p_aout,
 static void    aout_Close       ( aout_thread_t *p_aout );
 
 /* local functions */
-static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout );
-static int DirectxInitDSound( aout_thread_t *p_aout );
+static int  DirectxCreateSecondaryBuffer ( aout_thread_t *p_aout );
+static void DirectxDestroySecondaryBuffer( aout_thread_t *p_aout );
+static int  DirectxInitDSound            ( aout_thread_t *p_aout );
+static void DirectSoundThread            ( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -144,7 +152,6 @@ static int aout_Open( aout_thread_t *p_aout )
 {
     HRESULT dsresult;
     DSBUFFERDESC dsbuffer_desc;
-    WAVEFORMATEX waveformat;
 
     intf_WarnMsg( 3, "aout: DirectX aout_Open ");
 
@@ -161,6 +168,12 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->p_dsobject = NULL;
     p_aout->p_sys->p_dsbuffer_primary = NULL;
     p_aout->p_sys->p_dsbuffer = NULL;
+    p_aout->p_sys->p_dsnotify = NULL;
+    p_aout->p_sys->b_notification_thread_die = 0;
+    p_aout->p_sys->l_data_written_from_beginning = 0;
+    p_aout->p_sys->l_data_played_from_beginning = 0;
+    vlc_mutex_init( &p_aout->p_sys->buffer_lock );
+
 
     p_aout->psz_device = 0;
     p_aout->i_format   = AOUT_FORMAT_DEFAULT;
@@ -194,42 +207,25 @@ static int aout_Open( aout_thread_t *p_aout )
         return( 1 );
     }
 
-    /* Set Direct Sound primary buffer format because the default value set by
-     * Windows is usually not the high quality value */
-    memset(&waveformat, 0, sizeof(WAVEFORMATEX)); 
-    waveformat.wFormatTag = WAVE_FORMAT_PCM; 
-    waveformat.nChannels = 2; 
-    waveformat.nSamplesPerSec = 44100; 
-    waveformat.wBitsPerSample = 16; 
-    waveformat.nBlockAlign = waveformat.wBitsPerSample / 8 *
-                                 waveformat.nChannels;
-    waveformat.nAvgBytesPerSec = waveformat.nSamplesPerSec *
-                                     waveformat.nBlockAlign;
 
-    dsresult = IDirectSoundBuffer_SetFormat(p_aout->p_sys->p_dsbuffer_primary,
-                                            &waveformat);
-    if( dsresult != DS_OK )
-    {
-        intf_WarnMsg( 3, "aout: can't set primary buffer format");
-    }
+    /* Now we need to setup DirectSound play notification */
 
-#if 0
-    /* ensure the primary buffer is playing. We won't actually hear anything
-     * until the secondary buffer is playing */
-    dsresult = IDirectSoundBuffer_Play( p_aout->p_sys->p_dsbuffer_primary,
-                                        0,
-                                        0,
-                                        DSBPLAY_LOOPING);
-    if( dsresult != DS_OK )
+    /* first we need to create the notification events */
+    p_aout->p_sys->notification_events[0].hEventNotify =
+        CreateEvent( NULL, FALSE, FALSE, NULL );
+    p_aout->p_sys->notification_events[1].hEventNotify =
+        CreateEvent( NULL, FALSE, FALSE, NULL );
+
+    /* then launch the notification thread */
+    intf_WarnMsg( 3, "aout: aout_Open creating DirectSoundThread" );
+    if( vlc_thread_create( &p_aout->p_sys->notification_thread_id,
+                           "DirectSound Notification Thread",
+                           (void *) DirectSoundThread, (void *) p_aout) )
     {
-        intf_WarnMsg( 3, "aout: can't play direct sound primary buffer ");
-        IDirectSound_Release( p_aout->p_sys->p_dsbuffer_primary );
-        IDirectSound_Release( p_aout->p_sys->p_dsobject );
-        p_aout->p_sys->p_dsobject = NULL;
-        p_aout->p_sys->p_dsbuffer_primary = NULL;
-        return( 1 );
+        intf_ErrMsg( "aout error: can't create DirectSoundThread" );
+        intf_ErrMsg("aout error: %s", strerror(ENOMEM));
+        /* Let's go on anyway */
     }
-#endif
 
     return( 0 );
 }
@@ -243,24 +239,64 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-    HRESULT dsresult;
+    HRESULT       dsresult;
+    WAVEFORMATEX  *p_waveformat;
+    unsigned long i_size_struct;
 
     intf_WarnMsg( 3, "aout: DirectX aout_SetFormat ");
 
-    /* first release the current secondary buffer */
-    if( p_aout->p_sys->p_dsbuffer != NULL )
+    /* Set the format of Direct Sound primary buffer */
+
+    /* first we need to know the current format */
+    dsresult = IDirectSoundBuffer_GetFormat( p_aout->p_sys->p_dsbuffer_primary,
+                                             NULL, 0, &i_size_struct );
+    if( dsresult == DS_OK )
     {
-        IDirectSoundBuffer_Release( p_aout->p_sys->p_dsbuffer );
-        p_aout->p_sys->p_dsbuffer = NULL;
+        p_waveformat = malloc( i_size_struct );
+        dsresult = IDirectSoundBuffer_GetFormat(
+                                             p_aout->p_sys->p_dsbuffer_primary,
+                                             p_waveformat, i_size_struct,
+                                             NULL );
     }
 
-    /* then create a new secondary buffer */
-    dsresult = DirectxCreateSecondaryBuffer( p_aout );    
+    if( dsresult == DS_OK )
+    {
+        /* Here we'll change the format */
+        p_waveformat->nChannels        = 2; 
+        p_waveformat->nSamplesPerSec   = (p_aout->l_rate < 44100) ? 44100
+                                             : p_aout->l_rate; 
+        p_waveformat->wBitsPerSample   = 16; 
+        p_waveformat->nBlockAlign      = p_waveformat->wBitsPerSample / 8 *
+                                             p_waveformat->nChannels;
+        p_waveformat->nAvgBytesPerSec  = p_waveformat->nSamplesPerSec *
+                                             p_waveformat->nBlockAlign;
+
+        dsresult = IDirectSoundBuffer_SetFormat(
+                                             p_aout->p_sys->p_dsbuffer_primary,
+                                             p_waveformat );
+    }
+    else intf_WarnMsg( 3, "aout: can't get primary buffer format" );
+
     if( dsresult != DS_OK )
+        intf_WarnMsg( 3, "aout: can't set primary buffer format" );
+
+
+    /* Now we need to take care of Direct Sound secondary buffer */
+
+    vlc_mutex_lock( &p_aout->p_sys->buffer_lock );
+
+    /* first release the current secondary buffer */
+    DirectxDestroySecondaryBuffer( p_aout );
+
+    /* then create a new secondary buffer */
+    if( DirectxCreateSecondaryBuffer( p_aout ) )
     {
         intf_WarnMsg( 3, "aout: DirectX aout_SetFormat cannot create buffer");
+        vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
         return( 1 );
     }
+
+    vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
 
     p_aout->i_latency = 0;
   
@@ -270,48 +306,35 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************
- * returns the number of bytes in the audio buffer compared to the size of
- * l_buffer_limit...
+ * returns the number of bytes in the audio buffer that have not yet been
+ * sent to the sound device.
  *****************************************************************************/
 static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     long l_play_position, l_notused, l_result;
     HRESULT dsresult;
 
+    if( p_aout->p_sys->b_buffer_underflown )
+    {
+        intf_WarnMsg( 3, "aout: DirectX aout_GetBufInfo underflow");
+        return( l_buffer_limit );
+    }
+
     dsresult = IDirectSoundBuffer_GetCurrentPosition(p_aout->p_sys->p_dsbuffer,
                                                  &l_play_position, &l_notused);
-    if( dsresult == DSERR_BUFFERLOST )
-    {
-        IDirectSoundBuffer_Restore( p_aout->p_sys->p_dsbuffer );
-        dsresult = IDirectSoundBuffer_GetCurrentPosition(
-                                                 p_aout->p_sys->p_dsbuffer,
-                                                 &l_play_position, &l_notused
-                                                        );
-    }
     if( dsresult != DS_OK )
     {
         intf_WarnMsg(3,"aout: DirectX aout_GetBufInfo cannot get current pos");
         return( l_buffer_limit );
     }
 
-#if 0
-    /* temporary hack. When you start playing a new file, the play position
-     * doesn't start changing immediatly, even though sound is already
-     * playing from the sound card */
-    if( l_play_position == 0 )
-    { 
-       intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_buffer_limit);
-       return( l_buffer_limit );
-    }
-#endif
-
     l_result = (p_aout->p_sys->l_write_position >= l_play_position) ?
-      (p_aout->p_sys->l_write_position - l_play_position) /2
+      (p_aout->p_sys->l_write_position - l_play_position)
                : (p_aout->p_sys->l_buffer_size - l_play_position
-                  + p_aout->p_sys->l_write_position) /2 ;
+                  + p_aout->p_sys->l_write_position);
 
 #if 0
-    intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_result);
+    intf_WarnMsg( 3, "aout: DirectX aout_GetBufInfo: %li", l_result);
 #endif
     return l_result;
 }
@@ -320,58 +343,40 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  * aout_Play: play a sound buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes
+ * Don't forget that DirectSound buffers are circular buffers.
  *****************************************************************************/
 static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     VOID            *p_write_position, *p_start_buffer;
-    long            l_bytes1, l_bytes2;
-    long            l_play_position, l_notused, l_buffer_free_length;
+    long            l_bytes1, l_bytes2, l_play_position;
     HRESULT         dsresult;
 
-    /* We want to copy data to the circular sound buffer, so we first need to
-     * find out were in the buffer we can write our data */
-    dsresult = IDirectSoundBuffer_GetCurrentPosition(p_aout->p_sys->p_dsbuffer,
-                                                     &l_play_position,
-                                                     &l_notused);
-    if( dsresult == DSERR_BUFFERLOST )
+    /* protect buffer access (because of DirectSoundThread) */
+    vlc_mutex_lock( &p_aout->p_sys->buffer_lock );
+
+    if( p_aout->p_sys->b_buffer_underflown )
     {
-        IDirectSoundBuffer_Restore( p_aout->p_sys->p_dsbuffer );
+        /* reset the position to the beginning of the buffer */
+        dsresult = IDirectSoundBuffer_SetCurrentPosition(
+                                            p_aout->p_sys->p_dsbuffer, 1024 );
+        /*  there has been an underflow so we need to play the new sample
+         *  as soon as possible. This is why we query the play position */
         dsresult = IDirectSoundBuffer_GetCurrentPosition(
-                                                 p_aout->p_sys->p_dsbuffer,
-                                                 &l_play_position, &l_notused
-                                                        );
-    }
-    if( dsresult != DS_OK )
-    {
-        intf_WarnMsg( 3, "aout: DirectX aout_Play can'get buffer position");
-    }
+                                            p_aout->p_sys->p_dsbuffer,
+                                            &l_play_position,
+                                            &p_aout->p_sys->l_write_position );
+        if( dsresult != DS_OK )
+        {
+            intf_WarnMsg( 3, "aout: aout_Play can'get buffer position");
+            p_aout->p_sys->l_write_position = 0; 
+        }
 
-#if 1
-    /* check that we are not overflowing the circular buffer (everything should
-     * be alright but just in case) */
-    l_buffer_free_length =  l_play_position - p_aout->p_sys->l_write_position;
-    if( l_buffer_free_length <= 0 )
-        l_buffer_free_length += p_aout->p_sys->l_buffer_size;
-
-    if( i_size > l_buffer_free_length )
-    {
-        intf_WarnMsg( 3, "aout: DirectX aout_Play buffer overflow: size %i, free %i !!!", i_size, l_buffer_free_length);
-        intf_WarnMsg( 3, "aout: DirectX aout_Play buffer overflow: writepos %i, readpos %i !!!", p_aout->p_sys->l_write_position, l_play_position);
-        /*i_size = l_buffer_free_length;*/
-
-        /* Update the write pointer */
-        p_aout->p_sys->l_write_position = l_notused;
-
+        /* reinitialise the underflow detection counters */
+        p_aout->p_sys->l_data_written_from_beginning = 0;
+        p_aout->p_sys->l_data_played_from_beginning =
+         -(p_aout->p_sys->l_write_position % (p_aout->p_sys->l_buffer_size/2));
+        p_aout->p_sys->b_buffer_underflown = 0;
     }
-    else
-    {
-#if 0
-        intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: size %i, free %i !!!"
-                      , i_size, l_buffer_free_length);
-        intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: writepos %i, readpos %i !!!", p_aout->p_sys->l_write_position, l_play_position);
-#endif
-    }
-#endif
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock( p_aout->p_sys->p_dsbuffer,
@@ -398,10 +403,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     if( dsresult != DS_OK )
     {
         intf_WarnMsg( 3, "aout: DirectX aout_Play can't lock buffer");
+        vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
         return;
     }
 
-    /* Now do the actual memcopy (two memcpy because the buffer is circular) */
+    /* Now do the actual memcpy (two memcpy because the buffer is circular) */
     memcpy( p_write_position, buffer, l_bytes1 );
     if( p_start_buffer != NULL )
     {
@@ -415,6 +421,9 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     /* Update the write position index of the buffer*/
     p_aout->p_sys->l_write_position += i_size;
     p_aout->p_sys->l_write_position %= p_aout->p_sys->l_buffer_size;
+    p_aout->p_sys->l_data_written_from_beginning += i_size;
+
+    vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
 
     /* The play function has no effect if the buffer is already playing */
     dsresult = IDirectSoundBuffer_Play( p_aout->p_sys->p_dsbuffer,
@@ -445,18 +454,14 @@ static void aout_Close( aout_thread_t *p_aout )
 
     intf_WarnMsg( 3, "aout: DirectX aout_Close ");
 
-    /* make sure the buffer isn't playing */
-    if( p_aout->p_sys->p_dsbuffer != NULL )
-    {
-        IDirectSoundBuffer_Stop( p_aout->p_sys->p_dsbuffer );
-    }
+    /* kill the position notification thread */
+    p_aout->p_sys->b_notification_thread_die = 1;
+    SetEvent( p_aout->p_sys->notification_events[0].hEventNotify );
+    vlc_thread_join( p_aout->p_sys->notification_thread_id );
+    vlc_mutex_destroy( &p_aout->p_sys->buffer_lock );
 
-    /* first release the secondary buffer */
-    if( p_aout->p_sys->p_dsbuffer != NULL )
-    {
-        IDirectSoundBuffer_Release( p_aout->p_sys->p_dsbuffer );
-        p_aout->p_sys->p_dsbuffer = NULL;
-    }  
+    /* release the secondary buffer */
+    DirectxDestroySecondaryBuffer( p_aout );
 
     /* then release the primary buffer */
     if( p_aout->p_sys->p_dsbuffer_primary != NULL )
@@ -557,17 +562,17 @@ static int DirectxInitDSound( aout_thread_t *p_aout )
  *****************************************************************************/
 static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
 {
-    WAVEFORMATEX waveformat;
-    DSBUFFERDESC dsbdesc;
-    DSBCAPS      dsbcaps;
+    WAVEFORMATEX         waveformat;
+    DSBUFFERDESC         dsbdesc;
+    DSBCAPS              dsbcaps;
 
     /* First set the buffer format */
     memset(&waveformat, 0, sizeof(WAVEFORMATEX)); 
-    waveformat.wFormatTag = WAVE_FORMAT_PCM; 
-    waveformat.nChannels = p_aout->i_channels; 
-    waveformat.nSamplesPerSec = p_aout->l_rate; 
-    waveformat.wBitsPerSample = 16; 
-    waveformat.nBlockAlign = waveformat.wBitsPerSample / 8 *
+    waveformat.wFormatTag      = WAVE_FORMAT_PCM; 
+    waveformat.nChannels       = p_aout->i_channels; 
+    waveformat.nSamplesPerSec  = p_aout->l_rate; 
+    waveformat.wBitsPerSample  = 16; 
+    waveformat.nBlockAlign     = waveformat.wBitsPerSample / 8 *
                                  waveformat.nChannels;
     waveformat.nAvgBytesPerSec = waveformat.nSamplesPerSec *
                                      waveformat.nBlockAlign;
@@ -576,6 +581,7 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC)); 
     dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
+                    | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
     dsbdesc.dwBufferBytes = waveformat.nAvgBytesPerSec * 2;  /* 2 sec buffer */
     dsbdesc.lpwfxFormat = &waveformat; 
@@ -596,8 +602,179 @@ static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
     IDirectSoundBuffer_GetCaps( p_aout->p_sys->p_dsbuffer, &dsbcaps  );
     p_aout->p_sys->l_buffer_size = dsbcaps.dwBufferBytes;
     p_aout->p_sys->l_write_position = 0;
+
     intf_WarnMsg( 3, "aout: DirectX DirectxCreateSecondaryBuffer: %li",
                   p_aout->p_sys->l_buffer_size);
 
+    /* Now the secondary buffer is created, we need to setup its position
+     * notification */
+    p_aout->p_sys->notification_events[0].dwOffset = 0;    /* notif position */
+    p_aout->p_sys->notification_events[1].dwOffset = dsbcaps.dwBufferBytes / 2;
+
+    /* Get the IDirectSoundNotify interface */
+    if FAILED( IDirectSoundBuffer_QueryInterface( p_aout->p_sys->p_dsbuffer,
+                                                  &IID_IDirectSoundNotify,
+                                       (LPVOID *)&p_aout->p_sys->p_dsnotify ) )
+    {
+        intf_WarnMsg( 3, "aout: DirectX can't get Notify interface" );
+        /* Go on anyway */
+        p_aout->p_sys->p_dsnotify = NULL;
+        return( 0 );
+    }
+        
+    if FAILED( IDirectSoundNotify_SetNotificationPositions(
+                                        p_aout->p_sys->p_dsnotify,
+                                        2,
+                                        p_aout->p_sys->notification_events ) )
+    {
+        intf_WarnMsg( 3, "aout: DirectX can't set position Notification" );
+        /* Go on anyway */
+    }
+
     return( 0 );
 }
+
+/*****************************************************************************
+ * DirectxCreateSecondaryBuffer
+ *****************************************************************************
+ * This function destroy the secondary buffer.
+ *****************************************************************************/
+static void DirectxDestroySecondaryBuffer( aout_thread_t *p_aout )
+{
+    /* make sure the buffer isn't playing */
+    if( p_aout->p_sys->p_dsbuffer != NULL )
+    {
+        IDirectSoundBuffer_Stop( p_aout->p_sys->p_dsbuffer );
+    }
+
+    if( p_aout->p_sys->p_dsnotify != NULL )
+    {
+        IDirectSoundNotify_Release( p_aout->p_sys->p_dsnotify );
+        p_aout->p_sys->p_dsnotify = NULL;
+    }
+
+    if( p_aout->p_sys->p_dsbuffer != NULL )
+    {
+        IDirectSoundBuffer_Release( p_aout->p_sys->p_dsbuffer );
+        p_aout->p_sys->p_dsbuffer = NULL;
+    }
+}
+
+/*****************************************************************************
+ * DirectSoundThread: this thread will capture play notification events. 
+ *****************************************************************************
+ * As Direct Sound uses circular buffers, we need to use event notification to
+ * manage them.
+ * Using event notification implies blocking the thread until the event is
+ * signaled so we really need to run this in a separate thread.
+ *****************************************************************************/
+static void DirectSoundThread( aout_thread_t *p_aout )
+{
+    HANDLE  notification_events[2];
+    VOID    *p_write_position, *p_start_buffer;
+    long    l_bytes1, l_bytes2;
+    HRESULT dsresult;
+    long    l_buffer_size, l_play_position, l_data_in_buffer;
+
+    notification_events[0]=p_aout->p_sys->notification_events[0].hEventNotify;
+    notification_events[1]=p_aout->p_sys->notification_events[1].hEventNotify;
+
+    /* this thread must be high-priority */
+    if( !SetThreadPriority( GetCurrentThread(),
+                            THREAD_PRIORITY_ABOVE_NORMAL ) )
+    {
+        intf_WarnMsg( 3, "aout: DirectSoundThread could not renice itself" );
+    }
+
+    intf_WarnMsg( 3, "aout: DirectSoundThread ready" );
+
+    while( !p_aout->p_sys->b_notification_thread_die )
+    {
+        /* wait for the position notification */
+        l_play_position = WaitForMultipleObjects( 2, notification_events,
+                                                  0, INFINITE ); 
+        vlc_mutex_lock( &p_aout->p_sys->buffer_lock );
+
+        if( p_aout->p_sys->b_notification_thread_die )
+        {
+            break;
+        }
+
+        /* check for buffer underflow (bodge for wrap around) */
+        l_buffer_size = p_aout->p_sys->l_buffer_size;
+        l_play_position = (l_play_position - WAIT_OBJECT_0) * l_buffer_size/2;
+        p_aout->p_sys->l_data_played_from_beginning += (l_buffer_size/2);
+        l_data_in_buffer = p_aout->p_sys->l_data_written_from_beginning -
+                               p_aout->p_sys->l_data_played_from_beginning; 
+
+        /* detect wrap-around */
+        if( l_data_in_buffer < (-l_buffer_size/2) )
+        {
+            l_data_in_buffer += l_buffer_size;
+        }
+
+        /* detect underflow */
+        if( l_data_in_buffer <= 0 )
+        {
+            intf_WarnMsg(3,"aout: DirectSoundThread underflow");
+            p_aout->p_sys->b_buffer_underflown = 1;
+            p_aout->p_sys->l_write_position =
+                  (l_play_position + l_buffer_size/2) % l_buffer_size;
+            l_data_in_buffer = l_buffer_size / 2;
+        }
+
+
+        /* Clear the data which has already been played */
+
+        /* Before copying anything, we have to lock the buffer */
+        dsresult = IDirectSoundBuffer_Lock( p_aout->p_sys->p_dsbuffer,
+                   p_aout->p_sys->l_write_position,  /* Offset of lock start */
+                   l_buffer_size - l_data_in_buffer,      /* Number of bytes */
+                   &p_write_position,               /* Address of lock start */
+                   &l_bytes1,    /* Count of bytes locked before wrap around */
+                   &p_start_buffer,        /* Buffer adress (if wrap around) */
+                   &l_bytes2,            /* Count of bytes after wrap around */
+                   0);                                              /* Flags */
+        if( dsresult == DSERR_BUFFERLOST )
+        {
+            IDirectSoundBuffer_Restore( p_aout->p_sys->p_dsbuffer );
+            dsresult = IDirectSoundBuffer_Lock( p_aout->p_sys->p_dsbuffer,
+                                          p_aout->p_sys->l_write_position,
+                                          l_buffer_size - l_data_in_buffer,
+                                          &p_write_position,
+                                          &l_bytes1,
+                                          &p_start_buffer,
+                                          &l_bytes2,
+                                          0);
+        }
+        if( dsresult != DS_OK )
+        {
+            intf_WarnMsg( 3, "aout: DirectX aout_Play can't lock buffer");
+            vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
+            return;
+        }
+
+        /* Now do the actual memcpy (two because the buffer is circular) */
+        memset( p_write_position, 0, l_bytes1 );
+        if( p_start_buffer != NULL )
+        {
+            memset( p_start_buffer, 0, l_bytes2 );
+        }
+
+        /* Now the data has been copied, unlock the buffer */
+        IDirectSoundBuffer_Unlock( p_aout->p_sys->p_dsbuffer, 
+                        p_write_position, l_bytes1, p_start_buffer, l_bytes2 );
+
+        vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
+
+    }
+
+    /* free the events */
+    CloseHandle( notification_events[0] );
+    CloseHandle( notification_events[1] );
+
+    intf_WarnMsg( 3, "aout: DirectSoundThread exiting" );
+
+}
+
+

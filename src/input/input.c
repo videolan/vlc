@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.127 2001/07/18 14:21:00 massiot Exp $
+ * $Id: input.c,v 1.128 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -605,12 +605,8 @@ static void FileOpen( input_thread_t * p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     intf_WarnMsg( 1, "input: opening file `%s'", p_input->p_source );
-#if defined( WIN32 )
-    if( (p_input->i_handle = open( psz_name, O_BINARY ) ) == (-1) )
-#else
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
-#endif
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
         p_input->b_error = 1;

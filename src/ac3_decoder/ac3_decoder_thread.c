@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.35 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.36 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -78,15 +78,17 @@ static void     BitstreamCallback       ( bit_stream_t *p_bit_stream,
 vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3thread;
+    ac3dec_thread_t *   p_ac3thread_temp;
 
     intf_DbgMsg( "ac3dec debug: creating ac3 decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
-    p_ac3thread = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t));
+    p_ac3thread_temp = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t) + 15);
 
     /* We need to be 16 bytes aligned */
-    p_ac3thread->ac3thread = (int)p_ac3thread & (-15);
-    p_ac3thread = (ac3dec_thread_t *)p_ac3thread->ac3thread;
+    p_ac3thread = (ac3dec_thread_t *)(((unsigned long)p_ac3thread_temp + 15)
+				      & ~0xFUL );
+    p_ac3thread->ac3thread = p_ac3thread_temp;
     
     if(p_ac3thread == NULL)
     {
@@ -110,7 +112,7 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     if( DOWNMIX.p_module == NULL )
     {
         intf_ErrMsg( "ac3dec error: no suitable downmix module" );
-        free( p_ac3thread );
+        free( p_ac3thread->ac3thread );
         return( 0 );
     }
 
@@ -135,7 +137,7 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     {
         intf_ErrMsg( "ac3dec error: no suitable IMDCT module" );
         module_Unneed( p_ac3thread->ac3_decoder.downmix.p_module );
-        free( p_ac3thread );
+        free( p_ac3thread->ac3thread );
         return( 0 );
     }
 
@@ -163,7 +165,7 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
         intf_ErrMsg( "ac3dec error: can't spawn ac3 decoder thread" );
         module_Unneed( p_ac3thread->ac3_decoder.downmix.p_module );
         module_Unneed( p_ac3thread->ac3_decoder.imdct.p_module );
-        free (p_ac3thread);
+        free (p_ac3thread->ac3thread);
         return 0;
     }
 
@@ -341,8 +343,7 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
 
     /* Destroy descriptor */
     free( p_ac3thread->p_config );
-    p_ac3thread = (ac3dec_thread_t *)p_ac3thread->ac3thread;
-    free( p_ac3thread );
+    free( p_ac3thread->ac3thread );
 
     intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread);
 }

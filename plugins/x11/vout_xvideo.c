@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.24 2001/08/03 16:04:17 gbazin Exp $
+ * $Id: vout_xvideo.c,v 1.25 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -287,34 +287,15 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    /* Spawn base window - this window will include the video output window,
-     * but also command buttons, subtitles and other indicators */
-    if( XVideoCreateWindow( p_vout ) )
-    {
-        intf_ErrMsg( "vout error: cannot create XVideo window" );
-        XCloseDisplay( p_vout->p_sys->p_display );
-        free( p_vout->p_sys );
-        return( 1 );
-    }
-
-    if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
+    /* Check we have access to a video port */
+    if( (p_vout->p_sys->xv_port = XVideoGetPort(p_vout->p_sys->p_display)) <0 )
     {
         intf_ErrMsg( "vout error: cannot get XVideo port" );
-        XVideoDestroyWindow( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return 1;
     }
     intf_DbgMsg( "Using xv port %d" , p_vout->p_sys->xv_port );
-
-    /* p_vout->pf_setbuffers( p_vout, NULL, NULL ); */
-
-#if 0
-    /* XXX The brightness and contrast values should be read from environment
-     * XXX variables... */
-    XVideoSetAttribute( p_vout, "XV_BRIGHTNESS", 0.5 );
-    XVideoSetAttribute( p_vout, "XV_CONTRAST",   0.5 );
-#endif
 
     /* Create blank cursor (for mouse cursor autohiding) */
     p_vout->p_sys->b_mouse_pointer_visible = 1;
@@ -340,6 +321,24 @@ static int vout_Create( vout_thread_t *p_vout )
                                       &cursor_color,
                                       &cursor_color, 1, 1 );    
 
+    /* Spawn base window - this window will include the video output window,
+     * but also command buttons, subtitles and other indicators */
+    if( XVideoCreateWindow( p_vout ) )
+    {
+        intf_ErrMsg( "vout error: cannot create XVideo window" );
+        XCloseDisplay( p_vout->p_sys->p_display );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
+
+    /* p_vout->pf_setbuffers( p_vout, NULL, NULL ); */
+
+#if 0
+    /* XXX The brightness and contrast values should be read from environment
+     * XXX variables... */
+    XVideoSetAttribute( p_vout, "XV_BRIGHTNESS", 0.5 );
+    XVideoSetAttribute( p_vout, "XV_CONTRAST",   0.5 );
+#endif
 
     /* Disable screen saver and return */
     XVideoDisableScreenSaver( p_vout );
@@ -550,7 +549,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         else if( xevent.type == MotionNotify )
         {
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
-	    if( !p_vout->p_sys->b_mouse_pointer_visible )
+            if( !p_vout->p_sys->b_mouse_pointer_visible )
                 X11ToggleMousePointer( p_vout ); 
         }
         /* Other event */
@@ -938,6 +937,13 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
     XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                   ExposureMask );
 
+    /* If the cursor was formerly blank than blank it again */
+    if( !p_vout->p_sys->b_mouse_pointer_visible )
+    {
+        X11ToggleMousePointer( p_vout );
+        X11ToggleMousePointer( p_vout );
+    }
+
     return( 0 );
 }
 
@@ -1089,13 +1095,13 @@ void X11ToggleMousePointer( vout_thread_t *p_vout )
     {
         XDefineCursor( p_vout->p_sys->p_display,
                        p_vout->p_sys->window,
-		       p_vout->p_sys->blank_cursor );
-	p_vout->p_sys->b_mouse_pointer_visible = 0;
+                       p_vout->p_sys->blank_cursor );
+        p_vout->p_sys->b_mouse_pointer_visible = 0;
     }
     else
     {
         XUndefineCursor( p_vout->p_sys->p_display, p_vout->p_sys->window );
-	p_vout->p_sys->b_mouse_pointer_visible = 1;
+        p_vout->p_sys->b_mouse_pointer_visible = 1;
     }
 }
 

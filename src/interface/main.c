@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.109 2001/07/30 00:53:05 sam Exp $
+ * $Id: main.c,v 1.110 2001/08/05 15:32:46 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -287,6 +287,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      */
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     system_Init( &i_argc, ppsz_argv, ppsz_env );
+#elif defined( WIN32 )
+    _fmode = _O_BINARY;   /* sets the default file-translation mode on Win32 */
 #endif
 
     /*
