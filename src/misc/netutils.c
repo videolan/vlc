@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.66 2002/05/30 13:22:43 asmax Exp $
+ * $Id: netutils.c,v 1.66.2.1 2002/06/02 01:22:04 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -159,20 +159,10 @@ int network_ChannelJoin( int i_channel )
 
     if( !config_GetIntVariable( "network-channel" ) )
     {
-        intf_ErrMsg( "network: channels disabled, to enable them, use the"
+        intf_ErrMsg( "network: channels disabled, to enable them, use the "
                      "--channels option" );
         return -1;
     }
-
-    /* If last change is too recent, wait a while */
-//    if( mdate() - p_main->p_channel->last_change < INPUT_CHANNEL_CHANGE_DELAY )
-//    {
-//        intf_WarnMsg( 2, "network: waiting before changing channel" );
-        /* XXX Isn't this completely brain-damaged ??? -- Sam */
-        /* Yes it is. I don't think this is still justified with the new
-         * vlanserver --Meuuh */
-//        mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
-//    }
 
     if( config_GetIntVariable( "ipv4" ) )
     {

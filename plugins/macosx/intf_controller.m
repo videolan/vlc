@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.4 2002/05/20 05:20:12 jlj Exp $
+ * $Id: intf_controller.m,v 1.4.2.1 2002/06/02 01:22:04 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -165,6 +165,16 @@
 - (IBAction)next:(id)sender
 {
     [o_intf playlistNext];
+}
+
+- (IBAction)prevChannel:(id)sender
+{
+    [o_intf channelPrev];
+}
+
+- (IBAction)nextChannel:(id)sender
+{
+    [o_intf channelNext];
 }
 
 - (IBAction)mute:(id)sender

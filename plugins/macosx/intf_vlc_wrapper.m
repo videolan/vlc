@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.6.2.2 2002/06/01 23:41:41 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.6.2.3 2002/06/02 01:22:04 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -200,6 +200,79 @@ static Intf_VLCWrapper *o_intf = nil;
         intf_PlaylistPrev( p_main->p_playlist );
         p_input_bank->pp_input[0]->b_eof = 1;
     }
+}
+
+- (void)channelNext
+{
+    intf_thread_t * p_intf = p_main->p_intf;
+
+    p_intf->p_sys->i_channel++;
+
+    intf_WarnMsg( 3, "intf info: joining channel %d", p_intf->p_sys->i_channel );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        /* end playing item */
+        p_input_bank->pp_input[0]->b_eof = 1;
+
+        /* update playlist */
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        p_main->p_playlist->i_index--;
+        p_main->p_playlist->b_stopped = 1;
+
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+
+        /* FIXME: ugly hack to close input and outputs */
+        p_intf->pf_manage( p_intf );
+    }
+
+    network_ChannelJoin( p_intf->p_sys->i_channel );
+
+    /* FIXME 2 */
+    p_main->p_playlist->b_stopped = 0;
+    p_intf->pf_manage( p_intf );
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+}
+
+- (void)channelPrev
+{
+    intf_thread_t * p_intf = p_main->p_intf;
+
+    if ( p_intf->p_sys->i_channel )
+    {
+        p_intf->p_sys->i_channel--;
+    }
+
+    intf_WarnMsg( 3, "intf info: joining channel %d", p_intf->p_sys->i_channel );
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        /* end playing item */
+        p_input_bank->pp_input[0]->b_eof = 1;
+
+        /* update playlist */
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        p_main->p_playlist->i_index--;
+        p_main->p_playlist->b_stopped = 1;
+
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+
+        /* FIXME: ugly hack to close input and outputs */
+        p_intf->pf_manage( p_intf );
+    }
+
+    network_ChannelJoin( p_intf->p_sys->i_channel );
+
+    /* FIXME 2 */
+    p_main->p_playlist->b_stopped = 0;
+    p_intf->pf_manage( p_intf );
+
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 - (void)playSlower
@@ -653,7 +726,7 @@ static Intf_VLCWrapper *o_intf = nil;
     NSMenu *o_main_menu;
     NSMenuItem *o_controls_item;
     NSMenuItem *o_program_item, *o_title_item, *o_chapter_item, *o_language_item,
-               *o_subtitle_item;
+               *o_subtitle_item, *o_next_channel_item, *o_prev_channel_item;
     input_thread_t * p_input = p_input_bank->pp_input[0];
 
     o_main_menu  = [NSApp mainMenu];
@@ -663,6 +736,8 @@ static Intf_VLCWrapper *o_intf = nil;
     o_chapter_item = [[o_controls_item submenu] itemWithTitle: @"Chapter"]; 
     o_language_item = [[o_controls_item submenu] itemWithTitle: @"Language"]; 
     o_subtitle_item = [[o_controls_item submenu] itemWithTitle: @"Subtitles"]; 
+    o_next_channel_item = [[o_controls_item submenu] itemWithTag: 2]; 
+    o_prev_channel_item = [[o_controls_item submenu] itemWithTag: 1]; 
 
     if( p_input == NULL )
     {
@@ -930,6 +1005,17 @@ static Intf_VLCWrapper *o_intf = nil;
             [o_subtitle_item setEnabled: 0];
         }
         p_input->stream.b_changed = 0;
+    }
+
+    if( config_GetIntVariable( "network-channel" ) )
+    {
+        [o_next_channel_item setEnabled: 1];
+        [o_prev_channel_item setEnabled: 1];
+    }
+    else
+    {
+        [o_next_channel_item setEnabled: 0];
+        [o_prev_channel_item setEnabled: 0];
     }
 }
 
