@@ -159,7 +159,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_open);
   gtk_container_add (GTK_CONTAINER (menubar_file_menu), menubar_open);
-  gtk_tooltips_set_tip (tooltips, menubar_open, _("Open a File"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_open, _("Open a file"), NULL);
   gtk_widget_add_accelerator (menubar_open, "activate", accel_group,
                               GDK_F3, 0,
                               GTK_ACCEL_VISIBLE);
@@ -189,7 +189,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (menubar_network);
   gtk_container_add (GTK_CONTAINER (menubar_file_menu), menubar_network);
-  gtk_tooltips_set_tip (tooltips, menubar_network, _("Select a Network Stream"), NULL);
+  gtk_tooltips_set_tip (tooltips, menubar_network, _("Select a network stream"), NULL);
   gtk_widget_add_accelerator (menubar_network, "activate", accel_group,
                               GDK_F5, 0,
                               GTK_ACCEL_VISIBLE);
@@ -496,7 +496,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("File"),
-                                _("Open a File"), NULL,
+                                _("Open a file"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_open);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_open", toolbar_open,
@@ -518,7 +518,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Net"),
-                                _("Select a Network Stream"), NULL,
+                                _("Select a network stream"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_network);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_network", toolbar_network,
@@ -636,7 +636,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Prev"),
-                                _("Previous File"), NULL,
+                                _("Previous file"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_prev);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_prev", toolbar_prev,
@@ -1179,7 +1179,7 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_file);
   gtk_container_add (GTK_CONTAINER (popup_open_menu), popup_file);
-  gtk_tooltips_set_tip (tooltips, popup_file, _("Open a File"), NULL);
+  gtk_tooltips_set_tip (tooltips, popup_file, _("Open a file"), NULL);
 
   popup_disc = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_disc)->child),
@@ -1203,7 +1203,7 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (popup_network);
   gtk_container_add (GTK_CONTAINER (popup_open_menu), popup_network);
-  gtk_tooltips_set_tip (tooltips, popup_network, _("Select a Network Stream"), NULL);
+  gtk_tooltips_set_tip (tooltips, popup_network, _("Select a network stream"), NULL);
 
   separator12 = gtk_menu_item_new ();
   gtk_widget_ref (separator12);

@@ -17,7 +17,7 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
 {
   {
     GNOME_APP_UI_ITEM, N_("_Open File..."),
-    N_("Open a File"),
+    N_("Open a file"),
     (gpointer) GtkFileOpenShow, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
     0, (GdkModifierType) 0, NULL
@@ -31,7 +31,7 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
   },
   {
     GNOME_APP_UI_ITEM, N_("_Network Stream..."),
-    N_("Select a Network Stream"),
+    N_("Select a network stream"),
     (gpointer) GtkNetworkOpenShow, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
     0, (GdkModifierType) 0, NULL
@@ -370,7 +370,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("File"),
-                                _("Open a File"), NULL,
+                                _("Open a file"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_file);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_file", toolbar_file,
@@ -394,7 +394,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Net"),
-                                _("Select a Network Stream"), NULL,
+                                _("Select a network stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_network);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_network", toolbar_network,
@@ -522,7 +522,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Prev"),
-                                _("Previous File"), NULL,
+                                _("Previous file"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_prev);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_prev", toolbar_prev,
@@ -808,7 +808,7 @@ static GnomeUIInfo popup_file_menu_uiinfo[] =
 {
   {
     GNOME_APP_UI_ITEM, N_("_Open File..."),
-    N_("Open a File"),
+    N_("Open a file"),
     (gpointer) GtkFileOpenShow, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
     0, (GdkModifierType) 0, NULL
@@ -822,7 +822,7 @@ static GnomeUIInfo popup_file_menu_uiinfo[] =
   },
   {
     GNOME_APP_UI_ITEM, N_("_Network Stream..."),
-    N_("Select a Network Stream"),
+    N_("Select a network stream"),
     (gpointer) GtkNetworkOpenShow, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
     0, (GdkModifierType) 0, NULL

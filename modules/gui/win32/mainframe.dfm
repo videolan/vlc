@@ -2452,17 +2452,17 @@ object MainFrameDlg: TMainFrameDlg
       object PopupOpenFile: TMenuItem
         Tag = 3
         Action = OpenFileAction
-        Caption = 'Open file...'
+        Caption = 'Open File...'
       end
       object PopupOpenDisc: TMenuItem
         Tag = 3
         Action = OpenDiscAction
-        Caption = 'Open disc...'
+        Caption = 'Open Disc...'
       end
       object PopupNetworkStream: TMenuItem
         Tag = 3
         Action = NetworkStreamAction
-        Caption = 'Network stream...'
+        Caption = 'Network Stream...'
       end
     end
     object N7: TMenuItem
@@ -2503,7 +2503,7 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Category = 'Menu'
       Caption = 'Net'
-      Hint = 'Open a network stream'
+      Hint = 'Select a network stream'
       ImageIndex = 2
       ShortCut = 116
       OnExecute = NetworkStreamActionExecute

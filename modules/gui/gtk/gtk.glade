@@ -78,7 +78,7 @@
 	    <widget>
 	      <class>GtkMenuItem</class>
 	      <name>menubar_open</name>
-	      <tooltip>Open a File</tooltip>
+	      <tooltip>Open a file</tooltip>
 	      <accelerator>
 		<modifiers>0</modifiers>
 		<key>GDK_F3</key>
@@ -114,7 +114,7 @@
 	    <widget>
 	      <class>GtkMenuItem</class>
 	      <name>menubar_network</name>
-	      <tooltip>Select a Network Stream</tooltip>
+	      <tooltip>Select a network stream</tooltip>
 	      <accelerator>
 		<modifiers>0</modifiers>
 		<key>GDK_F5</key>
@@ -410,7 +410,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_open</name>
-	  <tooltip>Open a File</tooltip>
+	  <tooltip>Open a file</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>GtkFileOpenShow</handler>
@@ -436,7 +436,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_network</name>
-	  <tooltip>Select a Network Stream</tooltip>
+	  <tooltip>Select a network stream</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>GtkNetworkOpenShow</handler>
@@ -575,7 +575,7 @@
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_prev</name>
-	  <tooltip>Previous File</tooltip>
+	  <tooltip>Previous file</tooltip>
 	  <signal>
 	    <name>clicked</name>
 	    <handler>GtkPlaylistPrev</handler>
@@ -1194,7 +1194,7 @@
       <widget>
 	<class>GtkMenuItem</class>
 	<name>popup_file</name>
-	<tooltip>Open a File</tooltip>
+	<tooltip>Open a file</tooltip>
 	<signal>
 	  <name>activate</name>
 	  <handler>GtkFileOpenShow</handler>
@@ -1220,7 +1220,7 @@
       <widget>
 	<class>GtkMenuItem</class>
 	<name>popup_network</name>
-	<tooltip>Select a Network Stream</tooltip>
+	<tooltip>Select a network stream</tooltip>
 	<signal>
 	  <name>activate</name>
 	  <handler>GtkNetworkOpenShow</handler>

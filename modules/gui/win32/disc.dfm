@@ -3,7 +3,7 @@ object DiscDlg: TDiscDlg
   Top = 320
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
-  Caption = 'Open disc'
+  Caption = 'Open Disc'
   ClientHeight = 138
   ClientWidth = 338
   Color = clBtnFace
