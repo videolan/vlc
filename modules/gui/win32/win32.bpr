@@ -26,7 +26,7 @@
     <USERDEFINES value="_DEBUG;WIN32;__VLC__;__PLUGIN__;MODULE_NAME_IS_win32"/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="win32.bpf"/>
-    <INCLUDEPATH value="F:\ProgInst\Borland\CBuilder5\Bin;..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\.."/>
+    <INCLUDEPATH value="F:\ProgInst\Borland\CBuilder5\Bin;..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\..;..\..\..\intl"/>
     <LIBPATH value="F:\ProgInst\Borland\CBuilder5\Bin;..\..\win32;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
   </MACROS>
