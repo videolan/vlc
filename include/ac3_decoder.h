@@ -325,22 +325,16 @@ typedef struct stream_samples_s
 typedef s16 ac3dec_frame_t[ AC3DEC_FRAME_SIZE ];
 
 /*****************************************************************************
- * ac3dec_thread_t : ac3 decoder thread descriptor
+ * ac3dec_t : ac3 decoder descriptor
  *****************************************************************************/
-typedef struct ac3dec_thread_s
+typedef struct ac3dec_s
 {
-    /*
-     * Thread properties
-     */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
     boolean_t           b_invalid;                         /* `invalid' flag */
 
     /*
      * Input properties
      */
-    decoder_fifo_t      fifo;                  /* stores the PES stream data */
+
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
 
@@ -356,16 +350,6 @@ typedef struct ac3dec_thread_s
     stream_coeffs_t     coeffs;
     stream_samples_t    samples;
 
-    /*
-     * Output properties
-     */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
+} ac3dec_t;
 
-} ac3dec_thread_t;
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-ac3dec_thread_t *       ac3dec_CreateThread( input_thread_t * p_input );
-void                    ac3dec_DestroyThread( ac3dec_thread_t * p_ac3dec );
+int ac3_audio_block (ac3dec_t * p_ac3dec, s16 * buffer);

@@ -202,7 +202,7 @@ static __inline__ s16 calc_lowcomp( s16 a, s16 b0, s16 b1, s16 bin )
 	return(a);
 }
 
-void bit_allocate( ac3dec_thread_t * p_ac3dec )
+void bit_allocate( ac3dec_t * p_ac3dec )
 {
 	u16 i;
 	s16 fgain;

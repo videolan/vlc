@@ -1,27 +1,13 @@
-#include <unistd.h>                                              /* getpid() */
-
 #include <math.h>
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/soundcard.h>                               /* "audio_output.h" */
-#include <sys/types.h>
 #include <sys/uio.h>                                            /* "input.h" */
 
 #include "common.h"
 #include "config.h"
-#include "mtime.h"
 #include "vlc_thread.h"
-#include "debug.h"                                      /* "input_netlist.h" */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
-
+#include "mtime.h"
+#include "input.h"
+#include "decoder_fifo.h"
 #include "audio_output.h"
-
 #include "ac3_decoder.h"
 #include "ac3_imdct.h"
 
@@ -185,7 +171,7 @@ void imdct_init(void)
 	}
 }
 
-void imdct( ac3dec_thread_t * p_ac3dec )
+void imdct( ac3dec_t * p_ac3dec )
 {
 	int i;
 

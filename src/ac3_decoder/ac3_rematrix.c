@@ -42,7 +42,7 @@ static __inline__ u32 min( u32 a, u32 b )
 
 /* This routine simply does stereo rematixing for the 2 channel
  * stereo mode */
-void rematrix( ac3dec_thread_t * p_ac3dec )
+void rematrix( ac3dec_t * p_ac3dec )
 {
 	u32 num_bands;
 	u32 start;

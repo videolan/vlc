@@ -1,1 +1,1 @@
-void downmix( ac3dec_thread_t *, s16 * );
+void downmix( ac3dec_t *, s16 * );

@@ -34,6 +34,7 @@
 #include "audio_output.h"
 #include "audio_decoder.h"
 #include "ac3_decoder.h"
+#include "ac3_decoder_thread.h"
 
 #include "video.h"
 #include "video_output.h"

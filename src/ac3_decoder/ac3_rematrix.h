@@ -1,1 +1,1 @@
-void rematrix( ac3dec_thread_t * );
+void rematrix( ac3dec_t * );

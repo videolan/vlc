@@ -1,1 +1,1 @@
-void mantissa_unpack( ac3dec_thread_t * );
+void mantissa_unpack( ac3dec_t * );

@@ -70,7 +70,7 @@ static struct frmsize_s frmsizecod_tbl[] = {
       { 640 ,{1280 ,1394 ,1920 } }};
 
 /* Parse a syncinfo structure, minus the sync word */
-void parse_syncinfo( ac3dec_thread_t * p_ac3dec )
+void parse_syncinfo( ac3dec_t * p_ac3dec )
 {
         /* Get crc1 - we don't actually use this data though */
 	NeedBits( &(p_ac3dec->bit_stream), 16 );
@@ -100,7 +100,7 @@ void parse_syncinfo( ac3dec_thread_t * p_ac3dec )
 /*
  * This routine fills a bsi struct from the AC3 stream
  */
-void parse_bsi( ac3dec_thread_t * p_ac3dec )
+void parse_bsi( ac3dec_t * p_ac3dec )
 {
 	u32 i;
 
@@ -336,7 +336,7 @@ void parse_bsi( ac3dec_thread_t * p_ac3dec )
 }
 
 /* More pain inducing parsing */
-void parse_audblk( ac3dec_thread_t * p_ac3dec )
+void parse_audblk( ac3dec_t * p_ac3dec )
 {
 	int i, j;
 
@@ -861,7 +861,7 @@ void parse_audblk( ac3dec_thread_t * p_ac3dec )
 	}
 }
 
-void parse_auxdata( ac3dec_thread_t * p_ac3dec )
+void parse_auxdata( ac3dec_t * p_ac3dec )
 {
 	int i;
 	int skip_length;

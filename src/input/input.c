@@ -48,6 +48,7 @@
 #include "video_parser.h"
 
 #include "ac3_decoder.h"
+#include "ac3_decoder_thread.h"
 #include "spu_decoder.h"
 
 #include "main.h"

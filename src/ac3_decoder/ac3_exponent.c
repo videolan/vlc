@@ -29,7 +29,7 @@ static const s16 exps_2[128] = { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, 0, 0, 0
 
 static const s16 exps_3[128] = { -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0 };
 
-static __inline__ void exp_unpack_ch( ac3dec_thread_t * p_ac3dec, u16 type, u16 expstr, u16 ngrps, u16 initial_exp, u16 exps[], u16 * dest )
+static __inline__ void exp_unpack_ch( ac3dec_t * p_ac3dec, u16 type, u16 expstr, u16 ngrps, u16 initial_exp, u16 exps[], u16 * dest )
 {
 	u16 i,j;
 	s16 exp_acc;
@@ -118,7 +118,7 @@ static __inline__ void exp_unpack_ch( ac3dec_thread_t * p_ac3dec, u16 type, u16 
 	}
 }
 
-void exponent_unpack( ac3dec_thread_t * p_ac3dec )
+void exponent_unpack( ac3dec_t * p_ac3dec )
 {
 	u16 i;
 

@@ -101,7 +101,7 @@ static float exp_lut[ 25 ] =
 };
 
 /* Fetch an unpacked, left justified, and properly biased/dithered mantissa value */
-static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp )
+static __inline__ float float_get( ac3dec_t * p_ac3dec, u16 bap, u16 exp )
 {
 	u32 group_code;
 
@@ -217,7 +217,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 	}
 }
 
-static __inline__ void uncouple_channel( ac3dec_thread_t * p_ac3dec, u32 ch )
+static __inline__ void uncouple_channel( ac3dec_t * p_ac3dec, u32 ch )
 {
 	u32 bnd = 0;
 	u32 i,j;
@@ -247,7 +247,7 @@ static __inline__ void uncouple_channel( ac3dec_thread_t * p_ac3dec, u32 ch )
 	}
 }
 
-void mantissa_unpack( ac3dec_thread_t * p_ac3dec )
+void mantissa_unpack( ac3dec_t * p_ac3dec )
 {
 	int i, j;
 

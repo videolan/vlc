@@ -201,7 +201,8 @@ video_output_obj = 		video_output/video_output.o \
 						video_output/video_text.o \
 						video_output/video_yuv.o
 
-ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
+ac3_decoder_obj =		ac3_decoder/ac3_decoder_thread.o \
+						ac3_decoder/ac3_decoder.o \
 						ac3_decoder/ac3_parse.o \
 						ac3_decoder/ac3_exponent.o \
 						ac3_decoder/ac3_bit_allocate.o \

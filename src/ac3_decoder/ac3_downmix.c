@@ -42,7 +42,7 @@ static float smixlev_lut[4] = { 0.2928, 0.2071, 0.0   , 0.2071 };
  * to reduce complexity. Realistically, there aren't many machines around
  * with > 2 channel output anyways */
 
-void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
+void downmix( ac3dec_t * p_ac3dec, s16 * out_buf )
 {
 	int j;
 	float right_tmp;
