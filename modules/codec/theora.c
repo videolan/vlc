@@ -380,6 +380,14 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     block_t *p_block = *pp_block;
     void *p_buf;
 
+    if( ( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY ) != 0 )
+    {
+        /* Don't send the the first packet after a discontinuity to
+         * theora_decode, otherwise we get purple/green display artifacts
+         * appearing in the video output */
+        return NULL;
+    }
+
     /* Date management */
     if( p_block->i_pts > 0 && p_block->i_pts != p_sys->i_pts )
     {
