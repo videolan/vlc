@@ -246,11 +246,13 @@ static void Run( intf_thread_t *p_intf )
             sendto( i_socket, p_data, 2 * sizeof(int64_t), 0,
                     (struct sockaddr *)&from, i_struct_size );
 
+#if 0
             msg_Dbg( p_intf, "Master clockref: "I64Fd" -> "I64Fd", from %s "
                      "(date: "I64Fd")", i_clockref, i_master_clockref,
                      from.ss_family == AF_INET
                      ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
                      : "non-IPv4", i_date );
+#endif
         }
         else
         {
@@ -308,10 +310,12 @@ static void Run( intf_thread_t *p_intf )
                     p_intf->p_sys->p_input->i_pts_delay -= i_drift;
             }
 
+#if 0
             msg_Dbg( p_intf, "Slave clockref: "I64Fd" -> "I64Fd" -> "I64Fd", "
                      "clock diff: "I64Fd" drift: "I64Fd,
                      i_clockref, i_master_clockref, 
                      i_client_clockref, i_diff_date, i_drift );
+#endif
 
             /* Wait a bit */
             msleep( INTF_IDLE_SLEEP );
