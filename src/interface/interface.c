@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.107 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: interface.c,v 1.108 2003/10/14 23:09:03 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -332,7 +332,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Try to create the interface */
     sprintf( psz_intf, "%s,none", newval.psz_string );
-    p_intf = intf_Create( p_this, psz_intf );
+    p_intf = intf_Create( p_this->p_vlc, psz_intf );
     free( psz_intf );
     if( p_intf == NULL )
     {
