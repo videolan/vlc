@@ -22,12 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
 #include "bezier.hpp"
 #include <math.h>
-#ifdef sun
-#   include "solaris_specific.h" // for lrintf
-#endif
 
+#ifndef HAVE_LRINTF
+#   define lrintf(a) (int)rint(a)
+#endif
 
 Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
                 const vector<float> &rOrdinates, Flag_t flag )
@@ -211,4 +212,3 @@ inline float Bezier::power( float x, int n ) const
     else
         return 1;
 }
-
