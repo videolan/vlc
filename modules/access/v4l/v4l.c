@@ -366,7 +366,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Create( p_demux, "v4l-brightness", VLC_VAR_INTEGER |
                                                         VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-brighness", &val );
+    var_Get( p_demux, "v4l-brightness", &val );
     p_sys->i_brightness     = val.i_int;
 
     var_Create( p_demux, "v4l-hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
