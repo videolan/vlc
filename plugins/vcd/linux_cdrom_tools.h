@@ -20,7 +20,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <linux/cdrom.h>
+#if defined(HAVE_BSD_DVD_STRUCT) || defined(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H) || defined(DVD_STRUCT_IN_DVD_H)
+#   include <dvd.h>
+#else
+#   include <linux/cdrom.h>
+#endif
+
 /* where the data start on a VCD sector */
 #define VCD_DATA_START 24
 /* size of the availablr data on a VCD sector */

@@ -686,6 +686,11 @@ then
   ])
 fi
 
+if test x$enable_vcd != xno -a "${SYS}" = "bsdi"
+then
+  BUILTINS="${BUILTINS} vcd"
+fi
+
 dnl
 dnl  dummy plugin
 dnl

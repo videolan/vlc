@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.151 2001/11/07 22:58:13 jlj Exp $
+ * $Id: input.c,v 1.152 2001/11/09 13:49:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -837,7 +837,7 @@ static void NetworkOpen( input_thread_t * p_input )
         }
         else
         {
-           psz_broadcast = NULL; 
+            psz_broadcast = NULL; 
         }
     }
 
@@ -913,10 +913,7 @@ static void NetworkOpen( input_thread_t * p_input )
     i_mc_group = sock.sin_addr.s_addr;
 
 #if defined( WIN32 )
-    if ( psz_broadcast != NULL )
-    {
-        sock.sin_addr.s_addr = INADDR_ANY;
-    }
+    sock.sin_addr.s_addr = INADDR_ANY;
     
 #define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
@@ -950,7 +947,6 @@ static void NetworkOpen( input_thread_t * p_input )
             return;
         }
     }
-#endif
     
     /* Build socket for remote connection */
     if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
@@ -975,6 +971,7 @@ static void NetworkOpen( input_thread_t * p_input )
             return;
         }
     }
+#endif
 
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
