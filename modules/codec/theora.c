@@ -212,7 +212,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.video.i_width = p_sys->ti.width;
         p_dec->fmt_out.video.i_height = p_sys->ti.height;
 
-        if( p_sys->ti.aspect_denominator )
+        if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
             p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
                 p_sys->ti.aspect_numerator / p_sys->ti.aspect_denominator;
         else
