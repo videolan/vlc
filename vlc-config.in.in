@@ -13,6 +13,12 @@ optim="@optim@"
 plugins="@PLUGINS@"
 builtins="@BUILTINS@"
 
+cppflags="${cppflags} -DDEBUG"
+cflags="${cflags} -g"
+cxxflags="${cxxflags} -g"
+objcflags="${objcflags} -g"
+ldflags="${objcflags} -g"
+
 cflags_tuning="@CFLAGS_TUNING@"
 cflags_optim="@CFLAGS_OPTIM@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"

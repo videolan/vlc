@@ -7,8 +7,8 @@ NULL =
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-SUBDIRS = intl . share po m4
-DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib autotools
+SUBDIRS = intl modules . share po m4
+DIST_SUBDIRS = $(SUBDIRS) src debian doc ipkg lib autotools
 
 EXTRA_DIST = \
 	HACKING \

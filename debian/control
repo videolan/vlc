@@ -156,9 +156,11 @@ Package: wxvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Provides: vlc-gui
-Description: wxWindows frontend for VLC
- This plugin adds a wxWindow interface to the VLC media player. To
- activate it, use the `--intf wxwin' flag or run the `wxvlc' program.
+Description: wxWindows and skins frontends for VLC
+ This plugin adds a wxWindow interface and a skinnable interface to the
+ VLC media player. To activate the wxWindow GUI, use the `--intf wxwin'
+ flag or run the `wxvlc' program. To activate the skinnable GUI, use the
+ `--intf skins' flag.
 
 Package: vlc-alsa
 Architecture: any

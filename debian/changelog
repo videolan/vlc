@@ -1,5 +1,6 @@
-vlc (0.6.0-1) unstable; urgency=low
+vlc (0.6.0+cvs-20030627-1) unstable; urgency=low
 
+  * New upstream release.
   * debian/rules:
     + Replaced $(DEB_BUILD_ARCH) with `dpkg-architecture -qDEB_BUILD_GNU_CPU`
       so that the rules can be called directly.

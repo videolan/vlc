@@ -25,6 +25,7 @@ aclocal.m4
 vlc-debug.*
 vlc-log.*
 vlc-config
+vlc-config.in
 vlc
 VLC.app
 vlc.exe
