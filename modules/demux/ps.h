@@ -188,12 +188,18 @@ static inline int ps_pkt_parse_system( block_t *p_pkt,
 {
     uint8_t *p = &p_pkt->p_buffer[6 + 3 + 1 + 1 + 1];
 
+    /* System header is not useable if it references private streams (0xBD)
+     * or 'all audio streams' (0xB8) or 'all video streams' (0xB9) */
     while( p < &p_pkt->p_buffer[p_pkt->i_buffer] )
     {
-        /* msg_Dbg( p_demux, "   SYSTEM_START_CODE: id=0x%x", p[0] ); */
-        if( p[0]  >= 0xc0 ) /* And != 0xbd */
+        int i_id = p[0];
+
+        /* fprintf( stderr, "   SYSTEM_START_CODEEE: id=0x%x\n", p[0] ); */
+        if( p[0] >= 0xBC || p[0] == 0xB8 || p[0] == 0xB9 ) p += 2;
+        p++;
+
+        if( p[0] >= 0xc0 )
         {
-            int i_id = p[0];
             int i_tk = PS_ID_TO_TK( i_id );
 
             if( !tk[i_tk].b_seen )
@@ -203,9 +209,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt,
                     tk[i_tk].b_seen = VLC_TRUE;
                 }
             }
-            p += 2;
         }
-        p++;
     }
     return VLC_SUCCESS;
 }
