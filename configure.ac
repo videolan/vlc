@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.181 2004/02/11 08:50:04 zorglub Exp $
+dnl $Id: configure.ac,v 1.182 2004/02/20 22:07:51 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -28,6 +28,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_CXX
+AC_PROG_CXXCPP
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
@@ -2530,7 +2531,6 @@ then
     AX_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs` ${LIBICONV}])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
       [AX_ADD_LDFLAGS([freetype],[-framework Carbon])])
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
   elif test "${enable_freetype}" =  "yes"
   then
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
