@@ -35,4 +35,14 @@ EXTRA_DIST += \
 	bitmaps/speaker.xpm \
 	bitmaps/shuffle.xpm \
 	bitmaps/repeat.xpm \
-	bitmaps/loop.xpm
+	bitmaps/loop.xpm \
+	bitmaps/type_afile.xpm \
+	bitmaps/type_card.xpm \
+	bitmaps/type_cdda.xpm \
+	bitmaps/type_directory.xpm \
+	bitmaps/type_disc.xpm \
+	bitmaps/type_net.xpm \
+	bitmaps/type_node.xpm \
+	bitmaps/type_playlist.xpm \
+	bitmaps/type_unknown.xpm \
+	bitmaps/type_vfile.xpm

@@ -164,7 +164,9 @@ BookmarkEditDialog::BookmarkEditDialog( intf_thread_t *_p_intf,
     sizer->Add( bytes_text, 0, wxEXPAND|wxRIGHT, 5);
 
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( new wxButton( this, wxID_OK, wxU(_("OK") ) ) );
+    wxButton *ok_button = new wxButton( this, wxID_OK, wxU(_("OK") ) );
+    ok_button->SetDefault();
+    button_sizer->Add( ok_button );
     button_sizer->Add( new wxButton( this, wxID_CANCEL, wxU(_("Cancel") ) ) );
 
     panel_sizer->Add( sizer, 0, wxEXPAND | wxTOP|wxBOTTOM, 5 );
