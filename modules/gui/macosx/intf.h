@@ -195,6 +195,7 @@ struct intf_sys_t
     IBOutlet id o_mi_fittoscreen;
     IBOutlet id o_mi_fullscreen;
     IBOutlet id o_mi_floatontop;
+    IBOutlet id o_mi_snapshot;
     IBOutlet id o_mi_videotrack;
     IBOutlet id o_mu_videotrack;
     IBOutlet id o_mi_screen;

@@ -36,6 +36,9 @@ static char *ppsz_language_text[] =
   N_("Norwegian"), N_("Polish"), N_("Brazilian"), N_("Russian"),
   N_("Swedish") };
 
+static char *ppsz_snap_formats[] =
+{ "png", "jpg" };
+
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
  * define its own configuration options.
@@ -255,6 +258,11 @@ static char *ppsz_align_descriptions[] =
 #define SNAP_PATH_TEXT N_("Video snapshot directory")
 #define SNAP_PATH_LONGTEXT N_( \
     "Allows you to specify the directory where the video snapshots will " \
+    "be stored.")
+
+#define SNAP_FORMAT_TEXT N_("Video snapshot format")
+#define SNAP_FORMAT_LONGTEXT N_( \
+    "Allows you to specify the image format in which the video snapshots will " \
     "be stored.")
 
 #define ASPECT_RATIO_TEXT N_("Source aspect ratio")
@@ -898,6 +906,9 @@ vlc_module_begin();
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, VLC_FALSE );
+    add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
+                   SNAP_FORMAT_LONGTEXT, VLC_FALSE );
+        change_string_list( ppsz_snap_formats, NULL, 0 );
 
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
@@ -1195,14 +1206,14 @@ vlc_module_begin();
 #   define KEY_VOL_UP             KEY_MODIFIER_COMMAND|KEY_UP
 #   define KEY_VOL_DOWN           KEY_MODIFIER_COMMAND|KEY_DOWN
 #   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'
-#   define KEY_SUBDELAY_UP        KEY_MODIFIER_COMMAND|'k'
-#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'j'
-#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_COMMAND|'h'
-#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_COMMAND|'g'
+#   define KEY_SUBDELAY_UP        KEY_MODIFIER_COMMAND|'j'
+#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'h'
+#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_COMMAND|'l'
+#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_COMMAND|'k'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
-#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|'s'
+#   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2

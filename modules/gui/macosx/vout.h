@@ -48,6 +48,7 @@
 - (void)toggleFloatOnTop;
 - (void)toggleFullscreen;
 - (BOOL)isFullscreen;
+- (void)snapshot;
 - (void)updateTitle;
 
 - (BOOL)windowShouldClose:(id)sender;

@@ -292,6 +292,10 @@
                     if( ![o_window isZoomed] )
                         [o_window performZoom:self];
                 }
+                else if( [o_title isEqualToString: _NS("Snapshot") ] )
+                {
+                    [o_window snapshot];
+                }
                 else
                 {
                     vlc_value_t val;
@@ -634,6 +638,7 @@
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
                 [[o_mi title] isEqualToString: _NS("Double Size")] ||
                 [[o_mi title] isEqualToString: _NS("Fit to Screen")] ||
+                [[o_mi title] isEqualToString: _NS("Snapshot")] ||
                 [[o_mi title] isEqualToString: _NS("Float on Top")] )
     {
         id o_window;

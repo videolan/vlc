@@ -175,6 +175,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "snapshot-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -259,7 +260,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     char *psz_filename;
     subpicture_t *p_subpic;
     picture_t *p_pif;
-    vlc_value_t val;
+    vlc_value_t val, format;
     int i_ret;
 
     var_Get( p_vout, "snapshot-path", &val );
@@ -268,20 +269,35 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         free( val.psz_string );
         val.psz_string = 0;
     }
+#ifdef SYS_DARWIN
+    if( !val.psz_string && p_vout->p_vlc->psz_homedir )
+    {
+        asprintf( &val.psz_string, "%s/Desktop",
+                  p_vout->p_vlc->psz_homedir );
+    }
+#else
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/" CONFIG_DIR,
                   p_vout->p_vlc->psz_homedir );
     }
+#endif
     if( !val.psz_string )
     {
         msg_Err( p_vout, "no directory specified for snapshots" );
         return VLC_EGENERIC;
     }
+    var_Get( p_vout, "snapshot-format", &format );
+    if( format.psz_string && !*format.psz_string )
+    {
+        free( format.psz_string );
+        format.psz_string = strdup( "png" );
+    }
 
-    asprintf( &psz_filename, "%s/vlcsnap-%u.png", val.psz_string,
-              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF );
+    asprintf( &psz_filename, "%s/vlcsnap-%u.%s", val.psz_string,
+              (unsigned int)(p_pic->date / 100000) & 0xFFFFFF, format.psz_string );
     free( val.psz_string );
+    free( format.psz_string );
 
     /* Save the snapshot */
     fmt_in.i_chroma = p_vout->render.i_chroma;

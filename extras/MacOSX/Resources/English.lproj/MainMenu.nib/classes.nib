@@ -197,6 +197,7 @@
                 "o_mi_services" = id; 
                 "o_mi_show_all" = id; 
                 "o_mi_slower" = id; 
+                "o_mi_snapshot" = id; 
                 "o_mi_stop" = id; 
                 "o_mi_subtitle" = id; 
                 "o_mi_title" = id; 

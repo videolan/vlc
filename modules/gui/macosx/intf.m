@@ -366,6 +366,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     i_key = config_GetInt( p_intf, "key-fullscreen" );
     [o_mi_fullscreen setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_fullscreen setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-snapshot" );
+    [o_mi_snapshot setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_snapshot setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
 
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
@@ -477,6 +480,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_fittoscreen setTitle: _NS("Fit to Screen")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_floatontop setTitle: _NS("Float on Top")];
+    [o_mi_snapshot setTitle: _NS("Snapshot")];
     [o_mi_videotrack setTitle: _NS("Video Track")];
     [o_mu_videotrack setTitle: _NS("Video Track")];
     [o_mi_screen setTitle: _NS("Video Device")];

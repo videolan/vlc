@@ -333,6 +333,11 @@
     return( p_vout->b_fullscreen );
 }
 
+- (void)snapshot
+{
+    vout_Control( p_vout, VOUT_SNAPSHOT );
+}
+
 - (BOOL)canBecomeKeyWindow
 {
     return YES;
