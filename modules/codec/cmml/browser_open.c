@@ -48,20 +48,24 @@ int browser_Open( const char *psz_url )
 #else
     /* Assume we're on a UNIX of some sort */
     char *psz_open_commandline;
+    int i_ret;
 
     /* Debian uses www-browser */
     psz_open_commandline = strdup( "www-browser" );
     xstrcat( psz_open_commandline, psz_url );
+    i_ret = system( psz_open_commandline );
 
-    if( system( psz_open_commandline ) != 0 )
+    if( i_ret == 0 )
     {
-        free( psz_open_commandline );
-
-        /* Try mozilla */
-        psz_open_commandline = strdup( "mozilla" );
-        xstrcat( psz_open_commandline, psz_url );
-        return system( psz_open_commandline );
+        return 0;
     }
+
+    free( psz_open_commandline );
+
+    /* Try mozilla */
+    psz_open_commandline = strdup( "mozilla" );
+    xstrcat( psz_open_commandline, psz_url );
+    return system( psz_open_commandline );
 #endif
 }
 
