@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.36 2003/12/05 14:58:03 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.37 2003/12/07 12:11:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -233,6 +233,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_dec->fmt_in.video.i_aspect )
             {
                 p_sys->i_aspect = p_dec->fmt_in.video.i_aspect;
+                if( p_sys->i_aspect <= AR_221_1_PICTURE )
                 switch( p_sys->i_aspect )
                 {
                 case AR_3_4_PICTURE:
@@ -245,7 +246,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     p_sys->i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
                     break;
                 case AR_SQUARE_PICTURE:
-                default:
                     p_sys->i_aspect = VOUT_ASPECT_FACTOR *
                                    p_sys->p_info->sequence->width /
                                    p_sys->p_info->sequence->height;

@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.24 2003/12/06 23:25:23 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.25 2003/12/07 12:11:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -512,12 +512,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                     p_frag->p_buffer[9]&0x80 ? VLC_TRUE : VLC_FALSE;
             }
 
-#if 0
             p_dec->fmt_out.video.i_aspect =
                 mpeg2_aspect[p_sys->i_aspect_ratio_info][0] *
                 VOUT_ASPECT_FACTOR /
                 mpeg2_aspect[p_sys->i_aspect_ratio_info][1];
-#endif
 
         }
         else if( i_type == 0x08 )

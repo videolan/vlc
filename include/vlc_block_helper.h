@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.6 2003/12/06 23:25:23 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.7 2003/12/07 12:11:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -501,6 +501,7 @@ static inline int block_FindStartcodeFromOffset(
         *pi_offset += i_offset;
     }
 
+    *pi_offset -= i_match;
     return VLC_EGENERIC;
 }
 

@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.18 2003/12/04 23:15:01 gbazin Exp $
+ * $Id: encoder.c,v 1.19 2003/12/07 12:11:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -183,8 +183,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
 #if LIBAVCODEC_BUILD >= 4687
         p_context->sample_aspect_ratio =
-            av_d2q( p_enc->fmt_in.video.i_aspect * p_context->height /
-                    p_context->width / VOUT_ASPECT_FACTOR, 255 );
+            (AVRational){ p_enc->fmt_in.video.i_aspect *
+                          (int64_t)p_context->height / p_context->width,
+                          VOUT_ASPECT_FACTOR };
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;
