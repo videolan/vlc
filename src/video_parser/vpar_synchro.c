@@ -67,7 +67,7 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 mtime_t vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
-
+    return mdate() + 500000;
 }
 
 /*****************************************************************************

@@ -668,11 +668,17 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( !p_vpar->picture.i_current_structure )
     {
         /* This is a new frame. Get a structure from the video_output. */
-        P_picture = vout_CreatePicture( p_vpar->p_vout,
+        if( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
                                         99+p_vpar->sequence.i_chroma_format, /*???*/
                                         p_vpar->sequence.i_width,
                                         p_vpar->sequence.i_height,
-                                        p_vpar->sequence.i_width*sizeof(yuv_data_t) );
+                                        p_vpar->sequence.i_width*sizeof(yuv_data_t) ) )
+             == NULL )
+        {
+            intf_ErrMsg("vpar debug: allocation error in vout_CreatePicture\n");
+            p_vpar->b_error = 1;
+            return;
+        }
 
         /* Initialize values. */
         P_picture->date = vpar_SynchroDecode( p_vpar,
@@ -757,14 +763,18 @@ fprintf(stderr, "Image parsee\n");
 
         /* Link referenced pictures for the decoder 
          * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
+#if 0
         if( p_vpar->sequence.p_forward != NULL )
         {
-	        vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         }
         if( p_vpar->sequence.p_backward != NULL )
         {
             vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
         } 
+#endif
+        /* Send signal to the video_decoder. */
+        vlc_cond_signal( &p_vpar->vfifo.wait );
         
         /* Prepare context for the next picture. */
         P_picture = NULL;

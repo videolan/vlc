@@ -186,7 +186,7 @@ static void RunThread( vdec_thread_t *p_vdec )
         return;
     }
     p_vdec->b_run = 1;
-p_vdec->b_error = 1;
+
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
@@ -230,9 +230,6 @@ static void ErrorThread( vdec_thread_t *p_vdec )
     {
         p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo );
         vpar_DestroyMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-
-        /* Sleep a while */
-        msleep( VDEC_IDLE_SLEEP );                
     }
 }
 

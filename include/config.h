@@ -293,10 +293,10 @@
 /* Number of macroblock buffers available. It should be always greater than
  * twice the number of macroblocks in a picture. VFIFO_SIZE + 1 should also
  * be a power of two. */
-#define VFIFO_SIZE                      4095
+#define VFIFO_SIZE                      8191
 
 /* Maximum number of macroblocks in a picture. */
-#define MAX_MB                          32767
+#define MAX_MB                          2048
 
 /*******************************************************************************
  * Video decoder configuration
