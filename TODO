@@ -7,95 +7,202 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
-Task: 0x00
-Difficulty: Medium
-Urgency: Wishlist
-Description: Splash screen
- The vlc needs a splash screen with a vlc logo, instead of
- the "waiting for stream" message.
-Status: Todo
-
-Task: 0x01
-Difficulty: Hard
-Urgency: Wishlist
-Description: MGA YUV
- The Matrox acceleration for the vlc does not work yet,
- though there are initialization routines in the code.
-Status: Todo
-
-Task: 0x02
+Task: 0x21
 Difficulty: Medium
 Urgency: Normal
-Description: Better Gnome interface
- The Gnome interface has many stubs and is actually rather
- unfunctional. Someone should make the buttons work when
- the appropriate hooks exist.
+Description: Implement pause
+ There is no real `pause' command yet. Pausing just stops
+ displaying and sound playback, but the streams continues to
+ be decoded. One will have to do a file implementation as
+ well as a network implementation.
 Status: Todo
 
-Task: 0x03
+Task: 0x20
 Difficulty: Hard
 Urgency: Important
-Description: Playlist API
- Currently only files given in the command line are played,
- one after the other. We need a smarter way to handle this,
- through AddFile(), MoveFile(), etc. functions. input_file
- has to be modified to support this as well.
+Description: Rewrite input for Program Stream files
+ Currently when we read a PS file, it is first translated to TS
+ because we first had only PS support. Now time has come to get
+ rid of this ugly kludge and integrate a proper PS input.
 Status: Todo
 
-Task: 0x04
-Difficulty: Medium
+Task: 0x1f
+Difficulty: Hard
 Urgency: Normal
-Description: Get rid of vlc.channels
- The file vlc.channels should be removed and information
- found in it put either into ~/.vlcrc or in another rc
- file. Note that this file can be modified by the vlc.
+Description: DeCSS and DVD ioctls
+ The vlc needs the DVD ioctls support as well as the integration
+ of DeCSS to play DVDs properly. The person doing this should
+ probably not live in a country where DeCSS has been ruled illegal.
 Status: Todo
 
-Task: 0x05
-Difficulty: Easy
-Urgency: Important
-Description: vlms backport
- The vlc uses the same file input code as the vlms (VideoLAN
- Mini Server) which has been much improved. Someone should
- port modifications done to the vlms back to the vlc.
+Task: 0x1e
+Difficulty: Hard
+Urgency: Wishlist
+Description: ASCII-art output
+ For the ones who don't know how to waste their time, they can
+ try to do an ASCII-art output plugin.
 Status: Todo
 
-Task: 0x06
+Task: 0x1d
+Difficulty: Hard
+Urgency: Normal
+Description: LPCM decoder
+ The LPCM decoder is full of stubs, it only parses the stream
+ but does not decode it. Fix this.
+Status: Todo
+
+Task: 0x1c
 Difficulty: Guru
 Urgency: Important
-Description: Optimize video parser
- The video parser has some speed issues currently unexplained:
- even though most functions are inlined, it keeps eating more
- CPU than it should. This has to be investigated.
+Description: Fix field pictures support
+ Some MPEG2 streams are interleaved, and the vlc does not support
+ this very well. Adding support for them requires an excellent
+ knowledge of the MPEG2 papers.
 Status: Todo
 
-Task: 0x07
+Task: 0x1b
 Difficulty: Hard
-Urgency: Critical
-Description: Fix VDEC_SMP segfaults
- When compiled to support SMP, the vlc segfaults. The synchro
- code lacks locks, but there might be bugs elsewhere as well.
+Urgency: Wishlist
+Description: modularize decoder
+ Make the decoder a plugin, so that two versions can coexist
+ without recompilation (MMX and non-MMX).
 Status: Todo
 
-Task: 0x08
-Difficulty: Easy
-Urgency: Important
-Description: Get rid of floating instructions
- Mixing floating instructions and MMX is seldom a good idea,
- it might be interesting to remove all floating instructions
- in a single thread. The audio decoders are of course not
- concerned by this task.
-Status: Todo
-
-Task: 0x09
+Task: 0x1a
 Difficulty: Easy
 Urgency: Normal
-Description: Get rid of dumb vlc aliases
- When compiling the vlc, some symlinks to the main app
- are created, such as gvlc, ggivlc, etc. Actually this
- might confuse the user, so they should be removed,
- except perhaps gvlc and fbvlc which follow a usual
- naming scheme.
+Description: Make interface more responsive
+Status: Todo
+ When in "waiting for stream" mode, the interface is refreshed
+ every 5 seconds. This is too long, and can be confusing for
+ the user. Make it refresh at least after a keyboard/mouse event.
+Status: Todo
+
+Task: 0x19
+Difficulty: Hard
+Urgency: Normal
+Description: Support MP1 and MP3
+ The vlc does not support all MPEG1 audio formats yet, nor
+ does it support MPEG1/2 layer 3.
+
+Task: 0x18
+Difficulty: Guru
+Urgency: Wishlist
+Description: Split interface/video_output
+ The interface and the vout modules are too dependant, which
+ makes it impossible to run the Glide output with the Gnome
+ interface for instance. This will require a major rewrite of
+ the interface, and a solid knowledge of how the vlc internals
+ work.
+Status: Todo
+
+Task: 0x17
+Difficulty: Hard
+Urgency: Normal
+Description: Add 24bpp YUV
+ There is no 24bpp support yet. Add it, either in MMX
+ or in C.
+Status: Todo
+
+Task: 0x16
+Difficulty: Medium
+Urgency: Important
+Description: Fix 8bpp YUV
+ The 8bpp YUV function is broken, there is some serious
+ alpha blending, and it scales pretty badly. Fix it.
+Status: Todo
+
+Task: 0x15
+Difficulty: Medium
+Urgency: Critical
+Description: Fix input_file exit
+ input_file does not exit cleanly when the file is finished,
+ which makes it impossible to quit the vlc. Fix it.
+Status: Todo
+
+Task: 0x14
+Difficulty: Guru
+Urgency: Wishlist
+Description: Debug MPEG1 video
+ The MPEG1 support has been done, but it still crashes.
+Status: Todo
+
+Task: 0x13
+Difficulty: Hard
+Urgency: Wishlist
+Description: Support MPEG1 timecodes
+ The vlc can parse an MPEG1 system stream, but the parsed
+ PCR values do not seem to be correct. Check what's wrong.
+Status: Todo
+
+Task: 0x12
+Difficulty: Medium
+Urgency: Important
+Description: Fix 32bpp MMX YUV
+ The MMX 32bpp YUV function is buggy.
+Status: Todo
+
+Task: 0x11
+Difficulty: Hard
+Urgency: Normal
+Description: Optimize YUV scaling
+ The YUV scaling method does not seem very efficient. Perhaps
+ some CPU cycles can be gained by saving some buffers.
+Status: Todo
+
+Task: 0x10
+Difficulty: Easy
+Urgency: Normal
+Description: vlc icon
+ The vlc needs an icon. It should render well in 48x48 but
+ can be any size.
+Status: Todo
+
+Task: 0x0f
+Difficulty: Easy
+Urgency: Normal
+Description: Better black&white support
+ When in B&W mode, the chroma part of pictures is decoded,
+ but it would be more efficient not to decode at all when
+ the video decoder knows it does not need to.
+Status: Todo
+
+Task: 0x0e
+Difficulty: Easy
+Urgency: Wishlist
+Description: Rename channel names
+ Channels should start from 1 (not 0) like on a VCR or TV,
+ and Channel 0 should be renamed to "Playlist" or similar.
+Status: Todo
+
+Task: 0x0d
+Difficulty: Medium
+Urgency: Important
+Description: Framebuffer exit bug
+ When the vlc abnormally exits in framebuffer mode, it leaves
+ the console in an unusable state. This does not happen on
+ the Matrox framebuffer, but it does on the VESA one.
+Status: Todo
+
+Task: 0x0c
+Difficulty: Hard
+Urgency: Critical
+Description: Fix synchro
+ The synchronization algorithm sucks a bit. While it is
+ quite efficient on frameskipping on slow machines, it
+ is not smart enough on fast machines and does not detect
+ when it has enough time for a frame. Perhaps a better
+ handling of the dates might help.
+Status: Todo
+
+Task: 0x0b
+Difficulty: Medium
+Urgency: Important
+Description: Allow to force synchro
+ Add a --force-synchro option to bypass the auto-adaptative
+ algorithm present in the vlc. Options should allow displaying
+ only I frames, only I and P, or all frames, or some more
+ fancy stuff such as half the Bs.
 Status: Done 8 Aug 2000 (sam)
 
 Task: 0x0a
@@ -110,201 +217,95 @@ Description: Do separate packages
  core package.
 Status: Todo
 
-Task: 0x0b
-Difficulty: Medium
-Urgency: Important
-Description: Allow to force synchro
- Add a --force-synchro option to bypass the auto-adaptative
- algorithm present in the vlc. Options should allow displaying
- only I frames, only I and P, or all frames, or some more
- fancy stuff such as half the Bs.
+Task: 0x09
+Difficulty: Easy
+Urgency: Normal
+Description: Get rid of dumb vlc aliases
+ When compiling the vlc, some symlinks to the main app
+ are created, such as gvlc, ggivlc, etc. Actually this
+ might confuse the user, so they should be removed,
+ except perhaps gvlc and fbvlc which follow a usual
+ naming scheme.
 Status: Done 8 Aug 2000 (sam)
 
-Task: 0x0c
+Task: 0x08
+Difficulty: Easy
+Urgency: Important
+Description: Get rid of floating instructions
+ Mixing floating instructions and MMX is seldom a good idea,
+ it might be interesting to remove all floating instructions
+ in a single thread. The audio decoders are of course not
+ concerned by this task.
+Status: Todo
+
+Task: 0x07
 Difficulty: Hard
 Urgency: Critical
-Description: Fix synchro
- The synchronization algorithm sucks a bit. While it is
- quite efficient on frameskipping on slow machines, it
- is not smart enough on fast machines and does not detect
- when it has enough time for a frame. Perhaps a better
- handling of the dates might help.
+Description: Fix VDEC_SMP segfaults
+ When compiled to support SMP, the vlc segfaults. The synchro
+ code lacks locks, but there might be bugs elsewhere as well.
 Status: Todo
 
-Task: 0x0d
-Difficulty: Medium
-Urgency: Important
-Description: Framebuffer exit bug
- When the vlc abnormally exits in framebuffer mode, it leaves
- the console in an unusable state. This does not happen on
- the Matrox framebuffer, but it does on the VESA one.
-Status: Todo
-
-Task: 0x0e
-Difficulty: Easy
-Urgency: Wishlist
-Description: Rename channel names
- Channels should start from 1 (not 0) like on a VCR or TV,
- and Channel 0 should be renamed to "Playlist" or similar.
-Status: Todo
-
-Task: 0x0f
-Difficulty: Easy
-Urgency: Normal
-Description: Better black&white support
- When in B&W mode, the chroma part of pictures is decoded,
- but it would be more efficient not to decode at all when
- the video decoder knows it does not need to.
-Status: Todo
-
-Task: 0x10
-Difficulty: Easy
-Urgency: Normal
-Description: vlc icon
- The vlc needs an icon. It should render well in 48x48 but
- can be any size.
-Status: Todo
-
-Task: 0x11
-Difficulty: Hard
-Urgency: Normal
-Description: Optimize YUV scaling
- The YUV scaling method does not seem very efficient. Perhaps
- some CPU cycles can be gained by saving some buffers.
-Status: Todo
-
-Task: 0x12
-Difficulty: Medium
-Urgency: Important
-Description: Fix 32bpp MMX YUV
- The MMX 32bpp YUV function is buggy.
-Status: Todo
-
-Task: 0x13
-Difficulty: Hard
-Urgency: Wishlist
-Description: Support MPEG1 timecodes
- The vlc can parse an MPEG1 system stream, but the parsed
- PCR values do not seem to be correct. Check what's wrong.
-Status: Todo
-
-Task: 0x14
-Difficulty: Guru
-Urgency: Wishlist
-Description: Debug MPEG1 video
- The MPEG1 support has been done, but it still crashes.
-Status: Todo
-
-Task: 0x15
-Difficulty: Medium
-Urgency: Critical
-Description: Fix input_file exit
- input_file does not exit cleanly when the file is finished,
- which makes it impossible to quit the vlc. Fix it.
-Status: Todo
-
-Task: 0x16
-Difficulty: Medium
-Urgency: Important
-Description: Fix 8bpp YUV
- The 8bpp YUV function is broken, there is some serious
- alpha blending, and it scales pretty badly. Fix it.
-Status: Todo
-
-Task: 0x17
-Difficulty: Hard
-Urgency: Normal
-Description: Add 24bpp YUV
- There is no 24bpp support yet. Add it, either in MMX
- or in C.
-Status: Todo
-
-Task: 0x18
-Difficulty: Guru
-Urgency: Wishlist
-Description: Split interface/video_output
- The interface and the vout modules are too dependant, which
- makes it impossible to run the Glide output with the Gnome
- interface for instance. This will require a major rewrite of
- the interface, and a solid knowledge of how the vlc internals
- work.
-Status: Todo
-
-Task: 0x19
-Difficulty: Hard
-Urgency: Normal
-Description: Support MP1 and MP3
- The vlc does not support all MPEG1 audio formats yet, nor
- does it support MPEG1/2 layer 3.
- 
-Task: 0x1a
-Difficulty: Easy
-Urgency: Normal
-Description: Make interface more responsive
-Status: Todo
- When in "waiting for stream" mode, the interface is refreshed
- every 5 seconds. This is too long, and can be confusing for
- the user. Make it refresh at least after a keyboard/mouse event.
-Status: Todo
-
-Task: 0x1b
-Difficulty: Hard
-Urgency: Wishlist
-Description: modularize decoder
- Make the decoder a plugin, so that two versions can coexist
- without recompilation (MMX and non-MMX).
-Status: Todo
-
-Task: 0x1c
+Task: 0x06
 Difficulty: Guru
 Urgency: Important
-Description: Fix field pictures support
- Some MPEG2 streams are interleaved, and the vlc does not support
- this very well. Adding support for them requires an excellent
- knowledge of the MPEG2 papers.
+Description: Optimize video parser
+ The video parser has some speed issues currently unexplained:
+ even though most functions are inlined, it keeps eating more
+ CPU than it should. This has to be investigated.
 Status: Todo
 
-Task: 0x1d
-Difficulty: Hard
-Urgency: Normal
-Description: LPCM decoder
- The LPCM decoder is full of stubs, it only parses the stream
- but does not decode it. Fix this.
-Status: Todo
-
-Task: 0x1e
-Difficulty: Hard
-Urgency: Wishlist
-Description: ASCII-art output
- For the ones who don't know how to waste their time, they can
- try to do an ASCII-art output plugin.
-Status: Todo
-
-Task: 0x1f
-Difficulty: Hard
-Urgency: Normal
-Description: DeCSS and DVD ioctls
- The vlc needs the DVD ioctls support as well as the integration
- of DeCSS to play DVDs properly. The person doing this should
- probably not live in a country where DeCSS has been ruled illegal.
-Status: Todo
-
-Task: 0x20
-Difficulty: Hard
+Task: 0x05
+Difficulty: Easy
 Urgency: Important
-Description: Rewrite input for Program Stream files
- Currently when we read a PS file, it is first translated to TS
- because we first had only PS support. Now time has come to get
- rid of this ugly kludge and integrate a proper PS input.
+Description: vlms backport
+ The vlc uses the same file input code as the vlms (VideoLAN
+ Mini Server) which has been much improved. Someone should
+ port modifications done to the vlms back to the vlc.
 Status: Todo
 
-Task: 0x21
+Task: 0x04
 Difficulty: Medium
 Urgency: Normal
-Description: Implement pause
- There is no real `pause' command yet. Pausing just stops
- displaying and sound playback, but the streams continues to
- be decoded. One will have to do a file implementation as
- well as a network implementation.
+Description: Get rid of vlc.channels
+ The file vlc.channels should be removed and information
+ found in it put either into ~/.vlcrc or in another rc
+ file. Note that this file can be modified by the vlc.
 Status: Todo
+
+Task: 0x03
+Difficulty: Hard
+Urgency: Important
+Description: Playlist API
+ Currently only files given in the command line are played,
+ one after the other. We need a smarter way to handle this,
+ through AddFile(), MoveFile(), etc. functions. input_file
+ has to be modified to support this as well.
+Status: Todo
+
+Task: 0x02
+Difficulty: Medium
+Urgency: Normal
+Description: Better Gnome interface
+ The Gnome interface has many stubs and is actually rather
+ unfunctional. Someone should make the buttons work when
+ the appropriate hooks exist.
+Status: Todo
+
+Task: 0x01
+Difficulty: Hard
+Urgency: Wishlist
+Description: MGA YUV
+ The Matrox acceleration for the vlc does not work yet,
+ though there are initialization routines in the code.
+Status: Todo
+
+Task: 0x00
+Difficulty: Medium
+Urgency: Wishlist
+Description: Splash screen
+ The vlc needs a splash screen with a vlc logo, instead of
+ the "waiting for stream" message.
+Status: Todo
+
 
