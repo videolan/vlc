@@ -1,6 +1,10 @@
-/*
- *-------------------------------------------------------------------------
- *cxm12161 -- This function performs YUV12-to-RGB16 color conversion for H26x.
+/*******************************************************************************
+ * yuv_mmx.S: YUV transformation, optimized for MMX processors
+ * (c)1999 VideoLAN
+ *******************************************************************************
+ * Following functions are defined:     
+ * vout_YUV420_16_MMX
+ *            This function performs YUV12-to-RGB16 color conversion for H26x.
  *            It handles any format in which there are three fields, the low
  *            order field being B and fully contained in the low order byte, the
  *            second field being G and being somewhere in bits 4 through 11,
@@ -15,7 +19,7 @@
  *            Height may be any amount, but must be a multiple of two.  The U
  *            and V planes may have a different pitch than the Y plane, subject
  *            to the same limitations.
- */
+ *******************************************************************************/
 
 //.include iammx.inc
 //.include locals.inc
@@ -85,9 +89,8 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
 #define GUpperLimit      140
 #define BUpperLimit      148
 
-
 /*
- * extern void C MMX_YUV12ToRGB16 (
+ * extern void C vout_YUV420_16_MMX (
  *                                     U8* YPlane,
  *                                     U8* UPlane,
  *                                     U8* VPlane,
@@ -113,8 +116,8 @@ sixbitu:            .quad 0xc0c0c0c0c0c0c0c0
  *    RGB655 = 3
  */
 
-.globl yuv_2_rgb
-yuv_2_rgb: 
+.globl vout_YUV420_16_MMX
+vout_YUV420_16_MMX: 
   pushl      %esi
   pushl      %edi
 

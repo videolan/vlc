@@ -177,7 +177,11 @@ vout_thread_t * vout_CreateThread               (
 
     /* Initialize some fields used by the system-dependant method - these fields will
      * probably be modified by the method */
+#ifdef DEBUG
+    p_vout->b_info              = 1;    
+#else
     p_vout->b_info              = 0;    
+#endif
     p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, 
                                                        VOUT_GRAYSCALE_DEFAULT );
     p_vout->i_width             = i_width;

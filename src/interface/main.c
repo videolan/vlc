@@ -388,7 +388,7 @@ static void Usage( void )
 	     );
 
     /* Options */
-    intf_Msg("Options:" \
+    intf_Msg("Options:\n" \
              "  -h, --help                      print usage\n" \
              "  -g, --grayscale                 grayscale video\n" \
              "  --noaudio                       disable audio\n" \
@@ -396,7 +396,7 @@ static void Usage( void )
              "  --mono                          disable stereo\n"
              "  --novideo                       disable video\n" \
              "  --color                         color video\n" \
-             "  --novlans      	                disable vlans\n" \
+             "  --novlans                       disable vlans\n" \
              );
 
     /* Interface parameters */
@@ -408,7 +408,7 @@ static void Usage( void )
     intf_Msg("Audio parameters:\n" \
              "  " AOUT_DSP_VAR "=<filename>              dsp device path\n" \
              "  " AOUT_STEREO_VAR "={1|0}                stereo or mono output\n" \
-             "  " AOUT_RATE_VAR "=<rate>                 output rate\n" \
+             "  " AOUT_RATE_VAR "=<rate>           output rate\n" \
 	     );
 
     /* Video parameters */
