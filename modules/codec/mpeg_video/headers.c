@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.7 2003/01/15 13:16:39 sam Exp $
+ * $Id: headers.c,v 1.8 2003/01/30 00:39:41 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -1098,7 +1098,8 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
                                             p_vpar->picture.b_top_field_first
                            : ( p_vpar->picture.b_frame_structure + 1 ) +
                              p_vpar->picture.b_repeat_first_field;
-    for( i_dummy = 0; i_dummy < i_nb; i_dummy++ )
+    for( i_dummy = 0; i_dummy < i_nb && !p_vpar->p_fifo->b_die
+                       && !p_vpar->p_fifo->b_error; i_dummy++ )
     {
         RemoveBits( &p_vpar->bit_stream, 17 );
         RemoveBits( &p_vpar->bit_stream, 17 );

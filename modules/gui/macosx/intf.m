@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.38 2003/01/29 11:34:11 jlj Exp $
+ * $Id: intf.m,v 1.39 2003/01/30 00:39:41 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -318,6 +318,8 @@ static void Run( intf_thread_t *p_intf )
     NSDate * o_sleep_date;
     intf_thread_t * p_intf = [NSApp getIntf];
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
     while( !p_intf->b_die )
     {
