@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: caca.c,v 1.7 2004/01/12 16:16:41 gbazin Exp $
+ * $Id: caca.c,v 1.8 2004/01/18 04:55:19 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -129,7 +129,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    SetConsoleTitle( VOUT_TITLE " - Colour AsCii Art (caca)" );
 #endif
 
     /* Allocate structure */
@@ -146,6 +145,8 @@ static int Create( vlc_object_t *p_this )
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
+
+    caca_set_window_title( VOUT_TITLE " - Colour AsCii Art (caca)" );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -260,8 +261,15 @@ static int Manage( vout_thread_t *p_vout )
     int event;
     vlc_value_t val;
 
-    while(( event = caca_get_event(CACA_EVENT_KEY_PRESS) ))
+    while(( event = caca_get_event(CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE) ))
     {
+        if( event == CACA_EVENT_RESIZE )
+        {
+            /* Acknowledge the resize */
+            caca_refresh();
+            continue;
+        }
+
         switch( event & 0x00ffffff )
         {
         case 'q':
