@@ -307,6 +307,15 @@ C: richards
 D: BeOS video output (BBitmap and Overlay)
 S: United Kingdom
 
+N: Clément Stenac
+E: zorglub@videolan.org
+C: zorglub
+D: Playlist core and demuxers, SAP parser
+D: wxWidgets and joystick interfaces
+D: Announce system
+D: visualisation, volume normalizer
+S: France
+
 N: Peter Surda
 E: shurdeek@panorama.sth.ac.at
 D: rc plugin for VLC control through /dev/stdin
