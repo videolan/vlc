@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.42 2003/11/16 21:07:30 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -166,6 +166,9 @@ struct aout_input_t
 
     /* Mixer information */
     byte_t *                p_first_byte_to_mix;
+
+    /* If b_restart == 1, the input pipeline will be re-created. */
+    vlc_bool_t              b_restart;
 
     /* If b_error == 1, there is no input pipeline. */
     vlc_bool_t              b_error;

@@ -272,7 +272,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Allocate in the heap, it is more convenient for the decoder. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
-    p_input->b_error = 0;
+    p_input->b_error = VLC_FALSE;
+    p_input->b_restart = VLC_FALSE;
 
     return 0;
 }
@@ -304,6 +305,16 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer )
 {
     mtime_t start_date;
+
+    if( p_input->b_restart )
+    {
+        vlc_mutex_lock( &p_aout->mixer_lock );
+        vlc_mutex_lock( &p_input->lock );
+        aout_InputDelete( p_aout, p_input );
+        aout_InputNew( p_aout, p_input );
+        vlc_mutex_unlock( &p_input->lock );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+    }
 
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
@@ -458,12 +469,9 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    vlc_value_t val;
     char *psz_mode = newval.psz_string;
-    char *psz_filter;
-
-    var_Get( p_aout, "audio-filter", &val );
-    psz_filter = val.psz_string;
+    vlc_value_t val;
+    int i;
 
     if( !psz_mode || !*psz_mode )
     {
@@ -472,37 +480,27 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        if( !psz_filter || !*psz_filter )
+        if( !strcmp( "goom", psz_mode ) )
         {
-            if( !strcmp( "goom", psz_mode) )
-                val.psz_string = "goom";
-            else
-                val.psz_string = "visual";
-            var_Set( p_aout, "audio-filter", val );
+            val.psz_string = "goom";
         }
         else
         {
-            if( strstr( psz_filter, "visual" ) == NULL )
-            {
-                psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
-                strcat( psz_filter, ",visual" );
-            }
-            val.psz_string = psz_filter;
-            var_Set( p_aout, "audio-filter", val );
+            val.psz_string = psz_mode;
+            var_Create( p_aout, "effect-list", VLC_VAR_STRING );
+            var_Set( p_aout, "effect-list", val );
+
+            val.psz_string = "visual";
         }
+
+        var_Set( p_aout, "audio-filter", val );
     }
 
-    if( psz_mode && *psz_mode )
+    /* That sucks */
+    for( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
-        vlc_value_t val;
-        val.psz_string = psz_mode;
-        var_Create( p_aout, "effect-list", VLC_VAR_STRING );
-        var_Set( p_aout, "effect-list", val);
+        p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
     }
-
-    if( psz_filter ) free( psz_filter );
-
-    aout_Restart( p_aout );
 
     return VLC_SUCCESS;
 }
