@@ -38,31 +38,25 @@
  * #define MODULE_VAR(blah) "VLC_MODULE_foo_blah"
  *
  * and, if BUILTIN is set, we will also need:
- * #define InitModule foo_InitModule
- * #define ActivateModule foo_ActivateModule
- * #define DeactivateModule foo_DeactivateModule
+ * #define MODULE_FUNC( zog ) module_foo_zog
  *
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.
  */
 
 /* I can't believe I need to do this to change « foo » to « "foo" » */
-#define UGLY_KLUDGE(z) NASTY_CROCK(z)
-#define NASTY_CROCK(z) #z
-/* And I need to do _this_ to change « foo bar » to « foo_bar » ! */
-#define AWFUL_BRITTLE(y,z) CRUDE_HACK(y,z)
-#define CRUDE_HACK(y,z) y##_##z
+#define UGLY_KLUDGE( z ) NASTY_CROCK( z )
+#define NASTY_CROCK( z ) #z
+/* And I need to do _this_ to change « foo bar » to « foo_inner_bar » ! */
+#define AWFUL_BRITTLE( y, z ) CRUDE_HACK( y, z )
+#define CRUDE_HACK( y, z ) module_##y##_##z
 
 /* Also, I need to do this to change « blah » to « "VLC_MODULE_foo_blah" » */
-#define MODULE_STRING UGLY_KLUDGE(MODULE_NAME)
-#define MODULE_VAR(z) "VLC_MODULE_" UGLY_KLUDGE(MODULE_NAME) "_" #z
+#define MODULE_STRING UGLY_KLUDGE( MODULE_NAME )
+#define MODULE_VAR( z ) "VLC_MODULE_" UGLY_KLUDGE( MODULE_NAME ) "_" #z
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#ifdef BUILTIN
-#  define InitModule AWFUL_BRITTLE(MODULE_NAME,InitModule)
-#  define ActivateModule AWFUL_BRITTLE(MODULE_NAME,ActivateModule)
-#  define DeactivateModule AWFUL_BRITTLE(MODULE_NAME,DeactivateModule)
-#endif
+#define MODULE_FUNC( function ) AWFUL_BRITTLE( MODULE_NAME, function )
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
