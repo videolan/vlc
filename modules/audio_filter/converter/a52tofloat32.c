@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.6 2002/11/14 22:38:46 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.7 2002/11/18 23:00:41 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -289,8 +289,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
         p_samples = a52_samples( p_sys->p_liba52 );
 
-        if ( ((p_sys->i_flags & A52_CHANNEL1) || (p_sys->i_flags & A52_CHANNEL2)
-               || (p_sys->i_flags & A52_MONO))
+        if ( ((p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL1
+               || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL2
+               || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_MONO)
               && (p_filter->output.i_physical_channels 
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
         {

@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.14 2002/11/14 22:38:48 massiot Exp $
+ * $Id: aout.m,v 1.15 2002/11/18 23:00:41 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -129,9 +129,13 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     case kAudioFormatLinearPCM:
         p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
         if ( p_sys->stream_format.mChannelsPerFrame < 6 )
-            p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+            p_aout->output.output.i_physical_channels
+                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         else
-            p_aout->output.output.i_channels = AOUT_CHAN_3F2R | AOUT_CHAN_LFE;
+            p_aout->output.output.i_physical_channels
+                  = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_CENTER | AOUT_CHAN_REARRIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_LFE;
         break;
 
     case kAudioFormat60958AC3:
@@ -257,7 +261,12 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
                        outOutputData->mBuffers[ 0 ].mData, 
                        p_sys->i_buffer_size );
 
-//	msg_Dbg(p_aout, "This buffer has %d bytes, i take %d", p_buffer->i_nb_bytes, p_sys->i_buffer_size);
+/*	msg_Dbg(p_aout, "This buffer has %d bytes, i take %d: %f %f %f %f",
+        p_buffer->i_nb_bytes, p_sys->i_buffer_size,
+        ((float*)p_buffer->p_buffer)[0], ((float*)p_buffer->p_buffer)[1],
+        ((float*)p_buffer->p_buffer)[2], ((float*)p_buffer->p_buffer)[3]);
+*/
+
     
 	aout_BufferFree( p_buffer );
     }

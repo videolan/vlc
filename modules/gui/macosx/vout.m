@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.3 2002/10/04 14:02:20 sam Exp $
+ * $Id: vout.m,v 1.4 2002/11/18 23:00:41 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -139,6 +139,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         msg_Err( p_vout, "EnterMovies failed: %d", err );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys );
         return( 1 );
     } 
@@ -167,6 +168,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     {
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys );
         return( 1 );        
     }
@@ -176,6 +178,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         msg_Err( p_vout, "unable to create window" );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+        vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys ); 
         return( 1 );
     }
