@@ -75,11 +75,11 @@ static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_SysCreate: allocates FB video thread output method
+ * vout_FBCreate: allocates FB video thread output method
  *****************************************************************************
  * This function allocates and initializes a FB vout method.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_FBCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -102,39 +102,39 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize framebuffer video thread output method
+ * vout_FBInit: initialize framebuffer video thread output method
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_FBInit( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate FB video thread output method
+ * vout_FBEnd: terminate FB video thread output method
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_FBEnd( vout_thread_t *p_vout )
 {
     ;
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy FB video thread output method
+ * vout_FBDestroy: destroy FB video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_FBDestroy( vout_thread_t *p_vout )
 {
     FBCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SysManage: handle FB events
+ * vout_FBManage: handle FB events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_FBManage( vout_thread_t *p_vout )
 {
     /*
      * Size change
@@ -145,10 +145,10 @@ int vout_SysManage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Destroy XImages to change their size */
-        vout_SysEnd( p_vout );
+        vout_FBEnd( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_SysInit( p_vout ) )
+        if( vout_FBInit( p_vout ) )
         {
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );
@@ -166,12 +166,12 @@ int vout_SysManage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_FBDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to FB image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_FBDisplay( vout_thread_t *p_vout )
 {
     /* swap the two Y offsets */
     p_vout->p_sys->var_info.yoffset = p_vout->i_buffer_index ? p_vout->p_sys->var_info.yres : 0;
@@ -184,13 +184,13 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SetPalette: sets an 8 bpp palette
+ * vout_FBSetPalette: sets an 8 bpp palette
  *****************************************************************************
  * This function sets the palette given as an argument. It does not return
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-void vout_SetPalette( p_vout_thread_t p_vout,
+void vout_FBSetPalette( p_vout_thread_t p_vout,
                       u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };

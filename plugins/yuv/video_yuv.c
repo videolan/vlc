@@ -46,20 +46,12 @@
 #include "intf_msg.h"
 
 /*****************************************************************************
- * Constants
- *****************************************************************************/
-
-int     yuv_SysInit     ( vout_thread_t *p_vout );
-int     yuv_SysReset    ( vout_thread_t *p_vout );
-void    yuv_SysEnd      ( vout_thread_t *p_vout );
-
-/*****************************************************************************
  * vout_InitYUV: allocate and initialize translations tables
  *****************************************************************************
  * This function will allocate memory to store translation tables, depending
  * of the screen depth.
  *****************************************************************************/
-int yuv_SysInit( vout_thread_t *p_vout )
+int yuv_CInit( vout_thread_t *p_vout )
 {
     size_t      tables_size;                        /* tables size, in bytes */
 
@@ -113,27 +105,27 @@ int yuv_SysInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * yuv_SysReset: re-initialize translations tables
+ * yuv_CEnd: destroy translations tables
  *****************************************************************************
- * This function will initialize the tables allocated by vout_CreateTables and
- * set functions pointers.
+ * Free memory allocated by yuv_CCreate.
  *****************************************************************************/
-int yuv_SysReset( vout_thread_t *p_vout )
-{
-    yuv_SysEnd( p_vout );
-    return( yuv_SysInit( p_vout ) );
-}
-
-/*****************************************************************************
- * yuv_SysEnd: destroy translations tables
- *****************************************************************************
- * Free memory allocated by yuv_SysCreate.
- *****************************************************************************/
-void yuv_SysEnd( vout_thread_t *p_vout )
+void yuv_CEnd( vout_thread_t *p_vout )
 {
     free( p_vout->yuv.p_base );
     free( p_vout->yuv.p_buffer );
     free( p_vout->yuv.p_offset );
+}
+
+/*****************************************************************************
+ * yuv_CReset: re-initialize translations tables
+ *****************************************************************************
+ * This function will initialize the tables allocated by vout_CreateTables and
+ * set functions pointers.
+ *****************************************************************************/
+int yuv_CReset( vout_thread_t *p_vout )
+{
+    yuv_CEnd( p_vout );
+    return( yuv_CInit( p_vout ) );
 }
 
 /* following functions are local */

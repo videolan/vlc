@@ -66,11 +66,11 @@ static int     DummyOpenDisplay   ( vout_thread_t *p_vout );
 static void    DummyCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_SysCreate: allocates dummy video thread output method
+ * vout_DummyCreate: allocates dummy video thread output method
  *****************************************************************************
  * This function allocates and initializes a dummy vout method.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_DummyCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -93,50 +93,50 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize dummy video thread output method
+ * vout_DummyInit: initialize dummy video thread output method
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_DummyInit( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate dummy video thread output method
+ * vout_DummyEnd: terminate dummy video thread output method
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_DummyEnd( vout_thread_t *p_vout )
 {
     ;
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy dummy video thread output method
+ * vout_DummyDestroy: destroy dummy video thread output method
  *****************************************************************************
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_DummyDestroy( vout_thread_t *p_vout )
 {
     DummyCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SysManage: handle dummy events
+ * vout_DummyManage: handle dummy events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_DummyManage( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_DummyDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to dummy image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_DummyDisplay( vout_thread_t *p_vout )
 {
     ;
 }

@@ -38,13 +38,27 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void vout_GetPlugin( p_vout_thread_t p_vout );
-void intf_GetPlugin( p_intf_thread_t p_intf );
+static void vout_GetPlugin( p_vout_thread_t p_vout );
+static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+/* Video output */
+int     vout_MGACreate       ( vout_thread_t *p_vout, char *psz_display,
+                               int i_root_window, void *p_data );
+int     vout_MGAInit         ( p_vout_thread_t p_vout );
+void    vout_MGAEnd          ( p_vout_thread_t p_vout );
+void    vout_MGADestroy      ( p_vout_thread_t p_vout );
+int     vout_MGAManage       ( p_vout_thread_t p_vout );
+void    vout_MGADisplay      ( p_vout_thread_t p_vout );
+void    vout_SetPalette      ( p_vout_thread_t p_vout,
+                               u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+/* Interface */
+int     intf_MGACreate       ( p_intf_thread_t p_intf );
+void    intf_MGADestroy      ( p_intf_thread_t p_intf );
+void    intf_MGAManage       ( p_intf_thread_t p_intf );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -62,36 +76,30 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* The MGA module does not work yet */
+    p_info->i_score = 0x0;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* TODO: detect an MGA card ? */
-    return( 1 );
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void vout_GetPlugin( p_vout_thread_t p_vout )
+static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_sys_create  = vout_SysCreate;
-    p_vout->p_sys_init    = vout_SysInit;
-    p_vout->p_sys_end     = vout_SysEnd;
-    p_vout->p_sys_destroy = vout_SysDestroy;
-    p_vout->p_sys_manage  = vout_SysManage;
-    p_vout->p_sys_display = vout_SysDisplay;
+    p_vout->p_sys_create  = vout_MGACreate;
+    p_vout->p_sys_init    = vout_MGAInit;
+    p_vout->p_sys_end     = vout_MGAEnd;
+    p_vout->p_sys_destroy = vout_MGADestroy;
+    p_vout->p_sys_manage  = vout_MGAManage;
+    p_vout->p_sys_display = vout_MGADisplay;
 }
 
-void intf_GetPlugin( p_intf_thread_t p_intf )
+static void intf_GetPlugin( p_intf_thread_t p_intf )
 {
-    p_intf->p_sys_create  = intf_SysCreate;
-    p_intf->p_sys_destroy = intf_SysDestroy;
-    p_intf->p_sys_manage  = intf_SysManage;
+    p_intf->p_sys_create  = intf_MGACreate;
+    p_intf->p_sys_destroy = intf_MGADestroy;
+    p_intf->p_sys_manage  = intf_MGAManage;
 }
 

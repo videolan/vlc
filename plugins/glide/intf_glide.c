@@ -54,9 +54,9 @@ typedef struct intf_sys_s
 } intf_sys_t;
 
 /*****************************************************************************
- * intf_SysCreate: initialize 3dfx interface
+ * intf_GlideCreate: initialize 3dfx interface
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_GlideCreate( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -79,9 +79,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy 3dfx interface
+ * intf_GlideDestroy: destroy 3dfx interface
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_GlideDestroy( intf_thread_t *p_intf )
 {
     /* Close input thread, if any (blocking) */
     if( p_intf->p_input )
@@ -101,9 +101,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_GlideManage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_GlideManage( intf_thread_t *p_intf )
 {
     unsigned int buf;
 

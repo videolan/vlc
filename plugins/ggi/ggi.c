@@ -31,6 +31,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,13 +39,27 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void vout_GetPlugin( p_vout_thread_t p_vout );
-void intf_GetPlugin( p_intf_thread_t p_intf );
+static void vout_GetPlugin( p_vout_thread_t p_vout );
+static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+/* Video output */
+int     vout_GGICreate       ( vout_thread_t *p_vout, char *psz_display,
+                               int i_root_window, void *p_data );
+int     vout_GGIInit         ( p_vout_thread_t p_vout );
+void    vout_GGIEnd          ( p_vout_thread_t p_vout );
+void    vout_GGIDestroy      ( p_vout_thread_t p_vout );
+int     vout_GGIManage       ( p_vout_thread_t p_vout );
+void    vout_GGIDisplay      ( p_vout_thread_t p_vout );
+void    vout_GGISetPalette   ( p_vout_thread_t p_vout,
+                               u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+/* Interface */
+int     intf_GGICreate       ( p_intf_thread_t p_intf );
+void    intf_GGIDestroy      ( p_intf_thread_t p_intf );
+void    intf_GGIManage       ( p_intf_thread_t p_intf );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -62,36 +77,42 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* if the GGI libraries are there, assume we can enter the
+     * initialization part at least, even if we fail afterwards */
+    p_info->i_score = 0x100;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* TODO: detect GGI_DISPLAY or whatever */
-    return( 1 );
+    if( TestProgram( "ggivlc" ) )
+    {
+        p_info->i_score += 0x180;
+    }
+
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( VOUT_METHOD_VAR, "ggi" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void vout_GetPlugin( p_vout_thread_t p_vout )
+static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_sys_create  = vout_SysCreate;
-    p_vout->p_sys_init    = vout_SysInit;
-    p_vout->p_sys_end     = vout_SysEnd;
-    p_vout->p_sys_destroy = vout_SysDestroy;
-    p_vout->p_sys_manage  = vout_SysManage;
-    p_vout->p_sys_display = vout_SysDisplay;
+    p_vout->p_sys_create  = vout_GGICreate;
+    p_vout->p_sys_init    = vout_GGIInit;
+    p_vout->p_sys_end     = vout_GGIEnd;
+    p_vout->p_sys_destroy = vout_GGIDestroy;
+    p_vout->p_sys_manage  = vout_GGIManage;
+    p_vout->p_sys_display = vout_GGIDisplay;
 }
 
-void intf_GetPlugin( p_intf_thread_t p_intf )
+static void intf_GetPlugin( p_intf_thread_t p_intf )
 {
-    p_intf->p_sys_create  = intf_SysCreate;
-    p_intf->p_sys_destroy = intf_SysDestroy;
-    p_intf->p_sys_manage  = intf_SysManage;
+    p_intf->p_sys_create  = intf_GGICreate;
+    p_intf->p_sys_destroy = intf_GGIDestroy;
+    p_intf->p_sys_manage  = intf_GGIManage;
 }
 

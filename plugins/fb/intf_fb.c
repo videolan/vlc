@@ -82,9 +82,9 @@ static void    FBTextMode                 ( int i_tty_dev );
 static void    FBGfxMode                  ( int i_tty_dev );
 
 /*****************************************************************************
- * intf_SysCreate: initialize and create window
+ * intf_FBCreate: initialize and create window
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_FBCreate( intf_thread_t *p_intf )
 {
     struct sigaction            sig_tty;         /* sigaction for tty change */
     struct vt_mode              vt_mode;                  /* vt current mode */
@@ -194,9 +194,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy interface window
+ * intf_FBDestroy: destroy interface window
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_FBDestroy( intf_thread_t *p_intf )
 {
     /* resets the keyboard state */
     tcsetattr(0, 0, &p_intf->p_sys->old_termios);
@@ -222,9 +222,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_FBManage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_FBManage( intf_thread_t *p_intf )
 {
     unsigned char buf[16];
 

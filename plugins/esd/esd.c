@@ -31,6 +31,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,12 +39,21 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void aout_GetPlugin( p_aout_thread_t p_aout );
+static void aout_GetPlugin( p_aout_thread_t p_aout );
+
+/* Audio output */
+int     aout_EsdOpen         ( aout_thread_t *p_aout );
+int     aout_EsdReset        ( aout_thread_t *p_aout );
+int     aout_EsdSetFormat    ( aout_thread_t *p_aout );
+int     aout_EsdSetChannels  ( aout_thread_t *p_aout );
+int     aout_EsdSetRate      ( aout_thread_t *p_aout );
+long    aout_EsdGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
+void    aout_EsdPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+                               int i_size );
+void    aout_EsdClose        ( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -61,31 +71,31 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = NULL;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* esound should always work, but score it lower than DSP */
+    p_info->i_score = 0x100;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* TODO: check if suitable */
-    return( 1 );
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( AOUT_METHOD_VAR, "esd" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void aout_GetPlugin( p_aout_thread_t p_aout )
+static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_SysOpen;
-    p_aout->p_sys_reset       = aout_SysReset;
-    p_aout->p_sys_setformat   = aout_SysSetFormat;
-    p_aout->p_sys_setchannels = aout_SysSetChannels;
-    p_aout->p_sys_setrate     = aout_SysSetRate;
-    p_aout->p_sys_getbufinfo  = aout_SysGetBufInfo;
-    p_aout->p_sys_playsamples = aout_SysPlaySamples;
-    p_aout->p_sys_close       = aout_SysClose;
+    p_aout->p_sys_open        = aout_EsdOpen;
+    p_aout->p_sys_reset       = aout_EsdReset;
+    p_aout->p_sys_setformat   = aout_EsdSetFormat;
+    p_aout->p_sys_setchannels = aout_EsdSetChannels;
+    p_aout->p_sys_setrate     = aout_EsdSetRate;
+    p_aout->p_sys_getbufinfo  = aout_EsdGetBufInfo;
+    p_aout->p_sys_playsamples = aout_EsdPlaySamples;
+    p_aout->p_sys_close       = aout_EsdClose;
 }
 

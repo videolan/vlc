@@ -71,9 +71,9 @@ typedef struct intf_sys_s
 ggi_visual_t    vout_SysGetVisual( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * intf_SysCreate: initialize and create GII interface
+ * intf_GGICreate: initialize and create GII interface
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_GGICreate( intf_thread_t *p_intf )
 {
     /* Check that b_video is set */
     if( !p_main->b_video )
@@ -111,9 +111,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy interface
+ * intf_GGIDestroy: destroy interface
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_GGIDestroy( intf_thread_t *p_intf )
 {
     /* Close input thread, if any (blocking) */
     if( p_intf->p_input )
@@ -133,9 +133,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_GGIManage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_GGIManage( intf_thread_t *p_intf )
 {
     int         i_key;                                        /* unicode key */
 

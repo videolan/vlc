@@ -39,6 +39,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"                                              /* TestMMX() */
 #include "plugins.h"
 #include "playlist.h"
 #include "input_vlan.h"
@@ -73,6 +74,7 @@
 #define OPT_WIDTH               163
 #define OPT_HEIGHT              164
 #define OPT_COLOR               165
+#define OPT_YUV                 166
 
 #define OPT_NOVLANS             170
 #define OPT_SERVER              171
@@ -107,6 +109,7 @@ static const struct option longopts[] =
     {   "height",           1,          0,      OPT_HEIGHT },
     {   "grayscale",        0,          0,      'g' },
     {   "color",            0,          0,      OPT_COLOR },
+    {   "yuv",              1,          0,      OPT_YUV },
 
     /* DVD options */
     {   "dvdaudio",         1,          0,      'a' },
@@ -160,17 +163,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     p_main = &main_data;                       /* set up the global variable */
 
-#ifdef SYS_BEOS
     /*
      * System specific initialization code
      */
+#ifdef SYS_BEOS
     beos_Create();
 #endif
 
-#ifdef HAVE_MMX
     /*
      * Test if our code is likely to run on this CPU 
      */
+#ifdef HAVE_MMX
     if( !TestMMX() )
     {
         fprintf( stderr, "Sorry, this program needs an MMX processor. "
@@ -196,8 +199,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
     {
         intf_MsgDestroy();
-        fprintf( stderr, "error: can't read configuration (%s)\n",
-                strerror(errno) );
         return( errno );
     }
 
@@ -259,6 +260,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         InitSignalHandler();             /* prepare signals for interception */
 
+        /*
+         * This is the main loop
+         */
         intf_Run( p_main->p_intf );
 
         intf_Destroy( p_main->p_intf );
@@ -419,6 +423,7 @@ static void SetDefaultConfiguration( void )
 static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     int c, i_opt;
+    char * p_pointer;
 
     /* Set default configuration and copy arguments */
     p_main->i_argc    = i_argc;
@@ -427,6 +432,20 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     SetDefaultConfiguration();
 
     intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
+
+    /* Get the executable name */
+    p_main->psz_arg0 = p_pointer = ppsz_argv[ 0 ];
+    while( *p_pointer )
+    {
+        if( *p_pointer == '/' )
+        {
+            p_main->psz_arg0 = ++p_pointer;
+        }
+        else
+        {
+            ++p_pointer;
+        }
+    }
 
     /* Parse command line options */
     opterr = 0;
@@ -485,6 +504,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_COLOR:                                           /* --color */
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;
+        case OPT_YUV:                                               /* --yuv */
+            main_PutPszVariable( YUV_METHOD_VAR, optarg );
+            break;
 
         /* DVD options */
         case 'a':
@@ -541,11 +563,13 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 static void Usage( int i_fashion )
 {
     /* Usage */
-    intf_Msg( "Usage: vlc [options] [parameters] [file]...\n" );
+    intf_Msg( "Usage: %s [options] [parameters] [file]...\n",
+              p_main->psz_arg0 );
 
     if( i_fashion == USAGE )
     {
-        intf_Msg( "Try `vlc --help' for more information.\n" );
+        intf_Msg( "Try `%s --help' for more information.\n",
+                  p_main->psz_arg0 );
         return;
     }
 
@@ -672,82 +696,3 @@ static void SignalHandler( int i_signal )
     p_main->p_intf->b_die = 1;
 }
 
-#ifdef HAVE_MMX
-/*****************************************************************************
- * TestMMX: tests if the processor has MMX support.
- *****************************************************************************
- * This function is called if HAVE_MMX is enabled, to check whether the
- * CPU really supports MMX.
- *****************************************************************************/
-static int TestMMX( void )
-{
-/* FIXME: under beos, gcc does not support the following inline assembly */ 
-#ifdef SYS_BEOS
-    return( 1 );
-#else
-
-    int i_reg, i_dummy = 0;
-
-    /* test for a 386 CPU */
-    asm volatile ( "pushfl
-                    popl %%eax
-                    movl %%eax, %%ecx
-                    xorl $0x40000, %%eax
-                    pushl %%eax
-                    popfl
-                    pushfl
-                    popl %%eax
-                    xorl %%ecx, %%eax
-                    andl $0x40000, %%eax"
-                 : "=a" ( i_reg ) );
-
-    if( !i_reg )
-        return( 0 );
-
-    /* test for a 486 CPU */
-    asm volatile ( "movl %%ecx, %%eax
-                    xorl $0x200000, %%eax
-                    pushl %%eax
-                    popfl
-                    pushfl
-                    popl %%eax
-                    xorl %%ecx, %%eax
-                    pushl %%ecx
-                    popfl
-                    andl $0x200000, %%eax"
-                 : "=a" ( i_reg ) );
-
-    if( !i_reg )
-        return( 0 );
-
-    /* the CPU supports the CPUID instruction - get its level */
-    asm volatile ( "cpuid"
-                 : "=a" ( i_reg ),
-                   "=b" ( i_dummy ),
-                   "=c" ( i_dummy ),
-                   "=d" ( i_dummy )
-                 : "a"  ( 0 ),       /* level 0 */
-                   "b"  ( i_dummy ) ); /* buggy compiler shouldn't complain */
-
-    /* this shouldn't happen on a normal CPU */
-    if( !i_reg )
-        return( 0 );
-
-    /* test for the MMX flag */
-    asm volatile ( "cpuid
-                    andl $0x00800000, %%edx" /* X86_FEATURE_MMX */
-                 : "=a" ( i_dummy ),
-                   "=b" ( i_dummy ),
-                   "=c" ( i_dummy ),
-                   "=d" ( i_reg )
-                 : "a"  ( 1 ),       /* level 1 */
-                   "b"  ( i_dummy ) ); /* buggy compiler shouldn't complain */
-
-    if( !i_reg )
-        return( 0 );
-
-    return( 1 );
-
-#endif
-}
-#endif

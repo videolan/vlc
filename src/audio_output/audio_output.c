@@ -82,8 +82,9 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     aout_thread_t * p_aout;                             /* thread descriptor */
     typedef void    ( aout_getplugin_t ) ( aout_thread_t * p_aout );
     int             i_index;
+    int             i_best_index = 0, i_best_score = 0;
 #if 0
-    int             i_status;                                 /* thread status */
+    int             i_status;                               /* thread status */
 #endif
 
     /* Allocate descriptor */
@@ -102,12 +103,26 @@ aout_thread_t *aout_CreateThread( int *pi_status )
             /* ... and if this plugin provides the functions we want ... */
             if( p_main->p_bank->p_info[ i_index ]->aout_GetPlugin != NULL )
             {
-                /* ... then get these functions */
-                ( (aout_getplugin_t *)
-                  p_main->p_bank->p_info[ i_index ]->aout_GetPlugin )( p_aout );
+                /* ... and if this plugin has a good score ... */
+                if( p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
+                {
+                    /* ... then take it */
+                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
+                    i_best_index = i_index;
+                }
             }
         }
     }
+
+    if( i_best_score == 0 )
+    {
+        free( p_aout );
+        return( NULL );
+    }
+
+    /* Get the plugin functions */
+    ( (aout_getplugin_t *)
+      p_main->p_bank->p_info[ i_best_index ]->aout_GetPlugin )( p_aout );
 
     /*
      * Initialize audio device

@@ -211,6 +211,7 @@ video_decoder_obj =		video_decoder/video_decoder.o \
 			                        video_decoder/vdec_idct.o
 
 misc_obj =			misc/mtime.o \
+						misc/tests.o \
 						misc/rsc_files.o \
 						misc/netutils.o \
 						misc/playlist.o \

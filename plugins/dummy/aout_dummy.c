@@ -48,9 +48,9 @@ typedef struct aout_sys_s
 } aout_sys_t;
 
 /*****************************************************************************
- * aout_SysOpen: opens a dummy audio device
+ * aout_DummyOpen: opens a dummy audio device
  *****************************************************************************/
-int aout_SysOpen( aout_thread_t *p_aout )
+int aout_DummyOpen( aout_thread_t *p_aout )
 {
     /* Initialize some variables */
     p_aout->i_format = AOUT_DEFAULT_FORMAT;
@@ -61,57 +61,57 @@ int aout_SysOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysReset: fake reset
+ * aout_DummyReset: fake reset
  *****************************************************************************/
-int aout_SysReset( aout_thread_t *p_aout )
+int aout_DummyReset( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetFormat: pretends to set the dsp output format
+ * aout_DummySetFormat: pretends to set the dsp output format
  *****************************************************************************/
-int aout_SysSetFormat( aout_thread_t *p_aout )
+int aout_DummySetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetChannels: pretends to set stereo or mono mode
+ * aout_DummySetChannels: pretends to set stereo or mono mode
  *****************************************************************************/
-int aout_SysSetChannels( aout_thread_t *p_aout )
+int aout_DummySetChannels( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetRate: pretends to set audio output rate
+ * aout_DummySetRate: pretends to set audio output rate
  *****************************************************************************/
-int aout_SysSetRate( aout_thread_t *p_aout )
+int aout_DummySetRate( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysGetBufInfo: returns available bytes in buffer
+ * aout_DummyGetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_DummyGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     return( 2 * l_buffer_limit );               /* value big enough to sleep */
 }
 
 /*****************************************************************************
- * aout_SysPlaySamples: pretends to play a sound
+ * aout_DummyPlaySamples: pretends to play a sound
  *****************************************************************************/
-void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_DummyPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     ;
 }
 
 /*****************************************************************************
- * aout_SysClose: closes the dummy audio device
+ * aout_DummyClose: closes the dummy audio device
  *****************************************************************************/
-void aout_SysClose( aout_thread_t *p_aout )
+void aout_DummyClose( aout_thread_t *p_aout )
 {
     ;
 }

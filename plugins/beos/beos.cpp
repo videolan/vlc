@@ -40,14 +40,39 @@ extern "C"
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void aout_GetPlugin( p_aout_thread_t p_aout );
-void vout_GetPlugin( p_vout_thread_t p_vout );
-void intf_GetPlugin( p_intf_thread_t p_intf );
+static void aout_GetPlugin( p_aout_thread_t p_aout );
+static void vout_GetPlugin( p_vout_thread_t p_vout );
+static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+/* Audio output */
+int     aout_BeOpen         ( aout_thread_t *p_aout );
+int     aout_BeReset        ( aout_thread_t *p_aout );
+int     aout_BeSetFormat    ( aout_thread_t *p_aout );
+int     aout_BeSetChannels  ( aout_thread_t *p_aout );
+int     aout_BeSetRate      ( aout_thread_t *p_aout );
+long    aout_BeGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
+void    aout_BePlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+                              int i_size );
+void    aout_BeClose        ( aout_thread_t *p_aout );
+
+/* Video output */
+int     vout_BeCreate       ( vout_thread_t *p_vout, char *psz_display,
+                              int i_root_window, void *p_data );
+int     vout_BeInit         ( p_vout_thread_t p_vout );
+void    vout_BeEnd          ( p_vout_thread_t p_vout );
+void    vout_BeDestroy      ( p_vout_thread_t p_vout );
+int     vout_BeManage       ( p_vout_thread_t p_vout );
+void    vout_BeDisplay      ( p_vout_thread_t p_vout );
+void    vout_BeSetPalette   ( p_vout_thread_t p_vout,
+                              u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+/* Interface */
+int     intf_BeCreate       ( p_intf_thread_t p_intf );
+void    intf_BeDestroy      ( p_intf_thread_t p_intf );
+void    intf_BeManage       ( p_intf_thread_t p_intf );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -65,49 +90,43 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin = NULL;
 
-    return( p_info );
-}
+    /* the beos plugin always works under BeOS :) */
+    p_info->i_score = 0x800;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* the BeOS plugin always works under BeOS :) */
-    return( 1 );
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void aout_GetPlugin( p_aout_thread_t p_aout )
+static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_SysOpen;
-    p_aout->p_sys_reset       = aout_SysReset;
-    p_aout->p_sys_setformat   = aout_SysSetFormat;
-    p_aout->p_sys_setchannels = aout_SysSetChannels;
-    p_aout->p_sys_setrate     = aout_SysSetRate;
-    p_aout->p_sys_getbufinfo  = aout_SysGetBufInfo;
-    p_aout->p_sys_playsamples = aout_SysPlaySamples;
-    p_aout->p_sys_close       = aout_SysClose;
+    p_aout->p_sys_open        = aout_BeOpen;
+    p_aout->p_sys_reset       = aout_BeReset;
+    p_aout->p_sys_setformat   = aout_BeSetFormat;
+    p_aout->p_sys_setchannels = aout_BeSetChannels;
+    p_aout->p_sys_setrate     = aout_BeSetRate;
+    p_aout->p_sys_getbufinfo  = aout_BeGetBufInfo;
+    p_aout->p_sys_playsamples = aout_BePlaySamples;
+    p_aout->p_sys_close       = aout_BeClose;
 }
 
-void vout_GetPlugin( p_vout_thread_t p_vout )
+static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_sys_create  = vout_SysCreate;
-    p_vout->p_sys_init    = vout_SysInit;
-    p_vout->p_sys_end     = vout_SysEnd;
-    p_vout->p_sys_destroy = vout_SysDestroy;
-    p_vout->p_sys_manage  = vout_SysManage;
-    p_vout->p_sys_display = vout_SysDisplay;
+    p_vout->p_sys_create  = vout_BeCreate;
+    p_vout->p_sys_init    = vout_BeInit;
+    p_vout->p_sys_end     = vout_BeEnd;
+    p_vout->p_sys_destroy = vout_BeDestroy;
+    p_vout->p_sys_manage  = vout_BeManage;
+    p_vout->p_sys_display = vout_BeDisplay;
 }
 
-void intf_GetPlugin( p_intf_thread_t p_intf )
+static void intf_GetPlugin( p_intf_thread_t p_intf )
 {
-    p_intf->p_sys_create  = intf_SysCreate;
-    p_intf->p_sys_destroy = intf_SysDestroy;
-    p_intf->p_sys_manage  = intf_SysManage;
+    p_intf->p_sys_create  = intf_BeCreate;
+    p_intf->p_sys_destroy = intf_BeDestroy;
+    p_intf->p_sys_manage  = intf_BeManage;
 }
 
 } /* extern "C" */

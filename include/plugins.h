@@ -43,6 +43,8 @@ typedef struct plugin_info_s
     void *      vout_GetPlugin;
     void *      intf_GetPlugin;
     void *      yuv_GetPlugin;
+
+    int         i_score;
 } plugin_info_t;
 
 typedef struct plugin_bank_s

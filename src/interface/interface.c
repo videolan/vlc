@@ -93,6 +93,7 @@ intf_thread_t* intf_Create( void )
     intf_thread_t * p_intf;
     typedef void    ( intf_getplugin_t ) ( intf_thread_t * p_intf );
     int             i_index;
+    int             i_best_index = 0, i_best_score = 0;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
@@ -111,12 +112,26 @@ intf_thread_t* intf_Create( void )
             /* ... and if this plugin provides the functions we want ... */
             if( p_main->p_bank->p_info[ i_index ]->intf_GetPlugin != NULL )
             {
-                /* ... then get these functions */
-                ( (intf_getplugin_t *)
-                  p_main->p_bank->p_info[ i_index ]->intf_GetPlugin )( p_intf );
+                /* ... and if this plugin has a good score ... */
+                if( p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
+                {
+                    /* ... then take it */
+                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
+                    i_best_index = i_index;
+                }
             }
         }
     }
+
+    if( i_best_score == 0 )
+    {
+        free( p_intf );
+        return( NULL );
+    }
+
+    /* Get the plugin functions */
+    ( (intf_getplugin_t *)
+      p_main->p_bank->p_info[ i_best_index ]->intf_GetPlugin )( p_intf );
 
     /* Initialize structure */
     p_intf->b_die =     0;

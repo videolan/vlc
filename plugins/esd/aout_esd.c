@@ -64,15 +64,16 @@ typedef struct aout_sys_s
 } aout_sys_t;
 
 /*****************************************************************************
- * aout_SysOpen: opens an esd socket
+ * aout_EsdOpen: opens an esd socket
  *****************************************************************************/
-int aout_SysOpen( aout_thread_t *p_aout )
+int aout_EsdOpen( aout_thread_t *p_aout )
 {
     /* mpg123 does it this way */
     int i_bits = ESD_BITS16;
     int i_mode = ESD_STREAM;
     int i_func = ESD_PLAY;
 
+    fprintf(stderr, "aout-esd !!\n");
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
@@ -112,52 +113,52 @@ int aout_SysOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysReset: resets the dsp
+ * aout_EsdReset: resets the dsp
  *****************************************************************************/
-int aout_SysReset( aout_thread_t *p_aout )
+int aout_EsdReset( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetFormat: sets the dsp output format
+ * aout_EsdSetFormat: sets the dsp output format
  *****************************************************************************/
-int aout_SysSetFormat( aout_thread_t *p_aout )
+int aout_EsdSetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetChannels: sets the dsp's stereo or mono mode
+ * aout_EsdSetChannels: sets the dsp's stereo or mono mode
  *****************************************************************************/
-int aout_SysSetChannels( aout_thread_t *p_aout )
+int aout_EsdSetChannels( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetRate: sets the dsp's audio output rate
+ * aout_EsdSetRate: sets the dsp's audio output rate
  *****************************************************************************/
-int aout_SysSetRate( aout_thread_t *p_aout )
+int aout_EsdSetRate( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysGetBufInfo: buffer status query
+ * aout_EsdGetBufInfo: buffer status query
  *****************************************************************************/
-long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_EsdGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     /* arbitrary value that should be changed */
     return( l_buffer_limit );
 }
 
 /*****************************************************************************
- * aout_SysPlaySamples: plays a sound samples buffer
+ * aout_EsdPlaySamples: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_EsdPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int amount;
 
@@ -182,9 +183,9 @@ void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_SysClose: closes the dsp audio device
+ * aout_EsdClose: closes the dsp audio device
  *****************************************************************************/
-void aout_SysClose( aout_thread_t *p_aout )
+void aout_EsdClose( aout_thread_t *p_aout )
 {
     close( p_aout->i_fd );
 }

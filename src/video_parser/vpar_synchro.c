@@ -197,6 +197,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 {
     mtime_t i_delay = p_vpar->synchro.i_last_pts - mdate();
 
+    //return (i_coding_type == I_CODING_TYPE);
+
     switch( i_coding_type )
     {
         case I_CODING_TYPE:

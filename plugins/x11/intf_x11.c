@@ -91,9 +91,9 @@ static void X11DisableScreenSaver       ( intf_thread_t *p_intf );
 static void X11TogglePointer            ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * intf_SysCreate: initialize and create window
+ * intf_X11Create: initialize and create window
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_X11Create( intf_thread_t *p_intf )
 {
     char       *psz_display;
 
@@ -153,9 +153,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy interface window
+ * intf_X11Destroy: destroy interface window
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_X11Destroy( intf_thread_t *p_intf )
 {
     /* Enable screen saver */
     X11EnableScreenSaver( p_intf );
@@ -182,9 +182,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_X11Manage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_X11Manage( intf_thread_t *p_intf )
 {
     /* Manage main window */
     X11ManageWindow( p_intf );

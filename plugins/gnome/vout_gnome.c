@@ -79,7 +79,8 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  X11OpenDisplay      ( vout_thread_t *p_vout, char *psz_display, Window root_window, void *p_data );
+static int  X11OpenDisplay      ( vout_thread_t *p_vout, char *psz_display,
+                                  Window root_window, void *p_data );
 static void X11CloseDisplay     ( vout_thread_t *p_vout );
 static int  X11CreateWindow     ( vout_thread_t *p_vout );
 static void X11DestroyWindow    ( vout_thread_t *p_vout );
@@ -91,13 +92,13 @@ static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
                                   XShmSegmentInfo *p_shm_info );
 
 /*****************************************************************************
- * vout_SysCreate: allocate X11 video thread output method
+ * vout_GnomeCreate: allocate X11 video thread output method
  *****************************************************************************
  * This function allocate and initialize a X11 vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_GnomeCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -123,12 +124,12 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize X11 video thread output method
+ * vout_GnomeInit: initialize X11 video thread output method
  *****************************************************************************
  * This function create the XImages needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_GnomeInit( vout_thread_t *p_vout )
 {
     int i_err;
 
@@ -185,12 +186,12 @@ int vout_SysInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate X11 video thread output method
+ * vout_GnomeEnd: terminate X11 video thread output method
  *****************************************************************************
  * Destroy the X11 XImages created by vout_SysInit. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_GnomeEnd( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->b_shm )                             /* Shm XImages... */
     {
@@ -207,24 +208,24 @@ void vout_SysEnd( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy X11 video thread output method
+ * vout_GnomeDestroy: destroy X11 video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_GnomeDestroy( vout_thread_t *p_vout )
 {
     X11CloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SysManage: handle X11 events
+ * vout_GnomeManage: handle X11 events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * X11 events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_GnomeManage( vout_thread_t *p_vout )
 {
     /*
      * Color/Grayscale or gamma change: in 8bpp, just change the colormap
@@ -247,10 +248,10 @@ int vout_SysManage( vout_thread_t *p_vout )
                        p_vout->i_width, p_vout->i_height );
 
         /* Destroy XImages to change their size */
-        vout_SysEnd( p_vout );
+        vout_GnomeEnd( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_SysInit( p_vout ) )
+        if( vout_GnomeInit( p_vout ) )
         {
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );
@@ -266,12 +267,12 @@ int vout_SysManage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_GnomeDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to X11 server, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_GnomeDisplay( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->b_shm)                                /* XShm is used */
     {
@@ -299,14 +300,14 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SetPalette: sets an 8 bpp palette
+ * vout_GnomeSetPalette: sets an 8 bpp palette
  *****************************************************************************
  * This function sets the palette given as an argument. It does not return
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-void vout_SetPalette( p_vout_thread_t p_vout,
-                      u16 *red, u16 *green, u16 *blue, u16 *transp )
+void vout_GnomeSetPalette( p_vout_thread_t p_vout,
+                           u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
     int i;
     XColor color[255];

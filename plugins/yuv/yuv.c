@@ -31,6 +31,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,12 +39,15 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void yuv_GetPlugin( p_vout_thread_t p_vout );
+static void yuv_GetPlugin( p_vout_thread_t p_vout );
+
+/* YUV transformations */
+int     yuv_CInit          ( p_vout_thread_t p_vout );
+int     yuv_CReset         ( p_vout_thread_t p_vout );
+void    yuv_CEnd           ( p_vout_thread_t p_vout );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -61,25 +65,26 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = NULL;
     p_info->yuv_GetPlugin  = yuv_GetPlugin;
 
-    return( p_info );
-}
+    /* The C YUV functions should always work */
+    p_info->i_score = 0x100;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    return( 1 );
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( YUV_METHOD_VAR, "nommx" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void yuv_GetPlugin( p_vout_thread_t p_vout )
+static void yuv_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_yuv_init   = yuv_SysInit;
-    p_vout->p_yuv_reset  = yuv_SysReset;
-    p_vout->p_yuv_end    = yuv_SysEnd;
+    p_vout->p_yuv_init   = yuv_CInit;
+    p_vout->p_yuv_reset  = yuv_CReset;
+    p_vout->p_yuv_end    = yuv_CEnd;
 }
 

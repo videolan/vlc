@@ -75,9 +75,9 @@ extern "C"
 {
 
 /*****************************************************************************
- * aout_SysOpen: opens a BPushGameSound
+ * aout_BeOpen: opens a BPushGameSound
  *****************************************************************************/
-int aout_SysOpen( aout_thread_t *p_aout )
+int aout_BeOpen( aout_thread_t *p_aout )
 {
     /* Allocate structure */
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
@@ -136,41 +136,41 @@ int aout_SysOpen( aout_thread_t *p_aout )
     return( 0 );
 }
 /*****************************************************************************
- * aout_SysReset: resets the dsp
+ * aout_BeReset: resets the dsp
  *****************************************************************************/
-int aout_SysReset( aout_thread_t *p_aout )
+int aout_BeReset( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetFormat: sets the dsp output format
+ * aout_BeSetFormat: sets the dsp output format
  *****************************************************************************/
-int aout_SysSetFormat( aout_thread_t *p_aout )
+int aout_BeSetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetChannels: sets the dsp's stereo or mono mode
+ * aout_BeSetChannels: sets the dsp's stereo or mono mode
  *****************************************************************************/
-int aout_SysSetChannels( aout_thread_t *p_aout )
+int aout_BeSetChannels( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysSetRate: sets the dsp's audio output rate
+ * aout_BeSetRate: sets the dsp's audio output rate
  *****************************************************************************/
-int aout_SysSetRate( aout_thread_t *p_aout )
+int aout_BeSetRate( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SysGetBufInfo: buffer status query
+ * aout_BeGetBufInfo: buffer status query
  *****************************************************************************/
-long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_BeGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
 
     long i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
@@ -189,11 +189,11 @@ long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_SysPlaySamples: plays a sound samples buffer
+ * aout_BePlaySamples: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_BePlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     long i_newbuf_pos;
 
@@ -223,9 +223,9 @@ void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_SysClose: closes the dsp audio device
+ * aout_BeClose: closes the dsp audio device
  *****************************************************************************/
-void aout_SysClose( aout_thread_t *p_aout )
+void aout_BeClose( aout_thread_t *p_aout )
 {
     p_aout->p_sys->p_sound->UnlockCyclic();
     p_aout->p_sys->p_sound->StopPlaying( );

@@ -65,13 +65,13 @@ static int     GGIOpenDisplay   ( vout_thread_t *p_vout, char *psz_display, void
 static void    GGICloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_SysCreate: allocate GGI video thread output method
+ * vout_GGICreate: allocate GGI video thread output method
  *****************************************************************************
  * This function allocate and initialize a GGI vout method. It uses some of the
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window, void *p_data )
+int vout_GGICreate( vout_thread_t *p_vout, char *psz_display, int i_root_window, void *p_data )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -92,11 +92,11 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize GGI video thread output method
+ * vout_GGIInit: initialize GGI video thread output method
  *****************************************************************************
  * This function initialize the GGI display device.
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_GGIInit( vout_thread_t *p_vout )
 {
     /* Acquire first buffer */
     if( p_vout->p_sys->b_must_acquire )
@@ -108,11 +108,11 @@ int vout_SysInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate Sys video thread output method
+ * vout_GGIEnd: terminate Sys video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_SysCreate
+ * Terminate an output method created by vout_GGICreate
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_GGIEnd( vout_thread_t *p_vout )
 {
     /* Release buffer */
     if( p_vout->p_sys->b_must_acquire )
@@ -122,35 +122,35 @@ void vout_SysEnd( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy Sys video thread output method
+ * vout_GGIDestroy: destroy Sys video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_SysCreate
+ * Terminate an output method created by vout_GGICreate
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_GGIDestroy( vout_thread_t *p_vout )
 {
     GGICloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SysManage: handle Sys events
+ * vout_GGIManage: handle Sys events
  *****************************************************************************
  * This function should be called regularly by video output thread. It returns
  * a non null value if an error occured.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_GGIManage( vout_thread_t *p_vout )
 {
     /* FIXME: 8bpp: change palette ?? */
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_GGIDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to the display, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_GGIDisplay( vout_thread_t *p_vout )
 {
     /* Change display frame */
     if( p_vout->p_sys->b_must_acquire )

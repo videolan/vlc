@@ -31,6 +31,7 @@
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,14 +39,39 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
-
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void aout_GetPlugin( p_aout_thread_t p_aout );
-void vout_GetPlugin( p_vout_thread_t p_vout );
-void intf_GetPlugin( p_intf_thread_t p_intf );
+static void aout_GetPlugin( p_aout_thread_t p_aout );
+static void vout_GetPlugin( p_vout_thread_t p_vout );
+static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+/* Audio output */
+int     aout_DummyOpen         ( aout_thread_t *p_aout );
+int     aout_DummyReset        ( aout_thread_t *p_aout );
+int     aout_DummySetFormat    ( aout_thread_t *p_aout );
+int     aout_DummySetChannels  ( aout_thread_t *p_aout );
+int     aout_DummySetRate      ( aout_thread_t *p_aout );
+long    aout_DummyGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
+void    aout_DummyPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+                                 int i_size );
+void    aout_DummyClose        ( aout_thread_t *p_aout );
+
+/* Video output */
+int     vout_DummyCreate       ( vout_thread_t *p_vout, char *psz_display,
+                                 int i_root_window, void *p_data );
+int     vout_DummyInit         ( p_vout_thread_t p_vout );
+void    vout_DummyEnd          ( p_vout_thread_t p_vout );
+void    vout_DummyDestroy      ( p_vout_thread_t p_vout );
+int     vout_DummyManage       ( p_vout_thread_t p_vout );
+void    vout_DummyDisplay      ( p_vout_thread_t p_vout );
+void    vout_DummySetPalette   ( p_vout_thread_t p_vout,
+                                 u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+/* Interface */
+int     intf_DummyCreate       ( p_intf_thread_t p_intf );
+void    intf_DummyDestroy      ( p_intf_thread_t p_intf );
+void    intf_DummyManage       ( p_intf_thread_t p_intf );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
@@ -63,48 +89,55 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* The dummy plugin always works, but should have low priority */
+    p_info->i_score = 0x1;
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* the dummy plugin always works */
-    return( 1 );
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( VOUT_METHOD_VAR, "dummy" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( AOUT_METHOD_VAR, "dummy" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void aout_GetPlugin( p_aout_thread_t p_aout )
+static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_SysOpen;
-    p_aout->p_sys_reset       = aout_SysReset;
-    p_aout->p_sys_setformat   = aout_SysSetFormat;
-    p_aout->p_sys_setchannels = aout_SysSetChannels;
-    p_aout->p_sys_setrate     = aout_SysSetRate;
-    p_aout->p_sys_getbufinfo  = aout_SysGetBufInfo;
-    p_aout->p_sys_playsamples = aout_SysPlaySamples;
-    p_aout->p_sys_close       = aout_SysClose;
+    p_aout->p_sys_open        = aout_DummyOpen;
+    p_aout->p_sys_reset       = aout_DummyReset;
+    p_aout->p_sys_setformat   = aout_DummySetFormat;
+    p_aout->p_sys_setchannels = aout_DummySetChannels;
+    p_aout->p_sys_setrate     = aout_DummySetRate;
+    p_aout->p_sys_getbufinfo  = aout_DummyGetBufInfo;
+    p_aout->p_sys_playsamples = aout_DummyPlaySamples;
+    p_aout->p_sys_close       = aout_DummyClose;
 }
 
-void vout_GetPlugin( p_vout_thread_t p_vout )
+static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_sys_create  = vout_SysCreate;
-    p_vout->p_sys_init    = vout_SysInit;
-    p_vout->p_sys_end     = vout_SysEnd;
-    p_vout->p_sys_destroy = vout_SysDestroy;
-    p_vout->p_sys_manage  = vout_SysManage;
-    p_vout->p_sys_display = vout_SysDisplay;
+    p_vout->p_sys_create  = vout_DummyCreate;
+    p_vout->p_sys_init    = vout_DummyInit;
+    p_vout->p_sys_end     = vout_DummyEnd;
+    p_vout->p_sys_destroy = vout_DummyDestroy;
+    p_vout->p_sys_manage  = vout_DummyManage;
+    p_vout->p_sys_display = vout_DummyDisplay;
 }
 
-void intf_GetPlugin( p_intf_thread_t p_intf )
+static void intf_GetPlugin( p_intf_thread_t p_intf )
 {
-    p_intf->p_sys_create  = intf_SysCreate;
-    p_intf->p_sys_destroy = intf_SysDestroy;
-    p_intf->p_sys_manage  = intf_SysManage;
+    p_intf->p_sys_create  = intf_DummyCreate;
+    p_intf->p_sys_destroy = intf_DummyDestroy;
+    p_intf->p_sys_manage  = intf_DummyManage;
 }
 

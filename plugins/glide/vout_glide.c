@@ -74,11 +74,11 @@ static int     GlideOpenDisplay   ( vout_thread_t *p_vout );
 static void    GlideCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_SysCreate: allocates Glide video thread output method
+ * vout_GlideCreate: allocates Glide video thread output method
  *****************************************************************************
  * This function allocates and initializes a Glide vout method.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_GlideCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -101,50 +101,50 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize Glide video thread output method
+ * vout_GlideInit: initialize Glide video thread output method
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_GlideInit( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate Glide video thread output method
+ * vout_GlideEnd: terminate Glide video thread output method
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_GlideEnd( vout_thread_t *p_vout )
 {
     ;
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy Glide video thread output method
+ * vout_GlideDestroy: destroy Glide video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_GlideDestroy( vout_thread_t *p_vout )
 {
     GlideCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SysManage: handle Glide events
+ * vout_GlideManage: handle Glide events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_GlideManage( vout_thread_t *p_vout )
 {
     return 0;
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_GlideDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Glide image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_GlideDisplay( vout_thread_t *p_vout )
 {
     grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
 
@@ -188,7 +188,8 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_video = malloc( p_vout->p_sys->i_page_size * 2 );
     if( (int)p_vout->p_sys->p_video == -1 )
     {
-        intf_ErrMsg( "vout error: can't map video memory (%s)\n", strerror(errno) );
+        intf_ErrMsg( "vout error: can't map video memory (%s)\n",
+                     strerror(errno) );
         return( 1 );
     }
 

@@ -25,12 +25,17 @@
  *****************************************************************************/
 #include "defs.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <unistd.h>                                               /* close() */
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,18 +43,30 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
+#include "main.h"
 
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void aout_GetPlugin( p_aout_thread_t p_aout );
+static void aout_GetPlugin( p_aout_thread_t p_aout );
+
+/* Audio output */
+int     aout_DspOpen         ( aout_thread_t *p_aout );
+int     aout_DspReset        ( aout_thread_t *p_aout );
+int     aout_DspSetFormat    ( aout_thread_t *p_aout );
+int     aout_DspSetChannels  ( aout_thread_t *p_aout );
+int     aout_DspSetRate      ( aout_thread_t *p_aout );
+long    aout_DspGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
+void    aout_DspPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+                               int i_size );
+void    aout_DspClose        ( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
  *****************************************************************************/
 plugin_info_t * GetConfig( void )
 {
+    int i_fd;
     plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
 
     p_info->psz_name    = "OSS /dev/dsp";
@@ -61,31 +78,40 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = NULL;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* Test if the device can be opened */
+    if ( (i_fd = open( main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT ),
+                       O_WRONLY )) < 0 )
+    {
+        p_info->i_score = 0;
+    }
+    else
+    {
+        close( i_fd );
+        p_info->i_score = 0x100;
+    }
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* TODO: check if suitable */
-    return( 1 );
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( AOUT_METHOD_VAR, "dsp" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void aout_GetPlugin( p_aout_thread_t p_aout )
+static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_SysOpen;
-    p_aout->p_sys_reset       = aout_SysReset;
-    p_aout->p_sys_setformat   = aout_SysSetFormat;
-    p_aout->p_sys_setchannels = aout_SysSetChannels;
-    p_aout->p_sys_setrate     = aout_SysSetRate;
-    p_aout->p_sys_getbufinfo  = aout_SysGetBufInfo;
-    p_aout->p_sys_playsamples = aout_SysPlaySamples;
-    p_aout->p_sys_close       = aout_SysClose;
+    p_aout->p_sys_open        = aout_DspOpen;
+    p_aout->p_sys_reset       = aout_DspReset;
+    p_aout->p_sys_setformat   = aout_DspSetFormat;
+    p_aout->p_sys_setchannels = aout_DspSetChannels;
+    p_aout->p_sys_setrate     = aout_DspSetRate;
+    p_aout->p_sys_getbufinfo  = aout_DspGetBufInfo;
+    p_aout->p_sys_playsamples = aout_DspPlaySamples;
+    p_aout->p_sys_close       = aout_DspClose;
 }
 

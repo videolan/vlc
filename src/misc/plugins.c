@@ -89,9 +89,12 @@ void bank_Init( plugin_bank_t * p_bank )
     SEEK_PLUGIN( "beos" );
     SEEK_PLUGIN( "x11" );
     SEEK_PLUGIN( "dsp" );
+    SEEK_PLUGIN( "esd" );
     SEEK_PLUGIN( "gnome" );
     SEEK_PLUGIN( "ggi" );
     SEEK_PLUGIN( "fb" );
+    SEEK_PLUGIN( "glide" );
+    SEEK_PLUGIN( "mga" );
     SEEK_PLUGIN( "yuvmmx" );
     SEEK_PLUGIN( "yuv" );
     SEEK_PLUGIN( "dummy" );
@@ -107,51 +110,6 @@ void bank_Destroy( plugin_bank_t * p_bank )
 /*
  * Following functions are local
  */
-
-int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
-                    char * psz_filename )
-{
-    typedef plugin_info_t * ( get_config_t ) ( void );
-    get_config_t * p_func;   
-    int i;
-
-    for( i = 0 ; i < p_bank->i_plugin_count ; i++ )
-    {
-        if( p_bank->p_info[ i ] == NULL )
-        {
-            break;
-        }
-    }
-
-    /* no room to store that plugin, quit */
-    if( i == p_bank->i_plugin_count )
-    {
-        intf_ErrMsg( "plugin bank error: reached max plugin count (%i), "
-                     "increase MAX_PLUGIN_COUNT\n", p_bank->i_plugin_count );
-        return( -1 );
-    }
-
-    /* system-specific dynamic symbol loading */
-    GET_PLUGIN( p_func, plugin_id, "GetConfig" );
-
-    /* if it failed, just quit */
-    if( !p_func )
-    {
-        return( -1 );
-    }
-
-    /* run the plugin function to initialize the structure */
-    p_bank->p_info[ i ]            = p_func( );
-    p_bank->p_info[ i ]->plugin_id = plugin_id;
-
-    /* Tell the world we found it */
-    intf_Msg( "Found plugin: %s (version %s)\n", p_bank->p_info[ i ]->psz_name,
-              p_bank->p_info[ i ]->psz_version );
-
-    /* return nicely */
-    return( 0 );
-}
-
 
 char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
 {
@@ -206,6 +164,53 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
     }
 
     return( NULL );
+}
+
+
+int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
+                    char * psz_filename )
+{
+    typedef plugin_info_t * ( get_config_t ) ( void );
+    get_config_t * p_func;   
+    int i;
+
+    for( i = 0 ; i < p_bank->i_plugin_count ; i++ )
+    {
+        if( p_bank->p_info[ i ] == NULL )
+        {
+            break;
+        }
+    }
+
+    /* no room to store that plugin, quit */
+    if( i == p_bank->i_plugin_count )
+    {
+        intf_ErrMsg( "plugin bank error: reached max plugin count (%i), "
+                     "increase MAX_PLUGIN_COUNT\n", p_bank->i_plugin_count );
+        return( -1 );
+    }
+
+    /* system-specific dynamic symbol loading */
+    GET_PLUGIN( p_func, plugin_id, "GetConfig" );
+
+    /* if it failed, just quit */
+    if( !p_func )
+    {
+        return( -1 );
+    }
+
+    /* run the plugin function to initialize the structure */
+    p_bank->p_info[ i ]            = p_func( );
+    p_bank->p_info[ i ]->plugin_id = plugin_id;
+
+    /* Tell the world we found it */
+    intf_Msg( "Plugin %i: %s %s [0x%x]\n", i,
+              p_bank->p_info[ i ]->psz_name,
+              p_bank->p_info[ i ]->psz_version,
+              p_bank->p_info[ i ]->i_score );
+
+    /* return nicely */
+    return( 0 );
 }
 
 #if 0

@@ -125,9 +125,9 @@ extern "C"
 {
 
 /*****************************************************************************
- * intf_SysCreate: initialize dummy interface
+ * intf_BeCreate: initialize dummy interface
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_BeCreate( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
@@ -162,9 +162,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy dummy interface
+ * intf_BeDestroy: destroy dummy interface
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_BeDestroy( intf_thread_t *p_intf )
 {
     /* Close input thread, if any (blocking) */
     if( p_intf->p_input )
@@ -188,9 +188,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_BeManage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_BeManage( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->i_key != -1 )
     {

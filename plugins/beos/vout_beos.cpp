@@ -340,11 +340,11 @@ static int     BeosOpenDisplay   ( vout_thread_t *p_vout );
 static void    BeosCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_SysCreate: allocates dummy video thread output method
+ * vout_BeCreate: allocates dummy video thread output method
  *****************************************************************************
  * This function allocates and initializes a dummy vout method.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_BeCreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -371,9 +371,9 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize dummy video thread output method
+ * vout_BeInit: initialize dummy video thread output method
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_BeInit( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
     u32 i_page_size;
@@ -406,9 +406,9 @@ int vout_SysInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate dummy video thread output method
+ * vout_BeEnd: terminate dummy video thread output method
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_BeEnd( vout_thread_t *p_vout )
 {
    VideoWindow * p_win = p_vout->p_sys->p_window;
    
@@ -422,11 +422,11 @@ void vout_SysEnd( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy dummy video thread output method
+ * vout_BeDestroy: destroy dummy video thread output method
  *****************************************************************************
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_BeDestroy( vout_thread_t *p_vout )
 {
     BeosCloseDisplay( p_vout );
     
@@ -434,12 +434,12 @@ void vout_SysDestroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysManage: handle dummy events
+ * vout_BeManage: handle dummy events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_BeManage( vout_thread_t *p_vout )
 {
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
@@ -468,12 +468,12 @@ int vout_SysManage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_BeDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to dummy image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_BeDisplay( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
     

@@ -55,13 +55,13 @@
 #include "vout_mga.h"
 
 /*****************************************************************************
- * vout_SysCreate: allocate X11 video thread output method
+ * vout_MGACreate: allocate X11 video thread output method
  *****************************************************************************
  * This function allocate and initialize a X11 vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
+int vout_MGACreate( vout_thread_t *p_vout, char *psz_display,
                     int i_root_window, void *p_data )
 {
     /* Allocate structure */
@@ -105,12 +105,12 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_SysInit: initialize X11 video thread output method
+ * vout_MGAInit: initialize X11 video thread output method
  *****************************************************************************
  * This function create the XImages needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
-int vout_SysInit( vout_thread_t *p_vout )
+int vout_MGAInit( vout_thread_t *p_vout )
 {
     int i_err;
 
@@ -213,12 +213,12 @@ int vout_SysInit( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysEnd: terminate X11 video thread output method
+ * vout_MGAEnd: terminate X11 video thread output method
  *****************************************************************************
- * Destroy the X11 XImages created by vout_SysInit. It is called at the end of
+ * Destroy the X11 XImages created by vout_MGAInit. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
-void vout_SysEnd( vout_thread_t *p_vout )
+void vout_MGAEnd( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->b_shm )                             /* Shm XImages... */
     {
@@ -235,11 +235,11 @@ void vout_SysEnd( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDestroy: destroy X11 video thread output method
+ * vout_MGADestroy: destroy X11 video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
-void vout_SysDestroy( vout_thread_t *p_vout )
+void vout_MGADestroy( vout_thread_t *p_vout )
 {
     X11CloseDisplay( p_vout );
 
@@ -251,13 +251,13 @@ void vout_SysDestroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysManage: handle X11 events
+ * vout_MGAManage: handle X11 events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * X11 events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
-int vout_SysManage( vout_thread_t *p_vout )
+int vout_MGAManage( vout_thread_t *p_vout )
 {
     /*
      * Color/Grayscale or gamma change: in 8bpp, just change the colormap
@@ -280,10 +280,10 @@ int vout_SysManage( vout_thread_t *p_vout )
                        p_vout->i_width, p_vout->i_height );
 
         /* Destroy XImages to change their size */
-        vout_SysEnd( p_vout );
+        vout_MGAEnd( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_SysInit( p_vout ) )
+        if( vout_MGAInit( p_vout ) )
         {
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );
@@ -299,12 +299,12 @@ int vout_SysManage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_SysDisplay: displays previously rendered output
+ * vout_MGADisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to X11 server, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-void vout_SysDisplay( vout_thread_t *p_vout )
+void vout_MGADisplay( vout_thread_t *p_vout )
 {
     if( p_vout->p_sys->b_shm)                                /* XShm is used */
     {

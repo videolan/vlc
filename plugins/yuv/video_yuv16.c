@@ -73,6 +73,8 @@ void ConvertY4Gray16( YUV_ARGS_16BPP )
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
+    p_y = p_v;
+    i_height /= 4;
     /*
      * Perform conversion
      */

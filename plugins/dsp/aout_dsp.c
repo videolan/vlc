@@ -22,10 +22,10 @@
 
 /* TODO:
  *
- * - an aout_sysGetFormats() function
+ * - an aout_DspGetFormats() function
  * - dsp inline/static
  * - make this library portable (see mpg123)
- * - macroify aout_sysPlaySamples &/| aout_sysGetBufInfo ?
+ * - macroify aout_DspPlaySamples &/| aout_DspGetBufInfo ?
  *
  */
 
@@ -74,12 +74,12 @@ typedef struct aout_sys_s
 } aout_sys_t;
 
 /*****************************************************************************
- * aout_SysOpen: opens the audio device (the digital sound processor)
+ * aout_DspOpen: opens the audio device (the digital sound processor)
  *****************************************************************************
  * - This function opens the dsp as an usual non-blocking write-only file, and
  *   modifies the p_aout->p_sys->i_fd with the file's descriptor.
  *****************************************************************************/
-int aout_SysOpen( aout_thread_t *p_aout )
+int aout_DspOpen( aout_thread_t *p_aout )
 {
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -106,9 +106,9 @@ int aout_SysOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysReset: resets the dsp
+ * aout_DspReset: resets the dsp
  *****************************************************************************/
-int aout_SysReset( aout_thread_t *p_aout )
+int aout_DspReset( aout_thread_t *p_aout )
 {
     if ( ioctl( p_aout->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
@@ -120,13 +120,13 @@ int aout_SysReset( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysSetFormat: sets the dsp output format
+ * aout_DspSetFormat: sets the dsp output format
  *****************************************************************************
  * This functions tries to initialize the dsp output format with the value
  * contained in the dsp structure, and if this value could not be set, the
  * default value returned by ioctl is set.
  *****************************************************************************/
-int aout_SysSetFormat( aout_thread_t *p_aout )
+int aout_DspSetFormat( aout_thread_t *p_aout )
 {
     int i_format;
 
@@ -147,11 +147,11 @@ int aout_SysSetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysSetChannels: sets the dsp's stereo or mono mode
+ * aout_DspSetChannels: sets the dsp's stereo or mono mode
  *****************************************************************************
  * This function acts just like the previous one...
  *****************************************************************************/
-int aout_SysSetChannels( aout_thread_t *p_aout )
+int aout_DspSetChannels( aout_thread_t *p_aout )
 {
     boolean_t b_stereo = p_aout->b_stereo;
 
@@ -172,13 +172,13 @@ int aout_SysSetChannels( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysSetRate: sets the dsp's audio output rate
+ * aout_DspSetRate: sets the dsp's audio output rate
  *****************************************************************************
  * This function tries to initialize the dsp with the rate contained in the
  * dsp structure, but if the dsp doesn't support this value, the function uses
  * the value returned by ioctl...
  *****************************************************************************/
-int aout_SysSetRate( aout_thread_t *p_aout )
+int aout_DspSetRate( aout_thread_t *p_aout )
 {
     long l_rate;
 
@@ -199,7 +199,7 @@ int aout_SysSetRate( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SysGetBufInfo: buffer status query
+ * aout_DspGetBufInfo: buffer status query
  *****************************************************************************
  * This function fills in the audio_buf_info structure :
  * - int fragments : number of available fragments (partially usend ones not
@@ -209,7 +209,7 @@ int aout_SysSetRate( aout_thread_t *p_aout )
  * - int bytes : available space in bytes (includes partially used fragments)
  * Note! 'bytes' could be more than fragments*fragsize
  *****************************************************************************/
-long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_DspGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     ioctl( p_aout->i_fd, SNDCTL_DSP_GETOSPACE, &p_aout->p_sys->audio_buf );
 
@@ -220,11 +220,11 @@ long aout_SysGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_SysPlaySamples: plays a sound samples buffer
+ * aout_DspPlaySamples: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_DspPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     if( p_aout->b_active )
     {
@@ -233,9 +233,9 @@ void aout_SysPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_SysClose: closes the dsp audio device
+ * aout_DspClose: closes the dsp audio device
  *****************************************************************************/
-void aout_SysClose( aout_thread_t *p_aout )
+void aout_DspClose( aout_thread_t *p_aout )
 {
     close( p_aout->i_fd );
 }

@@ -27,10 +27,13 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 
+#include <X11/Xlib.h>
+
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 #include "plugins.h"
 
 #include "interface.h"
@@ -38,19 +41,36 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "plugins_export.h"
+#include "main.h"
 
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-void vout_GetPlugin( p_vout_thread_t p_vout );
-void intf_GetPlugin( p_intf_thread_t p_intf );
+static void vout_GetPlugin( p_vout_thread_t p_vout );
+static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+/* Video output */
+int     vout_X11Create       ( vout_thread_t *p_vout, char *psz_display,
+                               int i_root_window, void *p_data );
+int     vout_X11Init         ( p_vout_thread_t p_vout );
+void    vout_X11End          ( p_vout_thread_t p_vout );
+void    vout_X11Destroy      ( p_vout_thread_t p_vout );
+int     vout_X11Manage       ( p_vout_thread_t p_vout );
+void    vout_X11Display      ( p_vout_thread_t p_vout );
+void    vout_X11SetPalette   ( p_vout_thread_t p_vout,
+                               u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+/* Interface */
+int     intf_X11Create       ( p_intf_thread_t p_intf );
+void    intf_X11Destroy      ( p_intf_thread_t p_intf );
+void    intf_X11Manage       ( p_intf_thread_t p_intf );
 
 /*****************************************************************************
  * GetConfig: get the plugin structure and configuration
  *****************************************************************************/
 plugin_info_t * GetConfig( void )
 {
+    Display *p_display;
     plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
 
     p_info->psz_name    = "X Window System";
@@ -62,39 +82,54 @@ plugin_info_t * GetConfig( void )
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin  = NULL;
 
-    return( p_info );
-}
+    /* check that we can open the X display */
+    if( (p_display = XOpenDisplay( XDisplayName(
+                         main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) ) ))
+        == NULL )
+    {
+        p_info->i_score = 0x0;
+    }
+    else
+    {
+        XCloseDisplay( p_display );
+        p_info->i_score = 0x200;
+    }
 
-/*****************************************************************************
- * Test: tests if the plugin can be launched
- *****************************************************************************/
-int Test( void )
-{
-    /* TODO: detect an X display */
-    return( 1 );
+    if( TestProgram( "xvlc" ) )
+    {
+        p_info->i_score += 0x180;
+    }
+
+    /* If this plugin was requested, score it higher */
+    if( TestMethod( VOUT_METHOD_VAR, "x11" ) )
+    {
+        p_info->i_score += 0x200;
+    }
+
+    return( p_info );
 }
 
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
 
-void vout_GetPlugin( p_vout_thread_t p_vout )
+static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
-    p_vout->p_sys_create  = vout_SysCreate;
-    p_vout->p_sys_init    = vout_SysInit;
-    p_vout->p_sys_end     = vout_SysEnd;
-    p_vout->p_sys_destroy = vout_SysDestroy;
-    p_vout->p_sys_manage  = vout_SysManage;
-    p_vout->p_sys_display = vout_SysDisplay;
+    p_vout->p_sys_create  = vout_X11Create;
+    p_vout->p_sys_init    = vout_X11Init;
+    p_vout->p_sys_end     = vout_X11End;
+    p_vout->p_sys_destroy = vout_X11Destroy;
+    p_vout->p_sys_manage  = vout_X11Manage;
+    p_vout->p_sys_display = vout_X11Display;
 
     /* optional functions */
-    p_vout->p_set_palette = vout_SetPalette;
+    p_vout->p_set_palette = vout_X11SetPalette;
 }
 
-void intf_GetPlugin( p_intf_thread_t p_intf )
+static void intf_GetPlugin( p_intf_thread_t p_intf )
 {
-    p_intf->p_sys_create  = intf_SysCreate;
-    p_intf->p_sys_destroy = intf_SysDestroy;
-    p_intf->p_sys_manage  = intf_SysManage;
+    p_intf->p_sys_create  = intf_X11Create;
+    p_intf->p_sys_destroy = intf_X11Destroy;
+    p_intf->p_sys_manage  = intf_X11Manage;
 }
 

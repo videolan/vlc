@@ -94,6 +94,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     typedef void    ( vout_getplugin_t ) ( vout_thread_t * p_vout );
     int             i_status;                               /* thread status */
     int             i_index;               /* index for array initialization */
+    int             i_best_index = 0, i_best_score = 0;
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");
@@ -115,12 +116,26 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
             /* ... and if this plugin provides the functions we want ... */
             if( p_main->p_bank->p_info[ i_index ]->vout_GetPlugin != NULL )
             {
-                /* ... then get these functions */
-                ( (vout_getplugin_t *)
-                  p_main->p_bank->p_info[ i_index ]->vout_GetPlugin )( p_vout );
+                /* ... and if this plugin has a good score ... */
+                if( p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
+                {
+                    /* ... then take it */
+                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
+                    i_best_index = i_index;
+                }
             }
         }
     }
+
+    if( i_best_score == 0 )
+    {
+        free( p_vout );
+        return( NULL );
+    }
+
+    /* Get the plugin functions */
+    ( (vout_getplugin_t *)
+      p_main->p_bank->p_info[ i_best_index ]->vout_GetPlugin )( p_vout );
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */

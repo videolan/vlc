@@ -53,9 +53,9 @@ typedef struct intf_sys_s
 } intf_sys_t;
 
 /*****************************************************************************
- * intf_SysCreate: initialize dummy interface
+ * intf_DummyCreate: initialize dummy interface
  *****************************************************************************/
-int intf_SysCreate( intf_thread_t *p_intf )
+int intf_DummyCreate( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -78,9 +78,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_SysDestroy: destroy dummy interface
+ * intf_DummyDestroy: destroy dummy interface
  *****************************************************************************/
-void intf_SysDestroy( intf_thread_t *p_intf )
+void intf_DummyDestroy( intf_thread_t *p_intf )
 {
     /* Close input thread, if any (blocking) */
     if( p_intf->p_input )
@@ -100,9 +100,9 @@ void intf_SysDestroy( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_SysManage: event loop
+ * intf_DummyManage: event loop
  *****************************************************************************/
-void intf_SysManage( intf_thread_t *p_intf )
+void intf_DummyManage( intf_thread_t *p_intf )
 {
     ;
 }
