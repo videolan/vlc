@@ -7,7 +7,7 @@
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
  *          David Kennedy <dkennedy@tinytoad.com>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1037,7 +1037,9 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XMapWindow( p_vout->p_sys->p_display, p_win->base_window );
     do
     {
-        XNextEvent( p_vout->p_sys->p_display, &xevent);
+        XWindowEvent( p_vout->p_sys->p_display, p_win->base_window,
+                      SubstructureNotifyMask | StructureNotifyMask |
+                      ExposureMask, &xevent);
         if( (xevent.type == Expose)
             && (xevent.xexpose.window == p_win->base_window) )
         {
@@ -1478,9 +1480,9 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     {
         msg_Dbg( p_vout, "leaving fullscreen mode" );
 
-	XReparentWindow( p_vout->p_sys->p_display,
-			 p_vout->p_sys->original_window.video_window,
-			 p_vout->p_sys->original_window.base_window, 0, 0 );
+        XReparentWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->original_window.video_window,
+                         p_vout->p_sys->original_window.base_window, 0, 0 );
 
         p_vout->p_sys->fullscreen_window.video_window = None;
         DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
