@@ -315,9 +315,9 @@ static int Demux ( demux_t *p_demux )
         {
             char *temp;
             
-            temp = (char *)malloc( sizeof("rtsp/live://" ":" "123456789") +
+            temp = (char *)malloc( sizeof("rtsp://" ":" "123456789") +
                                        strlen( p_sys->psz_server ) + strlen( p_sys->psz_location ) );
-            sprintf( temp, "rtsp/live://" "%s:%i%s",
+            sprintf( temp, "rtsp://" "%s:%i%s",
                      p_sys->psz_server, p_sys->i_port > 0 ? p_sys->i_port : 554, p_sys->psz_location );
             
             p_sys->psz_uri = strdup( temp );
