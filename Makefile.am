@@ -236,7 +236,7 @@ EXTRA_DIST += \
 	$(NULL)
 
 dist-hook:
-	mv $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
+	cp $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
 	cd $(distdir) && srcdir=$(srcdir) $(srcdir)/toolbox --update-vc
 
 ###############################################################################
