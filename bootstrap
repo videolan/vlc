@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.33 2002/11/21 13:53:31 sam Exp $
+##  $Id: bootstrap,v 1.34 2002/12/17 14:39:05 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -292,6 +292,7 @@ fi
 
 PERLSUCKS=no
 AUTOMAKESUCKS=no
+INSTALLSUCKS=no
 
 ##
 ## Generate the modules makefile, by parsing modules/**/Modules.am
@@ -466,6 +467,7 @@ else
   else
     if automake-1.5 --version >/dev/null 2>&1
     then
+      INSTALLSUCKS=yes
       amvers="-1.5"
     else
       if automake --version > /dev/null 2>&1
@@ -474,6 +476,8 @@ else
         case $amvers in
         1.6|1.6.0|1.6.1)
           AUTOMAKESUCKS=yes ;;
+        1.5.*)
+          INSTALLSUCKS=yes ;;
         esac
 
         if expr "$amvers" "<" "1.5" > /dev/null 2>&1
@@ -503,12 +507,14 @@ case "$PERLSUCKS" in
   ;;
   yes)
     set +x
-    echo ""
-    echo "==========================================================="
-    echo "IMPORTANT NOTE: automake failed. On certain systems this is"
-    echo "because of insufficient stack size. Please set the stack"
-    echo "size to something bigger or unlimited (\`unlimit stacksize')"
-    echo "and try again."
+    cat << EOF
+
+=======================================================================
+IMPORTANT NOTE: automake failed, please check the error messages. If it
+actually segfaulted, it might be because of insufficient stack size; set
+the stack size to something bigger or unlimited (\`unlimit stacksize')
+and try again.
+EOF
     exit 1
   ;;
 esac
@@ -572,17 +578,21 @@ case "$GETTEXT" in
   yes)
   ;;
   no)
-    echo ""
-    echo "==========================================================="
-    echo "IMPORTANT NOTE: you do not have gettext installed on your"
-    echo "system. The vlc build will work, but you will not have"
-    echo "internationalization support. We suggest installing gettext."
+    cat << EOF
+
+===========================================================
+IMPORTANT NOTE: you do not have gettext installed on your
+system. The vlc build will work, but you will not have
+internationalization support. We suggest installing gettext.
+EOF
   ;;
   old)
-    echo ""
-    echo "=========================================================="
-    echo "NOTE: you have an old version of gettext installed on your"
-    echo "system. We suggest upgrading to gettext 0.11.3 or later."
+    cat << EOF
+
+==========================================================
+NOTE: you have an old version of gettext installed on your
+system. We suggest upgrading to gettext 0.11.3 or later.
+EOF
   ;;
 esac
 
@@ -590,12 +600,29 @@ case "$AUTOMAKESUCKS" in
   no)
   ;;
   yes)
-    echo ""
-    echo "============================================================="
-    echo "IMPORTANT NOTE: your version of automake has a bug which will"
-    echo "prevent proper plugin compilation. Either compile VLC with"
-    echo "the --disable-plugins flag, or use a version of automake newer"
-    echo "than 1.6.1 (1.6.2 is OK, and so are the 1.5 series)."
+    cat << EOF
+
+=============================================================
+IMPORTANT NOTE: your version of automake has a bug which will
+prevent proper plugin compilation. Either compile VLC with
+the --disable-plugins flag, or use a version of automake newer
+than 1.6.1 (1.6.2 is OK, and so are the 1.5 series).
+EOF
+  ;;
+esac
+
+case "$INSTALLSUCKS" in
+  no)
+  ;;
+  yes)
+    cat << EOF
+
+=============================================================
+IMPORTANT NOTE: your version of automake has a bug which will
+prevent proper installation. Do not use "make install" with this
+version of automake, or use a version of automake newer than 1.5
+(such as 1.6 or 1.7).
+EOF
   ;;
 esac
 
@@ -603,12 +630,14 @@ case "$SEDSUCKS" in
   no)
   ;;
   yes)
-    echo ""
-    echo "============================================================="
-    echo "IMPORTANT NOTE: the version of 'sed' on your system is unable"
-    echo "to handle long lines. bootstrap will try its best to generate"
-    echo "a correct Makefile, but you should expect problems. We highly"
-    echo "recommend installing GNU sed."
+    cat << EOF
+
+=============================================================
+IMPORTANT NOTE: the version of 'sed' on your system is unable
+to handle long lines. bootstrap will try its best to generate
+a correct Makefile, but you should expect problems. We highly
+recommend installing GNU sed.
+EOF
   ;;
 esac
 
