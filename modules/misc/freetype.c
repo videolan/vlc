@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.24 2003/10/01 22:44:58 hartman Exp $
+ * $Id: freetype.c,v 1.25 2003/10/23 23:00:37 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -31,7 +31,7 @@
 #include <vlc/vout.h>
 #include <osd.h>
 #include <math.h>
-
+ 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -42,6 +42,13 @@
 #define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
 #else
 #define DEFAULT_FONT ""
+#endif
+
+#if defined(HAVE_ICONV)
+#include <iconv.h>
+#endif
+#if defined(HAVE_FRIBIDI)
+#include <fribidi/fribidi.h>
 #endif
 
 typedef struct line_desc_t line_desc_t;
@@ -636,10 +643,13 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
                      int i_vmargin, mtime_t i_start, mtime_t i_stop )
 {
     subpicture_sys_t *p_string;
-    int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous, i_char;
+    int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
     subpicture_t *p_subpic;
     line_desc_t  *p_line,  *p_next;
-
+    uint32_t *p_unicode_string, i_char;
+    int i_string_length;
+    iconv_t iconv_handle;
+    
     FT_BBox line;
     FT_BBox glyph_size;
     FT_Vector result;
@@ -696,6 +706,52 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     p_string->p_lines = 0;
     p_string->psz_text = strdup( psz_string );
 
+#if defined(HAVE_ICONV)
+    p_unicode_string = malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
+    if( p_unicode_string == NULL )
+    {
+        msg_Err( p_vout, "Out of memory" );
+        goto error;
+    }
+    iconv_handle = iconv_open( "UCS-4LE", "UTF-8" );
+    if( iconv_handle == (iconv_t)-1 )
+    {
+        msg_Warn( p_vout, "Unable to do convertion" );
+        goto error;
+    }
+    {
+        char *p_in_buffer;
+        uint32_t *p_out_buffer;
+        int i_in_bytes, i_out_bytes, i_out_bytes_left, i_ret;
+        i_in_bytes = strlen( psz_string );
+        i_out_bytes = i_in_bytes * sizeof( uint32_t );
+        i_out_bytes_left = i_out_bytes;
+        p_in_buffer = psz_string;
+        p_out_buffer = p_unicode_string;
+        i_ret = iconv( iconv_handle, &p_in_buffer, &i_in_bytes, (char**)&p_out_buffer, &i_out_bytes_left );
+        if( i_in_bytes )
+        {
+            msg_Warn( p_vout, "Failed to convert string to unicode (%s), bytes left %d", strerror(errno), i_in_bytes );
+            goto error;
+        }
+        *p_out_buffer = 0;
+        i_string_length = ( i_out_bytes - i_out_bytes_left ) / sizeof(uint32_t);
+    }
+        
+#if defined(HAVE_FRIBIDI)
+    {
+        uint32_t *p_fribidi_string;
+        FriBidiCharType base_dir = FRIBIDI_TYPE_ON;
+        p_fribidi_string = malloc( ( i_string_length + 1 ) * sizeof(uint32_t) );
+        fribidi_log2vis( p_unicode_string, i_string_length, &base_dir,
+                         p_fribidi_string, NULL, NULL, NULL );
+        free( p_unicode_string );
+        p_unicode_string = p_fribidi_string;
+        p_fribidi_string[ i_string_length ] = 0;
+    }
+#endif
+#endif
+    
     /* Calculate relative glyph positions and a bounding box for the
      * entire string */
     p_line = NewLine( psz_string );
@@ -713,10 +769,11 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
 #define face p_vout->p_text_renderer_data->p_face
 #define glyph face->glyph
 
-    while( *psz_string )
+    while( *p_unicode_string )
     {
-        i_char = GetUnicodeCharFromUTF8( &psz_string );
-
+//        i_char = GetUnicodeCharFromUTF8( &psz_string );
+        i_char = *p_unicode_string++;
+        msg_Dbg( p_vout, "got char %d, '%c'", i_char, (char)i_char );
         if ( i_char == '\r' ) /* ignore CR chars wherever they may be */
         {
             continue;

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.91 2003/10/23 17:04:39 sam Exp $
+dnl $Id: configure.ac,v 1.92 2003/10/23 23:00:37 sigmunau Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2285,6 +2285,15 @@ then
         FREETYPE_PATH="${with_freetype_config_path}:${PATH}"
       fi ])
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
+  FRIBIDI_PATH="${PATH}"
+  AC_ARG_WITH(fribidi-config-path,
+    [    --with-fribidi-config-path=PATH fribidi-config path (default search in \$PATH)],
+    [ if test "${with_fribidi_config_path}" != "no"
+      then
+        FRIBIDI_PATH="${with_fribidi_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(FRIBIDI_CONFIG, fribidi-config, no, ${FRIBIDI_PATH})
+
 
   if test "${FREETYPE_CONFIG}" != "no"
   then
@@ -2299,6 +2308,11 @@ then
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
 from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
     ])
+  fi
+  if test "${FRIBIDI_CONFIG}" != "no"
+  then
+    AX_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
+    AX_ADD_LDFLAGS([freetype], [`${FRIBIDI_CONFIG} --libs`])
   fi
 fi
 
