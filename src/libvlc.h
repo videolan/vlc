@@ -27,14 +27,13 @@
 #include "vlc_keys.h"
 
 static char *ppsz_language[] =
-{ "auto", "en", "en_GB", "es", "de",
-  "fr", "hu", "it", "ja", "nl", "no",
-  "pl", "pt_BR", "ru", "sv" };
+{ "auto", "en", "en_GB", "bn", "da", "de", "el", "es",
+  "fr", "hi", "hu", "it", "ja", "my", "nl", "no",
+  "pl", "ps", "pt_BR", "ru", "sv", "tet", "tl" };
 static char *ppsz_language_text[] =
-{ N_("Auto"), N_("American"), N_("British"), N_("Spanish"), N_("German"),
-  N_("French"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Dutch"),
-  N_("Norwegian"), N_("Polish"), N_("Brazilian"), N_("Russian"),
-  N_("Swedish") };
+{ N_("Auto"), N_("American"), N_("British"), N_("Bengali"), N_("Danish"), N_("German"), N_("Greek"), N_("Spanish"),
+  N_("French"), N_("Hindi"), N_("Hungarian"), N_("Italian"), N_("Japanese"), N_("Burmese"), N_("Dutch"), N_("Norwegian"),
+  N_("Polish"), N_("Pashto"), N_("Brazilian"), N_("Russian"), N_("Swedish"), N_("Tetum"), N_("Tagalog") };
 
 static char *ppsz_snap_formats[] =
 { "png", "jpg" };
