@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.16 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: messages.cpp,v 1.17 2003/11/25 00:58:41 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -122,6 +122,11 @@ Messages::~Messages()
 {
     /* Clean up */
     if( save_log_dialog ) delete save_log_dialog;
+
+    delete info_attr;
+    delete err_attr;
+    delete warn_attr;
+    delete dbg_attr;
 }
 
 bool Messages::Show( bool show )

@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.42 2003/10/29 22:25:11 zorglub Exp $
+ * $Id: preferences.cpp,v 1.43 2003/11/25 00:58:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -119,17 +119,19 @@ class ConfigTreeData : public wxTreeItemData
 {
 public:
 
-    ConfigTreeData() { b_submodule = 0; panel = NULL; psz_section = NULL; }
-    virtual ~ConfigTreeData() { if( panel ) delete panel; }
+    ConfigTreeData() { b_submodule = 0; panel = NULL; psz_section = NULL;
+                       psz_help = NULL; }
+    virtual ~ConfigTreeData() { if( panel ) delete panel;
+                                if( psz_section) free(psz_section);
+                                if( psz_help) free(psz_help); }
 
     vlc_bool_t b_submodule;
-
-    char *psz_help;
 
     PrefsPanel *panel;
     wxBoxSizer *sizer;
     int i_object_id;
     char *psz_section;
+    char *psz_help;
 };
 
 /*****************************************************************************
@@ -362,7 +364,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
      * Build a tree of the main options
      */
     ConfigTreeData *config_data = new ConfigTreeData;
-    config_data->psz_section = NULL;
     config_data->i_object_id = GENERAL_ID;
     config_data->psz_help = wraptext( GENERAL_HELP, 72 , ISUTF8 );
     config_data->psz_section = strdup( GENERAL_TITLE );
@@ -417,7 +418,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
      * Build a tree of all the plugins
      */
     config_data = new ConfigTreeData;
-    config_data->psz_section = NULL;
     config_data->i_object_id = PLUGIN_ID;
     config_data->psz_help = wraptext( PLUGIN_HELP, 72, ISUTF8 );
     config_data->psz_section = strdup( PLUGIN_TITLE );
