@@ -27,7 +27,7 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
 		macosx/macosx mga/mga \
 		motion/motion motion/motionmmx motion/motionmmxext \
-		mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
+		mpeg/es mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
 		text/text x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
 
 #
