@@ -1657,7 +1657,9 @@ fi
 dnl
 dnl MP4 module
 dnl
-AC_CHECK_HEADERS(zlib.h, [ LDFLAGS_mp4="${LDFLAGS_mp4} -lz" ] )
+AC_CHECK_HEADERS(zlib.h, [
+  LDFLAGS_mp4="${LDFLAGS_mp4} -lz"
+] )
 
 dnl
 dnl  a52 AC3 decoder plugin
