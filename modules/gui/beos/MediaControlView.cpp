@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: MediaControlView.cpp,v 1.2 2002/09/18 11:50:47 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -120,8 +120,8 @@ MediaControlView::MediaControlView( BRect frame )
 
     /* Volume Slider */
     p_vol = new MediaSlider(BRect(xStart,20,255,30), new BMessage(VOLUME_CHG),
-                            0, VOLUME_MAX);
-    p_vol->SetValue(VOLUME_DEFAULT);
+                            AOUT_VOLUME_MIN, AOUT_VOLUME_MAX);
+    p_vol->SetValue(AOUT_VOLUME_DEFAULT);
     p_vol->UseFillColor(true, &fill_color);
     AddChild( p_vol );
 
