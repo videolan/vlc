@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.1.2.1 2002/06/02 00:43:43 sam Exp $
+ * $Id: crop.c,v 1.1.2.2 2002/06/02 02:04:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@ static void vout_getfunctions( function_list_t * p_function_list );
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING ( "crop-geometry", NULL, NULL, N_("Crop geometry"), N_("Set the geometry of the zone to crop") )
-//ADD_BOOL ( "autocrop", 0, NULL, N_("Automatic cropping"), N_("Activate automatic black border cropping") )
+ADD_BOOL ( "autocrop", 0, NULL, N_("Automatic cropping"), N_("Activate automatic black border cropping") )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -77,6 +77,12 @@ typedef struct vout_sys_s
     unsigned int i_x, i_y;
     unsigned int i_width, i_height, i_aspect;
 
+    boolean_t b_autocrop;
+
+    /* Autocrop specific variables */
+    unsigned int i_lastchange;
+    boolean_t    b_changed;
+
 } vout_sys_t;
 
 /*****************************************************************************
@@ -89,6 +95,8 @@ static void vout_Destroy   ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
+
+static void UpdateStats    ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -134,11 +142,17 @@ static int vout_Init( vout_thread_t *p_vout )
     
     I_OUTPUTPICTURES = 0;
 
+    p_vout->p_sys->i_lastchange = 0;
+    p_vout->p_sys->b_changed = 0;
+
     /* Initialize the output structure */
     p_vout->output.i_chroma = p_vout->render.i_chroma;
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
+
+    /* Shall we use autocrop ? */
+    p_vout->p_sys->b_autocrop = config_GetIntVariable( "autocrop" );
 
     /* Get geometry value from the user */
     psz_var = config_GetPszVariable( "crop-geometry" );
@@ -197,40 +211,41 @@ static int vout_Init( vout_thread_t *p_vout )
                      ( p_vout->output.i_height - p_vout->p_sys->i_height ) / 2;
         }
 
+        /* Check for validity */
+        if( p_vout->p_sys->i_x + p_vout->p_sys->i_width
+                                                   > p_vout->output.i_width )
+        {
+            p_vout->p_sys->i_x = 0;
+            if( p_vout->p_sys->i_width > p_vout->output.i_width )
+            {
+                p_vout->p_sys->i_width = p_vout->output.i_width;
+            }
+        }
+
+        if( p_vout->p_sys->i_y + p_vout->p_sys->i_height
+                                                   > p_vout->output.i_height )
+        {
+            p_vout->p_sys->i_y = 0;
+            if( p_vout->p_sys->i_height > p_vout->output.i_height )
+            {
+                p_vout->p_sys->i_height = p_vout->output.i_height;
+            }
+        }
+
         free( psz_var );
     }
     else
     {
         p_vout->p_sys->i_width  = p_vout->output.i_width;
         p_vout->p_sys->i_height = p_vout->output.i_height;
-        p_vout->p_sys->i_x =
-                     ( p_vout->output.i_width - p_vout->p_sys->i_width ) / 2;
-        p_vout->p_sys->i_y =
-                     ( p_vout->output.i_height - p_vout->p_sys->i_height ) / 2;
+        p_vout->p_sys->i_x = p_vout->p_sys->i_y = 0;
     }
 
-    /* Check for validity */
-    if( p_vout->p_sys->i_x + p_vout->p_sys->i_width > p_vout->output.i_width )
-    {
-        p_vout->p_sys->i_x = 0;
-        if( p_vout->p_sys->i_width > p_vout->output.i_width )
-        {
-            p_vout->p_sys->i_width = p_vout->output.i_width;
-        }
-    }
-
-    if( p_vout->p_sys->i_y + p_vout->p_sys->i_height > p_vout->output.i_height )
-    {
-        p_vout->p_sys->i_y = 0;
-        if( p_vout->p_sys->i_height > p_vout->output.i_height )
-        {
-            p_vout->p_sys->i_height = p_vout->output.i_height;
-        }
-    }
-
-    intf_WarnMsg( 3, "vout info: cropping at %ix%i+%i+%i",
+    /* Pheeew. Parsing done. */
+    intf_WarnMsg( 3, "vout info: cropping at %ix%i+%i+%i, %sautocropping",
                   p_vout->p_sys->i_width, p_vout->p_sys->i_height,
-                  p_vout->p_sys->i_x, p_vout->p_sys->i_y );
+                  p_vout->p_sys->i_x, p_vout->p_sys->i_y,
+                  p_vout->p_sys->b_autocrop ? "" : "not " );
 
     /* Set current output image properties */
     p_vout->p_sys->i_aspect = p_vout->output.i_aspect
@@ -297,6 +312,26 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
+    if( !p_vout->p_sys->b_changed )
+    {
+        return 0;
+    }
+
+    vout_DestroyThread( p_vout->p_sys->p_vout, NULL );
+
+    p_vout->p_sys->p_vout =
+        vout_CreateThread( NULL,
+                    p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+                    p_vout->render.i_chroma, p_vout->p_sys->i_aspect );
+    if( p_vout->p_sys->p_vout == NULL )
+    {
+        intf_ErrMsg( "vout error: failed to create vout" );
+        return 1;
+    }
+
+    p_vout->p_sys->b_changed = 0;
+    p_vout->p_sys->i_lastchange = 0;
+
     return 0;
 }
 
@@ -311,6 +346,11 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic = NULL;
     int i_plane;
+
+    if( p_vout->p_sys->b_changed )
+    {
+        return;
+    }
 
     while( ( p_outpic =
                  vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 )
@@ -354,6 +394,14 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    /* The source image may still be in the cache ... parse it! */
+    if( !p_vout->p_sys->b_autocrop )
+    {
+        return;
+    }
+
+    UpdateStats( p_vout, p_pic );
 }
 
 /*****************************************************************************
@@ -366,5 +414,89 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     ;
+}
+
+static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    u8 *p_in = p_pic->p[0].p_pixels;
+    int i_pitch = p_pic->p[0].i_pitch;
+    int i_lines = p_pic->p[0].i_lines;
+    int i_firstwhite = -1, i_lastwhite = -1, i;
+
+    /* Determine where black borders are */
+    switch( p_vout->output.i_chroma )
+    {
+    case FOURCC_I420:
+        /* XXX: Do not laugh ! I know this is very naive. But it's just a
+         *      proof of concept code snippet... */
+        for( i = i_lines ; i-- ; )
+        {
+            const int i_col = i * i_pitch / i_lines;
+
+            if( p_in[i_col/2] > 40
+                 && p_in[i_pitch / 2] > 40
+                 && p_in[i_pitch/2 + i_col/2] > 40 )
+            {
+                if( i_lastwhite == -1 )
+                {
+                    i_lastwhite = i;
+                }
+                i_firstwhite = i;
+            }
+            p_in += i_pitch;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    /* Decide whether it's worth changing the size */
+    if( i_lastwhite == -1 )
+    {
+        p_vout->p_sys->i_lastchange = 0;
+        return;
+    }
+
+    if( i_lastwhite - i_firstwhite < p_vout->p_sys->i_height / 2 )
+    {
+        p_vout->p_sys->i_lastchange = 0;
+        return;
+    }
+
+    if( i_lastwhite - i_firstwhite < p_vout->p_sys->i_height + 16
+         && i_lastwhite - i_firstwhite + 16 > p_vout->p_sys->i_height )
+    {
+        p_vout->p_sys->i_lastchange = 0;
+        return;
+    }
+
+    /* We need at least 25 images to make up our mind */
+    p_vout->p_sys->i_lastchange++;
+    if( p_vout->p_sys->i_lastchange < 25 )
+    {
+        return;
+    }
+
+    /* Tune a few values */
+    if( i_firstwhite & 1 )
+    {
+        i_firstwhite--;
+    }
+
+    if( !(i_lastwhite & 1) )
+    {
+        i_lastwhite++;
+    }
+
+    /* Change size */
+    p_vout->p_sys->i_y = i_firstwhite;
+    p_vout->p_sys->i_height = i_lastwhite - i_firstwhite + 1;
+
+    p_vout->p_sys->i_aspect = p_vout->output.i_aspect
+                            * p_vout->output.i_height / p_vout->p_sys->i_height
+                            * p_vout->p_sys->i_width / p_vout->output.i_width;
+
+    p_vout->p_sys->b_changed = 1;
 }
 

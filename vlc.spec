@@ -287,6 +287,8 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/filter_invert.so
 %{_libdir}/videolan/vlc/filter_transform.so
 %{_libdir}/videolan/vlc/filter_wall.so
+%{_libdir}/videolan/vlc/filter_clone.so
+%{_libdir}/videolan/vlc/filter_crop.so
 %{_libdir}/videolan/vlc/fx_scope.so
 %{_libdir}/videolan/vlc/http.so
 %{_libdir}/videolan/vlc/ipv4.so
