@@ -610,8 +610,8 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 
         p_this->b_thread = 1;
 
-        msg_Dbg( p_this, "thread %d (%s) created at priority %d (%s:%d)",
-                 (int)p_this->thread_id, psz_name, i_priority,
+        msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
+                 (unsigned int)p_this->thread_id, psz_name, i_priority,
                  psz_file, i_line );
 
         vlc_mutex_unlock( &p_this->object_lock );
@@ -724,18 +724,18 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     if( i_ret )
     {
 #ifdef HAVE_STRERROR
-        msg_Err( p_this, "thread_join(%d) failed at %s:%d (%s)",
-                         (int)p_this->thread_id, psz_file, i_line,
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
+                         (unsigned int)p_this->thread_id, psz_file, i_line,
                          strerror(i_ret) );
 #else
-        msg_Err( p_this, "thread_join(%d) failed at %s:%d",
-                         (int)p_this->thread_id, psz_file, i_line );
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d",
+                         (unsigned int)p_this->thread_id, psz_file, i_line );
 #endif
     }
     else
     {
-        msg_Dbg( p_this, "thread %d joined (%s:%d)",
-                         (int)p_this->thread_id, psz_file, i_line );
+        msg_Dbg( p_this, "thread %u joined (%s:%d)",
+                         (unsigned int)p_this->thread_id, psz_file, i_line );
     }
 
     p_this->b_thread = 0;
