@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.37 2003/09/28 16:50:04 gbazin Exp $
+ * $Id: ogg.c,v 1.38 2003/10/01 17:44:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -480,6 +480,8 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     p_pes->i_dts = p_pes->i_pts = i_pts;
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_pes_size = p_oggpacket->bytes;
+
+    if( p_stream->i_cat == SPU_ES ) p_pes->i_dts = 0;
 
     if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
@@ -1173,8 +1175,8 @@ static int Activate( vlc_object_t * p_this )
 }
 
 /****************************************************************************
- * Ogg_EndOfStream: Look for Beginning of Stream ogg pages and add Elementary
- *                  streams.
+ * Ogg_BeginningOfStream: Look for Beginning of Stream ogg pages and add
+ *                        Elementary streams.
  ****************************************************************************/
 static int Ogg_BeginningOfStream( input_thread_t *p_input, demux_sys_t *p_ogg)
 {
@@ -1208,6 +1210,7 @@ static int Ogg_BeginningOfStream( input_thread_t *p_input, demux_sys_t *p_ogg)
         p_stream->p_es->p_bitmapinfoheader  = (void*)p_stream->p_bih;
 
         p_stream->i_pcr  = p_stream->i_previous_pcr = -1;
+        p_stream->b_reinit = 0;
 #undef p_stream
     }
 
