@@ -1066,7 +1066,7 @@ then
   # now look for the gtk.h header
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
-  AC_CHECK_HEADERS(gtk/gtk.h, [
+  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, [
     PLUGINS="${PLUGINS} gtk"
     ALIASES="${ALIASES} gvlc"
   ])

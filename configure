@@ -5596,7 +5596,7 @@ fi
   # now look for the gtk.h header
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
-  for ac_hdr in gtk/gtk.h
+  for ac_hdr in gtk/gtk.h glib.h gdk/gdk.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
