@@ -626,20 +626,9 @@ package-win32-base:
             || true ; \
 	done
 
-	mkdir -p $(srcdir)/vlc-${VERSION}/skins/default
-	for i in $(srcdir)/share/skins/default/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins/default/ || true ; \
-	done
-	for i in $(srcdir)/doc/skins/*.txt; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
-	done
 	mkdir -p $(srcdir)/vlc-${VERSION}/skins2/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
 	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/fonts/ || true ; \
-	done
-	mkdir -p $(srcdir)/vlc-${VERSION}/skins2/default
-	for i in $(srcdir)/share/skins2/default/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/default/ || true ; \
 	done
 	for i in $(srcdir)/share/skins2/*.*; do \
 	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/ || true ; \
