@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.6 2002/12/13 01:56:29 gbazin Exp $
+ * $Id: preferences.c,v 1.7 2003/01/06 00:37:30 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -62,7 +62,9 @@ static void GtkConfigDialogDestroyed ( GtkObject *, gpointer );
 
 static void GtkStringChanged     ( GtkEditable *, gpointer );
 static void GtkIntChanged        ( GtkEditable *, gpointer );
+static void GtkIntRangedChanged  ( GtkEditable *, gpointer );
 static void GtkFloatChanged      ( GtkEditable *, gpointer );
+static void GtkFloatRangedChanged      ( GtkEditable *, gpointer );
 static void GtkBoolChanged       ( GtkToggleButton *, gpointer );
 
 static void GtkFreeHashTable     ( GtkObject *object );
@@ -153,7 +155,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *item_combo;
     GtkWidget *string_entry;
     GtkWidget *integer_spinbutton;
+    GtkWidget *integer_slider;
     GtkWidget *float_spinbutton;
+    GtkWidget *float_slider;
     GtkObject *item_adj;
     GtkWidget *bool_checkbutton;
     GtkWidget *module_clist;
@@ -457,41 +461,81 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
         case CONFIG_ITEM_INTEGER:
 
-            /* add input box with default value */
-            item_adj = gtk_adjustment_new( p_item->i_value,
-                                           -1, 99999, 1, 10, 10 );
-            integer_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
-                                                      1, 0 );
+            if (( p_item->i_max == 0) && ( p_item->i_min == 0))
+            {
+                /* add input box with default value */
+                item_adj = gtk_adjustment_new( p_item->i_value,
+                                               -1, 99999, 1, 10, 10 );
+                integer_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj), 1, 0 );
 
-            /* connect signal to track changes in the spinbutton value */
-            gtk_object_set_data( GTK_OBJECT(integer_spinbutton),
-                                 "config_option", p_item->psz_name );
-            gtk_signal_connect( GTK_OBJECT(integer_spinbutton), "changed",
-                                GTK_SIGNAL_FUNC(GtkIntChanged),
-                                (gpointer)config_dialog );
+                /* connect signal to track changes in the spinbutton value */
+                gtk_object_set_data( GTK_OBJECT(integer_spinbutton),
+                                     "config_option", p_item->psz_name );
+                gtk_signal_connect( GTK_OBJECT(integer_spinbutton), "changed",
+                                    GTK_SIGNAL_FUNC(GtkIntChanged),
+                                    (gpointer)config_dialog );
 
-            LABEL_AND_WIDGET( p_item->psz_text,
-                              integer_spinbutton, p_item->psz_longtext );
+                LABEL_AND_WIDGET( p_item->psz_text,
+                                  integer_spinbutton, p_item->psz_longtext );
+            }
+            else /* use i_min and i_max */
+            {
+                item_adj = gtk_adjustment_new( p_item->i_value, p_item->i_min,
+                                               p_item->i_max, 1, 1, 0 );
+                integer_slider = gtk_hscale_new( GTK_ADJUSTMENT(item_adj));
+                gtk_scale_set_digits (GTK_SCALE(integer_slider), 0);
+                                                
+                /* connect signal to track changes in the spinbutton value */
+                gtk_object_set_data( GTK_OBJECT(item_adj),
+                                     "config_option", p_item->psz_name );
+                gtk_signal_connect( GTK_OBJECT(item_adj), "value-changed",
+                                    GTK_SIGNAL_FUNC(GtkIntRangedChanged),
+                                    (gpointer)config_dialog );
+
+                LABEL_AND_WIDGET( p_item->psz_text,
+                                  integer_slider, p_item->psz_longtext );
+            }
             break;
 
         case CONFIG_ITEM_FLOAT:
 
-            /* add input box with default value */
-            item_adj = gtk_adjustment_new( p_item->f_value,
-                                           0, 99999, 0.01, 10, 10 );
-            float_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
-                                                    0.01, 2 );
+            if (( p_item->f_max == 0.0) && ( p_item->f_min == 0.0))
+            {
+                /* add input box with default value */
+                item_adj = gtk_adjustment_new( p_item->f_value,
+                                               0, 99999, 0.01, 10, 10 );
+                float_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
+                                                        0.01, 2 );
 
-            /* connect signal to track changes in the spinbutton value */
-            gtk_object_set_data( GTK_OBJECT(float_spinbutton),
-                                 "config_option", p_item->psz_name );
-            gtk_signal_connect( GTK_OBJECT(float_spinbutton), "changed",
-                                GTK_SIGNAL_FUNC(GtkFloatChanged),
-                                (gpointer)config_dialog );
+                /* connect signal to track changes in the spinbutton value */
+                gtk_object_set_data( GTK_OBJECT(float_spinbutton),
+                                     "config_option", p_item->psz_name );
+                gtk_signal_connect( GTK_OBJECT(float_spinbutton), "changed",
+                                    GTK_SIGNAL_FUNC(GtkFloatChanged),
+                                    (gpointer)config_dialog );
 
-            LABEL_AND_WIDGET( p_item->psz_text,
-                              float_spinbutton, p_item->psz_longtext );
+                LABEL_AND_WIDGET( p_item->psz_text,
+                                  float_spinbutton, p_item->psz_longtext );
+            }
+            else /* use f_min and f_max */
+            {
+                item_adj = gtk_adjustment_new( p_item->f_value, p_item->f_min,
+                                               p_item->f_max, 0.01, 0.01, 0 );
+                float_slider = gtk_hscale_new( GTK_ADJUSTMENT(item_adj));
+                gtk_scale_set_digits (GTK_SCALE(float_slider), 2);
+                                                
+                /* connect signal to track changes in the spinbutton value */
+                gtk_object_set_data( GTK_OBJECT(item_adj),
+                                     "config_option", p_item->psz_name );
+                gtk_signal_connect( GTK_OBJECT(item_adj), "value-changed",
+                                    GTK_SIGNAL_FUNC(GtkFloatRangedChanged),
+                                    (gpointer)config_dialog );
+
+                LABEL_AND_WIDGET( p_item->psz_text,
+                                  float_slider, p_item->psz_longtext );
+            }
             break;
+
 
         case CONFIG_ITEM_BOOL:
 
@@ -766,7 +810,6 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
                                                     "apply_button" );
     gtk_widget_set_sensitive( apply_button, TRUE );
 }
-
 /****************************************************************************
  * GtkIntChanged: signal called when the user changes an integer value.
  ****************************************************************************/
@@ -805,6 +848,43 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
     gtk_widget_set_sensitive( apply_button, TRUE );
 }
 
+
+/***************************************************************************************
+ * GtkIntRangedChanged: signal called when the user changes an integer with range value.
+ **************************************************************************************/
+static void GtkIntRangedChanged( GtkEditable *editable, gpointer user_data )
+{
+    intf_thread_t *p_intf;
+    module_config_t *p_config;
+    GHashTable *hash_table;
+    GtkWidget *apply_button;
+
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                   "p_intf" );
+
+    hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "config_hash_table" );
+
+    /* free old p_config */
+    p_config = (module_config_t *)g_hash_table_lookup( hash_table,
+                                                       (gpointer)editable );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
+
+    p_config = malloc( sizeof(module_config_t) );
+    p_config->i_type = CONFIG_ITEM_INTEGER;
+    p_config->i_value = ((GTK_ADJUSTMENT(editable))->value);
+    p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                      "config_option" );
+
+    g_hash_table_insert( hash_table, (gpointer)editable,
+                         (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
+}
+
 /****************************************************************************
  * GtkFloatChanged: signal called when the user changes a float value.
  ****************************************************************************/
@@ -831,6 +911,42 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
     p_config->i_type = CONFIG_ITEM_FLOAT;
     p_config->f_value = gtk_spin_button_get_value_as_float(
                            GTK_SPIN_BUTTON(editable) );
+    p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                      "config_option" );
+
+    g_hash_table_insert( hash_table, (gpointer)editable,
+                         (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
+}
+
+/***************************************************************************************
+ * GtkIntRangedChanged: signal called when the user changes an integer with range value.
+ **************************************************************************************/
+static void GtkFloatRangedChanged( GtkEditable *editable, gpointer user_data )
+{
+    intf_thread_t *p_intf;
+    module_config_t *p_config;
+    GHashTable *hash_table;
+    GtkWidget *apply_button;
+
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                   "p_intf" );
+
+    hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "config_hash_table" );
+
+    /* free old p_config */
+    p_config = (module_config_t *)g_hash_table_lookup( hash_table,
+                                                       (gpointer)editable );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
+
+    p_config = malloc( sizeof(module_config_t) );
+    p_config->i_type = CONFIG_ITEM_FLOAT;
+    p_config->f_value = ((GTK_ADJUSTMENT(editable))->value);
     p_config->psz_name = (char *)gtk_object_get_data( GTK_OBJECT(editable),
                                                       "config_option" );
 

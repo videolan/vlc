@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.47 2002/12/13 01:56:30 gbazin Exp $
+ * $Id: configuration.c,v 1.48 2003/01/06 00:37:30 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -222,7 +222,23 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         return;
     }
 
-    p_config->i_value = i_value;
+    /* if i_min == i_max == 0, then do not use them */
+    if ((p_config->i_min == 0) && (p_config->i_max == 0))
+    {
+        p_config->i_value = i_value;
+    }
+    else if (i_value < p_config->i_min)
+    {
+        p_config->i_value = p_config->i_min;
+    }
+    else if (i_value > p_config->i_max)
+    {
+        p_config->i_value = p_config->i_max;
+    }
+    else
+    {
+        p_config->i_value = i_value;
+    }
 
     if( p_config->pf_callback )
     {
@@ -255,7 +271,23 @@ void __config_PutFloat( vlc_object_t *p_this,
         return;
     }
 
-    p_config->f_value = f_value;
+    /* if f_min == f_max == 0, then do not use them */
+    if ((p_config->f_min == 0) && (p_config->f_max == 0))
+    {
+        p_config->f_value = f_value;
+    }
+    else if (f_value < p_config->f_min)
+    {
+        p_config->f_value = p_config->f_min;
+    }
+    else if (f_value > p_config->f_max)
+    {
+        p_config->f_value = p_config->f_max;
+    }
+    else
+    {
+        p_config->f_value = f_value;
+    }
 
     if( p_config->pf_callback )
     {
@@ -353,7 +385,11 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].i_type = p_orig[i].i_type;
         p_module->p_config[i].i_short = p_orig[i].i_short;
         p_module->p_config[i].i_value = p_orig[i].i_value;
+        p_module->p_config[i].i_min = p_orig[i].i_min;
+        p_module->p_config[i].i_max = p_orig[i].i_max;
         p_module->p_config[i].f_value = p_orig[i].f_value;
+        p_module->p_config[i].f_min = p_orig[i].f_min;
+        p_module->p_config[i].f_max = p_orig[i].f_max;
         p_module->p_config[i].b_dirty = p_orig[i].b_dirty;
 
         p_module->p_config[i].psz_type = p_orig[i].psz_type ?

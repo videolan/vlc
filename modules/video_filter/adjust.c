@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.4 2002/12/12 10:56:24 garf Exp $
+ * $Id: adjust.c,v 1.5 2003/01/06 00:37:30 garf Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -63,10 +63,10 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
-    add_float( "Contrast", 1.0, NULL, CONT_TEXT, CONT_LONGTEXT );
-    add_float( "Brightness", 1.0, NULL, LUM_TEXT, LUM_LONGTEXT );
-    add_integer( "Hue", 0, NULL, HUE_TEXT, HUE_LONGTEXT );
-    add_float( "Saturation", 1.0, NULL, SAT_TEXT, SAT_LONGTEXT );
+    add_float_with_range( "Contrast", 1.0, 0.0, 2.0, NULL, CONT_TEXT, CONT_LONGTEXT );
+    add_float_with_range( "Brightness", 1.0, 0.0, 2.0, NULL, LUM_TEXT, LUM_LONGTEXT );
+    add_integer_with_range( "Hue", 0, 0, 360, NULL, HUE_TEXT, HUE_LONGTEXT );
+    add_float_with_range( "Saturation", 1.0, 0.0, 3.0, NULL, SAT_TEXT, SAT_LONGTEXT );
     set_description( _("Contrast/Hue/Saturation/Brightness filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "adjust" );

@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.22 2002/12/10 14:19:44 gbazin Exp $
+ * $Id: configuration.h,v 1.23 2003/01/06 00:37:29 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -57,6 +57,10 @@ struct module_config_t
     char        *psz_value;                                  /* Option value */
     int          i_value;                                    /* Option value */
     float        f_value;                                    /* Option value */
+    int         i_min;                               /* Option minimum value */
+    int         i_max;                               /* Option maximum value */
+    float       f_min;                               /* Option minimum value */
+    float       f_max;                               /* Option maximum value */
 
     /* Function to call when commiting a change */
     void ( * pf_callback ) ( vlc_object_t * );
@@ -65,6 +69,7 @@ struct module_config_t
 
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
+
 };
 
 /*****************************************************************************
@@ -127,15 +132,19 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
     { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_string_from_list( name, psz_value, ppsz_list, p_callback, text, \
       longtext ) \
-    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, 0, 0, 0, 0, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_file( name, psz_value, p_callback, text, longtext ) \
     { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0 }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_module( name, psz_caps, psz_value, p_callback, text, longtext ) \
     { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_integer( name, i_value, p_callback, text, longtext ) \
     { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+#define add_integer_with_range( name, i_value, i_min, i_max, p_callback, text, longtext ) \
+    { static module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, i_min, i_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_float( name, f_value, p_callback, text, longtext ) \
     { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
+#define add_float_with_range( name, f_value, f_min, f_max, p_callback, text, longtext ) \
+    { static module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value, 0, 0, f_min, f_max }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_bool( name, b_value, p_callback, text, longtext ) \
     { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 

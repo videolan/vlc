@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.31 2002/12/18 17:52:23 gbazin Exp $
+ * $Id: libvlc.h,v 1.32 2003/01/06 00:37:30 garf Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -432,7 +432,7 @@ vlc_module_begin();
     add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
                            AOUT_TEXT, AOUT_LONGTEXT );
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
-    add_integer( "volume", -1, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
+    add_integer_with_range( "volume", 256, 0, 1024, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT );
     add_integer( "aout-channels", -1, NULL,
                  AOUT_CHANNELS_TEXT, AOUT_CHANNELS_LONGTEXT );
@@ -555,19 +555,19 @@ vlc_module_end();
 static module_config_t p_help_config[] =
 {
     { CONFIG_ITEM_BOOL, NULL, "help", 'h', N_("print help"),
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H', N_("print detailed help"),
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_BOOL, NULL, "list", 'l',
                               N_("print a list of available modules"),
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_STRING, NULL, "module", 'p', N_("print help on module"),
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_ITEM_BOOL, NULL, "version", '\0',
                               N_("print version information"),
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE },
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE },
     { CONFIG_HINT_END, NULL, NULL, '\0', NULL,
-      NULL, NULL, 0, 0.0, NULL, NULL, NULL, VLC_FALSE }
+      NULL, NULL, 0, 0.0, 0, 0, 0.0, 0.0, NULL, NULL, NULL, VLC_FALSE }
 };
 
 /*****************************************************************************
