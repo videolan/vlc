@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: decoder.c,v 1.2 2002/08/04 17:40:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -59,6 +59,8 @@ int E_(OpenDecoder) ( vlc_object_t *p_this )
  *****************************************************************************/
 static int Run ( decoder_fifo_t *p_fifo )
 {
+    u8           p_buffer[1024];
+
     bit_stream_t bit_stream;
     mtime_t      last_date = mdate();
     size_t       i_bytes = 0;
@@ -83,12 +85,10 @@ static int Run ( decoder_fifo_t *p_fifo )
 
     while( !p_fifo->b_die && !p_fifo->b_error )
     {
-        byte_t byte;
+        GetChunk( &bit_stream, p_buffer, 1024 );
+        write( i_fd, p_buffer, 1024 );
 
-        byte = GetBits( &bit_stream, 8 );
-        i_bytes++;
-
-        write( i_fd, &byte, 1 );
+        i_bytes += 1024;
 
         if( mdate() < last_date + 2000000 )
         {
