@@ -39,7 +39,7 @@ if [ "$CONFIG_DVD" = "y" ]; then
    bool '    DVD input module' CONFIG_DVDOLD
    bool '    dvdread input module' CONFIG_DVDREAD
    bool '    dvdplay input module' CONFIG_DVDPLAY
-   bool '    dvbpsi ts mux and demux module' CONFIG_DVDPSI
+   bool '    dvbpsi ts mux and demux module' CONFIG_DVBPSI
 fi
 bool 'VCD support' CONFIG_VCD
 bool 'Video for Linux (V4L) support' CONFIG_V4L

@@ -29,7 +29,7 @@ CONFIG_DVD=y
 CONFIG_DVDOLD=y
 # CONFIG_DVDREAD is not set
 # CONFIG_DVDPLAY is not set
-CONFIG_DVDPSI=y
+CONFIG_DVBPSI=y
 # CONFIG_VCD is not set
 # CONFIG_V4L is not set
 # CONFIG_SAT is not set
