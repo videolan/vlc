@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.66 2004/01/07 19:20:30 gbazin Exp $
+ * $Id: transcode.c,v 1.67 2004/01/17 11:41:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1151,7 +1151,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
     }
     if( id->p_vresample )
     {
-        free( id->p_vresample );
+        img_resample_close( id->p_vresample );
     }
 }
 
