@@ -45,10 +45,13 @@ class wizInputPage;
 enum
 {
     ActionRadio0_Event, ActionRadio1_Event,
+    MoreInfoStreaming_Event,
+    MoreInfoTranscode_Event,
 
     Open_Event,
     ListView_Event,
     InputRadio0_Event, InputRadio1_Event,
+    PartialEnable_Event,
 
     MethodRadio0_Event, MethodRadio1_Event,
     MethodRadio2_Event, MethodRadio3_Event,
@@ -90,12 +93,17 @@ END_EVENT_TABLE()
 
 /* Hello page */
 #define HELLO_TITLE _("Streaming/Transcoding Wizard")
-#define HELLO_TEXT _("Welcome, streaming wizard")
+#define HELLO_TEXT _("This wizard helps you to stream, transcode or" \
+                     " save a stream")
 #define HELLO_STREAMING _("Stream")
 #define HELLO_STREAMING_DESC _("Use this to stream on a network")
-#define HELLO_TRANSCODE _("Transcode")
+#define HELLO_TRANSCODE _("Transcode/Save")
 #define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it to a file")
 #define HELLO_NOTICE _("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them")
+
+#define MOREINFO_TRANSCODE _("Please notice that VLC is not very suited " \
+             "for file to file transcoding. You should use its transcoding " \
+             "features to save network streams, for example" )
 
 /* Input page */
 #define INPUT_TITLE _("Choose input")
@@ -267,58 +275,6 @@ struct encap encaps_array[] =
  * All the pages of the wizard, declaration
  *****************************************************************************/
 
-#if 0
-/* The open dialog */
-class WizardOpen : public wxNotebook
-{
-    public:
-    protected:
-        wxPanel *p_parent;
-        wxPanel *FilePanel();
-        wxPanel *DiscPanel();
-        wxPanel *NetPanel();
-        wxPanel *V4LPanel();
-        ArrayOfAutoBuiltPanel input_tab_array;
-
-        /* Controls for the file panel */
-        wxComboBox *file_combo;
-        wxFileDialog *file_dialog;
-
-        /* Controls for the disc panel */
-        wxRadioBox *disc_type;
-        wxTextCtrl *disc_device;
-        wxSpinCtrl *disc_title;
-        wxSpinCtrl *disc_chapter;
-
-
-        /* The media equivalent name for a DVD names. For example,
-         *  "Title", is "Track" for a CD-DA */
-        wxStaticText *disc_title_label;
-        wxStaticText *disc_chapter_label;
-        /* Indicates if the disc device control was modified */
-        bool b_disc_device_changed;
-
-
-        /* Controls for the net panel */
-        wxRadioBox *net_type;
-        int i_net_type;
-        wxPanel *net_subpanels[4];
-        wxRadioButton *net_radios[4];
-        wxSpinCtrl *net_ports[4];
-        int        i_net_ports[4];
-        wxTextCtrl *net_addrs[4];
-        wxCheckBox *net_ipv6;
-
-        /* Controls for the v4l panel */
-        wxRadioBox *video_type;
-        wxTextCtrl *video_device;
-        wxSpinCtrl *video_channel;
-        wxButton *v4l_button;
-        V4LDialog *v4l_dialog;
-        wxArrayString v4l_mrl;
-}
-#endif
-
 /* Declare classes */
 class wizHelloPage : public wxWizardPageSimple
 {
@@ -347,6 +303,7 @@ class wizInputPage : public wxWizardPage
         wizInputPage::~wizInputPage();
         void OnWizardPageChanging(wxWizardEvent& event);
         void OnInputChange(wxEvent& event);
+        void OnEnablePartial(wxCommandEvent& event);
         virtual wxWizardPage *GetPrev() const;
         virtual wxWizardPage *GetNext() const;
         void SetStreamingPage( wxWizardPage *page);
@@ -364,6 +321,8 @@ class wizInputPage : public wxWizardPage
         wxBoxSizer *mainSizer;
         wxArrayString mrl;
         wxTextCtrl *mrl_text;
+        wxTextCtrl *from_text;
+        wxTextCtrl *to_text;
         OpenDialog *p_open_dialog;
         wxListView *listview;
         wxPanel *open_panel;
@@ -377,6 +336,7 @@ class wizInputPage : public wxWizardPage
 BEGIN_EVENT_TABLE(wizInputPage, wxWizardPageSimple)
     EVT_RADIOBUTTON( InputRadio0_Event, wizInputPage::OnInputChange)
     EVT_RADIOBUTTON( InputRadio1_Event, wizInputPage::OnInputChange)
+    EVT_CHECKBOX( PartialEnable_Event, wizInputPage::OnEnablePartial)
     EVT_WIZARD_PAGE_CHANGING(-1, wizInputPage::OnWizardPageChanging)
 END_EVENT_TABLE()
 
@@ -435,6 +395,7 @@ public:
 protected:
     DECLARE_EVENT_TABLE()
     int i_method;
+    wxBoxSizer *mainSizer;
     wxStaticText *address_text;
     wxTextCtrl *address_txtctrl;
     WizardDialog * p_parent;
@@ -563,7 +524,12 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
                                               wxU( HELLO_TRANSCODE ) );
         i_action = 0;
 
-        mainSizer->Add( action_radios[0], 0, wxALL, 5 );
+        wxBoxSizer *stream_sizer = new wxBoxSizer( wxHORIZONTAL);
+        
+        stream_sizer->Add( action_radios[0], 0, wxALL, 5 );
+        stream_sizer->Add( new wxButton( this, MoreInfoStreaming_Event,
+                 wxU( _("More Info")) ), 0, wxALL, 5 );
+        mainSizer->Add( stream_sizer, 0, wxALL, 5 );
         mainSizer->Add( new wxStaticText(this, -1,
                  wxU( vlc_wraptext( HELLO_STREAMING_DESC ,TEXTWIDTH, false))),
                         0, wxBOTTOM, 5 );
@@ -572,8 +538,10 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
         mainSizer->Add( new wxStaticText(this, -1,
                  wxU( vlc_wraptext( HELLO_TRANSCODE_DESC ,TEXTWIDTH, false)))
                         , 0, wxBOTTOM, 5 );
+        mainSizer->Add( new wxButton( this, MoreInfoTranscode_Event,
+                 wxU( _("More Info")) ), 0, wxALL, 5 );
 
-        mainSizer->Add( new wxStaticLine(this, -1 ), 1, wxTOP|wxBOTTOM, 5 );
+        mainSizer->Add( new wxStaticLine(this, -1 ), 0, wxTOP|wxBOTTOM, 5 );
 
         mainSizer->Add( new wxStaticText(this, -1,
                         wxU( vlc_wraptext(HELLO_NOTICE , TEXTWIDTH , false ))),
@@ -679,13 +647,39 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
         input_radios[1]->Disable();
     }
 
+    /* Partial Extract Box */
+    wxStaticBox *partial_box = new wxStaticBox( this, -1,
+                    wxU(_("Partial Extract")) );
+    wxStaticBoxSizer *partial_sizer = new wxStaticBoxSizer( partial_box,
+                                                          wxVERTICAL );
+
+    partial_sizer->Add( new wxCheckBox( this, PartialEnable_Event,
+                            wxU(_("Enable") ) ), 0 , wxLEFT , 5 );
+
+    wxFlexGridSizer *partial_sizer2 = new wxFlexGridSizer( 4,1,20 );
+    partial_sizer2->Add( new wxStaticText(this, -1, wxU(_("From"))),0,wxLEFT ,5);
+    from_text = new wxTextCtrl( this, -1, wxT(""),
+                                  wxDefaultPosition, wxSize(80,25) );
+    partial_sizer2->Add( from_text, 0 , wxALIGN_RIGHT);
+    partial_sizer2->Add( new wxStaticText(this, -1, wxU(_("To"))),0,wxLEFT ,5);
+    to_text = new wxTextCtrl( this, -1, wxT(""),
+                                  wxDefaultPosition, wxSize(80,25) );
+    partial_sizer2->Add( to_text, 0 , wxALIGN_RIGHT);
+
+    partial_sizer->Add( partial_sizer2, 0, wxALL, 0 );
+
+    mainSizer->Add( partial_sizer, 0, wxALL, 5 );
+
+    from_text->Disable();
+    to_text->Disable();
+
     SetSizer(mainSizer);
     mainSizer->Fit(this);
+    mainSizer->Layout();
 }
 
 wizInputPage::~wizInputPage()
 {
-    if( p_open_dialog ) delete p_open_dialog;
 }
 
 void wizInputPage::OnInputChange(wxEvent& event)
@@ -699,6 +693,7 @@ void wizInputPage::OnInputChange(wxEvent& event)
             mainSizer->Hide( pl_panel );
             open_panel->Show();
             mainSizer->Show( open_panel );
+            mainSizer->Layout();
         }
     }
     else
@@ -707,7 +702,14 @@ void wizInputPage::OnInputChange(wxEvent& event)
         mainSizer->Hide( open_panel );
         pl_panel->Show();
         mainSizer->Show( pl_panel );
+            mainSizer->Layout();
     }
+}
+
+void wizInputPage::OnEnablePartial(wxCommandEvent& event)
+{
+   from_text->Enable( event.IsChecked() );
+   to_text->Enable( event.IsChecked() );
 }
 
 void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
@@ -723,6 +725,13 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
         else
         {
             p_parent->SetMrl( (const char *)mrl_text->GetValue().c_str() );
+            if( from_text->IsEnabled() )
+            {
+                msg_Dbg( p_intf, "Partial streaming enabled");
+                int i_from = atoi( from_text->GetValue().mb_str() );
+                int i_to = atoi( to_text->GetValue().mb_str() );
+                p_parent->SetPartial( i_from, i_to );
+            }
         }
     }
     else
@@ -938,10 +947,12 @@ void wizTranscodeCodecPage::OnWizardPageChanging(wxWizardEvent& event)
         }
     }
     struct codec *c = (struct codec*)
-             (video_combo->GetClientData(video_combo->GetSelection()));
+             (video_combo->GetClientData( video_combo->IsEnabled() ?
+                                          video_combo->GetSelection(): i_video_codec ));
     vcodec = strdup(c->psz_codec);
     c = (struct codec*)
-            (audio_combo->GetClientData(audio_combo->GetSelection()));
+           (audio_combo->GetClientData( audio_combo->IsEnabled() ?
+                                       audio_combo->GetSelection() : i_audio_codec ));
     acodec = strdup(c->psz_codec);
 
 
@@ -968,7 +979,7 @@ wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
     p_next = next;
     p_parent = (WizardDialog *)parent;
 
-    wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
     mainSizer->Add( new wxStaticText(this, -1, wxU(
@@ -1038,6 +1049,7 @@ void wizStreamingMethodPage::OnMethodChange(wxEvent& event)
     i_method = event.GetId() - MethodRadio0_Event;
     address_text->SetLabel( wxU(
      vlc_wraptext( _(methods_array[i_method].psz_address), TEXTWIDTH, false)));
+    mainSizer->Layout();
 }
 
 /***************************************************
@@ -1219,7 +1231,15 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
     p_intf = _p_intf;
     SetPageSize(wxSize(400,350));
 
+    /* Initialize structure */
     i_action = 0;
+    i_from = 0;
+    i_to = 0;
+    vb = 0;
+    ab = 0;
+    acodec=NULL;
+    vcodec=NULL;
+
     page1 = new wizHelloPage(this);
     page2 = new wizInputPage(this, page1, p_intf);
     encap_page = new wizEncapPage(this );
@@ -1249,7 +1269,7 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 
 WizardDialog::~WizardDialog()
 {
-//    Destroy();
+    Destroy();
     msg_Dbg(p_intf,"Killing wizard");
     delete page1;
     msg_Dbg(p_intf,"Killing wizard2");
@@ -1274,13 +1294,20 @@ void WizardDialog::SetMrl( const char *mrl )
     this->mrl = strdup( mrl );
 }
 
+void WizardDialog::SetPartial( int from, int to )
+{
+    msg_Dbg(p_intf, "From %i to %i", from, to );
+    this->i_from = i_from;
+    this->i_to = i_to;
+}
+
 void WizardDialog::SetTranscode( char *vcodec, int vb, char *acodec,int ab)
 {
-    if( vcodec )
+    if( strcmp( vcodec, "dummy") )
     {
-        this->vcodec = strdup(vcodec);
+        this->vcodec= strdup(vcodec);
     }
-    if( acodec)
+    if( strcmp( acodec, "dummy" ) )
     {
         this->acodec = strdup(acodec);
     }
@@ -1326,7 +1353,7 @@ void WizardDialog::Run()
         msg_Dbg( p_intf,"Action: %i", i_action);
         if( i_action == ACTION_TRANSCODE)
         {
-            msg_Dbg( p_intf,"Starting transcode of %s to file %s", mrl, "caca");
+            msg_Dbg( p_intf,"Starting transcode of %s to file %s", mrl, address);
             msg_Dbg( p_intf,"Using %s (%i kbps) / %s (%i kbps)",vcodec,vb,acodec,ab);
             msg_Dbg( p_intf,"Encap %s",mux);
             int i_tr_size = 10; /* 10 = ab + vb */
@@ -1334,10 +1361,18 @@ void WizardDialog::Run()
             i_tr_size += acodec ? strlen(acodec) : 0;
 
             char *psz_transcode = (char *)malloc( i_tr_size * sizeof(char));
+            if( vcodec || acodec )
+            {
+                sprintf( psz_transcode, "transcode{");
+            }
+            else
+            {
+                sprintf( psz_transcode, "%c", 0 );
+            }
             if( vcodec )
             {
-                sprintf( psz_transcode, "vcodec=%s,vb=%i",
-                                vcodec, vb );
+                sprintf( psz_transcode, "%svcodec=%s,vb=%i",
+                                psz_transcode, vcodec, vb );
             }
             if( acodec )
             {
@@ -1345,12 +1380,16 @@ void WizardDialog::Run()
                                 psz_transcode, vcodec ? ',' : ' ',
                                 acodec, ab );
             }
+            if( vcodec || acodec )
+            {
+                sprintf( psz_transcode, "%s}:", psz_transcode );
+            }
             i_size = 73 + strlen(mux) + strlen(address) + strlen(psz_transcode);
             psz_opt = (char *)malloc( i_size * sizeof(char) );
-            sprintf( psz_opt, ":sout=#transcode{%s}:standard{mux=%s,url=%s,"
+            sprintf( psz_opt, ":sout=#%sstandard{mux=%s,url=%s,"
                                "access=file}",
                                psz_transcode, mux, address );
-            msg_Dbg( p_intf,""); 
+            msg_Dbg( p_intf,"");
         }
         else
         {
@@ -1368,9 +1407,22 @@ void WizardDialog::Run()
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
         if( p_playlist )
         {
-            playlist_AddExt( p_playlist, mrl, ITEM_NAME,PLAYLIST_APPEND |
-                         PLAYLIST_GO, PLAYLIST_END , -1 ,
-                         (const char **)&psz_opt , 1 );
+            playlist_item_t *p_item = playlist_ItemNew( p_playlist, mrl, ITEM_NAME );
+            playlist_ItemAddOption( p_item, psz_opt);
+            if( i_from != 0)
+            {
+                char psz_from[20];
+                msg_Dbg( p_intf, "Setting starttime");
+                sprintf( psz_from, "start-time=%i", i_from);
+                playlist_ItemAddOption( p_item, psz_from);
+            }
+            if( i_to != 0)
+            {
+                char psz_to[20];
+                sprintf( psz_to, "stop-time=%i", i_to);
+                playlist_ItemAddOption( p_item, psz_to);
+            }
+            playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
             vlc_object_release(p_playlist);
         }
         else

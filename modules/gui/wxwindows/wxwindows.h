@@ -573,6 +573,7 @@ public:
     virtual ~WizardDialog();
     void SetTranscode( char *vcodec, int vb, char *acodec,int ab);
     void SetMrl( const char *mrl );
+    void SetPartial( int, int );
     void SetStream( char *method, char *address );
     void SetTranscodeOut( char *address );
     void SetAction( int i_action );
@@ -583,6 +584,7 @@ public:
 
 private:
     int vb,ab;
+    int i_from, i_to;
     char *vcodec,*acodec,*method,*address,*mrl,*mux;
     DECLARE_EVENT_TABLE();
 

@@ -139,6 +139,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
 
+    wxFlexGridSizer *sizer = new wxFlexGridSizer(2,3,20);
     /* URI Textbox */
     wxStaticText *uri_label =
            new wxStaticText( info_panel, -1, wxU(_("URI")) );
@@ -147,12 +148,8 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
         wxU(p_item->input.psz_uri), wxDefaultPosition, wxSize( 300, -1 ),
         wxTE_PROCESS_ENTER );
 
-    wxBoxSizer *uri_sizer = new wxBoxSizer( wxHORIZONTAL );
-
-    uri_sizer->Add( uri_label, 0 , wxALIGN_RIGHT |wxALL , 5 );
-    uri_sizer->Add( uri_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
-    uri_sizer->Layout();
-    box_sizer->Add( uri_sizer, 1, wxEXPAND , 5);
+    sizer->Add( uri_label, 0 , wxALIGN_LEFT |wxALL , 5 );
+    sizer->Add( uri_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
 
     /* Name Textbox */
     wxStaticText *name_label =
@@ -162,12 +159,8 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
         wxU(p_item->input.psz_name), wxDefaultPosition, wxSize( 300, -1 ),
         wxTE_PROCESS_ENTER );
 
-    wxBoxSizer *name_sizer = new wxBoxSizer( wxHORIZONTAL );
-
-    name_sizer->Add( name_label, 0 , wxALIGN_RIGHT |wxALL , 5  );
-    name_sizer->Add( name_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
-    name_sizer->Layout();
-    box_sizer->Add( name_sizer, 1 , wxEXPAND, 5 );
+    sizer->Add( name_label, 0 , wxALIGN_LEFT |wxALL , 5  );
+    sizer->Add( name_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
 
     /* Author Textbox */
     wxStaticText *author_label =
@@ -180,11 +173,8 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
 
-    wxBoxSizer *author_sizer = new wxBoxSizer( wxHORIZONTAL );
-    author_sizer->Add( author_label, 0 , wxALIGN_RIGHT | wxALL , 5 );
-    author_sizer->Add( author_text, 1 , wxALIGN_RIGHT | wxALL , 5);
-    author_sizer->Layout();
-    box_sizer->Add( author_sizer, 1, wxEXPAND, 5 );
+    sizer->Add( author_label, 0 , wxALIGN_LEFT | wxALL , 5 );
+    sizer->Add( author_text, 1 , wxALIGN_RIGHT | wxALL , 5);
 
     /* Treeview */
     info_tree = new wxTreeCtrl( info_panel, -1, wxDefaultPosition,
@@ -192,6 +182,8 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
                                 wxSUNKEN_BORDER |wxTR_HAS_BUTTONS |
                                 wxTR_HIDE_ROOT );
 
+    sizer->Layout();
+    box_sizer->Add( sizer, 0, wxEXPAND, 5 );
     box_sizer->Add( info_tree, 0, wxEXPAND, 5 );
     info_sizer->Add( box_sizer, 1, wxBOTTOM, 5 );
 
