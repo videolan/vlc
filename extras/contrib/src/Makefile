@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.16 2004/02/22 15:41:27 massiot Exp $
+# $Id: Makefile,v 1.17 2004/03/02 01:10:26 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -713,19 +713,19 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # libdts
 # ***************************************************************************
 
-dtsdec-$(DTSDEC_VERSION).tar.gz:
-	$(WGET) $(DTSDEC_URL)
+libdts-$(LIBDTS_VERSION).tar.bz:
+	$(WGET) $(LIBDTS_URL)
 
-dtsdec: dtsdec-$(DTSDEC_VERSION).tar.gz
+libdts: libdts-$(LIBDTS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.dts: dtsdec
+.dts: libdts
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
 CLEAN_FILE += .dts
-CLEAN_PKG += dtsdec
-DISTCLEAN_PKG += dtsdec-$(DTSDEC_VERSION).tar.gz
+CLEAN_PKG += libdts
+DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
 
 # ***************************************************************************
 # Some cleansing
