@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.53 2003/12/03 13:52:36 anil Exp $
+ * $Id: skin_main.cpp,v 1.54 2003/12/15 22:04:25 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -70,6 +70,12 @@ static int Open ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     g_pIntf = p_intf;
 
+#if defined X11_SKINS
+    // Open/Test for an X11 display
+    Display *display = XOpenDisplay( NULL );
+    if( !display ) return VLC_EGENERIC;
+#endif
+
     // Allocate instance and initialize some members
     p_intf->p_sys = (intf_sys_t *) malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -100,7 +106,6 @@ static int Open ( vlc_object_t *p_this )
 
 #if defined X11_SKINS
     // Initialize X11
-    Display *display = XOpenDisplay( NULL );
     p_intf->p_sys->display = display;
     vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
     // Fake window to receive broadcast events
