@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.93 2001/11/11 01:32:03 stef Exp $
+ * $Id: input_dvd.c,v 1.94 2001/11/11 18:15:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -197,7 +197,7 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
 
-    p_dvd->dvdhandle = (dvdcss_handle) p_input->i_handle;
+    p_dvd->dvdhandle = (dvdcss_handle) p_input->p_handle;
 
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
@@ -350,7 +350,7 @@ static void DVDOpen( struct input_thread_s *p_input )
         return;
     }
 
-    p_input->i_handle = (int) dvdhandle;
+    p_input->p_handle = (void *) dvdhandle;
 }
 
 /*****************************************************************************
@@ -359,7 +359,7 @@ static void DVDOpen( struct input_thread_s *p_input )
 static void DVDClose( struct input_thread_s *p_input )
 {
     /* Clean up libdvdcss */
-    dvdcss_close( (dvdcss_handle) p_input->i_handle );
+    dvdcss_close( (dvdcss_handle) p_input->p_handle );
 }
 
 /*****************************************************************************

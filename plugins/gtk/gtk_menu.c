@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.13 2001/07/25 03:12:33 sam Exp $
+ * $Id: gtk_menu.c,v 1.14 2001/11/11 18:15:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -202,7 +202,7 @@ void GtkMenubarTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
     if( menuitem->active && !p_intf->p_sys->b_title_update )
     {
-        gint i_title = (gint)user_data;
+        gint i_title = (gint)((long)user_data);
         input_ChangeArea( p_intf->p_input,
                           p_intf->p_input->stream.pp_areas[i_title] );
 
@@ -231,7 +231,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
     p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
     p_area    = p_intf->p_input->stream.p_selected_area;
-    i_chapter = (gint)user_data;
+    i_chapter = (gint)((long)user_data);
 
     if( menuitem->active && !p_intf->p_sys->b_chapter_update )
     {
@@ -273,7 +273,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
         p_menu    = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(            \
                                 p_intf->p_sys->window ), (menu) ) );        \
         p_area    = p_intf->p_input->stream.p_selected_area;                \
-        p_area->i_angle = (gint)user_data;                                  \
+        p_area->i_angle = (gint)((long)user_data);                          \
                                                                             \
         input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );         \
                                                                             \
@@ -379,7 +379,7 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
         gtk_signal_connect( GTK_OBJECT( p_item ),
                             "toggled",
                             GTK_SIGNAL_FUNC( pf_toggle ),
-                            (gpointer)(i_item + 1) );
+                            (gpointer)((long)(i_item + 1)) );
 
         if( i_nb > 20 )
         {

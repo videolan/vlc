@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.45 2001/11/08 14:45:44 stef Exp $
+ * $Id: input_ext-intf.h,v 1.46 2001/11/11 18:15:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -289,6 +289,7 @@ typedef struct input_thread_s
 
     int                     i_handle;           /* socket or file descriptor */
     FILE *                  p_stream;                       /* if applicable */
+    void *                  p_handle;          /* if i_handle isn't suitable */
     int                     i_read_once;        /* number of packet read by
                                                  * pf_read once */
     void *                  p_method_data;     /* data of the packet manager */

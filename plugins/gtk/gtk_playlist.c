@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.19 2001/10/04 00:50:24 sam Exp $
+ * $Id: gtk_playlist.c,v 1.20 2001/11/11 18:15:42 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -252,8 +252,8 @@ void GtkPlaylistInvert( GtkMenuItem * menuitem, gpointer user_data )
 
     for( i_dummy = 0 ; i_dummy < i_sel_l ; i_dummy++)
     {
-        pi_selected[i_dummy] = (int)g_list_nth_data( p_clist->selection,
-                                                     i_dummy );
+        pi_selected[i_dummy] = (long)g_list_nth_data( p_clist->selection,
+                                                      i_dummy );
     }
     
     gtk_clist_freeze( p_clist );
@@ -512,7 +512,7 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
 
 void GtkDeleteGListItem( gpointer data, gpointer param )
 {
-    int i_cur_row = ( int )data;
+    int i_cur_row = (long)data;
     intf_thread_t * p_intf = param;    
     
     intf_PlaylistDelete( p_main->p_playlist, i_cur_row );
