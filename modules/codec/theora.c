@@ -54,6 +54,11 @@ struct decoder_sys_t
     theora_state     td;                   /* theora bitstream user comments */
 
     /*
+     * Decoding properties
+     */
+    vlc_bool_t b_decoded_first_keyframe;
+
+    /*
      * Common properties
      */
     mtime_t i_pts;
@@ -139,6 +144,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->p_sys->b_packetizer = VLC_FALSE;
 
     p_sys->i_pts = 0;
+    p_sys->b_decoded_first_keyframe = VLC_FALSE;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -436,8 +442,18 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     theora_decode_packetin( &p_sys->td, p_oggpacket );
 
-    /* Decode */
-    theora_decode_YUVout( &p_sys->td, &yuv );
+    if( theora_packet_iskeyframe( p_oggpacket ) == 1 )
+        p_sys->b_decoded_first_keyframe = VLC_TRUE;
+
+    /* If we haven't seen a single keyframe yet, don't let Theora decode
+     * anything, otherwise we'll get display artifacts.  (This is impossible
+     * in the general case, but can happen if e.g. we play a network stream
+     * using a timed URL, such that the server doesn't start the video with a
+     * keyframe). */
+    if( p_sys->b_decoded_first_keyframe )
+        theora_decode_YUVout( &p_sys->td, &yuv );
+    else
+        return NULL;
 
     /* Get a new picture */
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
