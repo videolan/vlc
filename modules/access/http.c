@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.39 2003/07/31 18:25:12 bigben Exp $
+ * $Id: http.c,v 1.40 2003/07/31 21:18:59 bigben Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -464,6 +464,7 @@ static int Open( vlc_object_t *p_this )
     char *              psz_proxy, *psz_proxy_orig;
     char *              psz_user = NULL, *psz_pwd = NULL;
     int                 i_server_port = 0;
+    vlc_value_t         val;
 
     p_access_data = malloc( sizeof(_input_socket_t) );
     p_input->p_access_data = (access_sys_t *)p_access_data;
@@ -477,11 +478,16 @@ static int Open( vlc_object_t *p_this )
     p_access_data->psz_name = psz_name;
     p_access_data->psz_network = "";
     memset(p_access_data->psz_auth_string, 0, MAX_QUERY_SIZE);
-    if( config_GetInt( p_input, "ipv4" ) )
+    
+    var_Create( p_input, "ipv4", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "ipv4", &val );
+    if( val.i_int )
     {
         p_access_data->psz_network = "ipv4";
     }
-    if( config_GetInt( p_input, "ipv6" ) )
+    var_Create( p_input, "ipv6", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "ipv6", &val );
+    if( val.i_int )
     {
         p_access_data->psz_network = "ipv6";
     }
@@ -596,8 +602,13 @@ static int Open( vlc_object_t *p_this )
 
     if ( psz_user == NULL )
     {
-        psz_user = config_GetPsz( p_input, "http-user" );
-        psz_pwd = config_GetPsz( p_input, "http-pwd" );
+        var_Create( p_input, "http-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_input, "http-user", &val );
+        psz_user = val.psz_string;
+
+        var_Create( p_input, "http-pwd", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_input, "http-pwd", &val );
+        psz_pwd = val.psz_string;
     } 
 
     if (psz_user != NULL)
@@ -612,7 +623,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Check proxy config variable */
-    psz_proxy_orig = config_GetPsz( p_input, "http-proxy" );
+    var_Create( p_input, "http-proxy", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "http-proxy", &val );
+    psz_proxy_orig = val.psz_string;
     if( psz_proxy_orig == NULL )
     {
         /* Check proxy environment variable */
@@ -753,7 +766,10 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Update default_pts to a suitable value for http access */
-    p_input->i_pts_delay = config_GetInt( p_input, "http-caching" ) * 1000;
+
+    var_Create( p_input, "http-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "http-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     return VLC_SUCCESS;
 }
