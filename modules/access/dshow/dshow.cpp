@@ -2,9 +2,9 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: dshow.cpp,v 1.27 2004/01/29 17:04:01 gbazin Exp $
+ * $Id$
  *
- * Author: Gildas Bazin <gbazin@netcourrier.com>
+ * Author: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1348,8 +1348,9 @@ static int DemuxOpen( vlc_object_t *p_this )
             msg_Dbg( p_input, "new audio es %d channels %dHz",
                      fmt.audio.i_channels, fmt.audio.i_rate );
 
-            TAB_APPEND( p_sys->i_es, p_sys->es,
-                        es_out_Add( p_input->p_es_out, &fmt ) );
+            p_sys->es = (es_out_id_t **)realloc( p_sys->es,
+                          sizeof(es_out_id_t *) * (p_sys->i_es + 1) );
+            p_sys->es[p_sys->i_es++] = es_out_Add( p_input->p_es_out, &fmt );
         }
         else if( !memcmp( p_peek, "vids", 4 ) )
         {
@@ -1361,8 +1362,10 @@ static int DemuxOpen( vlc_object_t *p_this )
             msg_Dbg( p_input, "added new video es %4.4s %dx%d",
                      (char*)&fmt.i_codec,
                      fmt.video.i_width, fmt.video.i_height );
-            TAB_APPEND( p_sys->i_es, p_sys->es,
-                        es_out_Add( p_input->p_es_out, &fmt ) );
+
+            p_sys->es = (es_out_id_t **)realloc( p_sys->es,
+                          sizeof(es_out_id_t *) * (p_sys->i_es + 1) );
+            p_sys->es[p_sys->i_es++] = es_out_Add( p_input->p_es_out, &fmt );
         }
 
         p_peek += 20;
