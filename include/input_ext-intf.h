@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2003 VideoLAN
- * $Id: input_ext-intf.h,v 1.104 2004/01/26 23:07:16 fenrir Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -297,6 +297,7 @@ struct input_thread_t
 
     /* Thread properties */
     vlc_bool_t              b_eof;
+    vlc_bool_t              b_out_pace_control;
 
     /* Access module */
     module_t *       p_access;

@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.22 2004/03/03 11:12:08 massiot Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -240,6 +240,7 @@ struct sout_instance_t
     int                     i_preheader;    /* max over all muxer */
 
     int                     i_padding;      /* needed by some decoders */
+    int                     i_out_pace_nocontrol;   /* count of output that can't control the space */
 
     vlc_mutex_t             lock;
     sout_stream_t           *p_stream;
