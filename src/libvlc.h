@@ -873,7 +873,7 @@ vlc_module_begin();
               SUB_FILE_LONGTEXT, VLC_TRUE );
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
                  SPUMARGIN_LONGTEXT, VLC_TRUE );
-    add_module( "sub-filter", "subpicture filter", NULL, NULL,
+    add_module( "sub-filter", "sub filter", NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
 
     /* Input options */

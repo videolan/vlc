@@ -4,8 +4,8 @@
  * Copyright (C) 2003-2004 VideoLAN
  * $Id$
  *
- * Authors: Simon Latapie <garf@videolan.org>
- *          Gildas Bazin <gbazin@videolan.org>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Simon Latapie <garf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,9 @@ static int MouseEvent ( vlc_object_t *, char const *,
                         vlc_value_t , vlc_value_t , void * );
 static int Control    ( vout_thread_t *, int, va_list );
 
+static int  CreateFilter ( vlc_object_t * );
+static void DestroyFilter( vlc_object_t * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -68,6 +71,8 @@ static int Control    ( vout_thread_t *, int, va_list );
 vlc_module_begin();
     set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
+    add_shortcut( "logo" );
+    set_callbacks( Create, Destroy );
 
     add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
     add_integer( "logo-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
@@ -75,26 +80,13 @@ vlc_module_begin();
     add_integer_with_range( "logo-transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
 
+    /* subpicture filter submodule */
+    add_submodule();
+    set_capability( "sub filter", 0 );
+    set_callbacks( CreateFilter, DestroyFilter );
+    set_description( _("Logo sub filter") );
     add_shortcut( "logo" );
-    set_callbacks( Create, Destroy );
 vlc_module_end();
-
-/*****************************************************************************
- * vout_sys_t: logo video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Invert specific properties of an output thread.
- *****************************************************************************/
-struct vout_sys_t
-{
-    vout_thread_t *p_vout;
-
-    filter_t *p_blend;
-    picture_t *p_pic;
-
-    int i_width, i_height;
-    int posx, posy;
-};
 
 /*****************************************************************************
  * LoadPNG: loads the PNG logo into memory
@@ -184,9 +176,24 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Create: allocates logo video thread output method
+ * vout_sys_t: logo video output method descriptor
  *****************************************************************************
- * This function allocates and initializes a Invert vout method.
+ * This structure is part of the video output thread descriptor.
+ * It describes the Invert specific properties of an output thread.
+ *****************************************************************************/
+struct vout_sys_t
+{
+    vout_thread_t *p_vout;
+
+    filter_t *p_blend;
+    picture_t *p_pic;
+
+    int i_width, i_height;
+    int posx, posy;
+};
+
+/*****************************************************************************
+ * Create: allocates logo video thread output method
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -337,8 +344,6 @@ static void End( vout_thread_t *p_vout )
 
 /*****************************************************************************
  * Destroy: destroy logo video thread output method
- *****************************************************************************
- * Terminate an output method created by InvertCreateOutputMethod
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
@@ -455,4 +460,125 @@ static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * filter_sys_t: logo filter descriptor
+ *****************************************************************************/
+struct filter_sys_t
+{
+    picture_t *p_pic;
+
+    int i_width, i_height;
+    int posx, posy;
+
+    mtime_t i_last_date;
+};
+
+static subpicture_t *Filter( filter_t *, mtime_t );
+
+/*****************************************************************************
+ * CreateFilter: allocates logo video filter
+ *****************************************************************************/
+static int CreateFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
+    vlc_value_t val;
+
+    /* Allocate structure */
+    p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    if( p_sys == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+
+    var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-x", &val );
+    p_sys->posx = val.i_int;
+    var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-y", &val );
+    p_sys->posy = val.i_int;
+
+    p_sys->p_pic = LoadPNG( p_this );
+    if( !p_sys->p_pic )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
+    p_sys->i_last_date = 0;
+
+    /* Misc init */
+    p_filter->pf_sub_filter = Filter;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DestroyFilter: destroy logo video filter
+ *****************************************************************************/
+static void DestroyFilter( vlc_object_t *p_this )
+{
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
+        free( p_sys->p_pic->p_data_orig );
+    if( p_sys->p_pic ) free( p_sys->p_pic );
+
+    free( p_sys );
+}
+
+/****************************************************************************
+ * Filter: the whole thing
+ ****************************************************************************
+ * This function outputs subpictures at regular time intervals.
+ ****************************************************************************/
+static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    subpicture_t *p_spu;
+    subpicture_region_t *p_region;
+    video_format_t fmt;
+
+    if( p_sys->i_last_date && p_sys->i_last_date + 5000000 > date )
+    {
+        return 0;
+    }
+
+    /* Allocate the subpicture internal data. */
+    p_spu = p_filter->pf_sub_buffer_new( p_filter );
+    if( !p_spu ) return NULL;
+
+    /* Create new SPU region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt.i_width = fmt.i_visible_width = p_sys->i_width;
+    fmt.i_height = fmt.i_visible_height = p_sys->i_height;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    if( !p_region )
+    {
+        msg_Err( p_filter, "cannot allocate SPU region" );
+        p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        return NULL;
+    }
+
+    vout_CopyPicture( p_filter, &p_region->picture, p_sys->p_pic );
+    p_region->i_x = 0;
+    p_region->i_y = 0;
+    p_spu->i_x = p_sys->posx;
+    p_spu->i_y = p_sys->posy;
+    p_spu->p_region = p_region;
+
+    p_spu->i_start = date;
+    p_spu->i_stop = 0;
+    p_spu->b_ephemer = VLC_TRUE;
+
+    return p_spu;
 }

@@ -113,11 +113,11 @@ int spu_Init( spu_t *p_spu )
             (filter_owner_sys_t *)p_spu;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
-                         "subpicture filter", psz_filter, 0 );
+                         "sub filter", psz_filter, 0 );
         if( p_spu->pp_filter[p_spu->i_filter]->p_module ) p_spu->i_filter++;
         else
         {
-            msg_Dbg( p_spu, "no subpicture filter found" );
+            msg_Dbg( p_spu, "no sub filter found" );
             vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
             vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
         }
