@@ -51,7 +51,7 @@ modules/codec/a52old/a52old.c
 modules/codec/a52old/downmix/downmix.c
 modules/codec/a52old/imdct/imdct.c
 modules/codec/araw.c
-modules/codec/dv/dv.c
+modules/codec/dv.c
 modules/codec/faad/decoder.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/postprocessing/postprocessing.c
