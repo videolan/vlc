@@ -270,7 +270,7 @@
 #define VOUT_XSHM                       1
 
 /* Font maximum and minimum characters - characters outside this range are not
- * printed - maximum range is 0-256 */
+ * printed - maximum range is 1-256 */
 #define VOUT_MIN_CHAR 1
 #define VOUT_MAX_CHAR 128
 
@@ -330,7 +330,6 @@
  */
 #define INTF_APP_CLASS                  "vlc"
 #define INTF_APP_NAME                   "vlc"
-//??#define 
 
 /*
  * X11 console properties

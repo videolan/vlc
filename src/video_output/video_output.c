@@ -288,23 +288,22 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
  * vout_DisplayPicture: display a picture
  *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
- * display.
+ * display. The picture does not need to be locked, since it is ignored by
+ * the output thread if is reserved.
  *******************************************************************************/
 void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef DEBUG_VIDEO
     char        psz_date[MSTRTIME_MAX_SIZE];         /* buffer for date string */
 #endif
-  
-   vlc_mutex_lock( &p_vout->lock );
 
 #ifdef DEBUG_VIDEO
-   /* Check if picture status is valid */
-   if( p_pic->i_status != RESERVED_PICTURE )
-   {
-       intf_DbgMsg("error: picture %d has invalid status %d\n", 
-                   p_pic, p_pic->i_status );       
-   }   
+    /* Check if picture status is valid */
+    if( p_pic->i_status != RESERVED_PICTURE )
+    {
+        intf_DbgMsg("error: picture %d has invalid status %d\n", 
+                    p_pic, p_pic->i_status );       
+    }   
 #endif
 
     /* Remove reservation flag */
@@ -320,8 +319,6 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     intf_DbgMsg("picture %p: type=%d, %dx%d, date=%s\n", p_pic, p_pic->i_type, 
                 p_pic->i_width,p_pic->i_height, mstrtime( psz_date, p_pic->date ) );    
 #endif
-
-    vlc_mutex_unlock( &p_vout->lock );
 }
 
 /*******************************************************************************
@@ -329,7 +326,8 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *******************************************************************************
  * This function create a reserved image in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
- * already allocated zone of memory in the picture data fields.
+ * already allocated zone of memory in the picture data fields. It needs locking
+ * since several pictures can be created by several producers threads.
  *******************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type, 
 			       int i_width, int i_height, int i_bytes_per_line )
@@ -454,11 +452,11 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
  * This function frees a previously reserved picture or a permanent
  * picture. It is meant to be used when the construction of a picture aborted.
  * Note that the picture will be destroyed even if it is linked !
+ * This function does not need locking since reserved pictures are ignored by
+ * the output thread.
  *******************************************************************************/
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->lock );
-
 #ifdef DEBUG_VIDEO
    /* Check if picture status is valid */
    if( p_pic->i_status != RESERVED_PICTURE )
@@ -473,15 +471,13 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);    
 #endif
-
-    vlc_mutex_unlock( &p_vout->lock );
 }
 
 /*******************************************************************************
  * vout_LinkPicture: increment reference counter of a picture
  *******************************************************************************
  * This function increment the reference counter of a picture in the video
- * heap.
+ * heap. It needs a lock since several producer threads can access the picture.
  *******************************************************************************/
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -683,13 +679,10 @@ static void RunThread( vout_thread_t *p_vout)
     while( (!p_vout->b_die) && (!p_vout->b_error) )
     {
         /* 
-	 * Find the picture to display - this is the only operation requiring
-	 * the lock on the picture, since once a READY_PICTURE has been found,
-	 * it can't be modified by the other threads (except if it is unliked,
-	 * but its data remains)
-	 */
+	 * Find the picture to display - this operation does not need lock,
+         * since only READY_PICTURES are handled 
+         */
         p_pic = NULL;         
-        vlc_mutex_lock( &p_vout->lock );
 	for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
 	{
 	    if( (p_vout->p_picture[i_picture].i_status == READY_PICTURE) &&
@@ -700,7 +693,6 @@ static void RunThread( vout_thread_t *p_vout)
                 pic_date = p_pic->date;                
 	    }
 	}
-	vlc_mutex_unlock( &p_vout->lock );
 
         /* 
 	 * Render picture if any
@@ -720,7 +712,6 @@ static void RunThread( vout_thread_t *p_vout)
 	    {
 		/* Picture is late: it will be destroyed and the thread will go
 		 * immediately to next picture */
-		vlc_mutex_lock( &p_vout->lock );
 		if( p_pic->i_refcount )
 		{
 		    p_pic->i_status = DISPLAYED_PICTURE;
@@ -733,8 +724,7 @@ static void RunThread( vout_thread_t *p_vout)
 #ifdef DEBUG_VIDEO
 		intf_DbgMsg( "warning: late picture %p skipped\n", p_pic );
 #endif
-		vlc_mutex_unlock( &p_vout->lock );
-		p_pic = NULL;
+                p_pic = NULL;
 	    }
 	    else if( pic_date > current_date + VOUT_DISPLAY_DELAY )
 	    {
@@ -748,7 +738,6 @@ static void RunThread( vout_thread_t *p_vout)
 		/* Picture has not yet been displayed, and has a valid display
 		 * date : render it, then forget it */
 		RenderPicture( p_vout, p_pic );
-                vlc_mutex_lock( &p_vout->lock );
                 if( p_pic->i_refcount )
 		{
 		    p_pic->i_status = DISPLAYED_PICTURE;
@@ -757,7 +746,6 @@ static void RunThread( vout_thread_t *p_vout)
 		{
 		    p_pic->i_status = DESTROYED_PICTURE;
 		}
-                vlc_mutex_unlock( &p_vout->lock );
 
                 /* Print additional informations */
                 if( p_vout->b_info )
@@ -766,7 +754,7 @@ static void RunThread( vout_thread_t *p_vout)
                 }                
 	    }
         }
-    
+
         /*
          * Check events, sleep and display picture
 	 */
