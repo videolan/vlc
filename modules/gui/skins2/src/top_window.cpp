@@ -130,8 +130,8 @@ void TopWindow::processEvent( EvtMouse &rEvtMouse )
     // Change the focused control
     if( rEvtMouse.getAction() == EvtMouse::kDown )
     {
-        // Raise all the windows
-        m_rWindowManager.raiseAll( *this );
+        // Raise the window
+        m_rWindowManager.raise( *this );
 
         if( pNewHitControl && pNewHitControl->isFocusable() )
         {

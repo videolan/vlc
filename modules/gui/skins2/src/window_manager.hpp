@@ -76,11 +76,14 @@ class WindowManager: public SkinObject
         /// Hide all the registered windows
         void hideAll() const;
 
+        /// Raise the given window
+        void raise( TopWindow &rWindow ) const { rWindow.raise(); }
+
         /// Show the given window
-        void show( TopWindow &rWindow ) { rWindow.show(); }
+        void show( TopWindow &rWindow ) const { rWindow.show(); }
 
         /// Hide the given window
-        void hide( TopWindow &rWindow ) { rWindow.hide(); }
+        void hide( TopWindow &rWindow ) const { rWindow.hide(); }
 
         /// Toggle all the windows on top
         void toggleOnTop();

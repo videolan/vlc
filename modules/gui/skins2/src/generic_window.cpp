@@ -72,13 +72,13 @@ void GenericWindow::processEvent( EvtRefresh &rEvtRefresh )
 }
 
 
-void GenericWindow::show()
+void GenericWindow::show() const
 {
     m_varVisible.set( true );
 }
 
 
-void GenericWindow::hide()
+void GenericWindow::hide() const
 {
     m_varVisible.set( false );
 }

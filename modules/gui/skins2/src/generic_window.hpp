@@ -84,10 +84,10 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         /// only by the window manager or by inheritant classes.
         //@{
         /// Show the window
-        virtual void show();
+        virtual void show() const;
 
         /// Hide the window
-        virtual void hide();
+        virtual void hide() const;
 
         /// Move the window
         virtual void move( int left, int top );
@@ -114,7 +114,7 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         /// OS specific implementation
         OSWindow *m_pOsWindow;
         /// Variable for the visibility of the window
-        VarBoolImpl m_varVisible;
+        mutable VarBoolImpl m_varVisible;
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarBool> &rVariable );
