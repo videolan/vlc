@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.1 2002/03/06 01:20:56 stef Exp $
+ * $Id: dvd_access.c,v 1.2 2002/03/06 12:26:35 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,6 +236,8 @@ static int DVDOpen( struct input_thread_s *p_input )
     }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    p_input->psz_demux = "dvd";
 
     return 0;
 }

@@ -1,7 +1,7 @@
 /* dvd_demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_demux.c,v 1.1 2002/03/06 01:20:56 stef Exp $
+ * $Id: dvd_demux.c,v 1.2 2002/03/06 12:26:35 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -88,12 +88,6 @@ void _M( demux_getfunctions)( function_list_t * p_function_list )
  *****************************************************************************/
 static int DVDInit( input_thread_t * p_input )
 {
-
-    if( strncmp( p_input->p_access_module->psz_name, "dvd", 3 ) )
-    {
-        return -1;
-    }
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
     DVDLaunchDecoders( p_input );
