@@ -1568,8 +1568,9 @@ then
   fi
 
   dnl Duplicate the ffmpeg CPPFLAGS and LDFLAGS for the encoder
-  LDFLAGS_encoder_ffmpeg=${LDFLAGS_ffmpeg}
-  CPPFLAGS_encoder_ffmpeg=${CPPFLAGS_ffmpeg}
+  CPPFLAGS_encoder_ffmpeg="${CPPFLAGS_ffmpeg}"
+  dnl XXX: we don't link with -lavcodec blah blah blah
+  #LDFLAGS_encoder_ffmpeg="${LDFLAGS_ffmpeg}"
 
   dnl Add postprocessing modules
   PLUGINS="${PLUGINS} postprocessing_c"
