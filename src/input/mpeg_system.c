@@ -439,19 +439,14 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t *p_data,
              * packet. This is also here that we can synchronize with the
              * stream if we lost packets or if the decoder has just
              * started. */
-            if( (p_pes = (pes_packet_t *)malloc( sizeof(pes_packet_t) )) == NULL )
+            if( (p_pes = p_input->p_plugin->pf_new_pes( p_input->p_method_data ) ) == NULL )
             {
                 intf_ErrMsg("Out of memory");
                 p_input->b_error = 1;
                 return;
             }
             //intf_DbgMsg("New PES packet %p (first data: %p)\n", p_pes, p_data);
-
-            /* Init the PES fields so that the first data packet could be
-             * correctly added to the PES packet (see below). */
             p_pes->p_first = p_data;
-            p_pes->b_messed_up = p_pes->b_discontinuity = 0;
-            p_pes->i_pes_size = 0;
 
             /* If the PES header fits in the first data packet, we can
              * already set p_gather->i_pes_real_size. */
@@ -549,19 +544,9 @@ static void CRReInit( pgrm_descriptor_t * p_pgrm )
 /*****************************************************************************
  * CRDecode : Decode a clock reference
  *****************************************************************************/
-static void CRDecode( input_thread_t * p_input, es_descriptor_t * p_es,
+static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                       mtime_t cr_time )
 {
-    pgrm_descriptor_t *     p_pgrm;
-    if( p_es != NULL )
-    {
-        p_pgrm = p_es->p_pgrm;
-    }
-    else
-    {
-        p_pgrm = p_input->stream.pp_programs[0];
-    }
-
     if( p_pgrm->i_synchro_state != SYNCHRO_OK )
     {
         switch( p_pgrm->i_synchro_state )
@@ -571,54 +556,54 @@ static void CRDecode( input_thread_t * p_input, es_descriptor_t * p_es,
             p_pgrm->i_synchro_state = SYNCHRO_OK;
             break;
 
+        case SYNCHRO_NOT_STARTED:
+            p_pgrm->i_synchro_state = SYNCHRO_START;
+            break;
+
         default:
             break;
         }
     }
-    else if( p_input->stream.b_pace_control )
-    {
-        /* Wait a while before delivering the packets to the decoder. */
-        mwait( cr_time + p_pgrm->delta_absolute );
-    }
     else
     {
-        mtime_t                 sys_time, delta_cr;
-
-        sys_time = mdate();
-        delta_cr = sys_time - cr_time;
-
-        if( (p_es != NULL && p_es->b_discontinuity) ||
+        if( p_pgrm->b_discontinuity ||
             ( p_pgrm->last_cr != 0 &&
                   (    (p_pgrm->last_cr - cr_time) > CR_MAX_GAP
                     || (p_pgrm->last_cr - cr_time) < - CR_MAX_GAP ) ) )
         {
+            /* Stream discontinuity. */
             intf_WarnMsg( 3, "CR re-initialiazed" );
             CRReInit( p_pgrm );
             p_pgrm->i_synchro_state = SYNCHRO_REINIT;
-            if( p_es != NULL )
-            {
-                p_es->b_discontinuity = 0;
-            }
+            p_pgrm->b_discontinuity = 0;
         }
         p_pgrm->last_cr = cr_time;
 
-        if( p_pgrm->c_average_count == CR_MAX_AVERAGE_COUNTER )
+        if( p_input->stream.b_pace_control )
         {
-            p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
-                                              * (CR_MAX_AVERAGE_COUNTER - 1)) )
-                                 / CR_MAX_AVERAGE_COUNTER;
+            /* Wait a while before delivering the packets to the decoder. */
+            mwait( cr_time + p_pgrm->delta_absolute );
         }
         else
         {
-            p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
-                                              * p_pgrm->c_average_count) )
-                                 / ( p_pgrm->c_average_count + 1 );
-            p_pgrm->c_average_count++;
-        }
+            mtime_t                 sys_time, delta_cr;
 
-        if( p_pgrm->i_synchro_state == SYNCHRO_NOT_STARTED )
-        {
-            p_pgrm->i_synchro_state = SYNCHRO_START;
+            sys_time = mdate();
+            delta_cr = sys_time - cr_time;
+
+            if( p_pgrm->c_average_count == CR_MAX_AVERAGE_COUNTER )
+            {
+                p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
+                                              * (CR_MAX_AVERAGE_COUNTER - 1)) )
+                                     / CR_MAX_AVERAGE_COUNTER;
+            }
+            else
+            {
+                p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
+                                              * p_pgrm->c_average_count) )
+                                     / ( p_pgrm->c_average_count + 1 );
+                p_pgrm->c_average_count++;
+            }
         }
     }
 }
@@ -678,7 +663,6 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 = p_byte[1];
             p_input->p_es[i_es].i_type = p_byte[0];
             p_input->p_es[i_es].p_pgrm = p_input->stream.pp_programs[0];
-            p_input->p_es[i_es].b_discontinuity = 0;
             p_input->p_es[i_es].p_pes = NULL;
             p_byte += 4 + U16_AT(&p_byte[2]);
 
@@ -738,12 +722,10 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* MPEG-2 */
                     scr_time =
                       (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
-                         ((mtime_t)(p_data->p_buffer[4] & 0x3) << 28) |
-                         ((mtime_t)(p_data->p_buffer[5]) << 20) |
-                         ((mtime_t)(p_data->p_buffer[6] & 0xF8) << 12) |
-                         ((mtime_t)(p_data->p_buffer[6] & 0x3) << 13) |
-                         ((mtime_t)(p_data->p_buffer[7]) << 5) |
-                         ((mtime_t)(p_data->p_buffer[8] & 0xF8) >> 3)
+                         ((mtime_t)(U32_AT(p_data->p_buffer + 4) & 0x03FFF800)
+                                        << 4) |
+                         ((mtime_t)(U32_AT(p_data->p_buffer + 6) & 0x03FFF800)
+                                        >> 11)
                       ) * 300) / 27;
                 }
                 else
@@ -758,7 +740,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 }
                 /* Call the pace control. */
                 //intf_Msg("+%lld\n", scr_time);
-                CRDecode( p_input, NULL, scr_time - 200000 );
+                CRDecode( p_input, p_input->stream.pp_programs[0],
+                          scr_time );
                 b_trash = 1;
             }
             break;
@@ -826,7 +809,6 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     p_es->i_id = p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_VIDEO_ES;
                     p_es->p_pgrm = p_input->stream.pp_programs[0];
-                    p_es->b_discontinuity = 0;
                     p_es->p_pes = NULL;
 
 #ifdef AUTO_SPAWN
@@ -870,7 +852,6 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     p_es->i_id = p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->p_pgrm = p_input->stream.pp_programs[0];
-                    p_es->b_discontinuity = 0;
                     p_es->p_pes = NULL;
 
 #ifdef AUTO_SPAWN
@@ -1046,7 +1027,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                         /* If the PID carries the PCR, there will be a system
                          * time-based discontinuity. We let the PCR decoder
                          * handle that. */
-                        p_es->b_discontinuity = 1;
+                        p_es->p_pgrm->b_discontinuity = 1;
     
                         /* There also may be a continuity_counter
                          * discontinuity: resynchronise our counter with
@@ -1071,7 +1052,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                                     ( (( (mtime_t)U32_AT((u32*)&p[6]) << 1 )
                                       | ( p[10] >> 7 )) * 300 ) / 27;
                             /* Call the pace control. */
-                            CRDecode( p_input, p_es, pcr_time );
+                            CRDecode( p_input, p_es->p_pgrm, pcr_time );
                         }
                     } /* PCR ? */
                 } /* valid TS adaptation field ? */

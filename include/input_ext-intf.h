@@ -24,7 +24,6 @@ typedef struct es_descriptor_s
     void *                  p_demux_data;
     struct pgrm_descriptor_s *
                             p_pgrm;  /* very convenient in the demultiplexer */
-    boolean_t               b_discontinuity;
 
     /* PES parser information */
     struct pes_packet_s *   p_pes;                            /* Current PES */
@@ -82,6 +81,7 @@ typedef struct pgrm_descriptor_s
     count_t                 c_average_count;
                            /* counter used to compute dynamic average values */
     int                     i_synchro_state;
+    boolean_t               b_discontinuity;
 
     /* Demultiplexer data */
     void *                  p_demux_data;

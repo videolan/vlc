@@ -282,6 +282,27 @@ static struct data_packet_s * NewPacket( void * p_garbage,
 }
 
 /*****************************************************************************
+ * NewPES: allocates a pes packet
+ *****************************************************************************/
+static pes_packet_t * NewPES( void * p_garbage )
+{
+    pes_packet_t * p_pes;
+
+    if( (p_pes = (pes_packet_t *)malloc( sizeof(pes_packet_t) )) == NULL )
+    {
+        intf_DbgMsg( "Out of memory" );
+        return NULL;
+    }
+
+    p_pes->b_messed_up = p_pes->b_data_alignment = p_pes->b_discontinuity =
+        p_pes->b_has_pts = 0;
+    p_pes->i_pes_size = 0;
+    p_pes->p_first = NULL;
+
+    return( p_pes );
+}
+
+/*****************************************************************************
  * DeletePacket: deletes a data packet
  *****************************************************************************/
 static void DeletePacket( void * p_garbage,
@@ -326,6 +347,7 @@ input_capabilities_t * PSKludge( void )
     p_plugin->pf_read = PSRead;
     p_plugin->pf_demux = input_DemuxPS; /* FIXME: use i_p_config_t ! */
     p_plugin->pf_new_packet = NewPacket;
+    p_plugin->pf_new_pes = NewPES;
     p_plugin->pf_delete_packet = DeletePacket;
     p_plugin->pf_delete_pes = DeletePES;
     p_plugin->pf_rewind = NULL;

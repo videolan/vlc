@@ -251,7 +251,7 @@ C_OBJ =		$(INTERFACE) \
 		$(AC3_DECODER) \
 		$(LPCM_DECODER) \
 		$(AUDIO_DECODER) \
-		$(SPU_DEOCDER) \
+		$(SPU_DECODER) \
 		$(GEN_DECODER) \
 		$(VIDEO_PARSER) \
 		$(VIDEO_DECODER) \
@@ -378,7 +378,7 @@ export
 all: vlc @ALIASES@ plugins
 
 clean:
-	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
+	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
 	rm -f vlc @ALIASES@ lib/*.so
 
 distclean: clean

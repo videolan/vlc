@@ -29,6 +29,7 @@ typedef struct input_capabilities_s
 
     /* Packet management facilities */
     struct data_packet_s *(* pf_new_packet)( void *, size_t );
+    struct pes_packet_s *(* pf_new_pes)( void * );
     void                 (* pf_delete_packet)( void *,
                                                struct data_packet_s * );
     void                 (* pf_delete_pes)( void *, struct pes_packet_s * );
