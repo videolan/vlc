@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.9 2004/01/30 17:50:05 fenrir Exp $
+ * $Id: ts.c,v 1.10 2004/02/01 04:50:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -249,6 +249,7 @@ static int Open( vlc_object_t *p_this )
 
     uint8_t     *p_peek;
     int          i_peek;
+    int          i_sync;
     int          i;
 
     ts_pid_t     *pat;
@@ -260,14 +261,36 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( p_peek[0] != 0x47 || ( i_peek >= 189 && p_peek[188] != 0x47 ) )
+
+    /* Search first synch */
+    for( i_sync = 0; i_sync < i_peek; i_sync++ )
     {
-        if( strcmp( p_demux->psz_demux, "ts" ) )
+        if( p_peek[i_sync] == 0x47 ) break;
+    }
+    if( i_sync >= i_peek )
+    {
+        if( strcmp( p_demux->psz_demux, "ts2" ) )
         {
             msg_Warn( p_demux, "TS module discarded" );
             return VLC_EGENERIC;
         }
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
+    }
+    if( strcmp( p_demux->psz_demux, "ts2" ) )
+    {
+        /* Check next 3 sync points */
+        i_peek = 188*3 + 1 + i_sync;
+        if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
+        {
+            msg_Err( p_demux, "cannot peek" );
+            return VLC_EGENERIC;
+        }
+        if( p_peek[i_sync+  188] != 0x47 || p_peek[i_sync+2*188] != 0x47 ||
+            p_peek[i_sync+3*188] != 0x47 )
+        {
+            msg_Warn( p_demux, "TS module discarded (lost sync)" );
+            return VLC_EGENERIC;
+        }
     }
 
     /* Fill p_demux field */
