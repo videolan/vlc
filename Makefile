@@ -198,10 +198,12 @@ video_decoder_obj =		video_decoder_ref/video_decoder.o \
 #						video_decoder/vdec_motion.o
 
 misc_obj =			misc/mtime.o \
-						misc/xutils.o \
 						misc/rsc_files.o \
 						misc/netutils.o
 
+ifeq ($(VIDEO),X11)
+misc_obj+=			misc/xutils.o
+endif
 
 ifeq ($(ARCH),MMX)
 ASM_OBJ = 			video_decoder_ref/idctmmx.o \

@@ -248,13 +248,13 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         /* Allocate memory */
         switch( i_type )
         {
-        case YUV_422_PICTURE:           /* YUV picture: 3*16 ?? bits per pixel */
-        case YUV_442_PICTURE:
+        case YUV_420_PICTURE:           /* YUV picture: 3*16 ?? bits per pixel */
+        case YUV_422_PICTURE:
         case YUV_444_PICTURE:
             p_free_picture->p_data = malloc( 3 * i_height * i_bytes_per_line );                
             p_free_picture->p_y = p_free_picture->p_data;
-            p_free_picture->p_u = (byte_t *)p_free_picture->p_data + i_height * i_bytes_per_line;
-            p_free_picture->p_v = (byte_t *)p_free_picture->p_data + i_height * i_bytes_per_line * 2;
+            p_free_picture->p_u = p_free_picture->p_data + i_height * i_bytes_per_line;
+            p_free_picture->p_v = p_free_picture->p_data + i_height * i_bytes_per_line * 2;
             break;                
 #ifdef DEBUG
         default:

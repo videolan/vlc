@@ -12,6 +12,11 @@
  *******************************************************************************/
 
 /*******************************************************************************
+ * yuv_data_t: type for storing one Y, U or V sample.
+ *******************************************************************************/
+typedef s16 yuv_data_t;
+
+/*******************************************************************************
  * picture_t: video picture                                            
  *******************************************************************************
  * Any picture destined to be displayed by a video output thread should be 
@@ -47,16 +52,16 @@ typedef struct
      * p_v data pointers refers to different areas of p_data, and should not
      * be freed */   
     byte_t *        p_data;                                    /* picture data */
-    byte_t *        p_y;          /* pointer to beginning of Y image in p_data */
-    byte_t *        p_u;          /* pointer to beginning of U image in p_data */
-    byte_t *        p_v;          /* pointer to beginning of V image in p_data */
+    yuv_data_t *    p_y;          /* pointer to beginning of Y image in p_data */
+    yuv_data_t *    p_u;          /* pointer to beginning of U image in p_data */
+    yuv_data_t *    p_v;          /* pointer to beginning of V image in p_data */
 } picture_t;
 
 
 /* Pictures types */
 #define EMPTY_PICTURE           0       /* picture slot is empty and available */
-#define YUV_422_PICTURE         100                       /* 4:2:2 YUV picture */
-#define YUV_442_PICTURE         101                       /* 4:4:2 YUV picture */
+#define YUV_420_PICTURE         100                       /* 4:2:0 YUV picture */
+#define YUV_422_PICTURE         101                       /* 4:2:2 YUV picture */
 #define YUV_444_PICTURE         102                       /* 4:4:4 YUV picture */
 
 /* Pictures status */
