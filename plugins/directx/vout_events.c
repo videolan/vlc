@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.24 2002/07/29 19:07:00 gbazin Exp $
+ * $Id: vout_events.c,v 1.25 2002/07/30 17:14:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -512,12 +512,12 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
         DirectXUpdateRects( p_vout );
         if( p_vout->p_sys->b_using_overlay &&
-            !p_vout->p_sys->b_event_thread_die )
+            !p_vout->p_sys->p_event->b_die )
             DirectXUpdateOverlay( p_vout );
 
         /* signal the size change */
         if( !p_vout->p_sys->b_using_overlay &&
-            !p_vout->p_sys->b_event_thread_die )
+            !p_vout->p_sys->p_event->b_die )
             p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
 
         return 0;
