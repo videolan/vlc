@@ -42,6 +42,7 @@
 #include "bitmaps/type_playlist.xpm"
 
 #include <wx/dynarray.h>
+#include <wx/imaglist.h>
 
 #define HELP_SHUFFLE N_( "Shuffle" )
 #define HELP_LOOP N_( "Loop" )
