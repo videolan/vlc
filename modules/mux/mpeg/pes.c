@@ -2,7 +2,7 @@
  * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.11 2003/08/15 01:58:46 fenrir Exp $
+ * $Id: pes.c,v 1.12 2003/11/15 18:57:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -235,7 +235,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
                    int b_mpeg2 )
 {
     sout_buffer_t *p_es_sav, *p_pes;
-    mtime_t i_pts, i_dts;
+    mtime_t i_pts, i_dts, i_length;
 
     uint8_t *p_data;
     int     i_size;
@@ -245,6 +245,8 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     uint8_t header[30];     // PES header + extra < 30 (more like 17)
     int     i_pes_payload;
     int     i_pes_header;
+
+    int     i_pes_count = 1;
 
     /* HACK for private stream 1 in ps */
     if( ( i_stream_id >> 8 ) == PES_PRIVATE_STREAM_1 )
@@ -297,6 +299,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
                 p_sout->p_vlc->pf_memcpy( p_pes->p_buffer + i_pes_header,
                                           p_data, i_pes_payload );
             }
+            i_pes_count++;
         }
 
         /* copy header */
@@ -314,5 +317,17 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         sout_BufferRealloc( p_sout, p_es_sav, p_es_sav->i_size );
     }
 
+    /* Now redate all pes */
+    i_dts    = (*pp_pes)->i_dts;
+    i_length = (*pp_pes)->i_length / i_pes_count;
+    for( p_pes = *pp_pes; p_pes != NULL; p_pes = p_pes->p_next )
+    {
+        p_pes->i_dts = i_dts;
+        p_pes->i_length = i_length;
+
+        i_dts += i_length;
+    }
     return( 0 );
 }
+
+
