@@ -2,9 +2,10 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.13 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.14 2003/04/17 17:45:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
+ *          Emmanuel Puig    <karibu@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

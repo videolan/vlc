@@ -2,9 +2,10 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.11 2003/04/17 16:30:40 karibu Exp $
+ * $Id: gtk2_graphics.cpp,v 1.12 2003/04/17 17:45:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
+ *          Emmanuel Puig    <karibu@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

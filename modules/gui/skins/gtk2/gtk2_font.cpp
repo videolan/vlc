@@ -2,9 +2,10 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.8 2003/04/17 15:43:29 karibu Exp $
+ * $Id: gtk2_font.cpp,v 1.9 2003/04/17 17:45:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
+ *          Emmanuel Puig    <karibu@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
