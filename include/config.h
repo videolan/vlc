@@ -270,7 +270,7 @@
  * at least VOUT_IDLE_SLEEP plus the time required to render a few
  * images, to avoid trashing of decoded images */
 /* ?? this constant will probably evolve to a calculated value */
-#define VOUT_DISPLAY_DELAY              100000
+#define VOUT_DISPLAY_DELAY              500000
 
 /* Delay (in microseconds) between increments in idle levels */
 #define VOUT_IDLE_DELAY                 5000000000000

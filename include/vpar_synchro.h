@@ -25,15 +25,35 @@ typedef struct video_synchro_tab_s
     
 } video_synchro_tab_t;
 
+typedef struct video_synchro_fifo_s
+{
+    /* type of image to be decoded, and decoding date */
+    int i_image_type;
+    mtime_t decode_date;
+    
+} video_synchro_fifo_t;
+
 typedef struct video_synchro_s
 {
-    int modulo;
+    /* fifo containing decoding dates */
+    video_synchro_fifo_t fifo[16];
+    unsigned int i_fifo_start;
+    unsigned int i_fifo_stop;
+
+    /* 0: I
+     * 1: P
+     * 2: B
+     */
+    mtime_t decode_time;
+    
+    /* il manquait un compteur */
+    unsigned int modulo;
 
     /* P images since the last I */
-    int current_p_count;
+    unsigned int current_p_count;
     double p_count_predict;
     /* B images since the last I */
-    int current_b_count;
+    unsigned int current_b_count;
     double b_count_predict;
 
     /* 1 for linear count, 2 for binary count, 3 for ternary count */
