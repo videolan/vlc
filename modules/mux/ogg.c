@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.15 2003/10/09 11:48:41 gbazin Exp $
+ * $Id: ogg.c,v 1.16 2003/10/09 18:53:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -174,6 +174,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
             sout_buffer_t *p_buf;
 
             p_buf = sout_FifoShow( p_fifo );
+            if( p_buf->i_dts ) // To ignore vorbis and theora header packets
             if( i_stream < 0 || p_buf->i_dts < i_dts )
             {
                 i_dts = p_buf->i_dts;
@@ -211,6 +212,7 @@ typedef struct
     mtime_t i_length;
     int     i_packet_no;
     int     i_serial_no;
+    int     i_keyframe_granule_shift; /* Theora only */
     ogg_stream_state os;
 
     oggds_header_t oggds_header;
@@ -606,6 +608,21 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             }
             p_og = sout_BufferDuplicate( p_mux->p_sout,
                                          p_stream->pp_sout_headers[0] );
+
+            /* Get keyframe_granule_shift for theora granulepos calculation */
+            if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+            {
+                int i_keyframe_frequency_force = 1 << (op.packet[36] >> 3);
+
+                /* granule_shift = i_log( frequency_force -1 ) */
+                p_stream->i_keyframe_granule_shift = 0;
+                i_keyframe_frequency_force--;
+                while( i_keyframe_frequency_force )
+                {
+                    p_stream->i_keyframe_granule_shift++;
+                    i_keyframe_frequency_force >>= 1;
+                }
+            }
         }
         else
         {
@@ -866,7 +883,9 @@ static int Mux( sout_mux_t *p_mux )
         {
             if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
             {
-                op.granulepos = op.packetno; /* FIXME */
+                /* FIXME, we assume only keyframes and 25fps */
+  	        op.granulepos = ( ( i_dts - p_sys->i_start_dts ) * I64C(25)
+                    / I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
             }
             else
                 op.granulepos = ( i_dts - p_sys->i_start_dts ) * I64C(10) /

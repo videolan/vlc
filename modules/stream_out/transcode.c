@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.39 2003/10/09 12:31:05 gbazin Exp $
+ * $Id: transcode.c,v 1.40 2003/10/09 18:53:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1223,7 +1223,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 
 
     /* find encoder */
-    id->ff_enc = NULL;
+    id->ff_enc = id->ff_enc_c = NULL;
     i_ff_codec = get_ff_codec( id->f_dst.i_fourcc );
     if( i_ff_codec != 0 )
     {
@@ -1395,7 +1395,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
     }
 
     free( id->ff_dec_c );
-    free( id->ff_enc_c );
+    if( id->ff_enc_c ) free( id->ff_enc_c );
     free( id->p_buffer );
 }
 
@@ -1637,7 +1637,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-        if( id->f_dst.i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
+        if( id->p_encoder ||
+            id->f_dst.i_fourcc == VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
             frame->pts = p_sys->i_output_pts;
         else
             frame->pts = 0;
@@ -1675,6 +1676,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 sout_buffer_t *p_out;
                 p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
                 memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+                p_out->i_dts = p_block->i_dts;
+                p_out->i_pts = p_block->i_pts;
                 sout_BufferChain( out, p_out );
                 block_Release( p_block );
             }

@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.11 2003/10/09 11:48:41 gbazin Exp $
+ * $Id: theora.c,v 1.12 2003/10/09 18:53:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -696,7 +696,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     /* Ogg packet to block */
     p_block = block_New( p_enc, oggpacket.bytes );
     memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
-    p_block->i_dts = p_pict->date;//oggpacket.granulepos;
+    p_block->i_dts = p_block->i_pts = p_pict->date;;
 
     return p_block;
 }
