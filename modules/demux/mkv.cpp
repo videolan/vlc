@@ -420,7 +420,7 @@ static int Open( vlc_object_t * p_this )
     uint8_t     *p_peek;
     std::string  s_path, s_filename;
     int          i_upper_lvl;
-    size_t       i, j;
+    size_t       i;
 
     int          i_track;
 
@@ -585,8 +585,13 @@ static int Open( vlc_object_t * p_this )
                     if (!s_filename.compare(p_demux->psz_path))
                         continue;
 
+#if __GNUC__ >= 3
                     if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") || 
                         !s_filename.compare(s_filename.length() - 3, 3, "mka"))
+#else
+                    if (!s_filename.compare("mkv", s_filename.length() - 3, 3) || 
+                        !s_filename.compare("mka", s_filename.length() - 3, 3))
+#endif
                     {
                         // test wether this file belongs to the our family
                         bool b_keep_file_opened = false;
@@ -647,9 +652,12 @@ static int Open( vlc_object_t * p_this )
                                             else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                                             {
                                                 KaxSegmentFamily *p_fam = static_cast<KaxSegmentFamily*>(l);
-                                                for (j=0; j<p_sys->families.size(); j++)
+                                                std::vector<KaxSegmentFamily>::iterator iter;
+                                                for( iter = p_sys->families.begin();
+                                                     iter != p_sys->families.end();
+                                                     iter++ )
                                                 {
-                                                    if (p_sys->families.at(j) == *p_fam)
+                                                    if( *iter == *p_fam )
                                                     {
                                                         b_this_segment_matches = true;
                                                         break;
