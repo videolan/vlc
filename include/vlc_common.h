@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.48 2003/01/16 09:02:46 sam Exp $
+ * $Id: vlc_common.h,v 1.49 2003/01/27 22:42:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -493,8 +493,13 @@ static inline uint64_t U64_AT( void * _p )
 #endif
 
 #ifndef HAVE_STRNDUP
-#   define strndup vlc_strndup
-    VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
+#   if defined(STRNDUP_IN_GNOME_H) && \
+        (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main))
+        /* Do nothing: gnome.h defines strndup for us */
+#   else
+#       define strndup vlc_strndup
+        VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
+#   endif
 #elif !defined(__PLUGIN__)
 #   define vlc_strndup NULL
 #endif

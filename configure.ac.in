@@ -2313,6 +2313,13 @@ AC_ARG_ENABLE(gnome,
       NEED_GTK_MAIN=yes
       NEED_GNOME_MAIN=yes
       ALIASES="${ALIASES} gnome-vlc"
+      dnl We need this because of some moronic gnomesupport.h flavours
+      AC_MSG_CHECKING(for strndup in gnome.h)
+      AC_EGREP_HEADER(strndup,gnome.h,[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(STRNDUP_IN_GNOME_H, 1,
+                  Define if <gnome.h> defines strndup.)],[
+        AC_MSG_RESULT(no)])
      ],[
       AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
 developement tools or remove the --enable-gnome option])
