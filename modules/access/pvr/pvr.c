@@ -182,7 +182,6 @@ static int Open( vlc_object_t * p_this )
     access_t *p_access = (access_t*) p_this;
     access_sys_t * p_sys;
     char * psz_tofree, * psz_parser, * psz_device;
-
     vlc_value_t val;
 
     struct v4l2_format vfmt;
@@ -207,6 +206,8 @@ static int Open( vlc_object_t * p_this )
     p_access->p_sys = p_sys;
 
     /* defaults values */
+    var_Create( p_access, "pvr-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     var_Create( p_access, "pvr-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_access, "pvr-device" , &val);
     psz_device = val.psz_string;
@@ -625,6 +626,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 #endif
+
     return VLC_SUCCESS;
 }
 
@@ -725,7 +727,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = 1000000;
+            *pi_64 = (int64_t)var_GetInteger( p_access, "pvr-caching" ) * I64C(1000);
             break;
 
         /* */
