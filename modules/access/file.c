@@ -461,21 +461,22 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #endif
 
     /* If we reached an EOF then switch to the next file in the list */
-    if ( i_ret == 0 && ++p_access_data->i_index < p_access_data->i_files )
+    if ( i_ret == 0 && p_access_data->i_index + 1 < p_access_data->i_files )
     {
         int i_handle = p_access_data->_socket.i_handle;
         char *psz_name =
-            p_access_data->p_files[p_access_data->i_index]->psz_name;
+            p_access_data->p_files[p_access_data->i_index + 1]->psz_name;
 
         msg_Dbg( p_input, "opening file `%s'", psz_name );
 
         if ( _OpenFile( p_input, psz_name ) != VLC_SUCCESS )
         {
-            p_access_data->i_index--;
+            p_access_data->_socket.i_handle = i_handle;
             return 0;
         }
 
         close( i_handle );
+        p_access_data->i_index++;
 
         /* We have to read some data */
         return Read( p_input, p_buffer, i_len );
@@ -501,14 +502,15 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 
         for ( i = 0; i < p_access_data->i_files - 1; i++ )
         {
-            if( i_pos < p_access_data->p_files[i+1]->i_size + i_size ) break;
-            i_size += p_access_data->p_files[i+1]->i_size;
+            if( i_pos < p_access_data->p_files[i]->i_size + i_size ) break;
+            i_size += p_access_data->p_files[i]->i_size;
         }
 
         psz_name = p_access_data->p_files[i]->psz_name;
 
         msg_Dbg( p_input, "opening file `%s'", psz_name );
-        if ( _OpenFile( p_input, psz_name ) == VLC_SUCCESS )
+        if ( i != p_access_data->i_index &&
+             _OpenFile( p_input, psz_name ) == VLC_SUCCESS )
         {
             /* Close old file */
             close( i_handle );
