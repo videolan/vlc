@@ -58,7 +58,6 @@ KInterface::KInterface( intf_thread_t *p_intf, QWidget *parent,
     connect( fTimer, SIGNAL( timeout() ), this, SLOT( slotManage() ) );
 
     resize( 400, 30 );
-    msg_Dbg(p_intf, KStdAction::stdName(KStdAction::Preferences));
     ///////////////////////////////////////////////////////////////////
     // call inits to invoke all other construction parts
     // XXX could we move this up ?

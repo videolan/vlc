@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.13 2003/03/29 14:30:55 sigmunau Exp $
+ * $Id: preferences.cpp,v 1.14 2003/03/30 11:59:00 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -30,6 +30,7 @@
 #include <qlistview.h>
 #include <qnamespace.h>
 #include <qobjectlist.h>
+#include <qslider.h>
 #include <qspinbox.h>
 #include <qtooltip.h>
 #include <qvbox.h>
@@ -39,6 +40,7 @@
 #include <klocale.h>
 #include <knuminput.h>
 #include <kurlrequester.h>
+#include <kcombobox.h>
 
 #include "QConfigItem.h"
 #include "pluginsbox.h"
@@ -67,17 +69,20 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        msg_Dbg( p_intf,"adding module: %s", p_parser->psz_object_name );
         p_item = p_parser->p_config;
         while( p_item && p_item->i_type != CONFIG_HINT_END )
         {
-            msg_Dbg( p_intf, "adding item: %s type: %d", p_item->psz_text,p_item->i_type );
             switch( p_item->i_type )
             {
-
             case CONFIG_HINT_CATEGORY:
-            case CONFIG_HINT_END:
-
+                /* force the content to the top of the page */
+                if ( category_table )
+                {
+                    QWidget *space = new QWidget( category_table );
+                    category_table->setStretchFactor( space, 10 );
+                    category_table = NULL;
+                }
+                
                 /*
                  * Now we can start taking care of the new category
                  */
@@ -148,17 +153,36 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 new QLabel(p_item->psz_text, hb);
                 /* add input box with default value */
                 vlc_mutex_lock( p_item->p_lock );
-
-                KLineEdit *kl = new KLineEdit( p_item->psz_value ?
-                                               p_item->psz_value : "", hb);
                 QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
                                                   p_item->i_type,
                                                   p_item->psz_value ?
                                                   p_item->psz_value : "");
-                connect(kl, SIGNAL(textChanged ( const QString & )),
-                        ci, SLOT(setValue( const QString &)));
-                QToolTip::add(kl, p_item->psz_longtext);
-                kl->setMaxLength(40);
+                if ( p_item->ppsz_list )
+                {
+                    char **ppsz_list = p_item->ppsz_list;
+                    KComboBox *p_combobox = new KComboBox( true, hb );
+                    QToolTip::add(p_combobox, p_item->psz_longtext);
+                    connect(p_combobox, SIGNAL(activated ( const QString & )),
+                            ci, SLOT(setValue( const QString &)));
+                    while ( *ppsz_list )
+                    {
+                        p_combobox->insertItem( *ppsz_list );
+                        if ( !strcmp( *ppsz_list, p_item->psz_value?p_item->psz_value: "" ) )
+                        {
+                            p_combobox->setCurrentText( *ppsz_list );
+                        }
+                        ppsz_list++;
+                    }
+                }
+                else
+                {
+                    KLineEdit *kl = new KLineEdit( p_item->psz_value ?
+                                                   p_item->psz_value : "", hb);
+                    connect(kl, SIGNAL(textChanged ( const QString & )),
+                            ci, SLOT(setValue( const QString &)));
+                    QToolTip::add(kl, p_item->psz_longtext);
+                    kl->setMaxLength(40);
+                }
 
                 vlc_mutex_unlock( p_item->p_lock );
             }
@@ -195,14 +219,25 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 QHBox *hb = new QHBox(category_table);
                 hb->setSpacing(spacingHint());
                 new QLabel(p_item->psz_text, hb);
-                QSpinBox *item_adj = new QSpinBox(-1, 99999, 1, hb);
                 QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
                                                   p_item->i_type,
                                                   p_item->i_value);
-                item_adj->setValue( p_item->i_value );
-                connect(item_adj, SIGNAL(valueChanged( int)),
-                        ci, SLOT(setValue(int)));
-                QToolTip::add(item_adj, p_item->psz_longtext);
+                if ( p_item->i_min == 0 && p_item->i_max == 0 )
+                {
+                    QSpinBox *item_adj = new QSpinBox(-1, 99999, 1, hb);
+                    item_adj->setValue( p_item->i_value );
+                    connect(item_adj, SIGNAL(valueChanged( int)),
+                            ci, SLOT(setValue(int)));
+                    QToolTip::add(item_adj, p_item->psz_longtext);
+                }
+                else
+                {
+                    KIntNumInput *p_ii = new KIntNumInput( p_item->i_value, hb );
+                    p_ii->setRange( p_item->i_min, p_item->i_max, 1, true ); 
+                    connect( p_ii, SIGNAL( valueChanged( int ) ),
+                             ci, SLOT( setValue( int ) ) );
+                    QToolTip::add( p_ii, p_item->psz_longtext );
+                }
             }
             break;
 
@@ -212,7 +247,14 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 hb->setSpacing(spacingHint());
                 new QLabel(p_item->psz_text, hb);
                 KDoubleNumInput *kdi= new KDoubleNumInput(p_item->f_value, hb);
-                kdi->setRange(-1, 99999, 0.01, false);
+                if ( p_item->f_min == 0 && p_item->f_max == 0 )
+                {
+                    kdi->setRange(-1, 99999, 0.01, false);
+                }
+                else
+                {
+                    kdi->setRange( p_item->f_min, p_item->f_max, 0.01, true );
+                }
                 QConfigItem *ci = new QConfigItem(this, p_item->psz_name,
                                                   p_item->i_type,
                                                   p_item->f_value);
@@ -240,10 +282,18 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
             break;
 
             }
-
+            
             p_item++;
         }
     }
+    /* force the content to the top of the page, even on the last page */
+    if ( category_table )
+    {
+        QWidget *space = new QWidget( category_table );
+        category_table->setStretchFactor( space, 10 );
+        category_table = NULL;
+    }
+                
 
     vlc_list_release( p_list );
 
