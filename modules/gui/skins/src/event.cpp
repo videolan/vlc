@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.7 2003/04/14 10:00:38 karibu Exp $
+ * $Id: event.cpp,v 1.8 2003/04/14 22:29:06 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -391,7 +391,7 @@ void Event::CreateShortcut()
         return;
 
     // Initiatization
-    char *mod = new char[4];
+    char *mod = new char[5];
     char *key = new char[4];
 
     // Scan the event
