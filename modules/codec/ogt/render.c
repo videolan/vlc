@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.14 2004/01/16 04:14:54 rocky Exp $
+ * $Id: render.c,v 1.15 2004/01/16 13:32:37 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -103,7 +103,10 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
             RenderYUY2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
 	    break;
 
-        /* Used in ASCII Art. */
+        /* Palettized 8 bits per pixel (256 colors). Each
+           pixel is an uint8_t index in the palette
+           Used in ASCII Art. 
+        */
         case VLC_FOURCC('R','G','B','2'):
             msg_Err( p_vout, "RGB2 not implemented yet" );
 	    break;
@@ -498,6 +501,10 @@ yuv2rgb555(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
 #undef BLUE_PIXEL  
 }
 
+/* 
+   Should be Same as p_pic->p_format.i_bits_per_pixel / 8. But since
+   we know it here, why try to compute it?
+*/
 #define BYTES_PER_PIXEL 2
 
 static void 
@@ -728,6 +735,10 @@ RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/* 
+   Should be Same as p_pic->p_format.i_bits_per_pixel / 8. But since
+   we know it here, why try to compute it?
+*/
 #undef  BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 4
 
@@ -846,10 +857,12 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		    /* This is the location that's going to get changed.
 		     */
 		    uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
-                    uint8_t rgb[3];
+                    uint8_t rgb[4];
 
                     yuv2rgb(p_source, rgb);
-                    memcpy(p_dest, rgb, 3);
+                    *p_dest++ = rgb[2];
+                    *p_dest++ = rgb[1];
+                    *p_dest++ = rgb[0];
 		    break;
 		  }
 
@@ -919,14 +932,14 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		     */
 		    uint8_t *p_pixel_base_x = p_pixel_base 
                                             + i_x * BYTES_PER_PIXEL;
-                    uint8_t rgb[3];
+                    uint8_t rgb[4];
                     yuv2rgb(p_source, rgb); 
 
                     for(  ; i_ytmp < i_ynext ; i_ytmp += p_pic->p->i_pitch )
                     {
 		      /* This is the location that's going to get changed.  */
 		      uint8_t *p_dest = p_pixel_base_x + i_ytmp;
-                      memcpy(p_dest, rgb, 3);
+                      memcpy(p_dest, rgb, 4);
                     }
                     break;
 		  }
@@ -934,7 +947,7 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
                 default: 
                   {
                     
-                    uint8_t rgb[3];
+                    uint8_t rgb[4];
                     yuv2rgb(p_source, rgb);
 
                     for(  ; i_ytmp < i_ynext ; y_ytmp += p_pic->p->i_pitch )

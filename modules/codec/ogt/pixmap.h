@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.h,v 1.1 2004/01/16 04:14:54 rocky Exp $
+ * $Id: pixmap.h,v 1.2 2004/01/16 13:32:37 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -35,14 +35,11 @@ typedef union {
   } s;
 } ogt_yuvt_t;
 
-/* Force v in the range 0.255 */
-static inline uint8_t 
-clip_8_bit(int v)
-{
-  if (v<0)   return 0;
-  if (v>255) return 255;
-  return (uint8_t) v;
-}
+/* Force v in the range 0.255. In video_chroma/i420_rgb.c, this
+   is macro is called CLIP. FIXME: Combine with that.
+*/
+#define clip_8_bit(v) \
+  ((v < 0) ? 0 : (v > 255) ? 255 : v)
 
 static inline void
 yuv2rgb(ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )

@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.7 2004/01/16 04:14:54 rocky Exp $
+ * $Id: common.c,v 1.8 2004/01/16 13:32:37 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -179,10 +179,11 @@ vout_thread_t *VCDSubFindVout( decoder_t *p_dec )
    palette values. We work from the free space at the end to the
    beginning so we can expand inline.
 */
-void
-VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
-		   unsigned int i_height, unsigned int i_width ) 
+static void
+InlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys )
 {
+  const unsigned int i_width  = p_sys->i_width;
+  const unsigned int i_height = p_sys->i_height;
   int n = (i_height * i_width) - 1;
   uint8_t    *p_from = p_dest;
   ogt_yuvt_t *p_to   = (ogt_yuvt_t *) p_dest;
@@ -201,7 +202,7 @@ VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
 unsigned int 
 VCDSubGetAROverride(vlc_object_t * p_input, vout_thread_t *p_vout)
 {
-  char *psz_string = config_GetPsz( p_input, "sub-aspect-ratio" );
+  char *psz_string = config_GetPsz( p_input, MODULE_STRING "-aspect-ratio" );
 
   /* Check whether the user tried to override aspect ratio */
   if( !psz_string ) return 0;
@@ -327,7 +328,8 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
 
 }
 
-/* The video may be scaled. However subtitle bitmaps assume an 1:1
+/**
+   The video may be scaled. However subtitle bitmaps assume an 1:1
    aspect ratio. So unless the user has specified otherwise, we
    need to scale to compensate for or undo the effects of video
    output scaling.
@@ -335,6 +337,9 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
    Perhaps this should go in the Render routine? The advantage would
    be that it will deal with a dynamically changing aspect ratio.
    The downside is having to scale many times for each render call.
+
+   We also expand palette entries here, unless we are dealing with a 
+   palettized chroma (e.g. RGB2).
 */
 
 void 
@@ -344,9 +349,22 @@ VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
   vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
                                            FIND_CHILD );
   unsigned int i_aspect_x, i_aspect_y;
+  uint8_t *p_dest = (uint8_t *)p_spu->p_sys->p_data;
+
   if (p_vout) {
     /* Check for user-configuration override. */
-    unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
+    unsigned int i_new_aspect;
+    
+    if ( p_vout->output.i_chroma == VLC_FOURCC('R','G','B','2') ) {
+      /* This is an unscaled palettized format. We don't allow 
+         user scaling here. And to make the render process faster,
+         we don't expand the palette entries into a color value.
+       */
+      return;
+    }
+        
+    InlinePalette( p_dest, p_dec->p_sys );
+    i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
 
     if (i_new_aspect == VOUT_ASPECT_FACTOR) {
       /* For scaling 1:1, nothing needs to be done. Note this means

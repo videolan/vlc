@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.11 2004/01/14 11:47:19 rocky Exp $
+ * $Id: cvd_parse.c,v 1.12 2004/01/16 13:32:37 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -315,9 +315,14 @@ E_(ParsePacket)( decoder_t *p_dec)
     p_spu->p_sys->i_x_end        = p_sys->i_x_start + p_sys->i_width - 1;
     p_spu->p_sys->i_y_end        = p_sys->i_y_start + p_sys->i_height - 1;
 
+    p_spu->i_x        = p_sys->i_x_start 
+      + config_GetInt( p_dec, MODULE_STRING "-horizontal-correct" );
+
     /* FIXME: use aspect ratio for x? */
-    p_spu->i_x        = p_sys->i_x_start * 3 / 4; 
-    p_spu->i_y        = p_sys->i_y_start;
+    p_spu->i_x        = (p_spu->i_x * 3) / 4; 
+    p_spu->i_y        = p_sys->i_y_start 
+      + config_GetInt( p_dec, MODULE_STRING "-vertical-correct" );
+
     p_spu->i_width    = p_sys->i_width;
     p_spu->i_height   = p_sys->i_height;
 
@@ -530,7 +535,6 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     }
 #endif /*HAVE_LIBPNG*/
 
-    VCDInlinePalette( p_dest, p_sys, i_height, i_width );
     VCDSubHandleScaling( p_spu, p_dec );
 
     return VLC_SUCCESS;
