@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.61 2003/02/23 05:53:53 jlj Exp $
+ * $Id: intf.m,v 1.62 2003/02/27 08:19:02 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -406,6 +406,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     [NSThread detachNewThreadSelector: @selector(manage)
         toTarget: self withObject: nil];
+
+    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
 
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
