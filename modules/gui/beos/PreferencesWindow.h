@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.15 2003/05/17 18:30:41 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.16 2003/05/20 11:44:18 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -32,7 +32,6 @@
 #define PREFS_DEFAULTS       'prde'
 #define PREFS_APPLY          'prap'
 #define PREFS_SAVE           'prsa'
-#define TEXT_HEIGHT 16
 
 class StringItemWithView : public BStringItem
 {

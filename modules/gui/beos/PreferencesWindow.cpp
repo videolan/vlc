@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.22 2003/05/17 18:30:41 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.23 2003/05/20 11:44:18 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -503,13 +503,11 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
 
     rect = configView->Bounds();
     rect.InsetBy( 10, 10 );
-    rect.bottom = rect.top + TEXT_HEIGHT;
     ConfigTextControl * textControl;
     ConfigCheckBox * checkBox;
     ConfigMenuField * menuField;
     BPopUpMenu * popUp;
 
-    bool firstItem = true;
     bool categoryHit = false;
     do
     {
@@ -519,13 +517,9 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_MODULE:
             case CONFIG_ITEM_DIRECTORY:
-                if( !firstItem )
-                    rect.OffsetBy( 0, 25 );
-                else
-                    firstItem = false;
-
                 if( (*pp_item)->ppsz_list && (*pp_item)->ppsz_list[0] )
                 {
+                    rect.bottom = rect.top + 20;
                     popUp = new BPopUpMenu( "" );
                     menuField = new ConfigMenuField( rect, (*pp_item)->psz_text,
                                                      popUp, (*pp_item)->psz_name );
@@ -536,35 +530,32 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
                         popUp->AddItem( menuItem );
                     }
                     configView->AddChild( menuField );
+                    rect.top = rect.bottom + 10;
                 }
                 else
                 {
+                    rect.bottom = rect.top + 20;
                     textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
                                                          CONFIG_ITEM_STRING, (*pp_item)->psz_name );
                     configView->AddChild( textControl );
+                    rect.top = rect.bottom + 10;
                 }
                 break;
 
             case CONFIG_ITEM_INTEGER:
-                if( !firstItem )
-                    rect.OffsetBy( 0, 25 );
-                else
-                    firstItem = false;
-
+                rect.bottom = rect.top + 20;
                 textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
                                                      CONFIG_ITEM_INTEGER, (*pp_item)->psz_name );
                 configView->AddChild( textControl );
+                rect.top = rect.bottom + 10;
                 break;
 
             case CONFIG_ITEM_FLOAT:
-                if( !firstItem )
-                    rect.OffsetBy( 0, 25 );
-                else
-                    firstItem = false;
-
+                rect.bottom = rect.top + 20;
                 textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
                                                      CONFIG_ITEM_FLOAT, (*pp_item)->psz_name );
                 configView->AddChild( textControl );
+                rect.top = rect.bottom + 10;
                 break;
 
             case CONFIG_ITEM_BOOL:
@@ -572,14 +563,11 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
                     /* Don't show this one, the interface doesn't handle it anyway */
                     break;
 
-                if( !firstItem )
-                    rect.OffsetBy( 0,25 );
-                else
-                   firstItem = false;
-
+                rect.bottom = rect.top + 20;
                 checkBox = new ConfigCheckBox( rect, (*pp_item)->psz_text,
                                                (*pp_item)->psz_name );
                 configView->AddChild( checkBox );
+                rect.top = rect.bottom + 10;
                 break;
 
             case CONFIG_HINT_CATEGORY:
@@ -592,8 +580,7 @@ BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
              (*pp_item)++ );
 
     /* Adjust the configView size */
-    rect.bottom += 10;
-    configView->ResizeTo( configView->Bounds().Width(), rect.bottom );
+    configView->ResizeTo( configView->Bounds().Width(), rect.top );
 
     return configView;
 }
