@@ -1,7 +1,7 @@
 /*****************************************************************************
  * aout_s16.c: 16 bit signed audio output functions
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -27,13 +27,13 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 #include "aout_common.h"

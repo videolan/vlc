@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.31 2001/11/27 14:31:19 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: vout_xvideo.c,v 1.32 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -58,6 +58,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -66,7 +67,6 @@
 #include "video_output.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 
 #include "netutils.h"                                 /* network_ChannelJoin */
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_x11.c: X11 video output display method
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.31 2001/09/26 12:32:25 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: vout_x11.c,v 1.32 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,6 +54,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -62,7 +63,6 @@
 #include "video_output.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 
 #include "netutils.h"                                 /* network_ChannelJoin */
 

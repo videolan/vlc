@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.20 2001/11/11 18:15:42 sam Exp $
+ * $Id: gtk_playlist.c,v 1.21 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -51,6 +51,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
@@ -59,7 +60,6 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
-#include "intf_msg.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.2 2001/11/25 22:52:21 gbazin Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: ac3_mantissa.c,v 1.3 2001/11/28 15:08:04 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -32,9 +32,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "audio_output.h"
 

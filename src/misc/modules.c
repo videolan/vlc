@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.42 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: modules.c,v 1.43 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -60,6 +60,7 @@
 #endif
 
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -67,7 +68,6 @@
 #include "modules.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "stream_control.h"

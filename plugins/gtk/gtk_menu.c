@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.14 2001/11/11 18:15:41 sam Exp $
+ * $Id: gtk_menu.c,v 1.15 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -43,6 +43,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
@@ -51,7 +52,6 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
-#include "intf_msg.h"
 
 #include "video.h"
 #include "video_output.h"

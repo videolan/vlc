@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: x11.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * $Id: x11.c,v 1.8 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ac3_srfft_3dn.c: accelerated 3D Now! ac3 fft functions
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_3dn.c,v 1.2 2001/07/08 23:15:11 reno Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: ac3_srfft_3dn.c,v 1.3 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -36,8 +36,6 @@
 
 #include "config.h"
 #include "common.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

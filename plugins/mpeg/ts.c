@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ts.c : Transport Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: ts.c,v 1.5 2001/06/03 12:47:21 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: ts.c,v 1.6 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

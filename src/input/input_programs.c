@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.65 2001/11/15 17:39:13 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_programs.c,v 1.66 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,11 +32,10 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "debug.h"
-
-#include "intf_msg.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

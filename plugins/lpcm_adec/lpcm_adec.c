@@ -1,8 +1,8 @@
 /*****************************************************************************
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_adec.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: lpcm_adec.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -40,9 +40,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 

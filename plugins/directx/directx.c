@@ -1,8 +1,8 @@
 /*****************************************************************************
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: directx.c,v 1.1 2001/06/02 01:09:03 sam Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: directx.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

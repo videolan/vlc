@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aout_esd.c : Esound functions library
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: aout_esd.c,v 1.14 2001/07/12 20:31:33 reno Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: aout_esd.c,v 1.15 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,13 +46,13 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "main.h"
 
 #include "modules.h"

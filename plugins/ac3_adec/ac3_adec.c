@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_adec.c,v 1.3 2001/11/15 17:39:12 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: ac3_adec.c,v 1.4 2001/11/28 15:08:04 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -21,14 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*
- * TODO :
- *
- * - vérifier l'état de la fifo de sortie avant d'y stocker les samples
- *   décodés ;
- * - vlc_cond_signal() / vlc_cond_wait()
- *
- */
 #define MODULE_NAME ac3_adec
 #include "modules_inner.h"
 
@@ -46,9 +38,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.5 2001/06/12 18:16:49 stef Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: aout_ext-dec.c,v 1.6 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -28,13 +28,13 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 #include "aout_common.h"

@@ -25,7 +25,6 @@
  * Linux-specific.                                           
  ****************************************************************************/
 
-
 #include "defs.h"
 
 #include <stdio.h>
@@ -54,6 +53,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -61,8 +61,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "intf_msg.h"
 
 #include "main.h"
 

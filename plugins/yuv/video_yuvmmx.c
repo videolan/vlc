@@ -2,8 +2,8 @@
  * video_yuvmmx.c: MMX YUV transformation functions
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.12 2001/08/03 16:04:17 gbazin Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: video_yuvmmx.c,v 1.13 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,6 +38,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -46,8 +47,6 @@
 #include "video_output.h"
 
 #include "video_common.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -44,6 +44,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -51,7 +52,6 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "intf_msg.h"
 #include "intf_playlist.h"
 #include "interface.h"
 

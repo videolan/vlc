@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_events.c,v 1.4 2001/07/30 00:53:04 sam Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: vout_events.c,v 1.5 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -51,7 +52,6 @@
 #   include <directx.h>
 #endif
 
-#include "intf_msg.h"
 #include "interface.h"
 #include "main.h"
 

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.13 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: input_es.c,v 1.14 2001/11/28 15:08:05 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,6 +50,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -57,8 +58,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "intf_msg.h"
 
 #include "main.h"
 

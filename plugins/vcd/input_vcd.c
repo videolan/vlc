@@ -3,9 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
  *
- * Author: Johan Bilien <jobi@via.ecp.fr>, based on Stephane Borel's DVD input
- *                                         and on Christophe Massiot and
- *                                         Cyril Deguet's PS input
+ * Author: Johan Bilien <jobi@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +53,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -62,8 +61,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "intf_msg.h"
 
 #include "main.h"
 

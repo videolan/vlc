@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.13 2001/11/15 21:27:53 xav Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: vout_directx.c,v 1.14 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,6 +65,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -73,7 +74,6 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "intf_msg.h"
 #include "interface.h"
 #include "main.h"
 

@@ -4,8 +4,8 @@
  * here are a complete and portable C implementation, and may be replaced in
  * certain cases by optimized functions.
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: transforms_yuv.c,v 1.6 2001/06/03 12:47:21 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: transforms_yuv.c,v 1.7 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <ptyx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -42,6 +42,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
@@ -51,8 +52,6 @@
 #include "video_common.h"
 #include "transforms_common.h"
 #include "transforms_yuv.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

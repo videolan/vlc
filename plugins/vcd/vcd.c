@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.1 2001/10/23 03:17:49 jobi Exp $
+ * $Id: vcd.c,v 1.2 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,10 +34,9 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

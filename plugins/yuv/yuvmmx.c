@@ -1,8 +1,8 @@
 /*****************************************************************************
  * yuvmmx.c : Accelerated MMX YUV module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: yuvmmx.c,v 1.6 2001/06/03 12:47:21 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: yuvmmx.c,v 1.7 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

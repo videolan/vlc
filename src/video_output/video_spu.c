@@ -1,8 +1,8 @@
 /*****************************************************************************
  * video_spu.c : DVD subpicture units functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_spu.c,v 1.21 2001/05/08 20:38:25 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: video_spu.c,v 1.22 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  * 
@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

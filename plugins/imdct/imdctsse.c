@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.7 2001/10/30 19:34:53 reno Exp $
+ * $Id: imdctsse.c,v 1.8 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"

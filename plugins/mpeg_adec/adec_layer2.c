@@ -1,8 +1,8 @@
 /*****************************************************************************
  * adec_layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_layer2.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: adec_layer2.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -22,13 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*
- * TODO :
- *
- * - optimiser les NeedBits() et les GetBits() du code là où c'est possible ;
- *
- */
-
 #include "defs.h"
 
 #include <stdlib.h>                                                  /* NULL */
@@ -36,6 +29,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "modules_export.h"

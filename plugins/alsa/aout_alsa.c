@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.19 2001/11/12 20:16:33 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: aout_alsa.c,v 1.20 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -40,13 +40,13 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "main.h"
 
 #include "modules.h"

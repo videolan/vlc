@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.50 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: common.h,v 1.51 2001/11/28 15:08:04 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -70,6 +70,18 @@ typedef s16                 dctelem_t;
 
 /* Video buffer types */
 typedef u8                  yuv_data_t;
+
+/*****************************************************************************
+ * mtime_t: high precision date or time interval
+ *****************************************************************************
+ * Store an high precision date or time interval. The maximum precision is the
+ * micro-second, and a 64 bits integer is used to avoid any overflow (maximum
+ * time interval is then 292271 years, which should be length enough for any
+ * video). Date are stored as a time interval since a common date.
+ * Note that date and time intervals can be manipulated using regular arithmetic
+ * operators, and that no special functions are required.
+ *****************************************************************************/
+typedef s64 mtime_t;
 
 /*****************************************************************************
  * Classes declaration
@@ -229,4 +241,159 @@ struct decoder_fifo_s;
 /* The win32 specific stuff was getting really big so it has been moved */
 #if defined( WIN32 )
 #   include "common_win32.h"
+#endif
+
+/*****************************************************************************
+ * Plug-in stuff
+ *****************************************************************************/
+typedef struct module_symbols_s
+{
+    struct main_s* p_main;
+    struct aout_bank_s* p_aout_bank;
+    struct vout_bank_s* p_vout_bank;
+
+    int    ( * main_GetIntVariable ) ( char *, int );
+    char * ( * main_GetPszVariable ) ( char *, char * );
+    void   ( * main_PutIntVariable ) ( char *, int );
+    void   ( * main_PutPszVariable ) ( char *, char * );
+
+    int  ( * TestProgram )  ( char * );
+    int  ( * TestMethod )   ( char *, char * );
+    int  ( * TestCPU )      ( int );
+
+    int  ( * intf_ProcessKey ) ( struct intf_thread_s *, int );
+    void ( * intf_AssignKey )  ( struct intf_thread_s *, int, int, int );
+
+    void ( * intf_Msg )        ( char *, ... );
+    void ( * intf_ErrMsg )     ( char *, ... );
+    void ( * intf_StatMsg )    ( char *, ... );
+    void ( * intf_WarnMsg )    ( int, char *, ... );
+    void ( * intf_WarnMsgImm ) ( int, char *, ... );
+#ifdef TRACE
+    void ( * intf_DbgMsg )     ( char *, char *, int, char *, ... );
+    void ( * intf_DbgMsgImm )  ( char *, char *, int, char *, ... );
+#endif
+
+    int  ( * intf_PlaylistAdd )     ( struct playlist_s *, int, const char* );
+    int  ( * intf_PlaylistDelete )  ( struct playlist_s *, int );
+    void ( * intf_PlaylistNext )    ( struct playlist_s * );
+    void ( * intf_PlaylistPrev )    ( struct playlist_s * );
+    void ( * intf_PlaylistDestroy ) ( struct playlist_s * );
+    void ( * intf_PlaylistJumpto )  ( struct playlist_s *, int );
+    void ( * intf_UrlDecode )       ( char * );
+
+    void    ( * msleep )         ( mtime_t );
+    mtime_t ( * mdate )          ( void );
+
+    int  ( * network_ChannelCreate )( void );
+    int  ( * network_ChannelJoin )  ( int );
+
+    void ( * input_SetStatus )      ( struct input_thread_s *, int );
+    void ( * input_Seek )           ( struct input_thread_s *, off_t );
+    void ( * input_DumpStream )     ( struct input_thread_s * );
+    char * ( * input_OffsetToTime ) ( struct input_thread_s *, char *, off_t );
+    int  ( * input_ChangeES )       ( struct input_thread_s *,
+                                      struct es_descriptor_s *, u8 );
+    int  ( * input_ToggleES )       ( struct input_thread_s *,
+                                      struct es_descriptor_s *, boolean_t );
+    int  ( * input_ChangeArea )     ( struct input_thread_s *,
+                                      struct input_area_s * );
+    struct es_descriptor_s * ( * input_FindES ) ( struct input_thread_s *,
+                                                  u16 );
+    struct es_descriptor_s * ( * input_AddES ) ( struct input_thread_s *,
+                                      struct pgrm_descriptor_s *, u16, size_t );
+    void ( * input_DelES )          ( struct input_thread_s *,
+                                      struct es_descriptor_s * );
+    int  ( * input_SelectES )       ( struct input_thread_s *,
+                                      struct es_descriptor_s * );
+    int  ( * input_UnselectES )     ( struct input_thread_s *,
+                                      struct es_descriptor_s * );
+    struct pgrm_descriptor_s* ( * input_AddProgram ) ( struct input_thread_s *,
+                                                       u16, size_t );
+    void ( * input_DelProgram )     ( struct input_thread_s *,
+                                      struct pgrm_descriptor_s * );
+    struct input_area_s * ( * input_AddArea ) ( struct input_thread_s * );
+    void ( * input_DelArea )        ( struct input_thread_s *,
+                                      struct input_area_s * );
+
+    void ( * InitBitstream )        ( struct bit_stream_s *,
+                                      struct decoder_fifo_s *,
+                                      void ( * ) ( struct bit_stream_s *,
+                                                   boolean_t ),
+                                      void * );
+    int  ( * input_InitStream )     ( struct input_thread_s *, size_t );
+    void ( * input_EndStream )      ( struct input_thread_s * );
+
+    void ( * input_ParsePES )       ( struct input_thread_s *,
+                                      struct es_descriptor_s * );
+    void ( * input_GatherPES )      ( struct input_thread_s *,
+                                      struct data_packet_s *,
+                                      struct es_descriptor_s *,
+                                      boolean_t, boolean_t );
+    void ( * input_DecodePES )      ( struct decoder_fifo_s *,
+                                      struct pes_packet_s * );
+    struct es_descriptor_s * ( * input_ParsePS ) ( struct input_thread_s *,
+                                                   struct data_packet_s * );
+    void ( * input_DemuxPS )        ( struct input_thread_s *,
+                                      struct data_packet_s * );
+    void ( * input_DemuxTS )        ( struct input_thread_s *,
+                                      struct data_packet_s * );
+    void ( * input_DemuxPSI )       ( struct input_thread_s *,
+                                      struct data_packet_s *,
+                                      struct es_descriptor_s *, 
+                                      boolean_t, boolean_t );
+
+    int ( * input_ClockManageControl )   ( struct input_thread_s *,
+                                           struct pgrm_descriptor_s *,
+                                           mtime_t );
+
+    int ( * input_NetlistInit )          ( struct input_thread_s *,
+                                           int, int, int, size_t, int );
+    struct iovec * ( * input_NetlistGetiovec ) ( void * p_method_data );
+    void ( * input_NetlistMviovec )      ( void * , int,
+                                           struct data_packet_s **);
+    struct data_packet_s * ( * input_NetlistNewPacket ) ( void *, size_t );
+    struct data_packet_s * ( * input_NetlistNewPtr ) ( void * );
+    struct pes_packet_s * ( * input_NetlistNewPES ) ( void * );
+    void ( * input_NetlistDeletePacket ) ( void *, struct data_packet_s * );
+    void ( * input_NetlistDeletePES )    ( void *, struct pes_packet_s * );
+    void ( * input_NetlistEnd )          ( struct input_thread_s * );
+
+    struct aout_fifo_s * ( * aout_CreateFifo ) 
+                                       ( int, int, long, long, long, void * );
+    void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );
+
+    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int );
+    struct subpicture_s * (* vout_CreateSubPicture) ( struct vout_thread_s *, 
+                                                      int, int );
+    struct picture_s * ( * vout_CreatePicture ) ( struct vout_thread_s *, 
+                                                  int, int, int );
+
+    void  ( * vout_DestroySubPicture )  ( struct vout_thread_s *, 
+                                          struct subpicture_s * );
+    void  ( * vout_DisplaySubPicture )  ( struct vout_thread_s *, 
+                                          struct subpicture_s * );
+    void  ( * vout_DisplayPicture ) ( struct vout_thread_s *, 
+                                      struct picture_s * );
+    void  ( * vout_DestroyPicture ) ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_LinkPicture )    ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_UnlinkPicture )    ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_DatePicture )    ( struct vout_thread_s *p_vout, 
+                                      struct picture_s *p_pic, mtime_t );
+    
+    u32  ( * UnalignedShowBits )    ( struct bit_stream_s *, unsigned int );
+    void ( * UnalignedRemoveBits )  ( struct bit_stream_s * );
+    u32  ( * UnalignedGetBits )     ( struct bit_stream_s *, unsigned int );
+
+    char * ( * DecodeLanguage ) ( u16 );
+
+    struct module_s * ( * module_Need )    ( int, void * );
+    void ( * module_Unneed )        ( struct module_s * );
+} module_symbols_t;
+
+#ifdef PLUGIN
+extern module_symbols_t* p_symbols;
 #endif

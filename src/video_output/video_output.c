@@ -4,8 +4,8 @@
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.143 2001/10/03 13:14:05 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: video_output.c,v 1.144 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -40,6 +40,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "modules.h"
@@ -49,8 +50,6 @@
 #include "video_text.h"
 #include "video_spu.h"
 #include "video_yuv.h"
-
-#include "intf_msg.h"
 
 #include "main.h"
 

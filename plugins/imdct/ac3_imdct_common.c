@@ -2,7 +2,7 @@
  * ac3_imdct_common.c: common ac3 DCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.c,v 1.3 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_imdct_common.c,v 1.4 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -41,8 +41,6 @@
 
 #include "config.h"
 #include "common.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "ac3_imdct.h"
 #include "ac3_retables.h"

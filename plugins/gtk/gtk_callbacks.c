@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.26 2001/11/16 00:29:52 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.27 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -35,6 +35,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
@@ -43,7 +44,6 @@
 
 #include "interface.h"
 #include "intf_playlist.h"
-#include "intf_msg.h"
 
 #include "video.h"
 #include "video_output.h"

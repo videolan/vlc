@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.20 2001/10/03 12:46:17 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input_ext-dec.c,v 1.21 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,10 +31,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-
-#include "intf_msg.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

@@ -2,8 +2,8 @@
  * video_yuv.c: YUV transformation functions
  * These functions set up YUV tables for colorspace conversion
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuv.c,v 1.48 2001/05/01 04:18:18 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: video_yuv.c,v 1.49 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -35,6 +35,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "modules.h"
@@ -42,8 +43,6 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_yuv.h"
-
-#include "intf_msg.h"
 
 /*****************************************************************************
  * vout_InitYUV: allocate and initialize translation tables

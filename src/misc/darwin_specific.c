@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.4 2001/05/06 04:32:02 sam Exp $
+ * $Id: darwin_specific.c,v 1.5 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -25,7 +25,9 @@
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>                                                /* free() */
 
+#include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

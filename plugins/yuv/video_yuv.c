@@ -4,8 +4,8 @@
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuv.c,v 1.15 2001/07/11 02:01:05 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: video_yuv.c,v 1.16 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -40,6 +40,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -48,8 +49,6 @@
 #include "video_output.h"
 
 #include "video_common.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

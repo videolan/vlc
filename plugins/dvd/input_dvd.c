@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.101 2001/11/27 12:33:20 massiot Exp $
+ * $Id: input_dvd.c,v 1.102 2001/11/28 15:08:05 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -67,6 +68,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "iso_lang.h"
@@ -75,8 +77,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "intf_msg.h"
 
 #include "main.h"
 
@@ -338,7 +338,7 @@ static void DVDOpen( struct input_thread_s *p_input )
 
     while( *psz_parser && *psz_parser != '@' )
     {
-        *psz_parser++;
+        psz_parser++;
     }
 
     if( *psz_parser == '@' )

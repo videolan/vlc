@@ -3,8 +3,8 @@
  * Read an MPEG2 stream, demultiplex and parse it before sending it to
  * decoders.
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.160 2001/11/27 10:50:35 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input.c,v 1.161 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,13 +64,13 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 #include "netutils.h"
 #include "modules.h"
 
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "stream_control.h"

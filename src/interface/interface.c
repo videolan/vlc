@@ -3,8 +3,8 @@
  * This library provides basic functions for threads to interact with user
  * interface, such as command line.
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.80 2001/07/18 14:21:00 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: interface.c,v 1.81 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -36,6 +36,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "modules.h"
@@ -45,7 +46,6 @@
 
 #include "audio_output.h"
 
-#include "intf_msg.h"
 #include "interface.h"
 #include "intf_playlist.h"
 #include "intf_channels.h"

@@ -3,8 +3,8 @@
  * This library provides basic functions for threads to interact with user
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.38 2001/10/01 16:18:49 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: intf_msg.c,v 1.39 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -41,10 +41,10 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
-#include "intf_msg.h"
 #include "interface.h"
 
 #include "main.h"

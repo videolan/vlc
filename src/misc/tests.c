@@ -2,8 +2,8 @@
  * tests.c: several test functions needed by the plugins
  * Functions are prototyped in tests.h.
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: tests.c,v 1.7 2001/05/30 17:03:12 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: tests.c,v 1.8 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *

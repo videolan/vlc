@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: ps.c,v 1.4 2001/05/30 17:03:12 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: ps.c,v 1.5 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

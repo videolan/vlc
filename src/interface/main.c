@@ -3,8 +3,8 @@
  * Includes the main() function for vlc. Parses command line, start interface
  * and spawn threads.
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.126 2001/11/23 18:47:51 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: main.c,v 1.127 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -67,6 +67,7 @@
 #include "config.h"
 #include "common.h"
 #include "debug.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */
@@ -75,7 +76,6 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "intf_msg.h"
 #include "intf_playlist.h"
 #include "interface.h"
 

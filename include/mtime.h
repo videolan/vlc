@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.7 2001/03/21 13:42:33 sam Exp $
+ * $Id: mtime.h,v 1.8 2001/11/28 15:08:04 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -33,18 +33,6 @@
  *  none
  * this header includes inline functions
  *****************************************************************************/
-
-/*****************************************************************************
- * mtime_t: high precision date or time interval
- *****************************************************************************
- * Store an high precision date or time interval. The maximum precision is the
- * micro-second, and a 64 bits integer is used to avoid any overflow (maximum
- * time interval is then 292271 years, which should be length enough for any
- * video). Date are stored as a time interval since a common date.
- * Note that date and time intervals can be manipulated using regular arithmetic
- * operators, and that no special functions are required.
- *****************************************************************************/
-typedef s64 mtime_t;
 
 /*****************************************************************************
  * LAST_MDATE: date which will never happen

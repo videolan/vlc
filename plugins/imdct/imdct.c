@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.4 2001/07/11 02:01:04 sam Exp $
+ * $Id: imdct.c,v 1.5 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"

@@ -2,7 +2,7 @@
  * ac3_downmix_sse.c: accelerated SSE ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_sse.c,v 1.5 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: ac3_downmix_sse.c,v 1.6 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -32,9 +32,6 @@
 
 #include "config.h"
 #include "common.h"
-#include "threads.h"
-#include "mtime.h"
-#include "tests.h"
 
 #include "ac3_downmix.h"
 

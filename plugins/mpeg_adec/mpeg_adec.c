@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_adec.c,v 1.2 2001/11/15 17:39:12 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: mpeg_adec.c,v 1.3 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -32,12 +32,13 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 

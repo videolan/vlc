@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.1 2001/11/25 05:04:38 stef Exp $
+ * $Id: input_dvdread.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -62,6 +62,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "iso_lang.h"
@@ -70,8 +71,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "intf_msg.h"
 
 #include "main.h"
 

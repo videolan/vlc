@@ -39,13 +39,13 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "main.h"
 
 #include "modules.h"

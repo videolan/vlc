@@ -39,6 +39,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -47,7 +48,6 @@
 #include "video_output.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 #include "main.h"
 
 #include "modules.h"

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: dsp.c,v 1.9 2001/05/30 17:03:12 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: dsp.c,v 1.10 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,6 +35,7 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * video_text.c : text manipulation functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.30 2001/08/05 15:32:47 gbazin Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: video_text.c,v 1.31 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

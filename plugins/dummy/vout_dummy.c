@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.8 2001/05/30 17:03:12 sam Exp $
+ * $Id: vout_dummy.c,v 1.9 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,14 +35,13 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "video.h"
 #include "video_output.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -392,6 +392,9 @@ dnl
 dnl  Check the operating system
 dnl
 case ${target_os} in
+  linux*)
+    SYS=linux
+	;;
   bsdi*)
     SYS=bsdi
     ;;
@@ -806,16 +809,6 @@ AC_ARG_ENABLE(arts,
        CFLAGS_ARTS="`${ARTS_CONFIG} --cflags`"
        LIB_ARTS="`${ARTS_CONFIG} --libs `"
      fi
-   fi])
-
-dnl
-dnl  Darwin module
-dnl
-AC_ARG_ENABLE(darwin,
-  [  --enable-darwin         Darwin sound support (default enabled on MacOS X)],
-  [if test x$enable_darwin = xyes; then
-     PLUGINS="${PLUGINS} darwin"
-     LIB_DARWIN="-framework CoreAudio"
    fi])
 
 dnl

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.16 2001/09/06 10:19:18 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: idctclassic.c,v 1.17 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -34,6 +34,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"

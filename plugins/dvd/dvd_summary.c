@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.9 2001/11/07 17:37:16 stef Exp $
+ * $Id: dvd_summary.c,v 1.10 2001/11/28 15:08:05 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -58,12 +58,11 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "iso_lang.h"
 #include "tests.h"
-
-#include "intf_msg.h"
 
 #include "main.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * null.c : NULL module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: null.c,v 1.1 2001/06/07 01:10:33 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: null.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,6 +33,7 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dvd.c : DVD input module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.14 2001/11/12 20:16:33 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: dvd.c,v 1.15 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,10 +39,9 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

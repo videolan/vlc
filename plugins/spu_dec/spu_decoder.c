@@ -1,8 +1,8 @@
 /*****************************************************************************
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.3 2001/11/15 17:39:13 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN
+ * $Id: spu_decoder.c,v 1.4 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,9 +42,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "video.h"
 #include "video_output.h"

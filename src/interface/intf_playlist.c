@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.9 2001/11/12 04:12:38 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: intf_playlist.c,v 1.10 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,17 +22,16 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include "config.h"
-
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <errno.h>                                                 /* ENOMEM */
 
+#include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "main.h"

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.27 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: threads.h,v 1.28 2001/11/28 15:08:04 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-#ifdef GPROF
+#if defined(GPROF) || defined(DEBUG)
 #   include <sys/time.h>
 #endif
 
@@ -156,27 +156,11 @@ typedef void *(*vlc_thread_func_t)(void *p_data);
  * Prototypes
  *****************************************************************************/
 
-static __inline__ int  vlc_threads_init  ( void );
-static __inline__ int  vlc_threads_end   ( void );
-
-static __inline__ int  vlc_mutex_init    ( vlc_mutex_t * );
-static __inline__ int  vlc_mutex_lock    ( vlc_mutex_t * );
-static __inline__ int  vlc_mutex_unlock  ( vlc_mutex_t * );
-static __inline__ int  vlc_mutex_destroy ( vlc_mutex_t * );
-
-static __inline__ int  vlc_cond_init     ( vlc_cond_t * );
-static __inline__ int  vlc_cond_signal   ( vlc_cond_t * );
-static __inline__ int  vlc_cond_wait     ( vlc_cond_t *, vlc_mutex_t * );
-static __inline__ int  vlc_cond_destroy  ( vlc_cond_t * );
-
-static __inline__ int  vlc_thread_create ( vlc_thread_t *, char *,
-                                           vlc_thread_func_t, void * );
-static __inline__ void vlc_thread_exit   ( void );
-static __inline__ void vlc_thread_join   ( vlc_thread_t );
-
-#if 0
-static __inline__ int  vlc_cond_timedwait( vlc_cond_t *, vlc_mutex_t *,
-                                           mtime_t );
+/* Message functions - this is kludgy because we are included before
+ * modules_export.h */
+#ifdef PLUGIN
+#   define intf_ErrMsg p_symbols->intf_ErrMsg
+#   define intf_WarnMsg p_symbols->intf_WarnMsg
 #endif
 
 #ifdef GPROF
@@ -320,13 +304,28 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
  *****************************************************************************/
-static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
+#ifdef DEBUG
+#   define vlc_mutex_lock( P_MUTEX )                                        \
+        _vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
+#else
+#   define vlc_mutex_lock( P_MUTEX )                                        \
+        _vlc_mutex_lock( NULL, 0, P_MUTEX )
+#endif
+
+static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
+                                       vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_acquire( p_mutex, TRUE, NULL );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_mutex_lock( p_mutex );
+    int i_return = pthread_mutex_lock( p_mutex );
+    if( i_return )
+    {
+        intf_ErrMsg( "thread %d error: mutex_lock failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_return) );
+    }
+    return i_return;
 
 #elif defined( HAVE_CTHREADS_H )
     mutex_lock( p_mutex );
@@ -358,13 +357,28 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_unlock: unlock a mutex
  *****************************************************************************/
-static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
+#ifdef DEBUG
+#   define vlc_mutex_unlock( P_MUTEX )                                      \
+        _vlc_mutex_unlock( __FILE__, __LINE__, P_MUTEX )
+#else
+#   define vlc_mutex_unlock( P_MUTEX )                                      \
+        _vlc_mutex_unlock( NULL, 0, P_MUTEX )
+#endif
+
+static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
+                                         vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_release( p_mutex );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_mutex_unlock( p_mutex );
+    int i_return = pthread_mutex_unlock( p_mutex );
+    if( i_return )
+    {
+        intf_ErrMsg( "thread %d error: mutex_unlock failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_return) );
+    }
+    return i_return;
 
 #elif defined( HAVE_CTHREADS_H )
     mutex_unlock( p_mutex );
@@ -394,13 +408,28 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 /*****************************************************************************
  * vlc_mutex_destroy: destroy a mutex
  *****************************************************************************/
-static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
+#ifdef DEBUG
+#   define vlc_mutex_destroy( P_MUTEX )                                     \
+        _vlc_mutex_destroy( __FILE__, __LINE__, P_MUTEX )
+#else
+#   define vlc_mutex_destroy( P_MUTEX )                                     \
+        _vlc_mutex_destroy( NULL, 0, P_MUTEX )
+#endif
+
+static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
+                                          vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )    
-    return pthread_mutex_destroy( p_mutex );
+    int i_return = pthread_mutex_destroy( p_mutex );
+    if( i_return )
+    {
+        intf_ErrMsg( "thread %d error: mutex_destroy failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_return) );
+    }
+    return i_return;
 
 #elif defined( HAVE_CTHREADS_H )
     return 0;
@@ -619,13 +648,48 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
 /*****************************************************************************
  * vlc_cond_wait: wait until condition completion
  *****************************************************************************/
-static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
+#ifdef DEBUG
+#   define vlc_cond_wait( P_COND, P_MUTEX )                                 \
+        _vlc_cond_wait( __FILE__, __LINE__, P_COND, P_MUTEX  )
+#else
+#   define vlc_cond_wait( P_COND, P_MUTEX )                                 \
+        _vlc_cond_wait( NULL, 0, P_COND, P_MUTEX )
+#endif
+
+static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
+                                      vlc_cond_t *p_condvar,
+                                      vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_await( p_condvar, p_mutex, NULL );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+
+#ifndef DEBUG
     return pthread_cond_wait( p_condvar, p_mutex );
+#else
+    /* In debug mode, timeout */
+    struct timeval now;
+    struct timespec timeout;
+    int    i_result;
+
+    for( ; ; )
+    {
+        gettimeofday( &now, NULL );
+        timeout.tv_sec = now.tv_sec + THREAD_COND_TIMEOUT;
+        timeout.tv_nsec = now.tv_usec * 1000;
+
+        if( (i_result = pthread_cond_timedwait( p_condvar, p_mutex, &timeout )) )
+        {
+            intf_ErrMsg( "thread %d warning: Possible deadlock detected in cond_wait at %s:%d (%s)",
+                         pthread_self(), psz_file, i_line, strerror(i_result) );
+        }
+        else
+        {
+            return i_result;
+        }
+    }
+#endif
 
 #elif defined( HAVE_CTHREADS_H )
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
@@ -691,13 +755,28 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
 /*****************************************************************************
  * vlc_cond_destroy: destroy a condition
  *****************************************************************************/
-static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
+#ifdef DEBUG
+#   define vlc_cond_destroy( P_COND )                                       \
+        _vlc_cond_destroy( __FILE__, __LINE__, P_COND )
+#else
+#   define vlc_cond_destroy( P_COND )                                       \
+        _vlc_cond_destroy( NULL, 0, P_COND )
+#endif
+
+static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
+                                         vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_cond_destroy( p_condvar );
+    int i_result = pthread_cond_destroy( p_condvar );
+    if( i_result )
+    {
+        intf_ErrMsg( "thread %d error: cond_destroy failed at %s:%d (%s)",
+                     pthread_self(), psz_file, i_line, strerror(i_result) );
+    }
+    return i_result;
 
 #elif defined( HAVE_CTHREADS_H )
     return 0;
@@ -715,10 +794,19 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
-static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
-                                         char *psz_name,
-                                         vlc_thread_func_t func,
-                                         void *p_data )
+#ifdef DEBUG
+#   define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
+        _vlc_thread_create( __FILE__, __LINE__, P_THREAD, PSZ_NAME, FUNC, P_DATA )
+#else
+#   define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
+        _vlc_thread_create( NULL, 0, P_THREAD, PSZ_NAME, FUNC, P_DATA )
+#endif
+
+static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
+                                          vlc_thread_t *p_thread,
+                                          char *psz_name,
+                                          vlc_thread_func_t func,
+                                          void *p_data )
 {
     int i_ret;
 
@@ -785,6 +873,17 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
     vlc_cond_destroy( &wrapper.wait );
 #endif
 
+    if( i_ret == 0 )
+    {
+        intf_WarnMsg( 2, "thread info: %d (%s) has been created (%s:%d)",
+                      *p_thread, psz_name, psz_file, i_line );
+    }
+    else
+    {
+        intf_ErrMsg( "thread error: %s couldn't be created at %s:%d (%s)",
+                     psz_name, psz_file, i_line, strerror(i_ret) );
+    }
+
     return i_ret;
 }
 
@@ -820,25 +919,47 @@ static __inline__ void vlc_thread_exit( void )
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits
  *****************************************************************************/
-static __inline__ void vlc_thread_join( vlc_thread_t thread )
+#ifdef DEBUG
+#   define vlc_thread_join( THREAD )                                        \
+        _vlc_thread_join( __FILE__, __LINE__, THREAD ) 
+#else
+#   define vlc_thread_join( THREAD )                                        \
+        _vlc_thread_join( NULL, 0, THREAD ) 
+#endif
+
+static __inline__ void _vlc_thread_join( char * psz_file, int i_line,
+                                         vlc_thread_t thread )
 {
+    int i_ret = 0;
+
 #if defined( PTH_INIT_IN_PTH_H )
-    pth_join( thread, NULL );
+    i_ret = pth_join( thread, NULL );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    pthread_join( thread, NULL );
+    i_ret = pthread_join( thread, NULL );
 
 #elif defined( HAVE_CTHREADS_H )
-    cthread_join( thread );
+    i_ret = cthread_join( thread );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32 exit_value;
     wait_for_thread( thread, &exit_value );
 
 #elif defined( WIN32 )
-    WaitForSingleObject( thread, INFINITE);
+    WaitForSingleObject( thread, INFINITE );
 
 #endif
+
+    if( i_ret )
+    {
+        intf_ErrMsg( "thread error: thread_join(%d) failed at %s:%d (%s)",
+                     thread, psz_file, i_line, strerror(i_ret) );
+    }
+    else
+    {
+        intf_WarnMsg( 2, "thread info: %d has been joined (%s:%d)",
+                      thread, psz_file, i_line );
+    }
 }
 
 #ifdef GPROF
@@ -859,4 +980,9 @@ static void *vlc_thread_wrapper( void *p_wrapper )
     /* Call the real function */
     return func( p_data );
 }
+#endif
+
+#ifdef PLUGIN
+#   undef intf_WarnMsg
+#   undef intf_ErrMsg
 #endif

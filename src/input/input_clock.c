@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.23 2001/11/08 14:45:44 stef Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_clock.c,v 1.24 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,9 +31,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

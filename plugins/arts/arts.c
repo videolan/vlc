@@ -1,7 +1,7 @@
 /*****************************************************************************
  * arts.c : aRts module
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2001 VideoLAN
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *
@@ -33,6 +33,7 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 

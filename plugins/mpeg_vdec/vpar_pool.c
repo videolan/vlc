@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * Copyright (C) 2001 VideoLAN
+ * $Id: vpar_pool.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,9 +31,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "video.h"
 #include "video_output.h"

@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.7 2001/11/16 00:29:52 stef Exp $
+ * $Id: gtk_display.c,v 1.8 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -44,6 +44,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
@@ -53,7 +54,6 @@
 #include "input_ext-intf.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "video.h"

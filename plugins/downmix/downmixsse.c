@@ -1,10 +1,10 @@
 /*****************************************************************************
  * downmixsse.c : accelerated SSE AC3 downmix module
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: downmixsse.c,v 1.4 2001/07/11 02:01:04 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: downmixsse.c,v 1.5 2001/11/28 15:08:05 massiot Exp $
  *
- * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
+ * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,11 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"

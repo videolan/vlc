@@ -1,8 +1,8 @@
 /*****************************************************************************
  * audio_output.c : audio output thread
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.65 2001/11/05 15:22:44 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: audio_output.c,v 1.66 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -21,18 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* TODO:
- *
- * - Passer un certain nombre de "fonctions" (genre add_samples) en macro ou
- *   inline
- * - Faire les optimisations dans les fonctions threads :
- *   = Stocker les "petits calculs" dans des variables au lieu de les refaire
- *     à chaque boucle
- *   = Utiliser des tables pour les gros calculs
- * - Faire une structure différente pour intf/adec fifo
- *
- */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -48,14 +36,14 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
 #include "modules.h"
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
 #include "aout_common.h"

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aout_dsp.c : dsp functions library
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_dsp.c,v 1.15 2001/08/24 16:28:49 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: aout_dsp.c,v 1.16 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,13 +56,13 @@
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "main.h"
 
 #include "modules.h"

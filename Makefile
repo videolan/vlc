@@ -18,7 +18,6 @@ PLUGINS_DIR :=	ac3_adec \
 		alsa \
  		arts \
 		beos \
-		darwin \
 		directx \
 		dsp \
 		dummy \
@@ -53,7 +52,6 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		alsa/alsa \
  		arts/arts \
 		beos/beos \
-		darwin/darwin \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \

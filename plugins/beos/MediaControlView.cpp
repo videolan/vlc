@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.3 2001/10/21 06:05:30 tcastley Exp $
+ * $Id: MediaControlView.cpp,v 1.4 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -31,6 +31,7 @@ extern "C"
 {
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "main.h"
@@ -38,7 +39,6 @@ extern "C"
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "interface.h"
-#include "intf_msg.h"
 #include "intf_playlist.h"
 }
 

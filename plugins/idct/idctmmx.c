@@ -1,8 +1,8 @@
 /*****************************************************************************
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.19 2001/09/06 14:02:56 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: idctmmx.c,v 1.20 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -38,6 +38,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */

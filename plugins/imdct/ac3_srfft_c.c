@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ac3_srfft.c: ac3 FFT in C
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_srfft_c.c,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: ac3_srfft_c.c,v 1.2 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -37,8 +37,6 @@
 
 #include "config.h"
 #include "common.h"
-#include "threads.h"
-#include "mtime.h"
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

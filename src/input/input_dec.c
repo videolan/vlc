@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.16 2001/11/15 18:11:50 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_dec.c,v 1.17 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,9 +32,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
-#include "intf_msg.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ps.c: PS demux and packet management
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.38 2001/11/25 22:52:21 gbazin Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input_ps.c,v 1.39 2001/11/28 15:08:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -52,11 +52,10 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-
-#include "intf_msg.h"
 
 #include "main.h"
 

@@ -1,13 +1,15 @@
 /*****************************************************************************
  * netutils.c: various network functions
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.51 2001/11/27 14:42:46 sam Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: netutils.c,v 1.52 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
  *          Xavier Marchesini <xav@via.ecp.fr>
+ *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Samuel Hocevar <sam@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,10 +80,10 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "main.h"
 
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "netutils.h"

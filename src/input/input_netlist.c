@@ -5,8 +5,8 @@
  * pointer to an offset in iovec ; and iovec has a reference counter. It
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: input_netlist.c,v 1.44 2001/11/27 10:18:33 massiot Exp $
+ * Copyright (C) 1998-2001 VideoLAN
+ * $Id: input_netlist.c,v 1.45 2001/11/28 15:08:06 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -47,9 +47,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"                                           /* intf_*Msg */
 #include "threads.h"                                                /* mutex */
 #include "mtime.h"
-#include "intf_msg.h"                                           /* intf_*Msg */
 
 #if defined( WIN32 )
 #   include "input_iovec.h"
