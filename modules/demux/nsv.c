@@ -1,0 +1,375 @@
+/*****************************************************************************
+ * nsv.c: NullSoft Video demuxer.
+ *****************************************************************************
+ * Copyright (C) 2004 VideoLAN
+ * $Id: nsv.c,v 1.1 2004/01/04 14:28:11 fenrir Exp $
+ *
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
+#include <vlc/vlc.h>
+#include <vlc/input.h>
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("NullSoft demuxer" ) );
+    set_capability( "demux2", 1 );
+    set_callbacks( Open, Close );
+    add_shortcut( "nsv" );
+vlc_module_end();
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+
+struct demux_sys_t
+{
+    es_format_t  fmt_audio;
+    es_out_id_t *p_audio;
+
+    es_format_t  fmt_video;
+    es_out_id_t *p_video;
+
+    int64_t     i_pcr;
+    int64_t     i_pcr_inc;
+};
+
+static int Demux  ( demux_t *p_demux );
+static int Control( demux_t *p_demux, int i_query, va_list args );
+
+/*****************************************************************************
+ * Open
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+
+    uint8_t     *p_peek;
+    int         i;
+
+    if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
+    {
+        msg_Err( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+    if( strncmp( p_peek, "NSVf", 4 ) && strncmp( p_peek, "NSVs", 4 ))
+    {
+        msg_Warn( p_demux, "NSV module discarded" );
+        return VLC_EGENERIC;
+    }
+
+    /* Fill p_demux field */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    es_format_Init( &p_sys->fmt_audio, AUDIO_ES, 0 );
+    p_sys->p_audio = NULL;
+
+    es_format_Init( &p_sys->fmt_audio, VIDEO_ES, 0 );
+    p_sys->p_video = NULL;
+
+    p_sys->i_pcr   = 1;
+    p_sys->i_pcr_inc = 0;
+
+    /* Parse the headers */
+    if( !strncmp( p_peek, "NSVf", 4 ) )
+    {
+        int i_size = GetDWLE( &p_peek[4] );
+
+        /* For now skip it */
+        stream_Read( p_demux->s, NULL, i_size );
+    }
+
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    free( p_sys );
+}
+
+
+/*****************************************************************************
+ * Demux:
+ *****************************************************************************/
+static int Demux( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    uint8_t     header[19];
+    uint8_t     *p_peek;
+
+    int         i_size;
+    block_t     *p_frame;
+
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    {
+        msg_Warn( p_demux, "cannot peek" );
+        return 0;
+    }
+
+    if( GetWLE( p_peek ) == 0xbeef )
+    {
+        if( stream_Read( p_demux->s, NULL, 2 ) < 2 )
+        {
+            msg_Warn( p_demux, "cannot read" );
+            return 0;
+        }
+    }
+    else if( !strncmp( p_peek, "NSVs", 4 ) )
+    {
+        vlc_fourcc_t fcc;
+
+        if( stream_Read( p_demux->s, header, 19 ) < 19 )
+        {
+            msg_Warn( p_demux, "cannot read" );
+            return 0;
+        }
+
+        msg_Dbg( p_demux, "New NSVs chunk" );
+        /* Video */
+        switch( ( fcc = VLC_FOURCC( header[4], header[5], header[6], header[7] ) ) )
+        {
+            case VLC_FOURCC( 'V', 'P', '3', ' ' ):
+            case VLC_FOURCC( 'V', 'P', '3', '1' ):
+                fcc = VLC_FOURCC( 'V', 'P', '3', '1' );
+                break;
+            case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
+                break;
+            default:
+                msg_Warn( p_demux, "unknow codec" );
+                break;
+        }
+        if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_video.i_codec  )
+        {
+            es_format_Init( &p_sys->fmt_video, VIDEO_ES, fcc );
+            p_sys->fmt_video.video.i_width = GetWLE( &header[12] );
+            p_sys->fmt_video.video.i_height = GetWLE( &header[14] );
+            if( p_sys->p_video )
+            {
+                es_out_Del( p_demux->out, p_sys->p_video );
+            }
+            p_sys->p_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
+
+            msg_Dbg( p_demux, "    - video `%4.4s' %dx%d",
+                     (char*)&fcc,
+                     p_sys->fmt_video.video.i_width,
+                     p_sys->fmt_video.video.i_height );
+        }
+
+        /* Audio */
+        switch( ( fcc = VLC_FOURCC( header[8], header[9], header[10], header[11] ) ) )
+        {
+            case VLC_FOURCC( 'M', 'P', '3', ' ' ):
+                fcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+                break;
+            case VLC_FOURCC( 'P', 'C', 'M', ' ' ):
+                fcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                break;
+            case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
+                break;
+            default:
+                msg_Warn( p_demux, "unknow codec" );
+                break;
+        }
+
+        if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_audio.i_codec )
+        {
+            msg_Dbg( p_demux, "    - audio `%4.4s'", (char*)&fcc );
+
+            if( p_sys->p_audio )
+            {
+                es_out_Del( p_demux->out, p_sys->p_audio );
+                p_sys->p_audio = NULL;
+            }
+            es_format_Init( &p_sys->fmt_audio, AUDIO_ES, fcc );
+        }
+
+        if( header[16]&0x80 )
+        {
+            switch( header[16]&0x7f )
+            {
+                case 1: /* 29.97 fps */
+                    p_sys->i_pcr_inc = 33367;
+                    break;
+                case 3: /* 23.976 fps */
+                    p_sys->i_pcr_inc = 41708;
+                    break;
+                case 5: /* 14.98 fps */
+                    p_sys->i_pcr_inc = 66755;
+                    break;
+                default:
+                    msg_Dbg( p_demux, "unknow fps (0x%x)", header[16] );
+                    p_sys->i_pcr_inc = 40000;
+                    break;
+            }
+        }
+        else if( header[16] != 0 )
+        {
+            p_sys->i_pcr_inc = 1000000 / header[16];
+        }
+        else
+        {
+            msg_Dbg( p_demux, "invalid fps (0x00)" );
+            p_sys->i_pcr_inc = 40000;
+        }
+        msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
+    }
+    else
+    {
+        msg_Err( p_demux, "invalid signature 0x%x (%4.4s)", *(uint32_t*)p_peek, (char*)p_peek );
+        return -1;
+    }
+
+    if( stream_Read( p_demux->s, header, 5 ) < 5 )
+    {
+        msg_Warn( p_demux, "cannot read" );
+        return 0;
+    }
+
+    /* Set PCR */
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int)0, (int64_t)p_sys->i_pcr );
+
+    /* Read video */
+    i_size = ( header[0] >> 4 ) | ( header[1] << 4 ) | ( header[2] << 12 );
+    if( i_size > 0 )
+    {
+        /* msg_Dbg( p_demux, "frame video size=%d", i_size ); */
+        if( ( p_frame = stream_Block( p_demux->s, i_size ) ) )
+        {
+            p_frame->i_dts = p_sys->i_pcr;
+            es_out_Send( p_demux->out, p_sys->p_video, p_frame );
+        }
+    }
+
+    /* Read audio */
+    i_size = header[3] | ( header[4] << 8 );
+    if( i_size > 0 )
+    {
+        /* msg_Dbg( p_demux, "frame audio size=%d", i_size ); */
+
+        if( p_sys->fmt_audio.i_codec == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
+        {
+            uint8_t h[4];
+            stream_Read( p_demux->s, h, 4 );
+
+            p_sys->fmt_audio.audio.i_channels = h[1];
+            p_sys->fmt_audio.audio.i_rate = GetWLE( &h[2] );
+
+            i_size -= 4;
+        }
+        if( p_sys->p_audio == NULL )
+        {
+            p_sys->p_audio = es_out_Add( p_demux->out, &p_sys->fmt_audio );
+        }
+
+        if( ( p_frame = stream_Block( p_demux->s, i_size ) ) )
+        {
+            p_frame->i_dts =
+            p_frame->i_pts = p_sys->i_pcr;
+            es_out_Send( p_demux->out, p_sys->p_audio, p_frame );
+        }
+    }
+
+    p_sys->i_pcr += p_sys->i_pcr_inc;
+
+    return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    double f, *pf;
+    int64_t i64, *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_POSITION:
+            pf = (double*) va_arg( args, double* );
+            i64 = stream_Size( p_demux->s );
+            if( i64 > 0 )
+            {
+                *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
+            }
+            else
+            {
+                *pf = 0.0;
+            }
+            return VLC_SUCCESS;
+#if 0
+        case DEMUX_SET_POSITION:
+            f = (double) va_arg( args, double );
+            i64 = stream_Size( p_demux->s );
+
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+            return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 * ( stream_Tell( p_demux->s ) / 50 ) / p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 * ( stream_Size( p_demux->s ) / 50 ) / p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
+
+        case DEMUX_SET_TIME:
+#endif
+        case DEMUX_GET_FPS:
+            pf = (double*)va_arg( args, double * );
+            *pf = (double)1000000.0 / (double)p_sys->i_pcr_inc;
+            return VLC_SUCCESS;
+
+        default:
+            return VLC_EGENERIC;
+    }
+}
+
+
