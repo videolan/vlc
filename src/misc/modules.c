@@ -111,12 +111,6 @@
 
 #include "vlc_vlm.h"
 
-#if defined( UNDER_CE )
-#   define MYCHAR wchar_t
-#else
-#   define MYCHAR char
-#endif
-
 #ifdef HAVE_DYNAMIC_PLUGINS
 #   include "modules_plugin.h"
 #endif
@@ -129,6 +123,11 @@
 #    include "modules_builtin.h"
 #endif
 #include "network.h"
+
+#if defined( WIN32) || defined( UNDER_CE )
+    /* Avoid name collisions */
+#   define LoadModule(a,b,c) _LoadModule(a,b,c)
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -716,7 +715,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 {
 #if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
-    MYCHAR psz_path[MAX_PATH + 256];
+    wchar_t psz_path[MAX_PATH + 256];
     wchar_t psz_wdir[MAX_PATH];
 #else
     char psz_path[MAX_PATH + 256];
@@ -1388,7 +1387,7 @@ static void * _module_getsymbol( module_handle_t handle,
     return (void *)GetProcAddress( handle, psz_real );
 
 #elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
-    return (void *)GetProcAddress( handle, (MYCHAR*)psz_function );
+    return (void *)GetProcAddress( handle, (char *)psz_function );
 
 #elif defined(HAVE_DL_DLOPEN)
     return dlsym( handle, psz_function );
