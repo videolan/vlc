@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.42 2003/12/15 15:06:23 hartman Exp $
+ * $Id: modules_inner.h,v 1.43 2004/01/09 12:23:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -93,6 +93,7 @@
     {                                                                         \
         int i_shortcut = 1, i_config = -1;                                    \
         module_config_t *p_config = NULL;                                     \
+        static module_config_t config_end = {CONFIG_HINT_END};            \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
         p_module->b_unloadable = VLC_TRUE;                                    \
@@ -114,11 +115,11 @@
         }                                                                     \
         if( p_config )                                                        \
         {                                                                     \
-            p_config[ ++i_config ] = (module_config_t){ CONFIG_HINT_END };    \
+            p_config[ ++i_config ] = config_end;                              \
             config_Duplicate( p_module, p_config );                           \
             free( p_config );                                                 \
         }                                                                     \
-        else config_Duplicate(p_module, &(module_config_t){CONFIG_HINT_END}); \
+        else config_Duplicate( p_module, &config_end );                       \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
             return VLC_EGENERIC;                                              \

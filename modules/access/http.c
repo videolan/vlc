@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.51 2004/01/07 15:21:27 fenrir Exp $
+ * $Id: http.c,v 1.52 2004/01/09 12:23:47 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -234,12 +234,15 @@ static int  Open ( vlc_object_t *p_this )
         }
     }
 
-    if( ( p_sys->i_code == 301 || p_sys->i_code == 302 || p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
+    if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
+          p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
         p_sys->psz_location && *p_sys->psz_location )
     {
+        playlist_t * p_playlist;
+
         msg_Dbg( p_input, "redirection to %s", p_sys->psz_location );
 
-        playlist_t * p_playlist = (playlist_t *)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+        p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
         if( !p_playlist )
         {
             msg_Err( p_input, "redirection failed: can't find playlist" );
@@ -399,8 +402,11 @@ static void ParseURL( access_sys_t *p_sys, char *psz_url )
     /* Parse auth */
     if( ( p = strchr( psz, '@' ) ) )
     {
+        char *comma;
+
         *p++ = '\0';
-        char *comma = strchr( psz, ':' );
+        comma = strchr( psz, ':' );
+
         /* Retreive user:password */
         if( comma )
         {
@@ -477,9 +483,11 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
     /* Authentification */
     if( p_sys->psz_user && *p_sys->psz_user )
     {
-        char buf[strlen(p_sys->psz_user ) + 1 + strlen( p_sys->psz_passwd ? p_sys->psz_passwd : "" ) + 1];
+        char *buf;
         char *b64;
-        sprintf( buf, "%s:%s", p_sys->psz_user, p_sys->psz_passwd ? p_sys->psz_passwd : "" );
+
+        vasprintf( &buf, "%s:%s", p_sys->psz_user,
+                   p_sys->psz_passwd ? p_sys->psz_passwd : "" );
 
         b64 = b64_encode( buf );
 

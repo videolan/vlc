@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: win32_specific.c,v 1.30 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: win32_specific.c,v 1.31 2004/01/09 12:23:46 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -329,7 +329,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 for( j = 0 ; j < i_options ; j++ )
                 {
                     playlist_AddOption( p_playlist, i_pos ,
-                                        &ppsz_argv[i_opt+1+j] );
+                                        ppsz_argv[i_opt+1+j] );
                 }
                 i_opt += i_options;
             }

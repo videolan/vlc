@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.4 2004/01/07 23:39:41 fenrir Exp $
+ * $Id: net.c,v 1.5 2004/01/09 12:23:46 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -51,7 +51,10 @@
 #   include <sys/socket.h>
 #endif
 
-#include <unistd.h>
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #include "network.h"
 
 
