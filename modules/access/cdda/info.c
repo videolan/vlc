@@ -509,6 +509,7 @@ cdda_data_t *p_cdda, char *psz_cdtext)
    %a : The album artist **
    %A : The album information **
    %C : Category **
+   %e : The extended track data
    %I : CDDB disk ID **
    %G : Genre **
    %M : The current MRL
@@ -694,8 +695,7 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                 {
                     char psz_buffer[MSTRTIME_MAX_SIZE];
 		    unsigned int i_track_frames = 
-		      cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 
-		      cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+		      cdio_get_track_sec_count(p_cdda->p_cdio, i_track);
                     mtime_t i_duration = 
 		      i_track_frames / CDIO_CD_FRAMES_PER_SEC;
                     add_format_str_info( secstotimestr( psz_buffer, 
