@@ -41,15 +41,24 @@ static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 
+
+static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
+
 /*****************************************************************************
  * filter_sys_t: marquee filter descriptor
  *****************************************************************************/
 struct filter_sys_t
 {
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
+    int i_timeout;
+
     char *psz_marquee;    /* marquee string */
-    
+
     time_t last_time;
+
+    vlc_bool_t b_need_update;
 };
 
 #define MSG_TEXT N_("Marquee text")
@@ -58,6 +67,10 @@ struct filter_sys_t
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
 #define POSY_TEXT N_("Y offset, from the top")
 #define POSY_LONGTEXT N_("Y offset, down from the top" )
+#define TIMEOUT_TEXT N_("Marquee timeout")
+#define TIMEOUT_LONGTEXT N_("Defines the time the marquee must remain " \
+                            "displayed, in milliseconds. Default value is " \
+                            "0 (remain forever)")
 
 /*****************************************************************************
  * Module descriptor
@@ -68,6 +81,8 @@ vlc_module_begin();
     add_string( "marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
     add_integer( "marq-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
+                 VLC_FALSE );
     set_description( _("Marquee display sub filter") );
     add_shortcut( "marq" );
 vlc_module_end();
@@ -79,7 +94,6 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_value_t val;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -89,7 +103,7 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    /* hook to the playlist */ 
+    /* hook to the playlist */
     vlc_object_t *p_pl =
           vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_pl )
@@ -98,22 +112,22 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
 
-    var_Create( p_this, "marq-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "marq-x", &val );
-    p_sys->i_xoff = val.i_int;
-    var_Create( p_this, "marq-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "marq-y", &val );
-    p_sys->i_yoff = val.i_int;
+    p_sys->i_xoff = var_CreateGetInteger( p_pl , "marq-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_pl , "marq-y" );
+    p_sys->i_timeout = var_CreateGetInteger( p_pl , "marq-timeout" );
+    p_sys->psz_marquee =  var_CreateGetString( p_pl, "marquee" );
 
-    /*  Create the playlist marquee variables, free up the data structure */   
-    var_Create( p_pl, "marquee", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_pl, "marq-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_pl, "marq-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_AddCallback( p_pl, "marq-x", MarqueeCallback, p_sys );
+    var_AddCallback( p_pl, "marq-y", MarqueeCallback, p_sys );
+    var_AddCallback( p_pl, "marquee", MarqueeCallback, p_sys );
+    var_AddCallback( p_pl, "marq-timeout", MarqueeCallback, p_sys );
+
     vlc_object_release( p_pl );
- 
+
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
     p_sys->last_time = ((time_t)-1);
+    p_sys->b_need_update = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -127,13 +141,18 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
     free( p_sys );
- /* Delete the marquee variables from playlist */
+
+    /* Delete the marquee variables from playlist */
     vlc_object_t *p_pl =
         vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    var_Destroy(p_pl,"marquee");
-    var_Destroy(p_pl,"marq-x");
-    var_Destroy(p_pl,"marq_y");
-    vlc_object_release( p_pl ); 
+    if( !p_pl )
+    {
+        return;
+    }
+    var_Destroy( p_pl , "marquee" );
+    var_Destroy( p_pl , "marq-x" );
+    var_Destroy( p_pl , "marq_y" );
+    vlc_object_release( p_pl );
 }
 
 /****************************************************************************
@@ -147,20 +166,27 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
-    vlc_value_t val;
 
-    if( p_sys->last_time == time( NULL ) ) return NULL;
+    if( p_sys->last_time == time( NULL ) )
+    {
+        return NULL;
+    }
+
+    if( p_sys->b_need_update == VLC_FALSE )
+    {
+        return NULL;
+    }
 
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
-    
+
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
-    fmt.i_width = fmt.i_height = 0;     
+    fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = 0;
     fmt.i_y_offset = 0;
-    
+
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
     if( !p_spu->p_region )
     {
@@ -170,26 +196,46 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     t = p_sys->last_time = time( NULL );
 
-    /* hook to the playlist.  Can this just be done once somewhere? */ 
-    vlc_object_t *p_pl =
-          vlc_object_find( p_filter, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    var_Get(p_pl, "marquee", &val);
-    p_sys->psz_marquee = val.psz_string;  
-    var_Get(p_pl, "marq-x", &val);
-    p_sys->i_xoff = val.i_int;  
-    var_Get(p_pl, "marq-y", &val);
-    p_sys->i_yoff = val.i_int;  
-    vlc_object_release( p_pl );   
-    /* Does vlc_object_release have to be done every time? */
-    
-    p_spu->p_region->psz_text = strdup(p_sys->psz_marquee); 
+    p_spu->p_region->psz_text = strdup(p_sys->psz_marquee);
     p_spu->i_start = date;
-    p_spu->i_stop  = 0;
+    p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
     p_spu->i_x = p_sys->i_xoff;
     p_spu->i_y = p_sys->i_yoff;
 
     p_spu->i_flags = OSD_ALIGN_LEFT|OSD_ALIGN_TOP ;
+
+    p_sys->b_need_update = VLC_FALSE;
     return p_spu;
+}
+
+/**********************************************************************
+ * Callback to update params on the fly
+ **********************************************************************/
+static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+
+    if( !strncmp( psz_var, "marquee", 7 ) )
+    {
+        if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
+        p_sys->psz_marquee = strdup( newval.psz_string );
+    }
+    else if ( !strncmp( psz_var, "marq-x", 6 ) )
+    {
+        p_sys->i_xoff = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "marq-y", 6 ) )
+    {
+        p_sys->i_yoff = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "marq-timeout", 12 ) )
+    {
+        p_sys->i_timeout = newval.i_int;
+    }
+    p_sys->b_need_update = VLC_TRUE;
+    return VLC_SUCCESS;
 }
