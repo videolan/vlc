@@ -165,12 +165,12 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
     p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
-              p_dst->p[U_PLANE].i_pitch *
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[U_PLANE].i_pitch;
     p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
-              p_dst->p[V_PLANE].i_pitch *
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[V_PLANE].i_pitch;
 
     i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
     p_src1_y = p_dst_orig->p[Y_PLANE].p_pixels + i_x_offset +
@@ -179,12 +179,12 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
                ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
     p_src1_u = p_dst_orig->p[U_PLANE].p_pixels + i_x_offset/2 +
                p_filter->fmt_out.video.i_x_offset/2 +
-               p_dst_orig->p[U_PLANE].i_pitch *
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[U_PLANE].i_pitch;
     p_src1_v = p_dst_orig->p[V_PLANE].p_pixels + i_x_offset/2 +
                p_filter->fmt_out.video.i_x_offset/2 +
-               p_dst_orig->p[V_PLANE].i_pitch *
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[V_PLANE].i_pitch;
 
     i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
     p_src2_y = p_src->p[Y_PLANE].p_pixels +
@@ -493,12 +493,12 @@ static void BlendPalette( filter_t *p_filter, picture_t *p_dst,
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
     p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
-              p_dst->p[U_PLANE].i_pitch *
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[U_PLANE].i_pitch;
     p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
-              p_dst->p[V_PLANE].i_pitch *
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[V_PLANE].i_pitch;
 
     i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
     p_src1_y = p_dst_orig->p[Y_PLANE].p_pixels + i_x_offset +
@@ -507,12 +507,12 @@ static void BlendPalette( filter_t *p_filter, picture_t *p_dst,
                ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
     p_src1_u = p_dst_orig->p[U_PLANE].p_pixels + i_x_offset/2 +
                p_filter->fmt_out.video.i_x_offset/2 +
-               p_dst_orig->p[U_PLANE].i_pitch *
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[U_PLANE].i_pitch;
     p_src1_v = p_dst_orig->p[V_PLANE].p_pixels + i_x_offset/2 +
                p_filter->fmt_out.video.i_x_offset/2 +
-               p_dst_orig->p[V_PLANE].i_pitch *
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset )/2;
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[V_PLANE].i_pitch;
 
     i_src2_pitch = p_src->p->i_pitch;
     p_src2 = p_src->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
