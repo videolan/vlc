@@ -4,7 +4,7 @@
  * Copyright (C) 2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,11 @@ static void Close   ( vlc_object_t * );
 #define NAME_TEXT N_( "Display name of the Service" )
 #define NAME_LONGTEXT N_( \
     "This allows you to change the display name of the Service." )
+#define OPTIONS_TEXT N_("Configuration options")
+#define OPTIONS_LONGTEXT N_( \
+    "This option allows you to specify configuration options that will be " \
+    "used by the Service (eg. --foo=bar --no-foobar). It should be specified "\
+    "at install time so the Service is properly configured.")
 #define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
     "This option allows you to select additional interfaces spawned by the " \
@@ -60,6 +65,8 @@ vlc_module_begin();
               UNINSTALL_TEXT, UNINSTALL_LONGTEXT, VLC_TRUE );
     add_string ( "ntservice-name", VLCSERVICENAME, NULL,
                  NAME_TEXT, NAME_LONGTEXT, VLC_TRUE );
+    add_string ( "ntservice-options", NULL, NULL,
+                 OPTIONS_TEXT, OPTIONS_LONGTEXT, VLC_TRUE );
     add_string ( "ntservice-extraintf", NULL, NULL,
                  EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
 
@@ -153,7 +160,7 @@ static void Run( intf_thread_t *p_intf )
 static int NTServiceInstall( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys  = p_intf->p_sys;
-    char psz_path[MAX_PATH], psz_pathtmp[MAX_PATH], *psz_extraintf;
+    char psz_path[10*MAX_PATH], psz_pathtmp[MAX_PATH], *psz_extra;
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
@@ -166,13 +173,21 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
     sprintf( psz_path, "\"%s\" -I "MODULE_STRING, psz_pathtmp );
 
-    psz_extraintf = config_GetPsz( p_intf, "ntservice-extraintf" );
-    if( psz_extraintf && *psz_extraintf )
+    psz_extra = config_GetPsz( p_intf, "ntservice-extraintf" );
+    if( psz_extra && *psz_extra )
     {
         strcat( psz_path, " --ntservice-extraintf " );
-        strcat( psz_path, psz_extraintf );
+        strcat( psz_path, psz_extra );
     }
-    if( psz_extraintf ) free( psz_extraintf );
+    if( psz_extra ) free( psz_extra );
+
+    psz_extra = config_GetPsz( p_intf, "ntservice-options" );
+    if( psz_extra && *psz_extra )
+    {
+        strcat( psz_path, " " );
+        strcat( psz_path, psz_extra );
+    }
+    if( psz_extra ) free( psz_extra );
 
     SC_HANDLE service =
         CreateService( handle, p_sys->psz_service, p_sys->psz_service,
