@@ -4,6 +4,11 @@
 
 HEAD
 
+  * ./src/video_output/video_output.c: fixed a vout4 image starvation bug.
+  * ./plugins/dvd/dvd.c: we look for libdvdcss.so.2 as well as -.so.1.
+  * ./configure.in: BSD/OS fixes thanks to Steven M. Schultz.
+  * ./Makefile: renamed the `snapshot' rule to `dist'.
+  * ./Makefile: removed the `snapshot-nocss' rule which isn't needed anymore.
   * ./Makefile.modules: modules now depend on Makefile.opts.
   * ./configure.in: added (hopefully) explicit messages on how to get
     libdvdcss and link vlc with it.

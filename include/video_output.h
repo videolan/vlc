@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.72 2002/03/21 22:10:32 gbazin Exp $
+ * $Id: video_output.h,v 1.73 2002/04/04 05:08:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -148,7 +148,7 @@ typedef struct vout_thread_s
     vout_chroma_t       chroma;                        /* translation tables */
 
     /* Picture and subpicture heaps */
-    picture_t           p_picture[VOUT_MAX_PICTURES];            /* pictures */
+    picture_t           p_picture[2*VOUT_MAX_PICTURES];          /* pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
 
     /* Bitmap fonts */

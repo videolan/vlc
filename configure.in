@@ -58,6 +58,8 @@ case x"${target_os}" in
     ;;
   xbsdi*)
     SYS=bsdi
+    LIB_DVD="${LIB_DVD} -ldvd"
+    LIB_VCD="${LIB_VCD} -ldvd"
     ;;
   xdarwin*)
     SYS=darwin
@@ -81,12 +83,13 @@ case x"${target_os}" in
     PLDFLAGS="${PLDFLAGS} -nostart"
     ;;
   x*)
-    SYS=${target_os}
+    SYS="${target_os}"
     ;;
 esac
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign valloc)
+
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
     LIB_IPV4="${LIB_IPV4} -lsocket"
@@ -103,19 +106,12 @@ AC_CHECK_FUNC(nanosleep,,[
     AC_CHECK_LIB(posix4,nanosleep,LIB_VLC="${LIB_VLC} -lposix4")
   ])
 ])
-AC_CHECK_FUNCS(usleep)
 AC_CHECK_FUNC(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,LIB_VLC="${LIB_IPV4} -lresolv")
+  AC_CHECK_LIB(resolv,inet_aton,LIB_IPV4="${LIB_IPV4} -lresolv")
 ])
 AC_CHECK_FUNC(textdomain,,[
   AC_CHECK_LIB(intl,textdomain,LIB_VLC="${LIB_VLC} -lintl")
 ])
-AC_CHECK_FUNCS(vasprintf)
-AC_CHECK_FUNCS(swab)
-AC_CHECK_FUNCS([memalign valloc])
-
-AC_CHECK_FUNCS(sigrelse)
-AC_CHECK_FUNCS(getpwuid)
 
 dnl Check for getopt
 NEED_GETOPT=0
@@ -365,7 +361,7 @@ case x"${target_cpu}" in
     ARCH=unknown
     ;;
   *)
-    ARCH=${target_cpu}
+    ARCH="${target_cpu}"
     ;;
 esac
 
@@ -562,7 +558,7 @@ then
   AC_ARG_WITH(dvdcss-tree, 
   [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
   case "x$with_dvdcss" in
-  x)
+  x|xyes)
     if test "x$with_dvdcss_tree" = x
     then
       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
@@ -606,7 +602,7 @@ then
       dnl  Use ${with_dvdcss}/include/dvdcss/dvdcss.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvd"
-      LIB_DVD="${LIB_DVD} -L${with_dvdcss}/lib -ldvd"
+      LIB_DVD="${LIB_DVD} -L${with_dvdcss}/lib -ldvdcss"
       CFLAGS_DVD="${CFLAGS_DVD} -I${with_dvdcss}/include"
     else
       dnl  No libdvdcss could be found, sorry

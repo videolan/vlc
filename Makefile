@@ -323,7 +323,7 @@ po-uninstall:
 #
 # Package generation rules
 #
-snapshot-common:
+dist:
 	# Check that tmp isn't in the way
 	@if test -e tmp; then \
 		echo "Error: please remove ./tmp, it is in the way"; false; \
@@ -371,30 +371,11 @@ snapshot-common:
 		cp $$file tmp/vlc/share ; done
 	for file in vlc_beos.rsrc vlc.icns gvlc_win32.ico vlc_win32_rc.rc ; do \
 			cp share/$$file tmp/vlc/share/ ; done
-
-snapshot: snapshot-common
 	# Build archives
 	F=vlc-${VLC_QUICKVERSION}; \
 	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$F.tar $$F); \
 	bzip2 -f -9 < tmp/$$F.tar > $$F.tar.bz2; \
 	gzip -f -9 tmp/$$F.tar ; mv tmp/$$F.tar.gz .
-	# Clean up
-	rm -Rf tmp
-
-snapshot-nocss: snapshot-common
-	# Fix debian information
-	rm -f tmp/vlc/debian/control
-	sed -e 's#^ DVDs# unencrypted DVDs#' < debian/control \
-		> tmp/vlc/debian/control
-	rm -f tmp/vlc/debian/rules
-	sed -e 's#^\(export DVDCSS_FLAGS=\).*#\1"--enable-dvd --without-dvdcss"#' < debian/rules \
-		> tmp/vlc/debian/rules
-	chmod +x tmp/vlc/debian/rules
-	# Build css-disabled archives
-	F=vlc-${VLC_QUICKVERSION}; G=vlc-${VLC_QUICKVERSION}-nocss; \
-	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$G.tar $$F); \
-	bzip2 -f -9 < tmp/$$G.tar > $$G.tar.bz2; \
-	gzip -f -9 tmp/$$G.tar ; mv tmp/$$G.tar.gz .
 	# Clean up
 	rm -Rf tmp
 
@@ -470,9 +451,6 @@ package-macosx:
 
 	# Clean up
 	rm -Rf tmp
-
-deb:
-	dpkg-buildpackage -rfakeroot -us -uc
 
 #
 # Gtk/Gnome/* aliases and OS X application

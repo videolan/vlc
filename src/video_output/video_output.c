@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.169 2002/03/21 22:10:33 gbazin Exp $
+ * $Id: video_output.c,v 1.170 2002/04/04 05:08:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -125,7 +125,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
 
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
-    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
+    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++)
     {
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
@@ -374,22 +374,24 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->chroma.pf_end        = f.pf_end;
 #undef f
 
-        if( I_OUTPUTPICTURES < VOUT_MAX_PICTURES )
+        if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
         {
             intf_WarnMsg( 2, "vout info: indirect render, mapping "
                              "render pictures %i-%i to system pictures %i-%i",
-                             I_OUTPUTPICTURES - 1, VOUT_MAX_PICTURES - 2,
-                             I_OUTPUTPICTURES, VOUT_MAX_PICTURES - 1 );
+                             I_OUTPUTPICTURES - 1, 2 * VOUT_MAX_PICTURES - 2,
+                             I_OUTPUTPICTURES, 2 * VOUT_MAX_PICTURES - 1 );
         }
         else
         {
+            /* FIXME: if this happens, we don't have any render picture left */
             intf_WarnMsg( 2, "vout info: indirect render, no system "
                              "pictures needed, we have %i directbuffers",
                              I_OUTPUTPICTURES );
+            intf_ErrMsg( "vout: this is a bug!\n");
         }
 
         /* Append render buffers after the direct buffers */
-        for( i = I_OUTPUTPICTURES; i < VOUT_MAX_PICTURES; i++ )
+        for( i = I_OUTPUTPICTURES; i < 2 * VOUT_MAX_PICTURES; i++ )
         {
             PP_RENDERPICTURE[ I_RENDERPICTURES ] = &p_vout->p_picture[ i ];
             I_RENDERPICTURES++;
@@ -668,7 +670,7 @@ static void EndThread( vout_thread_t *p_vout )
     }
 
     /* Destroy all remaining pictures */
-    for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
+    for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++ )
     {
         if ( p_vout->p_picture[i_index].i_type == MEMORY_PICTURE )
         {

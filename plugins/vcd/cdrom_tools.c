@@ -2,7 +2,7 @@
  * cdrom_tools.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_tools.c,v 1.1 2002/02/20 05:50:00 jlj Exp $
+ * $Id: cdrom_tools.c,v 1.2 2002/04/04 05:08:05 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,9 +41,7 @@
 
 #include <sys/ioctl.h>
 
-#if defined(HAVE_BSD_DVD_STRUCT) || \
- defined(DVD_STRUCT_IN_BSDI_DVDIOCTL_DVD_H) || \
- defined(DVD_STRUCT_IN_DVD_H)
+#if defined(SYS_BSDI)
 #   include <dvd.h>
 #elif defined ( SYS_DARWIN )
 #   include <CoreFoundation/CFBase.h>

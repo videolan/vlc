@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.26 2002/03/25 19:16:20 gbazin Exp $
+ * $Id: xcommon.c,v 1.27 2002/04/04 05:08:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -399,16 +399,14 @@ static void vout_Destroy( vout_thread_t *p_vout )
         ToggleCursor( p_vout );
     }
 
-#ifdef MODULE_NAME_IS_xvideo   
-    XVideoReleasePort( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport );
-#else
-#if 0
+#ifdef MODULE_NAME_IS_x11
     /* Destroy colormap */
-    if( p_vout->p_sys->i_screen_depth == 8 )
+    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
         XFreeColormap( p_vout->p_sys->p_display, p_vout->p_sys->colormap );
     }
-#endif
+#else
+    XVideoReleasePort( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport );
 #endif
 
     DestroyCursor( p_vout );

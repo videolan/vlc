@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.7 2002/04/04 00:23:36 jlj Exp $
+ * $Id: intf_eject.c,v 1.8 2002/04/04 05:08:05 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -53,15 +53,16 @@
 #   include <sys/ioctl.h>
 
 #   include <sys/ioctl.h>
+#   include <sys/mount.h>
+
 #   include <linux/cdrom.h>
 #   if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
 #       include <linux/ucdrom.h>
 #   endif
 
-#   include <sys/mount.h>
-#   include <scsi/scsi.h>
-#   include <scsi/sg.h>
 #   ifdef HAVE_SCSI_SCSI_IOCTL_H
+#      include <scsi/scsi.h>
+#      include <scsi/sg.h>
 #      include <scsi/scsi_ioctl.h>
 #   endif
 #endif

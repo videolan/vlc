@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.8 2002/03/19 05:49:31 sam Exp $
+ * $Id: ipv4.c,v 1.9 2002/04/04 05:08:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -142,7 +142,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
  * OpenUDP: open a UDP socket
  *****************************************************************************
  * psz_bind_addr, i_bind_port : address and port used for the bind()
- *   system call. If psz_bind_addr == NULL, the socket is bound to
+ *   system call. If psz_bind_addr == "", the socket is bound to
  *   INADDR_ANY and broadcast reception is enabled. If i_bind_port == 0,
  *   1234 is used. If psz_bind_addr is a multicast (class D) address,
  *   join the multicast group.

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.28 2002/04/03 16:22:23 sam Exp $
+ * $Id: dvd.c,v 1.29 2002/04/04 05:08:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,10 +105,13 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void ProbeLibDVDCSS( void )
 {
-    char *pp_filelist[4] = { "libdvdcss.so.1",
-                             "./libdvdcss.so.1",
-                             "./lib/libdvdcss.so.1",
-                             NULL };
+    static char *pp_filelist[4] = { "libdvdcss.so.2",
+                                    "./libdvdcss.so.2",
+                                    "./lib/libdvdcss.so.2",
+                                    "libdvdcss.so.1",
+                                    "./libdvdcss.so.1",
+                                    "./lib/libdvdcss.so.1",
+                                    NULL };
     char **pp_file = pp_filelist;
 
     /* Try to open the dynamic object */
@@ -128,7 +131,7 @@ static void ProbeLibDVDCSS( void )
     /* If libdvdcss.so was found, check that it's valid */
     if( p_libdvdcss == NULL )
     {
-        intf_ErrMsg( "dvd warning: libdvdcss.so.1 not present" );
+        intf_ErrMsg( "dvd warning: libdvdcss.so.2 not present" );
     }
     else
     {
@@ -145,7 +148,7 @@ static void ProbeLibDVDCSS( void )
              || ____dvdcss_read == NULL || ____dvdcss_readv == NULL
              || ____dvdcss_error == NULL )
         {
-            intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.1, "
+            intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.2, "
                          "this shouldn't happen !" );
             dlclose( p_libdvdcss );
             p_libdvdcss = NULL;
