@@ -113,7 +113,7 @@ static int Activate( vlc_object_t *p_this )
 
     CONSOLE_INTRO_MSG;
 
-    printf( "Remote control interface initialized, `h' for help\n" );
+    printf( _("Remote control interface initialized, `h' for help\n") );
     return VLC_SUCCESS;
 }
 
@@ -379,7 +379,7 @@ static void Run( intf_thread_t *p_intf )
 
                 val.psz_string = psz_arg;
                 i_ret = var_Set( p_intf, psz_cmd, val );
-                printf( "%s: returned %i (%s)\n",
+                printf( _("%s: returned %i (%s)\n"),
                         psz_cmd, i_ret, vlc_error( i_ret ) );
             }
             /* Or maybe it's a global command */
@@ -392,7 +392,7 @@ static void Run( intf_thread_t *p_intf )
                 /* FIXME: it's a global command, but we should pass the
                  * local object as an argument, not p_intf->p_libvlc. */
                 i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
-                printf( "%s: returned %i (%s)\n",
+                printf( _("%s: returned %i (%s)\n"),
                         psz_cmd, i_ret, vlc_error( i_ret ) );
             }
             else if( !strcmp( psz_cmd, "info" ) )
@@ -416,12 +416,12 @@ static void Run( intf_thread_t *p_intf )
                         }
                         printf( "| \n" );
                     }
-                    printf( "+----[ end of stream info ]\n" );
+                    printf( _("+----[ end of stream info ]\n") );
                     vlc_mutex_unlock( &p_input->p_item->lock );
                 }
                 else
                 {
-                    printf( "no input\n" );
+                    printf( _("no input\n") );
                 }
             }
             else switch( psz_cmd[0] )
@@ -450,42 +450,42 @@ static void Run( intf_thread_t *p_intf )
             case '?':
             case 'h':
             case 'H':
-                printf("+----[ Remote control commands ]\n");
+                printf(_("+----[ Remote control commands ]\n"));
                 printf("| \n");
-                printf("| add XYZ  . . . . . . . . . . add XYZ to playlist\n");
-                printf("| playlist . . .  show items currently in playlist\n");
-                printf("| play . . . . . . . . . . . . . . . . play stream\n");
-                printf("| stop . . . . . . . . . . . . . . . . stop stream\n");
-                printf("| next . . . . . . . . . . . .  next playlist item\n");
-                printf("| prev . . . . . . . . . .  previous playlist item\n");
-                printf("| title [X]  . . . . set/get title in current item\n");
-                printf("| title_n  . . . . . .  next title in current item\n");
-                printf("| title_p  . . . .  previous title in current item\n");
-                printf("| chapter [X]  . . set/get chapter in current item\n");
-                printf("| chapter_n  . . . .  next chapter in current item\n");
-                printf("| chapter_p  . .  previous chapter in current item\n");
+                printf(_("| add XYZ  . . . . . . . . . . add XYZ to playlist\n"));
+                printf(_("| playlist . . .  show items currently in playlist\n"));
+                printf(_("| play . . . . . . . . . . . . . . . . play stream\n"));
+                printf(_("| stop . . . . . . . . . . . . . . . . stop stream\n"));
+                printf(_("| next . . . . . . . . . . . .  next playlist item\n"));
+                printf(_("| prev . . . . . . . . . .  previous playlist item\n"));
+                printf(_("| title [X]  . . . . set/get title in current item\n"));
+                printf(_("| title_n  . . . . . .  next title in current item\n"));
+                printf(_("| title_p  . . . .  previous title in current item\n"));
+                printf(_("| chapter [X]  . . set/get chapter in current item\n"));
+                printf(_("| chapter_n  . . . .  next chapter in current item\n"));
+                printf(_("| chapter_p  . .  previous chapter in current item\n"));
                 printf("| \n");
-                printf("| seek X . seek in seconds, for instance `seek 12'\n");
-                printf("| pause  . . . . . . . . . . . . . .  toggle pause\n");
-                printf("| f  . . . . . . . . . . . . . . toggle fullscreen\n");
-                printf("| info . . .  information about the current stream\n");
+                printf(_("| seek X . seek in seconds, for instance `seek 12'\n"));
+                printf(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
+                printf(_("| f  . . . . . . . . . . . . . . toggle fullscreen\n"));
+                printf(_("| info . . .  information about the current stream\n"));
                 printf("| \n");
-                printf("| volume [X] . . . . . . . .  set/get audio volume\n");
-                printf("| volup [X]  . . . . .  raise audio volume X steps\n");
-                printf("| voldown [X]  . . . .  lower audio volume X steps\n");
-                printf("| adev [X] . . . . . . . . .  set/get audio device\n");
-                printf("| achan [X]. . . . . . . .  set/get audio channels\n");
+                printf(_("| volume [X] . . . . . . . .  set/get audio volume\n"));
+                printf(_("| volup [X]  . . . . .  raise audio volume X steps\n"));
+                printf(_("| voldown [X]  . . . .  lower audio volume X steps\n"));
+                printf(_("| adev [X] . . . . . . . . .  set/get audio device\n"));
+                printf(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
                 printf("| \n");
-                printf("| help . . . . . . . . . . . . . this help message\n");
-                printf("| quit . . . . . . . . . . . . . . . . .  quit vlc\n");
+                printf(_("| help . . . . . . . . . . . . . this help message\n"));
+                printf(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
                 printf("| \n");
-                printf("+----[ end of help ]\n");
+                printf(_("+----[ end of help ]\n"));
                 break;
             case '\0':
                 /* Ignore empty lines */
                 break;
             default:
-                printf( "unknown command `%s', type `help' for help\n", psz_cmd );
+                printf( _("unknown command `%s', type `help' for help\n"), psz_cmd );
                 break;
             }
         }
@@ -561,7 +561,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 /* Get. */
                 var_Get( p_input, "chapter", &val );
                 var_Change( p_input, "chapter", VLC_VAR_GETCHOICES, &val_list, NULL );
-                printf( "Currently playing chapter %d/%d\n", val.i_int, val_list.p_list->i_count );
+                printf( _("Currently playing chapter %d/%d\n"), val.i_int, val_list.p_list->i_count );
                 var_Change( p_this, "chapter", VLC_VAR_FREELIST, &val_list, NULL );
             }
         }
@@ -598,7 +598,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 /* Get. */
                 var_Get( p_input, "title", &val );
                 var_Change( p_input, "title", VLC_VAR_GETCHOICES, &val_list, NULL );
-                printf( "Currently playing title %d/%d\n", val.i_int, val_list.p_list->i_count );
+                printf( _("Currently playing title %d/%d\n"), val.i_int, val_list.p_list->i_count );
                 var_Change( p_this, "title", VLC_VAR_FREELIST, &val_list, NULL );
             }
         }
@@ -652,7 +652,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "add" ) )
     {
-        printf( "trying to add %s to playlist\n", newval.psz_string );
+        printf( _("trying to add %s to playlist\n"), newval.psz_string );
         playlist_Add( p_playlist, newval.psz_string, newval.psz_string,
                       PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
     }
@@ -667,7 +667,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         }
         if ( i == 0 )
         {
-            printf( "| no entries\n" );
+            printf( _("| no entries\n") );
         }
     }
     /*
@@ -675,7 +675,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
      */
     else
     {
-        printf( "unknown command!\n" );
+        printf( _("unknown command!\n") );
     }
 
     vlc_object_release( p_playlist );
@@ -720,7 +720,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         audio_volume_t i_volume = atoi( newval.psz_string );
         if ( i_volume > AOUT_VOLUME_MAX )
         {
-            printf( "Volume must be in the range %d-%d\n", AOUT_VOLUME_MIN,
+            printf( _("Volume must be in the range %d-%d\n"), AOUT_VOLUME_MIN,
                     AOUT_VOLUME_MAX );
             i_error = VLC_EBADVAR;
         }
@@ -736,7 +736,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            printf( "Volume is %d\n", i_volume );
+            printf( _("Volume is %d\n"), i_volume );
             i_error = VLC_SUCCESS;
         }
     }
@@ -767,7 +767,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
             i_error = VLC_EGENERIC;
     }
 
-    if ( !i_error ) printf( "Volume is %d\n", i_volume );
+    if ( !i_error ) printf( _("Volume is %d\n"), i_volume );
     return i_error;
 }
 
@@ -828,7 +828,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
         var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
                     &val, &text );
-        printf( "+----[ end of %s ]\n", val_name.psz_string );
+        printf( _("+----[ end of %s ]\n"), val_name.psz_string );
 
         if( val_name.psz_string ) free( val_name.psz_string );
         i_error = VLC_SUCCESS;
