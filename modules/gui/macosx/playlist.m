@@ -545,7 +545,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
              var_Set( p_playlist, "loop", val1 );
              val1.b_bool = 1;
              var_Set( p_playlist, "repeat", val1 );
-             vout_OSDMessage( p_intf, _( "Repeat One" ) );
+             vout_OSDMessage( p_intf, SOLO_CHAN, _( "Repeat One" ) );
         break;
 
         case 2:
@@ -553,7 +553,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
              var_Set( p_playlist, "repeat", val1 );
              val1.b_bool = 1;
              var_Set( p_playlist, "loop", val1 );
-             vout_OSDMessage( p_intf, _( "Repeat All" ) );
+             vout_OSDMessage( p_intf, SOLO_CHAN, _( "Repeat All" ) );
         break;
 
         default:
@@ -564,7 +564,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                   val1.b_bool = 0;
                   var_Set( p_playlist, "repeat", val1 );
                   var_Set( p_playlist, "loop", val1 );
-                  vout_OSDMessage( p_intf, _( "Repeat Off" ) );
+                  vout_OSDMessage( p_intf, SOLO_CHAN, _( "Repeat Off" ) );
              }
          break;
      }

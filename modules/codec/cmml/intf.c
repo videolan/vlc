@@ -843,8 +843,8 @@ static int DisplayAnchor( intf_thread_t *p_intf,
         /* TODO: p_subpicture doesn't have the proper i_x and i_y
          * coordinates.  Need to look at the subpicture display system to
          * work out why. */
-        if ( vout_ShowTextAbsolute( p_vout,
-                psz_anchor_description, p_style, OSD_ALIGN_BOTTOM, 
+        if ( vout_ShowTextAbsolute( p_vout, SOLO_CHAN,
+                psz_anchor_description, p_style, OSD_ALIGN_BOTTOM,
                 i_margin_h, i_margin_v, i_now, 0 ) == VLC_SUCCESS )
         {
             /* Displayed successfully */

@@ -1258,7 +1258,8 @@ static void render( dvbsub_all_t *dvbsub, vout_thread_t *p_vout )
 
             /* Allocate the subpicture internal data. */
             dvbsub->p_spu[j] =
-                vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
+                vout_CreateSubPicture( p_vout, SUBT1_CHAN, TEXT_CONTENT,
+                                       MEMORY_SUBPICTURE );
             if( dvbsub->p_spu[j] == NULL )
             {
                 msg_Err(p_vout, "Unable to allocate memory, skipping");

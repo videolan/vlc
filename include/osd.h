@@ -53,16 +53,16 @@ struct text_style_t
 };
 static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
 
-VLC_EXPORT( subpicture_t *, vout_ShowTextRelative, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t ) );
-VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
-VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, char *, ... ) );
+VLC_EXPORT( subpicture_t *, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, char *, ... ) );
 /**
  * Same as __vlc_OSDMessage() but with automatic casting
  */
 #if defined(HAVE_VARIADIC_MACROS)
-#    define vout_OSDMessage( obj, fmt, args...) __vout_OSDMessage( VLC_OBJECT(obj), fmt, ## args )
+#    define vout_OSDMessage( obj, chan, fmt, args...) __vout_OSDMessage( VLC_OBJECT(obj), chan, fmt, ## args )
 #else
 #    define vout_OSDMessage __vout_OSDMessage
 #endif
-VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int , short ) );
+VLC_EXPORT( void, vout_OSDSlider, ( vlc_object_t *, int, int , short ) );
 VLC_EXPORT( void, vout_OSDIcon, ( vlc_object_t *, short ) );

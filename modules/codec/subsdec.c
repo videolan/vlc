@@ -371,7 +371,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
         }
     }
     StripTags( psz_subtitle );
-    vout_ShowTextAbsolute( p_vout, psz_subtitle, NULL, 
+    vout_ShowTextAbsolute( p_vout, SUBT1_CHAN, psz_subtitle, NULL,
         OSD_ALIGN_BOTTOM | p_sys->i_align, i_align_h,
         i_align_v, p_block->i_pts,
         p_block->i_length ? p_block->i_pts + p_block->i_length : 0 );

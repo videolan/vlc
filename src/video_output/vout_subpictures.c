@@ -82,7 +82,8 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  * \param i_type the type of the subpicture
  * \return NULL on error, a reserved subpicture otherwise
  */
-subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
+subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_channel,
+                                     int i_content, int i_type )
 {
     int                 i_subpic;                        /* subpicture index */
     subpicture_t *      p_subpic = NULL;            /* first free subpicture */
@@ -91,8 +92,39 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
     vlc_mutex_lock( &p_vout->subpicture_lock );
 
     /*
+     * Destroy all subpics which are not in the correct channel and
+     * subpics which are in the right channel and have the same content type
+     * (only concerns exclusive channels)
+     */
+    if( i_channel >= BEGIN_EXCLUSIVE_CHAN )
+    {
+        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+        {
+            p_subpic = &p_vout->p_subpicture[i_subpic];
+            if( p_subpic->i_status == FREE_SUBPICTURE
+                || ( p_subpic->i_status != RESERVED_SUBPICTURE
+                     && p_subpic->i_status != READY_SUBPICTURE ) )
+            {
+                continue;
+            }
+            if( ( p_subpic->i_channel != i_channel
+                  && p_subpic->i_channel >= BEGIN_EXCLUSIVE_CHAN )
+                || ( p_subpic->i_channel == i_channel
+                     && p_subpic->i_content == i_content ) )
+            {
+                if( p_subpic->pf_destroy )
+                {
+                    p_subpic->pf_destroy( p_subpic );
+                }
+                p_subpic->i_status = FREE_SUBPICTURE;
+            }
+        }
+    }
+
+    /*
      * Look for an empty place
      */
+    p_subpic = NULL;
     for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
     {
         if( p_vout->p_subpicture[i_subpic].i_status == FREE_SUBPICTURE )
@@ -113,6 +145,9 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
     }
 
     /* Copy subpicture information, set some default values */
+    p_subpic->i_channel = i_channel;
+    p_subpic->i_content = i_content;
+
     p_subpic->i_type    = i_type;
     p_subpic->i_status  = RESERVED_SUBPICTURE;
 
@@ -161,11 +196,6 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     if( p_subpic->pf_destroy )
     {
         p_subpic->pf_destroy( p_subpic );
-    }
-
-    if( p_subpic == p_vout->p_last_osd_message )
-    {
-        p_vout->p_last_osd_message = NULL;
     }
 
     p_subpic->i_status = FREE_SUBPICTURE;

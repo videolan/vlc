@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.17 2004/01/27 22:51:39 hartman Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -72,7 +72,8 @@ void E_(ParsePacket)( decoder_t *p_dec)
     subpicture_t  *p_spu;
 
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_sys->p_vout, MEMORY_SUBPICTURE );
+    p_spu = vout_CreateSubPicture( p_sys->p_vout, SUBT1_CHAN, TEXT_CONTENT,
+                                   MEMORY_SUBPICTURE );
     if( p_spu == NULL )
     {
         return;

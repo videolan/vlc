@@ -232,7 +232,7 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            vout_OSDMessage( p_intf, _( "Quit" ) );
+            vout_OSDMessage( p_intf, SOLO_CHAN, _( "Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
@@ -243,12 +243,12 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
-                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                    vout_OSDSlider( VLC_OBJECT( p_intf ), VOLUME_CHAN,
                         i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
                 }
                 else
                 {
-                    vout_OSDMessage( p_intf, "Vol %d%%",
+                    vout_OSDMessage( p_intf, VOLUME_CHAN, "Vol %d%%",
                                      2*i_newvol*100/AOUT_VOLUME_MAX );
                 }
             }
@@ -261,12 +261,12 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
-                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                    vout_OSDSlider( VLC_OBJECT( p_intf ), VOLUME_CHAN,
                         i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
                 }
                 else
                 {
-                    vout_OSDMessage( p_intf, "Vol %d%%",
+                    vout_OSDMessage( p_intf, VOLUME_CHAN, "Vol %d%%",
                                      2*i_newvol*100/AOUT_VOLUME_MAX );
                 }
             }
@@ -280,19 +280,19 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( i_newvol == 0 )
                 {
-                    vout_OSDMessage( p_intf, _( "Mute" ) );
+                    vout_OSDMessage( p_intf, SOLO_CHAN, _( "Mute" ) );
                     vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_MUTE_ICON );
                 }
                 else
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), VOLUME_CHAN,
                             i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, "Vol %d%%",
+                        vout_OSDMessage( p_intf, VOLUME_CHAN, "Vol %d%%",
                                          i_newvol * 100 / AOUT_VOLUME_MAX );
                     }
                 }
@@ -307,7 +307,8 @@ static void Run( intf_thread_t *p_intf )
             {
                 i_delay--;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, "Subtitle delay %i ms", i_delay*100);
+                vout_OSDMessage( p_intf, SOLO_CHAN, "Subtitle delay %i ms",
+                                 i_delay*100);
             }
         }
         else if( i_action == ACTIONID_SUBDELAY_UP )
@@ -318,7 +319,8 @@ static void Run( intf_thread_t *p_intf )
             {
                 i_delay++;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
-                vout_OSDMessage( p_intf, "Subtitle delay %i ms", i_delay*100);
+                vout_OSDMessage( p_intf, SOLO_CHAN, "Subtitle delay %i ms", 
+                                 i_delay*100);
             }
         }
         else if( i_action == ACTIONID_FULLSCREEN && p_vout )
@@ -367,7 +369,7 @@ static void Run( intf_thread_t *p_intf )
 
             if( i_action == ACTIONID_PAUSE )
             {
-                vout_OSDMessage( p_intf, _( "Pause" ) );
+                vout_OSDMessage( p_intf, SOLO_CHAN, _( "Pause" ) );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
@@ -377,12 +379,13 @@ static void Run( intf_thread_t *p_intf )
                 var_Set( p_input, "time-offset", val );
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
-                    vout_OSDSlider( VLC_OBJECT( p_intf ),
+                    vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                     GetPosition( p_intf ), OSD_HOR_SLIDER );
                 }
                 else
                 {
-                    vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
+                    vout_OSDMessage( p_intf, SOLO_CHAN,
+                                     _( "Jump -10 seconds" ) );
                 }
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC && b_seekable )
@@ -393,12 +396,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                         GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
+                        vout_OSDMessage( p_intf, POSITION_CHAN,
+                                         _( "Jump +10 seconds" ) );
                     }
                 }
             }
@@ -410,12 +414,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                         GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
+                        vout_OSDMessage( p_intf, SOLO_CHAN,
+                                         _( "Jump -1 minute" ) );
                     }
                 }
             }
@@ -427,12 +432,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                         GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
+                        vout_OSDMessage( p_intf, SOLO_CHAN,
+                                         _( "Jump +1 minute" ) );
                     }
                 }
             }
@@ -444,12 +450,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                         GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
+                        vout_OSDMessage( p_intf, SOLO_CHAN,
+                                         _( "Jump -5 minutes" ) );
                     }
                 }
             }
@@ -461,12 +468,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
-                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                        vout_OSDSlider( VLC_OBJECT( p_intf ), POSITION_CHAN,
                                         GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
-                        vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
+                        vout_OSDMessage( p_intf, SOLO_CHAN,
+                                         _( "Jump +5 minutes" ) );
                     }
                 }
             }
@@ -525,12 +533,12 @@ static void Run( intf_thread_t *p_intf )
                 if( time.i_time > 0 )
                 {
                     secstotimestr( psz_duration, time.i_time / 1000000 );
-                    vout_OSDMessage( p_input, "%s / %s",
+                    vout_OSDMessage( p_input, POSITION_CHAN, "%s / %s",
                                      psz_time, psz_duration );
                 }
                 else if( i_seconds > 0 )
                 {
-                    vout_OSDMessage( p_input, psz_time );
+                    vout_OSDMessage( p_input, POSITION_CHAN, psz_time );
                 }
             }
             else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&

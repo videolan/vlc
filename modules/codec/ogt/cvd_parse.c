@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.14 2004/01/22 04:46:19 rocky Exp $
+ * $Id$
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -292,7 +292,8 @@ E_(ParsePacket)( decoder_t *p_dec)
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_sys->p_vout, MEMORY_SUBPICTURE );
+    p_spu = vout_CreateSubPicture( p_sys->p_vout, SUBT1_CHAN, TEXT_CONTENT,
+                                   MEMORY_SUBPICTURE );
     if( p_spu == NULL )
     {
         return;

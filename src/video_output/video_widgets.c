@@ -45,7 +45,7 @@ static void RenderYUY2( vout_thread_t *, picture_t *, const subpicture_t *,
                         int );
 static void RenderRV32( vout_thread_t *, picture_t *, const subpicture_t *,
                         int );
-static subpicture_t *vout_CreateWidget( vout_thread_t * );
+static subpicture_t *vout_CreateWidget( vout_thread_t *, int );
 static void FreeWidget( subpicture_t * );
 
 /**
@@ -162,9 +162,9 @@ static void DrawTriangle( vout_thread_t *p_vout, subpicture_t *p_subpic,
 }
 
 /*****************************************************************************
- * Render: place string in picture
+ * Render: place widget in picture
  *****************************************************************************
- * This function merges the previously rendered freetype glyphs into a picture
+ * This function merges the previously drawn widget into a picture
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic,
                     const subpicture_t *p_subpic )
@@ -372,7 +372,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 /*****************************************************************************
  * Creates and initializes an OSD widget.
  *****************************************************************************/
-subpicture_t *vout_CreateWidget( vout_thread_t *p_vout )
+subpicture_t *vout_CreateWidget( vout_thread_t *p_vout, int i_channel )
 {
     subpicture_t *p_subpic;
     subpicture_sys_t *p_widget;
@@ -382,7 +382,8 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout )
     p_widget = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
+    p_subpic = vout_CreateSubPicture( p_vout, i_channel, GRAPH_CONTENT,
+                                      MEMORY_SUBPICTURE );
     if( p_subpic == NULL )
     {
         return NULL;
@@ -409,7 +410,8 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout )
  * Displays an OSD slider.
  * Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  *****************************************************************************/
-void vout_OSDSlider( vlc_object_t *p_caller, int i_position, short i_type )
+void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
+                     short i_type )
 {
     vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
                                              FIND_ANYWHERE );
@@ -422,7 +424,7 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_position, short i_type )
         return;
     }
 
-    p_subpic = vout_CreateWidget( p_vout );
+    p_subpic = vout_CreateWidget( p_vout, i_channel );
     if( p_subpic == NULL )
     {
         return;
@@ -481,16 +483,7 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_position, short i_type )
                   p_widget->i_height - 1, STYLE_EMPTY );
     }
 
-    vlc_mutex_lock( &p_vout->change_lock );
-
-    if( p_vout->p_last_osd_message )
-    {
-        vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
-    }
-    p_vout->p_last_osd_message = p_subpic;
     vout_DisplaySubPicture( p_vout, p_subpic );
-
-    vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_release( p_vout );
     return;
@@ -506,14 +499,24 @@ void vout_OSDIcon( vlc_object_t *p_caller, short i_type )
                                              FIND_ANYWHERE );
     subpicture_t *p_subpic;
     subpicture_sys_t *p_widget;
-    int i_x_margin, i_y_margin;
+    int i_x_margin, i_y_margin, i_channel;
 
     if( p_vout == NULL || !config_GetInt( p_caller, "osd" ) )
     {
         return;
     }
 
-    p_subpic = vout_CreateWidget( p_vout );
+    switch( i_type )
+    {
+        case OSD_SPEAKER_ICON:
+            i_channel = VOLUME_CHAN;
+            break;
+        default:
+            i_channel = SOLO_CHAN;
+            break;
+    }
+
+    p_subpic = vout_CreateWidget( p_vout, i_channel );
     if( p_subpic == NULL )
     {
         return;
@@ -575,16 +578,7 @@ void vout_OSDIcon( vlc_object_t *p_caller, short i_type )
         }
     }
 
-    vlc_mutex_lock( &p_vout->change_lock );
-
-    if( p_vout->p_last_osd_message )
-    {
-        vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
-    }
-    p_vout->p_last_osd_message = p_subpic;
     vout_DisplaySubPicture( p_vout, p_subpic );
-
-    vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_release( p_vout );
     return;

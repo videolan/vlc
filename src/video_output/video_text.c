@@ -26,6 +26,7 @@
 /**
  * \brief Show text on the video for some time
  * \param p_vout pointer to the vout the text is to be showed on
+ * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
  * \param p_style Pointer to a struct with text style info
  * \param i_flags flags for alignment and such
@@ -33,9 +34,9 @@
  * \param i_vmargin vertical margin in pixels
  * \param i_duration Amount of time the text is to be shown.
  */
-subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string,
-                              text_style_t *p_style, int i_flags,
-                              int i_hmargin, int i_vmargin,
+subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
+                              char *psz_string, text_style_t *p_style,
+                              int i_flags, int i_hmargin, int i_vmargin,
                               mtime_t i_duration )
 {
     subpicture_t *p_subpic = NULL;
@@ -43,8 +44,8 @@ subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string,
 
     if ( p_vout->pf_add_string )
     {
-        p_subpic = p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags,
-                             i_hmargin, i_vmargin, i_now, i_now + i_duration );
+        p_subpic = p_vout->pf_add_string( p_vout, i_channel, psz_string,
+           p_style, i_flags, i_hmargin, i_vmargin, i_now, i_now + i_duration );
     }
     else
     {
@@ -57,6 +58,7 @@ subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string,
 /**
  * \brief Show text on the video from a given start date to a given end date
  * \param p_vout pointer to the vout the text is to be showed on
+ * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
  * \param p_style Pointer to a struct with text style info
  * \param i_flags flags for alignment and such
@@ -67,14 +69,14 @@ subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string,
  *               if this is 0 the string will be shown untill the next string
  *               is about to be shown
  */
-int vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
-                           text_style_t *p_style, int i_flags,
-                           int i_hmargin, int i_vmargin, mtime_t i_start,
-                           mtime_t i_stop )
+int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
+                           char *psz_string, text_style_t *p_style,
+                           int i_flags, int i_hmargin, int i_vmargin,
+                           mtime_t i_start, mtime_t i_stop )
 {
     if ( p_vout->pf_add_string )
     {
-        p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags,
+        p_vout->pf_add_string( p_vout, i_channel, psz_string, p_style, i_flags,
                                i_hmargin, i_vmargin, i_start, i_stop );
         return VLC_SUCCESS;
     }
@@ -90,9 +92,11 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
  * \brief Write an informative message at the default location,
  *        for the default duration and only if the OSD option is enabled.
  * \param p_caller The object that called the function.
+ * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-void __vout_OSDMessage( vlc_object_t *p_caller, char *psz_format, ... )
+void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
+                        char *psz_format, ... )
 {
     vout_thread_t *p_vout;
     char *psz_string;
@@ -106,17 +110,9 @@ void __vout_OSDMessage( vlc_object_t *p_caller, char *psz_format, ... )
     {
         va_start( args, psz_format );
         vasprintf( &psz_string, psz_format, args );
-        vlc_mutex_lock( &p_vout->change_lock );
 
-        if( p_vout->p_last_osd_message )
-        {
-            vout_DestroySubPicture( p_vout, p_vout->p_last_osd_message );
-        }
-
-        p_vout->p_last_osd_message = vout_ShowTextRelative( p_vout, psz_string,
-                        NULL, OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
-
-        vlc_mutex_unlock( &p_vout->change_lock );
+        vout_ShowTextRelative( p_vout, i_channel, psz_string, NULL,
+                               OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,1000000 );
 
         vlc_object_release( p_vout );
         free( psz_string );

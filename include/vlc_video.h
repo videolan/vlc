@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.9 2004/01/25 18:17:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -193,6 +193,12 @@ struct picture_heap_t
  */
 struct subpicture_t
 {
+    /** \name Channel and content type */
+    /**@{*/
+    int             i_channel;                      /**< subpicture channel */
+    int             i_content;                            /**< content type */
+    /**@}*/
+
     /** \name Type and flags
        Should NOT be modified except by the vout thread */
     /**@{*/
@@ -239,6 +245,19 @@ struct subpicture_t
 #define FREE_SUBPICTURE        0                   /* free and not allocated */
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
+
+/* Subpicture channel */
+#define SUBT1_CHAN             1
+#define SUBT2_CHAN             2
+#define BEGIN_EXCLUSIVE_CHAN   3           /* exclusive subpic-channels list */
+#define POSITION_CHAN          3
+#define VOLUME_CHAN            4
+#define SOLO_CHAN              5
+#define END_EXCLUSIVE_CHAN     5                               /*end of list */
+
+/* Subpicture content type */
+#define TEXT_CONTENT           0
+#define GRAPH_CONTENT          1             /* used for OSD icon, slider... */
 
 /*****************************************************************************
  * Prototypes

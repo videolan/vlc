@@ -126,8 +126,6 @@ struct vout_thread_t
     picture_t           p_picture[2*VOUT_MAX_PICTURES];        /**< pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
 
-    subpicture_t *      p_last_osd_message;
-
     /* Statistics */
     count_t          c_loops;
     count_t          c_pictures, c_late_pictures;
@@ -147,8 +145,9 @@ struct vout_thread_t
                                                            the text renderer */
     module_t *            p_text_renderer_module;  /**< text renderer module */
     /** callback used when a new string needs to be shown on the vout */
-    subpicture_t * ( *pf_add_string ) ( vout_thread_t *, char *, text_style_t *, int,
-                             int, int, mtime_t, mtime_t );
+    subpicture_t * ( *pf_add_string ) ( vout_thread_t *, int, char *,
+                                        text_style_t *, int, int, int, mtime_t,
+                                        mtime_t );
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
@@ -257,7 +256,7 @@ enum output_query_e
  * \addtogroup subpicture
  * @{
  */
-VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int ) );
+VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int, int ) );
 VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 

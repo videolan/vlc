@@ -77,8 +77,8 @@ static void RenderYUY2( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static void RenderRV32( vout_thread_t *, picture_t *,
                         const subpicture_t * );
-static subpicture_t *AddText ( vout_thread_t *, char *, text_style_t *, int,
-                               int, int, mtime_t, mtime_t );
+static subpicture_t *AddText ( vout_thread_t *, int, char *, text_style_t *,
+                               int, int, int, mtime_t, mtime_t );
 
 static void FreeString( subpicture_t * );
 
@@ -667,9 +667,10 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
  * needed glyphs into memory. It is used as pf_add_string callback in
  * the vout method by this module
  */
-static subpicture_t *AddText ( vout_thread_t *p_vout, char *psz_string,
-                     text_style_t *p_style, int i_flags, int i_hmargin,
-                     int i_vmargin, mtime_t i_start, mtime_t i_stop )
+static subpicture_t *AddText ( vout_thread_t *p_vout, int i_channel,
+                     char *psz_string, text_style_t *p_style, int i_flags,
+                     int i_hmargin, int i_vmargin, mtime_t i_start,
+                     mtime_t i_stop )
 {
     subpicture_sys_t *p_string;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
@@ -705,7 +706,8 @@ static subpicture_t *AddText ( vout_thread_t *p_vout, char *psz_string,
     p_subpic = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
+    p_subpic = vout_CreateSubPicture( p_vout, i_channel, TEXT_CONTENT,
+                                      MEMORY_SUBPICTURE );
     if ( p_subpic == NULL )
     {
         return NULL;
