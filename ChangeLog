@@ -4,6 +4,7 @@
 
 HEAD
 
+  * First libdvdcss version (0.0.1).
   * Unrolled two loops in dvd_netlist.c to prevent message flooding.
   * DVD input stuttering fix by Jon Lech Johansen.
   * Removed a lock that caused late frames in DVDRead.

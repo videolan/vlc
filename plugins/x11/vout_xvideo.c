@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.18 2001/05/30 17:03:12 sam Exp $
+ * $Id: vout_xvideo.c,v 1.19 2001/06/19 05:51:57 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -588,7 +588,9 @@ static void vout_Display( vout_thread_t *p_vout )
                    p_vout->p_rendered_pic->i_height;
 
     if( XVideoUpdateImgSizeIfRequired( p_vout ) )
+    {
         return;
+    }
 
     switch( p_vout->p_rendered_pic->i_type )
     {
@@ -613,7 +615,9 @@ static void vout_Display( vout_thread_t *p_vout )
     }
 
     if( b_draw )
+    {
         XVideoDisplay( p_vout );
+    }
 }
 
 static void vout_SetPalette( p_vout_thread_t p_vout,
@@ -641,12 +645,15 @@ static int XVideoUpdateImgSizeIfRequired( vout_thread_t *p_vout )
     if( p_vout->p_sys->i_image_width != i_img_width
             || p_vout->p_sys->i_image_height != i_img_height )
     {
+        if( p_vout->p_sys->i_image_width != 0
+             && p_vout->p_sys->i_image_height != 0 )
+        {
+            /* Destroy XvImage to change its size */
+            vout_End( p_vout );
+        }
+
         p_vout->p_sys->i_image_width  = i_img_width;
         p_vout->p_sys->i_image_height = i_img_height;
-
-        /* Destroy XvImage to change its size */
-        vout_End( p_vout );
-            /* Note: vout_End does nothing if no XvImage to destroy. */
 
         /* Create XvImage using XShm extension */
         if( XVideoCreateShmImage( p_vout->p_sys->p_display,
@@ -914,13 +921,16 @@ static int XVideoCreateShmImage( Display* dpy, int xv_port,
                                                         0, 0 );
     p_shm_info->readOnly = False;
 
+#if 0
     /* Mark the shm segment to be removed when there will be no more
      * attachements, so it is automatic on process exit or after shmdt */
     shmctl( p_shm_info->shmid, IPC_RMID, 0 );
+#endif
 
     if( !XShmAttach( dpy, p_shm_info ) )
     {
         intf_ErrMsg( "vout error: XShmAttach failed" );
+        shmctl( p_shm_info->shmid, IPC_RMID, 0 );
         shmdt( p_shm_info->shmaddr );
         return( -1 );
     }
@@ -953,8 +963,10 @@ static void XVideoDestroyShmImage( vout_thread_t *p_vout, XvImage *p_xvimage,
     XDestroyImage( p_ximage ); /* XXX */
 #endif
 
+    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
+
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
-    {                                   /* also automatic freeing...         */
+    {
         intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
     }

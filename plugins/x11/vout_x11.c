@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.26 2001/05/30 17:03:12 sam Exp $
+ * $Id: vout_x11.c,v 1.27 2001/06/19 05:51:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1096,9 +1096,11 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
         return( 1 );
     }
 
+#if 0
     /* Mark the shm segment to be removed when there will be no more
      * attachements, so it is automatic on process exit or after shmdt */
     shmctl( p_shm_info->shmid, IPC_RMID, 0 );
+#endif
 
     /* Attach shared memory segment to X server (read only) */
     p_shm_info->readOnly = True;
@@ -1106,6 +1108,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
          == False )                                                 /* error */
     {
         intf_ErrMsg( "vout error: cannot attach shared memory to X11 server" );
+        shmctl( p_shm_info->shmid, IPC_RMID, 0 );      /* free shared memory */
         shmdt( p_shm_info->shmaddr );   /* detach shared memory from process
                                          * and automatic free */
         XDestroyImage( *pp_ximage );
@@ -1151,8 +1154,10 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     XShmDetach( p_vout->p_sys->p_display, p_shm_info );/* detach from server */
     XDestroyImage( p_ximage );
 
+    shmctl( p_shm_info->shmid, IPC_RMID, 0 );          /* free shared memory */
+
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
-    {                                   /* also automatic freeing...         */
+    {
         intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
     }
