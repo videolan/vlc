@@ -216,6 +216,12 @@ then
             Define if you want utf8 support)
 fi
 
+dnl
+dnl Iconv stuff
+dnl
+VLC_ADD_CFLAGS([vlc],[${INCICONV}])
+VLC_ADD_LDFLAGS([vlc],[${LIBICONV}])
+
 dnl Check for the need to include the mingwex lib for mingw32
 if test "${SYS}" = "mingw32"
 then
