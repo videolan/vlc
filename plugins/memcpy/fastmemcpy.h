@@ -1,12 +1,11 @@
 /*****************************************************************************
  * fastmemcpy.h : fast memcpy routines
  *****************************************************************************
- * $Id: fastmemcpy.h,v 1.2 2002/04/02 22:16:07 massiot Exp $
+ * $Id: fastmemcpy.h,v 1.3 2002/04/03 22:36:50 massiot Exp $
  *
  * Authors: various Linux kernel hackers
  *          various MPlayer hackers
  *          Nick Kurshev <nickols_k@mail.ru>
- *          Christophe Massiot <massiot@via.ecp.fr> (Altivec)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -383,71 +382,3 @@ void * _M( fast_memcpy )(void * to, const void * from, size_t len)
 
 
 #endif /* #if defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX ) */
-
-#ifdef HAVE_ALTIVEC
-#    if defined(CAN_COMPILE_C_ALTIVEC) || defined( __BUILD_ALTIVEC_ASM )
-
-#define vector_s16_t vector signed short
-#define vector_u16_t vector unsigned short
-#define vector_s8_t vector signed char
-#define vector_u8_t vector unsigned char
-#define vector_s32_t vector signed int
-#define vector_u32_t vector unsigned int
-#undef MMREG_SIZE
-#define MMREG_SIZE 16
-
-void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
-{
-    void * retval = _to;
-    u8 * to = (u8 *)_to;
-    u8 * from = (u8 *)_from;
-
-    if( len > 16 )
-    {
-        /* Align destination to MMREG_SIZE -boundary */
-        register unsigned long int delta;
-
-        delta = ((unsigned long)to)&(MMREG_SIZE-1);
-        if( delta )
-        {
-            delta = MMREG_SIZE - delta;
-            len -= delta;
-            memcpy(to, from, delta);
-            to += delta;
-            from += delta;
-        }
-
-        if( len & ~(MMREG_SIZE-1) )
-        {
-            vector_u8_t perm, ref0, ref1, tmp;
-
-            perm = vec_lvsl( 0, from );
-            ref0 = vec_ld( 0, from );
-            ref1 = vec_ld( 15, from );
-            from += 16;
-            len -= 16;
-            tmp = vec_perm( ref0, ref1, perm );
-            do
-            {
-                ref0 = vec_ld( 0, from );
-                ref1 = vec_ld( 15, from );
-                from += 16;
-                len -= 16;
-                vec_st( tmp, 0, to );
-                tmp = vec_perm( ref0, ref1, perm );
-                to += 16;
-            } while( len & ~(MMREG_SIZE-1) );
-            vec_st( tmp, 0, to );
-        }
-    }
-
-    if( len )
-    {
-        memcpy( to, from, len );
-    }
-
-    return retval;
-}
-
-#   endif
-#endif

@@ -383,7 +383,7 @@ THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 if test x$SYS != xmingw32; then
 SSE_MODULES="imdctsse downmixsse"
 fi
-ALTIVEC_MODULES="idctaltivec motionaltivec memcpyaltivec"
+ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
@@ -461,8 +461,9 @@ if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
   CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_c_altivec"
   CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_c_altivec"
+  CFLAGS_MEMCPYALTIVEC="$CFLAGS_MEMCPYALTIVEC $ac_cv_c_altivec"
   CFLAGS_VLC="$CFLAGS_VLC $ac_cv_c_altivec"
-  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
+  ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES} memcpyaltivec"
 fi
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
@@ -475,6 +476,7 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
 if test x"$ac_cv_ld_altivec" != x"no"; then
   LIB_IDCTALTIVEC="${LIB_IDCTALTIVEC} -framework vecLib"
   LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
+  LIB_MEMCPYALTIVEC="${LIB_MEMCPYALTIVEC} -framework vecLib"
   LIB_VLC="${LIB_VLC} -framework vecLib"
 fi
 fi # end if mingw32
@@ -1458,6 +1460,7 @@ AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_LIRC)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_MAD)
+AC_SUBST(LIB_MEMCPYALTIVEC)
 AC_SUBST(LIB_MOTIONALTIVEC)
 AC_SUBST(LIB_MPEG_TS)
 AC_SUBST(LIB_NCURSES)
@@ -1486,6 +1489,7 @@ AC_SUBST(CFLAGS_KDE)
 AC_SUBST(CFLAGS_IDCTALTIVEC)
 AC_SUBST(CFLAGS_MACOSX)
 AC_SUBST(CFLAGS_MAD)
+AC_SUBST(CFLAGS_MEMCPYALTIVEC)
 AC_SUBST(CFLAGS_MOTIONALTIVEC)
 AC_SUBST(CFLAGS_OPTIM)
 AC_SUBST(CFLAGS_OPTIM_NODEBUG)

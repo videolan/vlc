@@ -2,9 +2,9 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.7 2002/04/03 22:36:50 massiot Exp $
+ * $Id: memcpyaltivec.c,v 1.1 2002/04/03 22:36:50 massiot Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef __BUILD_ALTIVEC_ASM__
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -29,31 +31,11 @@
 
 #include <videolan/vlc.h>
 
-#undef HAVE_MMX
-#undef HAVE_MMX2
-#undef HAVE_SSE
-#undef HAVE_SSE2
-#undef HAVE_3DNOW
-#undef HAVE_ALTIVEC
-
-#if defined( MODULE_NAME_IS_memcpy3dn )
-#   define HAVE_3DNOW
-#   include "fastmemcpy.h"
-#elif defined( MODULE_NAME_IS_memcpymmx )
-#   define HAVE_MMX
-#   include "fastmemcpy.h"
-#elif defined( MODULE_NAME_IS_memcpymmxext )
-#   define HAVE_MMX2
-#   include "fastmemcpy.h"
-#endif
-
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
 static void memcpy_getfunctions( function_list_t * p_function_list );
-#ifndef MODULE_NAME_IS_memcpy
 void *      _M( fast_memcpy )  ( void * to, const void * from, size_t len );
-#endif
 
 /*****************************************************************************
  * Build configuration tree.
@@ -62,33 +44,11 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-#ifdef MODULE_NAME_IS_memcpy
-    SET_DESCRIPTION( "libc memcpy module" )
-    ADD_CAPABILITY( MEMCPY, 50 )
-    ADD_SHORTCUT( "c" )
-    ADD_SHORTCUT( "libc" )
-    ADD_SHORTCUT( "memcpy" )
-#elif defined( MODULE_NAME_IS_memcpy3dn )
-    SET_DESCRIPTION( "3D Now! memcpy module" )
+    SET_DESCRIPTION( "Altivec memcpy module" )
     ADD_CAPABILITY( MEMCPY, 100 )
-    ADD_REQUIREMENT( 3DNOW )
-    ADD_SHORTCUT( "3dn" )
-    ADD_SHORTCUT( "3dnow" )
-    ADD_SHORTCUT( "memcpy3dn" )
-    ADD_SHORTCUT( "memcpy3dnow" )
-#elif defined( MODULE_NAME_IS_memcpymmx )
-    SET_DESCRIPTION( "MMX memcpy module" )
-    ADD_CAPABILITY( MEMCPY, 100 )
-    ADD_REQUIREMENT( MMX )
-    ADD_SHORTCUT( "mmx" )
-    ADD_SHORTCUT( "memcpymmx" )
-#elif defined( MODULE_NAME_IS_memcpymmxext )
-    SET_DESCRIPTION( "MMX EXT memcpy module" )
-    ADD_CAPABILITY( MEMCPY, 200 )
-    ADD_REQUIREMENT( MMXEXT )
-    ADD_SHORTCUT( "mmxext" )
-    ADD_SHORTCUT( "memcpymmxext" )
-#endif
+    ADD_REQUIREMENT( ALTIVEC )
+    ADD_SHORTCUT( "altivec" )
+    ADD_SHORTCUT( "memcpyaltivec" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -106,10 +66,75 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void memcpy_getfunctions( function_list_t * p_function_list )
 {
-#ifdef MODULE_NAME_IS_memcpy
-    p_function_list->functions.memcpy.pf_memcpy = memcpy;
-#else
     p_function_list->functions.memcpy.pf_memcpy = _M( fast_memcpy );
-#endif
 }
 
+#else
+#   include <sys/types.h>
+#   define _M( toto ) toto
+#endif /* __BUILD_ALTIVEC_ASM__ */
+
+#if defined(CAN_COMPILE_C_ALTIVEC) || defined( __BUILD_ALTIVEC_ASM__ )
+
+#define vector_s16_t vector signed short
+#define vector_u16_t vector unsigned short
+#define vector_s8_t vector signed char
+#define vector_u8_t vector unsigned char
+#define vector_s32_t vector signed int
+#define vector_u32_t vector unsigned int
+#define MMREG_SIZE 16
+
+void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
+{
+    void * retval = _to;
+    unsigned char * to = (unsigned char *)_to;
+    unsigned char * from = (unsigned char *)_from;
+
+    if( len > 16 )
+    {
+        /* Align destination to MMREG_SIZE -boundary */
+        register unsigned long int delta;
+
+        delta = ((unsigned long)to)&(MMREG_SIZE-1);
+        if( delta )
+        {
+            delta = MMREG_SIZE - delta;
+            len -= delta;
+            memcpy(to, from, delta);
+            to += delta;
+            from += delta;
+        }
+
+        if( len & ~(MMREG_SIZE-1) )
+        {
+            vector_u8_t perm, ref0, ref1, tmp;
+
+            perm = vec_lvsl( 0, from );
+            ref0 = vec_ld( 0, from );
+            ref1 = vec_ld( 15, from );
+            from += 16;
+            len -= 16;
+            tmp = vec_perm( ref0, ref1, perm );
+            do
+            {
+                ref0 = vec_ld( 0, from );
+                ref1 = vec_ld( 15, from );
+                from += 16;
+                len -= 16;
+                vec_st( tmp, 0, to );
+                tmp = vec_perm( ref0, ref1, perm );
+                to += 16;
+            } while( len & ~(MMREG_SIZE-1) );
+            vec_st( tmp, 0, to );
+        }
+    }
+
+    if( len )
+    {
+        memcpy( to, from, len );
+    }
+
+    return retval;
+}
+
+#endif
