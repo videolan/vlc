@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.4 2003/10/20 12:25:22 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.5 2003/10/21 12:30:40 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -244,7 +244,7 @@ ModuleConfigControl::~ModuleConfigControl()
 
 wxString ModuleConfigControl::GetPszValue()
 {
-    return combo->GetStringSelection();
+    return wxU( (char *)combo->GetClientData( combo->GetSelection() ));
 }
 
 /*****************************************************************************
