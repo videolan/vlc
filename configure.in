@@ -972,7 +972,7 @@ then
       mad_LDFLAGS="${mad_LDFLAGS} -L${real_mad_tree}/libmad/.libs"
       LDFLAGS="${save_LDFLAGS} ${mad_LDFLAGS}"
       AC_CHECK_LIB(mad, mad_bit_init, [
-        #BUILTINS="${BUILTINS} codec/mad/mad"
+        BUILTINS="${BUILTINS} codec/mad/mad"
         mad_LDFLAGS="${mad_LDFLAGS} -lmad"
         ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
       ],[])
@@ -987,7 +987,7 @@ then
     AC_CHECK_HEADERS(mad.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libmad...]) ])
     AC_CHECK_LIB(mad, mad_bit_init, [
-      #PLUGINS="${PLUGINS} codec/mad/mad"
+      PLUGINS="${PLUGINS} codec/mad/mad"
       mad_LDFLAGS="${mad_LDFLAGS} -lmad" ],
       [ AC_MSG_ERROR([Cannot find libmad library...]) ])
     CFLAGS="${save_CFLAGS}"

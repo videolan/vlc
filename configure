@@ -6857,7 +6857,7 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-        #BUILTINS="${BUILTINS} codec/mad/mad"
+        BUILTINS="${BUILTINS} codec/mad/mad"
         mad_LDFLAGS="${mad_LDFLAGS} -lmad"
         
 else
@@ -6951,7 +6951,7 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-      #PLUGINS="${PLUGINS} codec/mad/mad"
+      PLUGINS="${PLUGINS} codec/mad/mad"
       mad_LDFLAGS="${mad_LDFLAGS} -lmad" 
 else
   echo "$ac_t""no" 1>&6
