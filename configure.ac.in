@@ -967,8 +967,8 @@ then
         dnl  Use a custom libdvdcss
         AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
         BUILTINS="${BUILTINS} dvd"
-        LDFLAGS_dvd="${LDFLAGS_dvd} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
-        LDFLAGS_dvdcss="${LDFLAGS_dvdcss} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
+        LDFLAGS_dvd="${LDFLAGS_dvd} -L${real_dvdcss_tree}/src/.libs -ldvdcss"
+        LDFLAGS_dvdcss="${LDFLAGS_dvdcss} -L${real_dvdcss_tree}/src/.libs -ldvdcss"
         CPPFLAGS_dvd="${CPPFLAGS_dvd} -I${real_dvdcss_tree}/src"
       else
         dnl  The given libdvdcss wasn't built
@@ -1034,12 +1034,12 @@ then
         AC_MSG_RESULT(no)
         AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
       fi
-      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+      if test -f "-L${real_dvdread_tree}/dvdread/.libs -ldvdread"
       then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
         BUILTINS="${BUILTINS} dvdread"
-        LDFLAGS_dvdread="${LDFLAGS_dvdread} ${real_dvdread_tree}/dvdread/.libs/libdvdread.a ${LDFLAGS_dvdcss}"
+        LDFLAGS_dvdread="${LDFLAGS_dvdread} -L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}"
         CPPFLAGS_dvdread="${CPPFLAGS_dvdread} -I${real_dvdread_tree}"
       else
         dnl  The given libdvdread wasn't built
@@ -1097,12 +1097,12 @@ then
         AC_MSG_RESULT(no)
         AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
       fi
-      if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
+      if test -f "-L${real_dvdplay_tree}/src/.libs -ldvdplay"
       then
         dnl  Use a custom libdvdplay
         AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
         BUILTINS="${BUILTINS} dvdplay"
-        LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${real_dvdplay_tree}/src/.libs/libdvdplay.a ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
+        LDFLAGS_dvdplay="${LDFLAGS_dvdplay} -L${real_dvdplay_tree}/src/.libs -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
         CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src"
       else
         dnl  The given libdvdplay wasn't built
@@ -1167,11 +1167,11 @@ then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
         BUILTINS="${BUILTINS} ts_dvbpsi"
-        LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+        LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -L${real_dvbpsi_tree}/src/.libs -ldvbpsi"
         CPPFLAGS_ts_dvbpsi="${CPPFLAGS_ts_dvbpsi} -I${real_dvbpsi_tree}/src"
 
         BUILTINS="${BUILTINS} mux_ts_dvbpsi"
-        LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+        LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} -L${real_dvbpsi_tree}/src/.libs -ldvbpsi"
         CPPFLAGS_mux_ts_dvbpsi="${CPPFLAGS_mux_ts_dvbpsi} -I${real_dvbpsi_tree}/src"
 
       else
@@ -1476,7 +1476,7 @@ then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       BUILTINS="${BUILTINS} ffmpeg"
-      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} ${real_ffmpeg_tree}/libavcodec/libavcodec.a"
+      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
       CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${real_ffmpeg_tree}/libavcodec"
     else
       dnl  The given libavcodec wasn't built
@@ -1528,7 +1528,7 @@ then
       dnl  Use a custom faad
       AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
       BUILTINS="${BUILTINS} faad"
-      LDFLAGS_faad="${LDFLAGS_faad} ${real_faad_tree}/libfaad/.libs/libfaad.a"
+      LDFLAGS_faad="${LDFLAGS_faad} -L${real_faad_tree}/libfaad/.libs -lfaad"
       CPPFLAGS_faad="${CPPFLAGS_faad} -I${real_faad_tree}/include"
     else
       dnl  The given libfaad wasn't built
@@ -1578,12 +1578,12 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
     fi
-    if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
+    if test -f "-L${real_xvid_tree}/build/generic -lxvidcore"
     then
       dnl  Use a custom xvid
       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
       BUILTINS="${BUILTINS} xvid"
-      LDFLAGS_xvid="${LDFLAGS_xvid} ${real_xvid_tree}/build/generic/libxvidcore.a"
+      LDFLAGS_xvid="${LDFLAGS_xvid} -L${real_xvid_tree}/build/generic -lxvidcore"
       CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${real_xvid_tree}/src"
     else
       dnl  The given libxvidcore wasn't built
