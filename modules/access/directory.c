@@ -149,11 +149,11 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: read the directory
  *****************************************************************************/
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len)
 {
-    char *                      psz_name;
-    char *                      psz_mode;
-    int                         i_mode, i_pos;
+    char *psz_name = 0;
+    char *psz_mode = 0;
+    int  i_mode, i_pos;
 
     playlist_t * p_playlist = (playlist_t *) vlc_object_find(
                         p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
