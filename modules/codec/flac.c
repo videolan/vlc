@@ -229,11 +229,12 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    int i_ret;
 
     /* Hmmm, mem leak ?*/
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
-    int i_ret = OpenDecoder( p_this );
+    i_ret = OpenDecoder( p_this );
 
     if( i_ret != VLC_SUCCESS ) return i_ret;
 
