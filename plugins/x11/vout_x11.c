@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.18 2001/04/11 02:01:24 henri Exp $
+ * $Id: vout_x11.c,v 1.19 2001/04/21 00:31:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,7 +108,22 @@ typedef struct vout_sys_s
     /* Mouse pointer properties */
     boolean_t           b_mouse;         /* is the mouse pointer displayed ? */
 
+    /* Displaying fullscreen */
+    boolean_t           b_fullscreen;
+
 } vout_sys_t;
+
+/* Fullscreen needs to be able to hide the wm decorations */
+#define MWM_HINTS_DECORATIONS   (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS 5
+typedef struct mwmhints_s
+{
+    u32 flags;
+    u32 functions;
+    u32 decorations;
+    s32 input_mode;
+    u32 status;
+} mwmhints_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -199,8 +214,12 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
+    p_vout->p_sys->b_fullscreen
+        = main_GetIntVariable( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT );
+
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
+
     if( X11CreateWindow( p_vout ) )
     {
         intf_ErrMsg( "vout error: cannot create X11 window" );
@@ -360,15 +379,17 @@ static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     boolean_t   b_resized;                        /* window has been resized */
+    boolean_t   b_gofullscreen;                    /* user wants full-screen */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
-
 
     /* Handle X11 events: ConfigureNotify events are parsed to know if the
      * output window's size changed, MapNotify and UnmapNotify to know if the
      * window is mapped (and if the display is useful), and ClientMessages
      * to intercept window destruction requests */
     b_resized = 0;
+    b_gofullscreen = 0;
+
     while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
                               StructureNotifyMask | KeyPressMask |
                               ButtonPressMask | ButtonReleaseMask | 
@@ -432,6 +453,10 @@ static int vout_Manage( vout_thread_t *p_vout )
                         case 'Q':
                             p_main->p_intf->b_die = 1;
                             break;
+                        case 'f':
+                        case 'F':
+                            b_gofullscreen = 1;
+                            break;
                         case '0':
                             network_ChannelJoin( 0 );
                             break;
@@ -466,7 +491,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                             if( intf_ProcessKey( p_main->p_intf, 
                                                  (char )i_key ) )
                             {
-                               intf_DbgMsg( "unhandled key '%c' (%i)", 
+                               intf_DbgMsg( "vout: unhandled key '%c' (%i)", 
                                             (char)i_key, i_key );
                             }
                             break;
@@ -510,8 +535,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Other event */
         else
         {
-            intf_DbgMsg( "%p -> unhandled event type %d received",
-                         p_vout, xevent.type );
+            intf_DbgMsg( "vout: unhandled event %d received", xevent.type );
         }
 #endif
     }
@@ -529,8 +553,43 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
         else
         {
-            intf_DbgMsg( "%p -> unhandled ClientMessage received", p_vout );
+            intf_DbgMsg( "vout: unhandled ClientMessage received" );
         }
+    }
+
+    if ( b_gofullscreen )
+    {
+        char *psz_display;
+        /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
+        psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
+
+        intf_DbgMsg( "vout: changing full-screen status" );
+
+        p_vout->p_sys->b_fullscreen = !p_vout->p_sys->b_fullscreen;
+
+        /* Get rid of the old window */
+        XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+        XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
+
+        /* And create a new one */
+        if( X11CreateWindow( p_vout ) )
+        {
+            intf_ErrMsg( "vout error: cannot create X11 window" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+
+            free( p_vout->p_sys );
+            return( 1 );
+        }
+
+        if( X11InitDisplay( p_vout, psz_display ) )
+        {
+            intf_ErrMsg( "vout error: cannot initialize X11 display" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return( 1 );
+        }
+        /* We've changed the size, update it */
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 
     /*
@@ -539,7 +598,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( b_resized )
     {
         /* If interface window has been resized, change vout size */
-        intf_DbgMsg( "resizing output window" );
+        intf_DbgMsg( "vout: resizing output window" );
         p_vout->i_width =  p_vout->p_sys->i_width;
         p_vout->i_height = p_vout->p_sys->i_height;
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -548,7 +607,7 @@ static int vout_Manage( vout_thread_t *p_vout )
              (p_vout->i_height != p_vout->p_sys->i_height) )
     {
         /* If video output size has changed, change interface window size */
-        intf_DbgMsg( "resizing output window" );
+        intf_DbgMsg( "vout: resizing output window" );
         p_vout->p_sys->i_width =    p_vout->i_width;
         p_vout->p_sys->i_height =   p_vout->i_height;
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
@@ -653,7 +712,7 @@ static void vout_SetPalette( p_vout_thread_t p_vout,
     int i, j;
     XColor p_colors[255];
 
-    intf_DbgMsg( "Palette change called" );
+    intf_DbgMsg( "vout: Palette change called" );
 
     /* allocate palette */
     for( i = 0, j = 255; i < 255; i++, j-- )
@@ -683,15 +742,33 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     XSetWindowAttributes    xwindow_attributes;
     XGCValues               xgcvalues;
     XEvent                  xevent;
+    Atom                    prop;
+    mwmhints_t              mwmhints;
+
     boolean_t               b_expose;
     boolean_t               b_configure_notify;
     boolean_t               b_map_notify;
 
-    /* Set main window's size */
-    p_vout->p_sys->i_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
-                                                   VOUT_WIDTH_DEFAULT );
-    p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                                   VOUT_HEIGHT_DEFAULT );
+    /* If we're full screen, we're full screen! */
+    if( p_vout->p_sys->b_fullscreen ) 
+    {
+        p_vout->p_sys->i_width = DisplayWidth( p_vout->p_sys->p_display, 
+                                               p_vout->p_sys->i_screen );
+        p_vout->p_sys->i_height =  DisplayHeight( p_vout->p_sys->p_display, 
+                                                  p_vout->p_sys->i_screen ); 
+        p_vout->i_width =  p_vout->p_sys->i_width;
+        p_vout->i_height = p_vout->p_sys->i_height;
+    }
+    else
+    {
+        /* Set main window's size */
+        p_vout->p_sys->i_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
+                                                       VOUT_WIDTH_DEFAULT );
+        p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
+                                                       VOUT_HEIGHT_DEFAULT );
+        p_vout->i_width =  p_vout->p_sys->i_width;
+        p_vout->i_height = p_vout->p_sys->i_height;
+    }
 
     /* Prepare window manager hints and properties */
     xsize_hints.base_width          = p_vout->p_sys->i_width;
@@ -704,21 +781,36 @@ static int X11CreateWindow( vout_thread_t *p_vout )
 
     /* Prepare window attributes */
     xwindow_attributes.backing_store = Always;       /* save the hidden part */
-    xwindow_attributes.background_pixel = WhitePixel( p_vout->p_sys->p_display,
+    xwindow_attributes.background_pixel = BlackPixel( p_vout->p_sys->p_display,
                                                       p_vout->p_sys->i_screen );
-
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
+    
 
     /* Create the window and set hints - the window must receive ConfigureNotify
      * events, and, until it is displayed, Expose and MapNotify events. */
+
     p_vout->p_sys->window =
-            XCreateWindow( p_vout->p_sys->p_display,
-                           DefaultRootWindow( p_vout->p_sys->p_display ),
-                           0, 0,
-                           p_vout->p_sys->i_width, p_vout->p_sys->i_height, 1,
-                           0, InputOutput, 0,
-                           CWBackingStore | CWBackPixel | CWEventMask,
-                           &xwindow_attributes );
+        XCreateWindow( p_vout->p_sys->p_display,
+                       DefaultRootWindow( p_vout->p_sys->p_display ),
+                       0, 0,
+                       p_vout->p_sys->i_width, p_vout->p_sys->i_height, 0,
+                       0, InputOutput, 0,
+                       CWBackingStore | CWBackPixel | CWEventMask,
+                       &xwindow_attributes );
+
+    if ( p_vout->p_sys->b_fullscreen )
+    {
+        prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = 0;
+        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                         prop, prop, 32, PropModeReplace,
+                         (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS );
+
+        XSetTransientForHint( p_vout->p_sys->p_display,
+                              p_vout->p_sys->window, None );
+        XRaiseWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+    }
 
     /* Set window manager hints and properties: size hints, command,
      * window's name, and accepted protocols */
@@ -735,7 +827,7 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                              &p_vout->p_sys->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg( "intf error: missing or bad window manager" );
+        intf_Msg( "vout error: missing or bad window manager" );
     }
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
@@ -797,8 +889,16 @@ static int X11CreateWindow( vout_thread_t *p_vout )
                                  CWColormap, &xwindow_attributes );
     }
 
+    if( p_vout->p_sys->b_fullscreen )
+    {
+        XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                        RevertToNone, CurrentTime );
+        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 0, 0 );
+    }
+
     /* At this stage, the window is open, displayed, and ready to
      * receive data */
+
     return( 0 );
 }
 
@@ -814,6 +914,8 @@ static int X11InitDisplay( vout_thread_t *p_vout, char *psz_display )
     XVisualInfo *               p_xvisual;           /* visuals informations */
     XVisualInfo                 xvisual_template;         /* visual template */
     int                         i_count;                       /* array size */
+
+
 
     /* Initialize structure */
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
@@ -938,7 +1040,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                p_vout->i_width, p_vout->i_height, i_quantum, 0);
     if(! *pp_ximage )                                               /* error */
     {
-        intf_ErrMsg( "error: XCreateImage() failed" );
+        intf_ErrMsg( "vout error: XCreateImage() failed" );
         free( pb_data );
         return( 1 );
     }
@@ -1049,7 +1151,7 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
 
     if( shmdt( p_shm_info->shmaddr ) )  /* detach shared memory from process */
     {                                   /* also automatic freeing...         */
-        intf_ErrMsg( "error: cannot detach shared memory (%s)",
+        intf_ErrMsg( "vout error: cannot detach shared memory (%s)",
                      strerror(errno) );
     }
 }
@@ -1068,7 +1170,7 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
  *****************************************************************************/
 void X11EnableScreenSaver( vout_thread_t *p_vout )
 {
-    intf_DbgMsg( "intf: enabling screen saver" );
+    intf_DbgMsg( "vout: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,

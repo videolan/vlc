@@ -101,6 +101,10 @@ D: audio output
 D: AC3 decoder
 D: MPEG audio decoder
 
+N: David Kennedy
+E: dkennedy@tinytoad.com
+D: X11 fullscreen patch
+
 N: Andres Krapf
 E: dae@via.ecp.fr
 C: dae
@@ -148,6 +152,10 @@ N: Richard Shepherd
 E: richard@rshepherd.demon.co.uk
 C: richards
 D: BeOS video output (BBitmap and Overlay)
+
+N: Espen Skoglund
+E: esk@ira.uka.de
+D: FreeBSD configure.in and Makefile patches
 
 N: Benoit Steiner
 E: benny@via.ecp.fr
