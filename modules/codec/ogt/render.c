@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.20 2004/01/22 13:33:39 rocky Exp $
+ * $Id: render.c,v 1.21 2004/01/23 03:46:41 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -1191,7 +1191,10 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
     int i_cmap;
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
+    unsigned int i_aspect_x, i_aspect_y;
 
+    vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
+                      &i_aspect_x );
     
     /* Find a corresponding colormap entries for our palette entries. */
     for( i_cmap = 0; i_cmap < NUM_SUBTITLE_COLORS; i_cmap++ )
@@ -1211,7 +1214,8 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
         cmap[i_cmap] = 0x44; /* Use something else. */
     }
 
-    i_xscale = ( p_vout->output.i_width << ASCALE ) / p_vout->render.i_width;
+    i_xscale = (( p_vout->output.i_width << ASCALE ) * i_aspect_x)
+      / (i_aspect_y * p_vout->render.i_width);
     i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
@@ -1265,7 +1269,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
           /* Draw until we reach the end of the line */
           for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
             {
-              ogt_yuvt_t p_yuvt = p_sys->p_palette[*p_source & 0x3];
+              ogt_yuvt_t p_yuvt;
 
               if( b_crop ) {
                 
@@ -1286,15 +1290,19 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                 return;
               }
               
-              if ( (p_yuvt.s.t) == 0 ) {
-                /* Completely transparent. Don't change pixel. */
+              p_yuvt = p_sys->p_palette[*p_source & 0x3];
+              if ( (p_yuvt.s.t) < (MAX_ALPHA) / 2 ) {
+                /* Completely or relatively transparent. Don't change pixel. */
                 ;
 #if 0
                 printf(" "); /*++++*/
 #endif
               } else {
-                uint8_t *p_dest = p_pixel_base_y + ((i_x*i_xscale) >> 7);
-                *p_dest++ = cmap[*p_source & 0x3];
+                int i_xdest = (i_x*i_xscale) >> ASCALE;
+                int i_xlast = ((i_x+1)*i_xscale) >> ASCALE;
+                /* This is the pixel that's going to change;*/
+                uint8_t *p_dest = p_pixel_base_y + i_xdest;
+                memset( p_dest, cmap[*p_source & 0x3], i_xlast - i_xdest );
 #if 0
                 printf("%1d", *p_source); /*++++*/
 #endif
@@ -1333,19 +1341,23 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                 return;
               }
               
-              if ( (p_yuvt.s.t) == 0 ) {
-                /* Completely transparent. Don't change pixel. */
+              if ( (p_yuvt.s.t) < (MAX_ALPHA) / 2 ) {
+                /* Completely or relatively transparent. Don't change pixel. */
                 ;
 #if 0
                 printf(" "); /*++++*/
 #endif
               } else {
+                int i_xdest = (i_x*i_xscale) >> ASCALE;
+                int i_xlast = ((i_x+1)*i_xscale) >> ASCALE;
+                int len     = i_xlast - i_xdest;
+#if 0
                 printf("%1d", *p_source); /*++++*/
+#endif
                 for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
                      i_ytmp += p_pic->p->i_pitch ) {
-                  uint8_t *p_dest = p_pixel_base + i_ytmp 
-                    + i_x * BYTES_PER_PIXEL;
-                  *p_dest++ = cmap[*p_source & 0x3];
+                  uint8_t *p_dest = p_pixel_base + i_ytmp + i_xdest;
+                  memset( p_dest, cmap[*p_source & 0x3], len );
                 }
               }
             }
