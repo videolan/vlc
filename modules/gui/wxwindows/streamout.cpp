@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.21 2003/07/07 07:14:56 adn Exp $
+ * $Id: streamout.cpp,v 1.22 2003/07/07 15:50:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -592,9 +592,10 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     video_transc_checkbox =
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
-        new wxComboBox( panel, VideoTranscCodec_Event, wxT("mp4v"),
+        new wxComboBox( panel, VideoTranscCodec_Event, wxT(""),
                         wxPoint(20,25), wxDefaultSize, WXSIZEOF(vcodecs_array),
                         vcodecs_array, wxCB_READONLY );
+    video_codec_combo->SetSelection(1);
     wxStaticText *bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     video_bitrate_combo =
@@ -615,7 +616,8 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     {
         wxT("mpga"),
         wxT("mp3"),
-        wxT("a52")
+        wxT("a52"),
+        wxT("vorb")
     };
     static const wxString abitrates_array[] =
     {
@@ -630,9 +632,10 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     audio_transc_checkbox =
         new wxCheckBox( panel, AudioTranscEnable_Event, wxU(_("Audio codec")));
     audio_codec_combo =
-        new wxComboBox( panel, AudioTranscCodec_Event, wxT("mpga"),
+        new wxComboBox( panel, AudioTranscCodec_Event, wxT(""),
                         wxPoint(20,25), wxDefaultSize, WXSIZEOF(acodecs_array),
                         acodecs_array, wxCB_READONLY );
+    audio_codec_combo->SetSelection(0);
     bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     audio_bitrate_combo =

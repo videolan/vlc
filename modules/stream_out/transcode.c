@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.23 2003/07/06 16:22:15 gbazin Exp $
+ * $Id: transcode.c,v 1.24 2003/07/07 15:50:44 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -362,6 +362,12 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
         /* open output stream */
         id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->f_dst );
         id->b_transcode = VLC_TRUE;
+
+        if( id->id == NULL )
+        {
+            free( id );
+            return NULL;
+        }
     }
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_vcodec != 0 )
     {
@@ -655,6 +661,10 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         msg_Err( p_stream, "cannot find encoder" );
         return VLC_EGENERIC;
     }
+
+    /* Hack for mp3 transcoding support */
+    if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','3',' ' ) )
+        id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','a' );
 
     id->ff_enc_c = avcodec_alloc_context();
     id->ff_enc_c->bit_rate    = id->f_dst.i_bitrate;
