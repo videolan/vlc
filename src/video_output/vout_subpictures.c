@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.18 2002/11/20 13:37:36 sam Exp $
+ * $Id: vout_subpictures.c,v 1.19 2003/01/30 12:38:13 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,6 +135,16 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
  *****************************************************************************/
 void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
+    /* Get lock */
+    vlc_mutex_lock( &p_vout->subpicture_lock );
+
+    /* There can be race conditions so we need to check the status */
+    if( p_subpic->i_status == FREE_SUBPICTURE )
+    {
+        vlc_mutex_unlock( &p_vout->subpicture_lock );
+        return;
+    }
+
     /* Check if status is valid */
     if( ( p_subpic->i_status != RESERVED_SUBPICTURE )
            && ( p_subpic->i_status != READY_SUBPICTURE ) )
@@ -149,6 +159,8 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     }
 
     p_subpic->i_status = FREE_SUBPICTURE;
+
+    vlc_mutex_unlock( &p_vout->subpicture_lock );
 }
 
 /*****************************************************************************
@@ -159,11 +171,17 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
                              subpicture_t *p_subpic )
 {
-    while( p_subpic != NULL )
+    /* Get lock */
+    vlc_mutex_lock( &p_vout->subpicture_lock );
+
+    /* Check i_status again to make sure spudec hasn't destroyed the subpic */
+    while( p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE )
     {
         p_subpic->pf_render( p_vout, p_pic, p_subpic );
         p_subpic = p_subpic->p_next;
     }
+
+    vlc_mutex_unlock( &p_vout->subpicture_lock );
 }
 
 /*****************************************************************************
