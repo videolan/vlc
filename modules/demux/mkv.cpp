@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.5 2003/06/22 23:22:11 fenrir Exp $
+ * $Id: mkv.cpp,v 1.6 2003/06/23 00:30:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1582,7 +1582,6 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     demux_sys_t    *p_sys   = p_input->p_demux_data;
 
     int             i_track;
-    pes_packet_t    *p_pes;
     unsigned int    i;
 
 #define tk  p_sys->track[i_track]
@@ -1602,65 +1601,11 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
     if( tk.p_es->p_decoder_fifo == NULL )
     {
+        tk.b_inited = VLC_FALSE;
         return;
     }
 
-    if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot allocate PES" );
-    }
-
-
-    p_pes->i_pts = i_pts;
-    p_pes->i_dts = i_pts;
-    if( tk.i_cat == SPU_ES )
-    {
-        /* special case : dts mean end of display */
-        if( i_duration > 0 )
-        {
-            /* FIXME not sure about that */
-            p_pes->i_dts += i_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
-        }
-        else
-        {
-            /* unknown */
-            p_pes->i_dts = 0;
-        }
-    }
-
-    p_pes->p_first = p_pes->p_last = NULL;
-    p_pes->i_nb_data = 0;
-    p_pes->i_pes_size = 0;
-
-    for( i = 0; i < block->NumberFrames(); i++ )
-    {
-        data_packet_t *p_data = NULL;
-        DataBuffer &data = block->GetBuffer(i);
-
-        if( ( p_data = input_NewPacket( p_input->p_method_data, data.Size() ) ) != NULL )
-        {
-            memcpy( p_data->p_payload_start, data.Buffer(), data.Size() );
-
-            p_data->p_payload_end = p_data->p_payload_start + data.Size();
-
-            if( p_pes->p_first == NULL )
-            {
-                p_pes->p_first = p_data;
-            }
-            else
-            {
-                p_pes->p_last->p_next  = p_data;
-            }
-            p_pes->i_nb_data++;
-            p_pes->i_pes_size += data.Size();
-            p_pes->p_last  = p_data;
-        }
-    }
-    if( tk.i_cat == SPU_ES && p_pes->p_first && p_pes->i_pes_size > 0 )
-    {
-        p_pes->p_first->p_payload_end[-1] = '\0';
-    }
-
+    /* First send init data */
     if( !tk.b_inited && tk.i_data_init > 0 )
     {
         pes_packet_t *p_init;
@@ -1722,7 +1667,43 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     }
     tk.b_inited = VLC_TRUE;
 
-    input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
+
+    for( i = 0; i < block->NumberFrames(); i++ )
+    {
+        pes_packet_t *p_pes;
+        DataBuffer &data = block->GetBuffer(i);
+
+        p_pes = MemToPES( p_input, data.Buffer(), data.Size() );
+        if( p_pes == NULL )
+        {
+            break;
+        }
+
+        p_pes->i_pts = i_pts;
+        p_pes->i_dts = i_pts;
+
+        if( tk.i_cat == SPU_ES )
+        {
+            if( i_duration > 0 )
+            {
+                /* FIXME not sure about that */
+                p_pes->i_dts += i_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
+            }
+            else
+            {
+                p_pes->i_dts = 0;
+            }
+            if( p_pes->p_first && p_pes->i_pes_size > 0 )
+            {
+                p_pes->p_first->p_payload_end[-1] = '\0';
+            }
+        }
+
+        input_DecodePES( tk.p_es->p_decoder_fifo, p_pes );
+
+        /* use time stamp only for first block */
+        i_pts = 0;
+    }
 
 #undef tk
 }
@@ -1870,6 +1851,8 @@ static int Demux( input_thread_t * p_input )
         i_pts = input_ClockGetTS( p_input,
                                   p_input->stream.p_selected_program,
                                   p_sys->i_pts * 9 / 100 );
+
+
 
         BlockDecode( p_input, block, i_pts, i_block_duration );
 
