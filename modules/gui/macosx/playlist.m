@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.18 2003/04/09 14:12:49 hartman Exp $
+ * $Id: playlist.m,v 1.19 2003/04/15 12:40:03 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -455,6 +455,7 @@
         
         return( NO );
     }
+    [self updateRowSelection];
 }
 
 @end
