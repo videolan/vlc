@@ -3,8 +3,28 @@
 #===================#
 
 0.4.6
-Mon, 28 Oct 2002 23:53:56 +0100
+Wed, 13 Nov 2002 ??
 
+  * FAQ: changed Debian repository location to HTTP (for better upload
+    stats estimations on our side).
+  * plugins/a52/a52.c: is now the default ac3/a52 decoder (because it has a
+    nicer audio quality than ac3_adec).
+  * configure, Makefile.modules, configure.in: --enable-familiar accepts now:
+    --with-sdl-prefix=[PATH], --enable-gtk-prefix=[PATH] and
+    --enable-gpe-prefix=[PATH] to enable cross-compiling.
+  * plugins/familiar/familiar_callbacks.c: Bug in ReadDirectory() it results
+    in empty file/directory names in the user interface.
+  * configure.in: Added GPE support to familiar interface.
+    Use --with-gpe-prefix=<installation-dir> to enable it.
+  * ipkg/*: GPE is integrated in familiar files.
+  * ipkg/*: Familiar packaging files.
+  * include/defs.h.in: Added HAVE_GPE_INIT_H define for autodetection of
+    libgpewidget and GPE headerfiles.
+  * ALL: changes to reflect the fact that libdvdcss now needs a colon after
+    the DVD drive letter.
+  * src/misc/modules.c: plugin extension check is now case unsensitive.
+  * plugins/dsp/aout_dsp.c: replaced O_NONBLOCK by O_NDELAY, and put the
+    device back in blocking mode once open.
   * plugins/network/ipv4.c: fixed a crash with multicast addresses when no
     interface address is given.
   * plugins/directx/vout_directx.c: fixed a nasty segfault on initialization.
