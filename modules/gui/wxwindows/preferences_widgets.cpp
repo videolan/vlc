@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.6 2003/10/28 21:59:13 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.7 2003/10/29 12:23:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -146,8 +146,7 @@ KeyConfigControl::KeyConfigControl( module_config_t *p_item, wxWindow *parent )
     shift = new wxCheckBox( this, -1, wxU(_("Shift")) );
     shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
     combo = new wxComboBox( this, -1, wxU("f"), wxDefaultPosition,
-                            wxDefaultSize, 0, NULL,
-                            wxCB_READONLY | wxCB_SORT );
+                            wxDefaultSize, 0, NULL, wxCB_READONLY );
     for( unsigned int i = 0; i < sizeof(keys)/sizeof(key_descriptor_s); i++ )
     {
         /* HPReg says casting the int to void * is fine */
@@ -290,7 +289,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *p_item,
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     combo = new wxComboBox( this, -1, wxU(p_item->psz_value),
                             wxDefaultPosition, wxDefaultSize,
-                            0, NULL, wxCB_READONLY|wxCB_SORT );
+                            0, NULL, wxCB_READONLY );
 
     /* build a list of available options */
     for( int i_index = 0; p_item->ppsz_list[i_index];

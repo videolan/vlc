@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.29 2003/10/29 00:04:56 sigmunau Exp $
+ * $Id: freetype.c,v 1.30 2003/10/29 12:23:50 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -359,7 +359,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
             uint8_t *p_in;
-            int i_pitch = p_pic->p[ i_plane ].i_pitch;
+            int i_pic_pitch = p_pic->p[ i_plane ].i_pitch;
+            int i_pic_width = p_pic->p[ i_plane ].i_visible_pitch;
 
             p_in = p_pic->p[ i_plane ].p_pixels;
 
@@ -377,7 +378,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
                 if ( p_string->i_flags & OSD_ALIGN_RIGHT )
                 {
-                    pen_x = i_pitch - p_line->i_width
+                    pen_x = i_pic_width - p_line->i_width
                         - p_string->i_x_margin;
                 }
                 else if ( p_string->i_flags & OSD_ALIGN_LEFT )
@@ -386,7 +387,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 }
                 else
                 {
-                    pen_x = i_pitch / 2 - p_line->i_width / 2
+                    pen_x = i_pic_width / 2 - p_line->i_width / 2
                         + p_string->i_x_margin;
                 }
 
@@ -394,7 +395,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 {
                     FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
+#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pic_pitch + x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
                     for(y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -436,7 +437,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 7;
                 if ( p_string->i_flags & OSD_ALIGN_RIGHT )
                 {
-                    pen_x = i_pitch - ( p_line->i_width >> 1 )
+                    pen_x = i_pic_width - ( p_line->i_width >> 1 )
                         - ( p_string->i_x_margin >> 1 );
                 }
                 else if ( p_string->i_flags & OSD_ALIGN_LEFT )
@@ -445,7 +446,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 }
                 else
                 {
-                    pen_x = i_pitch / 2 - p_line->i_width / 4
+                    pen_x = i_pic_width / 2 - p_line->i_width / 4
                         + p_string->i_x_margin / 2;
                 }
 
@@ -453,7 +454,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 {
                     FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ ( x + y * p_glyph->bitmap.width ) ] ]
-#define pixel p_in[ ( ( p_line->p_glyph_pos[ i ].y >> 1 ) + pen_y + ( y >> 1 ) -  ( p_glyph->top >> 1 ) ) * i_pitch + ( x >> 1 ) + pen_x + ( p_line->p_glyph_pos[ i ].x >> 1 ) + ( p_glyph->left >>1) ]
+#define pixel p_in[ ( ( p_line->p_glyph_pos[ i ].y >> 1 ) + pen_y + ( y >> 1 ) -  ( p_glyph->top >> 1 ) ) * i_pic_pitch + ( x >> 1 ) + pen_x + ( p_line->p_glyph_pos[ i ].x >> 1 ) + ( p_glyph->left >>1) ]
                     for( y = 0; y < p_glyph->bitmap.rows; y+=2 )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x+=2 )
@@ -485,8 +486,9 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
          p_line = p_line->p_next )
     {
         uint8_t *p_in;
-        int i_pitch = p_pic->p[0].i_pitch;
-        
+        int i_pic_pitch = p_pic->p[0].i_pitch;
+        int i_pic_width = p_pic->p[0].i_visible_pitch;
+
         p_in = p_pic->p[0].p_pixels;
         
         if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
@@ -501,7 +503,7 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
         pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
         if ( p_string->i_flags & OSD_ALIGN_RIGHT )
         {
-            pen_x = i_pitch - p_line->i_width
+            pen_x = i_pic_width - p_line->i_width
                 - p_string->i_x_margin;
         }
         else if ( p_string->i_flags & OSD_ALIGN_LEFT )
@@ -510,14 +512,14 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            pen_x = i_pitch / 2 /2 - p_line->i_width / 2 + p_string->i_x_margin;
+            pen_x = i_pic_width / 2 /2 - p_line->i_width / 2 + p_string->i_x_margin;
         }
         
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + 2 * ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) ]
+#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pic_pitch + 2 * ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) ]
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -563,8 +565,9 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
     for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
         uint8_t *p_in;
-        int i_pitch = p_pic->p[ i_plane ].i_pitch;
-        
+        int i_pic_pitch = p_pic->p[ i_plane ].i_pitch;
+        int i_pic_width = p_pic->p[ i_plane ].i_visible_pitch;
+
         p_in = p_pic->p[ i_plane ].p_pixels;
         
         if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
@@ -579,7 +582,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
         if ( p_string->i_flags & OSD_ALIGN_RIGHT )
         {
-            pen_x = i_pitch - p_line->i_width
+            pen_x = i_pic_width - p_line->i_width
                 - p_string->i_x_margin;
         }
         else if ( p_string->i_flags & OSD_ALIGN_LEFT )
@@ -588,7 +591,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            pen_x = i_pitch / 2 / 4 - p_line->i_width / 2
+            pen_x = i_pic_width / 2 / 4 - p_line->i_width / 2
                 + p_string->i_x_margin;
         }
         
@@ -596,7 +599,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel( c ) p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) * 4 + c ]
+#define pixel( c ) p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pic_pitch + ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) * 4 + c ]
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )

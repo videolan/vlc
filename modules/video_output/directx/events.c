@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.26 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: events.c,v 1.27 2003/10/29 12:23:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,6 +28,7 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
+#include <ctype.h>                                              /* tolower() */
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
@@ -194,16 +195,15 @@ void DirectXEventThread( event_thread_t *p_event )
             break;
 
         case WM_KEYDOWN:
-            /* the key events are first processed here. The next
-             * message processed by this main message loop will be the
-             * char translation of the key event */
-        case WM_CHAR:
-            if( msg.message == WM_KEYDOWN )
+            /* The key events are first processed here and not translated
+             * into WM_CHAR events because we need to know the status of the
+             * modifier keys. */
+            val.i_int = DirectXConvertKey( msg.wParam );
+            if( !val.i_int )
             {
-                val.i_int = DirectXConvertKey( msg.wParam );
-                TranslateMessage(&msg);
+                /* This appears to be a "normal" (ascii) key */
+                val.i_int = tolower( MapVirtualKey( msg.wParam, 2 ) );
             }
-            else val.i_int = msg.wParam;
 
             if( val.i_int )
             {

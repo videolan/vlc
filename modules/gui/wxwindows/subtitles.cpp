@@ -2,7 +2,7 @@
  * subtitles.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subtitles.cpp,v 1.6 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: subtitles.cpp,v 1.7 2003/10/29 12:23:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -111,7 +111,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
             new wxStaticText(panel, -1, wxU(p_item->psz_text));
         encoding_combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
                                          wxDefaultPosition, wxDefaultSize,
-                                         0, NULL, wxCB_READONLY | wxCB_SORT );
+                                         0, NULL, wxCB_READONLY );
 
         /* build a list of available options */
         for( int i_index = 0; p_item->ppsz_list && p_item->ppsz_list[i_index];
