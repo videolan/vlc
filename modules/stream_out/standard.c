@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.13 2003/08/28 21:02:14 fenrir Exp $
+ * $Id: standard.c,v 1.14 2003/08/29 19:49:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -153,11 +153,11 @@ static int Open( vlc_object_t *p_this )
         ( psz_mux == NULL || *psz_mux == '\0' ) )
     {
         /* access given, no mux */
-        if( !strcmp( psz_access, "mmsh" ) )
+        if( !strncmp( psz_access, "mmsh", 4 ) )
         {
             psz_mux = "asfh";
         }
-        else if( !strcmp( psz_access, "udp" ) )
+        else if( !strncmp( psz_access, "udp", 3 ) )
         {
             psz_mux = "ts";
         }
@@ -170,7 +170,7 @@ static int Open( vlc_object_t *p_this )
              ( psz_access == NULL || *psz_access == '\0' ) )
     {
         /* mux given, no access */
-        if( !strcmp( psz_mux, "asfh" ) )
+        if( !strncmp( psz_mux, "asfh", 4 ) )
         {
             psz_access = "mmsh";
         }
@@ -184,19 +184,31 @@ static int Open( vlc_object_t *p_this )
     /* fix or warm of incompatible couple */
     if( psz_mux && *psz_mux && psz_access && *psz_access )
     {
-        if( !strcmp( psz_access, "mmsh" ) && strcmp( psz_mux, "asfh" ) )
+        if( !strncmp( psz_access, "mmsh", 4 ) && strncmp( psz_mux, "asfh", 4 ) )
         {
+            char *p = strchr( psz_mux,'{' );
+
             msg_Warn( p_stream, "fixing to mmsh/asfh" );
-            psz_mux = "asfh";
+            if( p )
+            {
+                /* -> a little memleak but ... */
+                psz_mux = malloc( strlen( "asfh" ) + strlen( p ) + 1);
+                sprintf( psz_mux, "asfh%s", p );
+            }
+            else
+            {
+                psz_mux = "asfh";
+            }
         }
-        else if( ( !strcmp( psz_access, "rtp" ) ||
-                   !strcmp( psz_access, "udp" ) ) &&
+        else if( ( !strncmp( psz_access, "rtp", 3 ) ||
+                   !strncmp( psz_access, "udp", 3 ) ) &&
                  strncmp( psz_mux, "ts", 2 ) )
         {
             msg_Err( p_stream, "for now udp and rtp are only valid with TS" );
         }
-        else if( strcmp( psz_access, "file" ) &&
-                 ( !strcmp( psz_mux, "mov" ) || !strcmp( psz_mux, "mp4" ) ) )
+        else if( strncmp( psz_access, "file", 4 ) &&
+                 ( !strncmp( psz_mux, "mov", 3 ) ||
+                   !strncmp( psz_mux, "mp4", 3 ) ) )
         {
             msg_Err( p_stream, "mov and mp4 work only with file output" );
         }

@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.6 2003/08/29 01:11:43 fenrir Exp $
+ * $Id: asf.c,v 1.7 2003/08/29 19:49:33 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -99,6 +99,13 @@ struct sout_mux_sys_t
 
     vlc_bool_t      b_asf_http;
     int             i_seq;
+
+    /* meta data */
+    char            *psz_title;
+    char            *psz_author;
+    char            *psz_copyright;
+    char            *psz_comment;
+    char            *psz_rating;
 };
 
 static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
@@ -167,7 +174,36 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->fid.v4[i] = ( (uint64_t)rand() << 8 ) / RAND_MAX;
     }
-
+    /* meta data */
+    p_sys->psz_title    = sout_cfg_find_value( p_mux->p_cfg, "title" );
+    p_sys->psz_author   = sout_cfg_find_value( p_mux->p_cfg, "author" );
+    p_sys->psz_copyright= sout_cfg_find_value( p_mux->p_cfg, "copyright" );
+    p_sys->psz_comment  = sout_cfg_find_value( p_mux->p_cfg, "comment" );
+    p_sys->psz_rating   = sout_cfg_find_value( p_mux->p_cfg, "rating" );
+    if( p_sys->psz_title == NULL )
+    {
+        p_sys->psz_title = "";
+    }
+    if( p_sys->psz_author == NULL )
+    {
+        p_sys->psz_author = "";
+    }
+    if( p_sys->psz_copyright == NULL )
+    {
+        p_sys->psz_copyright = "";
+    }
+    if( p_sys->psz_comment == NULL )
+    {
+        p_sys->psz_comment = "";
+    }
+    if( p_sys->psz_rating == NULL )
+    {
+        p_sys->psz_rating = "";
+    }
+    msg_Dbg( p_mux,
+             "meta data: title='%s' author='%s' copyright='%s' comment='%s' rating='%s'",
+             p_sys->psz_title, p_sys->psz_author, p_sys->psz_copyright,
+             p_sys->psz_comment, p_sys->psz_rating );
 
     return VLC_SUCCESS;
 }
@@ -616,6 +652,21 @@ static void bo_addle_str16( bo_t *bo, char *str )
     }
 }
 
+static void bo_addle_str16_nosize( bo_t *bo, char *str )
+{
+    for( ;; )
+    {
+        uint16_t c;
+
+        c = (uint8_t)*str++;
+        bo_addle_u16( bo, c );
+        if( c == '\0' )
+        {
+            break;
+        }
+    }
+}
+
 /****************************************************************************
  * guid
  ****************************************************************************/
@@ -707,19 +758,26 @@ static const guid_t asf_guid_reserved_1 =
     0x11cf,
     { 0x8E, 0xE6,0x00, 0xC0, 0x0C ,0x20, 0x53, 0x65 }
 };
-static const guid_t asf_object_comment_guid =
+static const guid_t asf_object_codec_comment_guid =
 {
     0x86D15240,
     0x311D,
     0x11D0,
     { 0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6 }
 };
-static const guid_t asf_object_comment_reserved_guid =
+static const guid_t asf_object_codec_comment_reserved_guid =
 {
     0x86D15241,
     0x311D,
     0x11D0,
     { 0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6 }
+};
+static const guid_t asf_object_content_description_guid =
+{
+    0x75B22633,
+    0x668E,
+    0x11CF,
+    { 0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c }
 };
 
 static void asf_chunk_add( bo_t *bo,
@@ -741,6 +799,7 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     mtime_t        i_duration = 0;
     int i_size;
     int i_ci_size;
+    int i_cd_size = 0;
     sout_buffer_t *out;
     bo_t          bo;
     int           i;
@@ -770,8 +829,17 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
             i_ci_size += 6;
         }
     }
+    if( *p_sys->psz_title || *p_sys->psz_author || *p_sys->psz_copyright ||
+        *p_sys->psz_comment || *p_sys->psz_rating )
+    {
+        i_cd_size = 34 + 2 * ( strlen( p_sys->psz_title ) + 1 +
+                             strlen( p_sys->psz_author ) + 1 +
+                             strlen( p_sys->psz_copyright ) + 1 +
+                             strlen( p_sys->psz_comment ) + 1 +
+                             strlen( p_sys->psz_rating ) + 1 );
+    }
 
-    i_size += i_ci_size;
+    i_size += i_ci_size + i_cd_size;
 
     if( p_sys->b_asf_http )
     {
@@ -816,6 +884,24 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     bo_addle_u16( &bo, 6 );
     bo_addle_u32( &bo, 0 );
 
+    /* content description header */
+    if( i_cd_size > 0 )
+    {
+        bo_add_guid ( &bo, &asf_object_content_description_guid );
+        bo_addle_u64( &bo, i_cd_size );
+        bo_addle_u16( &bo, 2 * strlen( p_sys->psz_title ) + 2 );
+        bo_addle_u16( &bo, 2 * strlen( p_sys->psz_author ) + 2 );
+        bo_addle_u16( &bo, 2 * strlen( p_sys->psz_copyright ) + 2 );
+        bo_addle_u16( &bo, 2 * strlen( p_sys->psz_comment ) + 2 );
+        bo_addle_u16( &bo, 2 * strlen( p_sys->psz_rating ) + 2 );
+
+        bo_addle_str16_nosize( &bo, p_sys->psz_title );
+        bo_addle_str16_nosize( &bo, p_sys->psz_author );
+        bo_addle_str16_nosize( &bo, p_sys->psz_copyright );
+        bo_addle_str16_nosize( &bo, p_sys->psz_comment );
+        bo_addle_str16_nosize( &bo, p_sys->psz_rating );
+    }
+
     /* stream properties */
     for( i = 1; i < p_sys->i_track; i++ )
     {
@@ -842,9 +928,9 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     }
 
     /* Codec Infos */
-    bo_add_guid ( &bo, &asf_object_comment_guid );
+    bo_add_guid ( &bo, &asf_object_codec_comment_guid );
     bo_addle_u64( &bo, i_ci_size );
-    bo_add_guid ( &bo, &asf_object_comment_reserved_guid );
+    bo_add_guid ( &bo, &asf_object_codec_comment_reserved_guid );
     bo_addle_u32( &bo, p_sys->i_track - 1 );
     for( i = 1; i < p_sys->i_track; i++ )
     {
