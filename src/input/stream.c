@@ -45,7 +45,7 @@ char *stream_ReadLine( stream_t *s )
     int      i = 0;
     i_data = stream_Peek( s, &p_data, MAX_LINE );
 
-    while( i < i_data && p_data[i] != '\n' &&  i < i_data && p_data[i] != '\r')
+    while( i < i_data && p_data[i] != '\n' &&  p_data[i] != '\r' )
     {
         i++;
     }

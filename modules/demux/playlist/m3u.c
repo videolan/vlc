@@ -134,6 +134,14 @@ static int Demux( demux_t *p_demux )
     i_position = p_playlist->i_index + 1;
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
+
+        /* Skip leading tabs and spaces */
+        while( *psz_line == ' ' || *psz_line == '\t' ||
+               *psz_line == '\n' || *psz_line == '\r' )
+        {
+            psz_line++;
+        }
+
         if( *psz_line == '#' )
         {
             /* parse extra info */
