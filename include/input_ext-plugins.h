@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.38 2002/11/12 13:57:12 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.39 2003/01/25 03:12:20 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,6 +62,7 @@ VLC_EXPORT( void, input_ExtractPES, ( decoder_fifo_t *, pes_packet_t ** ) );
 VLC_EXPORT( void, input_FlushPESFifo, ( decoder_fifo_t * ) );
 void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );
+VLC_EXPORT( void, input_NullPacket, ( input_thread_t *, es_descriptor_t * ) );
 
 /*****************************************************************************
  * Prototypes from input_clock.c
@@ -98,50 +99,8 @@ VLC_EXPORT( int, input_AccessInit,      ( input_thread_t * ) );
 VLC_EXPORT( void, input_AccessReinit,   ( input_thread_t * ) );
 VLC_EXPORT( void, input_AccessEnd,      ( input_thread_t * ) );
 
-/*****************************************************************************
- * Create a NULL packet for padding in case of a data loss
- *****************************************************************************/
-static inline void input_NullPacket( input_thread_t * p_input,
-                                     es_descriptor_t * p_es )
-{
-    data_packet_t *             p_pad_data;
-    pes_packet_t *              p_pes;
-
-    if( (p_pad_data = input_NewPacket( p_input->p_method_data,
-                    PADDING_PACKET_SIZE )) == NULL )
-    {
-        msg_Err( p_input, "no new packet" );
-        p_input->b_error = 1;
-        return;
-    }
-
-    memset( p_pad_data->p_payload_start, 0, PADDING_PACKET_SIZE );
-    p_pad_data->b_discard_payload = 1;
-    p_pes = p_es->p_pes;
-
-    if( p_pes != NULL )
-    {
-        p_pes->b_discontinuity = 1;
-        p_pes->p_last->p_next = p_pad_data;
-        p_pes->p_last = p_pad_data;
-        p_pes->i_nb_data++;
-    }
-    else
-    {
-        if( (p_pes = input_NewPES( p_input->p_method_data )) == NULL )
-        {
-            msg_Err( p_input, "no PES packet" );
-            p_input->b_error = 1;
-            return;
-        }
-
-        p_pes->i_rate = p_input->stream.control.i_rate;
-        p_pes->p_first = p_pes->p_last = p_pad_data;
-        p_pes->i_nb_data = 1;
-        p_pes->b_discontinuity = 1;
-        input_DecodePES( p_es->p_decoder_fifo, p_pes );
-    }
-}
+/* no need to export this one */
+data_packet_t *input_NewPacketForce( input_buffers_t *, size_t );
 
 /*
  * Optional standard file descriptor operations (input_ext-plugins.h)

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.29 2003/01/23 15:52:04 sam Exp $
+ * $Id: avi.c,v 1.30 2003/01/25 03:12:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -142,7 +142,20 @@ static int input_ReadInPES( input_thread_t *p_input,
                                           p_pes->i_pes_size, 2048 ) );
         if( i_read <= 0 )
         {
-            return p_pes->i_pes_size;
+            /* should occur only with EOF and max allocation reached 
+             * it safer to  return an error */
+            /* free all data packet */
+            for( p_data = p_pes->p_first; p_data != NULL; )
+            {
+                data_packet_t *p_next;
+
+                p_next = p_data->p_next;
+                input_DeletePacket( p_input->p_method_data, p_data );
+                p_data = p_next;
+            }
+            /* free pes */
+            input_DeletePES( p_input->p_method_data, p_pes );
+            return -1;
         }
 
         if( !p_pes->p_first )
@@ -1695,6 +1708,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
     avi_stream_toread_t toread[100];
 
     demux_sys_t *p_avi = p_input->p_demux_data;
+
 
     /* detect new selected/unselected streams */
     for( i_stream = 0,i_stream_count= 0, b_video = VLC_FALSE;

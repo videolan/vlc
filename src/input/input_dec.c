@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.56 2003/01/22 10:44:50 fenrir Exp $
+ * $Id: input_dec.c,v 1.57 2003/01/25 03:12:20 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -282,6 +282,52 @@ void input_FlushPESFifo( decoder_fifo_t *p_fifo )
     /* No PES in the FIFO. p_last is no longer valid. */
     p_fifo->pp_last = &p_fifo->p_first;
     vlc_mutex_unlock( &p_fifo->data_lock );
+}
+
+
+/*****************************************************************************
+ * Create a NULL packet for padding in case of a data loss
+ *****************************************************************************/
+void input_NullPacket( input_thread_t * p_input,
+                       es_descriptor_t * p_es )
+{
+    data_packet_t *             p_pad_data;
+    pes_packet_t *              p_pes;
+
+    if( (p_pad_data = input_NewPacketForce( p_input->p_method_data,
+                    PADDING_PACKET_SIZE)) == NULL )
+    {
+        msg_Err( p_input, "no new packet" );
+        p_input->b_error = 1;
+        return;
+    }
+
+    memset( p_pad_data->p_payload_start, 0, PADDING_PACKET_SIZE );
+    p_pad_data->b_discard_payload = 1;
+    p_pes = p_es->p_pes;
+
+    if( p_pes != NULL )
+    {
+        p_pes->b_discontinuity = 1;
+        p_pes->p_last->p_next = p_pad_data;
+        p_pes->p_last = p_pad_data;
+        p_pes->i_nb_data++;
+    }
+    else
+    {
+        if( (p_pes = input_NewPES( p_input->p_method_data )) == NULL )
+        {
+            msg_Err( p_input, "no PES packet" );
+            p_input->b_error = 1;
+            return;
+        }
+
+        p_pes->i_rate = p_input->stream.control.i_rate;
+        p_pes->p_first = p_pes->p_last = p_pad_data;
+        p_pes->i_nb_data = 1;
+        p_pes->b_discontinuity = 1;
+        input_DecodePES( p_es->p_decoder_fifo, p_pes );
+    }
 }
 
 /*****************************************************************************
