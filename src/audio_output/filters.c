@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.15 2002/12/06 10:10:39 sam Exp $
+ * $Id: filters.c,v 1.16 2002/12/10 21:55:01 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -298,13 +298,11 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         aout_filter_t * p_filter = pp_filters[i];
         aout_buffer_t * p_output_buffer;
 
-        /* We need this because resamplers can produce more samples than
-           (i_in_nb * p_filter->output.i_rate / p_filter->input.i_rate) */
-        int i_compensate_rounding = 2 * p_filter->input.i_rate
-            / p_filter->output.i_rate;
-
+        /* Resamplers can produce slightly more samples than (i_in_nb *
+         * p_filter->output.i_rate / p_filter->input.i_rate) so we need
+         * slightly bigger buffers. */
         aout_BufferAlloc( &p_filter->output_alloc,
-            ((mtime_t)(*pp_input_buffer)->i_nb_samples + i_compensate_rounding)
+            ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
             * 1000000 / p_filter->input.i_rate,
             *pp_input_buffer, p_output_buffer );
         if ( p_output_buffer == NULL )
