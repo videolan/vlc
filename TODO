@@ -95,6 +95,14 @@ Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
+Description: no blocking primary interface
+Do away with the strange primary blocking interface. The first interface should be run in the same thread, but not be the blocking call. Load other interfaces in new threads.
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
 Description: OSD Icons
  Make OSD Icons for Play/Pause/Stop. Integrate them better into the core system.
 Status: Assigned to yoann
@@ -147,9 +155,17 @@ Urgency: Normal
 Platform: any
 Description: 24 bit LPCM
 - Increasingly more DVDs use 24 bit LPCM sound. We should support it.
-
 Status: Todo
 
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: APE decoder
+Need I say more? <a href="http://www.monkeysaudio.com/">Monkeys Audio (APE)</a> website.
+Status: Todo
+
+Task
 Task
 Difficulty: Medium
 Urgency: Wishlist
@@ -181,12 +197,12 @@ Task
 Difficulty: Hard
 Urgency: Critical
 Platform: OSX
-Description: CoreAudio multichannel audio output. Convert to 
-<a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
+Description: CoreAudio multichannel audio output.
+ Convert to <a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
 Still no info over S/PDIF output available.
-Outstanding issues:
- - G5 S/PDIF not working
- - G5 PCM not working because S/PDIF is selected by default, even if not connected.
+Outstanding issues:<br />
+ - G5 S/PDIF not working<br />
+ - G5 PCM not working because S/PDIF is selected by default, even if not connected.<br />
  - Coreaudio resampler doesn't handle input from lpcm decoder (the samples are too small).
 Status: Todo
 
@@ -200,6 +216,15 @@ Description: Stream text subtitles
   - Implement it
 (40% done) needs to be tested and validated
 Status: Assigned to fenrir
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: Fix up text subtitles
+Currently the subtitle dialog boxes are out of date and not really useable. Also we need more files to test and verify the current support, and the rendering of the subs should be sped up quite a bit (issue with outlining?) Other issues should mostly be dealt with after the vout systems are improved.
+
+Status: Todo
 
 Task
 Difficulty: Hard
@@ -431,6 +456,47 @@ Platform: any
 Description: UDP packet reordering
 Currently we ignore every packet that is too late and just wait for a fresh one.
 It would be nice to be able to reorder the packets in the buffer to prevent degredation of the signal.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: Make vlm more user friendly (setup etc)
+vlm is kinda a pain to setup if you are not entirely experiences with A/V and streaming or VLC for that matter. It can be heavily improved by updating the vlm http interface.
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: Protocol rollover
+It would be cool if VLC supported something like a protocol rollover mechanism, much like WM server has as well. Multicast, UDP, TCP, HTTP etc.
+However, how spec compliant can this be?
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: NAT issues
+Find a way to deal with clients behind a NAT. Multicast and RTSP work 'poorly' in these setups. NATP2P, STUN, UDP hole punching, other techniques ????
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: Gstreamer and Helix API integration
+See if you can support GStreamer and helix plugins in one way or another.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: Gnome-vfs support
+For integration with smb, sftp and other file sharing/mounting methods
 Status: Todo
 
 # Do not remove me

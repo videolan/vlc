@@ -9,6 +9,7 @@ Core support:
  * New plugins cache to speed up launch time
  * Fix crash with deinterlace switching
  * New --play-and-stop feature which stops the playlist after each played item
+ * Daemon mode
 
 Demux:
  * Support iTunes Music Store previews

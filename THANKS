@@ -40,6 +40,7 @@ Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
+Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc@macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar@hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja@sente.ch> - coreaudio multiple streams fix
