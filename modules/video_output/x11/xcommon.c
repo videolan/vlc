@@ -52,6 +52,7 @@
 #endif
 
 #include <X11/Xlib.h>
+#include <X11/Xproto.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -128,6 +129,8 @@ static int ConvertKey( int );
 
 static int WindowOnTop( vout_thread_t *, vlc_bool_t );
 
+static int X11ErrorHandler( Display *, XErrorEvent * );
+
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
  *****************************************************************************
@@ -179,6 +182,9 @@ int E_(Activate) ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     if( psz_display ) free( psz_display );
+
+    /* Replace error handler so we can intercept some non-fatal errors */
+    XSetErrorHandler( X11ErrorHandler );
 
     /* Get a screen ID matching the XOpenDisplay return value */
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
@@ -2107,6 +2113,23 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     }
 
     return p_image;
+}
+
+/*****************************************************************************
+ * X11ErrorHandler: replace error handler so we can intercept some of them
+ *****************************************************************************/
+static int X11ErrorHandler( Display * display, XErrorEvent * event )
+{
+    /* Ingnore errors on XSetInputFocus()
+     * (they happen when a window is not yet mapped) */
+    if( event->request_code == X_SetInputFocus )
+    {
+        fprintf(stderr, "XSetInputFocus failed\n");
+        return 0;
+    }
+
+    XSetErrorHandler(NULL);
+    return (XSetErrorHandler(X11ErrorHandler))( display, event );
 }
 
 #ifdef MODULE_NAME_IS_x11
