@@ -105,6 +105,7 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
     "of these drivers, then you need to enable this option." )
 
 vlc_module_begin();
+    set_shortname( "OSS" );
     set_description( _("Linux OSS audio output") );
 
     set_category( CAT_AUDIO );

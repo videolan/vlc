@@ -220,6 +220,7 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
     "then be used by default for audio playback.")
 
 vlc_module_begin();
+    set_shortname( "CoreAudio" );
     set_description( _("CoreAudio output") );
     set_capability( "audio output", 100 );
     set_category( CAT_AUDIO );

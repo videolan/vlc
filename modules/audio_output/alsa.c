@@ -96,6 +96,7 @@ static void ALSAFill     ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_shortname( "ALSA" );
     set_description( _("ALSA audio output") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

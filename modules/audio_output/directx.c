@@ -208,6 +208,7 @@ static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("DirectX audio output") );
+    set_shortname( "DirectX" );
     set_capability( "audio output", 100 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );

@@ -108,6 +108,7 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
 
 vlc_module_begin();
     set_description( N_("File audio output") );
+    set_shortname( _("File") );
 
     add_string( "audiofile-format", "s16", NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );

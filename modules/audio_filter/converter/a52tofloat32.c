@@ -100,6 +100,7 @@ struct filter_sys_t
     "listening room.")
 
 vlc_module_begin();
+    set_shortname( _("A/52") );
     set_description( _("ATSC A/52 (AC-3) audio decoder") );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_MISC );
@@ -114,7 +115,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Create: 
+ * Create:
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
