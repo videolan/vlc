@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.17 2003/05/04 22:33:35 massiot Exp $
+ * $Id: libmpeg2.c,v 1.18 2003/05/24 13:05:55 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -52,6 +52,7 @@ typedef struct dec_thread_t
      */
     mpeg2dec_t          *p_mpeg2dec;
     const mpeg2_info_t  *p_info;
+    vlc_bool_t          b_skip;
 
     /*
      * Input properties
@@ -140,6 +141,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->i_previous_pts = 0;
     p_dec->i_period_remainder = 0;
     p_dec->p_picture_to_destroy = NULL;
+    p_dec->b_skip     = 0;
 
     /* Initialize decoder */
     p_dec->p_mpeg2dec = mpeg2_init();
@@ -268,6 +270,23 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         }
         break;
 
+        case STATE_PICTURE_2ND:
+            vout_SynchroNewPicture( p_dec->p_synchro,
+                p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
+                p_dec->p_info->current_picture->nb_fields,
+                0, 0,
+                p_dec->i_current_rate );
+
+            if ( p_dec->b_skip )
+            {
+                vout_SynchroTrash( p_dec->p_synchro );
+            }
+            else
+            {
+                vout_SynchroDecode( p_dec->p_synchro );
+            }
+            break;
+
         case STATE_PICTURE:
         {
             uint8_t *buf[3];
@@ -287,12 +306,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE ) )
             {
                 mpeg2_skip( p_dec->p_mpeg2dec, 1 );
+                p_dec->b_skip = 1;
                 vout_SynchroTrash( p_dec->p_synchro );
                 mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
             }
             else
             {
                 mpeg2_skip( p_dec->p_mpeg2dec, 0 );
+                p_dec->b_skip = 0;
                 vout_SynchroDecode( p_dec->p_synchro );
                 if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
                 mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
@@ -352,6 +373,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 vout_SynchroReset( p_dec->p_synchro );
             }
             mpeg2_skip( p_dec->p_mpeg2dec, 1 );
+            p_dec->b_skip = 1;
 
             if( p_dec->p_info->current_fbuf &&
                 p_dec->p_info->current_fbuf->id )
