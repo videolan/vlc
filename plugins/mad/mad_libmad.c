@@ -36,7 +36,6 @@
 /*****************************************************************************
  * Libmad includes files
  *****************************************************************************/
-
 #include <mad.h>
 #include "mad_adec.h"
 #include "mad_libmad.h"
@@ -81,21 +80,18 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  * libmad_header: this function is called just after the header of a frame is
  * decoded
  *****************************************************************************/
-enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header)
-{
-    mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
-
-    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
-/*
-    intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
-	intf_DbgMsg( "mad_adec: libmad_header bitrate %d", p_libmad_header->bitrate);	
-*/
-    p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
-    vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
-    vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);
-
-    return MAD_FLOW_CONTINUE;
-}
+/* enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header)
+ * {
+ *   mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
+ *
+ *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
+ *   intf_DbgMsg( "mad_adec: libmad_header bitrate %d", p_libmad_header->bitrate);	
+ *
+ *   p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
+ *
+ *   return MAD_FLOW_CONTINUE;
+ * }
+ */
 
 /*****************************************************************************
  * lib_mad_filter: this function is called to filter data of a frame
@@ -106,6 +102,8 @@ enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header
  * }
  */
 
+//#define MPG321_ROUTINES     1
+#ifdef MPG321_ROUTINES
 /*****************************************************************************
  * support routines borrowed from mpg321 (file: mad.c), which is distributed
  * under GPL license
@@ -191,6 +189,25 @@ static __inline__ signed long audio_linear_dither(unsigned int bits, mad_fixed_t
     /* scale */
     return output >> scalebits;
 }
+#endif
+
+/*****************************************************************************
+ * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
+ *****************************************************************************/
+static __inline__ mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
+{
+  /* round */
+  sample += (1L << (MAD_F_FRACBITS - 16));
+
+  /* clip */
+  if (sample >= MAD_F_ONE)
+    sample = MAD_F_ONE - 1;
+  else if (sample < -MAD_F_ONE)
+    sample = -MAD_F_ONE;
+
+  /* quantize */
+  return sample >> (MAD_F_FRACBITS + 1 - 16);
+}
 
 /*****************************************************************************
  * libmad_ouput: this function is called just after the frame is decoded
@@ -201,19 +218,15 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     byte_t *buffer=NULL;
 
     mad_fixed_t const *left_ch = p_libmad_pcm->samples[0], *right_ch = p_libmad_pcm->samples[1];
-    /*
-     * 1152 because that's what mad has as a max; *4 because
-     * there are 4 distinct bytes per sample (in 2 channel case)
-     */
-    static unsigned char stream[ADEC_FRAME_SIZE];
     register int nsamples = p_libmad_pcm->length;
+    mad_fixed_t sample;
+#ifdef MPG321_ROUTINES
     static struct audio_dither dither;
-
-    register char * ptr = stream;
-    register signed int sample;
+#endif
 
     /* Set timestamp to synchronize audio and video decoder fifo's */
     vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
+    p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
     p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame] = p_mad_adec->i_pts_save;
 
     buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
@@ -222,47 +235,56 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     {
         while (nsamples--)
         {
-            sample = (signed int) audio_linear_dither(16, *left_ch++, &dither);
-#ifndef WORDS_BIGENDIAN
-            *ptr++ = (unsigned char) (sample >> 0);
-            *ptr++ = (unsigned char) (sample >> 8);
+#ifdef MPG321_ROUTINES
+            sample = audio_linear_dither(16, *left_ch++, &dither);
 #else
-            *ptr++ = (unsigned char) (sample >> 8);
-            *ptr++ = (unsigned char) (sample >> 0);
+            sample = s24_to_s16_pcm(*left_ch++);
 #endif
 
-            sample = (signed int) audio_linear_dither(16, *right_ch++, &dither);
 #ifndef WORDS_BIGENDIAN
-            *ptr++ = (unsigned char) (sample >> 0);
-            *ptr++ = (unsigned char) (sample >> 8);
+            *buffer++ = (byte_t) (sample) & 0xFF;
+            *buffer++ = (byte_t) (sample >> 8) & 0xFF;
 #else
-            *ptr++ = (unsigned char) (sample >> 8);
-            *ptr++ = (unsigned char) (sample >> 0);
+            *buffer++ = (byte_t) (sample >> 8);
+            *buffer++ = (byte_t) (sample);
+#endif
+	    /* right audio channel */
+#ifdef MPG321_ROUTINES
+            sample = audio_linear_dither(16, *right_ch++, &dither);
+#else
+            sample = s24_to_s16_pcm(*right_ch++);
+#endif
+
+#ifndef WORDS_BIGENDIAN
+            *buffer++ = (byte_t) (sample);
+            *buffer++ = (byte_t) (sample >> 8);
+#else
+            *buffer++ = (byte_t) (sample >> 8);
+            *buffer++ = (byte_t) (sample);
 #endif						
         }
-        buffer = memcpy(buffer,stream,p_libmad_pcm->length*4);
-        vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
   }
   else
   {
         while (nsamples--)
         {
-            sample = (signed int) audio_linear_dither(16, *left_ch++, &dither);
+#ifdef MPG321_ROUTINES
+            sample = audio_linear_dither(16, *left_ch++, &dither);
+#else
+            sample = s24_to_s16_pcm(*left_ch++);
+#endif
 
 #ifndef WORDS_BIGENDIAN
-            *ptr++ = (unsigned char) (sample >> 0);
-            *ptr++ = (unsigned char) (sample >> 8);
+            *buffer++ = (byte_t) (sample);
+            *buffer++ = (byte_t) (sample >> 8);
 #else
-            *ptr++ = (unsigned char) (sample >> 8);
-            *ptr++ = (unsigned char) (sample >> 0);
+            *buffer++ = (byte_t) (sample >> 8);
+            *buffer++ = (byte_t) (sample);
 #endif					
         }
-        buffer = memcpy(buffer,stream,p_libmad_pcm->length*2);
-        vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
     }
-    vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);
 
-    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
+//    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
     p_mad_adec->p_aout_fifo->l_end_frame = (p_mad_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);

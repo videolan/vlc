@@ -69,7 +69,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "Libmad MPEG 1/2/3 audio decoder library" )
-    ADD_CAPABILITY( DECODER, 50 )
+    ADD_CAPABILITY( DECODER, 950 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -180,10 +180,10 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     mad_decoder_init( p_mad_adec->libmad_decoder,
     		      p_mad_adec, 	/* vlc's thread structure and p_fifo playbuffer */
 		      libmad_input,  	/* input_func */
-		      libmad_header, 	/* header_func */
+		      0, 		/* header_func */
 		      0,		/* filter */
 		      libmad_output, 	/* output_func */
-		      0,  	/* error */
+		      0,  		/* error */
 		      0);            	/* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
@@ -231,9 +231,8 @@ static void EndThread (mad_adec_thread_t * p_mad_adec)
     /* mad_decoder_finish releases the memory allocated inside the struct */
     mad_decoder_finish( p_mad_adec->libmad_decoder );
 
-    /* Unlock the modules */
+    /* Unlock the modules, p_mad_adec->p_config is released by the decoder subsystem  */
     free( p_mad_adec->libmad_decoder );
-//    free( p_mad_adec->p_config ); /* for now a reminder until integration with cvs */
     free( p_mad_adec );
 
     intf_ErrMsg ("mad_adec debug: mad decoder thread %p destroyed", p_mad_adec);
