@@ -2,7 +2,7 @@
  * generic_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_window.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: generic_window.cpp,v 1.2 2004/01/25 21:38:57 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -147,18 +147,17 @@ void GenericWindow::processEvent( EvtLeave &rEvtLeave )
 
 void GenericWindow::processEvent( EvtMouse &rEvtMouse )
 {
-    // Raise the window and its anchored windows
-    m_rWindowManager.raise( this );
-
     // Get the control hit by the mouse
     CtrlGeneric *pNewHitControl = findHitControl( rEvtMouse.getXPos(),
                                                   rEvtMouse.getYPos() );
-
     setLastHit( pNewHitControl );
 
     // Change the focused control
     if( rEvtMouse.getAction() == EvtMouse::kDown )
     {
+        // Raise all the windows
+        m_rWindowManager.raise( this );
+
         if( pNewHitControl && pNewHitControl->isFocusable() )
         {
             // If a new control gains the focus, the previous one loses it
