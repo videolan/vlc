@@ -1789,8 +1789,11 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
     }
     else p_frame->pts = AV_NOPTS_VALUE;
 
-    p_sys->i_input_pts = 0;
-    p_sys->i_input_dts = 0;
+    if( p_sys->i_output_pts ) /* make sure 1st frame has a pts > 0 */
+    {
+        p_sys->i_input_pts = 0;
+        p_sys->i_input_dts = 0;
+    }
 
     return avcodec_default_get_buffer( p_context, p_frame );
 }
