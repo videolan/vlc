@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.88 2002/04/28 11:56:13 sam Exp $
+ * $Id: vout_sdl.c,v 1.89 2002/05/06 21:05:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -74,6 +74,7 @@ typedef struct vout_sys_s
     boolean_t   b_cursor;
     boolean_t   b_cursor_autohidden;
     mtime_t     i_lastmoved;
+    mtime_t     i_lastpressed;                        /* to track dbl-clicks */
 
 } vout_sys_t;
 
@@ -209,10 +210,6 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_cursor_autohidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
-    /* Set main window's size */
-    p_vout->p_sys->i_width = p_vout->i_window_width;
-    p_vout->p_sys->i_height = p_vout->i_window_height;
-
     if( OpenDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
@@ -244,9 +241,9 @@ static int vout_Init( vout_thread_t *p_vout )
         /* All we have is an RGB image with square pixels */
         p_vout->output.i_width  = p_vout->p_sys->i_width;
         p_vout->output.i_height = p_vout->p_sys->i_height;
-        p_vout->output.i_aspect = p_vout->p_sys->i_width
+        p_vout->output.i_aspect = p_vout->output.i_width
                                    * VOUT_ASPECT_FACTOR
-                                   / p_vout->p_sys->i_height;
+                                   / p_vout->output.i_height;
     }
     else
     {
@@ -347,10 +344,10 @@ static int vout_Manage( vout_thread_t *p_vout )
         switch( event.type )
         {
         case SDL_VIDEORESIZE:                          /* Resizing of window */
-            p_vout->p_sys->i_width = event.resize.w;
-            p_vout->p_sys->i_height = event.resize.h;
-            CloseDisplay( p_vout );
-            OpenDisplay( p_vout );
+            /* Update dimensions */
+            p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            p_vout->i_window_width = p_vout->p_sys->i_width = event.resize.w;
+            p_vout->i_window_height = p_vout->p_sys->i_height = event.resize.h;
             break;
 
         case SDL_MOUSEMOTION:
@@ -383,10 +380,13 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
             case SDL_BUTTON_LEFT:
                 /* In this part we will eventually manage
-                 * clicks for DVD navigation for instance. For the
-                 * moment just pause the stream. */
-                input_SetStatus( p_input_bank->pp_input[0],
-                                 INPUT_STATUS_PAUSE );
+                 * clicks for DVD navigation for instance. */
+
+                /* detect double-clicks */
+                if( ( mdate() - p_vout->p_sys->i_lastpressed ) < 300000 )
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+                p_vout->p_sys->i_lastpressed = mdate();
                 break;
 
             case 4:
@@ -492,13 +492,31 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         p_vout->b_fullscreen = ! p_vout->b_fullscreen;
 
-        SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
-
         p_vout->p_sys->b_cursor_autohidden = 0;
         SDL_ShowCursor( p_vout->p_sys->b_cursor &&
                         ! p_vout->p_sys->b_cursor_autohidden );
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    /*
+     * Size change
+     */
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
+        intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
+                      p_vout->p_sys->i_width,
+                      p_vout->p_sys->i_height );
+ 
+        CloseDisplay( p_vout );
+        OpenDisplay( p_vout );
+
+        /* We don't need to signal the vout thread about the size change if
+         * we can handle rescaling ourselves */
+        if( p_vout->p_sys->p_overlay != NULL )
+            p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+
     }
 
     /* Pointer change */
@@ -564,6 +582,12 @@ static int OpenDisplay( vout_thread_t *p_vout )
 {
     Uint32 i_flags;
     int    i_bpp;
+
+    /* Set main window's size */
+    p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->render.i_width :
+                                                    p_vout->i_window_width;
+    p_vout->p_sys->i_height = p_vout->b_fullscreen ? p_vout->render.i_height :
+                                                     p_vout->i_window_height;
 
     /* Initialize flags and cursor */
     i_flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_DOUBLEBUF;

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.30 2002/05/05 08:25:15 gbazin Exp $
+ * $Id: xcommon.c,v 1.31 2002/05/06 21:05:26 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -585,7 +585,6 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
-    boolean_t   b_resized;                        /* window has been resized */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
 
@@ -594,7 +593,6 @@ static int vout_Manage( vout_thread_t *p_vout )
      * window is mapped (and if the display is useful), and ClientMessages
      * to intercept window destruction requests */
 
-    b_resized = 0;
     while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
                               StructureNotifyMask | KeyPressMask |
                               ButtonPressMask | ButtonReleaseMask | 
@@ -608,7 +606,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                  || (xevent.xconfigure.height != p_vout->p_sys->i_height) )
             {
                 /* Update dimensions */
-                b_resized = 1;
                 p_vout->i_changes |= VOUT_SIZE_CHANGE;
                 p_vout->p_sys->i_width = xevent.xconfigure.width;
                 p_vout->p_sys->i_height = xevent.xconfigure.height;
@@ -734,9 +731,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     /* detect double-clicks */
                     if( ( ((XButtonEvent *)&xevent)->time -
                           p_vout->p_sys->i_time_button_last_pressed ) < 300 )
-                    {
-                      p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                    }
+                        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
                     p_vout->p_sys->i_time_button_last_pressed =
                         ((XButtonEvent *)&xevent)->time;
@@ -847,23 +842,9 @@ static int vout_Manage( vout_thread_t *p_vout )
                       p_vout->p_sys->i_height );
  
 #ifdef MODULE_NAME_IS_x11
-
-        /* Destroy XImages to change their size */
-        vout_End( p_vout );
-        for( i_x = 0; i_x < I_OUTPUTPICTURES; i_x++ )
-            p_vout->p_picture[ i_x ].i_status = FREE_PICTURE;
-
-        /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_Init( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: cannot resize display" );
-            return( 1 );
-        }
-
-        /* Need to reinitialise the chroma plugin */
-        p_vout->chroma.pf_end( p_vout );
-        p_vout->chroma.pf_init( p_vout );
-
+        /* We need to signal the vout thread about the size change because it
+         * is doing the rescaling */
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
 #endif
 
         vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
@@ -2255,4 +2236,3 @@ static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
                   p_vout->p_sys->colormap, p_colors, 255 );
 }
 #endif
-

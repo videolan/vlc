@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.12 2002/04/19 13:56:11 sam Exp $
+ * $Id: xmga.c,v 1.13 2002/05/06 21:05:26 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -188,6 +188,7 @@ typedef struct vout_sys_s
     boolean_t           b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
     Cursor              blank_cursor;                   /* the hidden cursor */
+    mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;
 
 } vout_sys_t;
@@ -599,10 +600,17 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
                 case Button1:
                     /* In this part we will eventually manage
-                     * clicks for DVD navigation for instance. For the
-                     * moment just pause the stream. */
-                    input_SetStatus( p_input_bank->pp_input[0],
-                                     INPUT_STATUS_PAUSE );
+                     * clicks for DVD navigation for instance. */
+
+                    /* detect double-clicks */
+                    if( ( ((XButtonEvent *)&xevent)->time -
+                          p_vout->p_sys->i_time_button_last_pressed ) < 300 )
+                    {
+                      p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    }
+
+                    p_vout->p_sys->i_time_button_last_pressed =
+                        ((XButtonEvent *)&xevent)->time;
                     break;
 
                 case Button4:

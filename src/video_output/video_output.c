@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.174 2002/05/05 08:25:15 gbazin Exp $
+ * $Id: video_output.c,v 1.175 2002/05/06 21:05:26 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -661,11 +661,39 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( p_vout->pf_manage( p_vout ) )
         {
-            /* A fatal error occured, and the thread must terminate immediately,
-             * without displaying anything - setting b_error to 1 causes the
-             * immediate end of the main while() loop. */
+            /* A fatal error occured, and the thread must terminate
+             * immediately, without displaying anything - setting b_error to 1
+             * causes the immediate end of the main while() loop. */
             p_vout->b_error = 1;
         }
+
+        if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+        {
+            /* this must only happen when the vout plugin is incapable of
+             * rescaling the picture itself. In this case we need to destroy
+             * the current picture buffers and recreate new ones with the right
+             * dimensions */
+            int i;
+
+            p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+
+            p_vout->pf_end( p_vout );
+            for( i = 0; i < I_OUTPUTPICTURES; i++ )
+                 p_vout->p_picture[ i ].i_status = FREE_PICTURE;
+
+            I_OUTPUTPICTURES = 0;
+            if( p_vout->pf_init( p_vout ) )
+            {
+                intf_ErrMsg( "vout error: cannot resize display" );
+                /* FixMe: p_vout->pf_end will be called again in EndThread() */
+                p_vout->b_error = 1;
+            }
+
+            /* Need to reinitialise the chroma plugin */
+            p_vout->chroma.pf_end( p_vout );
+            p_vout->chroma.pf_init( p_vout );
+        }
+
     }
 
     /*
