@@ -2,7 +2,7 @@
  * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.57 2004/02/10 02:57:18 hartman Exp $
+ * $Id: ogg.c,v 1.58 2004/02/15 13:16:43 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -436,9 +436,9 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                                 p_stream->i_pcr );
     }
 
-    if( !p_stream->fmt.i_codec == VLC_FOURCC( 'v','o','r','b' ) &&
-        !p_stream->fmt.i_codec == VLC_FOURCC( 's','p','x',' ' ) &&
-        !p_stream->fmt.i_codec == VLC_FOURCC( 'f','l','a','c' ) &&
+    if( p_stream->fmt.i_codec != VLC_FOURCC( 'v','o','r','b' ) &&
+        p_stream->fmt.i_codec != VLC_FOURCC( 's','p','x',' ' ) &&
+        p_stream->fmt.i_codec != VLC_FOURCC( 'f','l','a','c' ) &&
         p_stream->i_pcr >= 0 )
     {
         p_stream->i_previous_pcr = p_stream->i_pcr;
@@ -456,10 +456,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         return;
     }
 
-    if( !( p_block = block_New( p_input, p_oggpacket->bytes ) ) )
-    {
-        return;
-    }
+    if( !( p_block = block_New( p_input, p_oggpacket->bytes ) ) ) return;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
         p_block->i_dts = p_block->i_pts = i_pts;
@@ -489,24 +486,23 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         if( p_stream->fmt.i_codec == VLC_FOURCC( 's','u','b','t' ))
         {
             /* But with subtitles we need to retrieve the duration first */
-            int i;
-            long lenbytes = 0;
+            int i, lenbytes = 0;
         
-            if( ( i_header_len > 0 ) && ( p_oggpacket->bytes >= ( i_header_len + 1 ) ) )
+            if( i_header_len > 0 && p_oggpacket->bytes >= i_header_len + 1 )
             {
                 for( i = 0, lenbytes = 0; i < i_header_len; i++ )
                 {
                     lenbytes = lenbytes << 8;
-                    lenbytes += *((unsigned char *)p_oggpacket->packet + i_header_len - i);
+                    lenbytes += *(p_oggpacket->packet + i_header_len - i);
                 }
             }
-            if (((p_oggpacket->bytes - 1 - i_header_len) > 2) ||
-                ((p_oggpacket->packet[i_header_len + 1] != ' ') &&
-                 (p_oggpacket->packet[i_header_len + 1] != 0) && 
-                 (p_oggpacket->packet[i_header_len + 1] != '\n') &&
-                 (p_oggpacket->packet[i_header_len + 1] != '\r')))
+            if( p_oggpacket->bytes - 1 - i_header_len > 2 ||
+                ( p_oggpacket->packet[i_header_len + 1] != ' ' &&
+                  p_oggpacket->packet[i_header_len + 1] != 0 && 
+                  p_oggpacket->packet[i_header_len + 1] != '\n' &&
+                  p_oggpacket->packet[i_header_len + 1] != '\r' ) )
             {
-                p_block->i_dts = p_block->i_pts + (mtime_t)lenbytes*1000;
+                p_block->i_dts = p_block->i_pts + (mtime_t)lenbytes * 1000;
             }
         }
 
