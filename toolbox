@@ -1,13 +1,15 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.43 2003/07/29 21:56:47 gbazin Exp $
+##  $Id: toolbox,v 1.44 2003/07/31 13:06:05 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
 ###
 ###  Get a sane environment, just in case
 ###
+LC_ALL=C
+export LC_ALL
 LANG=C
 export LANG
 CYGWIN=binmode
@@ -633,5 +635,10 @@ then
       < "$1/debian/rules" > "$1/debian/rules.woody"
   mv "$1/debian/rules.woody" "$1/debian/rules"
   chmod 0755 "$1/debian/rules"
+
+  # modules/misc/freetype.c: replace the default font
+  sed -e 's,FreeSerifBold.ttf,thryomanes/thryb___.ttf,' \
+      < "$1/modules/misc/freetype.c" > "$1/modules/misc/freetype.c.woody"
+  mv "$1/modules/misc/freetype.c.woody" "$1/modules/misc/freetype.c"
 fi
 
