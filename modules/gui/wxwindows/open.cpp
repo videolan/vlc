@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.43 2003/11/10 18:21:35 gbazin Exp $
+ * $Id: open.cpp,v 1.44 2003/11/23 17:51:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -673,7 +673,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
                   + demux + wxT(":")
                   + disc_device->GetLineText(0)
                   + wxString::Format( wxT("@%d:%d"),
-                                      i_disc_title, i_disc_chapter );
+                                      disc_title->GetValue(),
+                                      disc_chapter->GetValue() );
         break;
     case NET_ACCESS:
         switch( i_net_type )
@@ -927,11 +928,6 @@ void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
  *****************************************************************************/
 void OpenDialog::OnDiscPanelChange( wxCommandEvent& event )
 {
-    if( event.GetId() == DiscTitle_Event )
-        i_disc_title = event.GetInt();
-    else if( event.GetId() == DiscChapter_Event )
-        i_disc_chapter = event.GetInt();
-
     UpdateMRL( DISC_ACCESS );
 }
 
@@ -959,17 +955,14 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     case 0:
         disc_title->SetRange( 0, 255 );
         disc_title->SetValue( 0 );
-        i_disc_title = 0;
         break;
 
     default:
         disc_title->SetRange( 1, 255 );
         disc_title->SetValue( 1 );
-        i_disc_title = 1;
         break;
     }
 
-    i_disc_chapter = 1;
     disc_chapter->SetRange( 1, 255 );
     disc_chapter->SetValue( 1 );
 
