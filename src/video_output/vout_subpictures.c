@@ -79,6 +79,7 @@ void vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  * already allocated zone of memory in the spu data fields. It needs locking
  * since several pictures can be created by several producers threads.
  * \param p_vout the vout in which to create the subpicture
+ * \param i_channel the channel this subpicture should belong to
  * \param i_type the type of the subpicture
  * \return NULL on error, a reserved subpicture otherwise
  */

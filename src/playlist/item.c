@@ -32,6 +32,7 @@
 /**
  * Create a new item, without adding it to the playlist
  *
+ * \param p_obj a vlc object (anyone will do)
  * \param psz_uri the mrl of the item
  * \param psz_name a text giving a name or description of the item
  * \return the new item or NULL on failure
@@ -254,7 +255,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
  *  Add a option to one item ( no need for p_playlist )
  *
  * \param p_item the item on which we want the info
- * \param psz_format the option
+ * \param psz_option the option
  * \return 0 on success
  */
 int playlist_ItemAddOption( playlist_item_t *p_item, const char *psz_option )

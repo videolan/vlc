@@ -34,14 +34,14 @@
  * Must be entered with playlist lock
  *
  * \param p_playlist the playlist to get the info from
- * \param i_item position of the item on
- *               which we want the info ( -1 for current )
+ * \param i_pos position of the item on
+ *              which we want the info ( -1 for current )
  * \param psz_cat the category in which the info is stored
  * \param psz_name the name of the info
  * \return the info value if any, an empty string else
-*/
+ */
 char * playlist_GetInfo( playlist_t *p_playlist, int i_pos,
-                         const char * psz_cat, const char *psz_name )
+                         const char *psz_cat, const char *psz_name )
 {
     playlist_item_t *p_item;
     char *psz_buffer;
@@ -117,7 +117,6 @@ info_category_t * playlist_ItemGetCategory( playlist_item_t *p_item,
 /**
  * Create one info category for an item ( no p_playlist required )
  *
- * \param p_playlist the playlist
  * \param p_item the item to create category for
  * \param psz_cat the category we want to create
  * \return the info category.

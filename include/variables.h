@@ -255,7 +255,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
  *
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
- * \param i The new integer value of this variable
+ * \param b The new boolean value of this variable
  */
 static inline int __var_SetBool( vlc_object_t *p_obj, const char *psz_name, vlc_bool_t b )
 {
