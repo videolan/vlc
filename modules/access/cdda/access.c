@@ -1107,7 +1107,7 @@ E_(Open)( vlc_object_t *p_this )
     SetWLE( &p_cdda->waveheader.BytesPerSample,
             2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
     SetDWLE( &p_cdda->waveheader.BytesPerSec,
-             16 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
+	     2*16/8 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
     p_cdda->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_cdda->waveheader.DataLength = 0;                 /* we just don't know */
     p_cdda->i_header_pos = 0;
