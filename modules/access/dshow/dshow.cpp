@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.2 2003/08/25 21:45:04 gbazin Exp $
+ * $Id: dshow.cpp,v 1.3 2003/08/25 22:57:40 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -46,7 +46,6 @@
 #endif
 
 #include <dshow.h>
-#include <vector>
 
 #include "filter.h"
 
@@ -170,8 +169,9 @@ struct access_sys_t
     uint8_t *p_header;
 
     /* list of elementary streams */
-    vector<dshow_stream_t> streams;
-    int                    i_current_stream;
+    dshow_stream_t **pp_streams;
+    int            i_streams;
+    int            i_current_stream;
 };
 
 /*****************************************************************************
@@ -182,17 +182,75 @@ static int AccessOpen( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
 
-#if 0
     /* parse url and open device(s) */
     char *psz_dup, *psz_parser;
     psz_dup = strdup( p_input->psz_name );
     psz_parser = psz_dup;
+    string vdevname, adevname;
 
     while( *psz_parser && *psz_parser != ':' )
     {
         psz_parser++;
     }
-#endif
+
+    if( *psz_parser == ':' )
+    {
+        /* read options */
+        for( ;; )
+        {
+            int i_len;
+
+            *psz_parser++ = '\0';
+            if( !strncmp( psz_parser, "vdev=", strlen( "vdev=" ) ) )
+            {
+                psz_parser += strlen( "vdev=" );
+                if( strchr( psz_parser, ':' ) )
+                {
+                    i_len = strchr( psz_parser, ':' ) - psz_parser;
+                }
+                else
+                {
+                    i_len = strlen( psz_parser );
+                }
+
+                vdevname = string( psz_parser, i_len );
+
+                psz_parser += i_len;
+            }
+            else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
+            {
+                psz_parser += strlen( "adev=" );
+                if( strchr( psz_parser, ':' ) )
+                {
+                    i_len = strchr( psz_parser, ':' ) - psz_parser;
+                }
+                else
+                {
+                    i_len = strlen( psz_parser );
+                }
+
+                adevname = string( psz_parser, i_len );
+
+                psz_parser += i_len;
+            }
+            else
+            {
+                msg_Warn( p_input, "unknown option" );
+            }
+
+            while( *psz_parser && *psz_parser != ':' )
+            {
+                psz_parser++;
+            }
+
+            if( *psz_parser == '\0' )
+            {
+                break;
+            }
+        }
+    }
+
+    free( psz_dup );
 
     p_input->pf_read        = Read;
     p_input->pf_seek        = NULL;
@@ -206,8 +264,6 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.i_method = INPUT_METHOD_FILE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* Update default_pts to a suitable value for access */
     p_input->i_pts_delay = config_GetInt( p_input, "dshow-caching" ) * 1000;
 
     /* Initialize OLE/COM */
@@ -216,7 +272,10 @@ static int AccessOpen( vlc_object_t *p_this )
     /* create access private data */
     p_input->p_access_data = p_sys =
         (access_sys_t *)malloc( sizeof( access_sys_t ) );
-    memset( p_sys, 0, sizeof( access_sys_t ) );
+
+    /* Initialize some data */
+    p_sys->i_streams = 0;
+    p_sys->pp_streams = (dshow_stream_t **)malloc( 1 );
 
     /* Create header */
     p_sys->i_header_size = 8;
@@ -232,17 +291,17 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->p_graph->QueryInterface( IID_IMediaControl,
                                     (void **)&p_sys->p_control );
 
-    if( OpenDevice( p_input, p_input->psz_name, 0 ) != VLC_SUCCESS )
+    if( OpenDevice( p_input, vdevname, 0 ) != VLC_SUCCESS )
     {
         msg_Err( p_input, "can't open video");
     }
 
-    if( OpenDevice( p_input, p_input->psz_name, 1 ) != VLC_SUCCESS )
+    if( OpenDevice( p_input, adevname, 1 ) != VLC_SUCCESS )
     {
         msg_Err( p_input, "can't open audio");
     }
 
-    if( p_sys->streams.empty() )
+    if( !p_sys->i_streams )
     {
         /* Uninitialize OLE/COM */
         CoUninitialize();   
@@ -277,18 +336,24 @@ static void AccessClose( vlc_object_t *p_this )
     p_sys->p_control->Stop();
     p_sys->p_control->Release();
 
+#if 0
     /* Remove filters from graph */
-    //p_sys->p_graph->RemoveFilter( p_sys->p_capture_filter );
-    //p_sys->p_graph->RemoveFilter( p_sys->p_device_filter );
-
-    /* Release objects */
-    //p_sys->p_device_filter->Release();
-    //p_sys->p_capture_filter->Release();
-    //p_sys->p_graph->Release();
+    for( int i = 0; i < p_sys->i_streams; i++ )
+    {
+        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
+        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter );
+        p_sys->pp_streams[i]->p_device_filter->Release();
+        p_sys->pp_streams[i]->p_capture_filter->Release();
+    }
+    p_sys->p_graph->Release();
+#endif
 
     /* Uninitialize OLE/COM */
     CoUninitialize();   
 
+    free( p_sys->p_header );
+    for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
+    free( p_sys->pp_streams );
     free( p_sys );
 }
 
@@ -458,8 +523,13 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
         dshow_stream.p_device_filter = p_device_filter;
         dshow_stream.p_capture_filter = p_capture_filter;
 
-        p_sys->streams.push_back( dshow_stream );
-        SetDWBE( &p_sys->p_header[4], (uint32_t)p_sys->streams.size() );
+        p_sys->pp_streams =
+            (dshow_stream_t **)realloc( p_sys->pp_streams,
+                                        sizeof(dshow_stream_t *)
+                                        * (p_sys->i_streams + 1) );
+        p_sys->pp_streams[p_sys->i_streams] = new dshow_stream_t;
+        *p_sys->pp_streams[p_sys->i_streams++] = dshow_stream;
+        SetDWBE( &p_sys->p_header[4], (uint32_t)p_sys->i_streams );
 
         return VLC_SUCCESS;
     }
@@ -583,7 +653,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
 static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
     access_sys_t   *p_sys = p_input->p_access_data;
-    dshow_stream_t *p_stream = &p_sys->streams[p_sys->i_current_stream];
+    dshow_stream_t *p_stream = p_sys->pp_streams[p_sys->i_current_stream];
     int            i_data = 0;
 
 #if 0
@@ -637,8 +707,8 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         /* Get new sample/frame from next stream */
         //if( p_sream->sample.p_sample ) p_stream->sample.p_sample->Release();
         p_sys->i_current_stream =
-            (p_sys->i_current_stream + 1) % p_sys->streams.size();
-        p_stream = &p_sys->streams[p_sys->i_current_stream];
+            (p_sys->i_current_stream + 1) % p_sys->i_streams;
+        p_stream = p_sys->pp_streams[p_sys->i_current_stream];
         if( p_stream->p_capture_filter &&
             p_stream->p_capture_filter->CustomGetPin()
                 ->CustomGetSample( &p_stream->sample ) == S_OK )
