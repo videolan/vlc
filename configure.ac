@@ -294,6 +294,7 @@ dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
+AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
 
 dnl Check for setlocal and langinfo
 AC_CHECK_FUNCS(setlocale)

@@ -234,30 +234,6 @@ static struct
     { NULL,         SUB_TYPE_UNKNOWN,   "Unknown",  NULL }
 };
 
-static char * local_stristr( char *psz_big, char *psz_little)
-{
-    char *p_pos = psz_big;
-
-    if (!psz_big || !psz_little || !*psz_little) return psz_big;
-
-    while (*p_pos)
-    {
-        if (toupper(*p_pos) == toupper(*psz_little))
-        {
-            char * psz_cur1 = p_pos + 1;
-            char * psz_cur2 = psz_little + 1;
-            while (*psz_cur1 && *psz_cur2 && toupper(*psz_cur1) == toupper(*psz_cur2))
-            {
-                psz_cur1++;
-                psz_cur2++;
-            }
-            if (!*psz_cur2) return p_pos;
-        }
-        p_pos++;
-    }
-    return NULL;
-}
-
 /*****************************************************************************
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
@@ -352,7 +328,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
                 break;
             }
 
-            if( local_stristr( s, "<SAMI>" ) )
+            if( strcasestr( s, "<SAMI>" ) )
             {
                 i_sub_type = SUB_TYPE_SAMI;
                 break;
@@ -385,7 +361,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
                 }
                 break;
             }
-            else if( local_stristr( s, "This is a Sub Station Alpha v4 script" ) )
+            else if( strcasestr( s, "This is a Sub Station Alpha v4 script" ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; /* I hope this will work */
                 break;
@@ -395,7 +371,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
                 i_sub_type = SUB_TYPE_SSA2_4; /* could be wrong */
                 break;
             }
-            else if( local_stristr( s, "[INFORMATION]" ) )
+            else if( strcasestr( s, "[INFORMATION]" ) )
             {
                 i_sub_type = SUB_TYPE_SUBVIEWER; /* I hope this will work */
                 break;
@@ -406,7 +382,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
                 i_sub_type = SUB_TYPE_VPLAYER;
                 break;
             }
-            else if( local_stristr( s, "# VobSub index file" ) )
+            else if( strcasestr( s, "# VobSub index file" ) )
             {
                 i_sub_type = SUB_TYPE_VOBSUB;
                 break;
@@ -1114,9 +1090,9 @@ static char *sub_SamiSearch( text_t *txt, char *psz_start, char *psz_str )
 {
     if( psz_start )
     {
-        if( local_stristr( psz_start, psz_str ) )
+        if( strcasestr( psz_start, psz_str ) )
         {
-            char *s = local_stristr( psz_start, psz_str );
+            char *s = strcasestr( psz_start, psz_str );
 
             s += strlen( psz_str );
 
@@ -1130,9 +1106,9 @@ static char *sub_SamiSearch( text_t *txt, char *psz_start, char *psz_str )
         {
             return NULL;
         }
-        if( local_stristr( p, psz_str ) )
+        if( strcasestr( p, psz_str ) )
         {
-            char *s = local_stristr( p, psz_str );
+            char *s = strcasestr( p, psz_str );
 
             s += strlen( psz_str );
 
@@ -1194,7 +1170,7 @@ static int  sub_Sami( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtit
                 {
                     ADDC( '\n' );
                 }
-                else if( local_stristr( p, "Start=" ) )
+                else if( strcasestr( p, "Start=" ) )
                 {
                     text_previous_line( txt );
                     break;

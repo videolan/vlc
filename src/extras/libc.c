@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.16 2004/02/09 16:12:25 sigmunau Exp $
+ * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -124,6 +124,36 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
     }
 
     return i_delta;
+}
+#endif
+
+/******************************************************************************
+ * strcasestr: find a substring (little) in another substring (big)
+ * Case sensitive. Return NULL if not found, return big if little == null
+ *****************************************************************************/
+#if !defined( HAVE_STRCASESTR ) && !defined( HAVE_STRISTR )
+static char * vlc_strncasestr( const char *psz_big, const char *psz_little )
+{
+    char *p_pox = psz_big;
+
+    if( !psz_big || !psz_little || !*psz_little ) return psz_big;
+ 
+    while( *p_pos ) 
+    {
+        if( toupper( *p_pos ) == toupper( *psz_little ) )
+        {
+            char * psz_cur1 = p_pos + 1;
+            char * psz_cur2 = psz_little + 1;
+            while( *psz_cur1 && *psz_cur2 && toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
+            {
+                psz_cur1++;
+                psz_cur2++;
+            }
+            if( !*psz_cur2 ) return p_pos;
+        }
+        p_pos++;
+    }
+    return NULL;
 }
 #endif
 
