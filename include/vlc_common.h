@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.108 2004/02/06 20:06:55 gbazin Exp $
+ * $Id: vlc_common.h,v 1.109 2004/02/23 20:34:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -732,8 +732,10 @@ static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
 /* 64 bits integer constant suffix */
 #if defined( __MINGW32__ ) || (!defined(WIN32) && !defined(UNDER_CE))
 #   define I64C(x)         x##LL
+#   define UI64C(x)        x##ULL
 #else
 #   define I64C(x)         x##i64
+#   define UI64C(x)        x##ui64
 #endif /* defined(WIN32)||defined(UNDER_CE) */
 
 #if defined(WIN32) || defined(UNDER_CE)
