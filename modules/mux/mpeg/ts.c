@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.17 2003/05/03 02:18:26 fenrir Exp $
+ * $Id: ts.c,v 1.18 2003/05/14 11:15:50 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -181,10 +181,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->pat.i_continuity_counter = 0;
 
     p_sys->i_pmt_version_number = rand() % 32;
-    p_sys->pmt.i_pid = 0x10;
+    p_sys->pmt.i_pid = 0x42;
     p_sys->pmt.i_continuity_counter = 0;
 
-    p_sys->i_pid_free = 0x11;
+    p_sys->i_pid_free = 0x43;
     p_sys->i_pcr_pid = 0x1fff;
 
     p_sys->i_mpeg4_streams = 0;
