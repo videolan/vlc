@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.39 2003/06/27 10:31:02 zorglub Exp $
+ * $Id: playlist.c,v 1.40 2003/06/27 13:38:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -521,6 +521,7 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
         {
+            SkipItem( p_playlist, 0 );
             PlayItem( p_playlist );
         }
 

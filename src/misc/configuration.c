@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.57 2003/06/14 16:29:22 gbazin Exp $
+ * $Id: configuration.c,v 1.58 2003/06/27 13:38:54 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1334,7 +1334,7 @@ char *config_GetHomeDir( void )
     HINSTANCE shfolder_dll;
     SHGETFOLDERPATH SHGetFolderPath ;
 
-    /* load the shell32 dll to retreive SHGetFolderPath */
+    /* load the shfolder dll to retrieve SHGetFolderPath */
     if( ( shfolder_dll = LoadLibrary("shfolder.dll") ) != NULL )
     {
         SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
