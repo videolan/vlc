@@ -1,7 +1,7 @@
 /*****************************************************************************
- * asf.c
+ * asf.c: asf muxer module for vlc
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003-2004 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -44,11 +44,11 @@ static void Close  ( vlc_object_t * );
 #define TITLE_LONGTEXT N_("Allows you to define the title that will be put " \
                           "in ASF comments.")
 #define AUTHOR_TEXT N_("Author")
-#define AUTHOR_LONGTEXT N_("Allows you to define the author that will be put " \
-                          "in ASF comments.")
+#define AUTHOR_LONGTEXT N_("Allows you to define the author that will be put "\
+                           "in ASF comments.")
 #define COPYRIGHT_TEXT N_("Copyright")
-#define COPYRIGHT_LONGTEXT N_("Allows you to define the copyright string that "\
-                          "will be put in ASF comments.")
+#define COPYRIGHT_LONGTEXT N_("Allows you to define the copyright string " \
+                              "that will be put in ASF comments.")
 #define COMMENT_TEXT N_("Comment")
 #define COMMENT_LONGTEXT N_("Allows you to define the comment that will be " \
                             "put in ASF comments.")
@@ -125,7 +125,7 @@ struct sout_mux_sys_t
 
     vlc_bool_t      b_write_header;
 
-    block_t   *pk;
+    block_t         *pk;
     int             i_pk_used;
     int             i_pk_frame;
     mtime_t         i_pk_dts;
@@ -144,8 +144,7 @@ struct sout_mux_sys_t
 static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
 
 static block_t *asf_header_create( sout_mux_t *, vlc_bool_t b_broadcast );
-static block_t *asf_packet_create( sout_mux_t *,
-                                         asf_track_t *, block_t * );
+static block_t *asf_packet_create( sout_mux_t *, asf_track_t *, block_t * );
 static block_t *asf_stream_end_create( sout_mux_t *);
 
 typedef struct
@@ -200,7 +199,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_track = 1;
     p_sys->i_packet_size = 4096;
     p_sys->i_packet_count= 0;
-    /* generate a random fid */
+
+    /* Generate a random fid */
     srand( mdate() & 0xffffffff );
     p_sys->fid.v1 = 0xbabac001;
     p_sys->fid.v2 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
@@ -209,7 +209,8 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->fid.v4[i] = ( (uint64_t)rand() << 8 ) / RAND_MAX;
     }
-    /* meta data */
+
+    /* Meta data */
     var_Get( p_mux, SOUT_CFG_PREFIX "title", &val );
     p_sys->psz_title = val.psz_string;
 
@@ -225,8 +226,8 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "rating", &val );
     p_sys->psz_rating = val.psz_string;
 
-    msg_Dbg( p_mux,
-             "meta data: title='%s' author='%s' copyright='%s' comment='%s' rating='%s'",
+    msg_Dbg( p_mux, "meta data: title='%s' author='%s' copyright='%s' "
+             "comment='%s' rating='%s'",
              p_sys->psz_title, p_sys->psz_author, p_sys->psz_copyright,
              p_sys->psz_comment, p_sys->psz_rating );
 
@@ -273,8 +274,8 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     vlc_bool_t *pb_bool;
     char **ppsz;
 
-   switch( i_query )
-   {
+    switch( i_query )
+    {
        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
            *pb_bool = VLC_TRUE;
@@ -295,7 +296,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 
         default:
             return VLC_EGENERIC;
-   }
+    }
 }
 
 /*****************************************************************************
@@ -323,9 +324,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         case AUDIO_ES:
         {
-            int      i_blockalign = p_input->p_fmt->audio.i_blockalign;
-            int      i_bitspersample = 0;
-            int      i_extra = 0;
+            int i_blockalign = p_input->p_fmt->audio.i_blockalign;
+            int i_bitspersample = 0;
+            int i_extra = 0;
 
             switch( p_input->p_fmt->i_codec )
             {
@@ -541,7 +542,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 /*****************************************************************************
  * Mux:
  *****************************************************************************/
-static int Mux      ( sout_mux_t *p_mux )
+static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
@@ -593,10 +594,7 @@ static int Mux      ( sout_mux_t *p_mux )
     return VLC_SUCCESS;
 }
 
-
-static int MuxGetStream( sout_mux_t *p_mux,
-                         int        *pi_stream,
-                         mtime_t    *pi_dts )
+static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 {
     mtime_t i_dts;
     int     i_stream;
@@ -677,9 +675,7 @@ static void bo_add_mem( bo_t *p_bo, uint8_t *p_mem, int i_size )
 
     if( i_copy > 0 )
     {
-        memcpy( &p_bo->p_buffer[p_bo->i_buffer],
-                p_mem,
-                i_copy );
+        memcpy( &p_bo->p_buffer[p_bo->i_buffer], p_mem, i_copy );
     }
     p_bo->i_buffer += i_size;
 }
@@ -689,14 +685,9 @@ static void bo_addle_str16( bo_t *bo, char *str )
     bo_addle_u16( bo, strlen( str ) + 1 );
     for( ;; )
     {
-        uint16_t c;
-
-        c = (uint8_t)*str++;
+        uint16_t c = (uint8_t)*str++;
         bo_addle_u16( bo, c );
-        if( c == '\0' )
-        {
-            break;
-        }
+        if( c == '\0' ) break;
     }
 }
 
@@ -704,14 +695,9 @@ static void bo_addle_str16_nosize( bo_t *bo, char *str )
 {
     for( ;; )
     {
-        uint16_t c;
-
-        c = (uint8_t)*str++;
+        uint16_t c = (uint8_t)*str++;
         bo_addle_u16( bo, c );
-        if( c == '\0' )
-        {
-            break;
-        }
+        if( c == '\0' ) break;
     }
 }
 
@@ -744,7 +730,6 @@ static const guid_t asf_object_data_guid =
     0x11CF,
     { 0xA6,0xD9, 0x00,0xAA,0x00,0x62,0xCE,0x6C }
 };
-
 static const guid_t asf_object_file_properties_guid =
 {
     0x8cabdca1,
@@ -768,7 +753,6 @@ static const guid_t asf_object_header_extention_guid =
    0x11CF,
    { 0x8E,0xE3, 0x00,0xC0,0x0C,0x20,0x53,0x65 }
 };
-
 static const guid_t asf_object_stream_type_audio =
 {
     0xF8699E40,
@@ -838,27 +822,23 @@ static void asf_chunk_add( bo_t *bo,
     bo_addle_u16( bo, i_len + 8 );
 }
 
-static block_t *asf_header_create( sout_mux_t *p_mux,
-                                         vlc_bool_t b_broadcast )
+static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     asf_track_t    *tk;
 
-    mtime_t        i_duration = 0;
+    mtime_t i_duration = 0;
     int i_size;
     int i_ci_size;
     int i_cd_size = 0;
     block_t *out;
-    bo_t          bo;
-    int           i;
+    bo_t bo;
+    int i;
 
     if( p_sys->i_dts_first > 0 )
     {
         i_duration = p_sys->i_dts_last - p_sys->i_dts_first;
-        if( i_duration < 0 )
-        {
-            i_duration = 0;
-        }
+        if( i_duration < 0 ) i_duration = 0;
     }
 
     /* calculate header size */
@@ -877,6 +857,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux,
             i_ci_size += 6;
         }
     }
+
     if( *p_sys->psz_title || *p_sys->psz_author || *p_sys->psz_copyright ||
         *p_sys->psz_comment || *p_sys->psz_rating )
     {
@@ -900,6 +881,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux,
         out = block_New( p_mux, i_size + 50 );
         bo_init( &bo, out->p_buffer, i_size + 50 );
     }
+
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
@@ -1014,7 +996,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux,
  *
  ****************************************************************************/
 static block_t *asf_packet_create( sout_mux_t *p_mux,
-                                         asf_track_t *tk, block_t *data )
+                                   asf_track_t *tk, block_t *data )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
@@ -1026,22 +1008,20 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
 
     while( i_pos < i_data )
     {
-        bo_t          bo;
-        int           i_payload;
+        bo_t bo;
+        int i_payload;
 
         if( p_sys->pk == NULL )
         {
-            p_sys->pk = block_New( p_mux,
-                                   p_sys->i_packet_size + i_preheader);
+            p_sys->pk = block_New( p_mux, p_sys->i_packet_size + i_preheader );
             /* reserve 14 bytes for the packet header */
             p_sys->i_pk_used = 14 + i_preheader;
             p_sys->i_pk_frame = 0;
             p_sys->i_pk_dts = data->i_dts;
         }
 
-
         bo_init( &bo, &p_sys->pk->p_buffer[p_sys->i_pk_used],
-                      p_sys->i_packet_size - p_sys->i_pk_used );
+                 p_sys->i_packet_size - p_sys->i_pk_used );
 
         /* add payload (header size = 17) */
         i_payload = __MIN( i_data - i_pos,
@@ -1068,15 +1048,15 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
 
             if( p_sys->b_asf_http )
             {
-                asf_chunk_add( &bo, 0x4424,
-                               p_sys->i_packet_size, 0x00, p_sys->i_seq++);
+                asf_chunk_add( &bo, 0x4424, p_sys->i_packet_size,
+                               0x00, p_sys->i_seq++);
             }
             bo_add_u8   ( &bo, 0x82 );
             bo_addle_u16( &bo, 0 );
             bo_add_u8( &bo, 0x11 );
             bo_add_u8( &bo, 0x5d );
             bo_addle_u16( &bo, i_pad );
-            bo_addle_u32( &bo, ( p_sys->i_pk_dts - p_sys->i_dts_first )/ 1000 );
+            bo_addle_u32( &bo, ( p_sys->i_pk_dts - p_sys->i_dts_first )/1000 );
             bo_addle_u16( &bo, 0 * data->i_length / 1000 );
             bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
 
@@ -1101,7 +1081,7 @@ static block_t *asf_stream_end_create( sout_mux_t *p_mux )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     block_t *out = NULL;
-    bo_t          bo;
+    bo_t bo;
 
     if( p_sys->b_asf_http )
     {
@@ -1109,5 +1089,6 @@ static block_t *asf_stream_end_create( sout_mux_t *p_mux )
         bo_init( &bo, out->p_buffer, 12 );
         asf_chunk_add( &bo, 0x4524, 0, 0x00, p_sys->i_seq++ );
     }
+
     return out;
 }
