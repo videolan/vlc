@@ -13,14 +13,14 @@ include /usr/share/dpatch/dpatch.make
 
 CONFIG_FLAGS = --enable-release --prefix=/usr
 CONFIG_FLAGS += \
-	--enable-gnome \
-	--enable-gtk \
+	--disable-gnome \
+	--disable-gtk \
 	--disable-familiar \
 	--disable-fb \
 	--enable-ggi \
 	--enable-sdl \
 	--enable-esd \
-	--enable-qt \
+	--disable-qt \
 	--enable-mad \
 	--enable-arts \
 	--enable-alsa \
@@ -30,9 +30,9 @@ CONFIG_FLAGS += \
 	--enable-dvbpsi \
 	--enable-xosd \
 	--enable-mozilla \
-	--enable-kde \
+	--disable-kde \
 	--enable-mp4 \
-	--disable-dvb \
+	--enable-dvb \
 	--enable-dv \
 	--disable-satellite \
 	--enable-ogg \
@@ -98,7 +98,7 @@ configure-stamp:
 	test -d extras/ffmpeg
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg \
-	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug --disable-mmx \
+	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug --disable-mmx --disable-altivec \
 	  && cd libavcodec \
 	  && $(MAKE); \
 	fi
@@ -232,32 +232,32 @@ install: build
 	ln -s vlc debian/libvlc0-dev/usr/share/doc/libvlc0-dev
 
 	# Package: gnome-vlc
-	mv debian/vlc/usr/bin/gnome-vlc debian/gnome-vlc/usr/bin/
+	#mv debian/vlc/usr/bin/gnome-vlc debian/gnome-vlc/usr/bin/
 	ln -s vlc debian/gnome-vlc/usr/share/doc/gnome-vlc
-	mv debian/vlc/usr/lib/vlc/misc/libgnome_main_plugin.so \
-	  debian/gnome-vlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/lib/vlc/gui/libgnome_plugin.so \
-	  debian/gnome-vlc/usr/lib/vlc/gui/
-	ln -s vlc.1.gz debian/gnome-vlc/usr/share/man/man1/gnome-vlc.1.gz
-	mv debian/vlc/$(VIDDIR)/gnome-vlc32x32.xpm debian/gnome-vlc/$(VIDDIR)/gnome-vlc.xpm
-	mv debian/vlc/$(VIDDIR)/gnome-vlc48x48.png debian/gnome-vlc/$(PIXDIR)/gnome-vlc.png
+	#mv debian/vlc/usr/lib/vlc/misc/libgnome_main_plugin.so \
+	#  debian/gnome-vlc/usr/lib/vlc/gui/
+	#mv debian/vlc/usr/lib/vlc/gui/libgnome_plugin.so \
+	#  debian/gnome-vlc/usr/lib/vlc/gui/
+	#ln -s vlc.1.gz debian/gnome-vlc/usr/share/man/man1/gnome-vlc.1.gz
+	#mv debian/vlc/$(VIDDIR)/gnome-vlc32x32.xpm debian/gnome-vlc/$(VIDDIR)/gnome-vlc.xpm
+	#mv debian/vlc/$(VIDDIR)/gnome-vlc48x48.png debian/gnome-vlc/$(PIXDIR)/gnome-vlc.png
 
 	# Package: vlc-gnome
 	mkdir -p debian/vlc-gnome/usr/share/doc/
 	ln -s vlc debian/vlc-gnome/usr/share/doc/vlc-gnome
 
 	# Package: gvlc
-	mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/
+	#mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/
 	ln -s vlc debian/gvlc/usr/share/doc/gvlc
-	mv debian/vlc/usr/lib/vlc/misc/libgtk_main_plugin.so \
-	  debian/gvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/lib/vlc/gui/libgtk_plugin.so \
-	  debian/gvlc/usr/lib/vlc/gui/
+	#mv debian/vlc/usr/lib/vlc/misc/libgtk_main_plugin.so \
+	#  debian/gvlc/usr/lib/vlc/gui/
+	#mv debian/vlc/usr/lib/vlc/gui/libgtk_plugin.so \
+	#  debian/gvlc/usr/lib/vlc/gui/
 	#mv debian/vlc/usr/lib/vlc/gui/libfamiliar_plugin.so \
 	#  debian/gvlc/usr/lib/vlc/gui/
-	ln -s vlc.1.gz debian/gvlc/usr/share/man/man1/gvlc.1.gz
-	mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/gvlc/$(VIDDIR)/gvlc.xpm
-	mv debian/vlc/$(VIDDIR)/gvlc48x48.png debian/gvlc/$(PIXDIR)/gvlc.png
+	#ln -s vlc.1.gz debian/gvlc/usr/share/man/man1/gvlc.1.gz
+	#mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/gvlc/$(VIDDIR)/gvlc.xpm
+	#mv debian/vlc/$(VIDDIR)/gvlc48x48.png debian/gvlc/$(PIXDIR)/gvlc.png
 
 	# Package: vlc-gtk
 	mkdir -p debian/vlc-gtk/usr/share/doc/
@@ -313,13 +313,13 @@ ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 endif
 
 	# Package: qvlc
-	mv debian/vlc/usr/bin/qvlc debian/qvlc/usr/bin/
+	#mv debian/vlc/usr/bin/qvlc debian/qvlc/usr/bin/
 	ln -s vlc debian/qvlc/usr/share/doc/qvlc
-	mv debian/vlc/usr/lib/vlc/gui/libqt_plugin.so \
-	  debian/qvlc/usr/lib/vlc/gui/
-	ln -s vlc.1.gz debian/qvlc/usr/share/man/man1/qvlc.1.gz
-	mv debian/vlc/$(VIDDIR)/qvlc32x32.xpm debian/qvlc/$(VIDDIR)/qvlc.xpm
-	mv debian/vlc/$(VIDDIR)/qvlc48x48.png debian/qvlc/$(PIXDIR)/qvlc.png
+	#mv debian/vlc/usr/lib/vlc/gui/libqt_plugin.so \
+	#  debian/qvlc/usr/lib/vlc/gui/
+	#ln -s vlc.1.gz debian/qvlc/usr/share/man/man1/qvlc.1.gz
+	#mv debian/vlc/$(VIDDIR)/qvlc32x32.xpm debian/qvlc/$(VIDDIR)/qvlc.xpm
+	#mv debian/vlc/$(VIDDIR)/qvlc48x48.png debian/qvlc/$(PIXDIR)/qvlc.png
 
 	# Package: vlc-qt
 	mkdir -p debian/vlc-qt/usr/share/doc/
@@ -340,14 +340,14 @@ endif
 	ln -s ../../mozilla/components/vlcintf.xpt debian/mozilla-plugin-vlc/usr/lib/mozilla-firefox/components/
 
 	# Package: kvlc
-	mv debian/vlc/usr/bin/kvlc debian/kvlc/usr/bin/
+	#mv debian/vlc/usr/bin/kvlc debian/kvlc/usr/bin/
 	ln -s vlc debian/kvlc/usr/share/doc/kvlc
-	mv debian/vlc/usr/lib/vlc/gui/libkde_plugin.so \
-	  debian/kvlc/usr/lib/vlc/gui/
-	mv debian/vlc/$(VIDDIR)/ui.rc debian/kvlc/$(VIDDIR)
-	ln -s vlc.1.gz debian/kvlc/usr/share/man/man1/kvlc.1.gz
-	mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/kvlc/$(VIDDIR)/kvlc.xpm
-	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
+	#mv debian/vlc/usr/lib/vlc/gui/libkde_plugin.so \
+	#  debian/kvlc/usr/lib/vlc/gui/
+	#mv debian/vlc/$(VIDDIR)/ui.rc debian/kvlc/$(VIDDIR)
+	#ln -s vlc.1.gz debian/kvlc/usr/share/man/man1/kvlc.1.gz
+	#mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/kvlc/$(VIDDIR)/kvlc.xpm
+	#mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
 
 	# Package: vlc-plugin-svgalib
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)

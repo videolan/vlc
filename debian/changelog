@@ -1,3 +1,20 @@
+vlc (0.7.2.svn20040827-1) unstable; urgency=high
+
+  * New SVN snapshot.
+  * debian/rules:
+    + Activated x264 support.
+    + Re-enabled libmodplug support.
+    + Build PIC plugins even on x86.
+    + Disabled SLP because its code is broken.
+    + Disabled the GNOME, Qt, GTK+ and KDE interfaces in favour of the
+      WxWidgets one.
+    + Activated HAL support.
+  * debian/control:
+    + Force the vlc-plugin-arts dependencies.
+    + Build-depend on jam and nasm because of x264.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 27 Aug 2004 21:31:13 +0200
+
 vlc (0.7.2.final-11) unstable; urgency=medium
 
   * configure.ac:

@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, jam, nasm, libmodplug-dev
+Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi3-dev, mozilla-dev, libidl0, libglib2.0-0, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, jam, nasm, libmodplug-dev, libhal-dev
 Build-Conflicts: libavcodec-dev
 Standards-Version: 3.6.1.1
 
@@ -39,32 +39,30 @@ Description: development files for VLC
  streams from various network sources.
 
 Package: gnome-vlc
-Section: gnome
+Section: oldlibs
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
-Recommends: vlc-plugin-esd
+Depends: wxvlc, vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
-Description: GNOME frontend for VLC
- This plugin adds a GNOME interface to the VLC media player. To activate
- it, use the `--intf gnome' flag or run the `gnome-vlc' program.
+Description: GNOME frontend for VLC (dummy legacy package)
+ The gnome-vlc package has been discontinued. You should use the wxvlc
+ package instead.
  .
- VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
- DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
- streams from various network sources.
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: gvlc
+Section: oldlibs
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: wxvlc, vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Replaces: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
-Description: GTK+ frontend for VLC
- This plugin adds a GTK+ interface to the VLC media player. To activate
- it, use the `--intf gtk' flag or run the `gvlc' program.
+Description: GTK+ frontend for VLC (dummy legacy package)
+ The gvlc package has been discontinued. You should use the wxvlc
+ package instead.
  .
- VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
- DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
- streams from various network sources.
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-plugin-esd
 Architecture: any
@@ -138,17 +136,17 @@ Description: Glide video output plugin for VLC
  streams from various network sources.
 
 Package: qvlc
+Section: oldlibs
 Architecture: any
-Depends: vlc (= ${Source-Version}), libqt3c102-mt, ${misc:Depends}
+Depends: wxvlc, vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-qt (<< 0.5.0)
 Replaces: vlc-qt (<< 0.5.0)
-Description: Qt frontend for VLC
- This plugin adds a Qt interface to the VLC media player. To activate it,
- use the `--intf qt' flag or run the `qvlc' program.
+Description: Qt frontend for VLC (dummy legacy package)
+ The qvlc package has been discontinued. You should use the wxvlc
+ package instead.
  .
- VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
- DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
- streams from various network sources.
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-plugin-arts
 Architecture: any
@@ -179,19 +177,18 @@ Description: multimedia plugin for Mozilla based on VLC
  streams from various network sources.
 
 Package: kvlc
-Section: kde
+Section: oldlibs
 Architecture: any
-Depends: vlc (= ${Source-Version}), kdelibs4 (>= 4:3.1.5-1), ${misc:Depends}
+Depends: wxvlc, vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: vlc-plugin-arts
 Conflicts: vlc-kde (<< 0.5.0)
 Replaces: vlc-kde (<< 0.5.0)
-Description: KDE frontend for VLC
- This plugin adds a KDE interface to the VLC media player. To activate it,
- use the `--intf kde' flag or run the `kvlc' program.
+Description: KDE frontend for VLC (dummy legacy package)
+ The kvlc package has been discontinued. You should use the wxvlc
+ package instead.
  .
- VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
- DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
- streams from various network sources.
+ This package is only useful to ensure clean upgrades from old Debian
+ releases and can be safely removed.
 
 Package: vlc-plugin-svgalib
 Architecture: i386
