@@ -1,0 +1,5 @@
+SOURCES_wav = \
+	modules/demux/wav/wav.c
+
+noinst_HEADERS += \
+	modules/demux/wav/wav.h

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.6 2002/08/26 09:12:46 sam Exp $
+ * $Id: ffmpeg.c,v 1.7 2002/10/14 21:59:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -666,8 +666,12 @@ static int InitThread( videodec_thread_t *p_vdec )
     }
 
     /* ***** Fill p_context with init values ***** */
-    p_vdec->p_context = &p_vdec->context;
+#if LIBAVCODEC_BUILD >= 4624
+    p_vdec->p_context = avcodec_alloc_context();
+#else
+    p_vdec->p_context = malloc( sizeof( AVCodecContext ) );
     memset( p_vdec->p_context, 0, sizeof( AVCodecContext ) );
+#endif
 
     p_vdec->p_context->width  = p_vdec->format.i_width;
     p_vdec->p_context->height = p_vdec->format.i_height;
@@ -966,6 +970,7 @@ static void EndThread( videodec_thread_t *p_vdec )
         avcodec_close( p_vdec->p_context );
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
                                  p_vdec->psz_namecodec );
+        free( p_vdec->p_context );
     }
 
     if( p_vdec->p_vout != NULL )
