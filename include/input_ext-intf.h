@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.89 2003/05/05 22:23:31 gbazin Exp $
+ * $Id: input_ext-intf.h,v 1.90 2003/05/17 22:00:00 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -349,6 +349,7 @@ struct input_thread_t
 #define INPUT_METHOD_DISC        0x20   /* stream is read directly from disc */
 #define INPUT_METHOD_DVD         0x21             /* stream is read from DVD */
 #define INPUT_METHOD_VCD         0x22             /* stream is read from VCD */
+#define INPUT_METHOD_CDDA        0x23            /* stream is read from CDDA */
 #define INPUT_METHOD_NETWORK     0x30         /* stream is read from network */
 #define INPUT_METHOD_UCAST       0x31                         /* UDP unicast */
 #define INPUT_METHOD_MCAST       0x32                       /* UDP multicast */
