@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.15 2003/12/13 12:56:59 rocky Exp $
+ * $Id: access.c,v 1.16 2003/12/14 23:40:36 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -625,7 +625,7 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
 		       playlist_t *p_playlist, unsigned int i_track, 
 		       char *psz_mrl, int psz_mrl_max, 
 		       const char *psz_source, int playlist_operation, 
-		       unsigned int i_pos)
+		       int i_pos)
 {
   mtime_t i_duration = 
     (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
