@@ -211,11 +211,14 @@ struct intf_sys_t
    static int InitSocket( intf_thread_t *p_intf, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
    static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
+    static void FreeSDP( sdp_t *p_sdp );
 #endif
 
 /* Detect multicast addresses */
 static int  ismult( char * );
 
+#define FREE( p ) \
+    if( p ) { free( p ); (p) = NULL; }
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -235,6 +238,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
+
+    /* FIXME */
+    p_sys->b_strict = VLC_FALSE;
 
     if( config_GetInt( p_intf, "sap-use-cache" ) )
     {
@@ -429,6 +435,8 @@ static void Run( intf_thread_t *p_intf )
 
         /* Parse the packet */
         ParseSAP( p_intf, p_buffer, i_read );
+
+        free( p_buffer );
     }
 }
 
@@ -494,6 +502,9 @@ static int Demux( demux_t *p_demux )
                  PLAYLIST_APPEND, PLAYLIST_END );
 
    vlc_object_release( p_playlist );
+
+   FreeSDP( p_sdp );
+   free( psz_sdp );
 
    return VLC_SUCCESS;
 }
@@ -641,8 +652,9 @@ static int ParseSAP( intf_thread_t *p_intf, uint8_t *p_buffer, int i_read )
             else
             {
                 p_intf->p_sys->pp_announces[i]->i_last = mdate();
+                FreeSDP( p_sdp );
+                return VLC_SUCCESS;
             }
-            return VLC_SUCCESS;
         }
     }
     /* Add item */
@@ -696,7 +708,8 @@ sap_announce_t *CreateAnnounce( intf_thread_t *p_intf, uint16_t i_hash,
     if( !p_playlist )
     {
         msg_Err( p_intf, "playlist not found" );
-        /* FIXME : Free */
+        FREE( psz_value );
+        free( p_sap );
         return NULL;
     }
 
@@ -893,6 +906,8 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     {
         asprintf( &p_sdp->psz_uri, "%s://%s:%i", psz_proto, psz_uri, i_port );
     }
+    FREE( psz_uri );
+    FREE( psz_proto );
     return VLC_SUCCESS;
 }
 
@@ -1026,8 +1041,6 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     return p_sdp;
 }
 
-#define FREE( p ) \
-    if( p ) { free( p ); (p) = NULL; }
 
 /***********************************************************************
  * ismult: returns true if we have a multicast address
@@ -1128,6 +1141,22 @@ static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
     return i_dstsize;
 }
 #endif
+
+
+static void FreeSDP( sdp_t *p_sdp )
+{
+    int i;
+    FREE( p_sdp->psz_sdp );
+    FREE( p_sdp->psz_sessionname );
+    FREE( p_sdp->psz_connection );
+    FREE( p_sdp->psz_media );
+    FREE( p_sdp->psz_uri );
+    for( i= 0 ; i< p_sdp->i_attributes; i++ )
+    {
+        FREE( p_sdp->pp_attributes[i] );
+    }
+    free( p_sdp );
+}
 
 static int RemoveAnnounce( intf_thread_t *p_intf, sap_announce_t *p_announce )
 {
