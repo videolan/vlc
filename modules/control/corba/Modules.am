@@ -8,9 +8,12 @@ nodist_SOURCES_corba = \
 	MediaControl.h \
 	$(NULL)
 
-CORBAIDLFILE=MediaControl.idl
+EXTRA_DIST += $(CORBAIDLFILE)
+BUILT_SOURCES += $(GENERATEDFILES) $(IMODULEFILE)
 
 if ENABLE_CORBA
+
+CORBAIDLFILE = MediaControl.idl
 
 corbaidldir = $(datadir)/idl
 corbaidl_DATA = $(CORBAIDLFILE)
@@ -19,12 +22,10 @@ corbaidl_DATA = $(CORBAIDLFILE)
 orbittypelibdir = $(libdir)/advene
 orbittypelib_DATA = MediaControl.so
 
-EXTRA_DIST += $(CORBAIDLFILE)
-
 ORBIT_IDL=$(shell pkg-config --variable=orbit_idl ORBit-2.0)
 
 GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
-BUILT_SOURCES += $(GENERATEDFILES) MediaControl-imodule.c
+IMODULEFILE = $(IMODULEFILE)
 
 ## MediaControl.so rules
 MediaControl.so: MediaControl-imodule.c
@@ -37,12 +38,12 @@ $(GENERATEDFILES): $(CORBAIDLFILE)
 ## We have to invoke 2 times $(ORBIT_IDL), else the --imodule
 ## invocation builds MediaControl-common.c without some
 ## glue code that is needed.
-MediaControl-imodule.c: $(CORBAIDLFILE)
+$(IMODULEFILE): $(CORBAIDLFILE)
 	$(ORBIT_IDL) --imodule $<
 	$(ORBIT_IDL) $<
 
 clean:
 	$(RM) -f $(GENERATEDFILES)
-	$(RM) -f MediaControl-imodule.c
+	$(RM) -f $(IMODULEFILE)
 
 endif
