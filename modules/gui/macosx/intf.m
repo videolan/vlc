@@ -496,7 +496,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         playlist_t *p_playlist =
             (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                            FIND_ANYWHERE );
-        NSLog( @"Ja Nu!!!!");
         if( p_playlist )
         {
             playlist_Play( p_playlist );
