@@ -1453,7 +1453,18 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 #undef SCREEN
 
         }
+        else
 #endif
+        {
+            /* The window wasn't necessarily created at the requested size */
+            p_vout->p_sys->p_win->i_x = p_vout->p_sys->p_win->i_y = 0;
+            p_vout->p_sys->p_win->i_width =
+                DisplayWidth( p_vout->p_sys->p_display,
+                              p_vout->p_sys->i_screen );
+            p_vout->p_sys->p_win->i_height =
+                DisplayHeight( p_vout->p_sys->p_display,
+                               p_vout->p_sys->i_screen );
+        }
 
         XMoveResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
