@@ -2,7 +2,7 @@
  * filter.h : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.h,v 1.3 2003/10/18 20:09:23 gbazin Exp $
+ * $Id: filter.h,v 1.4 2003/12/02 23:03:31 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,6 +45,7 @@ using namespace std;
 #include <dshow.h>
 
 extern const GUID MEDIASUBTYPE_I420;
+extern const GUID MEDIASUBTYPE_PREVIEW_VIDEO;
 
 typedef struct VLCMediaSample
 {

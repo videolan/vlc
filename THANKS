@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.12 2003/11/17 06:31:22 hartman Exp $
+$Id: THANKS,v 1.13 2003/12/02 23:03:31 gbazin Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -41,6 +41,7 @@ Joeri van Dooren <joeri@van.dooren.be> - OS X icon (v0.4.0)
 Johen Michael Zorko <zorko@att.net> - fix for delay issues in udp sout
 John Paul Lorenti <jpl31@columbia.edu> - ALSA device selection patch
 Julien Blache <jb@technologeek.org> - disc ejection code
+Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kuespert <ltlBeBoy@beosmail.com> - BeOS CSS support
 Mathias Kretschmer <mathias@research.att.com> - IP Multicast support

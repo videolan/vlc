@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.17 2003/11/26 21:54:00 gbazin Exp $
+ * $Id: dshow.cpp,v 1.18 2003/12/02 23:03:31 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -37,8 +37,8 @@
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
-static ssize_t Read        ( input_thread_t *, byte_t *, size_t );
-static ssize_t ReadDV      ( input_thread_t *, byte_t *, size_t );
+static ssize_t Read          ( input_thread_t *, byte_t *, size_t );
+static ssize_t ReadCompressed( input_thread_t *, byte_t *, size_t );
 
 static int OpenDevice( input_thread_t *, string, vlc_bool_t );
 static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
@@ -49,6 +49,9 @@ static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
 
 static int FindDevicesCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
+
+static void PropertiesPage( input_thread_t *, IBaseFilter * );
+
 #if 0
     /* Debug only, use this to find out GUIDs */
     unsigned char p_st[];
@@ -122,6 +125,9 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 #define CHROMA_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific chroma format " \
     "(eg. I420 (default), RV24, etc...)")
+#define CONFIG_TEXT N_("Show device properties dialog")
+#define CONFIG_LONGTEXT N_( \
+    "Show the properties dialog of the selected device")
 
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
@@ -145,6 +151,10 @@ vlc_module_begin();
 
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
+
+    add_bool( "dshow-config", VLC_FALSE, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
+              VLC_TRUE );
+
     add_shortcut( "dshow" );
     set_capability( "access", 0 );
     set_callbacks( AccessOpen, AccessClose );
@@ -205,6 +215,7 @@ struct access_sys_t
     int            i_width;
     int            i_height;
     int            i_chroma;
+    int            b_audio;
 };
 
 /*****************************************************************************
@@ -311,6 +322,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->i_width = i_width;
     p_sys->i_height = i_height;
     p_sys->i_chroma = i_chroma;
+    p_sys->b_audio = VLC_TRUE;
 
     /* Create header */
     p_sys->i_header_size = 8;
@@ -331,7 +343,7 @@ static int AccessOpen( vlc_object_t *p_this )
         msg_Err( p_input, "can't open video");
     }
 
-    if( OpenDevice( p_input, adevname, 1 ) != VLC_SUCCESS )
+    if( p_sys->b_audio && OpenDevice( p_input, adevname, 1 ) != VLC_SUCCESS )
     {
         msg_Err( p_input, "can't open audio");
     }
@@ -534,6 +546,10 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_dvhd )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
 
+            /* MPEG video formats */
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
+
             else goto fail;
 
             dshow_stream.header.video =
@@ -560,13 +576,24 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                 dshow_stream.i_fourcc == VLC_FOURCC( 'd', 'v', 's', 'd' ) ||
                 dshow_stream.i_fourcc == VLC_FOURCC( 'd', 'v', 'h', 'd' ) )
             {
-                p_input->pf_read = ReadDV;
+                p_input->pf_read = ReadCompressed;
                 if( !p_input->psz_demux || !*p_input->psz_demux )
                 {
                     p_input->psz_demux = "rawdv";
                 }
+                p_sys->b_audio = VLC_FALSE;
             }
 
+            /* Check if we are dealing with an MPEG video stream */
+            if( dshow_stream.i_fourcc == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
+            {
+                p_input->pf_read = ReadCompressed;
+                if( !p_input->psz_demux || !*p_input->psz_demux )
+                {
+                    p_input->psz_demux = "mpgv";
+                }
+                p_sys->b_audio = VLC_FALSE;
+            }
 
             /* Add video stream to header */
             p_sys->i_header_size += 20;
@@ -641,7 +668,41 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             p_pin->Release();
             p_input->i_mtu = __MAX( p_input->i_mtu, (unsigned int)i_mtu );
         }
-        else goto fail;
+
+        else if( dshow_stream.mt.majortype == MEDIATYPE_Stream )
+        {
+            msg_Dbg( p_input, "MEDIATYPE_Stream" );
+
+            if( dshow_stream.mt.subtype == MEDIASUBTYPE_MPEG2_PROGRAM )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'p' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_MPEG2_TRANSPORT )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'm', 'p', '2', 't' );
+
+            msg_Dbg( p_input, "selected stream pin accepts format: %4.4s",
+                     (char *)&dshow_stream.i_fourcc);
+
+            p_sys->b_audio = VLC_FALSE;
+            p_sys->i_header_size = 0;
+            p_sys->i_header_pos = 0;
+            p_input->i_mtu = INPUT_DEFAULT_BUFSIZE;
+
+            p_input->pf_read = ReadCompressed;
+            p_input->pf_set_program = input_SetProgram;
+        }
+
+        else
+        {
+            msg_Dbg( p_input, "unknown stream majortype" );
+            goto fail;
+        }
+
+        /* Show properties */
+        vlc_value_t val;
+        var_Create( p_input, "dshow-config",
+                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Get( p_input, "dshow-config", &val );
+
+        if(val.i_int) PropertiesPage( p_input, p_device_filter );
 
         /* Add directshow elementary stream to our list */
         dshow_stream.p_device_filter = p_device_filter;
@@ -770,14 +831,15 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
 
 static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                                      IBaseFilter *p_filter,
-                                     int i_chroma, int i_width, int i_height,
+                                     int i_fourcc, int i_width, int i_height,
                                      int i_channels, int i_samplespersec,
                                      int i_bitspersample )
 {
     IEnumPins *p_enumpins;
     IPin *p_output_pin;
     IEnumMediaTypes *p_enummt;
-    int i_orig_chroma = i_chroma;
+    int i_orig_fourcc = i_fourcc;
+    vlc_bool_t b_found = VLC_FALSE;
 
     AM_MEDIA_TYPE media_type;
     media_type.majortype = GUID_NULL;
@@ -789,8 +851,16 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
 
     if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return media_type;
 
-    /*while*/if( p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
+    while( !b_found && p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
     {
+        PIN_INFO info;
+
+        if( S_OK == p_output_pin->QueryPinInfo( &info ) )
+        {
+            msg_Dbg( p_this, "EnumDeviceCaps: pin %S", info.achName );
+            if( info.pFilter ) info.pFilter->Release();
+        }
+
         /* Probe pin */
         if( SUCCEEDED( p_output_pin->EnumMediaTypes( &p_enummt ) ) )
         {
@@ -800,26 +870,35 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
 
                 if( p_mt->majortype == MEDIATYPE_Video )
                 {
-                    int i_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
+                    int i_current_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
 
                     /* Packed RGB formats */
                     if( p_mt->subtype == MEDIASUBTYPE_RGB1 )
-                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
                     if( p_mt->subtype == MEDIASUBTYPE_RGB4 )
-                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
                     if( p_mt->subtype == MEDIASUBTYPE_RGB8 )
-                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
                     else if( p_mt->subtype == MEDIASUBTYPE_RGB555 )
-                        i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
                     else if( p_mt->subtype == MEDIASUBTYPE_RGB565 )
-                        i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
                     else if( p_mt->subtype == MEDIASUBTYPE_RGB24 )
-                        i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
                     else if( p_mt->subtype == MEDIASUBTYPE_RGB32 )
-                        i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+                        i_current_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
                     else if( p_mt->subtype == MEDIASUBTYPE_ARGB32 )
-                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
-                    else i_fourcc = *((int *)&p_mt->subtype);
+                        i_current_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+
+                    /* MPEG2 video elementary stream */
+                    else if( p_mt->subtype == MEDIASUBTYPE_MPEG2_VIDEO )
+                        i_current_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
+
+                    /* hauppauge pvr video preview */
+                    else if( p_mt->subtype == MEDIASUBTYPE_PREVIEW_VIDEO )
+                        i_current_fourcc = VLC_FOURCC( 'P', 'V', 'R', 'V' );
+
+                    else i_current_fourcc = *((int *)&p_mt->subtype);
 
                     int i_current_width = p_mt->pbFormat ?
                         ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth : 0;
@@ -830,20 +909,21 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
 
                     msg_Dbg( p_this, "EnumDeviceCaps: input pin "
                              "accepts chroma: %4.4s, width:%i, height:%i",
-                             (char *)&i_fourcc, i_current_width,
+                             (char *)&i_current_fourcc, i_current_width,
                              i_current_height );
 
-                    if( (!i_chroma || i_fourcc == i_chroma ||
-                         (!i_orig_chroma &&
-                          i_fourcc == VLC_FOURCC('I','4','2','0')) ) &&
-                        (!i_width || i_width == i_current_width) &&
-                        (!i_height || i_height == i_current_height) )
+                    if( ( !i_fourcc || i_fourcc == i_current_fourcc ||
+                          ( !i_orig_fourcc && i_current_fourcc ==
+                            VLC_FOURCC('I','4','2','0') ) ) &&
+                        ( !i_width || i_width == i_current_width ) &&
+                        ( !i_height || i_height == i_current_height ) )
                     {
                         /* Pick the 1st match */
                         media_type = *p_mt;
-                        i_chroma = i_fourcc;
+                        i_fourcc = i_current_fourcc;
                         i_width = i_current_width;
                         i_height = i_current_height;
+                        b_found = VLC_TRUE;
                     }
                     else
                     {
@@ -852,7 +932,7 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                 }
                 else if( p_mt->majortype == MEDIATYPE_Audio )
                 {
-                    int i_fourcc;
+                    int i_current_fourcc;
                     int i_current_channels =
                         ((WAVEFORMATEX *)p_mt->pbFormat)->nChannels;
                     int i_current_samplespersec =
@@ -861,13 +941,13 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                         ((WAVEFORMATEX *)p_mt->pbFormat)->wBitsPerSample;
 
                     if( p_mt->subtype == MEDIASUBTYPE_PCM )
-                        i_fourcc = VLC_FOURCC( 'p', 'c', 'm', ' ' );
-                    else i_fourcc = *((int *)&p_mt->subtype);
+                        i_current_fourcc = VLC_FOURCC( 'p', 'c', 'm', ' ' );
+                    else i_current_fourcc = *((int *)&p_mt->subtype);
 
                     msg_Dbg( p_this, "EnumDeviceCaps: input pin "
                              "accepts format: %4.4s, channels:%i, "
                              "samples/sec:%i bits/sample:%i",
-                             (char *)&i_fourcc, i_current_channels,
+                             (char *)&i_current_fourcc, i_current_channels,
                              i_current_samplespersec, i_current_bitspersample);
 
                     if( (!i_channels || i_channels == i_current_channels) &&
@@ -881,6 +961,7 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                         i_channels = i_current_channels;
                         i_samplespersec = i_current_samplespersec;
                         i_bitspersample = i_current_bitspersample;
+                        b_found = VLC_TRUE;
 
                         /* Setup a few properties like the audio latency */
                         IAMBufferNegotiation *p_ambuf;
@@ -902,6 +983,35 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                     {
                         FreeMediaType( *p_mt );
                     }
+                }
+                else if( p_mt->majortype == MEDIATYPE_Stream )
+                {
+                    msg_Dbg( p_this, "EnumDeviceCaps: MEDIATYPE_Stream" );
+
+                    int i_current_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
+
+                    if( p_mt->subtype == MEDIASUBTYPE_MPEG2_PROGRAM )
+                        i_current_fourcc = VLC_FOURCC( 'm', 'p', '2', 'p' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_MPEG2_TRANSPORT )
+                        i_current_fourcc = VLC_FOURCC( 'm', 'p', '2', 't' );
+
+                    if( ( !i_fourcc || i_fourcc == i_current_fourcc ) )
+                    {
+                        /* Pick the 1st match */
+                        media_type = *p_mt;
+                        i_fourcc = i_current_fourcc;
+                        b_found = VLC_TRUE;
+                    }
+                    else
+                    {
+                        FreeMediaType( *p_mt );
+                    }
+                }
+                else
+                {
+                    msg_Dbg( p_this,
+                             "EnumDeviceCaps: input pin: unknown format" );
+                    FreeMediaType( *p_mt );
                 }
 
                 CoTaskMemFree( (PVOID)p_mt );
@@ -1064,13 +1174,13 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
 }
 
 /*****************************************************************************
- * ReadDV: reads from the DV device into PES packets.
+ * ReadCompressed: reads compressed (MPEG/DV) data from the device.
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static ssize_t ReadDV( input_thread_t * p_input, byte_t * p_buffer,
-                       size_t i_len )
+static ssize_t ReadCompressed( input_thread_t * p_input, byte_t * p_buffer,
+                               size_t i_len )
 {
     access_sys_t   *p_sys = p_input->p_access_data;
     dshow_stream_t *p_stream = NULL;
@@ -1078,14 +1188,16 @@ static ssize_t ReadDV( input_thread_t * p_input, byte_t * p_buffer,
     int             i_data_size;
     uint8_t         *p_data;
 
-    /* Read 1 DV frame (they contain the video and audio data) */
+    /* Read 1 DV/MPEG frame (they contain the video and audio data) */
 
-    /* There must be only 1 elementary stream to produce a valid
-     * raw DV stream*/
+    /* There must be only 1 elementary stream to produce a valid stream
+     * of MPEG or DV data */
     p_stream = p_sys->pp_streams[0];
 
     while( 1 )
     {
+        if( p_input->b_die || p_input->b_error ) return 0;
+
         /* Get new sample/frame from the elementary stream (blocking). */
         vlc_mutex_lock( &p_sys->lock );
 
@@ -1106,24 +1218,10 @@ static ssize_t ReadDV( input_thread_t * p_input, byte_t * p_buffer,
         i_data_size = sample.p_sample->GetActualDataLength();
         sample.p_sample->GetPointer( &p_data );
 
-        REFERENCE_TIME i_pts, i_end_date;
-        HRESULT hr = sample.p_sample->GetTime( &i_pts, &i_end_date );
-        if( hr != VFW_S_NO_STOP_TIME && hr != S_OK ) i_pts = 0;
-
-        if( !i_pts )
-        {
-            if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
-            {
-                /* Use our data timestamp */
-                i_pts = sample.i_timestamp;
-                p_stream->b_pts = VLC_TRUE;
-            }
-        }
-
 #if 0
-        msg_Info( p_input, "access read %i data_size %i PTS: "I64Fd,
-                  i_len, i_data_size, i_pts );
+        msg_Info( p_input, "access read %i data_size %i", i_len, i_data_size );
 #endif
+        i_data_size = __MIN( i_data_size, (int)i_len );
 
         p_input->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
 
@@ -1367,4 +1465,35 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item->ppsz_list_text[i] = NULL;
 
     return VLC_SUCCESS;
+}
+
+static void PropertiesPage( input_thread_t *p_input,
+                            IBaseFilter *p_device_filter )
+{
+    ISpecifyPropertyPages *p_spec;
+    CAUUID cauuid;
+ 
+    HRESULT hr = p_device_filter->QueryInterface( IID_ISpecifyPropertyPages,
+                                                  (void **)&p_spec );
+    if( hr == S_OK )
+    {
+        hr = p_spec->GetPages( &cauuid );
+        if( hr == S_OK )
+        {
+            HWND hwnd_desktop = ::GetDesktopWindow();
+
+            hr = OleCreatePropertyFrame( hwnd_desktop, 30, 30, NULL, 1,
+                                         (IUnknown **)&p_device_filter,
+                                         cauuid.cElems,
+                                         (GUID *)cauuid.pElems, 0, 0, NULL );
+            if( hr == S_OK )
+            {
+                msg_Dbg( p_input, "made OleCreatePropertyFrame");
+            }
+
+            CoTaskMemFree( cauuid.pElems );
+        }
+
+        p_spec->Release();
+    }
 }
