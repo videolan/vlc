@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.30 2003/06/16 20:23:41 gbazin Exp $
+ * $Id: video.c,v 1.31 2003/06/16 20:49:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -267,6 +267,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->p_context->pix_fmt != PIX_FMT_YUV422P &&
         !(p_vdec->p_context->width % 16) && !(p_vdec->p_context->height % 16) )
     {
+        /* Some codecs set pix_fmt only after the 1st frame has been decoded,
+         * so we need to do another check in ffmpeg_GetFrameBuf() */
         p_vdec->b_direct_rendering = 1;
     }
 
@@ -314,8 +316,6 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     if( p_vdec->b_direct_rendering )
     {
-        /* FIXME: some codecs set pix_fmt only after a frame
-         * has been decoded. */
         msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
         p_vdec->p_context->flags|= CODEC_FLAG_EMU_EDGE;
         p_vdec->p_context->get_buffer     = ffmpeg_GetFrameBuf;
@@ -753,6 +753,17 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 {
     vdec_thread_t *p_vdec = (vdec_thread_t *)p_context->opaque;
     picture_t *p_pic;
+
+    /* Some codecs set pix_fmt only after the 1st frame has been decoded,
+     * so this check is necessary. */
+    if( !ffmpeg_PixFmtToChroma( p_context->pix_fmt ) )
+    {
+        p_context->get_buffer = avcodec_default_get_buffer;
+        p_context->release_buffer = avcodec_default_release_buffer;
+        p_vdec->b_direct_rendering = 0;
+        msg_Dbg( p_vdec->p_fifo, "disabling direct rendering" );
+        return p_context->get_buffer( p_context, p_ff_pic );
+    }
 
     /* Check and (re)create our vout if needed */
     p_vdec->p_vout = ffmpeg_CreateVout( p_vdec, p_vdec->p_context );
