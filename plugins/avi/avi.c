@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.32 2002/07/23 00:39:16 sam Exp $
+ * $Id: avi.c,v 1.33 2002/07/31 20:56:50 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -39,43 +39,20 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * );
-static int  AVIDemux         ( input_thread_t * );
-static int  AVIInit          ( input_thread_t * );
-static void AVIEnd           ( input_thread_t * );
+static int    AVIInit   ( vlc_object_t * );
+static void __AVIEnd    ( vlc_object_t * );
+static int    AVIDemux  ( input_thread_t * );
+
+#define AVIEnd(a) __AVIEnd(VLC_OBJECT(a))
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "RIFF-AVI Stream input" )
-    ADD_CAPABILITY( DEMUX, 150 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = AVIInit;
-    input.pf_end              = AVIEnd;
-    input.pf_demux            = AVIDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
-
+vlc_module_begin();
+    set_description( "RIFF-AVI demuxer" );
+    set_capability( "demux", 150 );
+    set_callbacks( AVIInit, __AVIEnd );
+vlc_module_end();
 
 /*****************************************************************************
  * Some usefull functions to manipulate memory 
@@ -544,8 +521,9 @@ static void __AVI_UpdateIndexOffset( input_thread_t *p_input )
 /*****************************************************************************
  * AVIEnd: frees unused data
  *****************************************************************************/
-static void AVIEnd( input_thread_t *p_input )
+static void __AVIEnd ( vlc_object_t * p_this )
 {   
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     int i;
     demux_data_avi_file_t *p_avi_demux;
     p_avi_demux = (demux_data_avi_file_t*)p_input->p_demux_data  ; 
@@ -580,14 +558,17 @@ static void AVIEnd( input_thread_t *p_input )
 /*****************************************************************************
  * AVIInit: check file and initializes AVI structures
  *****************************************************************************/
-static int AVIInit( input_thread_t *p_input )
-{
+static int AVIInit( vlc_object_t * p_this )
+{   
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     riffchunk_t *p_riff,*p_hdrl,*p_movi;
     riffchunk_t *p_avih;
     riffchunk_t *p_strl,*p_strh,*p_strf;
     demux_data_avi_file_t *p_avi_demux;
     es_descriptor_t *p_es = NULL; /* for not warning */
     int i;
+
+    p_input->pf_demux = AVIDemux;
 
     if( !( p_input->p_demux_data = 
                     p_avi_demux = malloc( sizeof(demux_data_avi_file_t) ) ) )
@@ -1039,7 +1020,7 @@ static int __AVI_SeekAndGetChunk( input_thread_t  *p_input,
                                   AVIStreamInfo_t *p_info )
 {
     pes_packet_t *p_pes;
-    int i_length;
+    int i_length, i_ret;
     
     i_length = __MIN( p_info->p_index[p_info->i_idxposc].i_length 
                         - p_info->i_idxposb,
@@ -1049,10 +1030,9 @@ static int __AVI_SeekAndGetChunk( input_thread_t  *p_input,
                       (off_t)p_info->p_index[p_info->i_idxposc].i_pos + 
                             p_info->i_idxposb + 8);
 
-    if( __AVI_GetDataInPES( p_input, 
-                            &p_pes, 
-                            i_length , 
-                            0) != i_length )
+    i_ret = __AVI_GetDataInPES( p_input, &p_pes, i_length , 0);
+
+    if( i_ret != i_length )
     {
         return( 0 );
     }
@@ -1532,6 +1512,7 @@ static pes_packet_t *AVI_ReadStreamBytesInPES(  input_thread_t  *p_input,
     {
         return( NULL );
     }
+fprintf(stderr, "blah ibyte %i\n", i_byte);
     if( !( p_data = input_NewPacket( p_input->p_method_data, i_byte ) ) )
     {
         input_DeletePES( p_input->p_method_data, p_pes );

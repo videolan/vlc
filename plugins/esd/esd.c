@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.16 2002/07/20 18:01:42 sam Exp $
+ * $Id: esd.c,v 1.17 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,52 +48,32 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void aout_getfunctions ( function_list_t * p_function_list );
-static int  aout_Open         ( aout_thread_t * );
-static int  aout_SetFormat    ( aout_thread_t * );
-static int  aout_GetBufInfo   ( aout_thread_t *, int );
-static void aout_Play         ( aout_thread_t *, byte_t *, int );
-static void aout_Close        ( aout_thread_t * );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
+
+static int  SetFormat    ( aout_thread_t * );
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("EsounD audio module") )
-    ADD_CAPABILITY( AOUT, 50 )
-    ADD_SHORTCUT( "esound" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("EsounD audio module") ); 
+    set_capability( "audio output", 50 );
+    set_callbacks( Open, Close );
+    add_shortcut( "esound" );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: open an esd socket
  *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
 
-/*****************************************************************************
- * aout_Open: open an esd socket
- *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
     /* mpg123 does it this way */
     int i_bits = ESD_BITS16;
     int i_mode = ESD_STREAM;
@@ -136,13 +116,17 @@ static int aout_Open( aout_thread_t *p_aout )
         return( -1 );
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SetFormat: set the output format
+ * SetFormat: set the output format
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     int i_fd;
 
@@ -155,20 +139,20 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* arbitrary value that should be changed */
     return( i_buffer_limit );
 }
 
 /*****************************************************************************
- * aout_Play: play a sound samples buffer
+ * Play: play a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_amount;
     
@@ -199,10 +183,12 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: close the Esound socket
+ * Close: close the Esound socket
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Close( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
     close( p_aout->p_sys->i_fd );
 }
 

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.40 2002/07/23 00:39:17 sam Exp $
+ * $Id: input_dec.c,v 1.41 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,43 +45,43 @@ static void             DeleteDecoderFifo( decoder_fifo_t * );
 decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
-    char * psz_plugin = config_GetPsz( p_input, "codec" );
+    char * psz_plugin;
+    decoder_fifo_t *p_fifo;
 
-    /* Get a suitable module */
-    p_es->p_module = module_Need( p_input, MODULE_CAPABILITY_DECODER,
-                                  psz_plugin, (void *)&p_es->i_fourcc );
-    if( psz_plugin ) free( psz_plugin );
-    if( p_es->p_module == NULL )
+    /* Create the decoder configuration structure */
+    p_fifo = CreateDecoderFifo( p_input, p_es );
+
+    if( p_fifo == NULL )
     {
-        msg_Err( p_input, "no suitable decoder module for fourcc `%4.4s'",
-                          (char*)&p_es->i_fourcc );
+        msg_Err( p_input, "could not create decoder fifo" );
         return NULL;
     }
 
-    /* Create the decoder configuration structure */
-    p_es->p_decoder_fifo = CreateDecoderFifo( p_input, p_es );
-
-    if( p_es->p_decoder_fifo == NULL )
+    /* Get a suitable module */
+    psz_plugin = config_GetPsz( p_fifo, "codec" );
+    p_fifo->p_module = module_Need( p_fifo, "decoder", psz_plugin );
+    if( psz_plugin ) free( psz_plugin );
+    if( p_fifo->p_module == NULL )
     {
-        msg_Err( p_input, "could not create decoder fifo" );
-        module_Unneed( p_es->p_module );
+        msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'",
+                       (char*)&p_fifo->i_fourcc );
+        DeleteDecoderFifo( p_fifo );
+        vlc_object_destroy( p_fifo );
         return NULL;
     }
 
     /* Spawn the decoder thread */
-    if ( vlc_thread_create( p_es->p_decoder_fifo, "decoder",
-                 p_es->p_module->p_functions->dec.functions.dec.pf_run, 0 ) )
+    if( vlc_thread_create( p_fifo, "decoder", p_fifo->pf_run, 0 ) )
     {
-        msg_Err( p_input, "cannot spawn decoder thread \"%s\"",
-                           p_es->p_module->psz_object_name );
-        DeleteDecoderFifo( p_es->p_decoder_fifo );
-        module_Unneed( p_es->p_module );
+        msg_Err( p_fifo, "cannot spawn decoder thread \"%s\"",
+                         p_fifo->p_module->psz_object_name );
+        module_Unneed( p_fifo, p_fifo->p_module );
         return NULL;
     }
 
     p_input->stream.b_changed = 1;
 
-    return p_es->p_decoder_fifo;
+    return p_fifo;
 }
 
 
@@ -117,7 +117,10 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     DeleteDecoderFifo( p_es->p_decoder_fifo );
 
     /* Unneed module */
-    module_Unneed( p_es->p_module );
+    module_Unneed( p_es->p_decoder_fifo, p_es->p_decoder_fifo->p_module );
+
+    /* Delete the fifo */
+    vlc_object_destroy( p_es->p_decoder_fifo );
 
     /* Tell the input there is no more decoder */
     p_es->p_decoder_fifo = NULL;
@@ -257,7 +260,5 @@ static void DeleteDecoderFifo( decoder_fifo_t * p_fifo )
     /* Destroy the lock and cond */
     vlc_cond_destroy( &p_fifo->data_wait );
     vlc_mutex_destroy( &p_fifo->data_lock );
-
-    vlc_object_destroy( p_fifo );
 }
 

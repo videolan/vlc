@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.15 2002/07/20 18:01:42 sam Exp $
+ * $Id: invert.c,v 1.16 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,30 +34,24 @@
 #include "filter_common.h"
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("invert video module") )
-    /* Capability score set to 0 because we don't want to be spawned
-     * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT_FILTER, 0 )
-    ADD_SHORTCUT( "invert" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("invert video module") );
+    set_capability( "video filter", 0 );
+    add_shortcut( "invert" );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: Invert video output method descriptor
@@ -71,38 +65,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates Invert video thread output method
+ * Create: allocates Invert video thread output method
  *****************************************************************************
  * This function allocates and initializes a Invert vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -111,13 +81,19 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = NULL;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = NULL;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize Invert video thread output method
+ * Init: initialize Invert video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -152,9 +128,9 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Invert video thread output method
+ * End: terminate Invert video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -167,36 +143,27 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Invert video thread output method
+ * Destroy: destroy Invert video thread output method
  *****************************************************************************
  * Terminate an output method created by InvertCreateOutputMethod
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
+static void Destroy( vlc_object_t *p_this )
+{   
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     vout_DestroyThread( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle Invert events
- *****************************************************************************
- * This function should be called regularly by video output thread. It manages
- * console events. It returns a non null value on error.
- *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * vout_Render: displays previously rendered output
+ * Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Invert image, waits
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i_index;
@@ -250,17 +217,5 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Invert image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
- *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
 }
 

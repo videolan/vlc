@@ -2,7 +2,7 @@
  * ac3_imdct_common.c: common ac3 DCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.c,v 1.7 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_imdct_common.c,v 1.8 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -37,9 +37,9 @@
 #   define M_PI 3.14159265358979323846
 #endif
 
-void _M( fft_64p )  ( complex_t *x );
+void E_( fft_64p )  ( complex_t *x );
 
-void _M( imdct_do_256 ) (imdct_t * p_imdct, float data[],float delay[])
+void E_( imdct_do_256 ) (imdct_t * p_imdct, float data[],float delay[])
 {
     int i, j, k;
     int p, q;
@@ -73,8 +73,8 @@ void _M( imdct_do_256 ) (imdct_t * p_imdct, float data[],float delay[])
         buf2[k].imag = -1.0f*(data[q + 1] * p_imdct->xcos2[j] + data[p + 1] * p_imdct->xsin2[j]);
     }
 
-    _M( fft_64p ) ( &buf1[0] );
-    _M( fft_64p ) ( &buf2[0] );
+    E_( fft_64p ) ( &buf1[0] );
+    E_( fft_64p ) ( &buf2[0] );
 
     /* Post IFFT complex multiply */
     for( i=0; i < 64; i++) {
@@ -117,7 +117,7 @@ void _M( imdct_do_256 ) (imdct_t * p_imdct, float data[],float delay[])
 }
 
 
-void _M( imdct_do_256_nol ) (imdct_t * p_imdct, float data[], float delay[])
+void E_( imdct_do_256_nol ) (imdct_t * p_imdct, float data[], float delay[])
 {
     int i, j, k;
     int p, q;
@@ -150,8 +150,8 @@ void _M( imdct_do_256_nol ) (imdct_t * p_imdct, float data[], float delay[])
         buf2[k].imag = -1.0f*(data[q + 1] * p_imdct->xcos2[j] + data[p + 1] * p_imdct->xsin2[j]);
     }
 
-    _M( fft_64p ) ( &buf1[0] );
-    _M( fft_64p ) ( &buf2[0] );
+    E_( fft_64p ) ( &buf1[0] );
+    E_( fft_64p ) ( &buf2[0] );
 
     /* Post IFFT complex multiply */
     for( i=0; i < 64; i++) {

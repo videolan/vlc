@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.22 2002/07/20 18:01:42 sam Exp $
+ * $Id: aout_dummy.c,v 1.23 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,76 +30,46 @@
 #include <vlc/aout.h>
 
 /*****************************************************************************
- * vout_dummy_t: dummy video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the dummy specific properties of an output thread.
- *****************************************************************************/
-struct aout_sys_t
-{
-    /* Prevent malloc(0) */
-    int i_dummy;
-};
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int     SetFormat   ( aout_thread_t * );
+static int     GetBufInfo  ( aout_thread_t *, int );
+static void    Play        ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenAudio: opens a dummy audio device
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
+int E_(OpenAudio) ( vlc_object_t *p_this )
 {
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
+
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * aout_Open: opens a dummy audio device
+ * SetFormat: pretends to set the dsp output format
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SetFormat: pretends to set the dsp output format
+ * GetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_GetBufInfo: returns available bytes in buffer
- *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     return( sizeof(s16) * i_buffer_limit + 1 ); /* value big enough to sleep */
 }
 
 /*****************************************************************************
- * aout_Play: pretends to play a sound
+ * Play: pretends to play a sound
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
-{
-    ;
-}
-
-/*****************************************************************************
- * aout_Close: closes the dummy audio device
- *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     ;
 }

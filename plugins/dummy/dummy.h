@@ -1,10 +1,10 @@
 /*****************************************************************************
- * intf_eject.h: CD/DVD-ROM ejection handling functions
+ * dummy.h : dummy plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.h,v 1.5 2002/07/31 20:56:50 sam Exp $
+ * Copyright (C) 2000, 2001, 2002 VideoLAN
+ * $Id: dummy.h,v 1.1 2002/07/31 20:56:51 sam Exp $
  *
- * Author: Julien Blache <jb@technologeek.org>
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
+/*****************************************************************************
+ * External prototypes
+ *****************************************************************************/
+int  E_(OpenIntf)     ( vlc_object_t * );
+
+int  E_(OpenAccess)   ( vlc_object_t * );
+
+int  E_(OpenDemux)    ( vlc_object_t * );
+void E_(CloseDemux)   ( vlc_object_t * );
+
+int  E_(OpenDecoder)  ( vlc_object_t * );
+
+int  E_(OpenAudio)    ( vlc_object_t * );
+
+int  E_(OpenVideo)    ( vlc_object_t * );
 

@@ -2,7 +2,7 @@
  * idctaltivec.c : AltiVec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.26 2002/06/01 16:45:34 sam Exp $
+ * $Id: idctaltivec.c,v 1.27 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,32 +36,18 @@
 
 #include "idct.h"
 
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list );
+static int Open( vlc_object_t *p_this );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("AltiVec IDCT module") )
-    ADD_CAPABILITY( IDCT, 200 )
-    ADD_REQUIREMENT( ALTIVEC )
-    ADD_SHORTCUT( "altivec" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    idct_getfunctions( &p_module->p_functions->idct );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
+vlc_module_begin();
+    set_description( _("AltiVec IDCT module") );
+    set_capability( "idct", 200 );
+    add_shortcut( "altivec" );
+    add_requirement( ALTIVEC );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * NormScan : This IDCT uses reordered coeffs, so we patch the scan table

@@ -2,7 +2,7 @@
  * memcpyaltivec.c : AltiVec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.6 2002/06/01 12:32:00 sam Exp $
+ * $Id: memcpyaltivec.c,v 1.7 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,44 +32,30 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Local prototypes.
  *****************************************************************************/
-static void memcpy_getfunctions( function_list_t * p_function_list );
-void *      _M( fast_memcpy )  ( void * to, const void * from, size_t len );
+static void * fast_memcpy ( void * to, const void * from, size_t len );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module initializer.
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("AltiVec memcpy module") )
-    ADD_CAPABILITY( MEMCPY, 100 )
-    ADD_REQUIREMENT( ALTIVEC )
-    ADD_SHORTCUT( "altivec" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    memcpy_getfunctions( &p_module->p_functions->memcpy );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void memcpy_getfunctions( function_list_t * p_function_list )
+static int Activate ( vlc_object_t *p_this )
 {
-    p_function_list->functions.memcpy.pf_memcpy = _M( fast_memcpy );
+    p_this->p_vlc->pf_memcpy = fast_memcpy;
+    return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Module descriptor.
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("AltiVec memcpy module") );
+    set_capability( "memcpy", 100 );
+    set_callbacks( Activate, NULL );
+    add_shortcut( "altivec" );
+vlc_module_end();
+
 #else
-#   define _M( toto ) toto
 typedef unsigned long size_t;
 #endif /* __BUILD_ALTIVEC_ASM__ */
 
@@ -92,7 +78,7 @@ typedef unsigned long size_t;
     }                                                                       \
 }
 
-void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
+static void * fast_memcpy( void * _to, const void * _from, size_t len )
 {
     void * retval = _to;
     unsigned char * to = (unsigned char *)_to;
@@ -161,7 +147,7 @@ void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
  * unexpand -a
  */
 
-void * _M( fast_memcpy )(void * _to, const void * _from, size_t len)
+static void * fast_memcpy( void * _to, const void * _from, size_t len )
 {
     asm ("                                              \n"                     
 	"	cmplwi		%cr0, %r5,  16		\n"

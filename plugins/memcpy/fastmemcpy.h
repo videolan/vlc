@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fastmemcpy.h : fast memcpy routines
  *****************************************************************************
- * $Id: fastmemcpy.h,v 1.4 2002/07/21 23:40:23 sam Exp $
+ * $Id: fastmemcpy.h,v 1.5 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: various Linux kernel hackers
  *          various MPlayer hackers
@@ -153,7 +153,7 @@ __asm__ __volatile__(\
 #define MIN_LEN 0x40  /* 64-byte blocks */
 #endif
 
-void * _M( fast_memcpy )(void * to, const void * from, size_t len)
+void * fast_memcpy(void * to, const void * from, size_t len)
 {
 	void *retval;
 	size_t i;

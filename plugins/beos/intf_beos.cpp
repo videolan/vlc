@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.43 2002/07/23 12:42:17 tcastley Exp $
+ * $Id: intf_beos.cpp,v 1.44 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,32 +38,17 @@
 #include "intf_vlc_wrapper.h"
 #include "InterfaceWindow.h"
 
-extern "C"
-{
+/*****************************************************************************
+ * Local prototype
+ *****************************************************************************/
+static void Run       ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Local prototypes.
+ * OpenIntf: initialize interface
  *****************************************************************************/
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Open: initialize interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
+int E_(OpenIntf) ( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;     
     BScreen *screen;
     screen = new BScreen();
     BRect rect = screen->Frame();
@@ -83,6 +68,7 @@ static int intf_Open( intf_thread_t *p_intf )
 //    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     p_intf->p_sys->p_input = NULL;
 
+    p_intf->pf_run = Run;
 
     /* Create the interface window */
     p_intf->p_sys->p_window =
@@ -99,10 +85,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy dummy interface
+ * CloseIntf: destroy interface
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+void E_(CloseIntf) ( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -120,9 +108,9 @@ static void intf_Close( intf_thread_t *p_intf )
 
 
 /*****************************************************************************
- * intf_Run: event loop
+ * Run: event loop
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {
@@ -152,6 +140,4 @@ static void intf_Run( intf_thread_t *p_intf )
     }
     
 }
-
-} /* extern "C" */
 

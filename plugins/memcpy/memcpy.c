@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.9 2002/06/01 12:32:00 sam Exp $
+ * $Id: memcpy.c,v 1.10 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,78 +37,70 @@
 #undef HAVE_ALTIVEC
 
 #if defined( MODULE_NAME_IS_memcpy3dn )
+#   define PRIORITY 100
 #   define HAVE_3DNOW
 #   include "fastmemcpy.h"
 #elif defined( MODULE_NAME_IS_memcpymmx )
+#   define PRIORITY 100
 #   define HAVE_MMX
 #   include "fastmemcpy.h"
 #elif defined( MODULE_NAME_IS_memcpymmxext )
+#   define PRIORITY 200
 #   define HAVE_MMX2
 #   include "fastmemcpy.h"
+#else
+#   define PRIORITY 50
 #endif
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Extern prototype
  *****************************************************************************/
-static void memcpy_getfunctions( function_list_t * p_function_list );
 #ifndef MODULE_NAME_IS_memcpy
-void *      _M( fast_memcpy )  ( void * to, const void * from, size_t len );
+#   define fast_memcpy E_(fast_memcpy)
+    void *fast_memcpy( void * to, const void * from, size_t len );
 #endif
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module initializer
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-#ifdef MODULE_NAME_IS_memcpy
-    SET_DESCRIPTION( _("libc memcpy module") )
-    ADD_CAPABILITY( MEMCPY, 50 )
-    ADD_SHORTCUT( "c" )
-    ADD_SHORTCUT( "libc" )
-#elif defined( MODULE_NAME_IS_memcpy3dn )
-    SET_DESCRIPTION( _("3D Now! memcpy module") )
-    ADD_CAPABILITY( MEMCPY, 100 )
-    ADD_REQUIREMENT( 3DNOW )
-    ADD_SHORTCUT( "3dn" )
-    ADD_SHORTCUT( "3dnow" )
-    ADD_SHORTCUT( "memcpy3dn" )
-    ADD_SHORTCUT( "memcpy3dnow" )
-#elif defined( MODULE_NAME_IS_memcpymmx )
-    SET_DESCRIPTION( _("MMX memcpy module") )
-    ADD_CAPABILITY( MEMCPY, 100 )
-    ADD_REQUIREMENT( MMX )
-    ADD_SHORTCUT( "mmx" )
-    ADD_SHORTCUT( "memcpymmx" )
-#elif defined( MODULE_NAME_IS_memcpymmxext )
-    SET_DESCRIPTION( _("MMX EXT memcpy module") )
-    ADD_CAPABILITY( MEMCPY, 200 )
-    ADD_REQUIREMENT( MMXEXT )
-    ADD_SHORTCUT( "mmxext" )
-    ADD_SHORTCUT( "memcpymmxext" )
-#endif
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    memcpy_getfunctions( &p_module->p_functions->memcpy );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void memcpy_getfunctions( function_list_t * p_function_list )
+static int Activate ( vlc_object_t *p_this )
 {
 #ifdef MODULE_NAME_IS_memcpy
-    p_function_list->functions.memcpy.pf_memcpy = memcpy;
+    p_this->p_vlc->pf_memcpy = memcpy;
 #else
-    p_function_list->functions.memcpy.pf_memcpy = _M( fast_memcpy );
+    p_this->p_vlc->pf_memcpy = E_(fast_memcpy);
 #endif
+
+    return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+#ifdef MODULE_NAME_IS_memcpy
+    set_description( _("libc memcpy module") );
+    add_shortcut( "c" );
+    add_shortcut( "libc" );
+#elif defined( MODULE_NAME_IS_memcpy3dn )
+    set_description( _("3D Now! memcpy module") );
+    add_requirement( 3DNOW );
+    add_shortcut( "3dn" );
+    add_shortcut( "3dnow" );
+    add_shortcut( "memcpy3dn" );
+    add_shortcut( "memcpy3dnow" );
+#elif defined( MODULE_NAME_IS_memcpymmx )
+    set_description( _("MMX memcpy module") );
+    add_requirement( MMX );
+    add_shortcut( "mmx" );
+    add_shortcut( "memcpymmx" );
+#elif defined( MODULE_NAME_IS_memcpymmxext )
+    set_description( _("MMX EXT memcpy module") );
+    add_requirement( MMXEXT );
+    add_shortcut( "mmxext" );
+    add_shortcut( "memcpymmxext" );
+#endif
+    set_capability( "memcpy", PRIORITY );
+    set_callbacks( Activate, NULL );
+vlc_module_end();
 

@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.5 2002/07/23 00:39:17 sam Exp $
+ * $Id: crop.c,v 1.6 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,12 +34,20 @@
 #include "filter_common.h"
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
+
+static void UpdateStats    ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define GEOMETRY_TEXT N_("Crop geometry")
 #define GEOMETRY_LONGTEXT N_("Set the geometry of the zone to crop")
@@ -47,26 +55,15 @@ static void vout_getfunctions( function_list_t * p_function_list );
 #define AUTOCROP_TEXT N_("Automatic cropping")
 #define AUTOCROP_LONGTEXT N_("Activate automatic black border cropping")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING ( "crop-geometry", NULL, NULL, GEOMETRY_TEXT, GEOMETRY_LONGTEXT )
-ADD_BOOL ( "autocrop", 0, NULL, AUTOCROP_TEXT, AUTOCROP_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("image crop video module") )
-    /* Capability score set to 0 because we don't want to be spawned
-     * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT_FILTER, 0 )
-    ADD_SHORTCUT( "crop" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT, GEOMETRY_LONGTEXT );
+    add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT, AUTOCROP_LONGTEXT );
+    set_description( _("image crop video module") );
+    set_capability( "video filter", 0 );
+    add_shortcut( "crop" );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: Crop video output method descriptor
@@ -89,40 +86,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-
-static void UpdateStats    ( vout_thread_t *, picture_t * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates Crop video thread output method
+ * Create: allocates Crop video thread output method
  *****************************************************************************
  * This function allocates and initializes a Crop vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -131,13 +102,19 @@ static int vout_Create( vout_thread_t *p_vout )
         return 1;
     }
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = NULL;
+
     return 0;
 }
 
 /*****************************************************************************
- * vout_Init: initialize Crop video thread output method
+ * Init: initialize Crop video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int   i_index;
     char *psz_var;
@@ -272,9 +249,9 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Crop video thread output method
+ * End: terminate Crop video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -287,23 +264,25 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Crop video thread output method
+ * Destroy: destroy Crop video thread output method
  *****************************************************************************
  * Terminate an output method created by CropCreateOutputMethod
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+static void Destroy( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     vout_DestroyThread( p_vout->p_sys->p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle Crop events
+ * Manage: handle Crop events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     if( !p_vout->p_sys->b_changed )
     {
@@ -329,13 +308,13 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: display previously rendered output
+ * Render: display previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to Crop image, waits
  * until it is displayed and switches the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic = NULL;
     int i_plane;
@@ -395,18 +374,6 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     UpdateStats( p_vout, p_pic );
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Invert image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
- *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
 }
 
 static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )

@@ -40,60 +40,50 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( vlc_fourcc_t * );
-static int  decoder_Run    ( decoder_fifo_t * );
+static int  OpenDecoder    ( vlc_object_t * );
+static int  RunDecoder     ( decoder_fifo_t * );
 static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
 static void EndThread      ( mad_adec_thread_t * p_mad_adec );
 
 /*****************************************************************************
- * Capabilities
- *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
-
-/*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define DOWNSCALE_TEXT N_("Mad audio downscale routine (fast,mp321)")
 #define DOWNSCALE_LONGTEXT N_( \
     "Specify the mad audio downscale routine you want to use. By default " \
     "the mad plugin will use the fastest routine.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "downscale", "fast", NULL, DOWNSCALE_TEXT, DOWNSCALE_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("libmad MPEG 1/2/3 audio decoder library") )
-    ADD_CAPABILITY( DECODER, 100 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "downscale", "fast", NULL, DOWNSCALE_TEXT, DOWNSCALE_LONGTEXT );
+    set_description( _("libmad MPEG 1/2/3 audio decoder") );
+    set_capability( "decoder", 100 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
- * to chose.
+ * to choose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
-{
-    return *pi_type == VLC_FOURCC('m','p','g','a') ? 0 : -1;
+static int OpenDecoder( vlc_object_t *p_this )
+{   
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc != VLC_FOURCC('m','p','g','a') )
+    {   
+        return VLC_EGENERIC; 
+    }
+    
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     mad_adec_thread_t *   p_mad_adec;
 

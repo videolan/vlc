@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.26 2002/07/23 00:39:17 sam Exp $
+ * $Id: video_parser.c,v 1.27 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -50,23 +50,14 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe     ( vlc_fourcc_t * );
-static int      decoder_Run       ( decoder_fifo_t * );
+static int      OpenDecoder       ( vlc_object_t * );
+static int      RunDecoder        ( decoder_fifo_t * );
 static int      InitThread        ( vpar_thread_t * );
 static void     EndThread         ( vpar_thread_t * );
 static void     BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 
 /*****************************************************************************
- * Capabilities
- *****************************************************************************/
-void _M( vdec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
-
-/*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define VDEC_IDCT_TEXT N_("IDCT module")
 #define VDEC_IDCT_LONGTEXT N_( \
@@ -92,45 +83,43 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
     "you select more pictures than what your CPU is capable to decode, " \
     "you won't get anything.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
-ADD_MODULE  ( "mpeg-idct", MODULE_CAPABILITY_IDCT, NULL, NULL,
-	      VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT )
-ADD_MODULE  ( "mpeg-motion", MODULE_CAPABILITY_MOTION, NULL, NULL,
-	      VDEC_MOTION_TEXT, VDEC_IDCT_LONGTEXT )
-ADD_INTEGER ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT )
-ADD_STRING  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
-              VPAR_SYNCHRO_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("MPEG I/II video decoder module") )
-    ADD_CAPABILITY( DECODER, 50 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( vdec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_module  ( "mpeg-idct", "idct", NULL, NULL,
+                  VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT );
+    add_module  ( "mpeg-motion", "motion", NULL, NULL,
+                  VDEC_MOTION_TEXT, VDEC_IDCT_LONGTEXT );
+    add_integer ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT );
+    add_string  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
+                  VPAR_SYNCHRO_LONGTEXT );
+    set_description( _("MPEG I/II video decoder module") );
+    set_capability( "decoder", 50 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    return *pi_type == VLC_FOURCC('m','p','g','v') ? 0 : -1;
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc == VLC_FOURCC('m','p','g','v') )
+    {   
+        p_fifo->pf_run = RunDecoder;
+        return VLC_SUCCESS;
+    }
+    
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
+static int RunDecoder ( decoder_fifo_t * p_fifo )
 {
     vpar_thread_t *     p_vpar;
     vlc_bool_t          b_error;
@@ -199,7 +188,7 @@ static int decoder_Run ( decoder_fifo_t * p_fifo )
 /*****************************************************************************
  * InitThread: initialize vpar output thread
  *****************************************************************************
- * This function is called from decoder_Run and performs the second step 
+ * This function is called from Run and performs the second step 
  * of the initialization. It returns 0 on success. Note that the thread's 
  * flag are not modified inside this function.
  *****************************************************************************/
@@ -211,45 +200,41 @@ static int InitThread( vpar_thread_t *p_vpar )
      * Choose the best motion compensation module
      */
     psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-motion" );
-    p_vpar->p_motion_module = module_Need( p_vpar->p_fifo,
-                     MODULE_CAPABILITY_MOTION, psz_name, NULL );
+    p_vpar->p_motion =
+                module_Need( p_vpar->p_fifo, "motion compensation", psz_name );
     if( psz_name ) free( psz_name );
 
-    if( p_vpar->p_motion_module == NULL )
+    if( p_vpar->p_motion == NULL )
     {
         msg_Err( p_vpar->p_fifo, "no suitable motion compensation module" );
         free( p_vpar );
         return( -1 );
     }
 
-#define f ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
-    memcpy( p_vpar->pool.ppppf_motion, f.ppppf_motion, sizeof(void *) * 16 );
-#undef f
+    memcpy( p_vpar->pool.ppppf_motion,
+            p_vpar->p_fifo->p_private, sizeof(void *) * 16 );
 
     /*
      * Choose the best IDCT module
      */
     psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-idct" );
-    p_vpar->p_idct_module = module_Need( p_vpar->p_fifo,
-                                MODULE_CAPABILITY_IDCT, psz_name, NULL );
+    p_vpar->p_idct = module_Need( p_vpar->p_fifo, "idct", psz_name );
     if( psz_name ) free( psz_name );
 
-    if( p_vpar->p_idct_module == NULL )
+    if( p_vpar->p_idct == NULL )
     {
         msg_Err( p_vpar->p_fifo, "no suitable IDCT module" );
-        module_Unneed( p_vpar->p_motion_module );
+        module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
         free( p_vpar );
         return( -1 );
     }
 
-#define f p_vpar->p_idct_module->p_functions->idct.functions.idct
-    p_vpar->pool.pf_idct_init   = f.pf_idct_init;
-    p_vpar->pf_sparse_idct_add  = f.pf_sparse_idct_add;
-    p_vpar->pf_idct_add         = f.pf_idct_add;
-    p_vpar->pf_sparse_idct_copy = f.pf_sparse_idct_copy;
-    p_vpar->pf_idct_copy        = f.pf_idct_copy;
-    p_vpar->pf_norm_scan        = f.pf_norm_scan;
-#undef f
+    p_vpar->pool.pf_idct_init   = ((void**)p_vpar->p_fifo->p_private)[0];
+    p_vpar->pf_norm_scan        = ((void**)p_vpar->p_fifo->p_private)[1];
+    p_vpar->pf_sparse_idct_add  = ((void**)p_vpar->p_fifo->p_private)[2];
+    p_vpar->pf_sparse_idct_copy = ((void**)p_vpar->p_fifo->p_private)[3];
+    p_vpar->pf_idct_add         = ((void**)p_vpar->p_fifo->p_private)[4];
+    p_vpar->pf_idct_copy        = ((void**)p_vpar->p_fifo->p_private)[5];
 
     /* Initialize input bitstream */
     InitBitstream( &p_vpar->bit_stream, p_vpar->p_fifo,
@@ -401,8 +386,8 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     vpar_EndPool( p_vpar );
 
-    module_Unneed( p_vpar->p_idct_module );
-    module_Unneed( p_vpar->p_motion_module );
+    module_Unneed( p_vpar->p_fifo, p_vpar->p_idct );
+    module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
 
     free( p_vpar );
 }

@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.21 2002/07/23 00:39:17 sam Exp $
+ * $Id: fb.c,v 1.22 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -43,17 +43,15 @@
 #include <vlc/vout.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
 
-static int  vout_Create    ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
@@ -62,26 +60,17 @@ static void TextMode       ( int i_tty );
 static void GfxMode        ( int i_tty );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 #define FB_DEV_VAR "fbdev"
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( FB_DEV_VAR, "/dev/fb0", NULL, N_("framebuffer device"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Linux console framebuffer module") )
-    ADD_CAPABILITY( VOUT, 30 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();                                            
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( FB_DEV_VAR, "/dev/fb0", NULL, N_("framebuffer device"), NULL );
+    set_description( _("Linux console framebuffer module") );
+    set_capability( "video output", 30 );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
@@ -119,27 +108,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates FB video thread output method
+ * Create: allocates FB video thread output method
  *****************************************************************************
  * This function allocates and initializes a FB vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     struct sigaction    sig_tty;                 /* sigaction for tty change */
     struct vt_mode      vt_mode;                          /* vt current mode */
     struct termios      new_termios;
@@ -150,6 +126,12 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         return( 1 );
     };
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
 
     /* Set tty and fb devices */
     p_vout->p_sys->i_tty = 0;           /* 0 == /dev/tty0 == current console */
@@ -240,9 +222,9 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize framebuffer video thread output method
+ * Init: initialize framebuffer video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -339,21 +321,23 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate framebuffer video thread output method
+ * End: terminate framebuffer video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     /* Clear the screen */
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy FB video thread output method
+ * Destroy: destroy FB video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_CreateOutputMethod
+ * Terminate an output method created by Create
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+static void Destroy( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    
     CloseDisplay( p_vout );
 
     /* Reset the terminal */
@@ -374,12 +358,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle FB events
+ * Manage: handle FB events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
 #if 0
     u8 buf;
@@ -407,10 +391,10 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Destroy XImages to change their size */
-        vout_End( p_vout );
+        End( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_Init( p_vout ) )
+        if( Init( p_vout ) )
         {
             msg_Err( p_vout, "cannot reinit framebuffer screen" );
             return( 1 );
@@ -430,20 +414,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: renders previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to FB image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* swap the two Y offsets if the drivers supports panning */
     if( p_vout->p_sys->b_pan )
@@ -461,7 +437,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 #if 0
-static void vout_SetPalette( vout_thread_t *p_vout,
+static void SetPalette( vout_thread_t *p_vout,
                              u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };

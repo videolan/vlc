@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.10 2002/06/01 12:31:59 sam Exp $
+ * $Id: imdct.c,v 1.11 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -33,43 +33,39 @@
 #include "ac3_imdct_common.h"
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Module initializer
  *****************************************************************************/
-static void imdct_getfunctions( function_list_t * p_function_list );
-
-/*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("AC3 IMDCT module") )
-    ADD_CAPABILITY( IMDCT, 50 )
-    ADD_SHORTCUT( "c" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    imdct_getfunctions( &p_module->p_functions->imdct );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void imdct_getfunctions( function_list_t * p_function_list )
+static int Open ( vlc_object_t *p_this )
 {
-#define F p_function_list->functions.imdct
-    F.pf_imdct_init    = _M( imdct_init );
-    F.pf_imdct_256     = _M( imdct_do_256 );
-    F.pf_imdct_256_nol = _M( imdct_do_256_nol );
-    F.pf_imdct_512     = _M( imdct_do_512 );
-    F.pf_imdct_512_nol = _M( imdct_do_512_nol );
-#undef F
+    imdct_t *p_imdct = (imdct_t *)p_this;
+
+    p_imdct->pf_imdct_init    = E_( imdct_init );
+    p_imdct->pf_imdct_256     = E_( imdct_do_256 );
+    p_imdct->pf_imdct_256_nol = E_( imdct_do_256_nol );
+    p_imdct->pf_imdct_512     = E_( imdct_do_512 );
+    p_imdct->pf_imdct_512_nol = E_( imdct_do_512_nol );
+
+    return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+#if defined( MODULE_NAME_IS_imdct )
+    set_description( _("AC3 IMDCT module") );
+    set_capability( "imdct", 50 );
+    add_shortcut( "c" );
+#elif defined( MODULE_NAME_IS_imdctsse )
+    set_description( _("SSE AC3 IMDCT module") );
+    set_capability( "imdct", 200 );
+    add_shortcut( "sse" );
+#elif defined( MODULE_NAME_IS_imdct3dn )
+    set_description( _("3D Now! AC3 IMDCT module") );
+    set_capability( "imdct", 200 );
+    add_shortcut( "3dn" );
+    add_shortcut( "3dnow" );
+#endif
+    set_callbacks( Open, NULL );
+vlc_module_end();
 

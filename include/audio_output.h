@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.49 2002/07/20 18:01:41 sam Exp $
+ * $Id: audio_output.h,v 1.50 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -120,11 +120,9 @@ struct aout_thread_t
 
     /* Plugin used and shortcuts to access its capabilities */
     module_t *   p_module;
-    int       ( *pf_open )       ( aout_thread_t * );
     int       ( *pf_setformat )  ( aout_thread_t * );
     int       ( *pf_getbufinfo ) ( aout_thread_t * , int );
     void      ( *pf_play )       ( aout_thread_t * , byte_t *, int );
-    void      ( *pf_close )      ( aout_thread_t * );
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before
@@ -185,7 +183,7 @@ struct aout_thread_t
 aout_thread_t * aout_CreateThread       ( vlc_object_t *, int, int );
 void            aout_DestroyThread      ( aout_thread_t * );
 
-#define aout_CreateFifo(a,b,c,d,e,f) __aout_CreateFifo(CAST_TO_VLC_OBJECT(a),b,c,d,e,f)
+#define aout_CreateFifo(a,b,c,d,e,f) __aout_CreateFifo(VLC_OBJECT(a),b,c,d,e,f)
 VLC_EXPORT( aout_fifo_t *, __aout_CreateFifo,  ( vlc_object_t *, int, int, int, int, void * ) );
 VLC_EXPORT( void,            aout_DestroyFifo, ( aout_fifo_t *p_fifo ) );
             void             aout_FreeFifo     ( aout_fifo_t *p_fifo );

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.30 2002/07/23 00:39:17 sam Exp $
+ * $Id: spu_decoder.c,v 1.31 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -45,8 +45,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe ( vlc_fourcc_t * );
-static int  decoder_Run   ( decoder_fifo_t * );
+static int  OpenDecoder   ( vlc_object_t * );      
+static int  RunDecoder    ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
 
@@ -56,49 +56,38 @@ static int  ParseControlSequences( spudec_thread_t *, subpicture_t * );
 static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
 static void RenderSPU            ( vout_thread_t *, picture_t *,
                                    const subpicture_t * );
-
 /*****************************************************************************
- * Capabilities
+ * Module descriptor.
  *****************************************************************************/
-void _M( spudec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
+vlc_module_begin();
+    set_description( _("DVD subtitles decoder module") );
+    set_capability( "decoder", 50 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("DVD subtitles decoder module") )
-    ADD_CAPABILITY( DECODER, 50 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( spudec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    return ( *pi_type == VLC_FOURCC('s','p','u',' ') ) ? 0 : -1;
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc == VLC_FOURCC('s','p','u',' ') )
+    {   
+        p_fifo->pf_run = RunDecoder;
+        return VLC_SUCCESS;
+    }
+    
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
    

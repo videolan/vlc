@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.93 2002/07/23 00:39:17 sam Exp $
+ * $Id: input_programs.c,v 1.94 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -651,8 +651,6 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
  *****************************************************************************/
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    decoder_fifo_t *p_fifo;
-
     if( p_es == NULL )
     {
         msg_Err( p_input, "nothing to do in input_SelectES" );
@@ -670,15 +668,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Release the lock, not to block the input thread during
      * the creation of the thread. */
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    p_fifo = input_RunDecoder( p_input, p_es );
+    p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    if( p_fifo == NULL )
+    if( p_es->p_decoder_fifo == NULL )
     {
         return -1;
     }
-
-    p_es->p_decoder_fifo = p_fifo;
 
     return 0;
 }

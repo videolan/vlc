@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.30 2002/07/20 18:01:43 sam Exp $
+ * $Id: aout_sdl.c,v 1.31 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,44 +56,34 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int     SetFormat   ( aout_thread_t * );
+static int     GetBufInfo  ( aout_thread_t *, int );
+static void    Play        ( aout_thread_t *, byte_t *, int );
 
-static void    aout_SDLCallback ( void *userdata, Uint8 *stream, int len );
+static void    SDLCallback ( void *, Uint8 *, int );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: open the audio device
+ * OpenAudio: open the audio device
  *****************************************************************************
  * This function opens the dsp as a usual non-blocking write-only file, and
  * modifies the p_aout->i_fd with the file's descriptor.
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+int E_(OpenAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
+
     SDL_AudioSpec desired;
 
     if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
     {
         return( 1 );
     }
+
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
 
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -136,7 +126,7 @@ static int aout_Open( aout_thread_t *p_aout )
     desired.format     = AUDIO_S16LSB;                     /* stereo 16 bits */
 #endif
     desired.channels   = p_aout->i_channels;
-    desired.callback   = aout_SDLCallback;
+    desired.callback   = SDLCallback;
     desired.userdata   = p_aout->p_sys;
     desired.samples    = 1024;
 
@@ -160,14 +150,14 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: reset the audio device and sets its format
+ * SetFormat: reset the audio device and sets its format
  *****************************************************************************
  * This functions resets the audio device, tries to initialize the output
  * format with the value contained in the dsp structure, and if this value
  * could not be set, the default value returned by ioctl is set. It then
  * does the same for the stereo mode, and for the output rate.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     /* TODO: finish and clean this */
     SDL_AudioSpec desired;
@@ -180,7 +170,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     desired.format     = AUDIO_S16LSB;                    /* stereo 16 bits */
 #endif
     desired.channels   = p_aout->i_channels;
-    desired.callback   = aout_SDLCallback;
+    desired.callback   = SDLCallback;
     desired.userdata   = p_aout->p_sys;
     desired.samples    = 2048;
 
@@ -201,12 +191,12 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************
  * returns the number of bytes in the audio buffer compared to the size of
  * i_buffer_limit...
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     if(i_buffer_limit > p_aout->p_sys->i_audio_end)
     {
@@ -217,11 +207,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play: play a sound samples buffer
+ * Play: play a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     byte_t * audio_buf = p_aout->p_sys->audio_buf;
 
@@ -238,10 +228,12 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: close the audio device
+ * CloseAudio: close the audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+void E_(CloseAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
+
     if( p_aout->p_sys->b_active )
     {
         SDL_PauseAudio( 1 );                                  /* pause audio */
@@ -260,9 +252,9 @@ static void aout_Close( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SDLCallback: what to do once SDL has played sound samples
+ * SDLCallback: what to do once SDL has played sound samples
  *****************************************************************************/
-static void aout_SDLCallback( void *userdata, byte_t *stream, int len )
+static void SDLCallback( void *userdata, byte_t *stream, int len )
 {
     aout_sys_t * p_sys = userdata;
 

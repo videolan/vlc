@@ -43,33 +43,18 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int     SetFormat   ( aout_thread_t * );
+static int     GetBufInfo  ( aout_thread_t *, int );
+static void    Play        ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open : creates a handle and opens an alsa device
+ * Open : creates a handle and opens an alsa device
  *****************************************************************************
  * This function opens an alsa device, through the alsa API
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+int E_(OpenAudio)( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i_ret;
 
     /* allocate structure */
@@ -97,22 +82,25 @@ static int aout_Open( aout_thread_t *p_aout )
                                               PLUGIN_DISABLE_MMAP ) ) < 0 )
     {
         msg_Err( p_aout, "unable to disable mmap (%s)", snd_strerror(i_ret) );
-        aout_Close( p_aout );
+        Close( p_this );
         free( p_aout->p_sys );
         return( 1 );
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     return( 0 );
 }
 
-
 /*****************************************************************************
- * aout_SetFormat : set the audio output format 
+ * SetFormat : set the audio output format 
  *****************************************************************************
  * This function prepares the device, sets the rate, format, the mode
  * ("play as soon as you have data"), and buffer information.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     int i_ret;
     int i_bytes_per_sample;
@@ -181,14 +169,14 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_BufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************
  * This function returns the number of used byte in the queue.
  * It also deals with errors : indeed if the device comes to run out
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     int i_ret;
     snd_pcm_channel_status_t status;
@@ -221,11 +209,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play : plays a sample
+ * Play : plays a sample
  *****************************************************************************
  * Plays a sample using the snd_pcm_write function from the alsa API
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_ret;
 
@@ -238,10 +226,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close : close the audio device
+ * CloseAudio: close the audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void E_(CloseAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i_ret;
 
     if( ( i_ret = snd_pcm_close( p_aout->p_sys->p_pcm_handle ) ) < 0 )

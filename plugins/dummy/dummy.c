@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.23 2002/07/23 20:15:41 sam Exp $
+ * $Id: dummy.c,v 1.24 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,18 +29,10 @@
 
 #include <vlc/vlc.h>
 
-/*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-void _M( access_getfunctions ) ( function_list_t * p_function_list );
-void _M( demux_getfunctions ) ( function_list_t * p_function_list );
-void _M( aout_getfunctions )  ( function_list_t * p_function_list );
-void _M( vout_getfunctions )  ( function_list_t * p_function_list );
-void _M( intf_getfunctions )  ( function_list_t * p_function_list );
-void _M( dec_getfunctions )   ( function_list_t * p_function_list );
+#include "dummy.h"
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define CHROMA_TEXT N_("dummy image chroma format")
 #define CHROMA_LONGTEXT N_( \
@@ -48,36 +40,28 @@ void _M( dec_getfunctions )   ( function_list_t * p_function_list );
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_STRING ( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
-MODULE_CONFIG_STOP
-
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("dummy functions module") )
-    /* Capability score set to 0 because we don't want to be spawned
-     * unless explicitly requested to */
-    ADD_CAPABILITY( INTF, 0 )
-    ADD_CAPABILITY( ACCESS, 0 )
-    ADD_CAPABILITY( DEMUX, 0 )
-    ADD_CAPABILITY( DECODER, 0 )
-    ADD_CAPABILITY( AOUT, 0 )
-    ADD_CAPABILITY( VOUT, 0 )
-    ADD_SHORTCUT( "vlc" )
-MODULE_INIT_STOP
-
-
-MODULE_ACTIVATE_START
-    _M( access_getfunctions )( &p_module->p_functions->access );
-    _M( demux_getfunctions )( &p_module->p_functions->demux );
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
-    _M( vout_getfunctions )( &p_module->p_functions->vout );
-    _M( intf_getfunctions )( &p_module->p_functions->intf );
-    _M( dec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("dummy functions module") );
+    add_shortcut( "vlc" );
+    add_submodule();
+        set_capability( "interface", 0 );
+        set_callbacks( E_(OpenIntf), NULL );
+    add_submodule();
+        set_capability( "access", 0 );
+        set_callbacks( E_(OpenAccess), NULL );
+    add_submodule();
+        set_capability( "demux", 0 );
+        set_callbacks( E_(OpenDemux), E_(CloseDemux) );
+    add_submodule();
+        set_capability( "decoder", 0 );
+        set_callbacks( E_(OpenDecoder), NULL );
+    add_submodule();
+        set_capability( "audio output", 0 );
+        set_callbacks( E_(OpenAudio), NULL );
+    add_submodule();
+        set_capability( "video output", 0 );
+        set_callbacks( E_(OpenVideo), NULL );
+        add_category_hint( N_("Video"), NULL );
+        add_string( "dummy-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT );
+vlc_module_end();
 

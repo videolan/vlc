@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.45 2002/07/23 00:39:17 sam Exp $
+ * $Id: xcommon.c,v 1.46 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,39 +65,20 @@
 #   include <X11/extensions/Xvlib.h>
 #endif
 
-#include "xcommon.h"
-
 #include "netutils.h"                                 /* network_ChannelJoin */
 
-/*****************************************************************************
- * Defines
- *****************************************************************************/
-#ifdef MODULE_NAME_IS_xvideo
-#   define IMAGE_TYPE     XvImage
-#   define EXTRA_ARGS     int i_xvport, int i_chroma
-#   define EXTRA_ARGS_SHM int i_xvport, int i_chroma, XShmSegmentInfo *p_shm
-#   define DATA_SIZE(p)   (p)->data_size
-#   define IMAGE_FREE     XFree      /* There is nothing like XvDestroyImage */
-#else
-#   define IMAGE_TYPE     XImage
-#   define EXTRA_ARGS     Visual *p_visual, int i_depth, int i_bytes_per_pixel
-#   define EXTRA_ARGS_SHM Visual *p_visual, int i_depth, XShmSegmentInfo *p_shm
-#   define DATA_SIZE(p)   ((p)->bytes_per_line * (p)->height)
-#   define IMAGE_FREE     XDestroyImage
-#endif
-
-VLC_DECLARE_STRUCT(x11_window_t)
+#include "xcommon.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
+int  E_(Activate)   ( vlc_object_t * );
+void E_(Deactivate) ( vlc_object_t * );
+
+static int  InitVideo      ( vout_thread_t * );
+static void EndVideo       ( vout_thread_t * );
+static void DisplayVideo   ( vout_thread_t *, picture_t * );
+static int  ManageVideo    ( vout_thread_t * );
 
 static int  InitDisplay    ( vout_thread_t * );
 
@@ -133,147 +114,27 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 #endif
 
 /*****************************************************************************
- * x11_window_t: X11 window descriptor
- *****************************************************************************
- * This structure contains all the data necessary to describe an X11 window.
- *****************************************************************************/
-struct x11_window_t
-{
-    Window              base_window;                          /* base window */
-    Window              video_window;     /* sub-window for displaying video */
-    GC                  gc;              /* graphic context instance handler */
-    int                 i_width;                     /* width of main window */
-    int                 i_height;                   /* height of main window */
-    Atom                wm_protocols;
-    Atom                wm_delete_window;
-};
-
-/*****************************************************************************
- * vout_sys_t: video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the X11 and XVideo specific properties of an output thread.
- *****************************************************************************/
-struct vout_sys_t
-{
-    /* Internal settings and properties */
-    Display *           p_display;                        /* display pointer */
-
-    Visual *            p_visual;                          /* visual pointer */
-    int                 i_screen;                           /* screen number */
-
-    /* Our current window */
-    x11_window_t *      p_win;
-
-    /* Our two windows */
-    x11_window_t        original_window;
-    x11_window_t        fullscreen_window;
-
-    /* X11 generic properties */
-    vlc_bool_t          b_altfullscreen;          /* which fullscreen method */
-    vlc_bool_t          b_createwindow;  /* are we the base window's owner ? */
-#ifdef HAVE_SYS_SHM_H
-    vlc_bool_t          b_shm;               /* shared memory extension flag */
-#endif
-
-#ifdef MODULE_NAME_IS_xvideo
-    int                 i_xvport;
-#else
-    Colormap            colormap;               /* colormap used (8bpp only) */
-
-    int                 i_screen_depth;
-    int                 i_bytes_per_pixel;
-    int                 i_bytes_per_line;
-#endif
-
-    /* Screen saver properties */
-    int                 i_ss_timeout;                             /* timeout */
-    int                 i_ss_interval;           /* interval between changes */
-    int                 i_ss_blanking;                      /* blanking mode */
-    int                 i_ss_exposure;                      /* exposure mode */
-#ifdef DPMSINFO_IN_DPMS_H
-    BOOL                b_ss_dpms;                              /* DPMS mode */
-#endif
-
-    /* Mouse pointer properties */
-    vlc_bool_t          b_mouse_pointer_visible;
-    mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
-    Cursor              blank_cursor;                   /* the hidden cursor */
-    mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
-    Pixmap              cursor_pixmap;
-};
-
-/*****************************************************************************
- * picture_sys_t: direct buffer method descriptor
- *****************************************************************************
- * This structure is part of the picture descriptor, it describes the
- * XVideo specific properties of a direct buffer.
- *****************************************************************************/
-struct picture_sys_t
-{
-    IMAGE_TYPE *        p_image;
-
-#ifdef HAVE_SYS_SHM_H
-    XShmSegmentInfo     shminfo;       /* shared memory zone information */
-#endif
-};
-
-/*****************************************************************************
- * mwmhints_t: window manager hints
- *****************************************************************************
- * Fullscreen needs to be able to hide the wm decorations so we provide
- * this structure to make it easier.
- *****************************************************************************/
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct mwmhints_t
-{
-    u32 flags;
-    u32 functions;
-    u32 decorations;
-    s32 input_mode;
-    u32 status;
-} mwmhints_t;
-
-/*****************************************************************************
- * Chroma defines
- *****************************************************************************/
-#ifdef MODULE_NAME_IS_xvideo
-#   define MAX_DIRECTBUFFERS 10
-#else
-#   define MAX_DIRECTBUFFERS 2
-#endif
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate X11 video thread output method
+ * Activate: allocate X11 video thread output method
  *****************************************************************************
  * This function allocate and initialize a X11 vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+int E_(Activate) ( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *       psz_display;
 #ifdef MODULE_NAME_IS_xvideo
     char *       psz_chroma;
     vlc_fourcc_t i_chroma = 0;
     vlc_bool_t   b_chroma = 0;
 #endif
+
+    p_vout->pf_init = InitVideo;
+    p_vout->pf_end = EndVideo;
+    p_vout->pf_manage = ManageVideo;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = DisplayVideo;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -409,12 +270,14 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy X11 video thread output method
+ * Deactivate: destroy X11 video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_CreateOutputMethod
+ * Terminate an output method created by Open
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+void E_(Deactivate) ( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* If the fullscreen window is still open, close it */
     if( p_vout->b_fullscreen )
     {
@@ -448,12 +311,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize X11 video thread output method
+ * InitVideo: initialize X11 video thread output method
  *****************************************************************************
  * This function create the XImages needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int InitVideo( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -545,21 +408,13 @@ static int vout_Init( vout_thread_t *p_vout )
     return( 0 );
 }
 
-/*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
  /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * DisplayVideo: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to X11 server.
  * (The Xv extension takes care of "double-buffering".)
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i_width, i_height, i_x, i_y;
 
@@ -613,13 +468,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * vout_Manage: handle X11 events
+ * ManageVideo: handle X11 events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * X11 events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int ManageVideo( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     char        i_key;                                    /* ISO Latin-1 key */
@@ -937,12 +792,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate X11 video thread output method
+ * EndVideo: terminate X11 video thread output method
  *****************************************************************************
- * Destroy the X11 XImages created by vout_Init. It is called at the end of
+ * Destroy the X11 XImages created by Init. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void EndVideo( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -1141,7 +996,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XSelectInput( p_vout->p_sys->p_display, p_win->video_window,
                   ExposureMask );
 
-    /* make sure the video window will be centered in the next vout_Manage() */
+    /* make sure the video window will be centered in the next ManageVideo() */
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
 
     /* If the cursor was formerly blank than blank it again */

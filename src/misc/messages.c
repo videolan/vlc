@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.5 2002/07/23 00:30:22 sam Exp $
+ * $Id: messages.c,v 1.6 2002/07/31 20:56:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,6 +65,9 @@ void __msg_Create( vlc_object_t *p_this )
     /* Message queue initialization */
     vlc_mutex_init( p_this, &p_this->p_vlc->msg_bank.lock );
 
+    p_this->p_vlc->msg_bank.b_configured = VLC_FALSE;
+    p_this->p_vlc->msg_bank.b_overflow = VLC_FALSE;
+
     p_this->p_vlc->msg_bank.i_start = 0;
     p_this->p_vlc->msg_bank.i_stop = 0;
 
@@ -80,6 +83,8 @@ void __msg_Flush( vlc_object_t *p_this )
     int i_index;
 
     vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+
+    p_this->p_vlc->msg_bank.b_configured = VLC_TRUE;
 
     for( i_index = p_this->p_vlc->msg_bank.i_start;
          i_index != p_this->p_vlc->msg_bank.i_stop;
@@ -102,16 +107,23 @@ void __msg_Flush( vlc_object_t *p_this )
  *****************************************************************************/
 void __msg_Destroy( vlc_object_t *p_this )
 {
-    /* Destroy lock */
-    vlc_mutex_destroy( &p_this->p_vlc->msg_bank.lock );
-
     if( p_this->p_vlc->msg_bank.i_sub )
     {
-        fprintf( stderr, "main error: stale interface subscribers\n" );
+        msg_Err( p_this, "stale interface subscribers" );
     }
 
-    /* Free remaining messages */
-    FlushMsg( &p_this->p_vlc->msg_bank );
+    /* Flush the queue */
+    if( !p_this->p_vlc->msg_bank.b_configured )
+    {
+        msg_Flush( p_this );
+    }
+    else
+    {
+        FlushMsg( &p_this->p_vlc->msg_bank );
+    }
+
+    /* Destroy lock */
+    vlc_mutex_destroy( &p_this->p_vlc->msg_bank.lock );
 }
 
 /*****************************************************************************
@@ -237,8 +249,9 @@ DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
                       const char *psz_format, va_list args )
 {
+    msg_bank_t *        p_bank = &p_this->p_vlc->msg_bank;   /* message bank */
     char *              psz_str = NULL;          /* formatted message string */
-    msg_item_t *        p_item;                        /* pointer to message */
+    msg_item_t *        p_item = NULL;                 /* pointer to message */
     msg_item_t          item;             /* message in case of a full queue */
 #ifdef WIN32
     char *              psz_temp;
@@ -278,28 +291,56 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #endif
 
     /* Put message in queue */
-    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+    vlc_mutex_lock( &p_bank->lock );
 
     /* Check there is room in the queue for our message */
-    if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
+    if( p_bank->b_overflow )
     {
         FlushMsg( &p_this->p_vlc->msg_bank );
 
-        if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
+        if( ((p_bank->i_stop - p_bank->i_start + 1) % VLC_MSG_QSIZE) == 0 )
         {
-            fprintf( stderr, "main warning: message queue overflow\n" );
+            /* Still in overflow mode, print from a dummy item */
             p_item = &item;
-            goto print_message;
+        }
+        else
+        {
+            /* Pheeew, at last, there is room in the queue! */
+            p_bank->b_overflow = VLC_FALSE;
+        }
+    }
+    else if( ((p_bank->i_stop - p_bank->i_start + 2) % VLC_MSG_QSIZE) == 0 )
+    {
+        FlushMsg( &p_this->p_vlc->msg_bank );
+
+        if( ((p_bank->i_stop - p_bank->i_start + 2) % VLC_MSG_QSIZE) == 0 )
+        {
+            p_bank->b_overflow = VLC_TRUE;
+
+            /* Put the overflow message in the queue */
+            p_item = p_bank->msg + p_bank->i_stop;
+            p_bank->i_stop = (p_bank->i_stop + 1) % VLC_MSG_QSIZE;
+
+            p_item->i_type =      VLC_MSG_ERR;
+            p_item->i_object_id = p_this->i_object_id;
+            p_item->psz_module =  strdup( "message" );
+            p_item->psz_msg =     strdup( "message queue overflowed" );
+
+            PrintMsg( p_this, p_item );
+
+            /* We print from a dummy item */
+            p_item = &item;
         }
     }
 
-    /* Put the message in the queue */
-    p_item = p_this->p_vlc->msg_bank.msg + p_this->p_vlc->msg_bank.i_stop;
-    p_this->p_vlc->msg_bank.i_stop =
-                (p_this->p_vlc->msg_bank.i_stop + 1) % VLC_MSG_QSIZE;
+    if( !p_bank->b_overflow )
+    {
+        /* Put the message in the queue */
+        p_item = p_bank->msg + p_bank->i_stop;
+        p_bank->i_stop = (p_bank->i_stop + 1) % VLC_MSG_QSIZE;
+    }
 
     /* Fill message information fields */
-print_message:
     p_item->i_type =      i_type;
     p_item->i_object_id = p_this->i_object_id;
     p_item->psz_module =  strdup( psz_module );
@@ -307,7 +348,13 @@ print_message:
 
     PrintMsg( p_this, p_item );
 
-    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
+    if( p_bank->b_overflow )
+    {
+        free( p_item->psz_module );
+        free( p_item->psz_msg );
+    }
+
+    vlc_mutex_unlock( &p_bank->lock );
 }
 
 /* following functions are local */
@@ -321,6 +368,12 @@ print_message:
 static void FlushMsg ( msg_bank_t *p_bank )
 {
     int i_index, i_start, i_stop;
+
+    /* Only flush the queue if it has been properly configured */
+    if( !p_bank->b_configured )
+    {
+        return;
+    }
 
     /* Get the maximum message index that can be freed */
     i_stop = p_bank->i_stop;
@@ -372,29 +425,32 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
     int i_type = p_item->i_type;
 
-    /* Send the message to stderr */
-    if( (i_type == VLC_MSG_ERR)
-         || ( (i_type == VLC_MSG_INFO) && !p_this->p_vlc->b_quiet )
-         || ( (i_type == VLC_MSG_WARN) && p_this->p_vlc->b_verbose
-                                       && !p_this->p_vlc->b_quiet )
-         || ( (i_type == VLC_MSG_DBG) && p_this->p_vlc->b_verbose
-                                       && !p_this->p_vlc->b_quiet ) )
+    if( p_this->p_vlc->b_quiet || !p_this->p_vlc->msg_bank.b_configured )
     {
-        if( p_this->p_vlc->b_color )
-        {
-            fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
-                             "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
-                             p_item->i_object_id, p_item->psz_module,
-                             ppsz_type[i_type], ppsz_color[i_type],
-                             p_item->psz_msg );
-        }
-        else
-        {
-            fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
-                             p_this->p_vlc->i_unique, p_item->i_object_id,
-                             p_item->psz_module, ppsz_type[i_type],
-                             p_item->psz_msg );
-        }
+        return;
+    }
+
+    if( !p_this->p_vlc->b_verbose &&
+         ( (i_type == VLC_MSG_WARN) || (i_type == VLC_MSG_DBG) ) )
+    {
+        return;
+    }
+
+    /* Send the message to stderr */
+    if( p_this->p_vlc->b_color )
+    {
+        fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
+                         "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
+                         p_item->i_object_id, p_item->psz_module,
+                         ppsz_type[i_type], ppsz_color[i_type],
+                         p_item->psz_msg );
+    }
+    else
+    {
+        fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
+                         p_this->p_vlc->i_unique, p_item->i_object_id,
+                         p_item->psz_module, ppsz_type[i_type],
+                         p_item->psz_msg );
     }
 }
 

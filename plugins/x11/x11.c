@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.20 2002/07/02 19:14:59 sam Exp $
+ * $Id: x11.c,v 1.21 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,12 +31,15 @@
 
 #include <vlc/vlc.h>
 
-#include "xcommon.h"
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+extern int  E_(Activate)   ( vlc_object_t * );
+extern void E_(Deactivate) ( vlc_object_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
-
 #define ALT_FS_TEXT N_("alternate fullscreen method")
 #define ALT_FS_LONGTEXT N_( \
     "There are two ways to make a fullscreen window, unfortunately each one " \
@@ -60,25 +63,16 @@
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between vlc and the X server.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_BOOL    ( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
-ADD_INTEGER ( "x11-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT )
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    add_integer( "x11-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
 #ifdef HAVE_SYS_SHM_H
-ADD_BOOL    ( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT )
+    add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
 #endif
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("X11 module") )
-    ADD_CAPABILITY( VOUT, 50 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( vout_getfunctions )( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_description( _("X11 module") );
+    set_capability( "video output", 50 );
+    set_callbacks( E_(Activate), E_(Deactivate) );
+vlc_module_end();
 

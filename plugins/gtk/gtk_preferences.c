@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.34 2002/07/11 19:28:13 sam Exp $
+ * $Id: gtk_preferences.c,v 1.35 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -172,7 +172,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
 
     /* Look for the selected module */
-    for( p_module = p_intf->p_vlc->module_bank.first ; p_module != NULL ;
+    for( p_module = p_intf->p_vlc->p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
@@ -315,17 +315,26 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             /* build a list of available modules */
             {
                 gchar * entry[2];
+                char *  psz_capability;
 
-                for( p_module_bis = p_intf->p_vlc->module_bank.first ;
+                for( p_module_bis = p_intf->p_vlc->p_module_bank->first ;
                      p_module_bis != NULL ;
                      p_module_bis = p_module_bis->next )
                 {
-                    if( p_module_bis->i_capabilities & (1 << p_item->i_value) )
+#if 0 /* FIXME */
+                    for( psz_capability = p_module_bis->pp_capabilities[0] ;
+                         *psz_capability ;
+                         psz_capability++ )
                     {
-                        entry[0] = p_module_bis->psz_object_name;
-                        entry[1] = p_module_bis->psz_longname;
-                        gtk_clist_append( GTK_CLIST(module_clist), entry );
+                        if( !strcmp( psz_capability, p_item->psz_type ) )
+                        {
+                            entry[0] = p_module_bis->psz_object_name;
+                            entry[1] = p_module_bis->psz_longname;
+                            gtk_clist_append( GTK_CLIST(module_clist), entry );
+                            break;
+                        }
                     }
+#endif
                 }
             }
 
@@ -651,7 +660,7 @@ void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
     if( gtk_clist_get_text( GTK_CLIST(module_clist), row, 0, &psz_name ) )
     {
         /* look for module 'psz_name' */
-        for( p_module = p_intf->p_vlc->module_bank.first ;
+        for( p_module = p_intf->p_vlc->p_module_bank->first ;
              p_module != NULL ;
              p_module = p_module->next )
         {

@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.8 2002/07/23 00:39:16 sam Exp $
+ * $Id: aa.c,v 1.9 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -35,31 +35,28 @@
 #include <vlc/intf.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions  ( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
+static void Display   ( vout_thread_t *, picture_t * );
+
+static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("ASCII-art video output module") )
-    ADD_CAPABILITY( VOUT, 10 )
-    ADD_SHORTCUT( "aalib" )
-MODULE_INIT_STOP
-
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("ASCII-art video output module") );
+    set_capability( "video output", 10 );
+    add_shortcut( "aalib" );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: aa video output method descriptor
@@ -76,40 +73,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-
-static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates aa video thread output method
+ * Create: allocates aa video thread output method
  *****************************************************************************
  * This function allocates and initializes a aa vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -127,6 +98,12 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = Display;
+
     p_vout->p_sys->i_width = aa_imgwidth(p_vout->p_sys->aa_context);
     p_vout->p_sys->i_height = aa_imgheight(p_vout->p_sys->aa_context);
     aa_autoinitkbd( p_vout->p_sys->aa_context, 0 );
@@ -136,9 +113,9 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize aa video thread output method
+ * Init: initialize aa video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic = NULL;
@@ -185,31 +162,33 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate aa video thread output method
+ * End: terminate aa video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     ;
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy aa video thread output method
+ * Destroy: destroy aa video thread output method
  *****************************************************************************
  * Terminate an output method created by AaCreateOutputMethod
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+static void Destroy( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     aa_close( p_vout->p_sys->aa_context );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle aa events
+ * Manage: handle aa events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     int event, x, y, b;
     event = aa_getevent( p_vout->p_sys->aa_context, 0 );
@@ -241,9 +220,9 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
+ * Render: render previously calculated output
  *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
   aa_fastrender( p_vout->p_sys->aa_context, 0, 0,
                  aa_imgwidth( p_vout->p_sys->aa_context ),
@@ -251,9 +230,9 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
     int i_width, i_height, i_x, i_y;

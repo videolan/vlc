@@ -2,7 +2,7 @@
  * ac3_imdct_common.h: common ac3 DCT headers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.h,v 1.2 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_imdct_common.h,v 1.3 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-void _M( imdct_init )       ( imdct_t * p_imdct );
-void _M( imdct_do_256 )     ( imdct_t * p_imdct, float data[], float delay[] );
-void _M( imdct_do_256_nol ) ( imdct_t * p_imdct, float data[], float delay[] );
-void _M( imdct_do_512  )    ( imdct_t * p_imdct, float data[], float delay[] );
-void _M( imdct_do_512_nol ) ( imdct_t * p_imdct, float data[], float delay[] );
+void E_( imdct_init )       ( imdct_t * p_imdct );
+void E_( imdct_do_256 )     ( imdct_t * p_imdct, float data[], float delay[] );
+void E_( imdct_do_256_nol ) ( imdct_t * p_imdct, float data[], float delay[] );
+void E_( imdct_do_512  )    ( imdct_t * p_imdct, float data[], float delay[] );
+void E_( imdct_do_512_nol ) ( imdct_t * p_imdct, float data[], float delay[] );

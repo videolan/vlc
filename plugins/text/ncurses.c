@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.19 2002/07/20 18:01:43 sam Exp $
+ * $Id: ncurses.c,v 1.20 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -39,14 +39,13 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * );
-static int  intf_Open         ( intf_thread_t * );
-static void intf_Close        ( intf_thread_t * );
-static void intf_Run          ( intf_thread_t * );
+static int  Open           ( vlc_object_t * );
+static void Close          ( vlc_object_t * );             
 
-static void FullScreen   ( intf_thread_t * );
-static void Play         ( intf_thread_t * );
-static void Stop         ( intf_thread_t * );
+static void Run            ( intf_thread_t * );                  
+static void FullScreen     ( intf_thread_t * );
+static void Play           ( intf_thread_t * );
+static void Stop           ( intf_thread_t * );
 static void Next           ( intf_thread_t * );
 static void Eject          ( intf_thread_t * );
 static void Pause          ( intf_thread_t * );
@@ -61,52 +60,33 @@ static int  PrintFullLine  ( const char *p_fmt, ... );
 static void ManageSlider   ( intf_thread_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("ncurses interface module") )
-    ADD_CAPABILITY( INTF, 10 )
-    ADD_SHORTCUT( "curses" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("ncurses interface module") );
+    set_capability( "interface", 10 );
+    set_callbacks( Open, Close );
+    add_shortcut( "curses" );
+vlc_module_end();
 
 /*****************************************************************************
  * intf_sys_t: description and status of ncurses interface
  *****************************************************************************/
 struct intf_sys_t
 {
-    /* special actions */
-    vlc_mutex_t         change_lock;                      /* the change lock */
+    input_thread_t *    p_input;
 
     float               f_slider_state;
     float               f_slider_state_old;
 };
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create window
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+static int Open( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize and create window
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -115,7 +95,9 @@ static int intf_Open( intf_thread_t *p_intf )
         return( 1 );
     }
 
-    memset ( p_intf->p_sys, 0, sizeof ( intf_sys_t ) );
+    p_intf->p_sys->p_input = NULL;
+
+    p_intf->pf_run = Run;
 
     /* Initialize the curses library */
     initscr();
@@ -135,10 +117,17 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface window
+ * Close: destroy interface window
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
+static void Close( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     /* Close the ncurses interface */
     endwin();
 
@@ -147,9 +136,9 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: ncurses thread
+ * Run: ncurses thread
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     signed char i_key;
     time_t t_last_refresh;
@@ -161,10 +150,20 @@ static void intf_Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
-        p_intf->pf_manage( p_intf );
-
         msleep( INTF_IDLE_SLEEP );
 
+        /* Update the input */ 
+        if( p_intf->p_sys->p_input == NULL )
+        {
+            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                              FIND_ANYWHERE );
+        }
+        else if( p_intf->p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_intf->p_sys->p_input );
+            p_intf->p_sys->p_input = NULL;
+        }
+    
         while( (i_key = getch()) != -1 )
         {
             /*
@@ -316,11 +315,11 @@ Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
     row++;
     move ( row, 0 );
 
-    if ( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if ( p_intf->p_sys->p_input != NULL )
     {
         PrintFullLine ( " DVD Chapter:%3d     DVD Title:%3d",
-            p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part,
-            p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id );
+            p_intf->p_sys->p_input->stream.p_selected_area->i_part,
+            p_intf->p_sys->p_input->stream.p_selected_area->i_id );
     }
 
     row++;
@@ -347,17 +346,22 @@ Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
 static void FullScreen( intf_thread_t *p_intf )
 {
-    vlc_mutex_lock( &p_intf->p_vlc->p_vout_bank->pp_vout[0]->change_lock );
+    vout_thread_t *p_vout;
 
-    p_intf->p_vlc->p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                              VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout == NULL )
+    {
+        return;
+    }
 
-    vlc_mutex_unlock( &p_intf->p_vlc->p_vout_bank->pp_vout[0]->change_lock );
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    vlc_object_release( p_vout );
 }
 
 static void Eject ( intf_thread_t *p_intf )
 {
-    char *psz_device = NULL;
-    char *psz_parser;
+    char *psz_device = NULL, *psz_parser, *psz_name;
 
     /*
      * Get the active input
@@ -365,15 +369,30 @@ static void Eject ( intf_thread_t *p_intf )
      * If it's neither a VCD nor a DVD, then return
      */
 
-    /*
-     * Don't really know if I must lock the stuff here, we're using it read-only
-     */
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
 
-    if( p_intf->p_vlc->p_playlist->current.psz_name != NULL)
+    if( p_playlist == NULL )
     {
-        if( !strncmp(p_intf->p_vlc->p_playlist->current.psz_name, "dvd:", 4) )
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->i_index < 0 )
+    {   
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+        return; 
+    }
+
+    psz_name = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
+
+    if( psz_name )
+    {
+        if( !strncmp(psz_name, "dvd:", 4) )
         {
-            switch( p_intf->p_vlc->p_playlist->current.psz_name[4] )
+            switch( psz_name[4] )
             {
             case '\0':
             case '@':
@@ -381,13 +400,13 @@ static void Eject ( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the first 4 characters */
-                psz_device = strdup( p_intf->p_vlc->p_playlist->current.psz_name + 4 );
+                psz_device = strdup( psz_name + 4 );
                 break;
             }
         }
-        else if( !strncmp(p_intf->p_vlc->p_playlist->current.psz_name, "vcd:", 4) )
+        else if( !strncmp(psz_name, "vcd:", 4) )
         {
-            switch( p_intf->p_vlc->p_playlist->current.psz_name[4] )
+            switch( psz_name[4] )
             {
             case '\0':
             case '@':
@@ -395,15 +414,18 @@ static void Eject ( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the first 4 characters */
-                psz_device = strdup( p_intf->p_vlc->p_playlist->current.psz_name + 4 );
+                psz_device = strdup( psz_name + 4 );
                 break;
             }
         }
         else
         {
-            psz_device = strdup( p_intf->p_vlc->p_playlist->current.psz_name );
+            psz_device = strdup( psz_name );
         }
     }
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
 
     if( psz_device == NULL )
     {
@@ -422,7 +444,7 @@ static void Eject ( intf_thread_t *p_intf )
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] == NULL )
+    if( p_intf->p_sys->p_input == NULL )
     {
 //X        msg_Dbg( p_input, "ejecting %s", psz_device );
 
@@ -435,72 +457,51 @@ static void Eject ( intf_thread_t *p_intf )
 
 static void Play ( intf_thread_t *p_intf )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist )
     {
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
-        p_intf->p_vlc->p_playlist->b_stopped = 0;
-    }
-    else
-    {
-        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
+        vlc_mutex_lock( &p_playlist->object_lock );
 
-        if( p_intf->p_vlc->p_playlist->b_stopped )
+        if( p_playlist->i_size )
         {
-            if( p_intf->p_vlc->p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-                intf_PlaylistJumpto( p_intf->p_vlc->p_playlist,
-                                     p_intf->p_vlc->p_playlist->i_index );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
         }
         else
         {
-
-            vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            vlc_object_release( p_playlist );
         }
-
     }
 }
 
 static void Pause ( intf_thread_t *p_intf )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input == NULL )
     {
-        if ( p_intf->p_vlc->p_input_bank->pp_input[0]->i_status & INPUT_STATUS_PLAY )
-        {
-            input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
-
-            vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-            p_intf->p_vlc->p_playlist->b_stopped = 0;
-            vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-        }
-        else
-        {
-            Play ( p_intf );
-        }
+        return;
     }
+
+    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+
+    return;
 }
 
 static void Stop ( intf_thread_t *p_intf )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        /* end playing item */
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-
-        p_intf->p_vlc->p_playlist->i_index--;
-        p_intf->p_vlc->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-
+        return;
     }
+
+    playlist_Stop( p_playlist );
+    vlc_object_release( p_playlist );
+
+    return;
 }
 
 static void Next ( intf_thread_t *p_intf )
@@ -508,31 +509,31 @@ static void Next ( intf_thread_t *p_intf )
     int i_id;
     input_area_t * p_area;
 
-    i_id = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id+1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id+1;
 
-    if ( i_id < p_intf->p_vlc->p_input_bank->pp_input[0]->stream.i_area_nb )
+    if ( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_id];
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
 
-        input_ChangeArea( p_intf->p_vlc->p_input_bank->pp_input[0],
+        input_ChangeArea( p_intf->p_sys->p_input,
                 (input_area_t *) p_area );
 
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
 static void ManageSlider ( intf_thread_t *p_intf )
 {
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-        vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-        if( p_intf->p_vlc->p_input_bank->pp_input[0]->stream.b_seekable &&
-            p_intf->p_vlc->p_input_bank->pp_input[0]->i_status & INPUT_STATUS_PLAY )
+        if( p_intf->p_sys->p_input->stream.b_seekable &&
+            p_intf->p_sys->p_input->stream.control.i_status == PLAYING_S )
         {
             float newvalue = p_intf->p_sys->f_slider_state;
 
-#define p_area p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
 
             /* If the user hasn't touched the slider since the last time,
              * then the input can safely change it */
@@ -550,9 +551,9 @@ static void ManageSlider ( intf_thread_t *p_intf )
                 off_t i_seek = ( newvalue * p_area->i_size ) / 100;
 
                 /* release the lock to be able to seek */
-                vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
-                input_Seek( p_intf->p_vlc->p_input_bank->pp_input[0]->p_this, i_seek, INPUT_SEEK_SET );
-                vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+                vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+                input_Seek( p_intf, i_seek, INPUT_SEEK_SET );
+                vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
                 /* Update the old value */
                 p_intf->p_sys->f_slider_state_old = newvalue;
@@ -560,7 +561,7 @@ static void ManageSlider ( intf_thread_t *p_intf )
 #    undef p_area
         }
 
-        vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 
@@ -569,15 +570,15 @@ static void PrevTitle ( intf_thread_t *p_intf )
     input_area_t *  p_area;
     int             i_id;
 
-    i_id = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id - 1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
     /* Disallow area 0 since it is used for video_ts.vob */
     if ( i_id > 0 )
     {
-        p_area = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_id];
-        input_ChangeArea( p_intf->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -586,14 +587,14 @@ static void NextTitle ( intf_thread_t *p_intf )
     input_area_t *  p_area;
     int             i_id;
 
-    i_id = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id + 1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
-    if ( i_id < p_intf->p_vlc->p_input_bank->pp_input[0]->stream.i_area_nb )
+    if ( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_id];
-        input_ChangeArea( p_intf->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -601,14 +602,14 @@ static void PrevChapter ( intf_thread_t *p_intf )
 {
     input_area_t *  p_area;
 
-    p_area = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if ( p_area->i_part > 0 )
     {
         p_area->i_part--;
-        input_ChangeArea( p_intf->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -616,14 +617,14 @@ static void NextChapter( intf_thread_t *p_intf )
 {
     input_area_t *  p_area;
 
-    p_area = p_intf->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if ( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
-        input_ChangeArea( p_intf->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
     }
 }
 

@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.14 2002/07/01 17:39:27 sam Exp $
+ * $Id: kde.cpp,v 1.15 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -37,44 +37,6 @@
 #include <qwidget.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list );
-
-/*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-extern "C"
-{
-
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("KDE interface module") )
-#ifndef WIN32
-    if( getenv( "DISPLAY" ) == NULL )
-    {
-        ADD_CAPABILITY( INTF, 8 )
-    }
-    else
-#endif
-    {
-        ADD_CAPABILITY( INTF, 85 )
-    }
-    ADD_PROGRAM( "kvlc" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-} // extern "C"
-
-/*****************************************************************************
  * The local class.
  *****************************************************************************/
 class KInterface;
@@ -93,20 +55,26 @@ class KThread
         ~KThread();
 
         // These methods get exported to the core
-        static int     open    ( intf_thread_t *p_intf );
-        static void    close   ( intf_thread_t *p_intf );
-        static void    run     ( intf_thread_t *p_intf );
+        static int     open    ( vlc_object_t * );
+        static void    close   ( vlc_object_t * );
+        static void    run     ( intf_thread_t * );
 };
 
 /*****************************************************************************
- * Functions exported as capabilities.
+ * Module descriptor
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = KThread::open;
-    p_function_list->functions.intf.pf_close = KThread::close;
-    p_function_list->functions.intf.pf_run   = KThread::run;
-}
+vlc_module_begin();
+#ifdef WIN32
+    int i = 90;
+#else
+    int i = getenv( "DISPLAY" ) == NULL ? 8 : 85;
+#endif
+    set_description( _("KDE interface module") );
+    set_capability( "interface", i );
+    set_program( "kvlc" );
+    //set_callbacks( E_(Open), E_(Close) );
+    set_callbacks( KThread::open, KThread::close );
+vlc_module_end();
 
 /*****************************************************************************
  * KThread::KThread: KDE interface constructor
@@ -163,8 +131,10 @@ KThread::~KThread()
 /*****************************************************************************
  * KThread::open: initialize and create window
  *****************************************************************************/
-int KThread::open(intf_thread_t *p_intf)
+int KThread::open(vlc_object_t *p_this)
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -173,6 +143,8 @@ int KThread::open(intf_thread_t *p_intf)
         return( 1 );
     }
 
+    p_intf->pf_run = KThread::run;
+
     p_intf->p_sys->p_thread = new KThread(p_intf);
     return ( 0 );
 }
@@ -180,8 +152,10 @@ int KThread::open(intf_thread_t *p_intf)
 /*****************************************************************************
  * KThread::close: destroy interface window
  *****************************************************************************/
-void KThread::close(intf_thread_t *p_intf)
+void KThread::close(vlc_object_t *p_this)
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     delete p_intf->p_sys->p_thread;
     free( p_intf->p_sys );
 }

@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec_dummy.c,v 1.1 2002/07/23 20:15:41 sam Exp $
+ * $Id: dec_dummy.c,v 1.2 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -40,26 +40,18 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Probe  ( vlc_fourcc_t * );
-static int  Run    ( decoder_fifo_t * );
+static int Run ( decoder_fifo_t * );
 
 /*****************************************************************************
- * Capabilities
- *****************************************************************************/
-void _M( dec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = Probe;
-    p_function_list->functions.dec.pf_run   = Run;
-}
-
-/*****************************************************************************
- * Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Always returns 0 because we are the dummy decoder!
  *****************************************************************************/
-static int Probe( vlc_fourcc_t *pi_type )
+int E_(OpenDecoder) ( vlc_object_t *p_this )
 {
-    return 0;
+    ((decoder_fifo_t*)p_this)->pf_run = Run;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.19 2002/07/23 00:39:17 sam Exp $
+ * $Id: xmga.c,v 1.20 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,15 +59,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
 
-static int  vout_Create    ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );                         
+static int  Manage    ( vout_thread_t * );               
+static void MGADisplay( vout_thread_t *, picture_t * );            
 
 static int  CreateWindow   ( vout_thread_t * );
 static void DestroyWindow  ( vout_thread_t * );
@@ -85,7 +83,7 @@ static void DestroyCursor  ( vout_thread_t * );
 static void ToggleCursor   ( vout_thread_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 
 #define ALT_FS_TEXT N_("alternate fullscreen method")
@@ -102,23 +100,14 @@ static void ToggleCursor   ( vout_thread_t * );
     "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "xmga-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_BOOL    ( "xmga-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("X11 MGA module") )
-    ADD_CAPABILITY( VOUT, 60 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();  
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "xmga-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    add_bool( "xmga-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    set_description( _("X11 MGA module") );
+    set_capability( "video output", 60 );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
@@ -213,29 +202,15 @@ typedef struct mwmhints_t
 #endif
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate X11 video thread output method
+ * Create: allocate X11 video thread output method
  *****************************************************************************
  * This function allocate and initialize a X11 vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
-{
+static int Create( vlc_object_t *p_this )
+{   
+    vout_thread_t *p_vout = (vout_thread_t *)p_this; 
     char *psz_display;
 
     /* Allocate structure */
@@ -284,16 +259,24 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Misc init */
     p_vout->p_sys->b_altfullscreen = 0;
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = MGADisplay;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy X11 video thread output method
+ * Destroy: destroy X11 video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_CreateOutputMethod
+ * Terminate an output method created by Create
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
+static void Destroy( vlc_object_t *p_this )
+{   
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* Restore cursor if it was blanked */
     if( !p_vout->p_sys->b_mouse_pointer_visible )
     {
@@ -311,12 +294,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize X11 video thread output method
+ * Init: initialize X11 video thread output method
  *****************************************************************************
  * This function create the XImages needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -393,20 +376,12 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
- /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * MGADisplay: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to X11 server.
  * (The Xv extension takes care of "double-buffering".)
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void MGADisplay( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i_width, i_height, i_x, i_y;
 
@@ -415,13 +390,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * vout_Manage: handle X11 events
+ * Manage: handle X11 events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * X11 events and allows window resizing. It returns a non null value on
  * error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     vlc_bool_t  b_resized;                        /* window has been resized */
@@ -644,12 +619,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate X11 video thread output method
+ * End: terminate X11 video thread output method
  *****************************************************************************
- * Destroy the X11 XImages created by vout_Init. It is called at the end of
+ * Destroy the X11 XImages created by Init. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 

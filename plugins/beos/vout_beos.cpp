@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.64 2002/07/28 01:46:26 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.65 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -460,46 +460,26 @@ void VLCView::Draw(BRect updateRect)
       FillRect(updateRect);
 }
 
-
-extern "C"
-{
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create     ( vout_thread_t * );
-static int  vout_Init       ( vout_thread_t * );
-static void vout_End        ( vout_thread_t * );
-static void vout_Destroy    ( vout_thread_t * );
-static int  vout_Manage     ( vout_thread_t * );
-static void vout_Display    ( vout_thread_t *, picture_t * );
-static void vout_Render     ( vout_thread_t *, picture_t * );
+static int  Init       ( vout_thread_t * );
+static void End        ( vout_thread_t * );
+static int  Manage     ( vout_thread_t * );
+static void Display    ( vout_thread_t *, picture_t * );
 
 static int  BeosOpenDisplay ( vout_thread_t *p_vout );
 static void BeosCloseDisplay( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-}
-
-/*****************************************************************************
- * vout_Create: allocates BeOS video thread output method
+ * OpenVideo: allocates BeOS video thread output method
  *****************************************************************************
  * This function allocates and initializes a BeOS vout method.
  *****************************************************************************/
-int vout_Create( vout_thread_t *p_vout )
+int E_(OpenVideo) ( vlc_object_t *p_this )
 {
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = (vout_sys_t*) malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -511,13 +491,19 @@ int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_height = p_vout->render.i_height;
     p_vout->p_sys->source_chroma = p_vout->render.i_chroma;
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = NULL;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize BeOS video thread output method
+ * Init: initialize BeOS video thread output method
  *****************************************************************************/
-int vout_Init( vout_thread_t *p_vout )
+int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -583,50 +569,32 @@ int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate BeOS video thread output method
+ * End: terminate BeOS video thread output method
  *****************************************************************************/
-void vout_End( vout_thread_t *p_vout )
+void End( vout_thread_t *p_vout )
 {
     BeosCloseDisplay( p_vout );
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy BeOS video thread output method
+ * CloseVideo: destroy BeOS video thread output method
  *****************************************************************************
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
-void vout_Destroy( vout_thread_t *p_vout )
+void E_(CloseVideo) ( vlc_object_t *p_this )
 {
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle BeOS events
- *****************************************************************************
- * This function should be called regularly by video output thread. It manages
- * console events. It returns a non null value on error.
- *****************************************************************************/
-int vout_Manage( vout_thread_t *p_vout )
-{
-                          
-    return( 0 );
-}
-
-/*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to BeOS image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
 
@@ -683,6 +651,3 @@ static void BeosCloseDisplay( vout_thread_t *p_vout )
     p_win = NULL;
 }
 
-
-
-} /* extern "C" */

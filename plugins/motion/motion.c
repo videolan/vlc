@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion.c,v 1.17 2002/06/01 12:32:00 sam Exp $
+ * $Id: motion.c,v 1.18 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -31,28 +31,19 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Local prototype
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list );
+static int Open ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("motion compensation module") )
-    ADD_CAPABILITY( MOTION, 50 )
-    ADD_SHORTCUT( "c" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    motion_getfunctions( &p_module->p_functions->motion );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("motion compensation module") );
+    set_capability( "motion compensation", 50 );
+    add_shortcut( "c" );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * Simple motion compensation in C
@@ -128,38 +119,27 @@ MC_FUNC (avg,xy)
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list )
+static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *, int, int ) =
 {
-    static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *,
-                                           int, int ) =
+    /* Copying functions */
     {
-        {
-            /* Copying functions */
-            {
-                /* Width == 16 */
-                MC_put_o16_c, MC_put_x16_c, MC_put_y16_c, MC_put_xy16_c
-            },
-            {
-                /* Width == 8 */
-                MC_put_o8_c,  MC_put_x8_c,  MC_put_y8_c, MC_put_xy8_c
-            }
-        },
-        {
-            /* Averaging functions */
-            {
-                /* Width == 16 */
-                MC_avg_o16_c, MC_avg_x16_c, MC_avg_y16_c, MC_avg_xy16_c
-            },
-            {
-                /* Width == 8 */
-                MC_avg_o8_c,  MC_avg_x8_c,  MC_avg_y8_c,  MC_avg_xy8_c
-            }
-        }
-    };
+        /* Width == 16 */
+        { MC_put_o16_c, MC_put_x16_c, MC_put_y16_c, MC_put_xy16_c },
+        /* Width == 8 */
+        { MC_put_o8_c,  MC_put_x8_c,  MC_put_y8_c, MC_put_xy8_c }
+    },
+    /* Averaging functions */
+    {
+        /* Width == 16 */
+        { MC_avg_o16_c, MC_avg_x16_c, MC_avg_y16_c, MC_avg_xy16_c },
+        /* Width == 8 */
+        { MC_avg_o8_c,  MC_avg_x8_c,  MC_avg_y8_c,  MC_avg_xy8_c }
+    }
+};
 
-#define list p_function_list->functions.motion
-    memcpy( list.ppppf_motion, ppppf_motion, sizeof( void * ) * 16 );
-#undef list
-
-    return;
+static int Open ( vlc_object_t *p_this )
+{
+    p_this->p_private = ppppf_motion;
+    return VLC_SUCCESS;
 }
+

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.86 2002/06/08 14:08:46 sam Exp $
+ * $Id: audio_output.c,v 1.87 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -88,8 +88,7 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
 
     /* Choose the best module */
     psz_name = config_GetPsz( p_aout, "aout" );
-    p_aout->p_module = module_Need( p_aout, MODULE_CAPABILITY_AOUT,
-                                    psz_name, (void *)p_aout );
+    p_aout->p_module = module_Need( p_aout, "audio output", psz_name );
     if( psz_name ) free( psz_name );
     if( p_aout->p_module == NULL )
     {
@@ -98,21 +97,12 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
         return NULL;
     }
 
-#define aout_functions p_aout->p_module->p_functions->aout.functions.aout
-    p_aout->pf_open       = aout_functions.pf_open;
-    p_aout->pf_setformat  = aout_functions.pf_setformat;
-    p_aout->pf_getbufinfo = aout_functions.pf_getbufinfo;
-    p_aout->pf_play       = aout_functions.pf_play;
-    p_aout->pf_close      = aout_functions.pf_close;
-#undef aout_functions
-
     /*
      * Initialize audio device
      */
     if ( p_aout->pf_setformat( p_aout ) )
     {
-        p_aout->pf_close( p_aout );
-        module_Unneed( p_aout->p_module );
+        module_Unneed( p_aout, p_aout->p_module );
         vlc_object_destroy( p_aout );
         return NULL;
     }
@@ -126,8 +116,7 @@ aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
      * this thread is only called in main and all calls are blocking */
     if( aout_SpawnThread( p_aout ) )
     {
-        p_aout->pf_close( p_aout );
-        module_Unneed( p_aout->p_module );
+        module_Unneed( p_aout, p_aout->p_module );
         vlc_object_destroy( p_aout );
         return NULL;
     }
@@ -263,11 +252,8 @@ void aout_DestroyThread( aout_thread_t * p_aout )
     }
     vlc_mutex_destroy( &p_aout->fifos_lock );
     
-    /* Free the plugin */
-    p_aout->pf_close( p_aout );
-
     /* Release the aout module */
-    module_Unneed( p_aout->p_module );
+    module_Unneed( p_aout, p_aout->p_module );
 
     /* Free structure */
     vlc_object_destroy( p_aout );

@@ -2,7 +2,7 @@
  * intf_macosx.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.m,v 1.9 2002/07/23 20:50:05 massiot Exp $
+ * $Id: intf_macosx.m,v 1.10 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -43,26 +43,15 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
+static void Run       ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenIntf: initialize interface
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+int E_(OpenIntf) ( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-/*****************************************************************************
- * intf_Open: initialize interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
@@ -76,6 +65,8 @@ static int intf_Open( intf_thread_t *p_intf )
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
+    p_intf->pf_run = Run;
+
     [[VLCApplication sharedApplication] autorelease];
     [NSApp initIntlSupport];
     [NSApp setIntf: p_intf];
@@ -86,10 +77,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface
+ * CloseIntf: destroy interface
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+void E_(CloseIntf) ( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     [p_intf->p_sys->o_sendport release];
@@ -99,9 +92,9 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: main loop
+ * Run: main loop
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     [NSApp run];
 }

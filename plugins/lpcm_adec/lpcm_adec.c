@@ -2,7 +2,7 @@
  * lpcm_adec.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.19 2002/07/23 00:39:17 sam Exp $
+ * $Id: lpcm_adec.c,v 1.20 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -41,52 +41,42 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( vlc_fourcc_t * );
-static int  decoder_Run    ( decoder_fifo_t * );
+static int  OpenDecoder    ( vlc_object_t * );
+static int  RunDecoder     ( decoder_fifo_t * );
+
        void DecodeFrame    ( lpcmdec_thread_t * );
 static int  InitThread     ( lpcmdec_thread_t * );
 static void EndThread      ( lpcmdec_thread_t * );
 
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("linear PCM audio decoder") );
+    set_capability( "decoder", 100 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Capabilities
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc != VLC_FOURCC('l','p','c','m') )
+    {   
+        return VLC_EGENERIC;
+    }
+    
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Build configuration tree.
+ * RunDecoder: the lpcm decoder
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("linear PCM audio decoder") )
-    ADD_CAPABILITY( DECODER, 100 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
- *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
-{
-    return ( *pi_type == VLC_FOURCC('l','p','c','m') ) ? 0 : -1;
-}
-
-/*****************************************************************************
- * decoder_Run: the lpcm decoder
- *****************************************************************************/
-static int decoder_Run( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     lpcmdec_thread_t *   p_lpcmdec;
 

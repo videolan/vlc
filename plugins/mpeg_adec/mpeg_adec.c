@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.26 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_adec.c,v 1.27 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -42,52 +42,46 @@
 /*****************************************************************************
  * Local Prototypes
  *****************************************************************************/
-static int   decoder_Probe ( vlc_fourcc_t * );
-static int   decoder_Run   ( decoder_fifo_t * );
-static void  EndThread     ( adec_thread_t * );
-static void  DecodeThread  ( adec_thread_t * );
+static int  OpenDecoder    ( vlc_object_t * );
+static int  RunDecoder     ( decoder_fifo_t * );
+
+static void EndThread      ( adec_thread_t * );
+static void DecodeThread   ( adec_thread_t * );
 
 /*****************************************************************************
- * Capabilities
+ * Module descriptor
  *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
+vlc_module_begin();
+    set_description( _("MPEG I/II layer 1/2 audio decoder") );
+    set_capability( "decoder", 50 );
+    add_requirement( FPU );
+    add_shortcut( "builtin" );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
+
+/*****************************************************************************
+ * OpenDecoder: probe the decoder and return score
+ *****************************************************************************
+ * Tries to launch a decoder and return score so that the interface is able
+ * to choose.
+ *****************************************************************************/
+static int OpenDecoder( vlc_object_t *p_this )
+{   
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc != VLC_FOURCC('m','p','g','a') )
+    {   
+        return VLC_EGENERIC;
+    }
+    
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Build configuration tree.
+ * RunDecoder: initialize, go inside main loop, destroy
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("MPEG I/II layer 1/2 audio decoder") )
-    ADD_CAPABILITY( DECODER, 50 )
-    ADD_REQUIREMENT( FPU )
-    ADD_SHORTCUT( "builtin" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
- *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
-{
-    return *pi_type == VLC_FOURCC('m','p','g','a') ? 0 : -1;
-}
-
-/*****************************************************************************
- * decoder_Run: initialize, go inside main loop, detroy
- *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     adec_thread_t   * p_adec;
     

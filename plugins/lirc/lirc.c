@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.14 2002/07/20 18:01:42 sam Exp $
+ * $Id: lirc.c,v 1.15 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -47,49 +47,27 @@ struct intf_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list );
-
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
+static int  Open    ( vlc_object_t * );
+static void Close   ( vlc_object_t * );
+static void Run     ( intf_thread_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("infrared remote control module") )
-    ADD_CAPABILITY( INTF, 8 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("infrared remote control module") );
+    set_capability( "interface", 0 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize interface
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Open: initialize dummy interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
     int i_fd;
 
     /* Allocate instance and initialize some members */
@@ -99,6 +77,8 @@ static int intf_Open( intf_thread_t *p_intf )
         msg_Err( p_intf, "out of memory" );
         return 1;
     }
+
+    p_intf->pf_run = Run;
 
     i_fd = lirc_init( "vlc", 1 );
     if( i_fd == -1 )
@@ -125,10 +105,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy dummy interface
+ * Close: destroy interface
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+static void Close( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -141,9 +123,9 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: main loop
+ * Run: main loop
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     char *code, *c;
     playlist_t *p_playlist;

@@ -7,7 +7,7 @@
  *****************************************************************************
  *    
  * Copyright (C) 2001 VideoLAN
- * $Id: dvd.c,v 1.1 2002/07/23 19:56:19 stef Exp $
+ * $Id: dvd.c,v 1.2 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,32 +35,30 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Exported prototypes
  *****************************************************************************/
-void _M( access_getfunctions)( function_list_t * p_function_list );
-void _M( demux_getfunctions)( function_list_t * p_function_list );
-void _M( intf_getfunctions)( function_list_t * p_function_list );
+int  E_(OpenDVD)   ( vlc_object_t * );
+void E_(CloseDVD)  ( vlc_object_t * );
+int  E_(InitDVD)   ( vlc_object_t * );
+void E_(EndDVD)    ( vlc_object_t * );
+int  E_(OpenIntf)  ( vlc_object_t * );
+void E_(CloseIntf) ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( "[dvdplay:][device][@[title][,[chapter][,angle]]]", NULL )
-MODULE_CONFIG_STOP
+vlc_module_begin();
+    add_category_hint( "[dvdplay:][device][@[title][,[chapter][,angle]]]", NULL );
+    set_description( "dvdplay input module" );
+    add_submodule();
+        set_capability( "access", 120 );
+        set_callbacks( E_(OpenDVD), E_(CloseDVD) );
+        add_shortcut( "dvd" );
+    add_submodule();
+        set_capability( "demux", 0 );
+        set_callbacks( E_(InitDVD), E_(EndDVD) );
+    add_submodule();
+        set_capability( "interface", 0 );
+        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
+vlc_module_end();
 
-MODULE_INIT_START
-    SET_DESCRIPTION( "dvdplay input module" )
-    ADD_CAPABILITY( INTF, 0 )
-    ADD_CAPABILITY( DEMUX, 0 )
-    ADD_CAPABILITY( ACCESS, 120 )
-    ADD_SHORTCUT( "dvd" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( access_getfunctions)( &p_module->p_functions->access );
-    _M( demux_getfunctions)( &p_module->p_functions->demux );
-    _M( intf_getfunctions)( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP

@@ -29,13 +29,13 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * External prototypes
  *****************************************************************************/
-void _M( access_getfunctions )( function_list_t * p_function_list );
-void _M( demux_getfunctions )( function_list_t * p_function_list );
+int  E_(Open)    ( vlc_object_t * );
+void E_(Close)   ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 
 #define FREQ_TEXT N_("satellite default transponder frequency")
@@ -62,28 +62,22 @@ void _M( demux_getfunctions )( function_list_t * p_function_list );
 #define LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
-MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( N_("Input"), NULL )
-    ADD_INTEGER ( "frequency", 11954, NULL, FREQ_TEXT, FREQ_LONGTEXT )
-    ADD_INTEGER ( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT )
-    ADD_INTEGER ( "fec", 3, NULL, FEC_TEXT, FEC_LONGTEXT )
-    ADD_INTEGER ( "symbol-rate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT )
-    ADD_BOOL    ( "diseqc", 0, NULL, DISEQC_TEXT, DISEQC_LONGTEXT )
-    ADD_INTEGER ( "lnb-lof1", 10000, NULL, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT )
-    ADD_INTEGER ( "lnb-lof2", 10000, NULL, LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT )
-    ADD_INTEGER ( "lnb-slof", 11700, NULL, LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("satellite input module") )
-    ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "sat" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( access_getfunctions )( &p_module->p_functions->access );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Input"), NULL );
+        add_integer( "frequency", 11954, NULL, FREQ_TEXT, FREQ_LONGTEXT );
+        add_integer( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT );
+        add_integer( "fec", 3, NULL, FEC_TEXT, FEC_LONGTEXT );
+        add_integer( "symbol-rate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT );
+        add_bool( "diseqc", 0, NULL, DISEQC_TEXT, DISEQC_LONGTEXT );
+        add_integer( "lnb-lof1", 10000, NULL,
+                     LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT );
+        add_integer( "lnb-lof2", 10000, NULL,
+                     LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT );
+        add_integer( "lnb-slof", 11700, NULL,
+                     LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT );
+    set_description( _("satellite input module") );
+    set_capability( "access", 0 );
+    add_shortcut( "sat" );
+    set_callbacks( E_(Open), E_(Close) );
+vlc_module_end();
 

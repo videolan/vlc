@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.24 2002/07/23 00:39:17 sam Exp $
+ * $Id: ggi.c,v 1.25 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,46 +36,35 @@
 #include <vlc/vout.h>
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
 
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );                         
+static int  Manage    ( vout_thread_t * );               
+static void Display   ( vout_thread_t *, picture_t * );            
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
 static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_("Specify the X11 hardware display you want to use."\
                            "\nBy default vlc will use the value of the DISPLAY"\
                            " environment variable.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "ggi_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "General Graphics Interface video output" )
-    ADD_CAPABILITY( VOUT, 30 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();                                
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    set_description( "General Graphics Interface video output" );
+    set_capability( "video output", 30 );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: video output GGI method descriptor
@@ -99,29 +88,16 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create  = vout_Create;
-    p_function_list->functions.vout.pf_init    = vout_Init;
-    p_function_list->functions.vout.pf_end     = vout_End;
-    p_function_list->functions.vout.pf_destroy = vout_Destroy;
-    p_function_list->functions.vout.pf_manage  = vout_Manage;
-    p_function_list->functions.vout.pf_render  = vout_Render;
-    p_function_list->functions.vout.pf_display = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate GGI video thread output method
+ * Create: allocate GGI video thread output method
  *****************************************************************************
  * This function allocate and initialize a GGI vout method. It uses some of the
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -138,15 +114,21 @@ int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize GGI video thread output method
+ * Init: initialize GGI video thread output method
  *****************************************************************************
  * This function initialize the GGI display device.
  *****************************************************************************/
-int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
 #define p_b p_vout->p_sys->pp_buffer
     int i_index;
@@ -251,11 +233,11 @@ int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate GGI video thread output method
+ * End: terminate GGI video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_Create
+ * Terminate an output method created by Create
  *****************************************************************************/
-void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
 #define p_b p_vout->p_sys->pp_buffer
     /* Release buffer */
@@ -267,24 +249,26 @@ void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy GGI video thread output method
+ * Destroy: destroy GGI video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_Create
+ * Terminate an output method created by Create
  *****************************************************************************/
-void vout_Destroy( vout_thread_t *p_vout )
-{
+static void Destroy( vlc_object_t *p_this )
+{   
+    vout_thread_t *p_vout = (vout_thread_t *)p_this; 
+    
     CloseDisplay( p_vout );
 
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle GGI events
+ * Manage: handle GGI events
  *****************************************************************************
  * This function should be called regularly by video output thread. It returns
  * a non null value if an error occured.
  *****************************************************************************/
-int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     struct timeval tv = { 0, 1000 };                        /* 1 millisecond */
     gii_event_mask mask;
@@ -344,17 +328,9 @@ int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************/
-void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
- *****************************************************************************/
-void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #define p_b p_vout->p_sys->pp_buffer
     p_pic->p->p_pixels = p_b[ p_vout->p_sys->i_index ]->write;

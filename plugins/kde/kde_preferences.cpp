@@ -37,7 +37,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     this->p_intf = p_intf;
 
     /* Look for the selected module */
-    for( p_module = p_intf->p_vlc->module_bank.first ; p_module != NULL ;
+    for( p_module = p_intf->p_vlc->p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
@@ -95,7 +95,8 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                 
                 /* build a list of available plugins */
                 
-                for( p_module_bis = p_intf->p_vlc->module_bank.first ;
+#if 0 /* FIXME */
+                for( p_module_bis = p_intf->p_vlc->p_module_bank->first ;
                      p_module_bis != NULL ;
                      p_module_bis = p_module_bis->next ) {
                     if( p_module_bis->i_capabilities & (1 << p_item->i_value)){
@@ -104,6 +105,7 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                                           p_module_bis->psz_longname);
                     }
                 }
+#endif
                 vlc_mutex_unlock( p_item->p_lock );
             }
             break;
@@ -208,7 +210,7 @@ KPreferences::~KPreferences()
 bool KPreferences::isConfigureable(QString module)
 {
     module_t *p_module;
-    for( p_module = p_intf->p_vlc->module_bank.first ;
+    for( p_module = p_intf->p_vlc->p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next ) {
         if( !module.compare( p_module->psz_object_name ) ) {

@@ -2,7 +2,7 @@
  * ac3_imdct_c.c: ac3 DCT in C
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_imdct_c.c,v 1.6 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_imdct_c.c,v 1.7 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -40,10 +40,10 @@
 #   define M_PI 3.14159265358979323846
 #endif
 
-void _M( fft_64p )  ( complex_t *x );
-void _M( fft_128p ) ( complex_t *x );
+void E_( fft_64p )  ( complex_t *x );
+void E_( fft_128p ) ( complex_t *x );
 
-void _M( imdct_init ) (imdct_t * p_imdct)
+void E_( imdct_init ) (imdct_t * p_imdct)
 {
     int i;
     float scale = 181.019;
@@ -55,7 +55,7 @@ void _M( imdct_init ) (imdct_t * p_imdct)
     }
 }
 
-void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
+void E_( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
 {
     int i, j;
     float tmp_a_r, tmp_a_i;
@@ -77,7 +77,7 @@ void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
         p_imdct->buf[i].imag = -1.0 * (data[2*j] * p_imdct->xcos1[j] + data[256-2*j-1] * p_imdct->xsin1[j]);
     }
 
-    _M( fft_128p ) ( &p_imdct->buf[0] );
+    E_( fft_128p ) ( &p_imdct->buf[0] );
 
     /* Post IFFT complex multiply  plus IFFT complex conjugate */
     for (i=0; i < 128; i++) {
@@ -122,7 +122,7 @@ void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
 }
 
 
-void _M( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
+void E_( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
 {
     int i, j;
 
@@ -148,7 +148,7 @@ void _M( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
         p_imdct->buf[i].imag = -1.0 * (data[2*j] * p_imdct->xcos1[j] + data[256-2*j-1] * p_imdct->xsin1[j]);
     }
        
-    _M( fft_128p ) ( &p_imdct->buf[0] );
+    E_( fft_128p ) ( &p_imdct->buf[0] );
 
     /* Post IFFT complex multiply  plus IFFT complex conjugate*/
     for (i=0; i < 128; i++) {

@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.16 2002/07/25 22:48:56 massiot Exp $
+ * $Id: vout_macosx.m,v 1.17 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -55,10 +55,8 @@ struct picture_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
 static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
@@ -75,27 +73,13 @@ static int  QTNewPicture       ( vout_thread_t *, picture_t * );
 static void QTFreePicture      ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates MacOS X video thread output method
+ * OpenVideo: allocates MacOS X video thread output method
  *****************************************************************************
  * This function allocates and initializes a MacOS X vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
-{
+int E_(OpenVideo) ( vlc_object_t *p_this )
+{   
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -182,6 +166,12 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    p_vout->pf_init = vout_Init;
+    p_vout->pf_end = vout_End;
+    p_vout->pf_manage = vout_Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = vout_Display;
+
     return( 0 );
 }
 
@@ -261,10 +251,12 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy video thread output method
+ * CloseVideo: destroy video thread output method
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
+void E_(CloseVideo) ( vlc_object_t *p_this )
+{       
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;     
+
     if( CoDestroyWindow( p_vout ) )
     {
         msg_Err( p_vout, "unable to destroy window" );
@@ -338,14 +330,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     }
 
     return( 0 );
-}
-
-/*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * aout_macosx.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.8 2002/07/20 18:01:42 sam Exp $
+ * $Id: aout_macosx.m,v 1.9 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -54,22 +54,19 @@ struct aout_sys_t
     UInt32              ui_buffer_size; // audio device buffer size
     vlc_bool_t          b_buffer_data;  // available buffer data?
     vlc_mutex_t         mutex_lock;     // pthread locks for sync of
-    vlc_cond_t          cond_sync;      // aout_Play and callback
+    vlc_cond_t          cond_sync;      // Play and callback
     mtime_t             clock_diff;     // diff between system clock & audio
 };
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int      aout_Open       ( aout_thread_t *p_aout );
-static int      aout_SetFormat  ( aout_thread_t *p_aout );
-static int      aout_GetBufInfo ( aout_thread_t *p_aout, int i_buffer_info );
-static void     aout_Play       ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void     aout_Close      ( aout_thread_t *p_aout );
+static int      SetFormat       ( aout_thread_t * );
+static int      GetBufInfo      ( aout_thread_t *, int );
+static void     Play            ( aout_thread_t *, byte_t *, int );
 
-static int      CABeginFormat   ( aout_thread_t *p_aout );
-static int      CAEndFormat     ( aout_thread_t *p_aout );
+static int      CABeginFormat   ( aout_thread_t * );
+static int      CAEndFormat     ( aout_thread_t * );
 
 static OSStatus CAIOCallback    ( AudioDeviceID inDevice,
                                   const AudioTimeStamp *inNow, 
@@ -80,23 +77,11 @@ static OSStatus CAIOCallback    ( AudioDeviceID inDevice,
                                   void *threadGlobals );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenAudio: opens a CoreAudio HAL device
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
+int E_(OpenAudio) ( vlc_object_t *p_this )
 {
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: opens a CoreAudio HAL device
- *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
     OSStatus err;
     UInt32 ui_param_size;
 
@@ -170,13 +155,17 @@ static int aout_Open( aout_thread_t *p_aout )
         return( -1 );
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SetFormat: pretends to set the dsp output format
+ * SetFormat: pretends to set the dsp output format
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     if( CAEndFormat( p_aout ) )
     {
@@ -260,9 +249,9 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: returns available bytes in buffer
+ * GetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     return( 0 ); /* send data as soon as possible */
 }
@@ -301,7 +290,7 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
 //X        msg_Warn( p_aout, "audio output is starving, expect glitches" );
     }
 
-    /* see aout_Play below */
+    /* see Play below */
     vlc_mutex_lock( &p_sys->mutex_lock );
     p_sys->b_buffer_data = 0;
     vlc_cond_signal( &p_sys->cond_sync );
@@ -311,15 +300,15 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
 }
 
 /*****************************************************************************
- * aout_Play: play a sound
+ * Play: play a sound
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     OSStatus err;
     UInt32 ui_buffer_size = p_aout->p_sys->ui_buffer_size;
 
     /* 
-     * wait for a callback to occur (to flush the buffer), so aout_Play
+     * wait for a callback to occur (to flush the buffer), so Play
      * can't be called twice, losing the data we just wrote. 
      */
     vlc_mutex_lock( &p_aout->p_sys->mutex_lock );
@@ -345,10 +334,12 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: closes the CoreAudio HAL device
+ * CloseAudio: closes the CoreAudio HAL device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+void E_(CloseAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
+
     if( CAEndFormat( p_aout ) )
     {
         msg_Err( p_aout, "CAEndFormat failed" );

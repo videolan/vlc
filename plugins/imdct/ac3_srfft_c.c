@@ -2,7 +2,7 @@
  * ac3_srfft.c: ac3 FFT in C
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_c.c,v 1.5 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_srfft_c.c,v 1.6 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -249,7 +249,7 @@ static void fft_asmb16(complex_t *x, complex_t *wTB)
 } 
 
 
-void _M( fft_64p ) ( complex_t *a )
+void E_( fft_64p ) ( complex_t *a )
 {
   fft_8(&a[0]); fft_4(&a[8]); fft_4(&a[12]);
   fft_asmb16(&a[0], &a[8]);
@@ -267,7 +267,7 @@ void _M( fft_64p ) ( complex_t *a )
 }
 
 
-void _M( fft_128p ) ( complex_t *a )
+void E_( fft_128p ) ( complex_t *a )
 {
   fft_8(&a[0]); fft_4(&a[8]); fft_4(&a[12]);
   fft_asmb16(&a[0], &a[8]);

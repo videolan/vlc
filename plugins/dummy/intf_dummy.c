@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.21 2002/07/20 18:01:42 sam Exp $
+ * $Id: intf_dummy.c,v 1.22 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,44 +31,16 @@
 #include <vlc/intf.h>
 
 /*****************************************************************************
- * intf_sys_t: description and status of FB interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    /* Prevent malloc(0) */
-    int i_dummy;
-};
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
+static void Run   ( intf_thread_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize dummy interface
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list )
+int  E_(OpenIntf) ( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Open: initialize dummy interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
-        return( 1 );
-    };
-
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
 #ifdef WIN32
     AllocConsole();
     freopen( "CONOUT$", "w", stdout );
@@ -78,23 +50,15 @@ static int intf_Open( intf_thread_t *p_intf )
     msg_Info( p_intf, _("\nUsing the dummy interface plugin...") );
 #endif
 
-    return( 0 );
+    p_intf->pf_run = Run;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * intf_Close: destroy dummy interface
+ * Run: main loop
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
-    /* Destroy structure */
-    free( p_intf->p_sys );
-}
-
-
-/*****************************************************************************
- * intf_Run: main loop
- *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {

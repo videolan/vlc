@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.187 2002/07/23 00:39:17 sam Exp $
+ * $Id: video_output.c,v 1.188 2002/07/31 20:56:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -184,9 +184,8 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
 
     p_vout->p_module = module_Need( p_vout,
                            ( p_vout->psz_filter_chain ) ?
-                           MODULE_CAPABILITY_VOUT_FILTER :
-                           MODULE_CAPABILITY_VOUT,
-                           psz_plugin, (void *)p_vout );
+                           "video filter" : "video output",
+                           psz_plugin );
 
     if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
@@ -195,16 +194,6 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
         vlc_object_destroy( p_vout );
         return( NULL );
     }
-
-#define f p_vout->p_module->p_functions->vout.functions.vout
-    p_vout->pf_create     = f.pf_create;
-    p_vout->pf_init       = f.pf_init;
-    p_vout->pf_end        = f.pf_end;
-    p_vout->pf_destroy    = f.pf_destroy;
-    p_vout->pf_manage     = f.pf_manage;
-    p_vout->pf_render     = f.pf_render;
-    p_vout->pf_display    = f.pf_display;
-#undef f
 
     /* Create thread and set locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
@@ -216,8 +205,7 @@ vout_thread_t * __vout_CreateThread ( vlc_object_t *p_parent,
     if( vlc_thread_create( p_vout, "video output", RunThread, 0 ) )
     {
         msg_Err( p_vout, "%s", strerror(ENOMEM) );
-        p_vout->pf_destroy( p_vout );
-        module_Unneed( p_vout->p_module );
+        module_Unneed( p_vout, p_vout->p_module );
         vlc_object_destroy( p_vout );
         return NULL;
     }
@@ -334,9 +322,7 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        p_vout->chroma.p_module =
-            module_Need( p_vout, MODULE_CAPABILITY_CHROMA,
-                         NULL, (void *)p_vout );
+        p_vout->chroma.p_module = module_Need( p_vout, "chroma", NULL );
 
         if( p_vout->chroma.p_module == NULL )
         {
@@ -346,11 +332,6 @@ static int InitThread( vout_thread_t *p_vout )
             vlc_mutex_unlock( &p_vout->change_lock );
             return( 1 );
         }
-
-#define f p_vout->chroma.p_module->p_functions->chroma.functions.chroma
-        p_vout->chroma.pf_init       = f.pf_init;
-        p_vout->chroma.pf_end        = f.pf_end;
-#undef f
 
         if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
         {
@@ -417,8 +398,6 @@ static void RunThread( vout_thread_t *p_vout)
     if( p_vout->b_error )
     {
         /* Destroy thread structures allocated by Create and InitThread */
-        p_vout->pf_destroy( p_vout );
-
         DestroyThread( p_vout );
         return;
     }
@@ -590,9 +569,9 @@ static void RunThread( vout_thread_t *p_vout)
         p_directbuffer = vout_RenderPicture( p_vout, p_picture, p_subpic );
 
         /*
-         * Call the plugin-specific rendering method
+         * Call the plugin-specific rendering method if there is one
          */
-        if( p_picture != NULL )
+        if( p_picture != NULL && p_vout->pf_render )
         {
             /* Render the direct buffer returned by vout_RenderPicture */
             p_vout->pf_render( p_vout, p_directbuffer );
@@ -631,7 +610,10 @@ static void RunThread( vout_thread_t *p_vout)
         if( p_picture != NULL )
         {
             /* Display the direct buffer returned by vout_RenderPicture */
-            p_vout->pf_display( p_vout, p_directbuffer );
+            if( p_vout->pf_display )
+            {
+                p_vout->pf_display( p_vout, p_directbuffer );
+            }
 
             /* Reinitialize idle loop count */
             i_idle_loops = 0;
@@ -645,7 +627,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Check events and manage thread
          */
-        if( p_vout->pf_manage( p_vout ) )
+        if( p_vout->pf_manage && p_vout->pf_manage( p_vout ) )
         {
             /* A fatal error occured, and the thread must terminate
              * immediately, without displaying anything - setting b_error to 1
@@ -671,13 +653,13 @@ static void RunThread( vout_thread_t *p_vout)
             if( p_vout->pf_init( p_vout ) )
             {
                 msg_Err( p_vout, "cannot resize display" );
-                /* FixMe: p_vout->pf_end will be called again in EndThread() */
+                /* FIXME: pf_end will be called again in EndThread() */
                 p_vout->b_error = 1;
             }
 
             /* Need to reinitialise the chroma plugin */
-            p_vout->chroma.pf_end( p_vout );
-            p_vout->chroma.pf_init( p_vout );
+            p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
+            p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
         }
 
     }
@@ -692,9 +674,6 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
-
-    /* Destroy method-dependant resources */
-    p_vout->pf_destroy( p_vout );
 
     /* Destroy thread structures allocated by CreateThread */
     DestroyThread( p_vout );
@@ -739,8 +718,7 @@ static void EndThread( vout_thread_t *p_vout )
 
     if( !p_vout->b_direct )
     {
-        p_vout->chroma.pf_end( p_vout );
-        module_Unneed( p_vout->chroma.p_module );
+        module_Unneed( p_vout, p_vout->chroma.p_module );
     }
 
     /* Destroy all remaining pictures */
@@ -782,7 +760,7 @@ static void DestroyThread( vout_thread_t *p_vout )
     vlc_mutex_destroy( &p_vout->change_lock );
 
     /* Release the module */
-    module_Unneed( p_vout->p_module );
+    module_Unneed( p_vout, p_vout->p_module );
 }
 
 /* following functions are local */

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.26 2002/07/23 00:39:16 sam Exp $
+ * $Id: vout_dummy.c,v 1.27 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,67 +36,36 @@
 #define DUMMY_MAX_DIRECTBUFFERS 10
 
 /*****************************************************************************
- * vout_sys_t: dummy video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the dummy specific properties of an output thread.
- *****************************************************************************/
-struct vout_sys_t
-{
-    /* Nothing needed here. Maybe stats ? */
-
-    /* Prevent malloc(0) */
-    int i_dummy;
-};
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates dummy video thread output method
+ * OpenVideo: activates dummy video thread output method
  *****************************************************************************
- * This function allocates and initializes a dummy vout method.
+ * This function initializes a dummy vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+int E_(OpenVideo) ( vlc_object_t *p_this )
 {
-    /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        return( 1 );
-    }
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    return( 0 );
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = Display;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * vout_Init: initialize dummy video thread output method
+ * Init: initialize dummy video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index, i_chroma;
     char *psz_chroma;
@@ -184,9 +153,9 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate dummy video thread output method
+ * End: terminate dummy video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -199,38 +168,28 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy dummy video thread output method
- *****************************************************************************
- * Terminate an output method created by DummyCreateOutputMethod
- *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * vout_Manage: handle dummy events
+ * Manage: handle dummy events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
+ * Render: render previously calculated output
  *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
 }
 
 /*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
 }

@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.7 2002/06/01 12:31:58 sam Exp $
+ * $Id: file.c,v 1.8 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,51 +41,11 @@
 #endif
 
 /*****************************************************************************
- * Local prototypes
+ * Open: open the file
  *****************************************************************************/
-static void input_getfunctions( function_list_t * );
-static int  FileOpen       ( input_thread_t * );
-
-/*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
- 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Standard filesystem file reading") )
-    ADD_CAPABILITY( ACCESS, 50 )
-    ADD_SHORTCUT( "stream" )
-MODULE_INIT_STOP
- 
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->access );
-MODULE_ACTIVATE_STOP
- 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-#define input p_function_list->functions.access
-    input.pf_open             = FileOpen;
-    input.pf_read             = input_FDRead;
-    input.pf_close            = input_FDClose;
-    input.pf_set_program      = input_SetProgram;
-    input.pf_set_area         = NULL;
-    input.pf_seek             = input_FDSeek;
-#undef input
-}
-
-/*****************************************************************************
- * FileOpen: open the file
- *****************************************************************************/
-static int FileOpen( input_thread_t * p_input )
-{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     char *              psz_name = p_input->psz_name;
     int                 i_stat;
     struct stat         stat_info;                                              
@@ -102,6 +62,11 @@ static int FileOpen( input_thread_t * p_input )
                           psz_name, strerror(errno));
         return( -1 );
     }
+
+    p_input->pf_read = input_FDRead;
+    p_input->pf_set_program = input_SetProgram;
+    p_input->pf_set_area = NULL;
+    p_input->pf_seek = input_FDSeek;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -173,3 +138,14 @@ static int FileOpen( input_thread_t * p_input )
 
     return( 0 );
 }
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("Standard filesystem file reading") );
+    set_capability( "access", 50 );
+    add_shortcut( "stream" );
+    set_callbacks( Open, __input_FDClose );
+vlc_module_end();
+ 

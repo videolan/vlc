@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.14 2002/06/01 12:31:57 sam Exp $
+List of known vlc bugs $Id: BUGS,v 1.15 2002/07/31 20:56:50 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -15,6 +15,9 @@ Core:
 Input:
 
   * DVD raw device support doesn't seem to work.
+
+  * Going to title 0 with the dvdold or dvdread plugins segfaults (tested
+    with Nausicaa).
 
 Decoders:
 
@@ -35,6 +38,10 @@ Video output:
 
   * On-the-fly resizing when using a chroma transformation doesn't work for
   all plugins. Currently it is only implemented for x11 and SDL.
+
+  * --filter clone gives a slanted picture on axe.mpeg
+  * --filter transform barfs on rambo.avi
+
 
 Chroma transformations:
 

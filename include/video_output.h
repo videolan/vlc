@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.81 2002/07/20 18:01:41 sam Exp $
+ * $Id: video_output.h,v 1.82 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -47,8 +47,6 @@ typedef struct vout_chroma_t
 
     /* Plugin used and shortcuts to access its capabilities */
     module_t * p_module;
-    int  ( * pf_init )  ( vout_thread_t * );
-    void ( * pf_end )   ( vout_thread_t * );
 
 } vout_chroma_t;
 
@@ -102,10 +100,8 @@ struct vout_thread_t
 
     /* Plugin used and shortcuts to access its capabilities */
     module_t *   p_module;
-    int       ( *pf_create )     ( vout_thread_t * );
     int       ( *pf_init )       ( vout_thread_t * );
     void      ( *pf_end )        ( vout_thread_t * );
-    void      ( *pf_destroy )    ( vout_thread_t * );
     int       ( *pf_manage )     ( vout_thread_t * );
     void      ( *pf_render )     ( vout_thread_t *, picture_t * );
     void      ( *pf_display )    ( vout_thread_t *, picture_t * );
@@ -170,7 +166,7 @@ struct vout_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(CAST_TO_VLC_OBJECT(a),b,c,d,e)
+#define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
 VLC_EXPORT( void,              vout_DestroyThread,  ( vout_thread_t * ) );
 

@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.11 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.12 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -37,8 +37,8 @@
 #   define M_PI 3.14159265358979323846
 #endif
 
-void _M( fft_64p )  ( complex_t *x );
-void _M( fft_128p ) ( complex_t *a );
+void E_( fft_64p )  ( complex_t *x );
+void E_( fft_128p ) ( complex_t *a );
 
 static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float *data, float *xcos_sin_sse);
 static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse);
@@ -46,7 +46,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt);
 
 
-void _M( imdct_init ) (imdct_t * p_imdct)
+void E_( imdct_init ) (imdct_t * p_imdct)
 {
 	int i;
 	float scale = 181.019;
@@ -62,18 +62,18 @@ void _M( imdct_init ) (imdct_t * p_imdct)
 	}
 }
 
-void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
+void E_( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
 {
 	imdct512_pre_ifft_twiddle_3dn (pm128, p_imdct->buf, data, p_imdct->xcos_sin_sse);
-	_M( fft_128p ) (p_imdct->buf);
+	E_( fft_128p ) (p_imdct->buf);
 	imdct512_post_ifft_twiddle_3dn (p_imdct->buf, p_imdct->xcos_sin_sse);
     imdct512_window_delay_3dn (p_imdct->buf, data, window, delay);
 }
 
-void _M( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
+void E_( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
 {
 	imdct512_pre_ifft_twiddle_3dn (pm128, p_imdct->buf, data, p_imdct->xcos_sin_sse);  
-	_M( fft_128p ) (p_imdct->buf);
+	E_( fft_128p ) (p_imdct->buf);
 	imdct512_post_ifft_twiddle_3dn (p_imdct->buf, p_imdct->xcos_sin_sse);
     imdct512_window_delay_nol_3dn (p_imdct->buf, data, window, delay);
 }

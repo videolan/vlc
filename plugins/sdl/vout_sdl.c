@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.97 2002/07/23 00:39:17 sam Exp $
+ * $Id: vout_sdl.c,v 1.98 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -83,15 +83,12 @@ struct picture_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static int  vout_Create     ( vout_thread_t * );
-static int  vout_Init       ( vout_thread_t * );
-static void vout_End        ( vout_thread_t * );
-static void vout_Destroy    ( vout_thread_t * );
-static int  vout_Manage     ( vout_thread_t * );
-static void vout_Render     ( vout_thread_t *, picture_t * );
-static void vout_Display    ( vout_thread_t *, picture_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 static int  OpenDisplay     ( vout_thread_t * );
 static void CloseDisplay    ( vout_thread_t * );
@@ -99,29 +96,16 @@ static int  NewPicture      ( vout_thread_t *, picture_t * );
 static void SetPalette      ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate SDL video thread output method
+ * OpenVideo: allocate SDL video thread output method
  *****************************************************************************
  * This function allocate and initialize a SDL vout method. It uses some of the
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+int E_(OpenVideo) ( vlc_object_t *p_this )                         
 {
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;          
+
 #ifdef HAVE_SETENV
     char *psz_method;
 #endif
@@ -138,6 +122,12 @@ static int vout_Create( vout_thread_t *p_vout )
         msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
 
 #ifdef HAVE_SETENV
     psz_method = config_GetPsz( p_vout, "vout" );
@@ -189,11 +179,11 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize SDL video thread output method
+ * Init: initialize SDL video thread output method
  *****************************************************************************
  * This function initialize the SDL display device.
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -254,11 +244,11 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Sys video thread output method
+ * End: terminate Sys video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_SDLCreate
+ * Terminate an output method created by OpenVideo
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -282,26 +272,27 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Sys video thread output method
+ * CloseVideo: destroy Sys video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+void E_(CloseVideo) ( vlc_object_t *p_this )                         
 {
-    CloseDisplay( p_vout );
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;          
 
+    CloseDisplay( p_vout );
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
 
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle Sys events
+ * Manage: handle Sys events
  *****************************************************************************
  * This function should be called regularly by video output thread. It returns
  * a non null value if an error occured.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
 
@@ -518,19 +509,11 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to the display.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int x, y, w, h;
     SDL_Rect disp;

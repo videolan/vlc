@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.16 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_ts.c,v 1.17 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -58,10 +58,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  TSInit  ( input_thread_t * );
-static void TSEnd   ( input_thread_t * );
-static int  TSDemux ( input_thread_t * );
+static int  Activate ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 #if defined MODULE_NAME_IS_mpeg_ts
 static void TSDemuxPSI ( input_thread_t *, data_packet_t *,
@@ -78,53 +76,34 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
 #endif
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
+vlc_module_begin();
 #if defined MODULE_NAME_IS_mpeg_ts
-    SET_DESCRIPTION( _("ISO 13818-1 MPEG Transport Stream input") )
-    ADD_CAPABILITY( DEMUX, 160 )
-    ADD_SHORTCUT( "ts" )
+    set_description( _("ISO 13818-1 MPEG Transport Stream input") );
+    set_capability( "demux", 160 );
+    add_shortcut( "ts" );
 #elif defined MODULE_NAME_IS_mpeg_ts_dvbpsi
-    SET_DESCRIPTION( _("ISO 13818-1 MPEG Transport Stream input (libdvbpsi)") )
-    ADD_CAPABILITY( DEMUX, 170 )
-    ADD_SHORTCUT( "ts_dvbpsi" )
+    set_description( _("ISO 13818-1 MPEG Transport Stream input (libdvbpsi)") );
+    set_capability( "demux", 170 );
+    add_shortcut( "ts_dvbpsi" );
 #endif
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_callbacks( Activate, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Activate: initializes TS structures
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
+static int Activate( vlc_object_t * p_this )
 {
-#define input p_function_list->functions.demux
-    input.pf_init             = TSInit;
-    input.pf_end              = TSEnd;
-    input.pf_demux            = TSDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
-
-/*****************************************************************************
- * TSInit: initializes TS structures
- *****************************************************************************/
-static int TSInit( input_thread_t * p_input )
-{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     es_descriptor_t     * p_pat_es;
     es_ts_data_t        * p_demux_data;
     stream_ts_data_t    * p_stream_data;
     byte_t              * p_peek;
+
+    /* Set the demux function */
+    p_input->pf_demux = Demux;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -199,19 +178,12 @@ static int TSInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * TSEnd: frees unused data
- *****************************************************************************/
-static void TSEnd( input_thread_t * p_input )
-{
-}
-
-/*****************************************************************************
- * TSDemux: reads and demuxes data packets
+ * Demux: reads and demuxes data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * packets.
  *****************************************************************************/
-static int TSDemux( input_thread_t * p_input )
+static int Demux( input_thread_t * p_input )
 {
     int             i_read_once = (p_input->i_mtu ?
                                    p_input->i_bufsize / TS_PACKET_SIZE :

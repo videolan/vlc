@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.12 2002/07/23 00:39:16 sam Exp $
+ * $Id: vlc_common.h,v 1.13 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -254,6 +254,9 @@ VLC_DECLARE_STRUCT(input_info_category_t)
     vlc_object_t ** pp_children;                         /* our children */ \
     volatile int    i_children;                                             \
                                                                             \
+    /* Private data */                                                      \
+    void *          p_private;                                              \
+                                                                            \
     /* Just a reminder so that people don't cast garbage */                 \
     int be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                        \
 
@@ -263,8 +266,8 @@ struct vlc_object_t
     VLC_COMMON_MEMBERS
 };
 
-/* CAST_TO_VLC_OBJECT: attempt at doing a clever cast */
-#define CAST_TO_VLC_OBJECT( x ) \
+/* VLC_OBJECT: attempt at doing a clever cast */
+#define VLC_OBJECT( x ) \
     ((vlc_object_t *)(x))+0*(x)->be_sure_to_add_VLC_COMMON_MEMBERS_to_struct
 
 /*****************************************************************************

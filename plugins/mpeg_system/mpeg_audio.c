@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.13 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_audio.c,v 1.14 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -35,45 +35,20 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions ( function_list_t * p_function_list );
-static int  MPEGAudioDemux     ( input_thread_t * );
-static int  MPEGAudioInit      ( input_thread_t * );
-static void MPEGAudioEnd       ( input_thread_t * );
+static int  Activate ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 /* TODO: support MPEG-2.5, not difficult */
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "MPEG I/II Audio stream demux" )
-    ADD_CAPABILITY( DEMUX, 110 )
-    ADD_SHORTCUT( "mpegaudio" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = MPEGAudioInit;
-    input.pf_end              = MPEGAudioEnd;
-    input.pf_demux            = MPEGAudioDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
+vlc_module_begin();
+    set_description( _("ISO 13818-3 MPEG I/II audio stream demux" ) );
+    set_capability( "demux", 100 );
+    set_callbacks( Activate, NULL );
+    add_shortcut( "mpegaudio" );
+vlc_module_end();
 
 /*****************************************************************************
  * Definitions of structures  and functions used by this plugins 
@@ -442,16 +417,20 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
                                     
 
 /*****************************************************************************
- * MPEGaudioInit : initializes MPEGaudio structures
+ * Activate: initializes MPEGaudio structures
  *****************************************************************************/
-static int MPEGAudioInit( input_thread_t * p_input )
+static int Activate( vlc_object_t * p_this )
 {
-    demux_data_mpegaudio_t *p_mpegaudio;
+    input_thread_t * p_input = (input_thread_t *)p_this;
+    demux_data_mpegaudio_t * p_mpegaudio;
     mpegaudio_format_t mpeg;
     es_descriptor_t * p_es;
     int i_pos;
     int b_forced;
     input_info_category_t * p_category;
+
+    /* Set the demux function */
+    p_input->pf_demux = Demux;
 
     /* XXX: i don't know what it's supposed to do, copied from ESInit */
     /* Initialize access plug-in structures. */
@@ -585,22 +564,12 @@ static int MPEGAudioInit( input_thread_t * p_input )
     return( 0 );
 }
 
-
 /*****************************************************************************
- * MPEGAudioEnd: frees unused data
- *****************************************************************************/
-static void MPEGAudioEnd( input_thread_t * p_input )
-{
-    
-}
-
-
-/*****************************************************************************
- * MPEGAudioDemux: reads and demuxes data packets
+ * Demux: reads and demuxes data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int MPEGAudioDemux( input_thread_t * p_input )
+static int Demux( input_thread_t * p_input )
 {
     int i_pos;
     int i_toread;

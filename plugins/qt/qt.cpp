@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.11 2002/06/01 12:32:00 sam Exp $
+ * $Id: qt.cpp,v 1.12 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,39 +29,24 @@
 
 #include <vlc/vlc.h>
 
-extern "C"
-{
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * External prototypes
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list );
+int  E_(Open)  ( vlc_object_t * );
+void E_(Close) ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Qt interface module") )
-#ifndef WIN32
-    if( getenv( "DISPLAY" ) == NULL )
-    {
-        ADD_CAPABILITY( INTF, 7 )
-    }
-    else
+vlc_module_begin();
+#ifdef WIN32
+    int i = 80;
+#else
+    int i = getenv( "DISPLAY" ) == NULL ? 7 : 80;
 #endif
-    {
-        ADD_CAPABILITY( INTF, 80 )
-    }
-    ADD_PROGRAM( "qvlc" )
-MODULE_INIT_STOP
+    set_description( _("Qt interface module") );
+    set_capability( "interface", i );
+    set_program( "qvlc" );
+    set_callbacks( E_(Open), E_(Close) );
+vlc_module_end();
 
-MODULE_ACTIVATE_START
-    _M( intf_getfunctions )( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-} /* extern "C" */

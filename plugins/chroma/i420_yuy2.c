@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.10 2002/07/23 00:39:16 sam Exp $
+ * $Id: i420_yuy2.c,v 1.11 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,10 +44,7 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static void chroma_getfunctions ( function_list_t * p_function_list );
-
-static int  chroma_Init         ( vout_thread_t *p_vout );
-static void chroma_End          ( vout_thread_t *p_vout );
+static int  Activate ( vlc_object_t * );
 
 static void I420_YUY2           ( vout_thread_t *, picture_t *, picture_t * );
 static void I420_YVYU           ( vout_thread_t *, picture_t *, picture_t * );
@@ -64,49 +61,32 @@ static unsigned long long i_80w;
 #endif
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor.
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
+vlc_module_begin();
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-    SET_DESCRIPTION( _("conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    ADD_CAPABILITY( CHROMA, 80 )
+    set_description( _("conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_chroma_i420_yuy2_mmx)
-    SET_DESCRIPTION( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    ADD_CAPABILITY( CHROMA, 100 )
-    ADD_REQUIREMENT( MMX )
+    set_description( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_capability( "chroma", 100 );
+    add_requirement( MMX );
     /* Initialize MMX-specific constants */
     i_00ffw = 0x00ff00ff00ff00ff;
     i_80w   = 0x0000000080808080;
 #endif
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    chroma_getfunctions( &p_module->p_functions->chroma );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_callbacks( Activate, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void chroma_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.chroma.pf_init = chroma_Init;
-    p_function_list->functions.chroma.pf_end  = chroma_End;
-}
-
-/*****************************************************************************
- * chroma_Init: allocate a chroma function
+ * Activate: allocate a chroma function
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int chroma_Init( vout_thread_t *p_vout )
+static int Activate( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     if( p_vout->render.i_width & 1 || p_vout->render.i_height & 1 )
     {
         return -1;
@@ -158,16 +138,6 @@ static int chroma_Init( vout_thread_t *p_vout )
     }
 
     return 0;
-}
-
-/*****************************************************************************
- * chroma_End: free the chroma function
- *****************************************************************************
- * This function frees the previously allocated chroma function
- *****************************************************************************/
-static void chroma_End( vout_thread_t *p_vout )
-{
-    ;
 }
 
 /* Following functions are local */

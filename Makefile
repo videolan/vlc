@@ -357,7 +357,7 @@ plugins-uninstall:
 builtins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(BUILTINS))
-	$(INSTALL) $(BUILTINS:%=plugins/%.a) $(DESTDIR)$(libdir)/vlc
+	$(INSTALL) -m 644 $(BUILTINS:%=plugins/%.a) $(DESTDIR)$(libdir)/vlc
 endif
 
 builtins-uninstall:
@@ -564,9 +564,7 @@ src/misc/modules_builtin.h: Makefile.opts Makefile Makefile.config
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "int InitModule__MODULE_"$$i"( module_t* );" >>$@; \
-		echo "int ActivateModule__MODULE_"$$i"( module_t* );" >>$@; \
-		echo "int DeactivateModule__MODULE_"$$i"( module_t* );" >>$@; \
+		echo "int vlc_entry__"$$i"( module_t* );" >>$@; \
 	done
 	@echo "" >> $@ ;
 endif
@@ -621,10 +619,6 @@ ifeq ($(SYS),beos)
 	mimeset -f $@
 endif
 
-# here are the rules for a dynamic link of libvlc:
-#vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) lib/libvlc.so $(BUILTIN_OBJ)
-#	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(builtins_LDFLAGS) -L./lib -lvlc
-
 #
 # Main library target
 #
@@ -633,6 +627,10 @@ lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 	ar rc $@ $(LIBVLC_OBJ)
 	$(RANLIB) $@
 
+#
+# DO NOT DISTRIBUTE SHARED VERSIONS OF LIBVLC UNTIL THE ABI IS STABLE
+# OR BURN IN HELL -- Sam
+#
 #lib/libvlc.so: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 #	$(CC) -shared $(LIBVLC_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) -o $@
 

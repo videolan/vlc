@@ -2,7 +2,7 @@
  * idct_decl.h : common declarations, must be included at the very end
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_decl.h,v 1.2 2002/02/15 13:32:53 sam Exp $
+ * $Id: idct_decl.h,v 1.3 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,19 +38,16 @@ static void IDCTAdd( dctelem_t * p_block, yuv_data_t * p_dest,
     AddBlock( p_block, p_dest, i_stride );
 }
 
+static void * IDCTFunctions[] =
+    { InitIDCT, NormScan, SparseIDCTAdd, SparseIDCTCopy, IDCTAdd, IDCTCopy };
+
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-#define F p_function_list->functions.idct
-    F.pf_idct_init = InitIDCT;
-    F.pf_norm_scan = NormScan;
-    F.pf_sparse_idct_add = SparseIDCTAdd;
-    F.pf_sparse_idct_copy = SparseIDCTCopy;
-    F.pf_idct_add = IDCTAdd;
-    F.pf_idct_copy = IDCTCopy;
-#undef F
+    p_this->p_private = IDCTFunctions;
+    return VLC_SUCCESS;
 }
 

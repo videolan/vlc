@@ -2,7 +2,7 @@
  * ac3_downmix.h : AC3 downmix types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.h,v 1.5 2002/07/20 18:01:41 sam Exp $
+ * $Id: ac3_downmix.h,v 1.6 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -31,6 +31,8 @@ struct dm_par_t
 
 struct downmix_t
 {
+    VLC_COMMON_MEMBERS
+
     /* Module used and shortcuts */
     module_t * p_module;
     void (*pf_downmix_3f_2r_to_2ch)(float *, dm_par_t * dm_par);

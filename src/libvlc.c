@@ -1,10 +1,8 @@
 /*****************************************************************************
  * libvlc.c: main libvlc source
- * Includes the main() function for vlc. Parses command line, starts playlist
- * and spawns threads.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.18 2002/07/21 18:57:02 sigmunau Exp $
+ * Copyright (C) 1998-2002 VideoLAN
+ * $Id: libvlc.c,v 1.19 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -102,7 +100,6 @@ static int  GetFilenames  ( vlc_t *, int, char *[] );
 static void Usage         ( vlc_t *, const char *psz_module_name );
 static void ListModules   ( vlc_t * );
 static void Version       ( void );
-static void Build         ( void );
 
 #ifndef WIN32
 static void InitSignalHandler   ( void );
@@ -204,7 +201,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     fprintf( stderr, COPYRIGHT_MESSAGE "\n" );
 
     /* Guess what CPU we have */
-    p_vlc->i_cpu_capabilities = CPUCapabilities( p_vlc );
+    p_vlc->i_cpu = CPUCapabilities( p_vlc );
 
     /*
      * Support for gettext
@@ -275,13 +272,13 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
     p_help_module->psz_object_name = "help";
     config_Duplicate( p_help_module, p_help_config );
-    p_help_module->next = p_vlc->module_bank.first;
-    p_vlc->module_bank.first = p_help_module;
+    p_help_module->next = p_vlc->p_module_bank->first;
+    p_vlc->p_module_bank->first = p_help_module;
     /* End hack */
 
     if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE ) )
     {
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -297,7 +294,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
         Usage( p_vlc, "help" );
         Usage( p_vlc, "main" );
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -309,19 +306,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "version" ) )
     {
         Version();
-        p_vlc->module_bank.first = p_help_module->next;
-        config_Free( p_help_module );
-        vlc_object_destroy( p_help_module );
-        module_EndBank( p_vlc );
-        msg_Destroy( p_vlc );
-        return VLC_EEXIT;
-    }
-
-    /* Check for build option */
-    if( config_GetInt( p_vlc, "build" ) )
-    {
-        Build();
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -330,7 +315,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
 
     /* Hack: remove the help module here */
-    p_vlc->module_bank.first = p_help_module->next;
+    p_vlc->p_module_bank->first = p_help_module->next;
     /* End hack */
 
     /*
@@ -342,11 +327,11 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     module_LoadBuiltins( p_vlc );
     module_LoadPlugins( p_vlc );
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
-                    p_vlc->module_bank.i_count );
+                    p_vlc->p_module_bank->i_count );
 
     /* Hack: insert the help module here */
-    p_help_module->next = p_vlc->module_bank.first;
-    p_vlc->module_bank.first = p_help_module;
+    p_help_module->next = p_vlc->p_module_bank->first;
+    p_vlc->p_module_bank->first = p_help_module;
     /* End hack */
 
     /* Check for help on modules */
@@ -354,7 +339,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     {
         Usage( p_vlc, p_tmp );
         free( p_tmp );
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -366,7 +351,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "longhelp" ) )
     {
         Usage( p_vlc, NULL );
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -378,7 +363,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "list" ) )
     {
         ListModules( p_vlc );
-        p_vlc->module_bank.first = p_help_module->next;
+        p_vlc->p_module_bank->first = p_help_module->next;
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -387,7 +372,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
 
     /* Hack: remove the help module here */
-    p_vlc->module_bank.first = p_help_module->next;
+    p_vlc->p_module_bank->first = p_help_module->next;
     config_Free( p_help_module );
     vlc_object_destroy( p_help_module );
     /* End hack */
@@ -430,19 +415,23 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
     /* p_vlc inititalization. FIXME ? */
     p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
+#if defined( __i386__ )
     if( !config_GetInt( p_vlc, "mmx" ) )
-        p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
+        p_vlc->i_cpu &= ~CPU_CAPABILITY_MMX;
     if( !config_GetInt( p_vlc, "3dn" ) )
-        p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_3DNOW;
+        p_vlc->i_cpu &= ~CPU_CAPABILITY_3DNOW;
     if( !config_GetInt( p_vlc, "mmxext" ) )
-        p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_MMXEXT;
+        p_vlc->i_cpu &= ~CPU_CAPABILITY_MMXEXT;
     if( !config_GetInt( p_vlc, "sse" ) )
-        p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_SSE;
+        p_vlc->i_cpu &= ~CPU_CAPABILITY_SSE;
+#endif
+#if defined( __powerpc__ ) || defined( SYS_DARWIN )
     if( !config_GetInt( p_vlc, "altivec" ) )
-        p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_ALTIVEC;
+        p_vlc->i_cpu &= ~CPU_CAPABILITY_ALTIVEC;
+#endif
 
 #define PRINT_CAPABILITY( capability, string )                              \
-    if( p_vlc->i_cpu_capabilities & capability )                            \
+    if( p_vlc->i_cpu & capability )                                         \
     {                                                                       \
         strncat( p_capabilities, string " ",                                \
                  sizeof(p_capabilities) - strlen(p_capabilities) );         \
@@ -465,18 +454,13 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * Choose the best memcpy module
      */
     psz_module = config_GetPsz( p_vlc, "memcpy" );
-    p_vlc->p_memcpy_module =
-            module_Need( p_vlc, MODULE_CAPABILITY_MEMCPY, psz_module, NULL );
+    p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", psz_module );
     if( psz_module ) free( psz_module );
+
     if( p_vlc->p_memcpy_module == NULL )
     {
-        msg_Err( p_vlc, "no suitable memcpy module, using libc default" );
+        msg_Warn( p_vlc, "no suitable memcpy module, using libc default" );
         p_vlc->pf_memcpy = memcpy;
-    }
-    else
-    {
-        p_vlc->pf_memcpy = p_vlc->p_memcpy_module->p_functions
-                                  ->memcpy.functions.memcpy.pf_memcpy;
     }
 
     /*
@@ -486,8 +470,8 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
          && network_ChannelCreate( p_vlc ) )
     {
         /* On error during Channels initialization, switch off channels */
-        msg_Err( p_vlc,
-                 "channels initialization failed, deactivating channels" );
+        msg_Warn( p_vlc,
+                  "channels initialization failed, deactivating channels" );
         config_PutInt( p_vlc, "network-channel", VLC_FALSE );
     }
 
@@ -500,7 +484,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         msg_Err( p_vlc, "playlist initialization failed" );
         if( p_vlc->p_memcpy_module != NULL )
         {
-            module_Unneed( p_vlc->p_memcpy_module );
+            module_Unneed( p_vlc, p_vlc->p_memcpy_module );
         }
         module_EndBank( p_vlc );
         msg_Destroy( p_vlc );
@@ -721,7 +705,7 @@ vlc_error_t vlc_end_r( vlc_t *p_vlc )
      */
     if( p_vlc->p_memcpy_module != NULL )
     {
-        module_Unneed( p_vlc->p_memcpy_module );
+        module_Unneed( p_vlc, p_vlc->p_memcpy_module );
     }
 
     free( p_vlc->psz_homedir );
@@ -931,7 +915,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
 #endif
 
     /* Enumerate the config for each module */
-    for( p_module = p_this->p_vlc->module_bank.first ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -1116,7 +1100,7 @@ static void ListModules( vlc_t *p_this )
     fprintf( stderr, _("[module]              [description]\n") );
 
     /* Enumerate each module */
-    for( p_module = p_this->p_vlc->module_bank.first ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -1158,25 +1142,6 @@ static void Version( void )
         "law.\nYou may redistribute it under the terms of the GNU General "
         "Public License;\nsee the file named COPYING for details.\n"
         "Written by the VideoLAN team at Ecole Centrale, Paris.\n") );
-
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
-    getchar();
-#endif
-}
-
-/*****************************************************************************
- * Build: print information about the vlc build
- *****************************************************************************
- * Print the ./configure command line and other information.
- *****************************************************************************/
-static void Build( void )
-{
-#ifdef WIN32
-    ShowConsole();
-#endif
-
-    fprintf( stderr, "configured with %s\n", CONFIGURE_LINE );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     fprintf( stderr, _("\nPress the RETURN key to continue...\n") );

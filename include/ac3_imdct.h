@@ -2,7 +2,7 @@
  * ac3_imdct.h : AC3 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.h,v 1.9 2002/07/20 18:01:41 sam Exp $
+ * $Id: ac3_imdct.h,v 1.10 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -32,6 +32,8 @@ struct complex_t
 
 struct imdct_t
 {
+    VLC_COMMON_MEMBERS
+
     complex_t * buf;
     void *      buf_orig;                         /* pointer before memalign */
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.208 2002/07/25 21:53:53 sigmunau Exp $
+ * $Id: input.c,v 1.209 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -87,20 +87,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->psz_source = strdup( p_item->psz_name );
 
     /* Demux */
-    p_input->p_demux_module = NULL;
-    p_input->pf_init    = NULL;
-    p_input->pf_end     = NULL;
-    p_input->pf_demux   = NULL;
-    p_input->pf_rewind  = NULL;
+    p_input->p_demux = NULL;
 
     /* Access */
-    p_input->p_access_module = NULL;
-    p_input->pf_open        = NULL;
-    p_input->pf_close       = NULL;
-    p_input->pf_read        = NULL;
-    p_input->pf_seek        = NULL;
-    p_input->pf_set_area    = NULL;
-    p_input->pf_set_program = NULL;
+    p_input->p_access = NULL;
     
     p_input->i_bufsize = 0;
     p_input->i_mtu = 0;
@@ -146,7 +136,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale" );
-    p_input->stream.control.i_smp = config_GetInt( p_input, "vdec-smp" );
 
     /* Initialize input info */
     p_input->stream.p_info = malloc( sizeof( input_info_category_t ) );
@@ -249,7 +238,7 @@ static int RunThread( input_thread_t *p_input )
                 input_AccessReinit( p_input );
                 
                 p_input->pf_set_program( p_input, 
-                        p_input->stream.p_new_program );
+                                         p_input->stream.p_new_program );
 
                 /* Escape all decoders for the stream discontinuity they
                  * will encounter. */
@@ -293,7 +282,8 @@ static int RunThread( input_thread_t *p_input )
 
         if( p_input->stream.p_selected_area->i_seek != NO_SEEK )
         {
-            if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
+            if( p_input->stream.b_seekable
+                 && p_input->pf_seek != NULL )
             {
                 off_t i_new_pos;
 
@@ -355,7 +345,7 @@ static int RunThread( input_thread_t *p_input )
         if( i_count == 0 && p_input->stream.b_seekable )
         {
             /* End of file - we do not set b_die because only the
-             * interface is allowed to do so. */
+             * playlist is allowed to do so. */
             msg_Info( p_input, "EOF reached" );
             p_input->b_eof = 1;
         }
@@ -463,25 +453,15 @@ static int InitThread( input_thread_t * p_input )
     }
 
     /* Find and open appropriate access module */
-    p_input->p_access_module =
-        module_Need( p_input, MODULE_CAPABILITY_ACCESS,
-                     p_input->psz_access, (void *)p_input );
+    p_input->p_access = module_Need( p_input, "access",
+                                     p_input->psz_access );
 
-    if( p_input->p_access_module == NULL )
+    if( p_input->p_access == NULL )
     {
         msg_Err( p_input, "no suitable access module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         return -1;
     }
-
-#define f p_input->p_access_module->p_functions->access.functions.access
-    p_input->pf_open          = f.pf_open;
-    p_input->pf_close         = f.pf_close;
-    p_input->pf_read          = f.pf_read;
-    p_input->pf_set_area      = f.pf_set_area;
-    p_input->pf_set_program   = f.pf_set_program;
-    p_input->pf_seek          = f.pf_seek;
-#undef f
 
     /* Waiting for stream. */
     if( p_input->i_mtu )
@@ -499,31 +479,23 @@ static int InitThread( input_thread_t * p_input )
         {
             if( p_input->b_die || p_input->b_error || p_input->b_eof )
             {
-                module_Unneed( p_input->p_access_module );
+                module_Unneed( p_input, p_input->p_access );
                 return -1;
             }
         }
     }
 
     /* Find and open appropriate demux module */
-    p_input->p_demux_module =
-        module_Need( p_input, MODULE_CAPABILITY_DEMUX,
-                     p_input->psz_demux, (void *)p_input );
+    p_input->p_demux = module_Need( p_input, "demux",
+                                    p_input->psz_demux );
 
-    if( p_input->p_demux_module == NULL )
+    if( p_input->p_demux== NULL )
     {
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
-        module_Unneed( p_input->p_access_module );
+        module_Unneed( p_input, p_input->p_access );
         return -1;
     }
-
-#define f p_input->p_demux_module->p_functions->demux.functions.demux
-    p_input->pf_init          = f.pf_init;
-    p_input->pf_end           = f.pf_end;
-    p_input->pf_demux         = f.pf_demux;
-    p_input->pf_rewind        = f.pf_rewind;
-#undef f
 
     return 0;
 }
@@ -568,12 +540,10 @@ static void EndThread( input_thread_t * p_input )
     input_EndStream( p_input );
 
     /* Free demultiplexer's data */
-    p_input->pf_end( p_input );
-    module_Unneed( p_input->p_demux_module );
+    module_Unneed( p_input, p_input->p_demux );
 
     /* Close the access plug-in */
-    p_input->pf_close( p_input );
-    module_Unneed( p_input->p_access_module );
+    module_Unneed( p_input, p_input->p_access );
 
     input_AccessEnd( p_input );
 

@@ -40,28 +40,17 @@ intf_thread_t *p_intfGlobal;
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
 static void intf_Run       ( intf_thread_t *p_intf );
 
 int Win32Manage( void *p_data );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize interface
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list )
+int E_(Open)( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_s *) malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -71,6 +60,7 @@ static int intf_Open( intf_thread_t *p_intf )
     };
 
     p_intfGlobal = p_intf;
+    p_intf->pf_run = intf_Run;
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
@@ -86,10 +76,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface
+ * Close: destroy interface
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+void E_(Close)( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );

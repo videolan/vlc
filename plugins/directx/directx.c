@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.11 2002/06/01 12:31:58 sam Exp $
+ * $Id: directx.c,v 1.12 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -30,13 +30,16 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * External prototypes
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
-void _M( vout_getfunctions )( function_list_t * p_function_list );
+int  E_(OpenVideo)    ( vlc_object_t * );
+void E_(CloseVideo)   ( vlc_object_t * );
+
+int  E_(OpenAudio)    ( vlc_object_t * );
+void E_(CloseAudio)   ( vlc_object_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 #define HW_YUV_TEXT N_("use hardware YUV->RGB conversions")
 #define HW_YUV_LONGTEXT N_( \
@@ -49,27 +52,24 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays." )
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_BOOL ( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT )
-ADD_BOOL ( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT )
-MODULE_CONFIG_STOP
+vlc_module_begin();
+    add_category_hint( N_("Video"), NULL );
+    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT );
+    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
+    set_description( _("DirectX extension module") )
+    add_submodule();
+        set_capability( "video output", 150 );
+        set_callbacks( E_(OpenVideo), E_(CloseVideo) );
+    add_submodule();
+        set_capability( "audio output", 150 );
+        set_callbacks( E_(OpenAudio), E_(CloseAudio) );
+vlc_module_end();
 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("DirectX extension module") )
-    ADD_CAPABILITY( AOUT, 150 )
-    ADD_CAPABILITY( VOUT, 150 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
-    _M( vout_getfunctions )( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
+#if 0 /* FIXME */
     /* check if we registered a window class because we need to
      * unregister it */
     WNDCLASS wndclass;
     if( GetClassInfo( GetModuleHandle(NULL), "VLC DirectX", &wndclass ) )
         UnregisterClass( "VLC DirectX", GetModuleHandle(NULL) );
-MODULE_DEACTIVATE_STOP
+#endif
+

@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.12 2002/07/24 16:21:46 sam Exp $
+ * $Id: mpeg_es.c,v 1.13 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,55 +42,34 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  ESDemux ( input_thread_t * );
-static int  ESInit  ( input_thread_t * );
-static void ESEnd   ( input_thread_t * );
+static int  Activate ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("ISO 13818-2 MPEG Elementary Stream input") )
-    ADD_CAPABILITY( DEMUX, 150 )
-    ADD_SHORTCUT( "es" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = ESInit;
-    input.pf_end              = ESEnd;
-    input.pf_demux            = ESDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
+vlc_module_begin();
+    set_description( _("ISO 13818-1 MPEG Elementary Stream input") );
+    set_capability( "demux", 150 );
+    set_callbacks( Activate, NULL );
+    add_shortcut( "es" );
+vlc_module_end();
 
 /*
  * Data reading functions
  */
 
 /*****************************************************************************
- * ESInit: initializes ES structures
+ * Activate: initializes ES structures
  *****************************************************************************/
-static int ESInit( input_thread_t * p_input )
+static int Activate( vlc_object_t * p_this )
 {
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     es_descriptor_t *   p_es;
     byte_t *            p_peek;
+
+    /* Set the demux function */
+    p_input->pf_demux = Demux;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -154,18 +133,11 @@ static int ESInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * ESEnd: frees unused data
- *****************************************************************************/
-static void ESEnd( input_thread_t * p_input )
-{
-}
-
-/*****************************************************************************
- * ESDemux: reads and demuxes data packets
+ * Demux: reads and demuxes data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int ESDemux( input_thread_t * p_input )
+static int Demux( input_thread_t * p_input )
 {
     ssize_t         i_read;
     decoder_fifo_t * p_fifo =

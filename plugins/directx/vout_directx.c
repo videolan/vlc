@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.41 2002/07/29 19:07:00 gbazin Exp $
+ * $Id: vout_directx.c,v 1.42 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -60,13 +60,10 @@ DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 static int  NewPictureVec  ( vout_thread_t *, picture_t *, int );
 static void FreePictureVec ( vout_thread_t *, picture_t *, int );
@@ -85,27 +82,14 @@ static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
 static int  DirectXGetSurfaceDesc ( picture_t *p_pic );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate DirectX video thread output method
+ * OpenVideo: allocate DirectX video thread output method
  *****************************************************************************
  * This function allocates and initialize the DirectX vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+int E_(OpenVideo) ( vlc_object_t *p_this )
 {
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -115,6 +99,12 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Initialisations */
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
+
     p_vout->p_sys->p_ddobject = NULL;
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_current_surface = NULL;
@@ -182,18 +172,18 @@ static int vout_Create( vout_thread_t *p_vout )
     return 0;
 
  error:
-    vout_Destroy( p_vout );
+    Destroy( p_vout );
     return 1;
 
 }
 
 /*****************************************************************************
- * vout_Init: initialize DirectX video thread output method
+ * Init: initialize DirectX video thread output method
  *****************************************************************************
  * This function create the directx surfaces needed by the output thread.
  * It is called at the beginning of the thread.
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_chroma_backup;
 
@@ -268,25 +258,27 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Sys video thread output method
+ * End: terminate Sys video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_Create.
+ * Terminate an output method created by Create.
  * It is called at the end of the thread.
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     FreePictureVec( p_vout, p_vout->p_picture, I_OUTPUTPICTURES );
     return;
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Sys video thread output method
+ * CloseVideo: destroy Sys video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_Create
+ * Terminate an output method created by Create
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
-    msg_Dbg( p_vout, "vout_Destroy" );
+void E_(CloseVideo) ( vlc_object_t *p_this )
+{   
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    
+    msg_Dbg( p_vout, "CloseVideo" );
 
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
@@ -315,12 +307,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle Sys events
+ * Manage: handle Sys events
  *****************************************************************************
  * This function should be called regularly by the video output thread.
  * It returns a non null value if an error occured.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int Manage( vout_thread_t *p_vout )
 {
     WINDOWPLACEMENT window_placement;
 
@@ -412,20 +404,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
+ * Display: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to the display, wait until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     HRESULT dxresult;
 
@@ -828,7 +812,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
  *****************************************************************************
  * This function is used to move or resize an overlay surface on the screen.
  * Ususally the overlay is moved by the user and thus, by a move or resize
- * event (in vout_Manage).
+ * event (in Manage).
  *****************************************************************************/
 void DirectXUpdateOverlay( vout_thread_t *p_vout )
 {

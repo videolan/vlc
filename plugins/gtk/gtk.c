@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.30 2002/07/15 20:09:31 sam Exp $
+ * $Id: gtk.c,v 1.31 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,12 +44,11 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Open         ( intf_thread_t *p_intf );
-static void intf_Close        ( intf_thread_t *p_intf );
-static void intf_Run          ( intf_thread_t *p_intf );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
 
-static gint GtkManage         ( gpointer p_data );
+static void Run          ( intf_thread_t * );
+static gint Manage       ( gpointer );
 
 /*****************************************************************************
  * Local variables (mutex-protected).
@@ -57,7 +56,7 @@ static gint GtkManage         ( gpointer p_data );
 static void ** pp_global_data = NULL;
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 #define TOOLTIPS_TEXT N_("show tooltips")
 #define TOOLTIPS_LONGTEXT N_("Show tooltips for configuration options.")
@@ -67,34 +66,25 @@ static void ** pp_global_data = NULL;
     "You can set the maximum height that the configuration windows in the " \
     "preferences menu will occupy.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_BOOL( "gtk-tooltips", 1, GtkHideTooltips, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT)
-ADD_INTEGER( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT)
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    pp_global_data = p_module->p_vlc->pp_global_data;
-    SET_DESCRIPTION( _("Gtk+ interface module") )
-#ifndef WIN32
-    if( getenv( "DISPLAY" ) == NULL )
-    {
-        ADD_CAPABILITY( INTF, 10 )
-    }
-    else
+vlc_module_begin();
+#ifdef WIN32
+    int i = 90;
+#else
+    int i = getenv( "DISPLAY" ) == NULL ? 10 : 90;
 #endif
-    {
-        ADD_CAPABILITY( INTF, 90 )
-    }
-    ADD_PROGRAM( "gvlc" )
-MODULE_INIT_STOP
+    pp_global_data = p_module->p_vlc->pp_global_data;
 
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_bool( "gtk-tooltips", 1, GtkHideTooltips,
+              TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT );
+    add_integer( "gtk-prefs-maxh", 480, NULL,
+                 PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT );
 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_description( _("Gtk+ interface module") );
+    set_capability( "interface", i );
+    set_callbacks( Open, Close );
+    set_program( "gvlc" );
+vlc_module_end();
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
@@ -140,21 +130,12 @@ void g_atexit( GVoidFunc func )
 }
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create window
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize and create window
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -162,6 +143,8 @@ static int intf_Open( intf_thread_t *p_intf )
         msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
+
+    p_intf->pf_run = Run;
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
@@ -183,10 +166,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface window
+ * Close: destroy interface window
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+static void Close( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -199,14 +184,14 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: Gtk+ thread
+ * Run: Gtk+ thread
  *****************************************************************************
  * this part of the interface is in a separate thread so that we can call
  * gtk_main() from within it without annoying the rest of the program.
  * XXX: the approach may look kludgy, and probably is, but I could not find
  * a better way to dynamically load a Gtk+ interface at runtime.
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
@@ -314,7 +299,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
-    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, GtkManage, p_intf );
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, Manage, p_intf );
 
     /* Enter Gtk mode */
     gtk_main();
@@ -337,12 +322,12 @@ static void intf_Run( intf_thread_t *p_intf )
 /* following functions are local */
 
 /*****************************************************************************
- * GtkManage: manage main thread messages
+ * Manage: manage main thread messages
  *****************************************************************************
  * In this function, called approx. 10 times a second, we check what the
  * main program wanted to tell us.
  *****************************************************************************/
-static gint GtkManage( gpointer p_data )
+static gint Manage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
     int i_start, i_stop;

@@ -2,7 +2,7 @@
  * vout_pictures.h : picture management definitions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vout_pictures.h,v 1.1 2002/07/23 00:39:17 sam Exp $
+ * $Id: vout_pictures.h,v 1.2 2002/07/31 20:56:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,11 +26,11 @@
  *****************************************************************************/
 
 /* Packed RGB for 8bpp */
-#define FOURCC_BI_RGB       VLC_FOURCC( 0 , 0 , 0 , 0 )
+#define FOURCC_BI_RGB       0x00000000
 #define FOURCC_RGB2         VLC_FOURCC('R','G','B','2')
 
 /* Packed RGB for 16, 24, 32bpp */
-#define FOURCC_BI_BITFIELDS VLC_FOURCC( 0 , 0 , 0 , 3 )
+#define FOURCC_BI_BITFIELDS 0x00000003
 
 /* Packed RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
 #define FOURCC_RV15         VLC_FOURCC('R','V','1','5')

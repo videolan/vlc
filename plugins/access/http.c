@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.18 2002/07/25 21:53:53 sigmunau Exp $
+ * $Id: http.c,v 1.19 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,47 +55,22 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * );
-static int  HTTPOpen       ( input_thread_t * );
-static void HTTPClose      ( input_thread_t * );
-static int  HTTPSetProgram ( input_thread_t *, pgrm_descriptor_t * );  
-static void HTTPSeek       ( input_thread_t *, off_t );
+static int  Open       ( vlc_object_t * );
+static void Close      ( vlc_object_t * );
+
+static int  SetProgram ( input_thread_t *, pgrm_descriptor_t * );  
+static void Seek       ( input_thread_t *, off_t );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
- 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("HTTP access plug-in") )
-    ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "http4" )
-    ADD_SHORTCUT( "http6" )
-MODULE_INIT_STOP
- 
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->access );
-MODULE_ACTIVATE_STOP
- 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.access
-    input.pf_open             = HTTPOpen;
-    input.pf_read             = input_FDNetworkRead;
-    input.pf_close            = HTTPClose;
-    input.pf_set_program      = HTTPSetProgram;
-    input.pf_set_area         = NULL;
-    input.pf_seek             = HTTPSeek;
-#undef input
-}
+vlc_module_begin();
+    set_description( _("HTTP access module") );
+    set_capability( "access", 0 );
+    add_shortcut( "http4" );
+    add_shortcut( "http6" );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
  * _input_socket_t: private access plug-in data, modified to add private
@@ -124,14 +99,13 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     char *              psz_return_alpha;
 
     /* Find an appropriate network module */
-    p_network = module_Need( p_input, MODULE_CAPABILITY_NETWORK,
-                             p_access_data->psz_network,
-                             &p_access_data->socket_desc );
+    p_input->p_private = (void*) &p_access_data->socket_desc;
+    p_network = module_Need( p_input, "network", p_access_data->psz_network );
     if( p_network == NULL )
     {
         return( -1 );
     }
-    module_Unneed( p_network );
+    module_Unneed( p_input, p_network );
 
     p_access_data->_socket.i_handle = p_access_data->socket_desc.i_handle;
 
@@ -166,7 +140,9 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
     /* Prepare the input thread for reading. */ 
     p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    /* FIXME: we shouldn't have to do that ! */
+
+    /* FIXME: we shouldn't have to do that ! It's UGLY but mandatory because
+     * input_FillBuffer assumes p_input->pf_read exists */
     p_input->pf_read = input_FDNetworkRead;
 
     while( !input_FillBuffer( p_input ) )
@@ -270,10 +246,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 }
 
 /*****************************************************************************
- * HTTPOpen: parse URL and open the remote file at the beginning
+ * Open: parse URL and open the remote file at the beginning
  *****************************************************************************/
-static int HTTPOpen( input_thread_t * p_input )
+static int Open( vlc_object_t *p_this )
 {
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     _input_socket_t *   p_access_data;
     char *              psz_name = strdup(p_input->psz_name);
     char *              psz_parser = psz_name;
@@ -459,6 +436,11 @@ static int HTTPOpen( input_thread_t * p_input )
     msg_Dbg( p_input, "opening server=%s port=%d path=%s",
                       psz_server_addr, i_server_port, psz_path );
 
+    p_input->pf_read = input_FDNetworkRead;
+    p_input->pf_set_program = SetProgram;
+    p_input->pf_set_area = NULL;
+    p_input->pf_seek = Seek;
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 1;
@@ -484,10 +466,11 @@ static int HTTPOpen( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * HTTPClose: free unused data structures
+ * Close: free unused data structures
  *****************************************************************************/
-static void HTTPClose( input_thread_t * p_input )
+static void Close( vlc_object_t *p_this )
 {
+    input_thread_t *  p_input = (input_thread_t *)p_this;
     _input_socket_t * p_access_data = 
         (_input_socket_t *)p_input->p_access_data;
 
@@ -496,18 +479,18 @@ static void HTTPClose( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * HTTPSetProgram: do nothing
+ * SetProgram: do nothing
  *****************************************************************************/
-static int HTTPSetProgram( input_thread_t * p_input,
-                           pgrm_descriptor_t * p_program )
+static int SetProgram( input_thread_t * p_input,
+                       pgrm_descriptor_t * p_program )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * HTTPSeek: close and re-open a connection at the right place
+ * Seek: close and re-open a connection at the right place
  *****************************************************************************/
-static void HTTPSeek( input_thread_t * p_input, off_t i_pos )
+static void Seek( input_thread_t * p_input, off_t i_pos )
 {
     _input_socket_t *   p_access_data = p_input->p_access_data;
     close( p_access_data->_socket.i_handle );

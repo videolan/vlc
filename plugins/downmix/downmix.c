@@ -2,7 +2,7 @@
  * downmix.c : AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmix.c,v 1.9 2002/06/01 12:31:58 sam Exp $
+ * $Id: downmix.c,v 1.10 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -33,45 +33,41 @@
 #include "ac3_downmix_common.h"
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Module initializer
  *****************************************************************************/
-static void downmix_getfunctions( function_list_t * p_function_list );
-
-/*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("AC3 downmix module") )
-    ADD_CAPABILITY( DOWNMIX, 50 )
-    ADD_SHORTCUT( "c" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    downmix_getfunctions( &p_module->p_functions->downmix );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void downmix_getfunctions( function_list_t * p_function_list )
+static int Open ( vlc_object_t *p_this )
 {
-#define F p_function_list->functions.downmix
-    F.pf_downmix_3f_2r_to_2ch = _M( downmix_3f_2r_to_2ch );
-    F.pf_downmix_3f_1r_to_2ch = _M( downmix_3f_1r_to_2ch );
-    F.pf_downmix_2f_2r_to_2ch = _M( downmix_2f_2r_to_2ch );
-    F.pf_downmix_2f_1r_to_2ch = _M( downmix_2f_1r_to_2ch );
-    F.pf_downmix_3f_0r_to_2ch = _M( downmix_3f_0r_to_2ch );
-    F.pf_stream_sample_2ch_to_s16 = _M( stream_sample_2ch_to_s16 );
-    F.pf_stream_sample_1ch_to_s16 = _M( stream_sample_1ch_to_s16 );
-#undef F
+    downmix_t *p_downmix = (downmix_t *)p_this;
+
+    p_downmix->pf_downmix_3f_2r_to_2ch = E_( downmix_3f_2r_to_2ch );
+    p_downmix->pf_downmix_3f_1r_to_2ch = E_( downmix_3f_1r_to_2ch );
+    p_downmix->pf_downmix_2f_2r_to_2ch = E_( downmix_2f_2r_to_2ch );
+    p_downmix->pf_downmix_2f_1r_to_2ch = E_( downmix_2f_1r_to_2ch );
+    p_downmix->pf_downmix_3f_0r_to_2ch = E_( downmix_3f_0r_to_2ch );
+    p_downmix->pf_stream_sample_2ch_to_s16 = E_( stream_sample_2ch_to_s16 );
+    p_downmix->pf_stream_sample_1ch_to_s16 = E_( stream_sample_1ch_to_s16 );
+
+    return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+#ifdef MODULE_NAME_IS_downmix
+    set_description( _("AC3 downmix module") );
+    set_capability( "downmix", 50 );
+    add_shortcut( "c" );
+#elif defined( MODULE_NAME_IS_downmixsse )
+    set_description( _("SSE AC3 downmix module") );
+    set_capability( "downmix", 200 );
+    add_shortcut( "sse" );
+#elif defined( MODULE_NAME_IS_downmix3dn )
+    set_description( _("3D Now! AC3 downmix module") );
+    set_capability( "downmix", 200 );
+    add_shortcut( "3dn" );
+    add_shortcut( "3dnow" );
+#endif
+    set_callbacks( Open, NULL );
+vlc_module_end();
 

@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.10 2002/07/20 18:01:43 sam Exp $
+ * $Id: waveout.c,v 1.11 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -36,37 +36,26 @@
 #include <mmsystem.h>
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void    aout_getfunctions( function_list_t * p_function_list );
+static int  Open         ( vlc_object_t * );             
+static void Close        ( vlc_object_t * );                   
 
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int  SetFormat    ( aout_thread_t * );  
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
 
 /* local functions */
 static int     OpenWaveOutDevice( aout_thread_t *p_aout );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Win32 waveOut extension module") )
-    ADD_CAPABILITY( AOUT, 250 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("Win32 waveOut extension module") ); 
+    set_capability( "audio output", 250 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
  * aout_sys_t: waveOut audio output method descriptor
@@ -91,25 +80,13 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: open the audio device
+ * Open: open the audio device
  *****************************************************************************
  * This function opens and setups Win32 waveOut
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
+static int Open( vlc_object_t *p_this )
+{   
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i;
 
     /* Allocate structure */
@@ -121,6 +98,9 @@ static int aout_Open( aout_thread_t *p_aout )
         return( 1 );
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
 
     /* Initialize some variables */
     p_aout->p_sys->i_current_buffer = 0;
@@ -132,15 +112,15 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: reset the audio device and sets its format
+ * SetFormat: reset the audio device and sets its format
  *****************************************************************************
  * This functions set a new audio format.
  * For this we need to close the current device and create another
  * one with the desired format.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
-    msg_Dbg( p_aout, "aout_SetFormat" );
+    msg_Dbg( p_aout, "SetFormat" );
 
     /* Check if the format has changed */
 
@@ -162,12 +142,12 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************
  * returns the number of bytes in the audio buffer that have not yet been
  * sent to the sound device.
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     MMTIME mmtime;
 
@@ -181,7 +161,7 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 
 
 #if 0
-    msg_Dbg( p_aout, "aout_GetBufInfo: %i",
+    msg_Dbg( p_aout, "GetBufInfo: %i",
                       p_aout->p_sys->dw_counter - mmtime.u.cb );
 #endif
 
@@ -189,11 +169,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play: play a sound buffer
+ * Play: play a sound buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 {
     MMRESULT result;
     int current_buffer = p_aout->p_sys->i_current_buffer;
@@ -243,10 +223,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: close the audio device
+ * Close: close the audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
-{
+static void Close( vlc_object_t *p_this )
+{       
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i;
 
     /* Before calling waveOutClose we must reset the device */

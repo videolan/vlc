@@ -4,7 +4,7 @@
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.9 2002/07/20 18:01:41 sam Exp $
+ * $Id: stream_control.h,v 1.10 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,8 +43,6 @@ struct stream_ctrl_t
 
     vlc_bool_t              b_mute;
     vlc_bool_t              b_grayscale;           /* use color or grayscale */
-    int                     i_smp; /* number of symmetrical threads to launch
-                                    * to decode the video | 0 == disabled    */
 };
 
 /* Possible status : */

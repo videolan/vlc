@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.9 2002/07/23 00:39:16 sam Exp $
+ * $Id: i420_rgb16.c,v 1.10 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,8 +50,8 @@ static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void _M( I420_RGB15 )( vout_thread_t *p_vout, picture_t *p_src,
-                                              picture_t *p_dest )
+void E_(I420_RGB15)( vout_thread_t *p_vout, picture_t *p_src,
+                                            picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     u16 *p_pic = (u16*)p_dest->p->p_pixels;
@@ -178,8 +178,8 @@ void _M( I420_RGB15 )( vout_thread_t *p_vout, picture_t *p_src,
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void _M( I420_RGB16 )( vout_thread_t *p_vout, picture_t *p_src,
-                                              picture_t *p_dest )
+void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
+                                            picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     u16 *p_pic = (u16*)p_dest->p->p_pixels;
@@ -306,8 +306,8 @@ void _M( I420_RGB16 )( vout_thread_t *p_vout, picture_t *p_src,
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
-                                              picture_t *p_dest )
+void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
+                                            picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     u32 *p_pic = (u32*)p_dest->p->p_pixels;

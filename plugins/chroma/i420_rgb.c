@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.10 2002/07/23 00:39:16 sam Exp $
+ * $Id: i420_rgb.c,v 1.11 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,10 +40,8 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static void chroma_getfunctions ( function_list_t * p_function_list );
-
-static int  chroma_Init         ( vout_thread_t * );
-static void chroma_End          ( vout_thread_t * );
+static int  Activate   ( vlc_object_t * );
+static void Deactivate ( vlc_object_t * );
 
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
 static void SetGammaTable       ( int *pi_table, double f_gamma );
@@ -52,48 +50,30 @@ static void Set8bppPalette      ( vout_thread_t *, u8 * );
 #endif
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor.
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
+vlc_module_begin();
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-    SET_DESCRIPTION( _("I420,IYUV,YV12 to "
-                       "RGB,RV15,RV16,RV24,RV32 conversions") )
-    ADD_CAPABILITY( CHROMA, 80 )
+    set_description( _("I420,IYUV,YV12 to "
+                       "RGB,RV15,RV16,RV24,RV32 conversions") );
+    set_capability( "chroma", 80 );
 #elif defined (MODULE_NAME_IS_chroma_i420_rgb_mmx)
-    SET_DESCRIPTION( _( "MMX I420,IYUV,YV12 to "
-                        "RV15,RV16,RV24,RV32 conversions") )
-    ADD_CAPABILITY( CHROMA, 100 )
-    ADD_REQUIREMENT( MMX )
+    set_description( _( "MMX I420,IYUV,YV12 to "
+                        "RV15,RV16,RV24,RV32 conversions") );
+    set_capability( "chroma", 100 );
+    add_requirement( MMX );
 #endif
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    chroma_getfunctions( &p_module->p_functions->chroma );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_callbacks( Activate, Deactivate );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void chroma_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.chroma.pf_init = chroma_Init;
-    p_function_list->functions.chroma.pf_end  = chroma_End;
-}
-
-/*****************************************************************************
- * chroma_Init: allocate a chroma function
+ * Activate: allocate a chroma function
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int chroma_Init( vout_thread_t *p_vout )
+static int Activate( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
     size_t i_tables_size;
 #endif
@@ -112,20 +92,20 @@ static int chroma_Init( vout_thread_t *p_vout )
             {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
                 case VLC_FOURCC('R','G','B','2'):
-                    p_vout->chroma.pf_convert = _M( I420_RGB8 );
+                    p_vout->chroma.pf_convert = E_(I420_RGB8);
                     break;
 #endif
                 case VLC_FOURCC('R','V','1','5'):
-                    p_vout->chroma.pf_convert = _M( I420_RGB15 );
+                    p_vout->chroma.pf_convert = E_(I420_RGB15);
                     break;
 
                 case VLC_FOURCC('R','V','1','6'):
-                    p_vout->chroma.pf_convert = _M( I420_RGB16 );
+                    p_vout->chroma.pf_convert = E_(I420_RGB16);
                     break;
 
                 case VLC_FOURCC('R','V','2','4'):
                 case VLC_FOURCC('R','V','3','2'):
-                    p_vout->chroma.pf_convert = _M( I420_RGB32 );
+                    p_vout->chroma.pf_convert = E_(I420_RGB32);
                     break;
 
                 default:
@@ -214,12 +194,14 @@ static int chroma_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * chroma_End: free the chroma function
+ * Deactivate: free the chroma function
  *****************************************************************************
  * This function frees the previously allocated chroma function
  *****************************************************************************/
-static void chroma_End( vout_thread_t *p_vout )
+static void Deactivate( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
     free( p_vout->chroma.p_sys->p_base );
 #endif

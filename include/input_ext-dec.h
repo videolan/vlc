@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.64 2002/07/23 00:39:16 sam Exp $
+ * $Id: input_ext-dec.h,v 1.65 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -118,6 +118,10 @@ struct decoder_fifo_t
     vlc_fourcc_t        i_fourcc;
     void *              p_demux_data;
     stream_ctrl_t *     p_stream_ctrl;
+
+    /* Module properties */
+    module_t *              p_module;
+    int                 ( * pf_run ) ( decoder_fifo_t * );
 };
 
 /*****************************************************************************

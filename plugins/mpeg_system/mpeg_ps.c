@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.16 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_ps.c,v 1.17 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,50 +41,29 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  PSDemux ( input_thread_t * );
-static int  PSInit  ( input_thread_t * );
-static void PSEnd   ( input_thread_t * );
+static int  Activate ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("ISO 13818-1 MPEG Program Stream input") )
-    ADD_CAPABILITY( DEMUX, 100 )
-    ADD_SHORTCUT( "ps" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("ISO 13818-1 MPEG Program Stream input") );
+    set_capability( "demux", 100 );
+    set_callbacks( Activate, NULL );
+    add_shortcut( "ps" );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Activate: initializes PS structures
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
+static int Activate( vlc_object_t * p_this )
 {
-#define input p_function_list->functions.demux
-    input.pf_init             = PSInit;
-    input.pf_end              = PSEnd;
-    input.pf_demux            = PSDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
-
-/*****************************************************************************
- * PSInit: initializes PS structures
- *****************************************************************************/
-static int PSInit( input_thread_t * p_input )
-{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     byte_t *            p_peek;
+
+    /* Set the demux function */
+    p_input->pf_demux = Demux;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -271,19 +250,12 @@ static int PSInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * PSEnd: frees unused data
- *****************************************************************************/
-static void PSEnd( input_thread_t * p_input )
-{
-}
-
-/*****************************************************************************
- * PSDemux: reads and demuxes data packets
+ * Demux: reads and demuxes data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * packets.
  *****************************************************************************/
-static int PSDemux( input_thread_t * p_input )
+static int Demux( input_thread_t * p_input )
 {
     int                 i;
 

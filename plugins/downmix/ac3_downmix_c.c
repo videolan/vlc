@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.5 2002/06/01 12:31:58 sam Exp $
+ * $Id: ac3_downmix_c.c,v 1.6 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -31,7 +31,7 @@
 
 #include "ac3_downmix.h"
 
-void _M( downmix_3f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
+void E_( downmix_3f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center, *left_sur, *right_sur;
@@ -51,7 +51,7 @@ void _M( downmix_3f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
     }
 }
 
-void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
+void E_( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *left_sur, *right_sur;
@@ -70,7 +70,7 @@ void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t *dm_par)
     }
 }
 
-void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
+void E_( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center, *right_sur;
@@ -90,7 +90,7 @@ void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
 }
 
 
-void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
+void E_( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *right_sur;
@@ -109,7 +109,7 @@ void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t *dm_par)
 }
 
 
-void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t *dm_par)
+void E_( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center;
@@ -128,7 +128,7 @@ void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t *dm_par)
 }
 
 
-void _M( stream_sample_2ch_to_s16 ) (s16 *out_buf, float *left, float *right)
+void E_( stream_sample_2ch_to_s16 ) (s16 *out_buf, float *left, float *right)
 {
     int i;
     for (i=0; i < 256; i++) {
@@ -138,7 +138,7 @@ void _M( stream_sample_2ch_to_s16 ) (s16 *out_buf, float *left, float *right)
 }
 
 
-void _M( stream_sample_1ch_to_s16 ) (s16 *out_buf, float *center)
+void E_( stream_sample_1ch_to_s16 ) (s16 *out_buf, float *center)
 {
     int i;
     float tmp;

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.8 2002/07/29 19:05:47 gbazin Exp $
+ * $Id: libvlc.h,v 1.9 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -316,127 +316,134 @@
 /*
  * Quick usage guide for the configuration options:
  *
- * MODULE_CONFIG_START
- * MODULE_CONFIG_STOP
- * ADD_CATEGORY_HINT( N_(text), N_(longtext) )
- * ADD_SUBCATEGORY_HINT( N_(text), N_(longtext) )
- * ADD_USAGE_HINT( N_(text) )
- * ADD_STRING( option_name, value, p_callback, N_(text), N_(longtext) )
- * ADD_FILE( option_name, psz_value, p_callback, N_(text), N_(longtext) )
- * ADD_MODULE( option_name, psz_value, i_capability, p_callback,
- *             N_(text), N_(longtext) )
- * ADD_INTEGER( option_name, i_value, p_callback, N_(text), N_(longtext) )
- * ADD_BOOL( option_name, b_value, p_callback, N_(text), N_(longtext) )
+ * add_category_hint( N_(text), N_(longtext) );
+ * add_subcategory_hint( N_(text), N_(longtext) );
+ * add_usage_hint( N_(text) );
+ * add_string( option_name, value, p_callback, N_(text), N_(longtext) );
+ * add_file( option_name, psz_value, p_callback, N_(text), N_(longtext) );
+ * add_module( option_name, psz_value, i_capability, p_callback,
+ *             N_(text), N_(longtext) );
+ * add_integer( option_name, i_value, p_callback, N_(text), N_(longtext) );
+ * add_bool( option_name, b_value, p_callback, N_(text), N_(longtext) );
  */
 
-MODULE_CONFIG_START
+vlc_module_begin();
+    /* Interface options */
+    add_category_hint( N_("Interface"), NULL);
+    add_module_with_short( "intf", 'I', "interface", NULL, NULL,
+                           INTF_TEXT, INTF_LONGTEXT );
+    add_bool_with_short( "verbose", 'v', 0, NULL,
+                         VERBOSE_TEXT, VERBOSE_LONGTEXT );
+    add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT );
+    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT );
+    add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT );
+    add_string( "plugin-path", NULL, NULL,
+                PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT );
 
-/* Interface options */
-ADD_CATEGORY_HINT( N_("Interface"), NULL)
-ADD_MODULE_WITH_SHORT ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
-ADD_BOOL_WITH_SHORT ( "verbose", 'v', 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT )
-ADD_BOOL_WITH_SHORT ( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT )
-ADD_BOOL            ( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT )
-ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
-ADD_STRING  ( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT )
+    /* Audio options */
+    add_category_hint( N_("Audio"), NULL);
+    add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
+                           AOUT_TEXT, AOUT_LONGTEXT );
+    add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT );
+    add_bool( "mono", 0, NULL, MONO_TEXT, MONO_LONGTEXT );
+    add_integer( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT );
+    add_integer( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT );
+    add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT );
+    add_integer( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT );
 
-/* Audio options */
-ADD_CATEGORY_HINT( N_("Audio"), NULL)
-ADD_MODULE_WITH_SHORT ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
-ADD_BOOL    ( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT )
-ADD_BOOL    ( "mono", 0, NULL, MONO_TEXT, MONO_LONGTEXT )
-ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
-ADD_INTEGER ( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT )
-ADD_INTEGER ( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT )
-ADD_INTEGER ( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT )
+    /* Video options */
+    add_category_hint( N_("Video"), NULL );
+    add_module_with_short( "vout", 'V', "video output", NULL, NULL,
+                           VOUT_TEXT, VOUT_LONGTEXT );
+    add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT );
+    add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT );
+    add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT );
+    add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT );
+    add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT );
+    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT );
+    add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT );
+    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT );
+    add_module( "filter", "video filter", NULL, NULL,
+                FILTER_TEXT, FILTER_LONGTEXT );
 
-/* Video options */
-ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_MODULE_WITH_SHORT ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
-ADD_BOOL    ( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT )
-ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
-ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
-ADD_FLOAT   ( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT )
-ADD_BOOL    ( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
-ADD_BOOL    ( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
-ADD_BOOL    ( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT )
-ADD_INTEGER ( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT )
-ADD_MODULE  ( "filter", MODULE_CAPABILITY_VOUT_FILTER, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
+    /* Input options */
+    add_category_hint( N_("Input"), NULL );
+    add_integer( "server-port", 1234, NULL,
+                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT );
+    add_bool( "network-channel", 0, NULL,
+              NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT );
+    add_string( "channel-server", "localhost", NULL,
+                CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT );
+    add_integer( "channel-port", 6010, NULL,
+                 CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT );
+    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT );
+    add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
 
-/* Input options */
-ADD_CATEGORY_HINT( N_("Input"), NULL )
-ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
-ADD_BOOL    ( "network-channel", 0, NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
-ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
-ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
-ADD_INTEGER ( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT )
-ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
+    add_integer( "program", 0, NULL,
+                 INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT );
+    add_integer( "audio-type", -1, NULL,
+                 INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT );
+    add_integer( "audio-channel", -1, NULL,
+                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT );
+    add_integer( "spu-channel", -1, NULL,
+                 INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT );
 
-ADD_INTEGER ( "program", 0, NULL, INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT )
-ADD_INTEGER ( "audio-type", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
-ADD_INTEGER ( "audio-channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
-ADD_INTEGER ( "spu-channel", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
+    add_string( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT );
+    add_string( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT );
 
-ADD_STRING  ( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
-ADD_STRING  ( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
+    add_bool_with_short( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT );
+    add_bool_with_short( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT );
 
-ADD_BOOL_WITH_SHORT ( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT )
-ADD_BOOL_WITH_SHORT ( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT )
+    /* Decoder options */
+    add_category_hint( N_("Decoders"), NULL );
+    add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT );
 
-/* Decoder options */
-ADD_CATEGORY_HINT( N_("Decoders"), NULL )
-ADD_MODULE  ( "codec", MODULE_CAPABILITY_DECODER, NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT )
-
-/* CPU options */
-ADD_CATEGORY_HINT( N_("CPU"), NULL )
-ADD_BOOL ( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT )
-ADD_BOOL ( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT )
-ADD_BOOL ( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT )
-ADD_BOOL ( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT )
-ADD_BOOL ( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT )
-
-/* Playlist options */
-ADD_CATEGORY_HINT( N_("Playlist"), NULL )
-ADD_BOOL ( "playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT )
-ADD_BOOL ( "enqueue", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT )
-ADD_BOOL ( "loop", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT )
-
-/* Misc options */
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_MODULE  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
-ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT )
-ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT )
-
-#if defined(WIN32)
-ADD_BOOL ( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT )
-ADD_INTEGER ( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT )
+    /* CPU options */
+    add_category_hint( N_("CPU"), NULL );
+#if defined( __i386__ )
+    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT );
+    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT );
+    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT );
+    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT );
+#endif
+#if defined( __powerpc__ ) || defined( SYS_DARWIN )
+    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT );
 #endif
 
-/* Usage (mainly useful for cmd line stuff) */
-ADD_USAGE_HINT( PLAYLIST_USAGE )
+    /* Playlist options */
+    add_category_hint( N_("Playlist"), NULL );
+    add_bool( "playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT );
+    add_bool( "enqueue", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT );
+    add_bool( "loop", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT );
 
-MODULE_CONFIG_STOP
+    /* Misc options */
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
+    add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
+    add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );
 
-MODULE_INIT_START
-    SET_DESCRIPTION( N_("main program") )
-    ADD_CAPABILITY( MAIN, 100/*whatever*/ )
-MODULE_INIT_STOP
+#if defined(WIN32)
+    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT );
+    add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT );
+#endif
 
-MODULE_ACTIVATE_START
-MODULE_ACTIVATE_STOP
+    /* Usage (mainly useful for cmd line stuff) */
+    add_usage_hint( PLAYLIST_USAGE );
 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_description( N_("main program") );
+    set_capability( "main", 100 );
+vlc_module_end();
 
 static module_config_t p_help_config[] =
 {
-    { CONFIG_ITEM_BOOL, "help", 'h', N_("print help") },
-    { CONFIG_ITEM_BOOL, "longhelp", 'H', N_("print detailed help") },
-    { CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available modules") },
-    { CONFIG_ITEM_STRING, "module", 'p', N_("print help on module") },
-    { CONFIG_ITEM_BOOL, "version", '\0', N_("print version information") },
-    { CONFIG_ITEM_BOOL, "build", '\0', N_("print build information") },
-    { CONFIG_HINT_END, NULL, '\0' }
+    { CONFIG_ITEM_BOOL, NULL, "help", 'h', N_("print help") },
+    { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H', N_("print detailed help") },
+    { CONFIG_ITEM_BOOL, NULL, "list", 'l',
+                              N_("print a list of available modules") },
+    { CONFIG_ITEM_STRING, NULL, "module", 'p', N_("print help on module") },
+    { CONFIG_ITEM_BOOL, NULL, "version", '\0',
+                              N_("print version information") },
+    { CONFIG_HINT_END, NULL, NULL, '\0' }
 };
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.8 2002/07/20 18:01:42 sam Exp $
+ * $Id: clone.c,v 1.9 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,36 +34,32 @@
 #include "filter_common.h"
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
+
+static void RemoveAllVout  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define COUNT_TEXT N_("Number of clones")
 #define COUNT_LONGTEXT N_("Select the number of video windows in which to "\
     "clone the video")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_INTEGER ( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("image clone video module") )
-    /* Capability score set to 0 because we don't want to be spawned
-     * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT_FILTER, 0 )
-    ADD_SHORTCUT( "clone" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_integer( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT );
+    set_description( _("image clone video module") );
+    set_capability( "video filter", 0 );
+    add_shortcut( "clone" );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: Clone video output method descriptor
@@ -78,40 +74,13 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-
-static void RemoveAllVout  ( vout_thread_t *p_vout );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates Clone video thread output method
+ * Create: allocates Clone video thread output method
  *****************************************************************************
  * This function allocates and initializes a Clone vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
+static int Create( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -120,6 +89,12 @@ static int vout_Create( vout_thread_t *p_vout )
         msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = NULL;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = NULL;
 
     /* Look what method was requested */
     p_vout->p_sys->i_clones = config_GetInt( p_vout, "clone-count" );
@@ -141,9 +116,9 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize Clone video thread output method
+ * Init: initialize Clone video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int   i_index, i_vout;
     picture_t *p_pic;
@@ -181,9 +156,9 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Clone video thread output method
+ * End: terminate Clone video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -196,12 +171,14 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Clone video thread output method
+ * Destroy: destroy Clone video thread output method
  *****************************************************************************
  * Terminate an output method created by CloneCreateOutputMethod
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+static void Destroy( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     RemoveAllVout( p_vout );
 
     free( p_vout->p_sys->pp_vout );
@@ -209,24 +186,13 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle Clone events
- *****************************************************************************
- * This function should be called regularly by video output thread. It manages
- * console events. It returns a non null value on error.
- *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * vout_Render: displays previously rendered output
+ * Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Clone image, waits
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic = NULL;
     int i_vout, i_plane;
@@ -275,18 +241,6 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
         vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ], p_outpic );
         vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ], p_outpic );
     }
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Invert image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
- *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
 }
 
 /*****************************************************************************

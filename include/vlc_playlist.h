@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.3 2002/07/20 18:01:42 sam Exp $
+ * $Id: vlc_playlist.h,v 1.4 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,7 +54,7 @@ struct playlist_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define playlist_Create(a) __playlist_Create(CAST_TO_VLC_OBJECT(a))
+#define playlist_Create(a) __playlist_Create(VLC_OBJECT(a))
 playlist_t * __playlist_Create   ( vlc_object_t * );
 void           playlist_Destroy  ( playlist_t * );
 

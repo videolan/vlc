@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.17 2002/06/02 23:11:48 sam Exp $
+ * $Id: dvdread.c,v 1.18 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,29 +30,24 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * External prototypes
  *****************************************************************************/
-void _M( access_getfunctions)( function_list_t * p_function_list );
-void _M( demux_getfunctions)( function_list_t * p_function_list );
+int  E_(OpenDVD)   ( vlc_object_t * );
+void E_(CloseDVD)  ( vlc_object_t * );
+
+int  E_(InitDVD)   ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("[dvdread:][device][@[title][,[chapter][,angle]]]"), NULL )
-MODULE_CONFIG_STOP
+vlc_module_begin();
+    add_category_hint( "[dvdread:][device][@[title][,[chapter][,angle]]]", NULL );
+    set_description( _("DVDRead input module") );
+    add_submodule();
+        set_capability( "access", 110 );
+        set_callbacks( E_(OpenDVD), E_(CloseDVD) );      
+    add_submodule();
+        set_capability( "demux", 0 );
+        set_callbacks( E_(InitDVD), NULL );
+vlc_module_end();  
 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("DVDRead input module") )
-    ADD_CAPABILITY( DEMUX, 0 )
-    ADD_CAPABILITY( ACCESS, 110 )
-    //ADD_SHORTCUT( "dvd" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( access_getfunctions)( &p_module->p_functions->access );
-    _M( demux_getfunctions)( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP

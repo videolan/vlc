@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.4 2002/07/23 17:19:02 fenrir Exp $
+ * $Id: cinepak.c,v 1.5 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -45,68 +45,50 @@
 #include "vdec_ext-plugins.h"
 #include "cinepak.h"
 
-/*
+/*****************************************************************************
  * Local prototypes
- */
-static int      decoder_Probe   ( vlc_fourcc_t * );
-static int      decoder_Run     ( decoder_fifo_t * );
+ *****************************************************************************/
+static int      OpenDecoder     ( vlc_object_t * );
+static int      RunDecoder      ( decoder_fifo_t * );
 static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
 static void     DecodeThread    ( videodec_thread_t * );
 
-
 /*****************************************************************************
- * Capabilities
+ * Module descriptor
  *****************************************************************************/
-void _M( vdec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
+vlc_module_begin();
+    set_description( "Cinepak video decoder" );
+    set_capability( "decoder", 70 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "Cinepak Video Decoder" )
-    ADD_CAPABILITY( DECODER, 70 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( vdec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    switch(  *pi_type )
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    
+    switch( p_fifo->i_fourcc )
     {
-        case( VLC_FOURCC('c','v','i','d') ):
-        case( VLC_FOURCC('C','V','I','D') ):
-            return( 0);
-        default:
-            return( -1 );
+        case VLC_FOURCC('c','v','i','d'):
+        case VLC_FOURCC('C','V','I','D'):
+            p_fifo->pf_run = RunDecoder;
+            return VLC_SUCCESS;
     }
+
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
-{
+static int RunDecoder( decoder_fifo_t *p_fifo )
+{   
     videodec_thread_t   *p_vdec;
     int b_error;
     

@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.1 2002/07/23 19:56:19 stef Exp $
+ * $Id: demux.c,v 1.2 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,36 +56,14 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-/* called from outside */
-static int  dvdplay_Rewind        ( struct input_thread_t * );
-static int  dvdplay_Demux         ( struct input_thread_t * );
-static int  dvdplay_Init          ( struct input_thread_t * );
-static void dvdplay_End           ( struct input_thread_t * );
+static int  Demux         ( input_thread_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * InitDVD: initializes dvdplay structures
  *****************************************************************************/
-void _M( demux_getfunctions)( function_list_t * p_function_list )
+int E_(InitDVD) ( vlc_object_t *p_this )
 {
-#define demux p_function_list->functions.demux
-    demux.pf_init             = dvdplay_Init;
-    demux.pf_end              = dvdplay_End;
-    demux.pf_demux            = dvdplay_Demux;
-    demux.pf_rewind           = dvdplay_Rewind;
-#undef demux
-}
-
-/*
- * Data demux functions
- */
-
-/*****************************************************************************
- * dvdplay_Init: initializes dvdplay structures
- *****************************************************************************/
-static int dvdplay_Init( input_thread_t * p_input )
-{
+    input_thread_t *p_input = (input_thread_t *)p_this;
     dvd_data_t *    p_dvd;
     char *          psz_intf = NULL;
 
@@ -96,6 +74,9 @@ static int dvdplay_Init( input_thread_t * p_input )
 
     p_input->p_demux_data = (void*)p_input->p_access_data;
     p_dvd = (dvd_data_t *)p_input->p_demux_data;
+
+    p_input->pf_demux = Demux;
+    p_input->pf_rewind = NULL;
 
     psz_intf = config_GetPsz( p_input, "intf" );
     config_PutPsz( p_input, "intf", "dvdplay" );
@@ -112,10 +93,11 @@ static int dvdplay_Init( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * dvdplay_End: frees unused data
+ * EndDVD: frees unused data
  *****************************************************************************/
-static void dvdplay_End( input_thread_t * p_input )
+void E_(EndDVD) ( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
     dvd_data_t *    p_dvd;
     intf_thread_t * p_intf = NULL;
 
@@ -133,9 +115,9 @@ static void dvdplay_End( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * dvdplay_Demux
+ * Demux
  *****************************************************************************/
-static int dvdplay_Demux( input_thread_t * p_input )
+static int Demux( input_thread_t * p_input )
 {
     dvd_data_t *            p_dvd;
     data_packet_t *         p_data;
@@ -188,10 +170,3 @@ static int dvdplay_Demux( input_thread_t * p_input )
     return i_data_nb;
 }
 
-/*****************************************************************************
- * dvdplay_Rewind : reads a stream backward
- *****************************************************************************/
-static int dvdplay_Rewind( input_thread_t * p_input )
-{
-    return( -1 );
-}

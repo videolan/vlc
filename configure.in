@@ -1816,7 +1816,7 @@ AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VideoLAN Client - version ${VERSION} ${CO
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 
 VLC_SYMBOL="`echo ${VERSION} | tr .- __`"
-AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__MODULE_${VLC_SYMBOL}", [String suffix for module functions])
+AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 
 DATA_PATH="${ac_tool_prefix}/share/videolan"

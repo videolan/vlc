@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.20 2002/07/23 17:19:02 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.21 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,8 +49,8 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe   ( vlc_fourcc_t * );
-static int      decoder_Run     ( decoder_fifo_t * );
+static int      OpenDecoder     ( vlc_object_t * );
+static int      RunDecoder      ( decoder_fifo_t * );
 static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
 static void     DecodeThread    ( videodec_thread_t * );
@@ -59,16 +59,7 @@ static void     DecodeThread    ( videodec_thread_t * );
 static int      b_ffmpeginit = 0;
 
 /*****************************************************************************
- * Capabilities
- *****************************************************************************/
-void _M( vdec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
-
-/*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 
 #define ERROR_RESILIENCE_LONGTEXT \
@@ -82,50 +73,47 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
     "when there not enough time.\n It's usefull with low CPU power " \
     "but it could produce broken pictures."
     
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
 #if LIBAVCODEC_BUILD >= 4611
-  ADD_INTEGER ( "ffmpeg-error-resilience", 0, NULL, 
-                "error resilience", ERROR_RESILIENCE_LONGTEXT )
-  ADD_INTEGER ( "ffmpeg-workaround-bugs", 0, NULL, 
-                "workaround bugs", "0-99, seems to be for msmpeg v3\n"  )
+    add_integer ( "ffmpeg-error-resilience", 0, NULL, 
+                  "error resilience", ERROR_RESILIENCE_LONGTEXT );
+    add_integer ( "ffmpeg-workaround-bugs", 0, NULL, 
+                  "workaround bugs", "0-99, seems to be for msmpeg v3\n"  );
 #endif
-  ADD_BOOL( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT ) 
-
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "ffmpeg video decoder((MS)MPEG4,SVQ1,H263)" )
-    ADD_CAPABILITY( DECODER, 70 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( vdec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
+    add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
+    set_description( _("ffmpeg video decoder((MS)MPEG4,SVQ1,H263)") );
+    set_capability( "decoder", 70 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    return( ffmpeg_GetFfmpegCodec( *pi_type, NULL, NULL ) ? 0 : -1 );
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( ffmpeg_GetFfmpegCodec( p_fifo->i_fourcc, NULL, NULL ) )
+    {
+        p_fifo->pf_run = RunDecoder;
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     videodec_thread_t   *p_vdec;
     int b_error;
-    
+
     if ( !(p_vdec = (videodec_thread_t*)malloc( sizeof(videodec_thread_t))) )
     {
         msg_Err( p_fifo, "out of memory" );
@@ -598,7 +586,7 @@ static void ffmpeg_ConvertPicture( picture_t *p_pic,
 /*****************************************************************************
  * InitThread: initialize vdec output thread
  *****************************************************************************
- * This function is called from decoder_Run and performs the second step 
+ * This function is called from RunDecoderoder and performs the second step 
  * of the initialization. It returns 0 on success. Note that the thread's 
  * flag are not modified inside this function.
  *****************************************************************************/

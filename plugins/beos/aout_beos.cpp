@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.25 2002/07/20 18:01:42 sam Exp $
+ * $Id: aout_beos.cpp,v 1.26 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,11 +37,8 @@
 #include <malloc.h>
 #include <string.h>
 
-extern "C"
-{
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
-}
 
 /*****************************************************************************
  * aout_sys_t: BeOS audio output method descriptor
@@ -58,37 +55,20 @@ struct aout_sys_t
     int i_buffer_pos;
 };
 
-extern "C"
-{
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int     SetFormat   ( aout_thread_t * );
+static int     GetBufInfo  ( aout_thread_t *, int );
+static void    Play        ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenAudio: opens a BPushGameSound
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
+int E_(OpenAudio) ( vlc_object_t *p_this )
+{       
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
 
-/*****************************************************************************
- * aout_Open: opens a BPushGameSound
- *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
     /* Allocate structure */
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
@@ -113,6 +93,10 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
     p_aout->p_sys->p_format->buffer_size = 4*8192;
     p_aout->p_sys->i_buffer_pos = 0;
+
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
 
     /* Allocate BPushGameSound */
     p_aout->p_sys->p_sound = new BPushGameSound( 8192,
@@ -143,17 +127,17 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: sets the dsp output format
+ * SetFormat: sets the dsp output format
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* Each value is 4 bytes long (stereo signed 16 bits) */
     int i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
@@ -168,11 +152,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play: plays a sound samples buffer
+ * Play: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_newbuf_pos;
 
@@ -202,16 +186,16 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: closes the dsp audio device
+ * CloseAudio: closes the dsp audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
-{
+void E_(CloseAudio) ( vlc_object_t *p_this )
+{       
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
+
     p_aout->p_sys->p_sound->UnlockCyclic();
     p_aout->p_sys->p_sound->StopPlaying( );
     delete p_aout->p_sys->p_sound;
     free( p_aout->p_sys->p_format );
     free( p_aout->p_sys );
 }
-
-} /* extern "C" */
 

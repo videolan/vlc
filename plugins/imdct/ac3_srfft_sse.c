@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.13 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_srfft_sse.c,v 1.14 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -51,7 +51,7 @@ static void fft_8_sse (complex_t *x);
 static void fft_asmb_sse (ck_sse_t * ck, int k, complex_t *x, complex_t *wTB,
          const complex_t *d, const complex_t *d_3);
 
-void _M( fft_64p ) ( complex_t *a )
+void E_( fft_64p ) ( complex_t *a )
 {
     ck_sse_t ck;
     ck.C1 = C_1_sse;
@@ -71,7 +71,7 @@ void _M( fft_64p ) ( complex_t *a )
     fft_asmb_sse(&ck, 8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
 }
 
-void _M( fft_128p ) ( complex_t *a )
+void E_( fft_128p ) ( complex_t *a )
 {
     ck_sse_t ck;
     ck.C1 = C_1_sse;

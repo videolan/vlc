@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.32 2002/07/03 19:40:49 sam Exp $
+ * $Id: configuration.c,v 1.33 2002/07/31 20:56:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -266,7 +266,7 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name)
 
     if( !psz_name ) return NULL;
 
-    for( p_module = p_this->p_vlc->module_bank.first ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -337,6 +337,8 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].f_value = p_orig[i].f_value;
         p_module->p_config[i].b_dirty = p_orig[i].b_dirty;
 
+        p_module->p_config[i].psz_type = p_orig[i].psz_type ?
+                                   strdup( _(p_orig[i].psz_type) ) : NULL;
         p_module->p_config[i].psz_name = p_orig[i].psz_name ?
                                    strdup( _(p_orig[i].psz_name) ) : NULL;
         p_module->p_config[i].psz_text = p_orig[i].psz_text ?
@@ -364,7 +366,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         }
 
         /* the callback pointer is only valid when the module is loaded so this
-         * value is set in ActivateModule() and reset in DeactivateModule() */
+         * value is set in module_activate() and reset in module_deactivate() */
         p_module->p_config[i].pf_callback = NULL;
     }
 }
@@ -381,6 +383,9 @@ void config_Free( module_t *p_module )
 
     for( ; p_item->i_type != CONFIG_HINT_END ; p_item++ )
     {
+        if( p_item->psz_type )
+            free( p_item->psz_type );
+
         if( p_item->psz_name )
             free( p_item->psz_name );
 
@@ -486,7 +491,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
 
     /* Look for the selected module, if NULL then save everything */
-    for( p_module = p_this->p_vlc->module_bank.first ; p_module != NULL ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
@@ -506,7 +511,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 !memcmp( &line[1], p_module->psz_object_name,
                          strlen(p_module->psz_object_name) ) )
             {
-                msg_Dbg( p_this, "loading config for module <%s>",
+                msg_Dbg( p_this, "loading config for module \"%s\"",
                                  p_module->psz_object_name );
 
                 break;
@@ -555,18 +560,16 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->i_value = atoi( psz_option_value);
-                        msg_Dbg( p_this, "found <%s> option %s=%i",
-                                 p_module->psz_object_name, p_item->psz_name,
-                                 p_item->i_value );
+                        msg_Dbg( p_this, "option \"%s\", value %i",
+                                 p_item->psz_name, p_item->i_value );
                         break;
 
                     case CONFIG_ITEM_FLOAT:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
                         p_item->f_value = (float)atof( psz_option_value);
-                        msg_Dbg( p_this, "found <%s> option %s=%f",
-                                 p_module->psz_object_name, p_item->psz_name,
-                                 (double)p_item->f_value );
+                        msg_Dbg( p_this, "option \"%s\", value %f",
+                                 p_item->psz_name, (double)p_item->f_value );
                         break;
 
                     default:
@@ -581,10 +584,9 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
                         vlc_mutex_unlock( p_item->p_lock );
 
-                        msg_Dbg( p_this, "found <%s> option %s=%s",
-                                 p_module->psz_object_name, p_item->psz_name,
-                                 p_item->psz_value != NULL ?
-                                      p_item->psz_value : "(NULL)" );
+                        msg_Dbg( p_this, "option \"%s\", value \"%s\"",
+                                 p_item->psz_name,
+                                 p_item->psz_value ? p_item->psz_value : "" );
                         break;
                     }
                 }
@@ -698,7 +700,8 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         if( (p_line[0] == '[') && (p_index2 = strchr(p_line,']')))
         {
             /* we found a section, check if we need to do a backup */
-            for( p_module = p_this->p_vlc->module_bank.first; p_module != NULL;
+            for( p_module = p_this->p_vlc->p_module_bank->first;
+                 p_module != NULL;
                  p_module = p_module->next )
             {
                 if( ((p_index2 - &p_line[1])
@@ -719,7 +722,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 /* we don't have this section in our list so we need to back
                  * it up */
                 *p_index2 = 0;
-                msg_Dbg( p_this, "backing up config for unknown module <%s>",
+                msg_Dbg( p_this, "backing up config for unknown module \"%s\"",
                                  &p_line[1] );
                 *p_index2 = ']';
 
@@ -760,7 +763,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     fprintf( file, "###\n###  " COPYRIGHT_MESSAGE "\n###\n\n" );
 
     /* Look for the selected module, if NULL then save everything */
-    for( p_module = p_this->p_vlc->module_bank.first ; p_module != NULL ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
@@ -771,7 +774,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         if( !p_module->i_config_items )
             continue;
 
-        msg_Dbg( p_this, "saving config for module <%s>",
+        msg_Dbg( p_this, "saving config for module \"%s\"",
                          p_module->psz_object_name );
 
         fprintf( file, "[%s]", p_module->psz_object_name );
@@ -885,7 +888,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
      */
 
     i_opts = 0;
-    for( p_module = p_this->p_vlc->module_bank.first;
+    for( p_module = p_this->p_vlc->p_module_bank->first;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -935,7 +938,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 
     /* Fill the p_longopts and psz_shortopts structures */
     i_index = 0;
-    for( p_module = p_this->p_vlc->module_bank.first ;
+    for( p_module = p_this->p_vlc->p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {

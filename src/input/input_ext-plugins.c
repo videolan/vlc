@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.17 2002/07/24 23:11:55 massiot Exp $
+ * $Id: input_ext-plugins.c,v 1.18 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -206,8 +206,6 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
     /* Safety check */
     if( p_buffers->i_allocated > INPUT_MAX_ALLOCATION )
     {
-//X        intf_Err( "INPUT_MAX_ALLOCATION reached (%d)",
-//X                     p_buffers->i_allocated );
         return NULL;
     } 
 
@@ -226,7 +224,6 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
             p_buf = malloc( sizeof(input_buffers_t) + i_size );
             if( p_buf == NULL )
             {
-//X                intf_ErrMsg( "Out of memory" );
                 return NULL;
             }
             p_buf->i_size = i_size;
@@ -239,7 +236,6 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
         p_buf = malloc( sizeof(input_buffers_t) + i_size );
         if( p_buf == NULL )
         {
-//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
         p_buf->i_size = i_size;
@@ -250,7 +246,7 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
     p_buf->p_next = NULL;
     p_buf->i_refcount = 0;
 
-    return( p_buf );
+    return p_buf;
 }
 
 data_buffer_t * input_NewBuffer( input_buffers_t * p_buffers, size_t i_size )
@@ -318,7 +314,6 @@ static inline data_packet_t * ShareBuffer( input_buffers_t * p_buffers,
         p_data = malloc( sizeof(data_packet_t) );
         if( p_data == NULL )
         {
-//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
     }
@@ -331,7 +326,7 @@ static inline data_packet_t * ShareBuffer( input_buffers_t * p_buffers,
     p_data->p_payload_end = p_data->p_demux_start + p_buf->i_size;
     p_buf->i_refcount++;
 
-    return( p_data );
+    return p_data;
 }
 
 data_packet_t * input_ShareBuffer( input_buffers_t * p_buffers,
@@ -352,8 +347,10 @@ data_packet_t * input_ShareBuffer( input_buffers_t * p_buffers,
 static inline data_packet_t * NewPacket( input_buffers_t * p_buffers,
                                          size_t i_size )
 {
-    data_buffer_t * p_buf = NewBuffer( p_buffers, i_size );
+    data_buffer_t * p_buf;
     data_packet_t * p_data;
+
+    p_buf = NewBuffer( p_buffers, i_size );
 
     if( p_buf == NULL )
     {
@@ -434,7 +431,6 @@ static inline pes_packet_t * NewPES( input_buffers_t * p_buffers )
         p_pes = malloc( sizeof(pes_packet_t) );
         if( p_pes == NULL )
         {
-//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
     }
@@ -524,7 +520,8 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
                        i_remains + p_input->i_bufsize );
     if( p_buf == NULL )
     {
-        return( -1 );
+        msg_Err( p_input, "failed allocating a new buffer (decoder stuck?)" );
+        return -1;
     }
     p_buf->i_refcount = 1;
 
@@ -668,8 +665,9 @@ void input_AccessEnd( input_thread_t * p_input )
 /*****************************************************************************
  * input_FDClose: close the target
  *****************************************************************************/
-void input_FDClose( input_thread_t * p_input )
+void __input_FDClose( vlc_object_t * p_this )
 {
+    input_thread_t * p_input = (input_thread_t *)p_this;
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
     msg_Info( p_input, "closing `%s/%s://%s'", 
@@ -682,8 +680,9 @@ void input_FDClose( input_thread_t * p_input )
 /*****************************************************************************
  * input_FDNetworkClose: close a network target
  *****************************************************************************/
-void input_FDNetworkClose( input_thread_t * p_input )
+void __input_FDNetworkClose( vlc_object_t * p_this )
 {
+    input_thread_t * p_input = (input_thread_t *)p_this;
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
     msg_Info( p_input, "closing network `%s/%s://%s'", 

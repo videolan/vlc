@@ -29,27 +29,24 @@
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * External prototypes
  ******************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
-void _M( vout_getfunctions )( function_list_t * p_function_list );
+int  E_(OpenAudio)    ( vlc_object_t * );
+void E_(CloseAudio)   ( vlc_object_t * );
+
+int  E_(OpenVideo)    ( vlc_object_t * );
+void E_(CloseVideo)   ( vlc_object_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
+vlc_module_begin();
+    set_description( _("QNX RTOS module") );
+    add_submodule();
+        set_capability( "video output", 100 );
+        set_callbacks( E_(OpenVideo), E_(CloseVideo) );
+    add_submodule();
+        set_capability( "audio output", 100 );
+        set_callbacks( E_(OpenAudio), E_(CloseAudio) );
+vlc_module_end();
 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("QNX RTOS module") )
-    ADD_CAPABILITY( VOUT, 100 )
-    ADD_CAPABILITY( AOUT, 50 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
-    _M( vout_getfunctions )( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP

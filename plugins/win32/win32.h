@@ -24,8 +24,4 @@
  * Exported interface functions.
  *****************************************************************************/
 extern "C" __declspec(dllexport)
-    int __VLC_SYMBOL( InitModule ) ( module_t *p_module );
-extern "C" __declspec(dllexport)
-    int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module );
-extern "C" __declspec(dllexport)
-    int __VLC_SYMBOL( DeactivateModule ) ( module_t *p_module );
+    int __VLC_SYMBOL( vlc_entry ) ( module_t *p_module );

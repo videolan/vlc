@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.7 2002/07/23 00:39:16 sam Exp $
+ * $Id: i420_rgb8.c,v 1.8 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,8 +39,7 @@ static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
 /*****************************************************************************
  * I420_RGB8: color YUV 4:2:0 to RGB 8 bpp
  *****************************************************************************/
-void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_src,
-                                             picture_t *p_dest )
+void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     u8 *p_pic = (u8*)p_dest->p->p_pixels;

@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.11 2002/06/01 12:31:58 sam Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.12 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -30,7 +30,7 @@
 
 static const float sqrt2_3dn __asm__ ("sqrt2_3dn") = 0.7071068;
 
-void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
+void E_( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -76,7 +76,7 @@ void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
     : "a" (samples), "c" (dm_par));
 }
 
-void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
+void E_( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -115,7 +115,7 @@ void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
     : "a" (samples), "c" (dm_par));
 }
 
-void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
+void E_( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -159,7 +159,7 @@ void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     : "a" (samples), "c" (dm_par));
 }
 
-void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
+void E_( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -196,7 +196,7 @@ void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     : "a" (samples), "c" (dm_par));
 }
 
-void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
+void E_( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -233,7 +233,7 @@ void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
     : "a" (samples), "c" (dm_par));
 }
 
-void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
+void E_( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -268,7 +268,7 @@ void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
     : "a" (s16_samples), "c" (left));
 }
 
-void _M( stream_sample_2ch_to_s16 ) (s16 *s16_samples, float *left, float *right)
+void E_( stream_sample_2ch_to_s16 ) (s16 *s16_samples, float *left, float *right)
 {
 
     __asm__ __volatile__ (

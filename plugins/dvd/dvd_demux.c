@@ -1,7 +1,7 @@
 /* dvd_demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_demux.c,v 1.7 2002/06/01 12:31:58 sam Exp $
+ * $Id: dvd_demux.c,v 1.8 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -50,28 +50,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-/* called from outside */
-static int  DVDRewind  ( input_thread_t * );
 static int  DVDDemux   ( input_thread_t * );
-static int  DVDInit    ( input_thread_t * );
-static void DVDEnd     ( input_thread_t * );
 
 void DVDLaunchDecoders( input_thread_t * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( demux_getfunctions)( function_list_t * p_function_list )
-{
-#define demux p_function_list->functions.demux
-    demux.pf_init             = DVDInit;
-    demux.pf_end              = DVDEnd;
-    demux.pf_demux            = DVDDemux;
-    demux.pf_rewind           = DVDRewind;
-#undef demux
-}
 
 /*
  * Data demux functions
@@ -80,12 +61,17 @@ void _M( demux_getfunctions)( function_list_t * p_function_list )
 /*****************************************************************************
  * DVDInit: initializes DVD structures
  *****************************************************************************/
-static int DVDInit( input_thread_t * p_input )
+int E_(DVDInit) ( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
     if( p_input->stream.i_method != INPUT_METHOD_DVD )
     {
         return -1;
     }
+
+    p_input->pf_demux = DVDDemux;
+    p_input->pf_rewind = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
@@ -94,13 +80,6 @@ static int DVDInit( input_thread_t * p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
-}
-
-/*****************************************************************************
- * DVDEnd: frees unused data
- *****************************************************************************/
-static void DVDEnd( input_thread_t * p_input )
-{
 }
 
 /*****************************************************************************
@@ -130,12 +109,4 @@ static int DVDDemux( input_thread_t * p_input )
     }
     
     return i;
-}
-
-/*****************************************************************************
- * DVDRewind : reads a stream backward
- *****************************************************************************/
-static int DVDRewind( input_thread_t * p_input )
-{
-    return( -1 );
 }

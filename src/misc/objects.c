@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.11 2002/06/08 14:08:46 sam Exp $
+ * $Id: objects.c,v 1.12 2002/07/31 20:56:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -101,8 +101,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         default:
             i_size = i_type > sizeof(vlc_object_t)
                    ? i_type : sizeof(vlc_object_t);
-            i_type = VLC_OBJECT_PRIVATE;
-            psz_type = "private";
+            i_type = VLC_OBJECT_GENERIC;
+            psz_type = "generic";
             break;
     }
 
@@ -145,6 +145,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     p_new->i_parents = 0;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
+
+    p_new->p_private = NULL;
 
     vlc_mutex_init( p_new, &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
@@ -234,7 +236,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     /* Otherwise, recursively look for the object */
     if( (i_mode & 0x000f) == FIND_ANYWHERE )
     {
-        p_found = vlc_object_find_inner( CAST_TO_VLC_OBJECT(p_this->p_vlc),
+        p_found = vlc_object_find_inner( VLC_OBJECT(p_this->p_vlc),
                                          i_type,
                                          (i_mode & ~0x000f) | FIND_CHILD );
     }
@@ -497,7 +499,8 @@ static void vlc_dumpstructure_inner( vlc_object_t *p_this,
             strcpy( psz_children, ", 1 child" );
             break;
         default:
-            snprintf( psz_children, 20, ", %i children", p_this->i_children );
+            snprintf( psz_children, 20,
+                      ", %i children", p_this->i_children );
             psz_children[19] = '\0';
             break;
     }

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.34 2002/07/23 00:39:16 sam Exp $
+ * $Id: ac3_adec.c,v 1.35 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -44,67 +44,51 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe     ( vlc_fourcc_t * );
-static int  decoder_Run       ( decoder_fifo_t * );
+static int  OpenDecoder       ( vlc_object_t * );
+static int  RunDecoder        ( decoder_fifo_t * );
 static int  InitThread        ( ac3dec_t * p_adec );
 static void EndThread         ( ac3dec_t * p_adec );
 static void BitstreamCallback ( bit_stream_t *p_bit_stream,
                                 vlc_bool_t b_new_pes );
 
 /*****************************************************************************
- * Capabilities
+ * Module descriptor
  *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_module  ( "ac3-downmix", "downmix", NULL, NULL,
+                  N_("AC3 downmix module"), NULL );
+    add_module  ( "ac3-imdct", "imdct", NULL, NULL,
+                  N_("AC3 IMDCT module"), NULL );
+    set_description( _("software AC3 decoder") );
+    set_capability( "decoder", 50 );
+    set_callbacks( OpenDecoder, NULL );
+    add_shortcut( "ac3" );
+vlc_module_end();         
 
 /*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-/* Variable containing the AC3 downmix method */
-#define DOWNMIX_METHOD_VAR              "ac3-downmix"
-/* Variable containing the AC3 IMDCT method */
-#define IMDCT_METHOD_VAR                "ac3-imdct"
-
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)
-ADD_MODULE  ( DOWNMIX_METHOD_VAR, MODULE_CAPABILITY_DOWNMIX, NULL, NULL,
-              N_("AC3 downmix module"), NULL )
-ADD_MODULE  ( IMDCT_METHOD_VAR, MODULE_CAPABILITY_IMDCT, NULL, NULL,
-              N_("AC3 IMDCT module"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("software AC3 decoder") )
-    ADD_CAPABILITY( DECODER, 50 )
-    ADD_SHORTCUT( "ac3" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    return *pi_type == VLC_FOURCC('a','5','2',' ') ? 0 : -1;
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    
+    if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ') )
+    {   
+        return VLC_EGENERIC;
+    }
+
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     ac3dec_t *   p_ac3dec;
     void *       p_orig;                          /* pointer before memalign */
@@ -246,56 +230,42 @@ static int InitThread( ac3dec_t * p_ac3dec )
     /*
      * Choose the best downmix module
      */
-#define DOWNMIX p_ac3dec->downmix
-    psz_name = config_GetPsz( p_ac3dec->p_fifo, DOWNMIX_METHOD_VAR );
-    DOWNMIX.p_module = module_Need( p_ac3dec->p_fifo,
-                                    MODULE_CAPABILITY_DOWNMIX, psz_name, NULL );
+    p_ac3dec->p_downmix = vlc_object_create( p_ac3dec->p_fifo,
+                                             sizeof( downmix_t ) );
+    p_ac3dec->p_downmix->psz_object_name = "downmix";
+
+    psz_name = config_GetPsz( p_ac3dec->p_downmix, "ac3-downmix" );
+    p_ac3dec->p_downmix->p_module =
+                    module_Need( p_ac3dec->p_downmix, "downmix", psz_name );
     if( psz_name ) free( psz_name );
 
-    if( DOWNMIX.p_module == NULL )
+    if( p_ac3dec->p_downmix->p_module == NULL )
     {
         msg_Err( p_ac3dec->p_fifo, "no suitable downmix module" );
+        vlc_object_destroy( p_ac3dec->p_downmix );
         return( -1 );
     }
-
-#define F DOWNMIX.p_module->p_functions->downmix.functions.downmix
-    DOWNMIX.pf_downmix_3f_2r_to_2ch     = F.pf_downmix_3f_2r_to_2ch;
-    DOWNMIX.pf_downmix_2f_2r_to_2ch     = F.pf_downmix_2f_2r_to_2ch;
-    DOWNMIX.pf_downmix_3f_1r_to_2ch     = F.pf_downmix_3f_1r_to_2ch;
-    DOWNMIX.pf_downmix_2f_1r_to_2ch     = F.pf_downmix_2f_1r_to_2ch;
-    DOWNMIX.pf_downmix_3f_0r_to_2ch     = F.pf_downmix_3f_0r_to_2ch;
-    DOWNMIX.pf_stream_sample_2ch_to_s16 = F.pf_stream_sample_2ch_to_s16;
-    DOWNMIX.pf_stream_sample_1ch_to_s16 = F.pf_stream_sample_1ch_to_s16;
-#undef F
-#undef DOWNMIX
 
     /*
      * Choose the best IMDCT module
      */
-    p_ac3dec->imdct = vlc_memalign( &p_ac3dec->imdct_orig,
-                                    16, sizeof(imdct_t) );
+    p_ac3dec->p_imdct = vlc_object_create( p_ac3dec->p_fifo,
+                                           sizeof( imdct_t ) );
     
-#define IMDCT p_ac3dec->imdct
-    psz_name = config_GetPsz( p_ac3dec->p_fifo, IMDCT_METHOD_VAR );
-    IMDCT->p_module = module_Need( p_ac3dec->p_fifo,
-                                   MODULE_CAPABILITY_IMDCT, psz_name, NULL );
+#define IMDCT p_ac3dec->p_imdct
+    psz_name = config_GetPsz( p_ac3dec->p_fifo, "ac3-imdct" );
+    p_ac3dec->p_imdct->p_module =
+                   module_Need( p_ac3dec->p_imdct, "imdct", psz_name );
     if( psz_name ) free( psz_name );
 
-    if( IMDCT->p_module == NULL )
+    if( p_ac3dec->p_imdct->p_module == NULL )
     {
         msg_Err( p_ac3dec->p_fifo, "no suitable IMDCT module" );
-        module_Unneed( p_ac3dec->downmix.p_module );
-        free( p_ac3dec->imdct_orig );
+        vlc_object_destroy( p_ac3dec->p_imdct );
+        module_Unneed( p_ac3dec->p_downmix, p_ac3dec->p_downmix->p_module );
+        vlc_object_destroy( p_ac3dec->p_downmix );
         return( -1 );
     }
-
-#define F IMDCT->p_module->p_functions->imdct.functions.imdct
-    IMDCT->pf_imdct_init    = F.pf_imdct_init;
-    IMDCT->pf_imdct_256     = F.pf_imdct_256;
-    IMDCT->pf_imdct_256_nol = F.pf_imdct_256_nol;
-    IMDCT->pf_imdct_512     = F.pf_imdct_512;
-    IMDCT->pf_imdct_512_nol = F.pf_imdct_512_nol;
-#undef F
 
     /* Initialize the ac3 decoder structures */
     p_ac3dec->samples = vlc_memalign( &p_ac3dec->samples_orig,
@@ -333,7 +303,7 @@ static int InitThread( ac3dec_t * p_ac3dec )
                                   16, 64 * sizeof(complex_t) );
 #undef IMDCT
 
-    _M( ac3_init )( p_ac3dec );
+    E_( ac3_init )( p_ac3dec );
 
     /*
      * Initialize the output properties
@@ -366,7 +336,7 @@ static void EndThread (ac3dec_t * p_ac3dec)
     }
 
     /* Free allocated structures */
-#define IMDCT p_ac3dec->imdct
+#define IMDCT p_ac3dec->p_imdct
     free( IMDCT->w_1_orig );
     free( IMDCT->w_64_orig );
     free( IMDCT->w_32_orig );
@@ -387,8 +357,11 @@ static void EndThread (ac3dec_t * p_ac3dec)
     free( p_ac3dec->samples_orig );
 
     /* Unlock the modules */
-    module_Unneed( p_ac3dec->downmix.p_module );
-    module_Unneed( p_ac3dec->imdct->p_module );
+    module_Unneed( p_ac3dec->p_downmix, p_ac3dec->p_downmix->p_module );
+    vlc_object_destroy( p_ac3dec->p_downmix );
+
+    module_Unneed( p_ac3dec->p_imdct, p_ac3dec->p_imdct->p_module );
+    vlc_object_destroy( p_ac3dec->p_imdct );
 
     /* Free what's left of the decoder */
     free( p_ac3dec->imdct_orig );

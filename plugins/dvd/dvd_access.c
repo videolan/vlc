@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.21 2002/07/17 21:28:19 stef Exp $
+ * $Id: dvd_access.c,v 1.22 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -69,30 +69,12 @@
  *****************************************************************************/
 
 /* called from outside */
-static int  DVDOpen         ( input_thread_t * );
-static void DVDClose        ( input_thread_t * );
 static int  DVDSetArea      ( input_thread_t *, input_area_t * );
 static int  DVDSetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 static ssize_t DVDRead      ( input_thread_t *, byte_t *, size_t );
 static void DVDSeek         ( input_thread_t *, off_t );
 
 static char * DVDParse( input_thread_t * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( access_getfunctions)( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.access
-    input.pf_open             = DVDOpen;
-    input.pf_close            = DVDClose;
-    input.pf_read             = DVDRead;
-    input.pf_set_area         = DVDSetArea;
-    input.pf_set_program      = DVDSetProgram;
-    input.pf_seek             = DVDSeek;
-#undef input
-}
 
 /*
  * Data access functions
@@ -104,8 +86,9 @@ void _M( access_getfunctions)( function_list_t * p_function_list )
 /*****************************************************************************
  * DVDOpen: open dvd
  *****************************************************************************/
-static int DVDOpen( input_thread_t *p_input )
+int E_(DVDOpen) ( vlc_object_t *p_this )
 {
+    input_thread_t *        p_input = (input_thread_t *)p_this;
     char *               psz_device;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
@@ -119,6 +102,11 @@ static int DVDOpen( input_thread_t *p_input )
     }
     p_input->p_access_data = (void *)p_dvd;
     
+    p_input->pf_read = DVDRead;
+    p_input->pf_seek = DVDSeek;
+    p_input->pf_set_area = DVDSetArea;
+    p_input->pf_set_program = DVDSetProgram;
+
     /* Parse command line */
     if( !( psz_device = DVDParse( p_input ) ) )
     {
@@ -247,8 +235,9 @@ static int DVDOpen( input_thread_t *p_input )
 /*****************************************************************************
  * DVDClose: close dvd
  *****************************************************************************/
-static void DVDClose( input_thread_t *p_input )
+void E_(DVDClose) ( vlc_object_t *p_this )
 {
+    input_thread_t * p_input = (input_thread_t *)p_this;
     thread_dvd_data_t *p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
     IfoDestroy( p_dvd->p_ifo );
@@ -465,7 +454,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         DVDReadAudio( p_input );
         DVDReadSPU  ( p_input );
    
-        if( p_input->p_demux_module )
+        if( p_input->p_demux )
         {
             DVDLaunchDecoders( p_input );
         }

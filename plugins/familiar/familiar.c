@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.6 2002/07/24 20:46:08 jpsaman Exp $
+ * $Id: familiar.c,v 1.7 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -90,47 +90,27 @@ void g_atexit( GVoidFunc func )
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Open         ( intf_thread_t *p_intf );
-static void intf_Close        ( intf_thread_t *p_intf );
-static void intf_Run          ( intf_thread_t *p_intf );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );             
+
+static void Run          ( intf_thread_t * );                  
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-   ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Familiar Linux Gtk+ interface module") )
-    ADD_CAPABILITY( INTF, 70 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( intf_getfunctions )( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
+vlc_module_begin();
+    set_description( _("Familiar Linux Gtk+ interface module") );
+    set_capability( "interface", 70 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create window
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+static int Open( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize and create window
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -142,14 +122,18 @@ static int intf_Open( intf_thread_t *p_intf )
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
 
+    p_intf->pf_run = Run;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface window
+ * Close: destroy interface window
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
+static void Close( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -160,14 +144,14 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: Gtk+ thread
+ * Run: Gtk+ thread
  *****************************************************************************
  * this part of the interface is in a separate thread so that we can call
  * gtk_main() from within it without annoying the rest of the program.
  * XXX: the approach may look kludgy, and probably is, but I could not find
  * a better way to dynamically load a Gtk+ interface at runtime.
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */

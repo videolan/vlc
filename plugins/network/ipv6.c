@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.15 2002/07/29 19:01:27 gbazin Exp $
+ * $Id: ipv6.c,v 1.16 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -70,37 +70,16 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void getfunctions( function_list_t * );
-static int  NetworkOpen( vlc_object_t *, network_socket_t * );
+static int Open( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
- 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("IPv6 network abstraction layer") )
-    ADD_CAPABILITY( NETWORK, 40 )
-MODULE_INIT_STOP
- 
-MODULE_ACTIVATE_START
-    getfunctions( &p_module->p_functions->network );
-MODULE_ACTIVATE_STOP
- 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void getfunctions( function_list_t * p_function_list )
-{
-#define f p_function_list->functions.network
-    f.pf_open = NetworkOpen;
-#undef f
-}
+vlc_module_begin();
+    set_description( _("IPv6 network abstraction layer") );
+    set_capability( "network", 40 );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * BuildAddr: utility function to build a struct sockaddr_in6
@@ -426,10 +405,12 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
 }
 
 /*****************************************************************************
- * NetworkOpen: wrapper around OpenUDP and OpenTCP
+ * Open: wrapper around OpenUDP and OpenTCP
  *****************************************************************************/
-static int NetworkOpen( vlc_object_t * p_this, network_socket_t * p_socket )
+static int Open( vlc_object_t * p_this )
 {
+    network_socket_t * p_socket = p_this->p_private;
+
     if( p_socket->i_type == NETWORK_UDP )
     {
         return OpenUDP( p_this, p_socket );

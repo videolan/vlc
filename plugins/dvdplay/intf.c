@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.1 2002/07/23 19:56:19 stef Exp $
+ * $Id: intf.c,v 1.2 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -59,33 +59,23 @@ struct intf_sys_t
 static int  InitThread     ( intf_thread_t *p_intf );
 
 /* Exported functions */
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
-
+static void RunIntf        ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenIntf: initialize dummy interface
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list )
+int E_(OpenIntf) ( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize dummy interface
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
         return( 1 );
     };
+
+    p_intf->pf_run = RunIntf;
 
     p_intf->p_sys->m_still_time = 0;
     p_intf->p_sys->b_inf_still = 0;
@@ -95,19 +85,21 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy dummy interface
+ * CloseIntf: destroy dummy interface
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+void E_(CloseIntf) ( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     /* Destroy structure */
     free( p_intf->p_sys );
 }
 
 
 /*****************************************************************************
- * intf_Run: main loop
+ * RunIntf: main loop
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void RunIntf( intf_thread_t *p_intf )
 {
     vout_thread_t *     p_vout;
     dvdplay_ctrl_t      control;

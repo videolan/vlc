@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.7 2002/07/23 22:42:20 fenrir Exp $
+ * $Id: mp4.c,v 1.8 2002/07/31 20:56:52 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -37,42 +37,20 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * );
-static int  MP4Demux         ( input_thread_t * );
-static int  MP4Init          ( input_thread_t * );
-static void MP4End           ( input_thread_t * );
+static int    MP4Init    ( vlc_object_t * );
+static void __MP4End     ( vlc_object_t * );
+static int    MP4Demux   ( input_thread_t * );
+
+#define MP4End(a) __MP4End(VLC_OBJECT(a))
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( "MP4 file input" )
-    ADD_CAPABILITY( DEMUX, 242 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = MP4Init;
-    input.pf_end              = MP4End;
-    input.pf_demux            = MP4Demux;
-    input.pf_rewind           = NULL;
-#undef input
-}
+vlc_module_begin();
+    set_description( "MP4 demuxer" );
+    set_capability( "demux", 242 );
+    set_callbacks( MP4Init, __MP4End );
+vlc_module_end();
 
 /*****************************************************************************
  * Declaration of local function 
@@ -102,8 +80,9 @@ static int  MP4_DecodeSample();
 /*****************************************************************************
  * MP4Init: check file and initializes MP4 structures
  *****************************************************************************/
-static int MP4Init( input_thread_t *p_input )
-{
+static int MP4Init( vlc_object_t * p_this )
+{   
+    input_thread_t *p_input = (input_thread_t *)p_this;
     u8  *p_peek;
     u32 i_type;
     
@@ -130,6 +109,8 @@ static int MP4Init( input_thread_t *p_input )
         /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
     }
+
+    p_input->pf_demux = MP4Demux;
 
     /* a little test to see if it could be a mp4 */
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
@@ -389,11 +370,12 @@ static int MP4Demux( input_thread_t *p_input )
 /*****************************************************************************
  * MP4End: frees unused data
  *****************************************************************************/
-static void MP4End( input_thread_t *p_input )
+static void __MP4End ( vlc_object_t * p_this )
 {   
 #define FREE( p ) \
     if( p ) { free( p ); } 
     int i_track;
+    input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_data_mp4_t *p_demux = p_input->p_demux_data;
     
     msg_Dbg( p_input, "Freeing all memory" );

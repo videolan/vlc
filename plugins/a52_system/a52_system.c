@@ -2,7 +2,7 @@
  * a52_system.c : A52 input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52_system.c,v 1.2 2002/07/23 00:39:16 sam Exp $
+ * $Id: a52_system.c,v 1.3 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -42,54 +42,25 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  Demux         ( struct input_thread_s * );
-static int  Init          ( struct input_thread_s * );
-static void End           ( struct input_thread_s * );
-
+static int  Init  ( vlc_object_t * );
+static int  Demux ( input_thread_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("A52 input") )
-    ADD_CAPABILITY( DEMUX, 150 )
-    ADD_SHORTCUT( "a52sys" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->demux );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = Init;
-    input.pf_end              = End;
-    input.pf_demux            = Demux;
-    input.pf_rewind           = NULL;
-#undef input
-}
-
-/*
- * Data reading functions
- */
+vlc_module_begin();                                      
+    set_description( "A52 demuxer" );                       
+    set_capability( "demux", 150 );
+    set_callbacks( Init, NULL );
+    add_shortcut( "a52sys" );
+vlc_module_end();
 
 /*****************************************************************************
  * Init: initializes ES structures
  *****************************************************************************/
-static int Init( input_thread_t * p_input )
+static int Init( vlc_object_t * p_this )
 {
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     es_descriptor_t *   p_es;
     byte_t *            p_peek;
 
@@ -99,6 +70,9 @@ static int Init( input_thread_t * p_input )
         /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
+
+    p_input->pf_demux = Demux;
+    p_input->pf_rewind = NULL;
 
     /* Have a peep at the show. */
     if( input_Peek( p_input, &p_peek, 2 ) < 2 )
@@ -139,13 +113,6 @@ static int Init( input_thread_t * p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
-}
-
-/*****************************************************************************
- * End: frees unused data
- *****************************************************************************/
-static void End( input_thread_t * p_input )
-{
 }
 
 /*****************************************************************************

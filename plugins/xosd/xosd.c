@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.4 2002/07/20 18:01:43 sam Exp $
+ * $Id: xosd.c,v 1.5 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -50,13 +50,13 @@ struct intf_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Open         ( intf_thread_t *p_intf );
-static void intf_Close        ( intf_thread_t *p_intf );
-static void intf_Run          ( intf_thread_t *p_intf );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );             
+
+static void Run          ( intf_thread_t * );                  
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define POSITION_TEXT N_("flip vertical position")
 #define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
@@ -71,43 +71,26 @@ static void intf_Run          ( intf_thread_t *p_intf );
 #define FONT_TEXT N_("font")
 #define FONT_LONGTEXT N_("Font used to display text in the xosd output")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_BOOL( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT )
-ADD_INTEGER( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT )
-ADD_INTEGER( "xosd-shadow-offset", 1, NULL, SHD_OFS_TEXT, SHD_OFS_LONGTEXT )
-ADD_STRING( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*", NULL, FONT_TEXT, FONT_LONGTEXT )
-MODULE_CONFIG_STOP
-// -misc-fixed-medium-r-normal-*-*-160-*-*-c-*-iso8859-15
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("xosd interface module") )
-    ADD_CAPABILITY( INTF, 40 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT );
+    add_integer( "xosd-text-offset", 0, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT );
+    add_integer( "xosd-shadow-offset", 1, NULL,
+                 SHD_OFS_TEXT, SHD_OFS_LONGTEXT );
+    add_string( "xosd-font", "-misc-fixed-medium-r-*-*-*-300-*-*-*-*-*-*",
+                NULL, FONT_TEXT, FONT_LONGTEXT );
+    set_description( _("xosd interface module") );
+    set_capability( "interface", 40 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create stuff
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize and create stuff
- *****************************************************************************/
-static int intf_Open( intf_thread_t * p_intf )
-{
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -127,14 +110,19 @@ static int intf_Open( intf_thread_t * p_intf )
                   0,
                   XOSD_string,
                   "xosd interface initialized" );
+
+    p_intf->pf_run = Run;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface stuff
+ * Close: destroy interface stuff
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
+static void Close( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     if( p_intf->p_sys->psz_source ) free( p_intf->p_sys->psz_source );
 
     /* Uninitialize library */
@@ -145,11 +133,11 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: xosd thread
+ * Run: xosd thread
  *****************************************************************************
  * This part of the interface runs in a separate thread
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     p_intf->p_sys->p_input = NULL;
 

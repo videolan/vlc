@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.58 2002/07/23 00:39:16 sam Exp $
+ * $Id: modules.h,v 1.59 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,64 +37,20 @@ typedef void *  module_handle_t;
 #endif
 
 /*****************************************************************************
- * Module capabilities.
- *****************************************************************************/
-#define MODULE_CAPABILITY_MAIN             0  /* Main */
-#define MODULE_CAPABILITY_INTF             1  /* Interface */
-#define MODULE_CAPABILITY_ACCESS           2  /* Input */
-#define MODULE_CAPABILITY_DEMUX            3  /* Input */
-#define MODULE_CAPABILITY_NETWORK          4  /* Network */
-#define MODULE_CAPABILITY_DECODER          5  /* Audio or video decoder */
-#define MODULE_CAPABILITY_MOTION           6  /* Motion compensation */
-#define MODULE_CAPABILITY_IDCT             7  /* IDCT transformation */
-#define MODULE_CAPABILITY_AOUT             8  /* Audio output */
-#define MODULE_CAPABILITY_AOUT_FILTER      9  /* Audio output filter */
-#define MODULE_CAPABILITY_VOUT            10  /* Video output */
-#define MODULE_CAPABILITY_VOUT_FILTER     11  /* Video output filter */
-#define MODULE_CAPABILITY_CHROMA          12  /* colorspace conversion */
-#define MODULE_CAPABILITY_IMDCT           13  /* IMDCT transformation */
-#define MODULE_CAPABILITY_DOWNMIX         14  /* AC3 downmix */
-#define MODULE_CAPABILITY_MEMCPY          15  /* memcpy */
-#define MODULE_CAPABILITY_MAX             16  /* Total number of capabilities */
-
-#define DECLARE_MODULE_CAPABILITY_TABLE \
-    static const char *ppsz_capabilities[] = \
-    { \
-        "main", \
-        "interface", \
-        "access", \
-        "demux", \
-        "network", \
-        "decoder", \
-        "motion", \
-        "iDCT", \
-        "audio output", \
-        "audio output filter", \
-        "video output", \
-        "video output filter", \
-        "chroma transformation", \
-        "iMDCT", \
-        "downmix", \
-        "memcpy", \
-        "unknown" \
-    }
-
-#define MODULE_CAPABILITY( i_capa ) \
-    ppsz_capabilities[ ((i_capa) > MODULE_CAPABILITY_MAX) ? \
-                          MODULE_CAPABILITY_MAX : (i_capa) ]
-
-/*****************************************************************************
  * module_bank_t: the module bank
  *****************************************************************************
  * This variable is accessed by any function using modules.
  *****************************************************************************/
 struct module_bank_t
 {
+    VLC_COMMON_MEMBERS
+
     module_t *   first;                          /* First module in the bank */
     int          i_count;                     /* Number of allocated modules */
 
     vlc_mutex_t  lock;         /* Global lock -- you can't imagine how awful *
                                     it is to design thread-safe linked lists */
+    module_symbols_t symbols;
 };
 
 /*****************************************************************************
@@ -113,14 +69,18 @@ struct module_t
      * Variables set by the module to tell us what it can do
      */
     char *psz_program;        /* Program name which will activate the module */
+
     char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];    /* Shortcuts to the module */
 
-    u32   i_capabilities;                                 /* Capability list */
-    int   pi_score[ MODULE_CAPABILITY_MAX ];    /* Score for each capability */
+    char *psz_capability;                                      /* Capability */
+    int   i_score;                              /* Score for each capability */
+    u32   i_cpu;                                /* Required CPU capabilities */
 
-    u32   i_cpu_capabilities;                   /* Required CPU capabilities */
+    vlc_bool_t b_submodule;                          /* Is this a submodule? */
 
-    module_functions_t *p_functions;                 /* Capability functions */
+    /* Callbacks */
+    int  ( * pf_activate )   ( vlc_object_t * );
+    void ( * pf_deactivate ) ( vlc_object_t * );
 
     /*
      * Variables set by the module to store its config options
@@ -132,24 +92,11 @@ struct module_t
     /*
      * Variables used internally by the module manager
      */
+    /* Plugin-specific stuff */
+    module_handle_t     handle;                             /* Unique handle */
+    char *              psz_filename;                     /* Module filename */
+
     vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
-
-    union
-    {
-        struct
-        {
-            module_handle_t     handle;                     /* Unique handle */
-            char *              psz_filename;             /* Module filename */
-
-        } plugin;
-
-        struct
-        {
-            int ( *pf_deactivate ) ( module_t * );
-
-        } builtin;
-
-    } is;
 
     int   i_usage;                                      /* Reference counter */
     int   i_unused_delay;                  /* Delay until module is unloaded */
@@ -164,177 +111,25 @@ struct module_t
 };
 
 /*****************************************************************************
- * Module functions description structure
- *****************************************************************************/
-typedef struct function_list_t
-{
-    union
-    {
-        /* Interface plugin */
-        struct
-        {
-            int  ( * pf_open ) ( intf_thread_t * );
-            void ( * pf_close )( intf_thread_t * );
-            void ( * pf_run )  ( intf_thread_t * );
-        } intf;
-
-        /* Access plugin */
-        struct
-        {
-            int  ( * pf_open )        ( input_thread_t * );
-            void ( * pf_close )       ( input_thread_t * );
-            ssize_t ( * pf_read )     ( input_thread_t *, byte_t *, size_t );
-            void ( * pf_seek )        ( input_thread_t *, off_t );
-            int  ( * pf_set_program ) ( input_thread_t *, pgrm_descriptor_t * );
-            int  ( * pf_set_area )    ( input_thread_t *, input_area_t * );
-        } access;
-
-        /* Demux plugin */
-        struct
-        {
-            int  ( * pf_init )   ( input_thread_t * );
-            void ( * pf_end )    ( input_thread_t * );
-            int  ( * pf_demux )  ( input_thread_t * );
-            int  ( * pf_rewind ) ( input_thread_t * );
-        } demux;
-
-        /* Network plugin */
-        struct
-        {
-            int  ( * pf_open ) ( vlc_object_t *, network_socket_t * );
-        } network;
-
-        /* Audio output plugin */
-        struct
-        {
-            int  ( * pf_open )       ( aout_thread_t * );
-            int  ( * pf_setformat )  ( aout_thread_t * );
-            int  ( * pf_getbufinfo ) ( aout_thread_t *, int );
-            void ( * pf_play )       ( aout_thread_t *, byte_t *, int );
-            void ( * pf_close )      ( aout_thread_t * );
-        } aout;
-
-        /* Video output plugin */
-        struct
-        {
-            int  ( * pf_create )     ( vout_thread_t * );
-            int  ( * pf_init )       ( vout_thread_t * );
-            void ( * pf_end )        ( vout_thread_t * );
-            void ( * pf_destroy )    ( vout_thread_t * );
-            int  ( * pf_manage )     ( vout_thread_t * );
-            void ( * pf_render )     ( vout_thread_t *, picture_t * );
-            void ( * pf_display )    ( vout_thread_t *, picture_t * );
-        } vout;
-
-        /* Motion compensation plugin */
-        struct
-        {
-            void ( * ppppf_motion[2][2][4] ) ( yuv_data_t *, yuv_data_t *,
-                                               int, int );
-        } motion;
-
-        /* IDCT plugin */
-        struct
-        {
-            void ( * pf_idct_init )    ( void ** );
-            void ( * pf_sparse_idct_add )( dctelem_t *, yuv_data_t *, int,
-                                         void *, int );
-            void ( * pf_idct_add )     ( dctelem_t *, yuv_data_t *, int,
-                                         void *, int );
-            void ( * pf_sparse_idct_copy )( dctelem_t *, yuv_data_t *, int,
-                                         void *, int );
-            void ( * pf_idct_copy )    ( dctelem_t *, yuv_data_t *, int,
-                                         void *, int );
-            void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
-        } idct;
-
-        /* Chroma transformation plugin */
-        struct
-        {
-            int  ( * pf_init )         ( vout_thread_t * );
-            void ( * pf_end )          ( vout_thread_t * );
-        } chroma;
-
-        /* IMDCT plugin */
-        struct
-        {
-            void ( * pf_imdct_init )   ( imdct_t * );
-            void ( * pf_imdct_256 )    ( imdct_t *, float [], float [] );
-            void ( * pf_imdct_256_nol )( imdct_t *, float [], float [] );
-            void ( * pf_imdct_512 )    ( imdct_t *, float [], float [] );
-            void ( * pf_imdct_512_nol )( imdct_t *, float [], float [] );
-//            void ( * pf_fft_64p )      ( complex_t * );
-
-        } imdct;
-
-        /* AC3 downmix plugin */
-        struct
-        {
-            void ( * pf_downmix_3f_2r_to_2ch ) ( float *, dm_par_t * );
-            void ( * pf_downmix_3f_1r_to_2ch ) ( float *, dm_par_t * );
-            void ( * pf_downmix_2f_2r_to_2ch ) ( float *, dm_par_t * );
-            void ( * pf_downmix_2f_1r_to_2ch ) ( float *, dm_par_t * );
-            void ( * pf_downmix_3f_0r_to_2ch ) ( float *, dm_par_t * );
-            void ( * pf_stream_sample_2ch_to_s16 ) ( s16 *, float *, float * );
-            void ( * pf_stream_sample_1ch_to_s16 ) ( s16 *, float * );
-
-        } downmix;
-
-        /* Decoder plugins */
-        struct
-        {
-            int  ( * pf_probe)( vlc_fourcc_t * p_es );
-            int  ( * pf_run ) ( decoder_fifo_t * p_fifo );
-        } dec;
-
-        /* memcpy plugins */
-        struct
-        {
-            void* ( * pf_memcpy ) ( void *, const void *, size_t );
-            void* ( * pf_memset ) ( void *, int, size_t );
-        } memcpy;
-
-    } functions;
-
-} function_list_t;
-
-struct module_functions_t
-{
-    /* XXX: The order here has to be the same as above for the #defines */
-    function_list_t intf;
-    function_list_t access;
-    function_list_t demux;
-    function_list_t network;
-    function_list_t dec;
-    function_list_t motion;
-    function_list_t idct;
-    function_list_t aout;
-    function_list_t vout;
-    function_list_t chroma;
-    function_list_t imdct;
-    function_list_t downmix;
-    function_list_t memcpy;
-};
-
-/*****************************************************************************
  * Exported functions.
  *****************************************************************************/
-#define module_InitBank(a)     __module_InitBank(CAST_TO_VLC_OBJECT(a))
+#define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
 void  __module_InitBank        ( vlc_object_t * );
-#define module_LoadMain(a)     __module_LoadMain(CAST_TO_VLC_OBJECT(a))
+#define module_LoadMain(a)     __module_LoadMain(VLC_OBJECT(a))
 void  __module_LoadMain        ( vlc_object_t * );
-#define module_LoadBuiltins(a) __module_LoadBuiltins(CAST_TO_VLC_OBJECT(a))
+#define module_LoadBuiltins(a) __module_LoadBuiltins(VLC_OBJECT(a))
 void  __module_LoadBuiltins    ( vlc_object_t * );
-#define module_LoadPlugins(a)  __module_LoadPlugins(CAST_TO_VLC_OBJECT(a))
+#define module_LoadPlugins(a)  __module_LoadPlugins(VLC_OBJECT(a))
 void  __module_LoadPlugins     ( vlc_object_t * );
-#define module_EndBank(a)      __module_EndBank(CAST_TO_VLC_OBJECT(a))
+#define module_EndBank(a)      __module_EndBank(VLC_OBJECT(a))
 void  __module_EndBank         ( vlc_object_t * );
-#define module_ResetBank(a)    __module_ResetBank(CAST_TO_VLC_OBJECT(a))
+#define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
 void  __module_ResetBank       ( vlc_object_t * );
-#define module_ManageBank(a)   __module_ManageBank(CAST_TO_VLC_OBJECT(a))
+#define module_ManageBank(a)   __module_ManageBank(VLC_OBJECT(a))
 void  __module_ManageBank      ( vlc_object_t * );
 
-#define module_Need(a,b,c,d) __module_Need(CAST_TO_VLC_OBJECT(a),b,c,d)
-VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, int, const char *, void * ) );
-VLC_EXPORT( void, module_Unneed, ( module_t * ) );
+#define module_Need(a,b,c) __module_Need(VLC_OBJECT(a),b,c)
+VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char * ) );
+#define module_Unneed(a,b) __module_Unneed(VLC_OBJECT(a),b)
+VLC_EXPORT( void, __module_Unneed, ( vlc_object_t *, module_t * ) );
 

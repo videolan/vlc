@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.39 2002/07/23 00:39:17 sam Exp $
+ * $Id: input_ext-intf.c,v 1.40 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -410,20 +410,6 @@ int input_ToggleMute( input_thread_t * p_input )
              p_input->stream.control.b_mute ? "activating" : "deactivating" );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return 0;
-}
-
-/****************************************************************************
- * input_SetSMP: change the number of video decoder threads
- ****************************************************************************/
-int input_SetSMP( input_thread_t * p_input, int i_smp )
-{
-    /* No need to warn the input thread since only the decoders
-     * worry about it. */
-    vlc_mutex_lock( &p_input->stream.control.control_lock );
-    p_input->stream.control.i_smp = i_smp;
-    vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
     return 0;
 }

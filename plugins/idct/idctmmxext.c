@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.24 2002/06/01 12:31:59 sam Exp $
+ * $Id: idctmmxext.c,v 1.25 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -38,32 +38,18 @@
 #include "idct.h"
 #include "block_mmx.h"
 
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list );
+static int Open( vlc_object_t *p_this );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("MMX EXT IDCT module") )
-    ADD_CAPABILITY( IDCT, 200 )
-    ADD_REQUIREMENT( MMXEXT )
-    ADD_SHORTCUT( "mmxext" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    idct_getfunctions( &p_module->p_functions->idct );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/* Following functions are local */
+vlc_module_begin();
+    set_description( _("MMX EXT IDCT module") );
+    set_capability( "idct", 200 );
+    add_shortcut( "mmxext" );
+    add_requirement( MMXEXT );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * NormScan : This IDCT uses reordered coeffs, so we patch the scan table

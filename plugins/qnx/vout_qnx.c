@@ -107,13 +107,10 @@ struct picture_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
+static int  QNXInit      ( vout_thread_t * );
+static void QNXEnd       ( vout_thread_t * );
+static int  QNXManage    ( vout_thread_t * );
+static void QNXDisplay   ( vout_thread_t *, picture_t * );
 
 static int  QNXInitDisplay ( vout_thread_t * );
 static int  QNXCreateWnd   ( vout_thread_t * );
@@ -121,33 +118,20 @@ static int  QNXDestroyWnd  ( vout_thread_t * );
 
 static int  NewPicture     ( vout_thread_t *, picture_t *, int );
 static void FreePicture    ( vout_thread_t *, picture_t * );
-static int ResizeOverlayOutput ( vout_thread_t * );
+static int  ResizeOverlayOutput ( vout_thread_t * );
 static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( vout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocate QNX video thread output method
+ * OpenVideo: allocate QNX video thread output method
  *****************************************************************************
  * This function allocate and initialize a QNX vout method. It uses some of the
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
-{
+int E_(OpenVideo) ( vlc_object_t *p_this )
+{   
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
     /* init connection to photon */
     if( PtInit( "/dev/photon" ) != 0 )
     {
@@ -178,16 +162,22 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    p_vout->pf_init = QNXInit;
+    p_vout->pf_end = QNXEnd;
+    p_vout->pf_manage = QNXManage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = QNXDisplay;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize QNX video thread output method
+ * QNXInit: initialize QNX video thread output method
  *****************************************************************************
  * This function create the buffers needed by the output thread. It is called
  * at the beginning of the thread, but also each time the window is resized.
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int QNXInit( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -264,12 +254,12 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate QNX video thread output method
+ * QNXEnd: terminate QNX video thread output method
  *****************************************************************************
- * Destroy the buffers created by vout_Init. It is called at the end of
+ * Destroy the buffers created by QNXInit. It is called at the end of
  * the thread, but also each time the window is resized.
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void QNXEnd( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -282,12 +272,14 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy QNX video thread output method
+ * CloseVideo: destroy QNX video thread output method
  *****************************************************************************
- * Terminate an output method created by vout_CreateOutputMethod
+ * Terminate an output method created by QNXCreate
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
-{
+void E_(CloseVideo) ( vlc_object_t *p_this )
+{   
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
     /* destroy the window */
     QNXDestroyWnd( p_vout );
 
@@ -296,12 +288,12 @@ static void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle QNX events
+ * QNXManage: handle QNX events
  *****************************************************************************
  * This function should be called regularly by video output thread. It allows
  * window resizing. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int QNXManage( vout_thread_t *p_vout )
 {
     int i_ev,  i_buflen;
     PhEvent_t *p_event;
@@ -464,8 +456,8 @@ static int vout_Manage( vout_thread_t *p_vout )
             p_vout->output.i_height = p_vout->p_sys->dim.h;
             p_vout->i_changes |= VOUT_YUV_CHANGE;
 
-            vout_End( p_vout );
-            if( vout_Init( p_vout ) )
+            QNXEnd( p_vout );
+            if( QNXInit( p_vout ) )
             {
                 msg_Err( p_vout, "cannot resize display" );
                 return( 1 );
@@ -489,20 +481,12 @@ static int vout_Manage( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Render: render previously calculated output
- *****************************************************************************/
-static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
+ * QNXDisplay: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to QNX server, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void QNXDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 {
     if( p_vout->p_sys->i_mode == MODE_NORMAL_MEM ||
         p_vout->p_sys->i_mode == MODE_SHARED_MEM )

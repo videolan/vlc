@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.4 2002/06/07 14:59:40 sam Exp $
+ * $Id: vlc_objects.h,v 1.5 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,7 +31,7 @@
 #define VLC_OBJECT_DECODER    (-7)
 #define VLC_OBJECT_VOUT       (-8)
 #define VLC_OBJECT_AOUT       (-9)
-#define VLC_OBJECT_PRIVATE  (-666)
+#define VLC_OBJECT_GENERIC  (-666)
 
 /* Object search mode */
 #define FIND_PARENT         0x0001
@@ -39,6 +39,9 @@
 #define FIND_ANYWHERE       0x0003
 
 #define FIND_STRICT         0x0010
+
+/* Object cast */
+
 
 /*****************************************************************************
  * Prototypes
@@ -58,35 +61,35 @@ VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_dumpstructure, ( vlc_object_t * ) );
 
 #define vlc_object_create(a,b) \
-    __vlc_object_create( CAST_TO_VLC_OBJECT(a), b )
+    __vlc_object_create( VLC_OBJECT(a), b )
 
 #define vlc_object_destroy(a) do { \
-    __vlc_object_destroy( CAST_TO_VLC_OBJECT(a) ); \
+    __vlc_object_destroy( VLC_OBJECT(a) ); \
     (a) = NULL; } while(0)
 
 #define vlc_object_find(a,b,c) \
-    __vlc_object_find( CAST_TO_VLC_OBJECT(a),b,c)
+    __vlc_object_find( VLC_OBJECT(a),b,c)
 
 #define vlc_object_yield(a) \
-    __vlc_object_yield( CAST_TO_VLC_OBJECT(a) )
+    __vlc_object_yield( VLC_OBJECT(a) )
 
 #define vlc_object_release(a) \
-    __vlc_object_release( CAST_TO_VLC_OBJECT(a) )
+    __vlc_object_release( VLC_OBJECT(a) )
 
 #define vlc_object_detach(a,b) \
-    __vlc_object_detach( CAST_TO_VLC_OBJECT(a), CAST_TO_VLC_OBJECT(b) )
+    __vlc_object_detach( VLC_OBJECT(a), VLC_OBJECT(b) )
 
 #define vlc_object_detach_all(a) \
-    __vlc_object_detach_all( CAST_TO_VLC_OBJECT(a) )
+    __vlc_object_detach_all( VLC_OBJECT(a) )
 
 #define vlc_object_attach(a,b) \
-    __vlc_object_attach( CAST_TO_VLC_OBJECT(a), CAST_TO_VLC_OBJECT(b) )
+    __vlc_object_attach( VLC_OBJECT(a), VLC_OBJECT(b) )
 
 #if 0
 #define vlc_object_setchild(a,b) \
-    __vlc_object_setchild( CAST_TO_VLC_OBJECT(a), CAST_TO_VLC_OBJECT(b) )
+    __vlc_object_setchild( VLC_OBJECT(a), VLC_OBJECT(b) )
 #endif
 
 #define vlc_dumpstructure(a) \
-    __vlc_dumpstructure( CAST_TO_VLC_OBJECT(a) )
+    __vlc_dumpstructure( VLC_OBJECT(a) )
 

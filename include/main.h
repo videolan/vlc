@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.41 2002/07/29 19:05:47 gbazin Exp $
+ * $Id: main.h,v 1.42 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ struct vlc_t
     char **                ppsz_argv;              /* command line arguments */
     char *                 psz_homedir;             /* user's home directory */
 
-    u32                    i_cpu_capabilities;             /* CPU extensions */
+    u32                    i_cpu;                          /* CPU extensions */
 
     /* Generic settings */
     vlc_bool_t             b_quiet;                            /* be quiet ? */
@@ -58,7 +58,7 @@ struct vlc_t
     void* ( *pf_memset ) ( void *, int, size_t );    /* FIXME: unimplemented */
 
     /* The module bank */
-    module_bank_t   module_bank;
+    module_bank_t * p_module_bank;
 
     /* The message bank */
     msg_bank_t      msg_bank;

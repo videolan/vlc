@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.10 2002/07/23 00:39:17 sam Exp $
+ * $Id: scope.c,v 1.11 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,61 +44,38 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    aout_thread_t aout;
     aout_fifo_t *p_aout_fifo;
 
+    aout_thread_t *p_aout;
     vout_thread_t *p_vout;
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void    aout_getfunctions( function_list_t * p_function_list );
+static int  Open         ( vlc_object_t * );             
+static void Close        ( vlc_object_t * );                   
 
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
+static int  SetFormat    ( aout_thread_t * );  
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("scope effect module") )
-    ADD_CAPABILITY( AOUT, 0 )
-    ADD_SHORTCUT( "scope" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("scope effect") ); 
+    set_capability( "audio output", 0 );
+    set_callbacks( Open, Close );
+    add_shortcut( "scope" );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: open a scope effect plugin
  *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: open a scope effect plugin
- *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     char *psz_method;
 
     /* Allocate structure */
@@ -136,83 +113,83 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Open audio output  */
-    p_aout->p_sys->aout.i_format   = p_aout->i_format;
-    p_aout->p_sys->aout.i_rate     = p_aout->i_rate;
-    p_aout->p_sys->aout.i_channels = p_aout->i_channels;
+    p_aout->p_sys->p_aout = vlc_object_create( p_aout, VLC_OBJECT_AOUT );
 
-    p_aout->p_sys->aout.p_module =
-                  module_Need( p_aout, MODULE_CAPABILITY_AOUT,
-                               "", (void *)&p_aout->p_sys->aout );
-    if( p_aout->p_sys->aout.p_module == NULL )
+    p_aout->p_sys->p_aout->i_format   = p_aout->i_format;
+    p_aout->p_sys->p_aout->i_rate     = p_aout->i_rate;
+    p_aout->p_sys->p_aout->i_channels = p_aout->i_channels;
+
+    p_aout->p_sys->p_aout->p_module =
+                  module_Need( p_aout->p_sys->p_aout, "audio output", "" );
+    if( p_aout->p_sys->p_aout->p_module == NULL )
     {
         msg_Err( p_aout, "no suitable aout module" );
+        vlc_object_destroy( p_aout->p_sys->p_aout );
         vout_DestroyThread( p_aout->p_sys->p_vout );
         free( p_aout->p_sys );
         return -1;
     }
 
-#define aout_functions p_aout->p_sys->aout.p_module->p_functions->aout.functions.aout
-    p_aout->p_sys->aout.pf_open       = aout_functions.pf_open;
-    p_aout->p_sys->aout.pf_setformat  = aout_functions.pf_setformat;
-    p_aout->p_sys->aout.pf_getbufinfo = aout_functions.pf_getbufinfo;
-    p_aout->p_sys->aout.pf_play       = aout_functions.pf_play;
-    p_aout->p_sys->aout.pf_close      = aout_functions.pf_close;
-#undef aout_functions
-    
+    vlc_object_attach( p_aout->p_sys->p_aout, p_aout );
+
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_SetFormat: set the output format
+ * SetFormat: set the output format
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     int i_ret;
 
     /* Force the output method */
-    p_aout->p_sys->aout.i_format = p_aout->i_format;
-    p_aout->p_sys->aout.i_channels = p_aout->i_channels;
-    p_aout->p_sys->aout.i_rate = p_aout->i_rate;
+    p_aout->p_sys->p_aout->i_format = p_aout->i_format;
+    p_aout->p_sys->p_aout->i_channels = p_aout->i_channels;
+    p_aout->p_sys->p_aout->i_rate = p_aout->i_rate;
 
     /*
      * Initialize audio device
      */
-    i_ret = p_aout->p_sys->aout.pf_setformat( &p_aout->p_sys->aout );
+    i_ret = p_aout->p_sys->p_aout->pf_setformat( p_aout->p_sys->p_aout );
 
     if( i_ret )
     {
         return i_ret;
     }
 
-    if( p_aout->p_sys->aout.i_format != p_aout->i_format
-         || p_aout->p_sys->aout.i_channels != p_aout->i_channels )
+    if( p_aout->p_sys->p_aout->i_format != p_aout->i_format
+         || p_aout->p_sys->p_aout->i_channels != p_aout->i_channels )
     {
         msg_Err( p_aout, "plugin is not very cooperative" );
         return 0;
     }
 
-    p_aout->i_channels = p_aout->p_sys->aout.i_channels;
-    p_aout->i_format = p_aout->p_sys->aout.i_format;
-    p_aout->i_rate = p_aout->p_sys->aout.i_rate;
+    p_aout->i_channels = p_aout->p_sys->p_aout->i_channels;
+    p_aout->i_format = p_aout->p_sys->p_aout->i_format;
+    p_aout->i_rate = p_aout->p_sys->p_aout->i_rate;
 
     return 0;
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
-    return p_aout->p_sys->aout.pf_getbufinfo( &p_aout->p_sys->aout,
-                                              i_buffer_limit );
+    return p_aout->p_sys->p_aout->pf_getbufinfo( p_aout->p_sys->p_aout,
+                                                 i_buffer_limit );
 }
 
 /*****************************************************************************
- * aout_Play: play a sound samples buffer
+ * Play: play a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 {
     picture_t *p_outpic;
     int i_index, i_image;
@@ -220,7 +197,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
     u16 *p_sample;
 
     /* Play the real sound */
-    p_aout->p_sys->aout.pf_play( &p_aout->p_sys->aout, p_buffer, i_size );
+    p_aout->p_sys->p_aout->pf_play( p_aout->p_sys->p_aout, p_buffer, i_size );
 
     for( i_image = 0; (i_image + 1) * SCOPE_WIDTH * 8 < i_size ; i_image++ )
     {
@@ -303,13 +280,20 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: close the Esound socket
+ * Close: close the plugin
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Close( vlc_object_t *p_this )
 {
-    p_aout->p_sys->aout.pf_close( &p_aout->p_sys->aout );
-    module_Unneed( p_aout->p_sys->aout.p_module );
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
+    /* Kill audio output */
+    module_Unneed( p_aout->p_sys->p_aout, p_aout->p_sys->p_aout->p_module );
+    vlc_object_detach_all( p_aout->p_sys->p_aout );
+    vlc_object_destroy( p_aout->p_sys->p_aout );
+
+    /* Kill video output */
     vout_DestroyThread( p_aout->p_sys->p_vout );
+
     free( p_aout->p_sys );
 }
 

@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.11 2002/06/01 12:31:58 sam Exp $
+ * $Id: udp.c,v 1.12 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,51 +45,26 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * );
-static int  UDPOpen       ( input_thread_t * );
+static int  Open       ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
- 
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Raw UDP access plug-in") )
-    ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "udpstream" )
-    ADD_SHORTCUT( "udp4" )
-    ADD_SHORTCUT( "udp6" )
-MODULE_INIT_STOP
- 
-MODULE_ACTIVATE_START
-    input_getfunctions( &p_module->p_functions->access );
-MODULE_ACTIVATE_STOP
- 
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("raw UDP access module") );
+    set_capability( "access", 0 );
+    add_shortcut( "udpstream" );
+    add_shortcut( "udp4" );
+    add_shortcut( "udp6" );
+    set_callbacks( Open, __input_FDNetworkClose );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: open the socket
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-#define input p_function_list->functions.access
-    input.pf_open             = UDPOpen;
-    input.pf_read             = input_FDNetworkRead;
-    input.pf_close            = input_FDNetworkClose;
-    input.pf_set_program      = input_SetProgram;
-    input.pf_set_area         = NULL;
-    input.pf_seek             = NULL;
-#undef input
-}
-
-/*****************************************************************************
- * UDPOpen: open the socket
- *****************************************************************************/
-static int UDPOpen( input_thread_t * p_input )
-{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     input_socket_t *    p_access_data;
     module_t *          p_network;
     char *              psz_network = "";
@@ -217,6 +192,11 @@ static int UDPOpen( input_thread_t * p_input )
         }
     }
 
+    p_input->pf_read = input_FDNetworkRead;
+    p_input->pf_set_program = input_SetProgram;
+    p_input->pf_set_area = NULL;
+    p_input->pf_seek = NULL;
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
@@ -248,14 +228,14 @@ static int UDPOpen( input_thread_t * p_input )
     socket_desc.i_server_port = i_server_port;
 
     /* Find an appropriate network module */
-    p_network = module_Need( p_input, MODULE_CAPABILITY_NETWORK,
-                             psz_network, &socket_desc );
+    p_input->p_private = (void*) &socket_desc;
+    p_network = module_Need( p_input, "network", psz_network );
     free(psz_name);
     if( p_network == NULL )
     {
         return( -1 );
     }
-    module_Unneed( p_network );
+    module_Unneed( p_input, p_network );
     
     p_access_data = p_input->p_access_data = malloc( sizeof(input_socket_t) );
     if( p_access_data == NULL )

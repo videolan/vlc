@@ -46,51 +46,30 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void aout_getfunctions ( function_list_t * );
-static int  aout_Open         ( aout_thread_t * );
-static int  aout_SetFormat    ( aout_thread_t * );
-static int  aout_GetBufInfo   ( aout_thread_t *, int );
-static void aout_Play         ( aout_thread_t *, byte_t *, int );
-static void aout_Close        ( aout_thread_t * );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
+
+static int  SetFormat    ( aout_thread_t * );
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("aRts audio module") )
-    ADD_CAPABILITY( AOUT, 50 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+   set_description( _("aRts audio module") );
+   set_capability( "audio output", 50 );
+   set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize arts connection to server
  *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: initialize arts connection to server
- *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
-{
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i_err = 0;
 
     /* Allocate structure */
@@ -110,6 +89,10 @@ static int aout_Open( aout_thread_t *p_aout )
         return(-1);
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     p_aout->p_sys->stream =
         arts_play_stream( p_aout->i_rate, 16, p_aout->i_channels, "vlc" );
 
@@ -117,9 +100,9 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: set the output format
+ * SetFormat: set the output format
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
    /*Not ready*/ 
 /*    p_aout->i_latency = esd_get_latency(i_fd);*/
@@ -131,20 +114,20 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     /* arbitrary value that should be changed */
     return( i_buffer_limit );
 }
 
 /*****************************************************************************
- * aout_Play: play a sound samples buffer
+ * Play: play a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_err = arts_write( p_aout->p_sys->stream, buffer, i_size );
 
@@ -155,10 +138,12 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: close the Esound socket
+ * Close: close the Esound socket
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Close( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
     arts_close_stream( p_aout->p_sys->stream );
     free( p_aout->p_sys );
 }

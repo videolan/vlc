@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.96 2002/06/04 00:11:12 sam Exp $
+ * $Id: interface.c,v 1.97 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -70,8 +70,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
 
     /* Choose the best module */
     psz_name = config_GetPsz( p_intf, "intf" );
-    p_intf->p_module = module_Need( p_intf, MODULE_CAPABILITY_INTF,
-                                    psz_name, (void *)p_intf );
+    p_intf->p_module = module_Need( p_intf, "interface", psz_name );
 
     if( psz_name ) free( psz_name );
     if( p_intf->p_module == NULL )
@@ -80,12 +79,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
         vlc_object_destroy( p_intf );
         return NULL;
     }
-
-#define f p_intf->p_module->p_functions->intf.functions.intf
-    p_intf->pf_open       = f.pf_open;
-    p_intf->pf_close      = f.pf_close;
-    p_intf->pf_run        = f.pf_run;
-#undef f
 
     /* Initialize structure */
     p_intf->b_menu        = 0;
@@ -162,11 +155,8 @@ void intf_StopThread( intf_thread_t *p_intf )
  *****************************************************************************/
 void intf_Destroy( intf_thread_t *p_intf )
 {
-    /* Destroy interface */
-    p_intf->pf_close( p_intf );
-
     /* Unlock module */
-    module_Unneed( p_intf->p_module );
+    module_Unneed( p_intf, p_intf->p_module );
 
     vlc_mutex_destroy( &p_intf->change_lock );
 

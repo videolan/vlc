@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.32 2002/07/21 19:26:13 sigmunau Exp $
+ * $Id: input_ext-plugins.h,v 1.33 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -79,7 +79,7 @@ int input_DelInfo( input_thread_t * p_input ); /* no need to export this */
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
-#define input_BuffersInit(a) __input_BuffersInit(CAST_TO_VLC_OBJECT(a))
+#define input_BuffersInit(a) __input_BuffersInit(VLC_OBJECT(a))
 void * __input_BuffersInit( vlc_object_t * );
 VLC_EXPORT( void, input_BuffersEnd, ( input_thread_t *, input_buffers_t * ) );
 
@@ -282,8 +282,10 @@ struct input_socket_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, input_FDClose, ( input_thread_t * ) );
-VLC_EXPORT( void, input_FDNetworkClose, ( input_thread_t * ) );
+VLC_EXPORT( void, __input_FDClose, ( vlc_object_t * ) );
+#define input_FDClose(a) __input_FDClose(VLC_OBJECT(a))
+VLC_EXPORT( void, __input_FDNetworkClose, ( vlc_object_t * ) );
+#define input_FDNetworkClose(a) __input_FDNetworkClose(VLC_OBJECT(a))
 VLC_EXPORT( ssize_t, input_FDRead, ( input_thread_t *, byte_t *, size_t ) );
 VLC_EXPORT( ssize_t, input_FDNetworkRead, ( input_thread_t *, byte_t *, size_t ) );
 VLC_EXPORT( void, input_FDSeek, ( input_thread_t *, off_t ) );

@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.12 2002/06/08 14:08:46 sam Exp $
+ * $Id: vpar_pool.c,v 1.13 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -107,7 +107,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
     p_control = p_vpar->p_fifo->p_stream_ctrl;
     vlc_mutex_lock( &p_control->control_lock );
-    i_new_smp = p_control->i_smp;
+    i_new_smp = config_GetInt( p_vpar->p_fifo, "vdec-smp" );
     vlc_mutex_unlock( &p_control->control_lock );
 
     /* FIXME: No error check because I'm tired. Come back later... */

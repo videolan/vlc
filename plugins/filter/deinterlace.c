@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.19 2002/07/23 00:39:17 sam Exp $
+ * $Id: deinterlace.c,v 1.20 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,9 +40,14 @@
 #define DEINTERLACE_LINEAR  5
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local protypes
  *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list );
+static int  Create    ( vlc_object_t * );
+static void Destroy   ( vlc_object_t * );
+
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static void Render    ( vout_thread_t *, picture_t * );
 
 static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
@@ -52,33 +57,22 @@ static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 static void Merge        ( void *, const void *, const void *, size_t );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Deinterlace mode")
 #define MODE_LONGTEXT N_("one of \"discard\", \"blend\", \"mean\", \"bob\" or \"linear\"")
 
 static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", NULL };
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING_FROM_LIST ( "deinterlace-mode", "discard", mode_list, NULL, \
-    MODE_TEXT, MODE_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("deinterlacing module") )
-    /* Capability score set to 0 because we don't want to be spawned
-     * as a video output unless explicitly requested to */
-    ADD_CAPABILITY( VOUT_FILTER, 0 )
-    ADD_SHORTCUT( "deinterlace" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    vout_getfunctions( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string_from_list( "deinterlace-mode", "discard", mode_list, NULL,
+                          MODE_TEXT, MODE_LONGTEXT );
+    set_description( _("deinterlacing module") );
+    set_capability( "video filter", 0 );
+    add_shortcut( "deinterlace" );
+    set_callbacks( Create, Destroy );
+vlc_module_end();
 
 /*****************************************************************************
  * vout_sys_t: Deinterlace video output method descriptor
@@ -98,38 +92,13 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  vout_Create    ( vout_thread_t * );
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static void vout_Destroy   ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, picture_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void vout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.vout.pf_create     = vout_Create;
-    p_function_list->functions.vout.pf_init       = vout_Init;
-    p_function_list->functions.vout.pf_end        = vout_End;
-    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
-    p_function_list->functions.vout.pf_manage     = vout_Manage;
-    p_function_list->functions.vout.pf_render     = vout_Render;
-    p_function_list->functions.vout.pf_display    = vout_Display;
-}
-
-/*****************************************************************************
- * vout_Create: allocates Deinterlace video thread output method
+ * Create: allocates Deinterlace video thread output method
  *****************************************************************************
  * This function allocates and initializes a Deinterlace vout method.
  *****************************************************************************/
-static int vout_Create( vout_thread_t *p_vout )
-{
+static int Create( vlc_object_t *p_this )
+{   
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_method;
 
     /* Allocate structure */
@@ -139,6 +108,12 @@ static int vout_Create( vout_thread_t *p_vout )
         msg_Err( p_vout, "out of memory" );
         return 1;
     }
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = NULL;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = NULL;
 
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
     p_vout->p_sys->b_double_rate = 0;
@@ -193,9 +168,9 @@ static int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize Deinterlace video thread output method
+ * Init: initialize Deinterlace video thread output method
  *****************************************************************************/
-static int vout_Init( vout_thread_t *p_vout )
+static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
@@ -275,9 +250,9 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Deinterlace video thread output method
+ * End: terminate Deinterlace video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void End( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -290,36 +265,27 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Deinterlace video thread output method
+ * Destroy: destroy Deinterlace video thread output method
  *****************************************************************************
  * Terminate an output method created by DeinterlaceCreateOutputMethod
  *****************************************************************************/
-static void vout_Destroy( vout_thread_t *p_vout )
+static void Destroy( vlc_object_t *p_this )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     vout_DestroyThread( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle Deinterlace events
- *****************************************************************************
- * This function should be called regularly by video output thread. It manages
- * console events. It returns a non null value on error.
- *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
-{
-    return 0;
-}
-
-/*****************************************************************************
- * vout_Render: displays previously rendered output
+ * Render: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Deinterlace image,
  * waits until it is displayed and switch the two rendering buffers, preparing
  * next frame.
  *****************************************************************************/
-static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
+static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *pp_outpic[2];
 
@@ -397,16 +363,6 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
             break;
     }
-}
-
-/*****************************************************************************
- * vout_Display: displays previously rendered output
- *****************************************************************************
- * This function does nothing, since all the rendering was already done.
- *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    ;
 }
 
 /*****************************************************************************

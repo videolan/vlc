@@ -2,7 +2,7 @@
  * motionaltivec.c : AltiVec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.14 2002/06/01 16:45:34 sam Exp $
+ * $Id: motionaltivec.c,v 1.15 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -36,29 +36,20 @@
 #endif
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Local prototype
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list );
+static int Open ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("AltiVec motion compensation module") )
-    ADD_CAPABILITY( MOTION, 150 )
-    ADD_REQUIREMENT( ALTIVEC )
-    ADD_SHORTCUT( "altivec" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    motion_getfunctions( &p_module->p_functions->motion );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("AltiVec motion compensation module") );
+    set_capability( "motion compensation", 150 );
+    add_requirement( ALTIVEC );
+    add_shortcut( "altivec" );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * Motion compensation in AltiVec
@@ -2056,40 +2047,28 @@ void MC_avg_xy_8_altivec (unsigned char * dest, unsigned char * ref,
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list )
+static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *, int, int ) =
 {
-    static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *,
-                                           int, int ) =
+    /* Copying functions */
     {
-        {
-            /* Copying functions */
-            {
-                /* Width == 16 */
-                MC_put_o_16_altivec, MC_put_x_16_altivec, MC_put_y_16_altivec, MC_put_xy_16_altivec
-            },
-            {
-                /* Width == 8 */
-                MC_put_o_8_altivec,  MC_put_x_8_altivec,  MC_put_y_8_altivec, MC_put_xy_8_altivec
-            }
-        },
-        {
-            /* Averaging functions */
-            {
-                /* Width == 16 */
-                MC_avg_o_16_altivec, MC_avg_x_16_altivec, MC_avg_y_16_altivec, MC_avg_xy_16_altivec
-            },
-            {
-                /* Width == 8 */
-                MC_avg_o_8_altivec,  MC_avg_x_8_altivec,  MC_avg_y_8_altivec,  MC_avg_xy_8_altivec
-            }
-        }
-    };
+        /* Width == 16 */
+        { MC_put_o_16_altivec, MC_put_x_16_altivec, MC_put_y_16_altivec, MC_put_xy_16_altivec },
+        /* Width == 8 */
+        { MC_put_o_8_altivec,  MC_put_x_8_altivec,  MC_put_y_8_altivec, MC_put_xy_8_altivec }
+    },
+    /* Averaging functions */
+    {
+        /* Width == 16 */
+        { MC_avg_o_16_altivec, MC_avg_x_16_altivec, MC_avg_y_16_altivec, MC_avg_xy_16_altivec },
+        /* Width == 8 */
+        { MC_avg_o_8_altivec,  MC_avg_x_8_altivec,  MC_avg_y_8_altivec,  MC_avg_xy_8_altivec }
+    }
+};
 
-#define list p_function_list->functions.motion
-    memcpy( list.ppppf_motion, ppppf_motion, sizeof( void * ) * 16 );
-#undef list
-
-    return;
+static int Open ( vlc_object_t *p_this )
+{
+    p_this->p_private = ppppf_motion;
+    return VLC_SUCCESS;
 }
 
 #endif        /* __BUILD_ALTIVEC_ASM__ */

@@ -2,7 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.18 2002/07/20 18:01:42 sam Exp $
+ * $Id: dsp.c,v 1.19 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,60 +61,36 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void aout_getfunctions ( function_list_t * );
-static int  aout_Open         ( aout_thread_t * );
-static int  aout_SetFormat    ( aout_thread_t * );
-static int  aout_GetBufInfo   ( aout_thread_t *, int );
-static void aout_Play         ( aout_thread_t *, byte_t *, int );
-static void aout_Close        ( aout_thread_t * );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
+
+static int  SetFormat    ( aout_thread_t * );
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Module descriptor
  *****************************************************************************/
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_file( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL );
+    set_description( _("Linux OSS /dev/dsp module") );
+    set_capability( "audio output", 100 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_FILE  ( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("Linux OSS /dev/dsp module") )
-    ADD_CAPABILITY( AOUT, 100 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: opens the audio device (the digital sound processor)
+ * Open: opens the audio device (the digital sound processor)
  *****************************************************************************
  * This function opens the dsp as a usual non-blocking write-only file, and
  * modifies the p_aout->p_sys->i_fd with the file's descriptor.
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+static int Open( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
@@ -131,6 +107,10 @@ static int aout_Open( aout_thread_t *p_aout )
         return( -1 );
     }
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
+
     /* Open the sound device */
     if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device, O_WRONLY ))
         < 0 )
@@ -146,14 +126,14 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: resets the dsp and sets its format
+ * SetFormat: resets the dsp and sets its format
  *****************************************************************************
  * This functions resets the DSP device, tries to initialize the output
  * format with the value contained in the dsp structure, and if this value
  * could not be set, the default value returned by ioctl is set. It then
  * does the same for the stereo mode, and for the output rate.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     int i_format;
     int i_rate;
@@ -219,7 +199,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************
  * This function fills in the audio_buf_info structure :
  * - returns : number of available fragments (not partially used ones)
@@ -228,7 +208,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  * - int bytes : available space in bytes (includes partially used fragments)
  * Note! 'bytes' could be more than fragments*fragsize
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_GETOSPACE,
            &p_aout->p_sys->audio_buf );
@@ -240,11 +220,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play: plays a sound samples buffer
+ * Play: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_tmp;
     i_tmp = write( p_aout->p_sys->i_fd, buffer, i_size );
@@ -256,10 +236,12 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close: closes the dsp audio device
+ * Close: closes the dsp audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Close( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
     close( p_aout->p_sys->i_fd );
     free( p_aout->p_sys->psz_device );
 }

@@ -2,7 +2,7 @@
  * ac3_downmix_common.h: ac3 downmix functions headers
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_common.h,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_downmix_common.h,v 1.2 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-void _M( downmix_3f_2r_to_2ch )     ( float *, dm_par_t * );
-void _M( downmix_2f_2r_to_2ch )     ( float *, dm_par_t * );
-void _M( downmix_3f_1r_to_2ch )     ( float *, dm_par_t * );
-void _M( downmix_2f_1r_to_2ch )     ( float *, dm_par_t * );
-void _M( downmix_3f_0r_to_2ch )     ( float *, dm_par_t * );
-void _M( stream_sample_2ch_to_s16 ) ( s16 *, float *, float * );
-void _M( stream_sample_1ch_to_s16 ) ( s16 *, float * );
+void E_( downmix_3f_2r_to_2ch )     ( float *, dm_par_t * );
+void E_( downmix_2f_2r_to_2ch )     ( float *, dm_par_t * );
+void E_( downmix_3f_1r_to_2ch )     ( float *, dm_par_t * );
+void E_( downmix_2f_1r_to_2ch )     ( float *, dm_par_t * );
+void E_( downmix_3f_0r_to_2ch )     ( float *, dm_par_t * );
+void E_( stream_sample_2ch_to_s16 ) ( s16 *, float *, float * );
+void E_( stream_sample_1ch_to_s16 ) ( s16 *, float * );
 

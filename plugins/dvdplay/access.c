@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.2 2002/07/25 20:34:35 stef Exp $
+ * $Id: access.c,v 1.3 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -62,44 +62,23 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int    dvdplay_Open          ( input_thread_t * );
-static void   dvdplay_Close         ( input_thread_t * );
-static int    dvdplay_SetArea       ( input_thread_t *,
-                                      input_area_t * );
-static int    dvdplay_SetProgram    ( input_thread_t *,
-                                      pgrm_descriptor_t * );
-static int    dvdplay_Read          ( input_thread_t *,
-                                      byte_t *, size_t );
+static int    dvdplay_SetArea       ( input_thread_t *, input_area_t * );
+static int    dvdplay_SetProgram    ( input_thread_t *, pgrm_descriptor_t * );
+static int    dvdplay_Read          ( input_thread_t *, byte_t *, size_t );
 static void   dvdplay_Seek          ( input_thread_t *, off_t );
 
 static void   pf_vmg_callback       ( void*, dvdplay_event_t );
 
 /* only from inside */
-
 static int dvdNewArea( input_thread_t *, input_area_t * );
 static int dvdNewPGC ( input_thread_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenDVD: open libdvdplay
  *****************************************************************************/
-void _M( access_getfunctions )( function_list_t * p_function_list )
+int E_(OpenDVD) ( vlc_object_t *p_this )
 {
-#define access p_function_list->functions.access
-    access.pf_open             = dvdplay_Open;
-    access.pf_close            = dvdplay_Close;
-    access.pf_read             = dvdplay_Read;
-    access.pf_set_area         = dvdplay_SetArea;
-    access.pf_set_program      = dvdplay_SetProgram;
-    access.pf_seek             = dvdplay_Seek;
-#undef access
-}
-
-/*****************************************************************************
- * dvdplay_Open: open libdvdplay
- *****************************************************************************/
-static int dvdplay_Open( input_thread_t *p_input )
-{
+    input_thread_t *        p_input = (input_thread_t *)p_this;
     char *                  psz_source;
     dvd_data_t *            p_dvd;
     input_area_t *          p_area;
@@ -117,6 +96,11 @@ static int dvdplay_Open( input_thread_t *p_input )
     }
 
     p_input->p_access_data = (void *)p_dvd;
+
+    p_input->pf_read = dvdplay_Read;
+    p_input->pf_seek = dvdplay_Seek;
+    p_input->pf_set_area = dvdplay_SetArea;
+    p_input->pf_set_program = dvdplay_SetProgram;
 
     /* command line */
     if( ( psz_source = dvdplay_ParseCL( p_input, 
@@ -208,13 +192,12 @@ static int dvdplay_Open( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * dvdplay_Close: close libdvdplay
+ * CloseDVD: close libdvdplay
  *****************************************************************************/
-static void dvdplay_Close( input_thread_t *p_input )
+void E_(CloseDVD) ( vlc_object_t *p_this )
 {
-    dvd_data_t *     p_dvd;
-
-    p_dvd = (dvd_data_t *)p_input->p_access_data;
+    input_thread_t * p_input = (input_thread_t *)p_this;
+    dvd_data_t *     p_dvd = (dvd_data_t *)p_input->p_access_data;
 
     /* close libdvdplay */
     dvdplay_close( p_dvd->vmg );

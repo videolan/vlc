@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.4 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: ac3_decoder.h,v 1.5 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -35,7 +35,7 @@ typedef struct ac3_sync_info_s {
 
 /**** ac3 decoder API - functions publically provided by the ac3 decoder ****/
 
-int _M( ac3_init )(ac3dec_t * p_ac3dec);
+int E_( ac3_init )(ac3dec_t * p_ac3dec);
 int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info);
 int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer);
 

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.23 2002/07/21 18:57:02 sigmunau Exp $
+ * $Id: rc.c,v 1.24 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -48,58 +48,30 @@
 #include <winsock2.h>                                            /* select() */
 #endif
 
-/*****************************************************************************
- * intf_sys_t: description and status of rc interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    input_thread_t * p_input;
-};
-
 #define MAX_LINE_LENGTH 256
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Open         ( intf_thread_t *p_intf );
-static void intf_Close        ( intf_thread_t *p_intf );
-static void intf_Run          ( intf_thread_t *p_intf );
+static int  Activate     ( vlc_object_t * );
+static void Run          ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("remote control interface module") )
-    ADD_CAPABILITY( INTF, 20 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("remote control interface module") );
+    set_capability( "interface", 20 );
+    set_callbacks( Activate, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Activate: initialize and create stuff
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
+static int Activate( vlc_object_t *p_this )
 {
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
 
-/*****************************************************************************
- * intf_Open: initialize and create stuff
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
 #ifdef HAVE_ISATTY
     /* Check that stdin is a TTY */
     if( !isatty( 0 ) )
@@ -112,13 +84,7 @@ static int intf_Open( intf_thread_t *p_intf )
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
-        return 1;
-    }
+    p_intf->pf_run = Run;
 
 #ifdef WIN32
     AllocConsole();
@@ -133,22 +99,15 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface stuff
- *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
-    /* Destroy structure */
-    free( p_intf->p_sys );
-}
-
-/*****************************************************************************
- * intf_Run: rc thread
+ * Run: rc thread
  *****************************************************************************
  * This part of the interface is in a separate thread so that we can call
  * exec() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
+    input_thread_t * p_input;
+
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
     vlc_bool_t b_complete = 0;
     input_info_category_t * p_category;
@@ -166,7 +125,7 @@ static void intf_Run( intf_thread_t *p_intf )
     memset(psz_dashes, '-', 80);
     psz_dashes[80] = '\0';
     
-    p_intf->p_sys->p_input = NULL;
+    p_input = NULL;
 
     while( !p_intf->b_die )
     {
@@ -202,21 +161,19 @@ static void intf_Run( intf_thread_t *p_intf )
         }
 
         /* Manage the input part */
-        if( p_intf->p_sys->p_input == NULL )
+        if( p_input == NULL )
         {
-            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                              FIND_ANYWHERE );
+            p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                               FIND_ANYWHERE );
         }
-        else if( p_intf->p_sys->p_input->b_dead )
+        else if( p_input->b_dead )
         {
-            vlc_object_release( p_intf->p_sys->p_input );
-            p_intf->p_sys->p_input = NULL;
+            vlc_object_release( p_input );
+            p_input = NULL;
         }
 
-        if( p_intf->p_sys->p_input )
+        if( p_input )
         {
-            input_thread_t *p_input = p_intf->p_sys->p_input;
-
             /* Get position */
             vlc_mutex_lock( &p_input->stream.stream_lock );
             if( !p_input->b_die && p_input->stream.i_mux_rate )
@@ -266,19 +223,18 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'p':
             case 'P':
-                if( p_intf->p_sys->p_input )
+                if( p_input )
                 {
-                    input_SetStatus( p_intf->p_sys->p_input,
-                                     INPUT_STATUS_PAUSE );
+                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 break;
 
             case 'f':
             case 'F':
-                if( p_intf->p_sys->p_input )
+                if( p_input )
                 {
                     vout_thread_t *p_vout;
-                    p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                    p_vout = vlc_object_find( p_input,
                                               VLC_OBJECT_VOUT, FIND_CHILD );
 
                     if( p_vout )
@@ -301,7 +257,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'r':
             case 'R':
-                if( p_intf->p_sys->p_input )
+                if( p_input )
                 {
                     for( i_dummy = 1;
                          i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
@@ -312,8 +268,7 @@ static void intf_Run( intf_thread_t *p_intf )
                     }
 
                     p_cmd[ i_dummy ] = 0;
-                    input_Seek( p_intf->p_sys->p_input,
-                                (off_t)atoi( p_cmd + 1 ),
+                    input_Seek( p_input, (off_t)atoi( p_cmd + 1 ),
                                 INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
                     /* rcreseek(f_cpos); */
                 }
@@ -334,8 +289,8 @@ static void intf_Run( intf_thread_t *p_intf )
             case 'i':
             case 'I':
                 printf( "Dumping stream info\n" );
-                vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-                p_category = p_intf->p_sys->p_input->stream.p_info;
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                p_category = p_input->stream.p_info;
                 while ( p_category )
                 {
                     psz_dashes[72 - strlen(p_category->psz_name) ] = '\0';
@@ -353,7 +308,10 @@ static void intf_Run( intf_thread_t *p_intf )
                 }
                 psz_dashes[78] = '\0';
                 printf( "+%s+\n", psz_dashes );
-                vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                break;
+            case '\0':
+                /* Ignore empty lines */
                 break;
             default:
                 printf( "unknown command `%s'\n", p_cmd );
@@ -364,11 +322,10 @@ static void intf_Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
     }
 
-    if( p_intf->p_sys->p_input )
+    if( p_input )
     {
-        vlc_object_release( p_intf->p_sys->p_input );
-        p_intf->p_sys->p_input = NULL;
+        vlc_object_release( p_input );
+        p_input = NULL;
     }
-
 }
 

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.41 2002/07/23 00:39:17 sam Exp $
+ * $Id: input_dvdread.c,v 1.42 2002/07/31 20:56:51 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -79,13 +79,9 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  DvdReadInit     ( input_thread_t * );
-static void DvdReadEnd      ( input_thread_t * );
 static int  DvdReadDemux    ( input_thread_t * );
 static int  DvdReadRewind   ( input_thread_t * );
 
-static int  DvdReadOpen       ( input_thread_t * );
-static void DvdReadClose      ( input_thread_t * );
 static int  DvdReadSetArea    ( input_thread_t *, input_area_t * );
 static int  DvdReadSetProgram ( input_thread_t *, pgrm_descriptor_t * );
 static int  DvdReadRead       ( input_thread_t *, byte_t *, size_t );
@@ -96,45 +92,24 @@ static void DvdReadLauchDecoders( input_thread_t * p_input );
 static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, u8 * p_data );
 static void DvdReadFindCell ( thread_dvd_data_t * p_dvd );
 
-/*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( access_getfunctions )( function_list_t * p_function_list )
-{
-#define access p_function_list->functions.access
-    access.pf_open             = DvdReadOpen;
-    access.pf_close            = DvdReadClose;
-    access.pf_read             = DvdReadRead;
-    access.pf_set_area         = DvdReadSetArea;
-    access.pf_set_program      = DvdReadSetProgram;
-    access.pf_seek             = DvdReadSeek;
-#undef access
-}
-
-void _M( demux_getfunctions )( function_list_t * p_function_list )
-{
-#define demux p_function_list->functions.demux
-    demux.pf_init             = DvdReadInit;
-    demux.pf_end              = DvdReadEnd;
-    demux.pf_demux            = DvdReadDemux;
-    demux.pf_rewind           = DvdReadRewind;
-#undef demux
-}
-
 /*
  * Data demux functions
  */
 
 /*****************************************************************************
- * DvdReadInit: initializes DVD structures
+ * InitDVD: initializes DVD structures
  *****************************************************************************/
-static int DvdReadInit( input_thread_t * p_input )
+int E_(InitDVD) ( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
     if( p_input->stream.i_method != INPUT_METHOD_DVD )
     {
         return -1;
     }
+
+    p_input->pf_demux = DvdReadDemux;
+    p_input->pf_rewind = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
@@ -143,13 +118,6 @@ static int DvdReadInit( input_thread_t * p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;
-}
-
-/*****************************************************************************
- * DvdReadEnd: frees unused data
- *****************************************************************************/
-static void DvdReadEnd( input_thread_t * p_input )
-{
 }
 
 /*****************************************************************************
@@ -232,10 +200,11 @@ static int DvdReadRewind( input_thread_t * p_input )
  */
 
 /*****************************************************************************
- * DvdReadOpen: open libdvdread
+ * OpenDVD: open libdvdread
  *****************************************************************************/
-static int DvdReadOpen( input_thread_t *p_input )
+int E_(OpenDVD) ( vlc_object_t *p_this )
 {
+    input_thread_t *        p_input = (input_thread_t *)p_this;
     char *                  psz_orig;
     char *                  psz_parser;
     char *                  psz_source;
@@ -254,6 +223,11 @@ static int DvdReadOpen( input_thread_t *p_input )
     {
         return( -1 );
     }
+
+    p_input->pf_read = DvdReadRead;
+    p_input->pf_seek = DvdReadSeek;
+    p_input->pf_set_area = DvdReadSetArea;
+    p_input->pf_set_program = DvdReadSetProgram;
 
     while( *psz_parser && *psz_parser != '@' )
     {
@@ -420,13 +394,12 @@ static int DvdReadOpen( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * DvdReadClose: close libdvdread
+ * CloseDVD: close libdvdread
  *****************************************************************************/
-static void DvdReadClose( input_thread_t *p_input )
+void E_(CloseDVD) ( vlc_object_t *p_this )
 {
-    thread_dvd_data_t *     p_dvd;
-
-    p_dvd = (thread_dvd_data_t *)p_input->p_access_data;
+    input_thread_t *    p_input = (input_thread_t *)p_this;
+    thread_dvd_data_t * p_dvd = (thread_dvd_data_t *)p_input->p_access_data;
 
     /* close libdvdread */
     DVDCloseFile( p_dvd->p_title );
@@ -772,7 +745,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* FIXME: hack to check that the demuxer is ready, and set
          * the decoders */
-        if( p_input->p_demux_module )
+        if( p_input->p_demux )
         {
             DvdReadLauchDecoders( p_input );
         }

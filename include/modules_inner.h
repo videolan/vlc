@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.23 2002/06/01 12:31:57 sam Exp $
+ * $Id: modules_inner.h,v 1.24 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,20 +48,26 @@
 #define UGLY_KLUDGE( z ) #z
 /* And I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
-#define CRUDE_HACK( y, z )  y##__MODULE_##z
+#define CRUDE_HACK( y, z )  y##__##z
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #if defined( __BUILTIN__ )
-#   define _M( function )          CONCATENATE( function, MODULE_NAME )
+#   define E_( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #   define DECLARE_SYMBOLS         ;
 #   define STORE_SYMBOLS           ;
 #elif defined( __PLUGIN__ )
-#   define _M( function )          function
+#   define E_( function )          function
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
 #   define DECLARE_SYMBOLS         module_symbols_t* p_symbols;
 #   define STORE_SYMBOLS           p_symbols = p_module->p_symbols;
+#endif
+
+#if defined( __cplusplus )
+#   define EXTERN_SYMBOL           extern "C"
+#else
+#   define EXTERN_SYMBOL
 #endif
 
 #define MODULE_STRING STRINGIFY( MODULE_NAME )
@@ -72,86 +78,112 @@
  * instance the module name, its shortcuts, its capabilities... we also create
  * a copy of its config because the module can be unloaded at any time.
  */
-#define MODULE_INIT_START                                                     \
+#define vlc_module_begin( )                                                   \
     DECLARE_SYMBOLS;                                                          \
-    int __VLC_SYMBOL( InitModule ) ( module_t *p_module )                     \
+    EXTERN_SYMBOL int __VLC_SYMBOL(vlc_entry) ( module_t *p_module )          \
     {                                                                         \
-        int i_shortcut = 1;                                                   \
+        int i_shortcut = 1, i_config = 0;                                     \
+        module_config_t p_config[ 100 ];                                      \
         STORE_SYMBOLS;                                                        \
+        p_module->b_submodule = VLC_FALSE;                                    \
         p_module->psz_object_name = MODULE_STRING;                            \
         p_module->psz_longname = MODULE_STRING;                               \
-        p_module->psz_program = NULL;                                         \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
-        p_module->i_capabilities = 0;                                         \
-        p_module->i_cpu_capabilities = 0;                                     \
-        do {
+        p_module->i_cpu = 0;                                                  \
+        p_module->psz_program = NULL;                                         \
+        p_module->psz_capability = "";                                        \
+        p_module->i_score = 1;                                                \
+        p_module->pf_activate = NULL;                                         \
+        p_module->pf_deactivate = NULL;                                       \
+        do                                                                    \
+        {                                                                     \
+            module_t *p_submodule = p_module /* the ; gets added */
 
-#define MODULE_INIT_STOP                                                      \
+#define vlc_module_end( )                                                     \
+            p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         } while( 0 );                                                         \
-        p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
+        p_config[ i_config ] =                                                \
+            (module_config_t){ CONFIG_HINT_END, NULL, NULL, '\0' };           \
         config_Duplicate( p_module, p_config );                               \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
-/*//X            intf_Err( p_module, "InitModule can't duplicate p_config" );*/      \
             return -1;                                                        \
         }                                                                     \
-        return 0;                                                             \
-    }
+        return 0 && i_shortcut;                                               \
+    }                                                                         \
+    int __VLC_SYMBOL(vlc_entry) ( module_t * ) /* the ; gets added */
 
-#define ADD_CAPABILITY( cap, score )                                          \
-    p_module->i_capabilities |= 1 << MODULE_CAPABILITY_##cap;                 \
-    p_module->pi_score[ MODULE_CAPABILITY_##cap ] = score;
 
-#define ADD_REQUIREMENT( cap )                                                \
-    p_module->i_cpu_capabilities |= CPU_CAPABILITY_##cap;
+#define add_submodule( )                                                      \
+    p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                           \
+    p_submodule = vlc_object_create( p_module, VLC_OBJECT_MODULE );           \
+    vlc_object_attach( p_submodule, p_module );                               \
+    p_submodule->b_submodule = VLC_TRUE;                                      \
+    /* Nuahahaha! Heritage! Polymorphism! Ugliness!! */                       \
+    for( i_shortcut = 0; p_module->pp_shortcuts[ i_shortcut ]; i_shortcut++ ) \
+    {                                                                         \
+        p_submodule->pp_shortcuts[ i_shortcut ] =                             \
+                                p_module->pp_shortcuts[ i_shortcut ];         \
+    }                                                                         \
+    p_submodule->psz_object_name = p_module->psz_object_name;                 \
+    p_submodule->psz_program = p_module->psz_program;                         \
+    p_submodule->psz_capability = p_module->psz_capability;                   \
+    p_submodule->i_score = p_module->i_score;                                 \
+    p_submodule->i_cpu = p_module->i_cpu;                                     \
+    p_submodule->pf_activate = NULL;                                          \
+    p_submodule->pf_deactivate = NULL
 
-#define ADD_PROGRAM( program )                                                \
-    p_module->psz_program = program;
+#define add_requirement( cap )                                                \
+    p_module->i_cpu |= CPU_CAPABILITY_##cap
 
-#define ADD_SHORTCUT( shortcut )                                              \
-    p_module->pp_shortcuts[ i_shortcut ] = shortcut;                          \
-    i_shortcut++;
+#define add_shortcut( shortcut )                                              \
+    p_submodule->pp_shortcuts[ i_shortcut ] = shortcut;                       \
+    i_shortcut++
 
-#define SET_DESCRIPTION( desc )                                               \
-    p_module->psz_longname = desc;
+#define set_description( desc )                                               \
+    p_module->psz_longname = desc
+
+#define set_capability( cap, score )                                          \
+    p_submodule->psz_capability = cap;                                        \
+    p_submodule->i_score = score
+
+#define set_program( program )                                                \
+    p_submodule->psz_program = program
+
+#define set_callbacks( activate, deactivate )                                 \
+    p_submodule->pf_activate = activate;                                      \
+    p_submodule->pf_deactivate = deactivate
 
 /*
- * ActivateModule: this function is called before functions can be accessed,
+ * module_activate: this function is called before functions can be accessed,
  * we do allocation tasks here, and maybe additional stuff such as large
  * table allocation. Once ActivateModule is called we are almost sure the
  * module will be used.
  */
-#define MODULE_ACTIVATE_START                                                 \
-    int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module )                 \
+#define module_activate( prototype )                                          \
+    __module_activate( prototype );                                           \
+    int __VLC_SYMBOL( module_activate ) ( module_t *p_module )                \
     {                                                                         \
         STORE_SYMBOLS;                                                        \
-        p_module->p_functions =                                               \
-          ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
-        if( p_module->p_functions == NULL )                                   \
-        {                                                                     \
-            return( -1 );                                                     \
-        }                                                                     \
         config_SetCallbacks( p_module->p_config, p_config );                  \
-        do {
-
-#define MODULE_ACTIVATE_STOP                                                  \
-        } while( 0 );                                                         \
-        return 0;                                                             \
-    }
+        return __module_activate( p_module );                                 \
+    }                                                                         \
+                                                                              \
+    static int __module_activate( prototype )
 
 /*
  * DeactivateModule: this function is called after we are finished with the
  * module. Everything that has been done in ActivateModule needs to be undone
  * here.
  */
-#define MODULE_DEACTIVATE_START                                               \
-    int __VLC_SYMBOL( DeactivateModule )( module_t *p_module )                \
+#define module_deactivate( prototype )                                        \
+    __module_deactivate( prototype );                                         \
+    int __VLC_SYMBOL( module_deactivate )( module_t *p_module )               \
     {                                                                         \
-        free( p_module->p_functions );                                        \
-        do {
-
-#define MODULE_DEACTIVATE_STOP                                                \
-        } while( 0 );                                                         \
+        int i_ret = __module_deactivate( p_module );                          \
         config_UnsetCallbacks( p_module->p_config );                          \
-        return 0;                                                             \
-    }
+        return i_ret;                                                         \
+    }                                                                         \
+                                                                              \
+    static int __module_deactivate( prototype )
+

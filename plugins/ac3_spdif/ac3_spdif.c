@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.31 2002/07/23 00:39:16 sam Exp $
+ * $Id: ac3_spdif.c,v 1.32 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -42,10 +42,11 @@
 #include "ac3_spdif.h"
 
 /****************************************************************************
- * Local Prototypes
+ * Local prototypes
  ****************************************************************************/
-static int  decoder_Probe     ( vlc_fourcc_t * );
-static int  decoder_Run       ( decoder_fifo_t * );
+static int  OpenDecoder    ( vlc_object_t * );
+static int  RunDecoder     ( decoder_fifo_t * );
+
 static int  InitThread        ( ac3_spdif_thread_t * );
 static void EndThread         ( ac3_spdif_thread_t * );
 static void BitstreamCallback ( bit_stream_t *, vlc_bool_t );
@@ -98,52 +99,41 @@ static const frame_size_t p_frame_size_code[64] =
 };
 
 /*****************************************************************************
- * Capabilities
+ * Module descriptor
  *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
+vlc_module_begin();
+    set_description( _("SPDIF pass-through AC3 decoder") );
+    set_capability( "decoder", 0 );
+    set_callbacks( OpenDecoder, NULL );
+    add_shortcut( "pass_through" );
+    add_shortcut( "pass" );
+vlc_module_end();
 
 /*****************************************************************************
- * Build configuration tree.
- *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("SPDIF pass-through AC3 decoder") )
-    ADD_CAPABILITY( DECODER, 0 )
-    ADD_SHORTCUT( "pass_through" )
-    ADD_SHORTCUT( "pass" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
-{
-    return( *pi_type == VLC_FOURCC('a','5','2',' ') ) ? 0 : -1;
+static int OpenDecoder( vlc_object_t *p_this ) 
+{   
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+
+    if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ') )
+    {   
+        return VLC_EGENERIC; 
+    }
+
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
-
 /****************************************************************************
- * decoder_Run: the whole thing
+ * RunDecoder: the whole thing
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static int decoder_Run( decoder_fifo_t * p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     ac3_spdif_thread_t *   p_spdif;
     mtime_t     i_frame_time;

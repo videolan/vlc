@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.25 2002/07/20 18:01:42 sam Exp $
+ * $Id: aout_directx.c,v 1.26 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -93,11 +93,9 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int     aout_Open        ( aout_thread_t * );
-static int     aout_SetFormat   ( aout_thread_t * );
-static int     aout_GetBufInfo  ( aout_thread_t *, int );
-static void    aout_Play        ( aout_thread_t *, byte_t *, int );
-static void    aout_Close       ( aout_thread_t * );
+static int     SetFormat   ( aout_thread_t * );
+static int     GetBufInfo  ( aout_thread_t *, int );
+static void    Play        ( aout_thread_t *, byte_t *, int );
 
 /* local functions */
 static int  DirectxCreateSecondaryBuffer ( aout_thread_t * );
@@ -106,29 +104,17 @@ static int  DirectxInitDSound            ( aout_thread_t * );
 static void DirectSoundThread            ( notification_thread_t * );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open: open the audio device
+ * OpenAudio: open the audio device
  *****************************************************************************
  * This function opens and setups Direct Sound.
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+int E_(OpenAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
     HRESULT dsresult;
     DSBUFFERDESC dsbuffer_desc;
 
-    msg_Dbg( p_aout, "aout_Open" );
+    msg_Dbg( p_aout, "Open" );
 
    /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -148,6 +134,9 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->l_data_played_from_beginning = 0;
     vlc_mutex_init( p_aout, &p_aout->p_sys->buffer_lock );
 
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
 
     /* Initialise DirectSound */
     if( DirectxInitDSound( p_aout ) )
@@ -201,19 +190,19 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat: reset the audio device and sets its format
+ * SetFormat: reset the audio device and sets its format
  *****************************************************************************
  * This functions set a new audio format.
  * For this we need to close the current secondary buffer and create another
  * one with the desired format.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     HRESULT       dsresult;
     WAVEFORMATEX  *p_waveformat;
     unsigned long i_size_struct;
 
-    msg_Dbg( p_aout, "aout_SetFormat" );
+    msg_Dbg( p_aout, "SetFormat" );
 
     /* Set the format of Direct Sound primary buffer */
 
@@ -272,19 +261,19 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_GetBufInfo: buffer status query
+ * GetBufInfo: buffer status query
  *****************************************************************************
  * returns the number of bytes in the audio buffer that have not yet been
  * sent to the sound device.
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     long l_play_position, l_notused, l_result;
     HRESULT dsresult;
 
     if( p_aout->p_sys->b_buffer_underflown )
     {
-        msg_Warn( p_aout, "aout_GetBufInfo underflow" );
+        msg_Warn( p_aout, "GetBufInfo underflow" );
         return( i_buffer_limit );
     }
 
@@ -292,7 +281,7 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
                                                  &l_play_position, &l_notused);
     if( dsresult != DS_OK )
     {
-        msg_Warn( p_aout, "aout_GetBufInfo cannot get current pos" );
+        msg_Warn( p_aout, "GetBufInfo cannot get current pos" );
         return( i_buffer_limit );
     }
 
@@ -302,18 +291,18 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
                   + p_aout->p_sys->l_write_position);
 
 #if 0
-    msg_Dbg( p_aout, "aout_GetBufInfo: %i", i_result);
+    msg_Dbg( p_aout, "GetBufInfo: %i", i_result);
 #endif
     return l_result;
 }
 
 /*****************************************************************************
- * aout_Play: play a sound buffer
+ * Play: play a sound buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes
  * Don't forget that DirectSound buffers are circular buffers.
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     VOID            *p_write_position, *p_start_buffer;
     long            l_bytes1, l_bytes2, l_play_position;
@@ -336,7 +325,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
             p_aout->p_sys->l_write_position = 0; 
         }
 
-        msg_Warn( p_aout, "aout_Play underflow" );
+        msg_Warn( p_aout, "Play underflow" );
         /* reinitialise the underflow detection counters */
         p_aout->p_sys->b_buffer_underflown = 0;
         p_aout->p_sys->l_data_written_from_beginning = 0;
@@ -382,7 +371,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     if( dsresult != DS_OK )
     {
-        msg_Warn( p_aout, "aout_Play cannot lock buffer" );
+        msg_Warn( p_aout, "Play cannot lock buffer" );
         vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
         return;
     }
@@ -420,19 +409,20 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     if( dsresult != DS_OK )
     {
-        msg_Warn( p_aout, "aout_Play cannot play buffer" );
+        msg_Warn( p_aout, "Play cannot play buffer" );
         return;
     }
 
 }
 
 /*****************************************************************************
- * aout_Close: close the audio device
+ * CloseAudio: close the audio device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+void E_(CloseAudio) ( vlc_object_t *p_this )
 {
+    aout_thread_t * p_aout = (aout_thread_t *)p_this;
 
-    msg_Dbg( p_aout, "aout_Close" );
+    msg_Dbg( p_aout, "Close" );
 
     /* kill the position notification thread, if any */
     vlc_object_detach_all( p_aout->p_sys->p_notif );
@@ -742,7 +732,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         }
         if( dsresult != DS_OK )
         {
-            msg_Warn( p_notif, "aout_Play cannot lock buffer" );
+            msg_Warn( p_notif, "Play cannot lock buffer" );
             vlc_mutex_unlock( &p_aout->p_sys->buffer_lock );
             return;
         }

@@ -1,1 +1,1 @@
-vcd_SOURCES = vcd.c input_vcd.c cdrom_tools.c
+vcd_SOURCES = vcd.c cdrom_tools.c

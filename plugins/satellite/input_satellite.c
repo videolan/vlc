@@ -50,8 +50,6 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     SatelliteOpen       ( input_thread_t * );
-static void    SatelliteClose      ( input_thread_t * );
 static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
                                      size_t i_len );
 static int     SatelliteSetArea    ( input_thread_t *, input_area_t * );
@@ -59,26 +57,11 @@ static int     SatelliteSetProgram ( input_thread_t *, pgrm_descriptor_t * );
 static void    SatelliteSeek       ( input_thread_t *, off_t );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: open the dvr device
  *****************************************************************************/
-void _M( access_getfunctions )( function_list_t * p_function_list )
+int E_(Open) ( vlc_object_t *p_this )
 {
-#define access p_function_list->functions.access
-    access.pf_open             = SatelliteOpen;
-    access.pf_close            = SatelliteClose;
-    access.pf_read             = SatelliteRead;
-    access.pf_set_area         = SatelliteSetArea;
-    access.pf_set_program      = SatelliteSetProgram;
-    access.pf_seek             = SatelliteSeek;
-#undef access
-}
-
-/*****************************************************************************
- * SatelliteOpen : open the dvr device
- *****************************************************************************/
-static int SatelliteOpen( input_thread_t * p_input )
-{
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     input_socket_t *    p_satellite;
     char *              psz_parser;
     char *              psz_next;
@@ -101,6 +84,11 @@ static int SatelliteOpen( input_thread_t * p_input )
     {
         return( -1 );
     }
+
+    p_input->pf_read = SatelliteRead;
+    p_input->pf_set_program = SatelliteSetProgram;
+    p_input->pf_set_area = SatelliteSetArea;
+    p_input->pf_seek = SatelliteSeek;
 
     i_freq = (int)strtol( psz_parser, &psz_next, 10 );
 
@@ -308,10 +296,11 @@ static int SatelliteOpen( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * SatelliteClose : Closes the device
+ * Close : Close the device
  *****************************************************************************/
-static void SatelliteClose( input_thread_t * p_input )
+void E_(Close) ( vlc_object_t *p_this )
 {
+    input_thread_t *    p_input = (input_thread_t *)p_this;
     input_socket_t *    p_satellite;
     int                 i_es_index;
 

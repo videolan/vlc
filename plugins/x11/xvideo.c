@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.16 2002/07/02 19:14:59 sam Exp $
+ * $Id: xvideo.c,v 1.17 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -32,10 +32,14 @@
 
 #include <vlc/vlc.h>
 
-#include "xcommon.h"
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+extern int  E_(Activate)   ( vlc_object_t * );
+extern void E_(Deactivate) ( vlc_object_t * );
 
 /*****************************************************************************
- * Building configuration tree
+ * Module descriptor
  *****************************************************************************/
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \
@@ -70,29 +74,20 @@
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between vlc and the X server.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_INTEGER ( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT )
-ADD_BOOL    ( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
-ADD_STRING  ( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
-ADD_INTEGER ( "xvideo-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT )
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT );
+    add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT );
+    add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT );
+    add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT );
+    add_integer( "xvideo-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
 #ifdef HAVE_SYS_SHM_H
-ADD_BOOL    ( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT )
+    add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT );
 #endif
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("XVideo extension module") )
-    ADD_CAPABILITY( VOUT, 150 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( vout_getfunctions )( &p_module->p_functions->vout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+    set_description( _("XVideo extension module") );
+    set_capability( "video output", 150 );
+    set_callbacks( E_(Activate), E_(Deactivate) );
+vlc_module_end();
 
 /* following functions are local */
 

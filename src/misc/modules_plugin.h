@@ -251,8 +251,8 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_ReadTS_inner = input_ReadTS; \
     (p_symbols)->input_DemuxPS_inner = input_DemuxPS; \
     (p_symbols)->input_DemuxTS_inner = input_DemuxTS; \
-    (p_symbols)->input_FDClose_inner = input_FDClose; \
-    (p_symbols)->input_FDNetworkClose_inner = input_FDNetworkClose; \
+    (p_symbols)->__input_FDClose_inner = __input_FDClose; \
+    (p_symbols)->__input_FDNetworkClose_inner = __input_FDNetworkClose; \
     (p_symbols)->input_FDRead_inner = input_FDRead; \
     (p_symbols)->input_FDNetworkRead_inner = input_FDNetworkRead; \
     (p_symbols)->input_FDSeek_inner = input_FDSeek; \
@@ -266,7 +266,7 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->GetLang_2B_inner = GetLang_2B; \
     (p_symbols)->DecodeLanguage_inner = DecodeLanguage; \
     (p_symbols)->__module_Need_inner = __module_Need; \
-    (p_symbols)->module_Unneed_inner = module_Unneed; \
+    (p_symbols)->__module_Unneed_inner = __module_Unneed; \
     (p_symbols)->mstrtime_inner = mstrtime; \
     (p_symbols)->mdate_inner = mdate; \
     (p_symbols)->mwait_inner = mwait; \

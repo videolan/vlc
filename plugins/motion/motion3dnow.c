@@ -2,7 +2,7 @@
  * motion3dnow.c : 3D Now! motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion3dnow.c,v 1.11 2002/06/01 12:32:00 sam Exp $
+ * $Id: motion3dnow.c,v 1.12 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -33,30 +33,21 @@
 #include "mmx.h"
 
 /*****************************************************************************
- * Local and extern prototypes.
+ * Local prototype.
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list );
+static int Open ( vlc_object_t * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("3D Now! motion compensation module") )
-    ADD_CAPABILITY( MOTION, 150 )
-    ADD_REQUIREMENT( 3DNOW )
-    ADD_SHORTCUT( "3dn" )
-    ADD_SHORTCUT( "3dnow" )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    motion_getfunctions( &p_module->p_functions->motion );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("3D Now! motion compensation module") );
+    set_capability( "motion compensation", 150 );
+    add_requirement( 3DNOW );
+    add_shortcut( "3dn" );
+    add_shortcut( "3dnow" );
+    set_callbacks( Open, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * Motion compensation in 3D Now! (OK I know this does MMXEXT too and it's ugly)
@@ -559,39 +550,27 @@ static void MC_put_xy8_3dnow (yuv_data_t * dest, yuv_data_t * ref,
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-static void motion_getfunctions( function_list_t * p_function_list )
+static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *, int, int ) =
 {
-    static void (* ppppf_motion[2][2][4])( yuv_data_t *, yuv_data_t *,
-                                           int, int ) =
+    /* Copying functions */
     {
-        {
-            /* Copying functions */
-            {
-                /* Width == 16 */
-                MC_put_16_3dnow, MC_put_x16_3dnow, MC_put_y16_3dnow, MC_put_xy16_3dnow
-            },
-            {
-                /* Width == 8 */
-                MC_put_8_3dnow,  MC_put_x8_3dnow,  MC_put_y8_3dnow, MC_put_xy8_3dnow
-            }
-        },
-        {
-            /* Averaging functions */
-            {
-                /* Width == 16 */
-                MC_avg_16_3dnow, MC_avg_x16_3dnow, MC_avg_y16_3dnow, MC_avg_xy16_3dnow
-            },
-            {
-                /* Width == 8 */
-                MC_avg_8_3dnow,  MC_avg_x8_3dnow,  MC_avg_y8_3dnow,  MC_avg_xy8_3dnow
-            }
-        }
-    };
+        /* Width == 16 */
+        { MC_put_16_3dnow, MC_put_x16_3dnow, MC_put_y16_3dnow, MC_put_xy16_3dnow },
+        /* Width == 8 */
+        { MC_put_8_3dnow,  MC_put_x8_3dnow,  MC_put_y8_3dnow, MC_put_xy8_3dnow }
+    },
+    /* Averaging functions */
+    {
+        /* Width == 16 */
+        { MC_avg_16_3dnow, MC_avg_x16_3dnow, MC_avg_y16_3dnow, MC_avg_xy16_3dnow },
+        /* Width == 8 */
+        { MC_avg_8_3dnow,  MC_avg_x8_3dnow,  MC_avg_y8_3dnow,  MC_avg_xy8_3dnow }
+    }
+};
 
-#define list p_function_list->functions.motion
-    memcpy( list.ppppf_motion, ppppf_motion, sizeof( void * ) * 16 );
-#undef list
-
-    return;
+static int Open ( vlc_object_t *p_this )
+{
+    p_this->p_private = ppppf_motion;
+    return VLC_SUCCESS;
 }
 

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.72 2002/07/23 00:39:16 sam Exp $
+ * $Id: input_ext-intf.h,v 1.73 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,13 +65,9 @@ struct es_descriptor_t
 
     /* Decoder information */
     decoder_fifo_t *        p_decoder_fifo;
-    vlc_thread_t            thread_id;                  /* ID of the decoder */
 
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
-
-    /* Module properties */
-    module_t *              p_module;
 };
 
 /* Special PID values - note that the PID is only on 13 bits, and that values
@@ -274,9 +270,7 @@ struct input_thread_t
     vlc_bool_t              b_eof;
 
     /* Access module */
-    module_t *       p_access_module;
-    int           (* pf_open ) ( input_thread_t * );
-    void          (* pf_close )( input_thread_t * );
+    module_t *       p_access;
     ssize_t       (* pf_read ) ( input_thread_t *, byte_t *, size_t );
     int           (* pf_set_program )( input_thread_t *, pgrm_descriptor_t * );
     int           (* pf_set_area )( input_thread_t *, input_area_t * );
@@ -285,9 +279,7 @@ struct input_thread_t
     size_t           i_mtu;
 
     /* Demux module */
-    module_t *       p_demux_module;
-    int           (* pf_init )   ( input_thread_t * );
-    void          (* pf_end )    ( input_thread_t * );
+    module_t *       p_demux;
     int           (* pf_demux )  ( input_thread_t * );
     int           (* pf_rewind ) ( input_thread_t * );
                                            /* NULL if we don't support going *
@@ -347,19 +339,19 @@ struct input_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define input_CreateThread(a,b,c) __input_CreateThread(CAST_TO_VLC_OBJECT(a),b,c)
+#define input_CreateThread(a,b,c) __input_CreateThread(VLC_OBJECT(a),b,c)
 input_thread_t * __input_CreateThread ( vlc_object_t *,
                                         playlist_item_t *, int * );
 void   input_StopThread     ( input_thread_t * );
 void   input_DestroyThread  ( input_thread_t * );
 
-#define input_SetStatus(a,b) __input_SetStatus(CAST_TO_VLC_OBJECT(a),b)
+#define input_SetStatus(a,b) __input_SetStatus(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __input_SetStatus, ( vlc_object_t *, int ) );
 
-#define input_Seek(a,b,c) __input_Seek(CAST_TO_VLC_OBJECT(a),b,c)
+#define input_Seek(a,b,c) __input_Seek(VLC_OBJECT(a),b,c)
 VLC_EXPORT( void, __input_Seek, ( vlc_object_t *, off_t, int ) );
 
-#define input_Tell(a,b) __input_Tell(CAST_TO_VLC_OBJECT(a),b)
+#define input_Tell(a,b) __input_Tell(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __input_Tell, ( vlc_object_t *, stream_position_t * ) );
 
 VLC_EXPORT( void, input_DumpStream, ( input_thread_t * ) );
@@ -370,6 +362,5 @@ VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, u16 ) );
 
 int    input_ToggleGrayscale( input_thread_t * );
 int    input_ToggleMute     ( input_thread_t * );
-int    input_SetSMP         ( input_thread_t *, int );
 
 #endif /* "input_ext-intf.h" */

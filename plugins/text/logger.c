@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.13 2002/07/20 18:01:43 sam Exp $
+ * $Id: logger.c,v 1.14 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -68,54 +68,34 @@ struct intf_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototypes
  *****************************************************************************/
-static void intf_getfunctions ( function_list_t * p_function_list );
-static int  intf_Open         ( intf_thread_t *p_intf );
-static void intf_Close        ( intf_thread_t *p_intf );
-static void intf_Run          ( intf_thread_t *p_intf );
+static int  Open    ( vlc_object_t * );                  
+static void Close   ( vlc_object_t * );
+static void Run     ( intf_thread_t * );
 
 static void FlushQueue        ( msg_subscription_t *, FILE *, int );
 static void TextPrint         ( const msg_item_t *, FILE * );
 static void HtmlPrint         ( const msg_item_t *, FILE * );
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_STRING( "logfile", NULL, NULL, N_("log filename"), N_("Specify the log filename.") )
-    ADD_STRING( "logmode", NULL, NULL, N_("log format"), N_("Specify the log format. Available choices are \"text\" (default) and \"html\"") )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("file logging interface module") )
-    ADD_CAPABILITY( INTF, 1 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    intf_getfunctions( &p_module->p_functions->intf );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_string( "logfile", NULL, NULL, N_("log filename"), N_("Specify the log filename.") );
+    add_string( "logmode", NULL, NULL, N_("log format"), N_("Specify the log format. Available choices are \"text\" (default) and \"html\"") );
+    set_description( _("file logging interface module") );
+    set_capability( "interface", 0 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create stuff
  *****************************************************************************/
-static void intf_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-/*****************************************************************************
- * intf_Open: initialize and create stuff
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
+static int Open( vlc_object_t *p_this )
+{   
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
     char *psz_mode, *psz_file;
 
 #ifdef WIN32
@@ -210,10 +190,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface stuff
+ * Close: destroy interface stuff
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
-{
+static void Close( vlc_object_t *p_this )
+{       
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+        
     /* Flush the queue and unsubscribe from the message queue */
     FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                 p_intf->p_sys->i_mode );
@@ -238,12 +220,12 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: rc thread
+ * Run: rc thread
  *****************************************************************************
  * This part of the interface is in a separate thread so that we can call
  * exec() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )
     {

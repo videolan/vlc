@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: null.c,v 1.7 2002/06/01 12:31:58 sam Exp $
+ * $Id: null.c,v 1.8 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,41 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-
 #include <vlc/vlc.h>
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor.
  *****************************************************************************/
-MODULE_CONFIG_START
-     /*        ADD_PANE( "First pane" )
-            ADD_SUBCATEGORY_HINT( "First frame" )
-
-                ADD_STRING( "Random text: ", MODULE_VAR(text), NULL )
-            ADD_SUBCATEGORY_HINT( "Second frame" )
-
-                ADD_FILE( "Select file: ", MODULE_VAR(file), NULL )
-            ADD_SUBCATEGORY_HINT( "Third frame" )
-
-        ADD_PANE( "Second pane" )
-            ADD_SUBCATEGORY_HINT( "Frame" )
-     */
-MODULE_CONFIG_STOP
-
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("the Null module that does nothing") )
-MODULE_INIT_STOP
-
-
-MODULE_ACTIVATE_START
-    /* Since the Null module can't do anything, there is no need to
-     * fill the p_functions structure. */
-MODULE_ACTIVATE_STOP
-
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    set_description( _("the module that does nothing") );
+vlc_module_end();
 

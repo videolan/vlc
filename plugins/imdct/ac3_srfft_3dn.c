@@ -2,7 +2,7 @@
  * ac3_srfft_3dn.c: accelerated 3D Now! ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_3dn.c,v 1.6 2002/06/01 12:31:59 sam Exp $
+ * $Id: ac3_srfft_3dn.c,v 1.7 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -39,7 +39,7 @@ static void fft_8_3dn (complex_t *x);
 static void fft_asmb_3dn (int k, complex_t *x, complex_t *wTB,
 	     const complex_t *d, const complex_t *d_3);
 
-void _M( fft_64p ) ( complex_t *a )
+void E_( fft_64p ) ( complex_t *a )
 {
 	fft_8_3dn(&a[0]); fft_4_3dn(&a[8]); fft_4_3dn(&a[12]);
 	fft_asmb_3dn(2, &a[0], &a[8], &delta16[0], &delta16_3[0]);
@@ -56,7 +56,7 @@ void _M( fft_64p ) ( complex_t *a )
 	fft_asmb_3dn(8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
 }
 
-void _M( fft_128p ) ( complex_t *a )
+void E_( fft_128p ) ( complex_t *a )
 {
     fft_8_3dn(&a[0]); fft_4_3dn(&a[8]); fft_4_3dn(&a[12]);
 	fft_asmb_3dn(2, &a[0], &a[8], &delta16[0], &delta16_3[0]);

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_dummy.c,v 1.20 2002/07/20 18:01:42 sam Exp $
+ * $Id: input_dummy.c,v 1.21 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,11 +36,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DummyInit   ( input_thread_t * );
-static int  DummyOpen   ( input_thread_t * );
-static void DummyClose  ( input_thread_t * );
-static void DummyEnd    ( input_thread_t * );
-static int  DummyDemux  ( input_thread_t * );
+static int Demux ( input_thread_t * );
 
 /*****************************************************************************
  * access_sys_t: private input data
@@ -60,61 +56,34 @@ struct demux_sys_t
 #define COMMAND_PAUSE 3
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * OpenAccess: open the target, ie. do nothing
  *****************************************************************************/
-void _M( access_getfunctions )( function_list_t * p_function_list )
+int E_(OpenAccess) ( vlc_object_t *p_this )
 {
-#define input p_function_list->functions.access
-    input.pf_open             = DummyOpen;
-    input.pf_read             = NULL;
-    input.pf_close            = DummyClose;
-    input.pf_set_program      = NULL;
-    input.pf_set_area         = NULL;
-    input.pf_seek             = NULL;
-#undef input
-}
+    input_thread_t *p_input = (input_thread_t *)p_this;
 
-void _M( demux_getfunctions )( function_list_t * p_function_list )
-{
-#define input p_function_list->functions.demux
-    input.pf_init             = DummyInit;
-    input.pf_end              = DummyEnd;
-    input.pf_demux            = DummyDemux;
-    input.pf_rewind           = NULL;
-#undef input
-}
-
-/*****************************************************************************
- * DummyOpen: open the target, ie. do nothing
- *****************************************************************************/
-static int DummyOpen( input_thread_t * p_input )
-{
     p_input->stream.i_method = INPUT_METHOD_NONE;
 
     /* Force dummy demux plug-in */
     p_input->psz_demux = "vlc";
-    return 0;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * DummyClose: close the target, ie. do nothing
+ * OpenDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-static void DummyClose( input_thread_t * p_input )
+int E_(OpenDemux) ( vlc_object_t *p_this )
 {
-}
-
-/*****************************************************************************
- * DummyInit: initialize the target, ie. parse the command
- *****************************************************************************/
-static int DummyInit( input_thread_t *p_input )
-{
+    input_thread_t *p_input = (input_thread_t *)p_this;
     char * psz_name = p_input->psz_name;
     int i_len = strlen( psz_name );
     struct demux_sys_t * p_method;
     int   i_arg;
     
     p_input->stream.b_seekable = 0;
+    p_input->pf_demux = Demux;
+    p_input->pf_rewind = NULL;
 
     p_method = malloc( sizeof( struct demux_sys_t ) );
     if( p_method == NULL )
@@ -168,17 +137,19 @@ static int DummyInit( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * DummyEnd: end the target, ie. do nothing
+ * CloseDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-static void DummyEnd( input_thread_t *p_input )
+void E_(CloseDemux) ( vlc_object_t *p_this )
 {
+    input_thread_t *p_input = (input_thread_t *)p_this;
+
     free( p_input->p_demux_data );
 }
 
 /*****************************************************************************
- * DummyDemux: do what the command says
+ * Demux: do what the command says
  *****************************************************************************/
-static int DummyDemux( input_thread_t *p_input )
+static int Demux( input_thread_t *p_input )
 {
     struct demux_sys_t * p_method = p_input->p_demux_data;
     playlist_t *p_playlist;

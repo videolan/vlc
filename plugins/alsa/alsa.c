@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.20 2002/07/20 18:01:42 sam Exp $
+ * $Id: alsa.c,v 1.21 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -36,35 +36,27 @@
 #include <alsa/asoundlib.h>
 
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes
  *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list );
-static int  aout_Open        ( aout_thread_t * );
-static int  aout_SetFormat   ( aout_thread_t * );
-static void aout_HandleXrun  ( aout_thread_t *);
-static int  aout_GetBufInfo  ( aout_thread_t *, int i_buffer_limit );
-static void aout_Play        ( aout_thread_t *, byte_t *buffer, int i_size );
-static void aout_Close       ( aout_thread_t * );
+static int  Open         ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
+
+static int  SetFormat    ( aout_thread_t * );
+static int  GetBufInfo   ( aout_thread_t *, int );
+static void Play         ( aout_thread_t *, byte_t *, int );
+
+static void HandleXrun   ( aout_thread_t *);
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( N_("Device"), NULL )
-    ADD_STRING( "alsa-device", NULL, NULL, N_("Name"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("ALSA audio module") )
-    ADD_CAPABILITY( AOUT, 50 )
-MODULE_INIT_STOP
-    
-MODULE_ACTIVATE_START
-    aout_getfunctions( &p_module->p_functions->aout );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Device"), NULL );
+    add_string( "alsa-device", NULL, NULL, N_("Name"), NULL );
+    set_description( _("ALSA audio module") );
+    set_capability( "audio output", 50 );
+    set_callbacks( Open, Close );
+vlc_module_end();
 
 /*****************************************************************************
  * Preamble
@@ -95,25 +87,14 @@ struct aout_sys_t
 };
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
- *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list )
-{
-    p_function_list->functions.aout.pf_open = aout_Open;
-    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
-    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.pf_play = aout_Play;
-    p_function_list->functions.aout.pf_close = aout_Close;
-}
-
-/*****************************************************************************
- * aout_Open : creates a handle and opens an alsa device
+ * Open: create a handle and open an alsa device
  *****************************************************************************
  * This function opens an alsa device, through the alsa API
  *****************************************************************************/
-static int aout_Open( aout_thread_t *p_aout )
+static int Open( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+
     /* Allows user to choose which ALSA device to use */
     char  psz_alsadev[128];
     char *psz_device, *psz_userdev;
@@ -126,6 +107,10 @@ static int aout_Open( aout_thread_t *p_aout )
         msg_Err( p_aout, "out of memory" );
         return -1;
     }
+
+    p_aout->pf_setformat = SetFormat;
+    p_aout->pf_getbufinfo = GetBufInfo;
+    p_aout->pf_play = Play;
 
     /* Read in ALSA device preferences from configuration */
     psz_userdev = config_GetPsz( p_aout, "alsa-device" );
@@ -179,12 +164,12 @@ static int aout_Open( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_SetFormat : sets the alsa output format
+ * SetFormat : sets the alsa output format
  *****************************************************************************
  * This function prepares the device, sets the rate, format, the mode
  * ( "play as soon as you have data" ), and buffer information.
  *****************************************************************************/
-static int aout_SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_thread_t *p_aout )
 {
     int i_rv;
     int i_format;
@@ -317,12 +302,12 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_HandleXrun : reprepare the output
+ * HandleXrun : reprepare the output
  *****************************************************************************
  * When buffer gets empty, the driver goes in "Xrun" state, where it needs
  * to be reprepared before playing again
  *****************************************************************************/
-static void aout_HandleXrun(aout_thread_t *p_aout)
+static void HandleXrun(aout_thread_t *p_aout)
 {
     int i_rv;
 
@@ -339,14 +324,14 @@ static void aout_HandleXrun(aout_thread_t *p_aout)
 
 
 /*****************************************************************************
- * aout_BufInfo: buffer status query
+ * BufInfo: buffer status query
  *****************************************************************************
  * This function returns the number of used byte in the queue.
  * It also deals with errors : indeed if the device comes to run out
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
     snd_pcm_status_t *p_status;
     int i_alsa_get_status_returns;
@@ -366,7 +351,7 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
     switch( snd_pcm_status_get_state( p_status ) )
     {
         case SND_PCM_STATE_XRUN :
-            aout_HandleXrun( p_aout );
+            HandleXrun( p_aout );
             break;
 
         case SND_PCM_STATE_OPEN:
@@ -384,11 +369,11 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_Play : plays a sample
+ * Play : plays a sample
  *****************************************************************************
  * Plays a sample using the snd_pcm_writei function from the alsa API
  *****************************************************************************/
-static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     snd_pcm_uframes_t tot_frames;
     snd_pcm_uframes_t frames_left;
@@ -415,10 +400,11 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_Close : close the Alsa device
+ * Close: close the Alsa device
  *****************************************************************************/
-static void aout_Close( aout_thread_t *p_aout )
+static void Close( vlc_object_t *p_this )
 {
+    aout_thread_t *p_aout = (aout_thread_t *)p_this;
     int i_close_returns;
 
     i_close_returns = snd_pcm_close( p_aout->p_sys->p_alsa_handle );

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.33 2002/07/17 21:28:19 stef Exp $
+ * $Id: dvd.c,v 1.34 2002/07/31 20:56:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,14 +45,13 @@
 #endif
 
 /*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-void _M( access_getfunctions)( function_list_t * p_function_list );
-void _M( demux_getfunctions)( function_list_t * p_function_list );
-
-/*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+int  E_(DVDOpen)   ( vlc_object_t * );
+void E_(DVDClose)  ( vlc_object_t * );
+
+int  E_(DVDInit)   ( vlc_object_t * );
+
 #ifdef GOD_DAMN_DMCA
 static void *p_libdvdcss;
 static void ProbeLibDVDCSS  ( void );
@@ -60,38 +59,33 @@ static void UnprobeLibDVDCSS( void );
 #endif
 
 /*****************************************************************************
- * Build configuration tree.
+ * Module descriptor
  *****************************************************************************/
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"), NULL )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    ADD_CAPABILITY( DEMUX, 0 )
+vlc_module_begin();
+    int i;
+    add_category_hint( N_("[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"), NULL );
 #ifdef GOD_DAMN_DMCA
-    SET_DESCRIPTION( _("DVD input module, uses libdvdcss if present") )
-    ADD_CAPABILITY( ACCESS, 90 )
+    set_description( _("DVD input module, uses libdvdcss if installed") );
+    i = 90;
 #else
-    SET_DESCRIPTION( _("DVD input module, uses libdvdcss") )
-    ADD_CAPABILITY( ACCESS, 100 )
+    set_description( _("DVD input module, uses libdvdcss") );
+    i = 100;
 #endif
-    ADD_SHORTCUT( "dvdold" );
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( access_getfunctions)( &p_module->p_functions->access );
-    _M( demux_getfunctions)( &p_module->p_functions->demux );
+    add_shortcut( "dvdold" );
+    add_submodule();
+        set_capability( "access", i );
+        set_callbacks( E_(DVDOpen), E_(DVDClose) );
+    add_submodule();
+        set_capability( "demux", 0 );
+        set_callbacks( E_(DVDInit), NULL );
 #ifdef GOD_DAMN_DMCA
     ProbeLibDVDCSS();
 #endif
-MODULE_ACTIVATE_STOP
+vlc_module_end();
 
-MODULE_DEACTIVATE_START
-#ifdef GOD_DAMN_DMCA
+#if 0 /* FIXME */
     UnprobeLibDVDCSS();
 #endif
-MODULE_DEACTIVATE_STOP
-
 
 /* Following functions are local */
 

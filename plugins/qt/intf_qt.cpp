@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.17 2002/07/20 18:01:43 sam Exp $
+ * $Id: intf_qt.cpp,v 1.18 2002/07/31 20:56:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -134,33 +134,16 @@ struct intf_sys_t
 };
 
 /*****************************************************************************
- * Local prototypes.
+ * Local prototype
  *****************************************************************************/
-static int  intf_Open      ( intf_thread_t *p_intf );
-static void intf_Close     ( intf_thread_t *p_intf );
-static void intf_Run       ( intf_thread_t *p_intf );
+static void Run ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Functions exported as capabilities. They are declared as static so that
- * we don't pollute the namespace too much.
+ * Open: initialize and create window
  *****************************************************************************/
-extern "C"
+int E_(Open) ( vlc_object_t *p_this )
 {
-
-void _M( intf_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.intf.pf_open  = intf_Open;
-    p_function_list->functions.intf.pf_close = intf_Close;
-    p_function_list->functions.intf.pf_run   = intf_Run;
-}
-
-}
-
-/*****************************************************************************
- * intf_Open: initialize and create window
- *****************************************************************************/
-static int intf_Open( intf_thread_t *p_intf )
-{
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
     char *pp_argv[] = { "" };
     int   i_argc    = 1;
 
@@ -171,6 +154,8 @@ static int intf_Open( intf_thread_t *p_intf )
         msg_Err( p_intf, "out of memory" );
         return 1;
     }
+
+    p_intf->pf_run = Run;
 
     /* Create the C++ objects */
     p_intf->p_sys->p_app = new QApplication( i_argc, pp_argv );
@@ -185,10 +170,12 @@ static int intf_Open( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Close: destroy interface window
+ * Close: destroy interface window
  *****************************************************************************/
-static void intf_Close( intf_thread_t *p_intf )
+void E_(Close) ( vlc_object_t *p_this )
 {
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+
     if( p_intf->p_sys->p_input )
     {
         vlc_object_release( p_intf->p_sys->p_input );
@@ -203,12 +190,12 @@ static void intf_Close( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Run: Qt thread
+ * Run: Qt thread
  *****************************************************************************
  * This part of the interface is in a separate thread so that we can call
  * exec() from within it without annoying the rest of the program.
  *****************************************************************************/
-static void intf_Run( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     p_intf->p_sys->p_window->show();
 

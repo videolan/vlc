@@ -183,3 +183,13 @@ the Boston strangler is to the woman home alone.
 
   -- Jack Valenti (president of the MPAA) on April 12, 1982
 %
+<Meuuh> then we need to update download.html
+<Meuuh> what do we still have ?
+<sam> the mail, freshmeat, the videolan.org news
+<sam> cvs tag
+<sam> regression tests
+<sam> bwaahahahahahAHAHAHA
+<Meuuh> mouhahaha
+
+  -- #videolan
+%

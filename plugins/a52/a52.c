@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.21 2002/07/23 00:39:16 sam Exp $
+ * $Id: a52.c,v 1.22 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -63,8 +63,8 @@ static vlc_bool_t  b_liba52_initialized = 0;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( vlc_fourcc_t * );
-static int  decoder_Run    ( decoder_fifo_t * );
+static int  OpenDecoder    ( vlc_object_t * );
+static int  RunDecoder     ( decoder_fifo_t * );
 static int  DecodeFrame    ( a52_adec_thread_t * );
 static int  InitThread     ( a52_adec_thread_t * );
 static void EndThread      ( a52_adec_thread_t * );
@@ -74,16 +74,7 @@ static void               float2s16_2       ( float *, int16_t * );
 static inline int16_t     convert   ( int32_t );
 
 /*****************************************************************************
- * Capabilities
- *****************************************************************************/
-void _M( adec_getfunctions )( function_list_t * p_function_list )
-{
-    p_function_list->functions.dec.pf_probe = decoder_Probe;
-    p_function_list->functions.dec.pf_run   = decoder_Run;
-}
-
-/*****************************************************************************
- * Build configuration structure.
+ * Module descriptor
  *****************************************************************************/
 #define DYNRNG_TEXT N_("A/52 dynamic range compression")
 #define DYNRNG_LONGTEXT N_( \
@@ -93,38 +84,37 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
     "compression the playback will be more adapted to a movie theater or a " \
     "listening room.")
 
-MODULE_CONFIG_START
-ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_BOOL    ( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT )
-MODULE_CONFIG_STOP
-
-MODULE_INIT_START
-    SET_DESCRIPTION( _("a52 ATSC A/52 aka AC-3 audio decoder module") )
-    ADD_CAPABILITY( DECODER, 60 )
-MODULE_INIT_STOP
-
-MODULE_ACTIVATE_START
-    _M( adec_getfunctions )( &p_module->p_functions->dec );
-MODULE_ACTIVATE_STOP
-
-MODULE_DEACTIVATE_START
-MODULE_DEACTIVATE_STOP
+vlc_module_begin();
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT );
+    set_description( _("a52 ATSC A/52 aka AC-3 audio decoder module") );
+    set_capability( "decoder", 60 );
+    set_callbacks( OpenDecoder, NULL );
+vlc_module_end();
 
 /*****************************************************************************
- * decoder_Probe: probe the decoder and return score
+ * OpenDecoder: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int decoder_Probe( vlc_fourcc_t *pi_type )
+static int OpenDecoder( vlc_object_t *p_this )
 {
-    return *pi_type == VLC_FOURCC('a','5','2',' ') ? 0 : -1;
+    decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
+    
+    if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ') )
+    {   
+        return VLC_EGENERIC;
+    }
+
+    p_fifo->pf_run = RunDecoder;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * decoder_Run: this function is called just after the thread is created
+ * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_fifo_t *p_fifo )
+static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     a52_adec_thread_t *p_a52_adec;
 

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_threads.h,v 1.7 2002/07/30 07:56:40 gbazin Exp $
+ * $Id: vlc_threads.h,v 1.8 2002/07/31 20:56:50 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -191,19 +191,19 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, char *, int ) );
  * vlc_threads_init: initialize threads system
  *****************************************************************************/
 #define vlc_threads_init( P_THIS )                                          \
-    __vlc_threads_init( CAST_TO_VLC_OBJECT(P_THIS) )
+    __vlc_threads_init( VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_threads_end: deinitialize threads system
  *****************************************************************************/
 #define vlc_threads_end( P_THIS )                                          \
-    __vlc_threads_end( CAST_TO_VLC_OBJECT(P_THIS) )
+    __vlc_threads_end( VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
 #define vlc_mutex_init( P_THIS, P_MUTEX )                                   \
-    __vlc_mutex_init( CAST_TO_VLC_OBJECT(P_THIS), P_MUTEX )
+    __vlc_mutex_init( VLC_OBJECT(P_THIS), P_MUTEX )
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
@@ -344,7 +344,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
 #define vlc_cond_init( P_THIS, P_COND )                                   \
-    __vlc_cond_init( CAST_TO_VLC_OBJECT(P_THIS), P_COND )
+    __vlc_cond_init( VLC_OBJECT(P_THIS), P_COND )
 
 /*****************************************************************************
  * vlc_cond_signal: start a thread on condition completion
@@ -731,21 +731,21 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
  * vlc_thread_create: create a thread
  *****************************************************************************/
 #   define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, WAIT )                \
-        __vlc_thread_create( CAST_TO_VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, (void * ( * ) ( void * ))FUNC, WAIT )
+        __vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, (void * ( * ) ( void * ))FUNC, WAIT )
 
 /*****************************************************************************
  * vlc_thread_ready: tell the parent thread we were successfully spawned
  *****************************************************************************/
 #   define vlc_thread_ready( P_THIS )                                       \
-        __vlc_thread_ready( CAST_TO_VLC_OBJECT(P_THIS) )
+        __vlc_thread_ready( VLC_OBJECT(P_THIS) )
 
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits
  *****************************************************************************/
 #ifdef DEBUG
 #   define vlc_thread_join( P_THIS )                                        \
-        __vlc_thread_join( CAST_TO_VLC_OBJECT(P_THIS), __FILE__, __LINE__ ) 
+        __vlc_thread_join( VLC_OBJECT(P_THIS), __FILE__, __LINE__ ) 
 #else
 #   define vlc_thread_join( P_THIS )                                        \
-        __vlc_thread_join( CAST_TO_VLC_OBJECT(P_THIS), "(unknown)", 0 ) 
+        __vlc_thread_join( VLC_OBJECT(P_THIS), "(unknown)", 0 ) 
 #endif
