@@ -96,6 +96,12 @@
 				F51352810170659801A80A1F,
 				F51352820170659801A80A1F,
 				F52EEB2F017E3F8C01A80A1F,
+				F5C6804202B407B701B7B2C9,
+				F5C6804302B407B701B7B2C9,
+				F5C6804402B407B701B7B2C9,
+				F5C6804502B407B701B7B2C9,
+				F5C6804602B407B701B7B2C9,
+				F5C6804702B407B701B7B2C9,
 			);
 			isa = PBXGroup;
 			path = Resources;
@@ -204,12 +210,12 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>VOB</string>
+				<string>vob</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>vlc.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>VOB File (DVD)</string>
+			<string>VOB File (DVD Video)</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -222,7 +228,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>vlc.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>MPEG file</string>
+			<string>MPEG File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -230,12 +236,35 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>avi</string>
-				<string>asf</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>vlc.icns</string>
+			<string>divx.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>DivX</string>
+			<string>DivX File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>m1v</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg1.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-1 Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>m2v</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg2.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>MPEG-2 Video File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
@@ -255,11 +284,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.4.0</string>
+	<string>0.4.2</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleVersion</key>
-	<string>0.4.0</string>
+	<string>0.4.2</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -286,6 +315,12 @@
 				F52EEB2A017E3F0701A80A1F,
 				F52EEB2B017E3F0701A80A1F,
 				F52EEB30017E3F8C01A80A1F,
+				F5C6804802B407B701B7B2C9,
+				F5C6804902B407B701B7B2C9,
+				F5C6804A02B407B701B7B2C9,
+				F5C6804B02B407B701B7B2C9,
+				F5C6804C02B407B701B7B2C9,
+				F5C6804D02B407B701B7B2C9,
 			);
 			isa = PBXResourcesBuildPhase;
 			name = "Bundle Resources";
@@ -354,6 +389,72 @@
 		};
 		F52EEB30017E3F8C01A80A1F = {
 			fileRef = F52EEB2F017E3F8C01A80A1F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804202B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = divx.icns;
+			refType = 4;
+		};
+		F5C6804302B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = mpeg2.icns;
+			refType = 4;
+		};
+		F5C6804402B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = mpeg.icns;
+			refType = 4;
+		};
+		F5C6804502B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = generic.icns;
+			refType = 4;
+		};
+		F5C6804602B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = mpeg1.icns;
+			refType = 4;
+		};
+		F5C6804702B407B701B7B2C9 = {
+			isa = PBXFileReference;
+			path = mpeg4.icns;
+			refType = 4;
+		};
+		F5C6804802B407B701B7B2C9 = {
+			fileRef = F5C6804202B407B701B7B2C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804902B407B701B7B2C9 = {
+			fileRef = F5C6804302B407B701B7B2C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804A02B407B701B7B2C9 = {
+			fileRef = F5C6804402B407B701B7B2C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804B02B407B701B7B2C9 = {
+			fileRef = F5C6804502B407B701B7B2C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804C02B407B701B7B2C9 = {
+			fileRef = F5C6804602B407B701B7B2C9;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C6804D02B407B701B7B2C9 = {
+			fileRef = F5C6804702B407B701B7B2C9;
 			isa = PBXBuildFile;
 			settings = {
 			};
