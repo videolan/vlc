@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.9 2001/01/30 05:48:23 sam Exp $
+ * $Id: input_dvd.c,v 1.10 2001/01/30 19:19:02 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -338,7 +338,9 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     {
         lseek64( p_input->i_handle, i_pos & ~0x7FF, SEEK_SET );
         i_nb = read( p_input->i_handle, p_tmp, 0x800 );
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
         CSSDescrambleSector( p_method->css.p_title_key[0].key, p_tmp );
+#endif
         memcpy( p_buffer, p_tmp + (i_pos & 0x7FF ), i_len );
     }
     switch( i_nb )
