@@ -34,6 +34,10 @@
 
 #include "wxwindows.h"
 
+/* Callback prototype */
+static int PlaylistChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -43,16 +47,22 @@ enum
 {
     /* menu items */
     ButtonAdd_Event = wxID_HIGHEST + 1,
-    ButtonDel_Event
+    ButtonDel_Event,
+    ButtonClear_Event
 };
+
+DEFINE_LOCAL_EVENT_TYPE( wxEVT_BOOKMARKS );
 
 BEGIN_EVENT_TABLE(BookmarksDialog, wxFrame)
     /* Hide the window when the user closes the window */
     EVT_CLOSE(BookmarksDialog::OnClose )
     EVT_BUTTON( ButtonAdd_Event, BookmarksDialog::OnAdd )
     EVT_BUTTON( ButtonDel_Event, BookmarksDialog::OnDel )
+    EVT_BUTTON( ButtonClear_Event, BookmarksDialog::OnClear )
 
     EVT_LIST_ITEM_ACTIVATED( -1, BookmarksDialog::OnActivateItem )
+
+    EVT_COMMAND( -1, wxEVT_BOOKMARKS, BookmarksDialog::OnUpdate )
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -80,8 +90,11 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
         new wxButton( panel, ButtonAdd_Event, wxU(_("Add")) );
     wxButton *button_del =
         new wxButton( panel, ButtonDel_Event, wxU(_("Remove")) );
+    wxButton *button_clear =
+        new wxButton( panel, ButtonClear_Event, wxU(_("Clear")) );
     panel_sizer->Add( button_add, 0, wxEXPAND );
     panel_sizer->Add( button_del, 0, wxEXPAND );
+    panel_sizer->Add( button_clear, 0, wxEXPAND );
     panel->SetSizerAndFit( panel_sizer );
 
     list_ctrl = new wxListView( this, -1, wxDefaultPosition, wxDefaultSize,
@@ -95,10 +108,27 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     sizer->Add( panel, 0, wxEXPAND | wxALL, 5 );
     sizer->Add( list_ctrl, 1, wxEXPAND | wxALL, 5 );
     SetSizer( sizer );
+
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist )
+    {
+       /* Some global changes happened -> Rebuild all */
+       var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, this );
+    }
 }
 
 BookmarksDialog::~BookmarksDialog()
 {
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist )
+    {
+       /* Some global changes happened -> Rebuild all */
+       var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    }
 }
 
 /*****************************************************************************
@@ -115,6 +145,7 @@ void BookmarksDialog::Update()
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
 
+    list_ctrl->DeleteAllItems();
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
                        &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -122,7 +153,6 @@ void BookmarksDialog::Update()
         return;
     }
 
-    list_ctrl->DeleteAllItems();
     for( int i = 0; i < i_bookmarks; i++ )
     {
         list_ctrl->InsertItem( i, wxL2U( pp_bookmarks[i]->psz_name ) );
@@ -158,7 +188,7 @@ void BookmarksDialog::OnAdd( wxCommandEvent& event )
     var_Get( p_input, "position", &pos );
     bookmark.psz_name = NULL;
     bookmark.i_byte_offset =
-        (pos.f_float * p_input->stream.p_selected_area->i_size);
+      (int64_t)((double)pos.f_float * p_input->stream.p_selected_area->i_size);
     var_Get( p_input, "time", &pos );
     bookmark.i_time_offset = pos.i_time;
     input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
@@ -186,6 +216,20 @@ void BookmarksDialog::OnDel( wxCommandEvent& event )
     Update();
 }
 
+void BookmarksDialog::OnClear( wxCommandEvent& event )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( !p_input ) return;
+
+    input_Control( p_input, INPUT_CLEAR_BOOKMARKS );
+
+    vlc_object_release( p_input );
+
+    Update();
+}
+
 void BookmarksDialog::OnActivateItem( wxListEvent& event )
 {
     input_thread_t *p_input =
@@ -196,4 +240,25 @@ void BookmarksDialog::OnActivateItem( wxListEvent& event )
     input_Control( p_input, INPUT_SET_BOOKMARK, event.GetIndex() );
 
     vlc_object_release( p_input );
+}
+
+void BookmarksDialog::OnUpdate( wxCommandEvent &event )
+{
+    Update();
+}
+
+/*****************************************************************************
+ * PlaylistChanged: callback triggered by the intf-change playlist variable
+ *  We don't rebuild the playlist directly here because we don't want the
+ *  caller to block for a too long time.
+ *****************************************************************************/
+static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                            vlc_value_t oval, vlc_value_t nval, void *param )
+{
+    BookmarksDialog *p_dialog = (BookmarksDialog *)param;
+
+    wxCommandEvent bookmarks_event( wxEVT_BOOKMARKS, 0 );
+    p_dialog->AddPendingEvent( bookmarks_event );
+
+    return VLC_SUCCESS;
 }

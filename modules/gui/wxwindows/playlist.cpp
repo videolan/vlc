@@ -30,12 +30,12 @@
 #include "wxwindows.h"
 
 /* Callback prototype */
-int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param );
-int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param );
-int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int PlaylistChanged( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void * );
+static int PlaylistNext( vlc_object_t *, const char *,
+                         vlc_value_t, vlc_value_t, void * );
+static int ItemChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Event Table.
@@ -1229,8 +1229,8 @@ void Playlist::OnPlaylistEvent( wxCommandEvent& event )
  *  We don't rebuild the playlist directly here because we don't want the
  *  caller to block for a too long time.
  *****************************************************************************/
-int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                            vlc_value_t oval, vlc_value_t nval, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
     p_playlist_dialog->b_need_update = VLC_TRUE;
@@ -1240,15 +1240,15 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * Next: callback triggered by the playlist-current playlist variable
  *****************************************************************************/
-int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
-                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
+                         vlc_value_t oval, vlc_value_t nval, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
 
     wxCommandEvent event( wxEVT_PLAYLIST, UpdateItem_Event );
-    event.SetInt( old_val.i_int );
+    event.SetInt( oval.i_int );
     p_playlist_dialog->AddPendingEvent( event );
-    event.SetInt( new_val.i_int );
+    event.SetInt( nval.i_int );
     p_playlist_dialog->AddPendingEvent( event );
 
     return 0;
@@ -1257,8 +1257,8 @@ int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 /*****************************************************************************
  * ItemChanged: callback triggered by the item-change playlist variable
  *****************************************************************************/
-int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
-                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
 

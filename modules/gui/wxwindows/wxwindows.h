@@ -1018,7 +1018,9 @@ private:
     void OnClose( wxCommandEvent& event );
     void OnAdd( wxCommandEvent& event );
     void OnDel( wxCommandEvent& event );
+    void OnClear( wxCommandEvent& event );
     void OnActivateItem( wxListEvent& event );
+    void OnUpdate( wxCommandEvent &event );
 
     DECLARE_EVENT_TABLE();
 
