@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.27 2003/01/31 10:14:13 sam Exp $
+ * $Id: mixer.c,v 1.28 2003/11/24 21:47:33 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -189,8 +189,10 @@ static int MixBuffer( aout_instance_t * p_aout )
         }
 
         /* Check for the continuity of start_date */
-        while ( p_buffer != NULL && p_buffer->end_date < start_date )
+        while ( p_buffer != NULL && p_buffer->end_date < start_date - 1 )
         {
+            /* We authorize a +-1 because rounding errors get compensated
+             * regularly. */
             aout_buffer_t * p_next = p_buffer->p_next;
             msg_Warn( p_aout, "the mixer got a packet in the past ("I64Fd")",
                       start_date - p_buffer->end_date );
