@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.22 2003/05/22 12:00:57 gbazin Exp $
+ * $Id: vcd.c,v 1.23 2003/08/09 19:39:17 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -129,8 +129,8 @@ static int VCDOpen( vlc_object_t *p_this )
             i_chapter = (int)strtol( psz_parser, &psz_next, 10 );
         }
 
-        i_title = i_title ? i_title : 1;
-        i_chapter = i_chapter ? i_chapter : 1;
+        i_title = i_title > 0 ? i_title : 1;
+        i_chapter = i_chapter > 0 ? i_chapter : 1;
     }
 
     if( !*psz_source )
@@ -209,7 +209,7 @@ static int VCDOpen( vlc_object_t *p_this )
     p_input->stream.i_area_nb = 1;
 
 #define area p_input->stream.pp_areas
-    for( i = 1 ; i <= p_vcd->i_nb_tracks - 1 ; i++ )
+    for( i = 1 ; i < p_vcd->i_nb_tracks; i++ )
     {
         /* Titles are Program Chains */
         input_AddArea( p_input, i, 1 );
@@ -228,7 +228,7 @@ static int VCDOpen( vlc_object_t *p_this )
     }
 #undef area
 
-    p_area = p_input->stream.pp_areas[i_title];
+    p_area = p_input->stream.pp_areas[__MIN(i_title,p_vcd->i_nb_tracks -1)];
 
     p_vcd->b_valid_ep = 1;
     if( VCDEntryPoints( p_input ) < 0 )
