@@ -2,7 +2,7 @@
  * vout_intf.c : video output interface
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: video_output.c 6961 2004-03-05 17:34:23Z sam $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -32,6 +32,8 @@
 #include "video_output.h"
 #include "vlc_interface.h"
 
+#include <vlc/input.h>                                 /* for input_thread_t */
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -41,6 +43,8 @@ static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
+static int FullscreenCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
@@ -177,6 +181,18 @@ void vout_IntfInit( vout_thread_t *p_vout )
     text.psz_string = _("Always on top");
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
+
+    /* Add a fullscreen variable */
+    var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
+    text.psz_string = _("Fullscreen");
+    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "fullscreen", VLC_VAR_INHERITVALUE, &val, NULL );
+    if( val.b_bool )
+    {
+        /* user requested fullscreen */
+        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    }
+    var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 }
 
 /*****************************************************************************
@@ -195,5 +211,42 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
+    return VLC_SUCCESS;
+}
+
+static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    input_thread_t *p_input;
+    vlc_value_t val;
+
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
+    if( p_input )
+    {
+        /* Modify input as well because the vout might have to be restarted */
+        var_Create( p_input, "fullscreen", VLC_VAR_BOOL );
+        var_Set( p_input, "fullscreen", newval );
+
+        vlc_object_release( p_input );
+    }
+
+    /* Disable "always on top" in fullscreen mode */
+    var_Get( p_vout, "video-on-top", &val );
+    if( newval.b_bool && val.b_bool )
+    {
+        val.b_bool = VLC_FALSE;
+        vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, val.b_bool );
+    }
+    else if( !newval.b_bool && val.b_bool )
+    {
+        vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, val.b_bool );
+    }
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
