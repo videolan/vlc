@@ -2748,6 +2748,18 @@ then
 fi
 
 dnl
+dnl  GLX module
+dnl
+AC_ARG_ENABLE(glx,
+  [  --enable-glx            X11 OpenGL (GLX) support (default disabled)])
+if test "${enable_glx}" = "yes"
+then
+  VLC_ADD_PLUGINS([glx])
+  VLC_ADD_LDFLAGS([glx],[-lGL -lGLU])
+fi
+
+
+dnl
 dnl  AA plugin
 dnl
 AC_ARG_ENABLE(aa,

@@ -115,7 +115,7 @@ double **origrad;
 double **origx;  //original mesh
 double **origy;
 
-
+char *buffer; //XXX
 
 int galaktos_init( galaktos_thread_t *p_thread )
 {
@@ -127,8 +127,8 @@ int galaktos_init( galaktos_thread_t *p_thread )
     initPresetLoader();
 
     /* Load default preset directory */
-    loadPresetDir("/home/cyril/.vlc/galaktos");
-//    loadPresetDir("/etc/projectM/presets");
+//    loadPresetDir("/home/cyril/.vlc/galaktos");
+    loadPresetDir("/etc/projectM/presets");
 
     initPCM(maxsamples);
     initBeatDetect();

@@ -31,6 +31,7 @@ MKV mkv
 MOD mod
 X11 x11
 XVIDEO xvideo
+GLX glx
 FB fb
 MGA mga
 SDL sdl

@@ -92,6 +92,7 @@ comment 'Video plugins'
 if [ "$CONFIG_LINUX" = "y" ]; then
    bool 'X11 support' CONFIG_X11
    bool 'XVideo support' CONFIG_XVIDEO
+   bool 'GLX support' CONFIG_GLX
    bool 'Linux framebuffer support' CONFIG_FB
    bool 'Linux kernel Matrox support' CONFIG_MGA
 fi

@@ -38,6 +38,8 @@
 
 extern int texsize;
 
+extern char *buffer;
+
 
 void setup_opengl( int w, int h )
 {
@@ -118,6 +120,7 @@ void CreateRenderTarget(int texsize,int *RenderTargetTextureID, int *RenderTarge
         /* We can fake a render target in this demo by rendering to the
          * screen and copying to a texture before we do normal rendering.
          */
+    buffer = malloc(3*texsize*texsize);
 
         glBindTexture(GL_TEXTURE_2D, *RenderTargetTextureID);
         glTexImage2D(GL_TEXTURE_2D,
@@ -127,7 +130,7 @@ void CreateRenderTarget(int texsize,int *RenderTargetTextureID, int *RenderTarge
 			0,
 			GL_RGB,
 			GL_UNSIGNED_BYTE,
-			0);
+			buffer);
  //   }
 
 }
