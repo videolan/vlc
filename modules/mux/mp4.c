@@ -697,7 +697,7 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
         last[2] = ( i_size >>  8 )&0xff;
         last[3] = ( i_size       )&0xff;
 
-        if( last[4] == 7 && tk->avc.i_sps <= 0 )  /* SPS */
+        if( (last[4]&0x1f) == 7 && tk->avc.i_sps <= 0 )  /* SPS */
         {
             tk->avc.i_sps = i_size;
             tk->avc.sps = malloc( i_size );
@@ -706,7 +706,7 @@ static void ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_block )
             tk->avc.i_profile = tk->avc.sps[1];
             tk->avc.i_level   = tk->avc.sps[3];
         }
-        else if( last[4] == 8 && tk->avc.i_pps <= 0 )   /* PPS */
+        else if( (last[4]&0x1f) == 8 && tk->avc.i_pps <= 0 )   /* PPS */
         {
             tk->avc.i_pps = i_size;
             tk->avc.pps = malloc( i_size );
