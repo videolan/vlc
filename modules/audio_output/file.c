@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.17 2003/03/10 00:04:14 massiot Exp $
+ * $Id: file.c,v 1.18 2003/03/30 14:09:59 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -108,7 +108,7 @@ vlc_module_begin();
     add_category_hint( N_("Audio"), NULL, VLC_FALSE );
     add_string_from_list( "audiofile-format", "s16", format_list, NULL,
                           FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
-    add_string( "audiofile-path", "audiofile.wav", NULL, PATH_TEXT,
+    add_file( "audiofile-path", "audiofile.wav", NULL, PATH_TEXT,
                 PATH_LONGTEXT, VLC_FALSE );
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );
     set_description( N_("file audio output module") );
