@@ -572,7 +572,7 @@ public:
     matroska_segment_t *FindSegment( EbmlBinary & uid ) const;
     void PreloadFamily( demux_t *p_demux );
     void PreloadLinked( demux_t *p_demux );
-    bool AnalyseAllSegmentsFound( EbmlStream *p_estream, const matroska_segment_t *p_segment );
+    bool AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
 
 static int  Demux  ( demux_t * );
@@ -680,7 +680,7 @@ static int Open( vlc_object_t * p_this )
     p_segment->Preload( p_demux );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-    /* _todo_ handle multi-segment files */
+    /* TODO handle multi-segment files */
     if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
     {
         // assume it's a regular file
@@ -710,7 +710,7 @@ static int Open( vlc_object_t * p_this )
                     s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
 
                     if (!s_filename.compare(p_demux->psz_path))
-                        continue;
+                        continue; // don't reuse the original opened file
 
 #if defined(__GNUC__) && (__GNUC__ < 3)
                     if (!s_filename.compare("mkv", s_filename.length() - 3, 3) || 
@@ -724,8 +724,9 @@ static int Open( vlc_object_t * p_this )
                         StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
                         EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
-                        if ( !p_sys->AnalyseAllSegmentsFound( p_estream, p_segment ))
+                        if ( !p_sys->AnalyseAllSegmentsFound( p_estream ))
                         {
+                            msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
                             delete p_estream;
                             delete p_file_io;
                         }
@@ -1403,12 +1404,13 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-bool demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, const matroska_segment_t *p_segment )
+bool demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
 {
 return false;
     int i_upper_lvl = 0;
     size_t i;
     EbmlElement *p_l0, *p_l1, *p_l2;
+    bool b_keep_stream = false, b_keep_segment;
 
     // verify the EBML Header
     p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
@@ -1417,8 +1419,7 @@ return false;
         return false;
     }
 
-    matroska_stream_t  *p_stream1 = new matroska_stream_t( this );
-    streams.push_back( p_stream1 );
+    matroska_stream_t *p_stream1 = new matroska_stream_t( this );
 
     p_l0->SkipData(*p_estream, EbmlHead_Context);
     delete p_l0;
@@ -1427,6 +1428,7 @@ return false;
     p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
     if (p_l0 == NULL)
     {
+        delete p_stream1;
         return false;
     }
 
@@ -1436,8 +1438,7 @@ return false;
         {
             EbmlParser  *ep;
             matroska_segment_t *p_segment1 = new matroska_segment_t( this );
-
-            p_stream1->segments.push_back( p_segment1 );
+            b_keep_segment = false;
 
             ep = new EbmlParser(p_estream, p_l0);
             p_segment1->ep = ep;
@@ -1457,8 +1458,9 @@ return false;
                         if( MKV_IS_ID( l, KaxSegmentUID ) )
                         {
                             KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
-                            if (p_segment && p_segment->segment_uid == *p_uid)
-                                break;
+                            b_keep_segment = (FindSegment( *p_uid ) == NULL);
+                            if ( !b_keep_segment )
+                                break; // this segment is already known
                             p_segment1->segment_uid = *( new KaxSegmentUID(*p_uid) );
                         }
                         else if( MKV_IS_ID( l, KaxPrevUID ) )
@@ -1479,6 +1481,13 @@ return false;
                     break;
                 }
             }
+            if ( b_keep_segment )
+            {
+                b_keep_stream = true;
+                p_stream1->segments.push_back( p_segment1 );
+            }
+            else
+                delete p_segment1;
         }
 
         p_l0->SkipData(*p_estream, EbmlHead_Context);
@@ -1486,7 +1495,12 @@ return false;
         p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
     }
 
-    return true;
+    if ( b_keep_stream )
+        streams.push_back( p_stream1 );
+    else
+        delete p_stream1;
+
+    return b_keep_stream;
 }
 
 static void UpdateCurrentToChapter( demux_t & demux )
