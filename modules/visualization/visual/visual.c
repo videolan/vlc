@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.7 2003/09/14 16:41:48 zorglub Exp $
+ * $Id: visual.c,v 1.8 2003/09/19 21:53:32 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -292,7 +292,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     /* We can now call our visualization effects */
     p_current_effect = p_filter->p_sys->p_first_effect;
 
-    while( p_current_effect )  
+    while( p_current_effect && p_current_effect->psz_func )  
     {
 
         if( !strcasecmp( p_current_effect->psz_func, "dummy" ) )
