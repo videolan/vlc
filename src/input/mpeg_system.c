@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.49 2001/04/12 03:26:53 stef Exp $
+ * $Id: mpeg_system.c,v 1.50 2001/04/13 01:49:22 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1169,8 +1169,8 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
          * (see ISO/IEC 13818 (2.4.4.2) which should be set to 0x00 */
         if( (u8)p[0] != 0x00 )
         {
-        /*    intf_WarnMsg( 2, */
-            intf_ErrMsg( "Non zero pointer field found. Trying to continue" );
+            intf_WarnMsg( 2, 
+                          "Non zero pointer field found. Trying to continue" );
             p+=(u8)p[0];
         }
         else
@@ -1180,7 +1180,7 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
 
         if( ((u8)(p[1]) & 0xc0) != 0x80 ) 
         {
-            intf_ErrMsg( "Invalid PSI packet" );
+            intf_WarnMsg( 2, "Invalid PSI packet" );
             p_psi->b_trash = 1;
         }
         else 
@@ -1271,7 +1271,7 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                 input_DecodePMT( p_input, p_es );
                 break;
             default:
-                intf_ErrMsg("Received unknown PSI in demuxPSI");
+                intf_WarnMsg(2, "Received unknown PSI in demuxPSI");
         }
     }
 #undef p_psi    
@@ -1299,7 +1299,7 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         /* PAT has changed. We are going to delete all programms and 
          * create new ones. We chose not to only change what was needed
          * as a PAT change may mean the stream is radically changing and
-         * this is a secure method to avoid krashed */
+         * this is a secure method to avoid krashes */
         pgrm_descriptor_t * p_pgrm;
         es_descriptor_t   * p_current_es;
         es_ts_data_t      * p_es_demux;
@@ -1367,7 +1367,7 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
  * DecodePMT : decode a given Program Stream Map
  * ***************************************************************************
  * When the PMT changes, it may mean a deep change in the stream, and it is
- * careful to deletes the ES and add them again. If the PMT doesn't change,
+ * careful to delete the ES and add them again. If the PMT doesn't change,
  * there no need to do anything.
  *****************************************************************************/
 static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
@@ -1389,15 +1389,52 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         int                 i_section_length,i_current_section;
         int                 i_prog_info_length, i_loop;
         int                 i_es_info_length, i_pid, i_stream_type;
+        int                 i_audio_es, i_spu_es;
+        int                 i_required_audio_es, i_required_spu_es;
         
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
         
         p_pgrm_data->i_pcr_pid = U16_AT(p_current_section + 8) & 0x1fff;
         
+        i_audio_es = 0;
+        i_spu_es = 0;
+        
         /* Lock stream information */
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
+        /* Get the number of the required audio stream */
+        if( p_main->b_audio )
+        {
+            /* Default is the first one */
+            i_required_audio_es = main_GetIntVariable( INPUT_CHANNEL_VAR, 1 );
+            if( i_required_audio_es < 0 )
+            {
+                main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+                i_required_audio_es = 1;
+            }
+        }
+        else
+        {
+            i_required_audio_es = 0;
+        }
+
+        /* Same thing for subtitles */
+        if( p_main->b_video )
+        {
+            /* for spu, default is none */
+            i_required_spu_es = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
+            if( i_required_spu_es < 0 )
+            {
+                main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
+                i_required_spu_es = 0;
+            }
+        }
+        else
+        {
+            i_required_spu_es = 0;
+        }
+        
         /* Delete all ES in this program  except the PSI */
         for( i_loop=0; i_loop < p_es->p_pgrm->i_es_number; i_loop++ )
         {
@@ -1429,10 +1466,40 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                 /* Add this ES to the program */
                 p_new_es = input_AddES( p_input, p_es->p_pgrm, 
                                         (u16)i_pid, sizeof( es_ts_data_t ) );
+
+                /* Tell the decoders what kind of stream it is */
                 p_new_es->i_type = i_stream_type;
+
+                /* Tell the interface what kind of stream it is and select 
+                 * the required ones */
+                switch( i_stream_type )
+                {
+                    case MPEG1_VIDEO_ES:
+                    case MPEG2_VIDEO_ES:
+                        p_new_es->i_cat = VIDEO_ES;
+                        input_SelectES( p_input, p_new_es );
+                        break;
+                    case MPEG1_AUDIO_ES:
+                    case MPEG2_AUDIO_ES:
+                    case AC3_AUDIO_ES :
+                    case LPCM_AUDIO_ES :
+                        p_new_es->i_cat = AUDIO_ES;
+                        i_audio_es += 1;
+                        if( i_audio_es == i_required_audio_es )
+                            input_SelectES( p_input, p_new_es );
+                        break;
+                    /* Not sure this one is fully norm-compliant */
+                    case DVD_SPU_ES :
+                        p_new_es->i_cat = SPU_ES;
+                        i_spu_es += 1;
+                        if( i_spu_es == i_required_spu_es )
+                            input_SelectES( p_input, p_new_es );
+                        break;
+                    default :
+                        p_new_es->i_cat = UNKNOWN_ES;
+                        break;
+                }
                 
-                /* We want to decode */
-                input_SelectES( p_input, p_new_es );
                 p_current_data += 5 + i_es_info_length;
             }
 
@@ -1443,6 +1510,12 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             
         } while( i_current_section < p_psi->i_last_section_number );
 
+        if( i_required_audio_es > i_audio_es )
+            intf_WarnMsg( 2, "TS input: Non-existing audio es required." );
+        
+        if( i_required_spu_es > i_spu_es )
+            intf_WarnMsg( 2, "TS input: Non-existing subtitles es required." );
+        
         p_pgrm_data->i_pmt_version = p_psi->i_version_number;
 
         /* inform interface that stream has changed */

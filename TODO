@@ -199,7 +199,7 @@ Description: Make aout eat less CPU
  When the vlc is launched without a stream, the audio_output thread
  eats all memory, probably because there is no msleep() when no data
  is available in the audio_output queue.
-Status: Done one doesn't know when by some unknown stranger
+Status: Done (henri)
 
 Task: 0x37
 Difficulty: Guru

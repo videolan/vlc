@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.28 2001/04/12 03:26:53 stef Exp $
+ * $Id: intf_gnome.c,v 1.29 2001/04/13 01:49:22 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -351,11 +351,13 @@ static gint GnomeManage( gpointer p_data )
         char            psz_title[3];
         char            psz_chapter[3];
 
+        /* Used by TS input when PMT changes */
         if( p_intf->p_input->stream.b_changed )
         {
             p_intf->p_sys->b_menus_update = 1;
             p_intf->p_input->stream.b_changed = 0;
-fprintf( stderr, "########changed interface##########\n" );
+            intf_WarnMsg( 2, 
+                          "Interface menus refreshed as stream has changed" );
         }
 
 #define p_area p_intf->p_input->stream.p_selected_area

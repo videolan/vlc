@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.43 2001/04/12 02:40:09 stef Exp $
+ * $Id: input_dvd.c,v 1.44 2001/04/13 01:49:22 henri Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -759,7 +759,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             i_spu = main_GetIntVariable( INPUT_SUBTITLE_VAR, 0 );
             if( i_spu < 0 || i_spu > vts.manager_inf.i_spu_nb )
             {
-                main_PutIntVariable( INPUT_CHANNEL_VAR, 1 );
+                main_PutIntVariable( INPUT_SUBTITLE_VAR, 0 );
                 i_spu = 0;
             }
             if( i_spu > 0 && vts.manager_inf.i_spu_nb > 0 )
