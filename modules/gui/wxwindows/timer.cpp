@@ -49,6 +49,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    b_init = 0;
     i_old_playing_status = PAUSE_S;
     i_old_rate = INPUT_RATE_DEFAULT;
 
@@ -90,6 +91,14 @@ Timer::~Timer()
  *****************************************************************************/
 void Timer::Notify()
 {
+#if defined( __WXMSW__ ) /* Work-around a bug with accelerators */
+    if( !b_init )
+    {
+        p_main_interface->Init();
+        b_init = VLC_TRUE;
+    }
+#endif
+
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */

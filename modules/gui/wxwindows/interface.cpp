@@ -279,6 +279,12 @@ Interface::~Interface()
     delete timer;
 }
 
+void Interface::Init()
+{
+    /* Misc init */
+    SetupHotkeys();
+}
+
 void Interface::Update()
 {
     /* Misc updates */

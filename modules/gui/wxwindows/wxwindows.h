@@ -181,6 +181,7 @@ public:
 private:
     intf_thread_t *p_intf;
     Interface *p_main_interface;
+    vlc_bool_t b_init;
     int i_old_playing_status;
     int i_old_rate;
     vlc_bool_t b_old_seekable;
@@ -291,6 +292,7 @@ public:
     /* Constructor */
     Interface( intf_thread_t *p_intf );
     virtual ~Interface();
+    void Init();
     void TogglePlayButton( int i_playing_status );
     void Update();
 
