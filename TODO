@@ -114,7 +114,6 @@ Think playlist within playlist, directory structures, SAP section, TV channels l
 50% done.<br />
 Todo:<br />
 - Core support<br />
-   - *** Fix meta-information (author and duration)<br />
    - *** Improve random mode and fix loop<br />
    - *   "Name finder"<br />
    - *   "Protocol rollover" node<br />
@@ -123,8 +122,6 @@ Todo:<br />
 - Helper modules<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />
-   - **  Adapt CDDAX<br />
-   - **  Fix MP4, LIVE.COM<br />
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
    - *** Investigate bug with wxImageList<br />
