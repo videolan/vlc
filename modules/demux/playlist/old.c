@@ -2,7 +2,7 @@
  * old.c : Old playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: old.c,v 1.2 2004/01/25 20:05:29 hartman Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -27,6 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 #include <vlc/intf.h>
 
 #include <errno.h>                                                 /* ENOMEM */

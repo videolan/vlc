@@ -1,6 +1,6 @@
 SOURCES_mpeg_system = system.c system.h
 SOURCES_m4v = m4v.c
-SOURCES_ps = ps.c
+SOURCES_ps_old = ps.c
 SOURCES_ts_old = ts.c
 SOURCES_ts_old_dvbpsi = ts.c
 SOURCES_mpga = mpga.c

@@ -28,6 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 #include <vlc/intf.h>
 
 #include <errno.h>                                                 /* ENOMEM */

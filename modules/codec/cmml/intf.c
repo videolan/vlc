@@ -33,14 +33,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 
 #include <osd.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
 
 #include "vlc_keys.h"
 

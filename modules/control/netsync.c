@@ -334,8 +334,12 @@ static mtime_t GetClockRef( intf_thread_t *p_intf, mtime_t i_pts )
 
     if( !p_input ) return 0;
 
+#if 0
     p_pgrm = p_input->stream.p_selected_program;
     if( p_pgrm ) return input_ClockGetTS( p_input, p_pgrm, i_pts );
+#else
+#warning "This code is currently broken. FIXME!!!"
+#endif
 
     return 0;
 }

@@ -893,7 +893,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
-AX_ADD_PLUGINS([mpgv mpga m4v h264 ps ps2 pva avi asf aac mp4 rawdv nsv real aiff mjpeg])
+AX_ADD_PLUGINS([mpgv mpga m4v h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -902,7 +902,7 @@ AX_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
 AX_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 AX_ADD_PLUGINS([aout_file])
 AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-AX_ADD_PLUGINS([id3 m3u playlist export sgimb])
+AX_ADD_PLUGINS([m3u playlist export sgimb])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxsub adpcm a52sys dtssys au])
 AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
@@ -1837,12 +1837,12 @@ then
 fi
 
 dnl
-dnl   libid3tag support
+dnl   libid3tag support (FIXME!!! doesn't work with new input)
 dnl
-AC_CHECK_HEADERS(id3tag.h, [
-  AC_CHECK_HEADERS(zlib.h, [
-    AX_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
-    AX_ADD_PLUGINS([id3tag])]) ])
+dnl AC_CHECK_HEADERS(id3tag.h, [
+dnl   AC_CHECK_HEADERS(zlib.h, [
+dnl     AX_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
+dnl     AX_ADD_PLUGINS([id3tag])]) ])
 
 dnl
 dnl  ffmpeg decoder/demuxer plugin
@@ -3512,8 +3512,8 @@ dnl
 dnl  SLP access plugin
 dnl
 AC_ARG_ENABLE(slp,
-  [  --enable-slp            SLP service discovery support (default enabled)])
-if test "${enable_slp}" != "no"
+  [  --enable-slp            SLP service discovery support (default disabled)])
+if test "${enable_slp}" = "yes"
 then
   AC_ARG_WITH(slp,
   [    --with-slp=PATH       libslp headers and libraries])
