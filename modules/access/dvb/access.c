@@ -78,21 +78,27 @@ int E_(Open) ( vlc_object_t *p_this )
     char *              psz_parser;
     char *              psz_next;
     int                 i_fd = 0;
-		unsigned int				u_adapter = 1;
-		unsigned int				u_device = 0;
+    unsigned int        u_adapter = 1;
+    unsigned int        u_device = 0;
     unsigned int        u_freq = 0;
     unsigned int        u_srate = 0;
-    vlc_bool_t          b_polarisation = 0;
-    int                 i_fec = 0;
-    fe_code_rate_t      fe_fec = FEC_NONE;
-    vlc_bool_t          b_diseqc;
-    vlc_bool_t					b_probe;
     int                 i_lnb_lof1;
     int                 i_lnb_lof2;
     int                 i_lnb_slof;
-		char 								dvr[] = DVR;
-		char 								frontend[] = FRONTEND;
-		int									i_len = 0;
+    int                 i_bandwidth = 0;
+    int                 i_modulation = 0;
+    int                 i_guard = 0;
+    int                 i_transmission = 0;
+    int                 i_hierarchy = 0;
+    vlc_bool_t          b_polarisation = 0;
+    int                 i_fec = 0;
+    int                 i_code_rate_HP = 0;
+    int                 i_code_rate_LP = 0;
+    vlc_bool_t          b_diseqc;
+    vlc_bool_t          b_probe;
+    char                dvr[] = DVR;
+    char                frontend[] = FRONTEND;
+    int                 i_len = 0;
 
     /* parse the options passed in command line : */
     psz_parser = strdup( p_input->psz_name );
@@ -105,42 +111,44 @@ int E_(Open) ( vlc_object_t *p_this )
     // Get adapter and device number to use for this dvb card
     u_adapter = config_GetInt( p_input, "adapter" );
     u_device  = config_GetInt( p_input, "device" );
-
+  
     /* Determine frontend device information and capabilities */
     b_probe = config_GetInt( p_input, "probe" );
     if (b_probe)
-	  {
+    {
         if ( ioctl_InfoFrontend(p_input, &frontend_info, u_adapter, u_device) < 0 )
         {
-          	msg_Err( p_input, "(access) cannot determine frontend info" );
+            msg_Err( p_input, "(access) cannot determine frontend info" );
             return -1;
         }
-        if (frontend_info.type != FE_QPSK)
+    }
+    else /* no frontend probing is done so use default border values. */
+    {
+        msg_Dbg( p_input, "using default bvalues for frontend info" );
+        i_len = sizeof(FRONTEND);
+        if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
         {
-            msg_Err( p_input, "frontend not of type satellite" );
-            return -1;
+            msg_Err( p_input, "snprintf() truncated string for FRONTEND" );
+            frontend[sizeof(FRONTEND)] = '\0';
         }
-    }
-	  else /* no frontend probing is done so use default values. */
-		{
-			  int i_len;
-			  
-			  msg_Dbg( p_input, "using default values for frontend info" );
-	   	  i_len = sizeof(FRONTEND);
-     		if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
-     		{
-     		  msg_Err( p_input, "snprintf() truncated string for FRONTEND" );
-     			frontend[sizeof(FRONTEND)] = '\0';
-        }
-			  strncpy(frontend_info.name, frontend, 128);
-			  frontend_info.type = FE_QPSK;
-    	  frontend_info.frequency_max = 12999;
-        frontend_info.frequency_min = 10000;
-				frontend_info.symbol_rate_max = 30000;
-        frontend_info.symbol_rate_min = 1000;
-				/* b_polarisation */
-    }
+        strncpy(frontend_info.name, frontend, 128);
 
+        msg_Dbg(p_input, "method of access is %s", p_input->psz_access);
+        
+        frontend_info.type = FE_QPSK;
+        if (strncmp( p_input->psz_access, "qpsk",4 ) ==0)
+            frontend_info.type = FE_QPSK;
+        else if (strncmp( p_input->psz_access, "cable",5 ) ==0)
+            frontend_info.type = FE_QAM;
+        else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
+            frontend_info.type = FE_OFDM;
+
+        frontend_info.frequency_max = 12999;
+        frontend_info.frequency_min = 10000;
+        frontend_info.symbol_rate_max = 30000;
+        frontend_info.symbol_rate_min = 1000;
+    }
+    
     /* Register Callback functions */
     p_input->pf_read = SatelliteRead;
     p_input->pf_set_program = SatelliteSetProgram;
@@ -164,10 +172,11 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
+    /* Validating input values */
     if ( ((u_freq) > frontend_info.frequency_max) ||
          ((u_freq) < frontend_info.frequency_min) )
     {
-        msg_Warn( p_input, "invalid frequency %d, using default one", u_freq );
+        msg_Warn( p_input, "invalid frequency %d (kHz), using default one", u_freq );
         u_freq = config_GetInt( p_input, "frequency" );
         if ( ((u_freq) > frontend_info.frequency_max) ||
              ((u_freq) < frontend_info.frequency_min) )
@@ -212,57 +221,58 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    switch( i_fec )
-    {
-        case 1:
-            fe_fec = FEC_1_2;
-            break;
-        case 2:
-            fe_fec = FEC_2_3;
-            break;
-        case 3:
-            fe_fec = FEC_3_4;
-            break;
-        case 4:
-            fe_fec = FEC_4_5;
-            break;
-        case 5:
-            fe_fec = FEC_5_6;
-            break;
-        case 6:
-            fe_fec = FEC_6_7;
-            break;
-        case 7:
-            fe_fec = FEC_7_8;
-            break;
-        case 8:
-            fe_fec = FEC_8_9;
-            break;
-        case 9:
-            fe_fec = FEC_AUTO;
-            break;
-        default:
-            /* cannot happen */
-            fe_fec = FEC_NONE;
-            msg_Err( p_input, "invalid FEC (unknown)" );
-            break;
-    }
+    /* Get antenna configuration options */
+    b_diseqc = config_GetInt( p_input, "diseqc" );
+    i_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
+    i_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
+    i_lnb_slof = config_GetInt( p_input, "lnb-slof" );
 
+    /* Setting frontend parameters for tuning the hardware */      
     switch( frontend_info.type )
     {
-       	case FE_QPSK:
+        /* DVB-S: satellite and budget cards (nova) */
+        case FE_QPSK:
             fep.frequency = u_freq * 1000;
-            fep.inversion = INVERSION_AUTO;
-       	    fep.u.qpsk.symbol_rate = u_srate * 1000;
-       	    fep.u.qpsk.fec_inner = fe_fec;
-       	    msg_Dbg( p_input, "satellite frontend found on %s", frontend_info.name );
+            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.u.qpsk.symbol_rate = u_srate * 1000;
+            fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
+            msg_Dbg( p_input, "satellite (QPSK) frontend found on %s", frontend_info.name );
             break;
-       	case FE_QAM:
-       	    msg_Dbg( p_input, "cable frontend found on %s", frontend_info.name );
+            
+        /* DVB-C */
+        case FE_QAM:
+            i_modulation  = config_GetInt(p_input, "modulation");
+
+            fep.frequency = u_freq * 1000;
+            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.u.qam.symbol_rate = u_srate * 1000;
+            fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
+            fep.u.qam.modulation = dvb_DecodeModulation(p_input, i_modulation); 
+            msg_Dbg( p_input, "cable (QAM) frontend found on %s", frontend_info.name );
             break;
+
+        /* DVB-T */
         case FE_OFDM:
-            msg_Dbg( p_input, "terrestrial frontend found on %s", frontend_info.name );
+            i_bandwidth = config_GetInt( p_input, "bandwidth");
+            i_code_rate_HP = config_GetInt(p_input, "code-rate-hp");
+            i_code_rate_LP = config_GetInt(p_input, "code-rate-lp");
+            i_modulation  = config_GetInt(p_input, "modulation");
+            i_transmission = config_GetInt(p_input, "transmission");
+            i_guard = config_GetInt(p_input, "guard");
+            i_hierarchy = config_GetInt(p_input, "hierarchy");
+            
+            fep.frequency = u_freq * 1000;
+            fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
+            fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);
+            fep.u.ofdm.code_rate_HP = dvb_DecodeFEC(p_input, i_code_rate_HP); 
+            fep.u.ofdm.code_rate_LP = dvb_DecodeFEC(p_input, i_code_rate_LP);
+            fep.u.ofdm.constellation = dvb_DecodeModulation(p_input, i_modulation); 
+            fep.u.ofdm.transmission_mode = dvb_DecodeTransmission(p_input, i_transmission);
+            fep.u.ofdm.guard_interval = dvb_DecodeGuardInterval(p_input, i_guard);
+            fep.u.ofdm.hierarchy_information = dvb_DecodeHierarchy(p_input, i_hierarchy);
+            msg_Dbg( p_input, "terrestrial (OFDM) frontend found on %s", frontend_info.name );
             break;
+
         default:
             msg_Err( p_input, "Could not determine frontend type on %s", frontend_info.name );
             return -1;
@@ -280,11 +290,11 @@ int E_(Open) ( vlc_object_t *p_this )
     p_input->p_access_data = (void *)p_satellite;
 
     /* Open the DVR device */
-	  i_len = sizeof(DVR);
-		if (snprintf(dvr, sizeof(DVR), DVR, u_adapter, u_device) >= i_len)
-		{
-		  msg_Err( p_input, "snprintf() truncated string for DVR" );
-			dvr[sizeof(DVR)] = '\0';
+    i_len = sizeof(DVR);
+    if (snprintf(dvr, sizeof(DVR), DVR, u_adapter, u_device) >= i_len)
+    {
+        msg_Err( p_input, "snprintf() truncated string for DVR" );
+        dvr[sizeof(DVR)] = '\0';
     }
     msg_Dbg( p_input, "opening DVR device '%s'", dvr );
 
@@ -300,17 +310,8 @@ int E_(Open) ( vlc_object_t *p_this )
         return -1;
     }
 
-    /* Get antenna configuration options */
-    b_diseqc = config_GetInt( p_input, "diseqc" );
-    i_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
-    i_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
-    i_lnb_slof = config_GetInt( p_input, "lnb-slof" );
-
     /* Initialize the Satellite Card */
-    msg_Dbg( p_input, "initializing Sat Card with Freq: %u, Pol: %d, "
-                      "FEC: %d, Srate: %u", u_freq, b_polarisation, fe_fec, u_srate );
-
-    switch (ioctl_SetQPSKFrontend (p_input, fep, b_polarisation, u_adapter, u_device ))
+    switch (ioctl_SetFrontend (p_input, fep, b_polarisation, u_adapter, u_device ))
     {
         case -2:
             msg_Err( p_input, "frontend returned an unexpected event" );
@@ -413,8 +414,8 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     ssize_t i_ret;
-		unsigned int				u_adapter = 1;
-		unsigned int			  u_device = 0;
+    unsigned int u_adapter = 1;
+    unsigned int u_device = 0;
     unsigned int i;
 
     // Get adapter and device number to use for this dvb card
@@ -460,11 +461,14 @@ static int SatelliteSetArea( input_thread_t * p_input, input_area_t * p_area )
  *                 and makes the appropriate changes to stream structure.
  *****************************************************************************/
 int SatelliteSetProgram( input_thread_t    * p_input,
-											   pgrm_descriptor_t * p_new_prg )
+                         pgrm_descriptor_t * p_new_prg )
 {
     unsigned int i_es_index;
-		unsigned int u_adapter = 1;
-		unsigned int u_device = 0;
+    vlc_value_t val;
+    unsigned int u_adapter = 1;
+    unsigned int u_device = 0;
+    unsigned int u_video_type = 1; /* default video type */
+    unsigned int u_audio_type = 2; /* default audio type */
 
     // Get adapter and device number to use for this dvb card
     u_adapter = config_GetInt( p_input, "adapter" );
@@ -497,17 +501,22 @@ int SatelliteSetProgram( input_thread_t    * p_input,
         {
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
+            case MPEG2_MOTO_VIDEO_ES:
                 if ( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 1, u_adapter, u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_video_type,
+                                       u_adapter, u_device);
+                    u_video_type += 3;
                 }
                 break;
             case MPEG1_AUDIO_ES:
             case MPEG2_AUDIO_ES:
                 if ( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 2, u_adapter, u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_audio_type,
+                                       u_adapter, u_device);
                     input_SelectES( p_input , p_es );
+                    u_audio_type += 3;
                 }
                 break;
             default:
@@ -519,6 +528,10 @@ int SatelliteSetProgram( input_thread_t    * p_input,
     }
 
     p_input->stream.p_selected_program = p_new_prg;
+
+    /* Update the navigation variables without triggering a callback */
+    val.i_int = p_new_prg->i_number;
+    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
 
     return 0;
 }

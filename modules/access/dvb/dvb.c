@@ -55,59 +55,59 @@
 
 struct diseqc_cmd_t
 {
-	struct dvb_diseqc_master_cmd cmd;
-	uint32_t wait;
+    struct dvb_diseqc_master_cmd cmd;
+    uint32_t wait;
 };
 
 struct diseqc_cmd_t switch_cmds[] =
 {
-	{ { { 0xe0, 0x10, 0x38, 0xf0, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf2, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf1, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf3, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf4, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf6, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf5, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf7, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf8, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xfa, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xf9, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xfb, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xfc, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xfe, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xfd, 0x00, 0x00 }, 4 }, 0 },
-	{ { { 0xe0, 0x10, 0x38, 0xff, 0x00, 0x00 }, 4 }, 0 }
+    { { { 0xe0, 0x10, 0x38, 0xf0, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf2, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf1, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf3, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf4, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf6, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf5, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf7, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf8, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xfa, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xf9, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xfb, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xfc, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xfe, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xfd, 0x00, 0x00 }, 4 }, 0 },
+    { { { 0xe0, 0x10, 0x38, 0xff, 0x00, 0x00 }, 4 }, 0 }
 };
 
-static int ioctl_CheckQPSK(input_thread_t * p_input, int front);
+static int ioctl_CheckFrontend(input_thread_t * p_input, int front);
 
 /*****************************************************************************
  * ioctl_FrontendControl : commands the SEC device
  *****************************************************************************/
 int ioctl_FrontendControl(input_thread_t * p_input, int freq, int pol, int lnb_slof,
-								          int diseqc, unsigned int u_adapter, unsigned int u_device)
+                          int diseqc, unsigned int u_adapter, unsigned int u_device)
 {
     struct dvb_diseqc_master_cmd  cmd;
     fe_sec_tone_mode_t tone;
     fe_sec_voltage_t voltage;
     int frontend;
-	  char front[] = FRONTEND;
-	  int i_len;
+    char front[] = FRONTEND;
+    int i_len;
 
- 	  i_len = sizeof(FRONTEND);
-		if (snprintf(front, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
-		{
-		  msg_Err(p_input, "snprintf() truncated string for FRONTEND" );
-			front[sizeof(FRONTEND)] = '\0';
+    i_len = sizeof(FRONTEND);
+    if (snprintf(front, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input, "snprintf() truncated string for FRONTEND" );
+        front[sizeof(FRONTEND)] = '\0';
     }
 
-	  msg_Dbg(p_input, "Opening frontend %s",front);	  
+    msg_Dbg(p_input, "Opening frontend %s",front);	  
     if((frontend = open(front,O_RDWR)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
-	  		msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed (%s)",strerror(errno));
+        msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed (%s)",strerror(errno));
 #   else
-	  		msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed");
+        msg_Err(p_input, "ioctl_FrontEndControl: Opening frontend failed");
 #   endif
         return -1;
     }
@@ -121,9 +121,9 @@ int ioctl_FrontendControl(input_thread_t * p_input, int freq, int pol, int lnb_s
     voltage = (pol) ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13;
     
     /* In case we have a DiSEqC, set it to the correct address */
-    cmd.msg[0] =0x0;  /* framing */
-    cmd.msg[1] =0x10; /* address */
-    cmd.msg[2] =0x38; /* command */
+    cmd.msg[0] = 0x0;  /* framing */
+    cmd.msg[1] = 0x10; /* address */
+    cmd.msg[2] = 0x38; /* command */
     /* command parameters start at index 3 */
     cmd.msg[3] = 0xF0 | ((diseqc * 4) & 0x0F);   
     cmd.msg_len = 4;
@@ -169,23 +169,23 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
 {
     int front;
     int ret;
-	  char frontend[] = FRONTEND;
-	  int i_len;
+    char frontend[] = FRONTEND;
+    int i_len;
 
- 	  i_len = sizeof(FRONTEND);
-		if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
-		{
-		  msg_Err(p_input, "snprintf() truncated string for FRONTEND" );
-			frontend[sizeof(FRONTEND)] = '\0';
+    i_len = sizeof(FRONTEND);
+    if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input, "snprintf() truncated string for FRONTEND" );
+        frontend[sizeof(FRONTEND)] = '\0';
     }
 
-	  msg_Dbg(p_input, "Opening device %s", frontend);
+    msg_Dbg(p_input, "Opening device %s", frontend);
     if((front = open(frontend,O_RDWR)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
-		  msg_Err(p_input, "ioctl_InfoFrontEnd: opening device failed (%s)", strerror(errno));
+        msg_Err(p_input, "ioctl_InfoFrontEnd: opening device failed (%s)", strerror(errno));
 #   else
-		  msg_Err(p_input, "ioctl_InfoFrontEnd: opening device failed");
+        msg_Err(p_input, "ioctl_InfoFrontEnd: opening device failed");
 #   endif
       return -1;
     }
@@ -193,126 +193,178 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
     /* Determine type of frontend */
     if ((ret=ioctl(front, FE_GET_INFO, info)) < 0)
     {
-      	close(front);
+        close(front);
 #   ifdef HAVE_ERRNO_H
         msg_Err(p_input, "ioctl FE_GET_INFO failed (%d) %s", ret, strerror(errno));
 #   else
         msg_Err(p_input, "ioctl FE_GET_INFO failed (%d)", ret);
 #   endif
-      	return -1;
+        return -1;
     }
-    msg_Dbg(p_input,  "Frontend Info:\tname = %s\n\t\tfrequency_min = %d\n\t\tfrequency_max = %d\n\t\tfrequency_stepsize = %d\n\t\tfrequency_tolerance = %d\n\t\tsymbol_rate_min = %d\n\t\tsymbol_rate_max = %d\n\t\tsymbol_rate_tolerance (ppm) = %d\n\t\tnotifier_delay (ms)= %d\n",
-        		info->name,
-        		info->frequency_min,
-        		info->frequency_max,
-        		info->frequency_stepsize,
-        		info->frequency_tolerance,
-        		info->symbol_rate_min,
-        		info->symbol_rate_max,
-        		info->symbol_rate_tolerance,
-        		info->notifier_delay );
-
+    /* Print out frontend capabilities. */
+    msg_Dbg(p_input, "Frontend Info:\tname = %s\n\t\tfrequency_min = %d\n\t\tfrequency_max = %d\n\t\tfrequency_stepsize = %d\n\t\tfrequency_tolerance = %d\n\t\tsymbol_rate_min = %d\n\t\tsymbol_rate_max = %d\n\t\tsymbol_rate_tolerance (ppm) = %d\n\t\tnotifier_delay (ms)= %d\n",
+            info->name,
+            info->frequency_min,
+            info->frequency_max,
+            info->frequency_stepsize,
+            info->frequency_tolerance,
+            info->symbol_rate_min,
+            info->symbol_rate_max,
+            info->symbol_rate_tolerance,
+            info->notifier_delay );
+    msg_Dbg(p_input, "Frontend Info capability list:");
+    if (info->caps&FE_IS_STUPID)
+        msg_Dbg(p_input, "no capabilities - frontend is stupid!");
+    if (info->caps&FE_CAN_INVERSION_AUTO)
+        msg_Dbg(p_input, "inversion auto");
+    if (info->caps&FE_CAN_FEC_1_2)
+        msg_Dbg(p_input, "forward error correction 1/2");
+    if (info->caps&FE_CAN_FEC_2_3)
+        msg_Dbg(p_input, "forward error correction 2/3");
+    if (info->caps&FE_CAN_FEC_3_4)
+        msg_Dbg(p_input, "forward error correction 3/4");
+    if (info->caps&FE_CAN_FEC_4_5)
+        msg_Dbg(p_input, "forward error correction 4/5");
+    if (info->caps&FE_CAN_FEC_5_6)
+        msg_Dbg(p_input, "forward error correction 5/6");
+    if (info->caps&FE_CAN_FEC_6_7)
+        msg_Dbg(p_input, "forward error correction 6/7");
+    if (info->caps&FE_CAN_FEC_7_8)
+        msg_Dbg(p_input, "forward error correction 7/8");
+    if (info->caps&FE_CAN_FEC_8_9)
+        msg_Dbg(p_input, "forward error correction 8/9");
+    if (info->caps&FE_CAN_FEC_AUTO)
+        msg_Dbg(p_input, "forward error correction auto");
+    if (info->caps&FE_CAN_QPSK)
+        msg_Dbg(p_input, "card can do QPSK");
+    if (info->caps&FE_CAN_QAM_16)
+        msg_Dbg(p_input, "card can do QAM 16");
+    if (info->caps&FE_CAN_QAM_32)
+        msg_Dbg(p_input, "card can do QAM 32");
+    if (info->caps&FE_CAN_QAM_64)
+        msg_Dbg(p_input, "card can do QAM 64");
+    if (info->caps&FE_CAN_QAM_128)
+        msg_Dbg(p_input, "card can do QAM 128");
+    if (info->caps&FE_CAN_QAM_256)
+        msg_Dbg(p_input, "card can do QAM 256");
+    if (info->caps&FE_CAN_QAM_AUTO)
+        msg_Dbg(p_input, "card can do QAM auto");
+    if (info->caps&FE_CAN_TRANSMISSION_MODE_AUTO)
+        msg_Dbg(p_input, "transmission mode auto");
+    if (info->caps&FE_CAN_BANDWIDTH_AUTO)
+        msg_Dbg(p_input, "bandwidth mode auto");
+    if (info->caps&FE_CAN_GUARD_INTERVAL_AUTO)
+        msg_Dbg(p_input, "guard interval mode auto");
+    if (info->caps&FE_CAN_HIERARCHY_AUTO)
+        msg_Dbg(p_input, "hierarchy mode auto");
+    if (info->caps&FE_CAN_MUTE_TS)
+        msg_Dbg(p_input, "card can mute TS");
+    if (info->caps&FE_CAN_CLEAN_SETUP)
+        msg_Dbg(p_input, "clean setup");        
+    msg_Dbg(p_input,"End of capability list");
+    
     close(front);
     return 0;
 }
 
 int ioctl_DiseqcSendMsg (input_thread_t *p_input, int fd, fe_sec_voltage_t v, struct diseqc_cmd_t **cmd,
-		     fe_sec_tone_mode_t t, fe_sec_mini_cmd_t b)
+                         fe_sec_tone_mode_t t, fe_sec_mini_cmd_t b)
 {
     int err;
 
-  	if ((err = ioctl(fd, FE_SET_TONE, SEC_TONE_OFF))<0)
-  	{
+    if ((err = ioctl(fd, FE_SET_TONE, SEC_TONE_OFF))<0)
+    {
 #   ifdef HAVE_ERRNO_H
-    		msg_Err(p_input, "ioclt FE_SET_TONE failed, tone=%s (%d) %s", SEC_TONE_ON ? "on" : "off", err, strerror(errno));
+        msg_Err(p_input, "ioclt FE_SET_TONE failed, tone=%s (%d) %s", SEC_TONE_ON ? "on" : "off", err, strerror(errno));
 #   else
-  		  msg_Err(p_input, "ioclt FE_SET_TONE failed, tone=%s (%d)", SEC_TONE_ON ? "on" : "off", err);
+        msg_Err(p_input, "ioclt FE_SET_TONE failed, tone=%s (%d)", SEC_TONE_ON ? "on" : "off", err);
 #   endif
-  		  return err;
+        return err;
     }
-  	if ((err = ioctl(fd, FE_SET_VOLTAGE, v))<0)
-  	{
+    if ((err = ioctl(fd, FE_SET_VOLTAGE, v))<0)
+    {
 #   ifdef HAVE_ERRNO_H
-  		  msg_Err(p_input, "ioclt FE_SET_VOLTAGE failed, voltage=%d (%d) %s", v, err, strerror(errno));
+        msg_Err(p_input, "ioclt FE_SET_VOLTAGE failed, voltage=%d (%d) %s", v, err, strerror(errno));
 #   else
-  		  msg_Err(p_input, "ioclt FE_SET_VOLTAGE failed, voltage=%d (%d)", v, err);
+        msg_Err(p_input, "ioclt FE_SET_VOLTAGE failed, voltage=%d (%d)", v, err);
 #   endif
-  		  return err;
+        return err;
     }
 
-  	msleep(15);
-  	while (*cmd)
-  	{
-    		msg_Dbg(p_input, "msg: %02x %02x %02x %02x %02x %02x",
-    		    (*cmd)->cmd.msg[0], (*cmd)->cmd.msg[1],
-    		    (*cmd)->cmd.msg[2], (*cmd)->cmd.msg[3],
-    		    (*cmd)->cmd.msg[4], (*cmd)->cmd.msg[5]);
+    msleep(15);
+    while (*cmd)
+    {
+        msg_Dbg(p_input, "DiseqcSendMsg(): %02x %02x %02x %02x %02x %02x",
+            (*cmd)->cmd.msg[0], (*cmd)->cmd.msg[1],
+            (*cmd)->cmd.msg[2], (*cmd)->cmd.msg[3],
+            (*cmd)->cmd.msg[4], (*cmd)->cmd.msg[5]);
 
-    		if ((err = ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &(*cmd)->cmd))<0)
-    		{
+        if ((err = ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &(*cmd)->cmd))<0)
+        {
 #       ifdef HAVE_ERRNO_H
-    			  msg_Err(p_input, "ioclt FE_DISEQC_SEND_MASTER_CMD failed (%d) %s", err, strerror(errno));
+            msg_Err(p_input, "ioclt FE_DISEQC_SEND_MASTER_CMD failed (%d) %s", err, strerror(errno));
 #       else
-    			  msg_Err(p_input, "ioclt FE_DISEQC_SEND_MASTER_CMD failed (%d)", err);
+            msg_Err(p_input, "ioclt FE_DISEQC_SEND_MASTER_CMD failed (%d)", err);
 #       endif
-    			return err;
+            return err;
         }
 
-    		msleep((*cmd)->wait);
-    		cmd++;
-  	}
+        msleep((*cmd)->wait);
+        cmd++;
+    }
 
-  	msleep(15);
+    msleep(15);
 
-  	if ((err = ioctl(fd, FE_DISEQC_SEND_BURST, b))<0)
-  	{
+    if ((err = ioctl(fd, FE_DISEQC_SEND_BURST, b))<0)
+    {
 #   ifdef HAVE_ERRNO_H
-  		  msg_Err(p_input, "ioctl FE_DISEQC_SEND_BURST failed, burst=%d (%d) %s",b, err, strerror(errno));
+        msg_Err(p_input, "ioctl FE_DISEQC_SEND_BURST failed, burst=%d (%d) %s",b, err, strerror(errno));
 #   else
-  		  msg_Err(p_input, "ioctl FE_DISEQC_SEND_BURST failed, burst=%d (%d)",b, err);
+        msg_Err(p_input, "ioctl FE_DISEQC_SEND_BURST failed, burst=%d (%d)",b, err);
 #   endif
       return err;
     }
-  	msleep(15);
+    msleep(15);
 
     if ((err = ioctl(fd, FE_SET_TONE, t))<0)
     {
 #   ifdef HAVE_ERRNO_H
-  		  msg_Err(p_input, "ioctl FE_SET_TONE failed, tone=%d (%d) %s", t, err, strerror(errno));
+        msg_Err(p_input, "ioctl FE_SET_TONE failed, tone=%d (%d) %s", t, err, strerror(errno));
 #   else
-  		  msg_Err(p_input, "ioctl FE_SET_TONE failed, tone=%d (%d)", t, err);
+        msg_Err(p_input, "ioctl FE_SET_TONE failed, tone=%d (%d)", t, err);
 #   endif
-  		  return err;
-  	}
-  	return err; 
+        return err;
+    }
+    return err; 
 }
 
-int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos, int voltage_18, int hiband)
+int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos,
+                       int voltage_18, int hiband)
 {
     int ret;
-  	struct diseqc_cmd_t *cmd[2] = { NULL, NULL };
-  	int i = 4 * switch_pos + 2 * hiband + (voltage_18 ? 1 : 0);
+    struct diseqc_cmd_t *cmd[2] = { NULL, NULL };
+    int i = 4 * switch_pos + 2 * hiband + (voltage_18 ? 1 : 0);
 
-  	msg_Dbg(p_input, "ioctl_SetupSwitch: switch pos %i, %sV, %sband",
-  	        switch_pos, voltage_18 ? "18" : "13", hiband ? "hi" : "lo");
-  	msg_Dbg(p_input, "ioctl_SetupSwitch: index %i", i);
+    msg_Dbg(p_input, "ioctl_SetupSwitch: switch pos %i, %sV, %sband",
+            switch_pos, voltage_18 ? "18" : "13", hiband ? "hi" : "lo");
+    msg_Dbg(p_input, "ioctl_SetupSwitch: index %i", i);
 
-  	if ((i < 0) || (i >= (int)(sizeof(switch_cmds)/sizeof(struct diseqc_cmd_t))))
+    if ((i < 0) || (i >= (int)(sizeof(switch_cmds)/sizeof(struct diseqc_cmd_t))))
         return -EINVAL;
 
-  	cmd[0] = &switch_cmds[i];
+    cmd[0] = &switch_cmds[i];
 
-  	if ((ret = ioctl_DiseqcSendMsg (p_input, frontend_fd,
-  				(i % 2) ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
-  				cmd,
-  				(i/2) % 2 ? SEC_TONE_ON : SEC_TONE_OFF,
-  				(i/4) % 2 ? SEC_MINI_B : SEC_MINI_A))<0)
-  	{
-    		msg_Err(p_input, "ioctl_DiseqcSendMsg() failed (%d)", ret);
-    		return ret;
-  	}
+    if ((ret = ioctl_DiseqcSendMsg (p_input, frontend_fd,
+          (i % 2) ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
+          cmd,
+          (i/2) % 2 ? SEC_TONE_ON : SEC_TONE_OFF,
+          (i/4) % 2 ? SEC_MINI_B : SEC_MINI_A))<0)
+    {
+        msg_Err(p_input, "ioctl_DiseqcSendMsg() failed (%d)", ret);
+        return ret;
+    }
 
-  	return ret;
+    return ret;
 }
 
 #define SWITCHFREQ 11700000
@@ -320,23 +372,23 @@ int ioctl_SetupSwitch (input_thread_t *p_input, int frontend_fd, int switch_pos,
 #define LOF_LO      9750000
 
 /*****************************************************************************
- * ioctl_SetQPSKFrontend : controls the FE device
+ * ioctl_SetFrontend : controls the FE device
  *****************************************************************************/
-int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep,
-                           int b_polarisation, unsigned int u_adapter, unsigned int u_device  )
+int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep,
+                       int b_polarisation, unsigned int u_adapter, unsigned int u_device  )
 {
     int front;
     int ret;
     int i;
     int hiband;
-	  char frontend[] = FRONTEND;
-	  int i_len;
+    char frontend[] = FRONTEND;
+    int i_len;
 
- 	  i_len = sizeof(FRONTEND);
-		if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
-		{
-		  msg_Err(p_input,  "error: snprintf() truncated string for FRONTEND" );
-			frontend[sizeof(FRONTEND)] = '\0';
+    i_len = sizeof(FRONTEND);
+    if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input,  "ioctl_SetFrontEnd snprintf() truncated string for FRONTEND" );
+        frontend[sizeof(FRONTEND)] = '\0';
     }
     
     /* Open the frontend device */
@@ -356,23 +408,23 @@ int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_paramet
     hiband = (fep.frequency >= SWITCHFREQ);
     if ((ret=ioctl_SetupSwitch (p_input, front, 0, b_polarisation, hiband))<0)
     {
-  			msg_Err(p_input, "ioctl_SetupSwitch failed (%d)", ret);
-  			return -1;
-		}
+        msg_Err(p_input, "ioctl_SetupSwitch failed (%d)", ret);
+        return -1;
+    }
 
     if (hiband)
-    	fep.frequency -= LOF_HI;
+        fep.frequency -= LOF_HI;
     else
-    	fep.frequency -= LOF_LO;
+        fep.frequency -= LOF_LO;
 
     /* Now send it all to the frontend device */
     if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
     {
-      	close(front);
+        close(front);
 #   ifdef HAVE_ERRNO_H
-		 	  msg_Err(p_input, "ioctl_SetQPSKFrontend: ioctl FE_SET_FRONTEND failed (%d) %s", ret, strerror(errno));
+        msg_Err(p_input, "ioctl_SetFrontend: ioctl FE_SET_FRONTEND failed (%d) %s", ret, strerror(errno));
 #   else
-		 	  msg_Err(p_input, "ioctl_SetQPSKFrontend: ioctl FE_SET_FRONTEND failed (%d)", ret);
+        msg_Err(p_input, "ioctl_SetFrontend: ioctl FE_SET_FRONTEND failed (%d)", ret);
 #   endif
         return -1;
     }
@@ -386,21 +438,21 @@ int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_paramet
             msg_Err(p_input, "ioctl FE_READ_STATUS failed (%d) %s", ret, strerror(errno));
 #       else
             msg_Err(p_input, "ioctl FE_READ_STATUS failed (%d)", ret);
-#       endif				  
-				}
+#       endif
+        }
 
         if (s & FE_HAS_LOCK)
         {
-		        msg_Dbg(p_input, "ioctl_SetQPSKFrontend: tuning status == 0x%02x!!! ..."
+            msg_Dbg(p_input, "ioctl_SetFrontend: tuning status == 0x%02x!!! ..."
                              "tuning succeeded", s);
-      		  ret = 0;
+            ret = 0;
         }
         else
         {
-        		msg_Dbg(p_input, "ioctl_SetQPSKFrontend: tuning status == 0x%02x!!! ..."
+            msg_Dbg(p_input, "ioctl_SetFrontend: tuning status == 0x%02x!!! ..."
                              "tuning failed", s);
-        		ret = -1;
-      	}
+            ret = -1;
+        }
         usleep( 500000 );
     }
 
@@ -412,12 +464,12 @@ int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_paramet
 /******************************************************************
  * Check completion of the frontend control sequence
  ******************************************************************/
-static int ioctl_CheckQPSK(input_thread_t * p_input, int front)
+static int ioctl_CheckFrontend(input_thread_t * p_input, int front)
 {
     int ret;
     struct pollfd pfd[1];
     struct dvb_frontend_event event;
-    /* poll for QPSK event to check if tuning worked */
+    /* poll for frontend event to check if tuning worked */
     pfd[0].fd = front;
     pfd[0].events = POLLIN;
 
@@ -428,53 +480,53 @@ static int ioctl_CheckQPSK(input_thread_t * p_input, int front)
             if ( (ret=ioctl(front, FE_GET_EVENT, &event)) < 0)
             {
 #           ifdef HAVE_ERRNO_H
-                msg_Err(p_input, "ioctl_CheckQPSK: ioctl FE_GET_EVENT failed (%d) %s", ret, strerror(errno));
+                msg_Err(p_input, "ioctl_CheckFrontend: ioctl FE_GET_EVENT failed (%d) %s", ret, strerror(errno));
 #           else
-                msg_Err(p_input, "ioctl_CheckQPSK: ioctl FE_GET_EVENT failed (%d)", ret);
+                msg_Err(p_input, "ioctl_CheckFrontend: ioctl FE_GET_EVENT failed (%d)", ret);
 #           endif
                 return -5;
             }
 
             switch(event.status)
             {
-             	case FE_HAS_SIGNAL:  /* found something above the noise level */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_HAS_SIGNAL");
-							  break;
-             	case FE_HAS_CARRIER: /* found a DVB signal  */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_HAS_CARRIER");
-							  break;
-             	case FE_HAS_VITERBI: /* FEC is stable  */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_HAS_VITERBI");
-							  break;              
-             	case FE_HAS_SYNC:    /* found sync bytes  */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_HAS_SYNC");
-							  break;              
-             	case FE_HAS_LOCK:    /* everything's working... */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_HAS_LOCK");
-							  break;
-             	case FE_TIMEDOUT:    /*  no lock within the last ~2 seconds */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_TIMEDOUT");
-             	  return -2;
-             	case FE_REINIT:      /*  frontend was reinitialized,  */
-             	                     /*  application is recommned to reset */
-                                         /*  DiSEqC, tone and parameters */
-							  msg_Dbg(p_input, "ioctl_CheckQPSK: FE_REINIT");
-         	      return -1;
+                case FE_HAS_SIGNAL:  /* found something above the noise level */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_SIGNAL");
+                    break;
+                case FE_HAS_CARRIER: /* found a DVB signal  */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_CARRIER");
+                    break;
+                case FE_HAS_VITERBI: /* FEC is stable  */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_VITERBI");
+                    break;
+                case FE_HAS_SYNC:    /* found sync bytes  */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_SYNC");
+                    break;
+                case FE_HAS_LOCK:    /* everything's working... */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_HAS_LOCK");
+                    break;
+                case FE_TIMEDOUT:    /*  no lock within the last ~2 seconds */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_TIMEDOUT");
+                    return -2;
+                case FE_REINIT:      /*  frontend was reinitialized,  */
+                                     /*  application is recommned to reset */
+                                     /*  DiSEqC, tone and parameters */
+                    msg_Dbg(p_input, "ioctl_CheckFrontend: FE_REINIT");
+                    return -1;
             }
         }
         else
         {
             /* should come here */
-            msg_Err(p_input, "ioctl_CheckQPSK: event() failed");
+            msg_Err(p_input, "ioctl_CheckFrontend: event() failed");
             return -3;
         }
     }
     else
     {
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "ioctl_CheckQPSK: poll() failed (%s)", strerror(errno));
+        msg_Err(p_input, "ioctl_CheckFrontend: poll() failed (%s)", strerror(errno));
 #   else
-        msg_Err(p_input, "ioctl_CheckQPSK: poll() failed");
+        msg_Err(p_input, "ioctl_CheckFrontend: poll() failed");
 #   endif
         return -4;
     }
@@ -490,24 +542,24 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
 {
     struct dmx_pes_filter_params s_filter_params;
     char dmx[] = DMX;
-	  int i_len;
-	  int result;
+    int i_len;
+    int result;
 
     /* We first open the device */
- 	  i_len = sizeof(DMX);
-		if (snprintf( dmx, sizeof(DMX), DMX, u_adapter, u_device) >= i_len)
-		{
-		  msg_Err(p_input,  "snprintf() truncated string for DMX" );
-			dmx[sizeof(DMX)] = '\0';
+    i_len = sizeof(DMX);
+    if (snprintf( dmx, sizeof(DMX), DMX, u_adapter, u_device) >= i_len)
+    {
+        msg_Err(p_input,  "snprintf() truncated string for DMX" );
+        dmx[sizeof(DMX)] = '\0';
     }
 
     msg_Dbg(p_input, "Opening demux device %s", dmx);
     if ((*pi_fd = open(dmx, O_RDWR|O_NONBLOCK))  < 0)
     {
 #   ifdef HAVE_ERRNO_H
-		 	  msg_Err(p_input, "ioctl_SetDMXFIlter: opening device failed (%s)", strerror(errno));
+        msg_Err(p_input, "ioctl_SetDMXFilter: opening device failed (%s)", strerror(errno));
 #   else
-		 	  msg_Err(p_input, "ioctl_SetDMXFIlter: opening device failed");
+        msg_Err(p_input, "ioctl_SetDMXFilter: opening device failed");
 #   endif
         return -1;
     }
@@ -519,16 +571,42 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
     switch ( i_type )
     {
         case 1:
-            msg_Dbg(p_input, "ioctl_SetDMXFIlter: DMX_PES_VIDEO for PMT %d", i_pid);
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO;
             break;
         case 2:
-            msg_Dbg(p_input, "ioctl_SetDMXFIlter: DMX_PES_AUDIO for PMT %d", i_pid);
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO;
             break;
         case 3:
-            msg_Dbg(p_input, "ioctl_SetDMXFIlter: DMX_PES_OTHER for PMT %d", i_pid);
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_OTHER for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_OTHER;
+            break;
+        case 4:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO1 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_VIDEO1;
+            break;
+        case 5:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO1 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_AUDIO1;
+            break;
+
+        case 7:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO2 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_VIDEO2;
+            break;
+        case 8:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO2 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_AUDIO2;
+            break;
+            
+        case 10:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO3 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_VIDEO3;
+            break;
+        case 11:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO3 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_AUDIO3;
             break;
         default:
             msg_Err(p_input, "trying to set PMT id to=%d for unknown type %d", i_pid, i_type );
@@ -540,9 +618,9 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
     if ((result = ioctl(*pi_fd, DMX_SET_PES_FILTER, &s_filter_params)) < 0)
     {
 #   ifdef HAVE_ERRNO_H
-		    msg_Err(p_input, "ioctl_SetDMXFIlter: ioctl failed with %d (%s)",result, strerror(errno));
+        msg_Err(p_input, "ioctl_SetDMXFilter: ioctl failed with %d (%s)",result, strerror(errno));
 #   else
-		    msg_Err(p_input, "ioctl_SetDMXFIlter: ioctl failed with %d",result);
+        msg_Err(p_input, "ioctl_SetDMXFilter: ioctl failed with %d",result);
 #   endif
         return -1;
     }
@@ -563,8 +641,219 @@ int ioctl_UnsetDMXFilter(input_thread_t * p_input, int demux)
 #   else
         msg_Err(p_input, "ioctl DMX_STOP failed for demux %d (%d)", demux, ret);
 #   endif
-			return -1;
+        return -1;
     }
     close(demux);
     return 0;
 }
+
+/*****************************************************************************
+ * dvb_DecodeBandwidth : decodes arguments for DVB S/C/T card
+ *****************************************************************************/
+fe_bandwidth_t dvb_DecodeBandwidth(input_thread_t * p_input, int bandwidth)
+{
+    fe_bandwidth_t      fe_bandwidth = 0;
+    
+    switch (bandwidth)
+    {
+        case 0:
+            fe_bandwidth = BANDWIDTH_AUTO;
+            break;
+        case 6:
+            fe_bandwidth = BANDWIDTH_6_MHZ;
+            break;
+        case 7:
+            fe_bandwidth = BANDWIDTH_7_MHZ;
+            break;
+        case 8:
+            fe_bandwidth = BANDWIDTH_8_MHZ;
+            break;
+        default:
+            msg_Dbg( p_input, "terrestrial dvb has bandwidth not set, using auto");
+            fe_bandwidth = BANDWIDTH_AUTO;
+            break;
+    }
+    
+    return fe_bandwidth;
+}
+
+fe_code_rate_t dvb_DecodeFEC(input_thread_t * p_input, int fec)
+{
+    fe_code_rate_t fe_fec = FEC_NONE;
+    
+    switch( fec )
+    {
+        case 1:
+            fe_fec = FEC_1_2;
+            break;
+        case 2:
+            fe_fec = FEC_2_3;
+            break;
+        case 3:
+            fe_fec = FEC_3_4;
+            break;
+        case 4:
+            fe_fec = FEC_4_5;
+            break;
+        case 5:
+            fe_fec = FEC_5_6;
+            break;
+        case 6:
+            fe_fec = FEC_6_7;
+            break;
+        case 7:
+            fe_fec = FEC_7_8;
+            break;
+        case 8:
+            fe_fec = FEC_8_9;
+            break;
+        case 9:
+            fe_fec = FEC_AUTO;
+            break;
+        default:
+            /* cannot happen */
+            fe_fec = FEC_NONE;
+            msg_Err( p_input, "argument has invalid FEC (%d)", fec);
+            break;
+    }    
+    return fe_fec;
+}
+
+fe_modulation_t dvb_DecodeModulation(input_thread_t * p_input, int modulation)
+{
+    fe_modulation_t     fe_modulation = 0;
+    
+    switch( modulation )
+    {
+        case -1:
+            fe_modulation = QPSK;
+            break;
+        case 0:
+            fe_modulation = QAM_AUTO;
+            break;
+        case 16:
+            fe_modulation = QAM_16;
+            break;
+        case 32:
+            fe_modulation = QAM_32;
+            break;
+        case 64:
+            fe_modulation = QAM_64;
+            break;
+        case 128:
+            fe_modulation = QAM_128;
+            break;
+        case 256:
+            fe_modulation = QAM_256;
+            break;
+        default:
+            msg_Dbg( p_input, "terrestrial/cable dvb has constellation/modulation not set, using auto");
+            fe_modulation = QAM_AUTO;
+            break;
+    }    
+    return fe_modulation;
+}
+
+fe_transmit_mode_t dvb_DecodeTransmission(input_thread_t * p_input, int transmission)
+{
+    fe_transmit_mode_t  fe_transmission = 0;
+    
+    switch( transmission )
+    {
+        case 0:
+            fe_transmission = TRANSMISSION_MODE_AUTO;
+            break;
+        case 2:
+            fe_transmission = TRANSMISSION_MODE_2K;
+            break;
+        case 8:
+            fe_transmission = TRANSMISSION_MODE_8K;
+            break;
+        default:
+            msg_Dbg( p_input, "terrestrial dvb has transmission mode not set, using auto");
+            fe_transmission = TRANSMISSION_MODE_AUTO;
+            break;
+    }    
+    return fe_transmission;
+}
+
+fe_guard_interval_t dvb_DecodeGuardInterval(input_thread_t * p_input, int guard)
+{
+    fe_guard_interval_t fe_guard = 0;
+
+    switch( guard )
+    {
+        case 0:
+            fe_guard = GUARD_INTERVAL_AUTO;
+            break;
+        case 4:
+            fe_guard = GUARD_INTERVAL_1_4;
+            break;
+        case 8:
+            fe_guard = GUARD_INTERVAL_1_8;
+            break;
+        case 16:
+            fe_guard = GUARD_INTERVAL_1_16;
+            break;
+        case 32:
+            fe_guard = GUARD_INTERVAL_1_32;
+            break;
+        default:
+            msg_Dbg( p_input, "terrestrial dvb has guard interval not set, using auto");
+            fe_guard = GUARD_INTERVAL_AUTO;
+            break;
+    }
+    return fe_guard;
+}
+
+fe_hierarchy_t dvb_DecodeHierarchy(input_thread_t * p_input, int hierarchy)
+{
+    fe_hierarchy_t      fe_hierarchy = 0;
+
+    switch (hierarchy)
+    {
+        case -1:
+            fe_hierarchy = HIERARCHY_NONE;
+            break;
+        case 0:
+            fe_hierarchy = HIERARCHY_AUTO;
+            break;
+        case 1:
+            fe_hierarchy = HIERARCHY_1;
+            break;
+        case 2:
+            fe_hierarchy = HIERARCHY_2;
+            break;
+        case 4:
+            fe_hierarchy = HIERARCHY_4;
+            break;
+        default:
+            msg_Dbg( p_input, "terrestrial dvb has hierarchy not set, using auto");
+            fe_hierarchy = HIERARCHY_AUTO;
+            break;
+    }
+    return fe_hierarchy;
+}
+
+fe_spectral_inversion_t dvb_DecodeInversion(input_thread_t * p_input, int inversion)
+{
+    fe_spectral_inversion_t fe_inversion=0;
+
+    switch (inversion)
+    {
+        case 0:
+            fe_inversion = INVERSION_OFF;
+            break;
+        case 1:
+            fe_inversion = INVERSION_ON;
+            break;
+        case 2:
+            fe_inversion = INVERSION_AUTO;
+            break;
+        default:
+            msg_Dbg( p_input, "dvb has inversion/polarisation not set, using auto");
+            fe_inversion = INVERSION_AUTO;
+            break;
+    }
+    return fe_inversion;
+} 
