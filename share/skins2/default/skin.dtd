@@ -2,7 +2,7 @@
 -->
 
 
-<!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window)*)>
+<!ELEMENT Theme (ThemeInfo,(Bitmap|BitmapFont|Font|Window)*)>
     <!ATTLIST Theme
         version     CDATA   #REQUIRED
         tooltipfont CDATA   "defaultfont"

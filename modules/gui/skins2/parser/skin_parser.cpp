@@ -51,6 +51,13 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_data.m_listBitmap.push_back( bitmap );
     }
 
+    else if( rName == "BitmapFont" )
+    {
+        const BuilderData::BitmapFont font( attr["id"] , attr["file"],
+                attr["type"] );
+        m_data.m_listBitmapFont.push_back( font );
+    }
+
     else if( rName == "Button" )
     {
         const BuilderData::Button button( uniqueId( attr["id"] ), atoi( attr["x"] ) +

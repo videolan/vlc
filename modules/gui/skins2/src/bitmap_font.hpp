@@ -49,6 +49,8 @@ class BitmapFont: public GenericFont
     private:
         /// Bitmap
         const GenericBitmap &m_rBitmap;
+        /// Glyph size
+        int m_width, m_height;
 };
 
 #endif

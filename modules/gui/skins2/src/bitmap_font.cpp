@@ -23,17 +23,61 @@
 
 #include "bitmap_font.hpp"
 #include "generic_bitmap.hpp"
+#include "../utils/ustring.hpp"
 
 
 BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
     GenericFont( pIntf ), m_rBitmap( rBitmap )
 {
+    m_width = 9;
+    m_height = 13;
 }
 
 
 GenericBitmap *BitmapFont::drawString( const UString &rString,
                                        uint32_t color, int maxWidth ) const
 {
-    return NULL;
+    uint32_t *pString = (uint32_t*)rString.u_str();
+    // Compute the text width
+    int width = 0;
+    for( uint32_t *ptr = pString; *ptr; ptr++ )
+    {
+        uint32_t c = *ptr;
+        if( (c >= '0' && c <= '9') || c == '-' )
+        {
+            width += m_width + 3;
+        }
+        else
+        {
+            width += 6;
+        }
+    }
+    // Create a bitmap
+    BitmapImpl *pBmp = new BitmapImpl( getIntf(), width, m_height );
+    int xDest = 0;
+    while( *pString )
+    {
+        uint32_t c = *(pString++);
+        int xSrc = -1;
+        if( c >= '0' && c <= '9' )
+        {
+            xSrc = (c - '0') * m_width;
+        }
+        else if( c == '-' )
+        {
+            xSrc = 11 * m_width;
+        }
+        if( xSrc != -1 )
+        {
+            pBmp->drawBitmap( m_rBitmap, xSrc, 0, xDest, 0, m_width,
+                              m_height );
+            xDest += m_width + 3;
+        }
+        else
+        {
+            xDest += 6;
+        }
+    }
+    return pBmp;
 }
 

@@ -30,15 +30,10 @@
 
 void Time::set( float percentage, bool updateVLC )
 {
-    if( getIntf()->p_sys->p_input == NULL )
-    {
-        return;
-    }
-
     VarPercent::set( percentage );
 
     // Avoid looping forever...
-    if( updateVLC )
+    if( updateVLC && getIntf()->p_sys->p_input )
     {
         vlc_value_t pos;
         pos.f_float = percentage;

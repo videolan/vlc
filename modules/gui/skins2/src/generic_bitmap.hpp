@@ -29,7 +29,7 @@
 #include "../utils/pointer.hpp"
 
 
-/// Base class for bitmaps
+/// Generic interface for bitmaps
 class GenericBitmap: public SkinObject
 {
     public:
@@ -50,13 +50,13 @@ class GenericBitmap: public SkinObject
 };
 
 
-/// Bitmap created from a region of another bitmap
-class SubBitmap: public GenericBitmap
+/// Basic bitmap implementation
+class BitmapImpl: public GenericBitmap
 {
     public:
-        SubBitmap( intf_thread_t *pIntf, const GenericBitmap &rSource,
-                   int left, int top, int width, int height );
-        ~SubBitmap();
+        /// Create an empty bitmap of the given size
+        BitmapImpl( intf_thread_t *pIntf, int width, int height );
+        ~BitmapImpl();
 
         /// Get the width of the bitmap
         virtual int getWidth() const { return m_width; }
@@ -67,6 +67,10 @@ class SubBitmap: public GenericBitmap
         /// Get a linear buffer containing the image data.
         /// Each pixel is stored in 4 bytes in the order B,G,R,A
         virtual uint8_t *getData() const { return m_pData; }
+
+        // Copy a region of another bitmap on this bitmap
+        void drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
+                         int xDest, int yDest, int width, int height );
 
     private:
         /// Size of the bitmap.

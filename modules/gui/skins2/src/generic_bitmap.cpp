@@ -24,27 +24,32 @@
 #include "generic_bitmap.hpp"
 
 
-SubBitmap::SubBitmap( intf_thread_t *pIntf, const GenericBitmap &rSource,
-                      int left, int top, int width, int height ):
+BitmapImpl::BitmapImpl( intf_thread_t *pIntf, int width, int height ):
     GenericBitmap( pIntf ), m_width( width ), m_height( height ),
     m_pData( NULL )
 {
     m_pData = new uint8_t[width * height * 4];
-
-    uint32_t *pSrc = (uint32_t*)rSource.getData();
-    uint32_t *pDest = (uint32_t*)m_pData;
-    int srcWidth = rSource.getWidth();
-    for( int y = top; y < top + height; y++ )
-    {
-        memcpy( pDest, pSrc, 4 * width );
-        pSrc += srcWidth;
-        pDest += width;
-    }
+    memset( m_pData, 0, width * height * 4 );
 }
 
 
-SubBitmap::~SubBitmap()
+BitmapImpl::~BitmapImpl()
 {
     delete[] m_pData;
+}
+
+
+void BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
+                             int xDest, int yDest, int width, int height )
+{
+    int srcWidth = rSource.getWidth();
+    uint32_t *pSrc = (uint32_t*)rSource.getData() + ySrc * srcWidth + xSrc;
+    uint32_t *pDest = (uint32_t*)m_pData + yDest * m_width + xDest ;
+    for( int y = 0; y < height; y++ )
+    {
+        memcpy( pDest, pSrc, 4 * width );
+        pSrc += srcWidth;
+        pDest += m_width;
+    }
 }
 

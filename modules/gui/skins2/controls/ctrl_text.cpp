@@ -184,8 +184,6 @@ void CtrlText::onUpdate( Subject<VarText> &rVariable )
 
 void CtrlText::displayText( const UString &rText )
 {
-    m_pTimer->stop();
-
     // Create the images ('normal' and 'double') from the text
     // 'Normal' image
     if( m_pImg )
@@ -208,8 +206,6 @@ void CtrlText::displayText( const UString &rText )
     // Update the current image used, as if the control size had changed
     onChangePosition();
 
-    // XXX: will this always work?
-    m_fsm.setState( "outStill" );
     notifyLayout();
 }
 
@@ -256,7 +252,7 @@ void CtrlText::transManualMoving( SkinObject *pCtrl )
 
     // Start the automatic movement, but only if the text is wider than the
     // control
-    if( pThis->m_pImg && 
+    if( pThis->m_pImg &&
         pThis->m_pImg->getWidth() >= pThis->getPosition()->getWidth() )
     {
         // The current image may have been set incorrectly in displayText(), so

@@ -68,6 +68,19 @@ m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
     list<Bitmap> m_listBitmap;
 
     /// Type definition
+    struct BitmapFont
+    {
+        BitmapFont( const string & id, const string & file, const string & type ):
+m_id( id ), m_file( file ), m_type( type ) {}
+
+        const string m_id;
+        const string m_file;
+        const string m_type;
+    };
+    /// List
+    list<BitmapFont> m_listBitmapFont;
+
+    /// Type definition
     struct Font
     {
         Font( const string & id, const string & fontFile, int size ):

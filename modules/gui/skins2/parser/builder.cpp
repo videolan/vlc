@@ -31,6 +31,7 @@
 #include "../src/generic_bitmap.hpp"
 #include "../src/top_window.hpp"
 #include "../src/anchor.hpp"
+#include "../src/bitmap_font.hpp"
 #include "../src/ft2_font.hpp"
 #include "../src/theme.hpp"
 #include "../controls/ctrl_button.hpp"
@@ -81,6 +82,7 @@ Theme *Builder::build()
     // Create everything from the data in the XML
     ADD_OBJECTS( Theme );
     ADD_OBJECTS( Bitmap );
+    ADD_OBJECTS( BitmapFont );
     ADD_OBJECTS( Font );
     ADD_OBJECTS( Window );
     ADD_OBJECTS( Layout );
@@ -134,6 +136,23 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
     GenericBitmap *pBmp = new PngBitmap( getIntf(), rData.m_fileName,
                                          rData.m_alphaColor );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
+}
+
+
+void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
+{
+    GenericBitmap *pBmp = new PngBitmap( getIntf(), rData.m_file, 0 );
+    m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
+
+    GenericFont *pFont = new BitmapFont( getIntf(), *pBmp );
+    if( pFont->init() )
+    {
+        m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );
+    }
+    else
+    {
+        delete pFont;
+    }
 }
 
 
