@@ -312,15 +312,17 @@ diff -ru libdvdnav-orig/src/dvdread/ifo_read.h libdvdnav/src/dvdread/ifo_read.h
 diff -ru libdvdnav-orig/src/dvdread/md5.h libdvdnav/src/dvdread/md5.h
 --- libdvdnav-orig/src/dvdread/md5.h	Sat Mar 12 16:44:18 2005
 +++ libdvdnav/src/dvdread/md5.h	Sat Mar 12 17:49:33 2005
-@@ -21,6 +21,12 @@
+@@ -21,6 +21,14 @@
  #ifndef _MD5_H
  #define _MD5_H 1
  
-+#define md5_init_ctx    dvdnav_md5_init_ctx
-+#define md5_read_ctx    dvdnav_md5_read_ctx
-+#define md5_finish_ctx  dvdnav_md5_finish_ctx
-+#define md5_stream      dvdnav_md5_stream
-+#define md5_buffer      dvdnav_md5_buffer
++#define md5_init_ctx      dvdnav_md5_init_ctx
++#define md5_read_ctx      dvdnav_md5_read_ctx
++#define md5_finish_ctx    dvdnav_md5_finish_ctx
++#define md5_stream        dvdnav_md5_stream
++#define md5_buffer        dvdnav_md5_buffer
++#define md5_process_block dvdnav_md5_process_block
++#define md5_process_bytes dvdnav_md5_process_bytes
 +
  #include <stdio.h>
  
