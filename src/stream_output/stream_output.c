@@ -902,7 +902,8 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
     /* First, var_Create all variables */
     for( i = 0; ppsz_options[i] != NULL; i++ )
     {
-        asprintf( &psz_name, "%s%s", psz_prefix, ppsz_options[i] );
+        asprintf( &psz_name, "%s%s", psz_prefix,
+                  *ppsz_options[i] == '*' ? &ppsz_options[i][1] : ppsz_options[i] );
 
         i_type = config_GetType( p_this, psz_name );
 
@@ -917,6 +918,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
     {
         vlc_value_t val;
         vlc_bool_t b_yes = VLC_TRUE;
+        vlc_bool_t b_once = VLC_FALSE;
 
         if( cfg->psz_name == NULL || *cfg->psz_name == '\0' )
         {
@@ -937,6 +939,14 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
                 b_yes = VLC_FALSE;
                 break;
             }
+
+            if( *ppsz_options[i] == '*' &&
+                !strcmp( &ppsz_options[i][1], cfg->psz_name ) )
+            {
+                b_once = VLC_TRUE;
+                break;
+            }
+
         }
         if( ppsz_options[i] == NULL )
         {
@@ -946,7 +956,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
         }
 
         /* create name */
-        asprintf( &psz_name, "%s%s", psz_prefix, ppsz_options[i] );
+        asprintf( &psz_name, "%s%s", psz_prefix, b_once ? &ppsz_options[i][1] : ppsz_options[i] );
 
         /* get the type of the variable */
         i_type = config_GetType( p_this, psz_name );
@@ -959,6 +969,11 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
         if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
         {
             msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
+            goto next;
+        }
+        if( i_type != VLC_VAR_STRING && b_once )
+        {
+            msg_Warn( p_this, "*option_name need to be a string option" );
             goto next;
         }
 
@@ -981,6 +996,19 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
                 msg_Warn( p_this, "unhandled config var type" );
                 memset( &val, 0, sizeof( vlc_value_t ) );
                 break;
+        }
+        if( b_once )
+        {
+            vlc_value_t val2;
+
+            var_Get( p_this, psz_name, &val2 );
+            if( *val2.psz_string )
+            {
+                free( val2.psz_string );
+                msg_Dbg( p_this, "ignoring option %s (not first occurence)", psz_name );
+                goto next;
+            }
+            free( val2.psz_string );
         }
         var_Set( p_this, psz_name, val );
         msg_Dbg( p_this, "set sout option: %s to %s", psz_name, cfg->psz_value );
