@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
+ * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.c,v 1.6 2003/12/28 04:51:52 rocky Exp $
+ * $Id: cvd.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -33,7 +33,7 @@
 #include <vlc/decoder.h>
 
 #include "subtitle.h"
-#include "ogt.h"
+#include "cvd.h"
 #include "common.h"
 
 #define DEBUG_LONGTEXT N_( \
@@ -43,9 +43,7 @@
     "packet assembly info   4\n" \
     "image bitmaps          8\n" \
     "image transformations 16\n" \
-    "rendering information 32\n" \
-    "misc info             64\n" )
-
+    "misc info             32\n" )
 
 /*****************************************************************************
  * Module descriptor.
@@ -54,7 +52,7 @@ static int  DecoderOpen   ( vlc_object_t * );
 static int  PacketizerOpen( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Philips OGT (SVCD subtitle) decoder") );
+    set_description( _("CVD subtitle decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( DecoderOpen, VCDSubClose );
 
@@ -63,7 +61,7 @@ vlc_module_begin();
                   N_(DEBUG_LONGTEXT), VLC_TRUE );
 
     add_submodule();
-    set_description( _("Philips OGT (SVCD subtitle) packetizer") );
+    set_description( _("Chaoji VCD subtitle packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( PacketizerOpen, VCDSubClose );
 vlc_module_end();
@@ -89,7 +87,7 @@ DecoderOpen( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'o','g','t',' ' ) )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'c','v','d',' ' ) )
     {
         return VLC_EGENERIC;
     }
@@ -105,7 +103,7 @@ DecoderOpen( vlc_object_t *p_this )
 
     VCDSubInitSubtitleBlock( p_sys );
 
-    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'o','g','t',' ' ) );
+    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'c','v','d',' ' ) );
 
 
     p_dec->pf_decode_sub = Decode;
@@ -185,6 +183,8 @@ Packetize( decoder_t *p_dec, block_t **pp_block )
     }
     return NULL;
 }
+
+/* following functions are local */
 
 #define SPU_HEADER_LEN 5
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * render.h : Common SVCD and CVD rendering routine(s).
+ * cvd.h : CVD subtitles decoder thread interface
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.h,v 1.2 2003/12/28 04:51:52 rocky Exp $
+ * $Id: cvd.h,v 1.1 2003/12/28 04:51:52 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -21,8 +21,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void VCDSubRender  ( vout_thread_t *, picture_t *, const subpicture_t * );
+void E_(ParseHeader)( decoder_t *, uint8_t *, block_t *  );
+void E_(ParsePacket)( decoder_t * );
 

@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.3 2003/12/28 02:01:11 rocky Exp $
+ * $Id: render.c,v 1.4 2003/12/28 04:51:52 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -59,7 +59,7 @@ static void RenderI420( vout_thread_t *, picture_t *, const subpicture_t *,
   routine can be as fast as possible.
 
  *****************************************************************************/
-void VCDRenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
+void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
 		   const subpicture_t *p_spu )
 {
     struct subpicture_sys_t *p_sys = p_spu->p_sys;

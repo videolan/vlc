@@ -1,8 +1,8 @@
 /*****************************************************************************
- * render.h : Common SVCD and CVD rendering routine(s).
+ * Header for Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.h,v 1.2 2003/12/28 04:51:52 rocky Exp $
+ * $Id: common.h,v 1.1 2003/12/28 04:51:52 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -21,8 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-void VCDSubRender  ( vout_thread_t *, picture_t *, const subpicture_t * );
+void           VCDSubClose  ( vlc_object_t * );
+void           VCDSubInitSubtitleBlock( decoder_sys_t * p_sys );
+void           VCDSubInitSubtitleData(decoder_sys_t *p_sys);
+void           VCDSubAppendData( decoder_t *p_dec, uint8_t *buffer, 
+				 uint32_t buf_len );
+vout_thread_t *VCDSubFindVout( decoder_t *p_dec );
+
+void           VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu, 
+			     unsigned int i_scale_x, unsigned int i_scale_y );
+void           VCDSubDestroySPU( subpicture_t *p_spu );
+int            VCDSubCropCallback( vlc_object_t *p_object, char const *psz_var,
+				   vlc_value_t oldval, vlc_value_t newval, 
+				   void *p_data );
+void           VCDSubUpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object );
+
 

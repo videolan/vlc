@@ -1,10 +1,10 @@
 /*****************************************************************************
- * parse.c: Philips OGT (SVCD subtitle) packet parser
+ * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: parse.c,v 1.3 2003/12/28 02:01:11 rocky Exp $
+ * $Id: ogt_parse.c,v 1.1 2003/12/28 04:51:52 rocky Exp $
  *
- * Authors: Rocky Bernstein 
+ * Author: Rocky Bernstein 
  *   based on code from: 
  *       Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
  *       Sam Hocevar <sam@zoy.org>
@@ -33,6 +33,7 @@
 #include <vlc/decoder.h>
 
 #include "subtitle.h"
+#include "common.h"
 #include "render.h"
 #include "ogt.h"
 
@@ -43,12 +44,6 @@ typedef uint8_t ogt_color_t;
  * Local prototypes.
  *****************************************************************************/
 static int  ParseImage         ( decoder_t *, subpicture_t * );
-
-static void DestroySPU       ( subpicture_t * );
-
-static void UpdateSPU        ( subpicture_t *, vlc_object_t * );
-static int  CropCallback     ( vlc_object_t *, char const *,
-                               vlc_value_t, vlc_value_t, void * );
 
 /*
   The format is roughly as follows (everything is big-endian):
@@ -177,8 +172,8 @@ E_(ParsePacket)( decoder_t *p_dec)
     /* Fill the p_spu structure */
     vlc_mutex_init( p_dec, &p_spu->p_sys->lock );
 
-    p_spu->pf_render  = VCDRenderSPU;
-    p_spu->pf_destroy = DestroySPU;
+    p_spu->pf_render  = VCDSubRender;
+    p_spu->pf_destroy = VCDSubDestroySPU;
     p_spu->p_sys->p_data = (uint8_t*)p_spu->p_sys + sizeof( subpicture_sys_t );
 
     p_spu->p_sys->i_x_end        = p_sys->i_x_start + p_sys->i_width - 1;
@@ -242,74 +237,6 @@ static inline ogt_color_t
 ExtractField(uint8_t *p, unsigned int i_remaining) 
 {
   return ( ( *p >> 2*(i_remaining-1) ) & 0x3 );
-}
-
-/* Scales down (reduces size) of p_dest in the x direction as 
-   determined through aspect ratio x_scale by y_scale. Scaling
-   is done in place. p_spu->i_width, is updated to new width
-
-   The aspect ratio is assumed to be between 1/2 and 1.
-*/
-static void
-ScaleX( decoder_t *p_dec, subpicture_t *p_spu, 
-	unsigned int i_scale_x, unsigned int i_scale_y )
-{
-  int i_row, i_col;
-
-  decoder_sys_t *p_sys = p_dec->p_sys;
-  uint8_t *p_src1 = p_spu->p_sys->p_data;
-  uint8_t *p_src2 = p_src1 + PIXEL_SIZE;
-  uint8_t *p_dst  = p_src1;
-  unsigned int i_new_width = (p_spu->i_width * i_scale_x) / i_scale_y ;
-  unsigned int used=0;  /* Number of bytes used up in p_src1. */
-
-  dbg_print( (DECODE_DBG_CALL|DECODE_DBG_TRANSFORM) , 
-	     "Old width: %d, new width: %d", 
-	     p_spu->i_width, i_new_width);
-  
-  for ( i_row=0; i_row <= p_spu->i_height - 1; i_row++ ) {
-
-    if (used != 0) {
-      /* Discard the remaining piece of the column of the previous line*/
-      used=0;
-      p_src1 = p_src2;
-      p_src2 += PIXEL_SIZE;
-    }
-    
-    for ( i_col=0; i_col <= p_spu->i_width - 2; i_col++ ) {
-      unsigned int i;
-      unsigned int w1= i_scale_x - used;
-      unsigned int w2= i_scale_y - w1;
-
-      used = w2;
-      for (i = 0; i < PIXEL_SIZE; i++ ) {
-	*p_dst = ( (*p_src1 * w1) + (*p_src2 * w2) ) / i_scale_y;
-	p_src1++; p_src2++; p_dst++;
-      }
-
-      if (i_scale_x == used) {
-	/* End of last pixel was end of p_src2. */
-	p_src1 = p_src2;
-	p_src2 += PIXEL_SIZE;
-	i_col++;
-	used = 0;
-      }
-    }
-  }
-  p_spu->i_width = i_new_width;
-
-  if ( p_sys && p_sys->i_debug & DECODE_DBG_TRANSFORM )
-  { 
-    ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;
-    for ( i_row=0; i_row < p_spu->i_height - 1; i_row++ ) {
-      for ( i_col=0; i_col < p_spu->i_width - 1; i_col++ ) {
-	printf("%1x", p_source->s.t);
-	p_source++;
-      }
-      printf("\n");
-    }
-  }
-
 }
 
 /*****************************************************************************
@@ -434,69 +361,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
        or undo the effects of video output scaling. 
     */
     /* FIXME do the right scaling depending on vout. It may not be 4:3 */
-    ScaleX( p_dec, p_spu, 3, 4 );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * DestroySPU: subpicture destructor
- *****************************************************************************/
-static void DestroySPU( subpicture_t *p_spu )
-{
-    if( p_spu->p_sys->p_input )
-    {
-        /* Detach from our input thread */
-        var_DelCallback( p_spu->p_sys->p_input, "highlight",
-                         CropCallback, p_spu );
-        vlc_object_release( p_spu->p_sys->p_input );
-    }
-
-    vlc_mutex_destroy( &p_spu->p_sys->lock );
-    free( p_spu->p_sys );
-}
-
-/*****************************************************************************
- * UpdateSPU: update subpicture settings
- *****************************************************************************
- * This function is called from CropCallback and at initialization time, to
- * retrieve crop information from the input.
- *****************************************************************************/
-static void UpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object )
-{
-    vlc_value_t val;
-
-    if( var_Get( p_object, "highlight", &val ) )
-    {
-        return;
-    }
-
-    p_spu->p_sys->b_crop = val.b_bool;
-    if( !p_spu->p_sys->b_crop )
-    {
-        return;
-    }
-
-    var_Get( p_object, "x-start", &val );
-    p_spu->p_sys->i_x_start = val.i_int;
-    var_Get( p_object, "y-start", &val );
-    p_spu->p_sys->i_y_start = val.i_int;
-    var_Get( p_object, "x-end", &val );
-    p_spu->p_sys->i_x_end = val.i_int;
-    var_Get( p_object, "y-end", &val );
-    p_spu->p_sys->i_y_end = val.i_int;
-
-}
-
-/*****************************************************************************
- * CropCallback: called when the highlight properties are changed
- *****************************************************************************
- * This callback is called from the input thread when we need cropping
- *****************************************************************************/
-static int CropCallback( vlc_object_t *p_object, char const *psz_var,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    UpdateSPU( (subpicture_t *)p_data, p_object );
+    VCDSubScaleX( p_dec, p_spu, 3, 4 );
 
     return VLC_SUCCESS;
 }
