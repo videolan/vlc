@@ -34,20 +34,24 @@
  <sect1>
   <heading>What is the VideoLAN project ?</heading>
   <p>
-    VideoLAN is a complete software solution for video streaming, developed
-    by students at the <htmlurl url="http://www.ecp.fr" name="Ecole Centrale
-    Paris"> and contributors from all over the world, under the General
-    Public License (GPL). It has been designed for streaming MPEG 1 and MPEG
-    2 videos on local area networks (LAN), but it can be extended to
-    metropolitan or wide area networks (MAN, WAN), 
-    thanks to the multicast technology.
-    The VideoLAN solution includes a server, which can stream video from
-    various sources (file, DVD, satellite, camera, ...), a client, which can
-    receive, decode and display MPEG 1 and MPEG 2 streams and, if necessary,
-    a channel server which tells automatically to the client the parameters
-    needed to receive the stream.
 
-    <verb>
+   VideoLAN is a complete software solution for video streaming, developed
+   by students at the <htmlurl url="http://www.ecp.fr" name="Ecole Centrale
+   Paris"> and contributors from all over the world, under the <htmlurl
+   url="http://www.gnu.org/copyleft/gpl.html" name="General Public License
+   (GPL)">. It has been designed for streaming MPEG 1 and MPEG 2 videos on
+   local area networks (LAN), but it can be extended to metropolitan or
+   wide area networks (MAN, WAN), thanks to the multicast technology.
+
+   The VideoLAN solution includes a server, which can stream video from
+   various sources (file, DVD, satellite and MPEG 2 encoder), a client, which can
+   receive, decode and display MPEG 1 and MPEG 2 streams and, if necessary,
+   a channel server which tells automatically to the client the parameters
+   needed to receive the stream.
+
+   Here is an illustration of the complete VideoLAN solution :
+
+   <verb>
 
         DVD --->-                 Unicast/Broadcast/Multicast
                   \                           ---
@@ -62,9 +66,10 @@
                                        | Channel Server |
                                        |    (VLCS)      |
                                         ----------------
-    </verb>
-    More details about the project can be found on the
-    <htmlurl url="http://www.videolan.org" name="VideoLAN Web site">.
+   </verb>
+
+   More details about the project can be found on the
+   <htmlurl url="http://www.videolan.org" name="VideoLAN Web site">.
 
   </p>
  </sect1>
@@ -159,19 +164,28 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
   </p>
 
   <p>
-   In this HOWTO, we consider you already have a little knowledge about
-   Linux, and you know how to use a DVD. If not, good howtos can be
-   found on the Linux Documentation Projet.
+
+   In this HOWTO, we consider you already have a little knowledge
+   about Linux, and you know how to use a DVD. If not, good howtos
+   can be found on the <htmlurl url="http://www.tldp.org" name="Linux
+   Documentation Projet">.
+
   </p>
  </sect1>
 
  <sect1> 
   <heading>Legal</heading> 
   <p> 
-   Copyright (©) 2001-2002 by the VideoLAN project. This document may be
-   distributed only subject to the terms and conditions set forth in
-   <htmlurl url="http://metalab.unc.edu/LDP/LDP-COPYRIGHT.html" 
-   name="the LDP license">.
+
+   Copyright (©) 2002 by the VideoLAN project.
+
+   Permission is granted to copy, distribute and/or modify this document
+   under the terms of the GNU Free Documentation License, Version
+   1.1 or any later version published by the Free Software Foundation ;
+   with no Invariant Sections, with no Front-Cover Texts, and with no
+   Back-Cover Texts. The text of the license can be found on <htmlurl
+   url="http://www.gnu.org/copyleft/fdl.html">.
+
   </p> 
  </sect1> 
 </sect>
