@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.14 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: a52.c,v 1.14.2.1 2002/05/31 21:57:51 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -28,7 +28,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-#include <stdint.h>                                            /* int16_t .. */
+#include <inttypes.h>                                          /* int16_t .. */
 
 #include <videolan/vlc.h>
 
