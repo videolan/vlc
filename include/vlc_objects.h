@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.11 2002/10/03 13:21:54 sam Exp $
+ * $Id: vlc_objects.h,v 1.12 2002/10/11 22:32:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,12 +43,34 @@
 #define FIND_STRICT         0x0010
 
 /*****************************************************************************
+ * The vlc_object_t type. Yes, it's that simple :-)
+ *****************************************************************************/
+struct vlc_object_t
+{
+    VLC_COMMON_MEMBERS
+};
+
+/*****************************************************************************
+ * The vlc_list_t object list type
+ *****************************************************************************/
+struct vlc_list_t
+{
+    int             i_count;
+    vlc_object_t ** pp_objects;
+
+    /* Private */
+    int             _i_extra;
+    vlc_object_t *  _p_first;
+};  
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __vlc_object_destroy, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
+VLC_EXPORT( void *, __vlc_object_get, ( vlc_object_t *, int ) );
 VLC_EXPORT( void *, __vlc_object_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
@@ -70,6 +92,9 @@ VLC_EXPORT( void, __vlc_dumpstructure, ( vlc_object_t * ) );
 
 #define vlc_object_attach(a,b) \
     __vlc_object_attach( VLC_OBJECT(a), VLC_OBJECT(b) )
+
+#define vlc_object_get(a,b) \
+    __vlc_object_get( VLC_OBJECT(a),b)
 
 #define vlc_object_find(a,b,c) \
     __vlc_object_find( VLC_OBJECT(a),b,c)

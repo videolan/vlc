@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.3 2002/10/03 18:56:09 sam Exp $
+ * $Id: vlcshell.cpp,v 1.4 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,7 +29,6 @@
 
 /* vlc stuff */
 #include <vlc/vlc.h>
-#include "config.h"
 
 /* Mozilla stuff */
 #include <npapi.h>
@@ -88,6 +87,7 @@ char * NPP_GetMIMEDescription( void )
 NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 {
     static nsIID nsid = VLCINTF_IID;
+    static char psz_desc[1000];
 
     switch( variable )
     {
@@ -96,8 +96,14 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
             return NPERR_NO_ERROR;
 
         case NPPVpluginDescriptionString:
-            *((char **)value) = PLUGIN_DESCRIPTION;
+            snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, VLC_Version() );
+            psz_desc[1000-1] = 0;
+            *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
+
+        default:
+            /* go on... */
+            break;
     }
 
     if( instance == NULL )
@@ -154,6 +160,7 @@ void NPP_Shutdown( void )
 NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                  char* argn[], char* argv[], NPSavedData* saved )
 {
+    vlc_value_t value;
     int i_ret;
     int i;
 
@@ -185,26 +192,29 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     p_plugin->fWindow = NULL;
     p_plugin->window = 0;
 
-    p_plugin->p_vlc = vlc_create_r();
-    if( p_plugin->p_vlc == NULL )
+    p_plugin->i_vlc = VLC_Create();
+    if( p_plugin->i_vlc < 0 )
     {
+        p_plugin->i_vlc = 0;
         delete p_plugin;
         p_plugin = NULL;
         return NPERR_GENERIC_ERROR;
     }
 
-    i_ret = vlc_init_r( p_plugin->p_vlc, sizeof(ppsz_foo)/sizeof(char*), ppsz_foo );
+    i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_foo)/sizeof(char*), ppsz_foo );
     if( i_ret )
     {
-        vlc_destroy_r( p_plugin->p_vlc );
-        p_plugin->p_vlc = NULL;
+        VLC_Destroy( p_plugin->i_vlc );
+        p_plugin->i_vlc = 0;
         delete p_plugin;
         p_plugin = NULL;
         return NPERR_GENERIC_ERROR;
     }
 
-    vlc_set_r( p_plugin->p_vlc, "vout", "xvideo,x11,dummy" );
-    vlc_set_r( p_plugin->p_vlc, "intf", "dummy" );
+    value.psz_string = "xvideo,x11,dummy";
+    VLC_Set( p_plugin->i_vlc, "conf::vout", value );
+    value.psz_string = "dummy";
+    VLC_Set( p_plugin->i_vlc, "conf::intf", value );
 
     p_plugin->b_stream = 0;
     p_plugin->b_autoplay = 0;
@@ -227,7 +237,8 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         {
             if( !strcmp( argv[i], "yes" ) )
             {
-                vlc_set_r( p_plugin->p_vlc, "loop", "1" );
+                value.b_bool = VLC_TRUE;
+                VLC_Set( p_plugin->i_vlc, "conf::loop", value );
             }
         }
     }
@@ -251,11 +262,11 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
     if( p_plugin != NULL )
     {
-        if( p_plugin->p_vlc != NULL )
+        if( p_plugin->i_vlc )
         {
-            vlc_stop_r( p_plugin->p_vlc );
-            vlc_destroy_r( p_plugin->p_vlc );
-            p_plugin->p_vlc = NULL;
+            VLC_Stop( p_plugin->i_vlc );
+            VLC_Destroy( p_plugin->i_vlc );
+            p_plugin->i_vlc = 0;
         }
 
         if( p_plugin->psz_target )
@@ -274,7 +285,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
 NPError NPP_SetWindow( NPP instance, NPWindow* window )
 {
-    char psz_window[32];
+    vlc_value_t value;
 
     if( instance == NULL )
     {
@@ -284,9 +295,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
     /* Write the window ID for vlc */
-    sprintf( psz_window, "%li", (long int)window->window );
-    vlc_set_r( p_plugin->p_vlc, "x11-drawable", psz_window );
-    vlc_set_r( p_plugin->p_vlc, "xvideo-drawable", psz_window );
+    value.p_address = (void*)window->window;
+    VLC_Set( p_plugin->i_vlc, "drawable", value );
 
     /*
      * PLUGIN DEVELOPERS:
@@ -323,8 +333,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
         if( p_plugin->psz_target )
         {
-            vlc_add_target_r( p_plugin->p_vlc, p_plugin->psz_target,
-                              i_mode, PLAYLIST_END );
+            VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
+                           i_mode, PLAYLIST_END );
             p_plugin->b_stream = 1;
         }
     }
@@ -422,8 +432,8 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
     fprintf(stderr, "NPP_StreamAsFile\n");
-    vlc_add_target_r( p_plugin->p_vlc, fname,
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+    VLC_AddTarget( p_plugin->i_vlc, fname,
+                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 }
 
 #if 0

@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.99 2002/08/29 23:53:22 massiot Exp $
+ * $Id: interface.c,v 1.100 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -78,8 +78,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
     }
 
     /* Initialize structure */
-    p_intf->b_menu        = 0;
-    p_intf->b_menu_change = 0;
+    p_intf->b_menu        = VLC_FALSE;
+    p_intf->b_menu_change = VLC_FALSE;
 
     /* Initialize mutexes */
     vlc_mutex_init( p_intf, &p_intf->change_lock );
@@ -98,7 +98,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
  * This function either creates a new thread and runs the interface in it,
  * or runs the interface in the current thread, depending on b_block.
  *****************************************************************************/
-vlc_error_t intf_RunThread( intf_thread_t *p_intf )
+int intf_RunThread( intf_thread_t *p_intf )
 {
     if( p_intf->b_block )
     {
@@ -112,7 +112,7 @@ vlc_error_t intf_RunThread( intf_thread_t *p_intf )
 
         p_intf->pf_run( p_intf );
 
-        p_intf->b_die = 1;
+        p_intf->b_die = VLC_TRUE;
 
         /* Do not join the thread... intf_StopThread will do it for us */
     }
@@ -140,7 +140,7 @@ void intf_StopThread( intf_thread_t *p_intf )
     /* Tell the interface to die */
     if( !p_intf->b_block )
     {
-        p_intf->b_die = 1;
+        p_intf->b_die = VLC_TRUE;
     }
 
     /* Wait for the thread to exit */
@@ -180,7 +180,7 @@ static void Manager( intf_thread_t *p_intf )
 
         if( p_intf->p_vlc->b_die )
         {
-            p_intf->b_die = 1;
+            p_intf->b_die = VLC_TRUE;
             return;
         }
     }

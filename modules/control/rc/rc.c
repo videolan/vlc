@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.7 2002/10/03 17:01:59 gbazin Exp $
+ * $Id: rc.c,v 1.8 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -69,7 +69,9 @@ static void Run          ( intf_thread_t *p_intf );
 vlc_module_begin();
     add_category_hint( N_("Remote control"), NULL );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT );
+#ifdef HAVE_ISATTY
     add_bool( "fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT );
+#endif
     set_description( _("remote control interface module") );
     set_capability( "interface", 20 );
     set_callbacks( Activate, NULL );
@@ -129,6 +131,9 @@ static void Run( intf_thread_t *p_intf )
 
     p_input = NULL;
     p_playlist = NULL;
+
+    var_Create( p_intf, "foo", VLC_VAR_STRING );
+    var_Set( p_intf, "foo", (vlc_value_t)"test" );
 
     while( !p_intf->b_die )
     {
@@ -213,7 +218,6 @@ static void Run( intf_thread_t *p_intf )
         if( b_complete == 1 )
         {
             char *p_cmd = p_buffer;
-            char *p_tmp;
 
             if( !strcmp( p_cmd, "quit" ) )
             {
@@ -251,13 +255,17 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_liststructure( p_intf->p_vlc );
             }
-            else if( !strncmp( p_cmd, "set ", 4 ) )
+            else if( !strncmp( p_cmd, "setfoo ", 7 ) )
             {
-//                vlc_set_r( p_intf->p_vlc, p_cmd + 4, strstr( p_cmd + 4, " " ) );
-                p_tmp = strstr( p_cmd + 4, " " );
-                p_tmp[0] = '\0';
-                config_PutPsz( p_intf->p_vlc, p_cmd + 4, p_tmp + 1 );
-                config_PutInt( p_intf->p_vlc, p_cmd + 4, atoi(p_tmp + 1) );
+                vlc_value_t value;
+                value.psz_string = p_cmd + 7;
+                var_Set( p_intf, "foo", value );
+            }
+            else if( !strncmp( p_cmd, "getfoo", 6 ) )
+            {
+                vlc_value_t value;
+                var_Get( p_intf, "foo", &value );
+                printf( "current value is '%s'\n", value.psz_string );
             }
             else if( !strncmp( p_cmd, "intf ", 5 ) )
             {
@@ -391,8 +399,6 @@ static void Run( intf_thread_t *p_intf )
                 break;
             }
         }
-
-        msleep( INTF_IDLE_SLEEP );
     }
 
     if( p_input )
@@ -406,5 +412,7 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         p_playlist = NULL;
     }
+
+    var_Destroy( p_intf, "foo" );
 }
 

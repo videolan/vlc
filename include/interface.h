@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.35 2002/10/04 12:01:40 gbazin Exp $
+ * $Id: interface.h,v 1.36 2002/10/11 22:32:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ struct intf_thread_t
  *****************************************************************************/
 #define intf_Create(a) __intf_Create(VLC_OBJECT(a))
 VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t * ) );
-VLC_EXPORT( vlc_error_t,       intf_RunThread,  ( intf_thread_t * ) );
+VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
@@ -68,7 +68,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
          freopen( "CONOUT$", "w", stdout ); \
          freopen( "CONOUT$", "w", stderr ); \
          freopen( "CONIN$", "r", stdin ); \
-         msg_Info( p_intf, VERSION_MESSAGE ); \
+         msg_Info( p_intf, COPYRIGHT_MESSAGE ); \
          msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
                              "anymore, open a dos command box, go to the " \
                              "directory where you installed VLC and run " \

@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.13 2002/10/08 18:10:09 sam Exp $
+ * $Id: vlc.c,v 1.14 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,8 +32,6 @@
 
 #include <vlc/vlc.h>
 
-#include "config.h"
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -46,9 +44,9 @@ static void SigHandler  ( int i_signal );
  *****************************************************************************/
 int main( int i_argc, char *ppsz_argv[] )
 {
-    vlc_error_t err;
+    int i_ret;
 
-    fprintf( stderr, COPYRIGHT_MESSAGE "\n" );
+    fprintf( stderr, "VideoLAN Client %s\n", VLC_Version() );
 
 #ifdef HAVE_PUTENV
 #   ifdef DEBUG
@@ -67,10 +65,10 @@ int main( int i_argc, char *ppsz_argv[] )
 #endif
 
     /* Create a libvlc structure */
-    err = vlc_create();
-    if( err != VLC_SUCCESS )
+    i_ret = VLC_Create();
+    if( i_ret < 0 )
     {
-        return err;
+        return i_ret;
     }
 
 #ifndef WIN32
@@ -88,37 +86,37 @@ int main( int i_argc, char *ppsz_argv[] )
 #endif
 
     /* Initialize libvlc */
-    err = vlc_init( i_argc, ppsz_argv );
-    if( err != VLC_SUCCESS )
+    i_ret = VLC_Init( 0, i_argc, ppsz_argv );
+    if( i_ret < 0 )
     {
-        vlc_destroy();
-        return err;
+        VLC_Destroy( 0 );
+        return i_ret;
     }
 
     /* Run libvlc, in non-blocking mode */
-    err = vlc_play();
+    i_ret = VLC_Play( 0 );
 
     /* Add background interfaces */
 #if 0
-    { int i; for( i=10; i--; ) vlc_add_intf( NULL, "dummy", 0 ); }
-    vlc_add_intf( NULL, "dummy", VLC_FALSE );
-    vlc_add_intf( NULL, "logger", VLC_FALSE );
-    vlc_add_intf( NULL, "xosd", VLC_FALSE );
-    vlc_add_intf( NULL, "gtk", VLC_FALSE );
-    vlc_add_intf( NULL, "kde", VLC_FALSE );
-    vlc_add_intf( "rc", VLC_FALSE );
+    { int i; for( i=10; i--; ) VLC_AddIntf( 0, "dummy", 0 ); }
+    VLC_AddIntf( 0, "dummy", VLC_FALSE );
+    VLC_AddIntf( 0, "logger", VLC_FALSE );
+    VLC_AddIntf( 0, "xosd", VLC_FALSE );
+    VLC_AddIntf( 0, "gtk", VLC_FALSE );
+    VLC_AddIntf( 0, "kde", VLC_FALSE );
+    VLC_AddIntf( 0, "rc", VLC_FALSE );
 #endif
 
     /* Add a blocking interface and keep the return value */
-    err = vlc_add_intf( NULL, VLC_TRUE );
+    i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE );
 
     /* Finish the threads */
-    vlc_stop();
+    VLC_Stop( 0 );
 
     /* Destroy the libvlc structure */
-    vlc_destroy();
+    VLC_Destroy( 0 );
 
-    return err;
+    return i_ret;
 }
 
 #ifndef WIN32
@@ -146,7 +144,7 @@ static void SigHandler( int i_signal )
                          "again in case it gets stuck\n", i_signal );
 
         /* Acknowledge the signal received */
-        vlc_die();
+        VLC_Die( 0 );
     }
     else if( time( NULL ) > abort_time + 2 )
     {

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.28 2002/10/03 13:21:54 sam Exp $
+ * $Id: vlc_common.h,v 1.29 2002/10/11 22:32:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -156,6 +156,10 @@ typedef u32 vlc_fourcc_t;
 
 /* Internal types */
 typedef struct libvlc_t libvlc_t;
+typedef struct vlc_t vlc_t;
+typedef struct vlc_list_t vlc_list_t;
+typedef struct vlc_object_t vlc_object_t;
+typedef struct variable_t variable_t;
 
 /* Messages */
 typedef struct msg_bank_t msg_bank_t;
@@ -271,11 +275,18 @@ typedef struct iso639_lang_t iso639_lang_t;
     vlc_mutex_t  object_lock;                                               \
     vlc_cond_t   object_wait;                                               \
                                                                             \
+    /* Object properties */                                                 \
     volatile vlc_bool_t b_error;                    /* set by the object */ \
     volatile vlc_bool_t b_die;                     /* set by the outside */ \
     volatile vlc_bool_t b_dead;                     /* set by the object */ \
     volatile vlc_bool_t b_attached;                 /* set by the object */ \
                                                                             \
+    /* Object variables */                                                  \
+    vlc_mutex_t     var_lock;                                               \
+    int             i_vars;                                                 \
+    variable_t *    p_vars;                                                 \
+                                                                            \
+    /* Stuff related to the libvlc structure */                             \
     libvlc_t *      p_libvlc;                        /* root of all evil */ \
     vlc_t *         p_vlc;                     /* (root of all evil) - 1 */ \
                                                                             \
@@ -289,23 +300,6 @@ typedef struct iso639_lang_t iso639_lang_t;
                                                                             \
     /* Just a reminder so that people don't cast garbage */                 \
     int be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                        \
-
-/* The real vlc_object_t type. Yes, it's that simple :-) */
-struct vlc_object_t
-{
-    VLC_COMMON_MEMBERS
-};
-
-/* The object list */
-struct vlc_list_t
-{
-    int             i_count;
-    vlc_object_t ** pp_objects;
-
-    /* Private */
-    int             _i_extra;
-    vlc_object_t *  _p_first;
-};  
 
 /* VLC_OBJECT: attempt at doing a clever cast */
 #define VLC_OBJECT( x ) \
@@ -508,12 +502,13 @@ typedef __int64 off_t;
 #include "vlc_symbols.h"
 #include "os_specific.h"
 #include "vlc_messages.h"
+#include "variables.h"
+#include "vlc_objects.h"
 #include "vlc_threads_funcs.h"
 #include "mtime.h"
 #include "modules.h"
 #include "main.h"
 #include "configuration.h"
-#include "vlc_objects.h"
 
 #if defined( __BORLANDC__ )
 #   undef PACKAGE

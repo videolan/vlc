@@ -171,6 +171,7 @@ HEADERS_include = \
 	include/os_specific.h \
 	include/stream_control.h \
 	include/stream_output.h \
+	include/variables.h \
 	include/video.h \
 	include/video_output.h \
 	include/vlc_common.h \
@@ -334,6 +335,7 @@ SOURCES_libvlc = \
 	src/misc/iso-639.def \
 	src/misc/messages.c \
 	src/misc/objects.c \
+	src/misc/variables.c \
 	src/misc/extras.c \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_beos) \

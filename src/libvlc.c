@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.37 2002/10/08 18:10:09 sam Exp $
+ * $Id: libvlc.c,v 1.38 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -80,9 +80,7 @@
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
 static libvlc_t libvlc;
-
-//#define GLOBAL_VLC NULL
-#define GLOBAL_VLC ((vlc_t*)libvlc.pp_children[1])
+static vlc_t *  p_static_vlc;
 
 /*****************************************************************************
  * Local prototypes
@@ -97,48 +95,22 @@ static void ShowConsole   ( void );
 #endif
 
 /*****************************************************************************
- * vlc_create: allocate a vlc_t structure, and initialize libvlc if needed.
+ * VLC_Version: return the libvlc version.
  *****************************************************************************
- * This function allocates a vlc_t structure and returns NULL in case of
- * failure. Also, the thread system is initialized.
+ * This function returns full version string (numeric version and codename).
  *****************************************************************************/
-vlc_error_t vlc_create( void )
+char * VLC_Version( void )
 {
-    vlc_t * p_vlc;
-    vlc_bool_t b_failed = VLC_FALSE;
-
-    /* This call should be thread-safe, but an additional check will be
-     * necessary afterwards to check that only one p_vlc is created. */
-    p_vlc = vlc_create_r();
-
-    if( p_vlc == NULL )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* We have created an object, which ensures us that p_global_lock has
-     * been properly initialized. We can now atomically check that we are
-     * the only p_vlc object. */
-#if 0
-    vlc_mutex_lock( libvlc.p_global_lock );
-    if( libvlc.i_children != 1 ) /* FIXME !!! FIXME */
-    {
-        b_failed = VLC_TRUE;
-    }
-    vlc_mutex_unlock( libvlc.p_global_lock );
-#endif
-
-    /* There can be only one */
-    if( b_failed )
-    {
-        vlc_destroy_r( p_vlc );
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
+    return VERSION_MESSAGE;
 }
 
-vlc_t * vlc_create_r( void )
+/*****************************************************************************
+ * VLC_Create: allocate a vlc_t structure, and initialize libvlc if needed.
+ *****************************************************************************
+ * This function allocates a vlc_t structure and returns a negative value
+ * in case of failure. Also, the thread system is initialized.
+ *****************************************************************************/
+int VLC_Create( void )
 {
     int i_ret;
     vlc_t * p_vlc = NULL;
@@ -147,9 +119,9 @@ vlc_t * vlc_create_r( void )
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
     i_ret = vlc_threads_init( &libvlc );
-    if( i_ret )
+    if( i_ret < 0 )
     {
-        return NULL;
+        return i_ret;
     }
 
     /* Now that the thread system is initialized, we don't have much, but
@@ -196,7 +168,7 @@ vlc_t * vlc_create_r( void )
     p_vlc = vlc_object_create( &libvlc, VLC_OBJECT_VLC );
     if( p_vlc == NULL )
     {
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     p_vlc->psz_object_name = "root";
@@ -207,14 +179,17 @@ vlc_t * vlc_create_r( void )
     /* Store our newly allocated structure in the global list */
     vlc_object_attach( p_vlc, &libvlc );
 
+    /* Store data for the non-reentrant API */
+    p_static_vlc = p_vlc;
+
     /* Update the handle status */
     p_vlc->i_status = VLC_STATUS_CREATED;
 
-    return p_vlc;
+    return p_vlc->i_object_id;
 }
 
 /*****************************************************************************
- * vlc_init: initialize a vlc_t structure.
+ * VLC_Init: initialize a vlc_t structure.
  *****************************************************************************
  * This function initializes a previously allocated vlc_t structure:
  *  - CPU detection
@@ -222,18 +197,16 @@ vlc_t * vlc_create_r( void )
  *  - message queue, module bank and playlist initialization
  *  - configuration and commandline parsing
  *****************************************************************************/
-vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
-{
-    return vlc_init_r( GLOBAL_VLC, i_argc, ppsz_argv );
-}
-
-vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
+int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 {
     char         p_capabilities[200];
     char *       p_tmp;
     vlc_bool_t   b_exit;
+    vlc_t *      p_vlc;
     module_t    *p_help_module;
     playlist_t  *p_playlist;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
@@ -521,25 +494,21 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 }
 
 /*****************************************************************************
- * vlc_add_intf: add an interface
+ * VLC_AddIntf: add an interface
  *****************************************************************************
  * This function opens an interface plugin and runs it. If b_block is set
- * to 0, vlc_add_intf will return immediately and let the interface run in a
- * separate thread. If b_block is set to 1, vlc_add_intf will continue until
+ * to 0, VLC_AddIntf will return immediately and let the interface run in a
+ * separate thread. If b_block is set to 1, VLC_AddIntf will continue until
  * user requests to quit.
  *****************************************************************************/
-vlc_error_t vlc_add_intf( const char *psz_module, vlc_bool_t b_block )
+int VLC_AddIntf( int i_object, const char *psz_module, vlc_bool_t b_block )
 {
-    return vlc_add_intf_r( GLOBAL_VLC,
-                           psz_module, b_block );
-}
-
-vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
-                                          vlc_bool_t b_block )
-{
-    vlc_error_t err;
+    int i_err;
     intf_thread_t *p_intf;
+    vlc_t *p_vlc;
     char *psz_oldmodule = NULL;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
@@ -574,30 +543,29 @@ vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
 
     /* Try to run the interface */
     p_intf->b_block = b_block;
-    err = intf_RunThread( p_intf );
-    if( err )
+    i_err = intf_RunThread( p_intf );
+    if( i_err )
     {
         vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
-        return err;
+        return i_err;
     }
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * vlc_destroy: stop playing and destroy everything.
+ * VLC_Destroy: stop playing and destroy everything.
  *****************************************************************************
  * This function requests the running threads to finish, waits for their
  * termination, and destroys their structure.
  *****************************************************************************/
-vlc_error_t vlc_destroy( void )
+int VLC_Destroy( int i_object )
 {
-    return vlc_destroy_r( GLOBAL_VLC );
-}
+    vlc_t *p_vlc;
 
-vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
-{
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+
     /* Check that the handle is valid */
     if( !p_vlc || (p_vlc->i_status != VLC_STATUS_STOPPED
                     && p_vlc->i_status != VLC_STATUS_CREATED) )
@@ -658,18 +626,17 @@ vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
 }
 
 /*****************************************************************************
- * vlc_die: ask vlc to die.
+ * VLC_Die: ask vlc to die.
  *****************************************************************************
  * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
- * task. It is your duty to call vlc_end and vlc_destroy afterwards.
+ * task. It is your duty to call vlc_end and VLC_Destroy afterwards.
  *****************************************************************************/
-vlc_error_t vlc_die( void )
+int VLC_Die( int i_object )
 {
-    return vlc_die_r( GLOBAL_VLC );
-}
+    vlc_t *p_vlc;
 
-vlc_error_t vlc_die_r( vlc_t *p_vlc )
-{
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+
     if( !p_vlc )
     {
         fprintf( stderr, "error: invalid status (!EXIST)\n" );
@@ -682,42 +649,18 @@ vlc_error_t vlc_die_r( vlc_t *p_vlc )
 }
 
 /*****************************************************************************
- * vlc_status: return the current vlc status.
- *****************************************************************************
- * This function returns the current value of p_vlc->i_status.
- *****************************************************************************/
-vlc_status_t vlc_status( void )
-{
-    return vlc_status_r( GLOBAL_VLC );
-}
-
-vlc_status_t vlc_status_r( vlc_t *p_vlc )
-{
-    if( !p_vlc )
-    {
-        return VLC_STATUS_NONE;
-    }
-
-    return p_vlc->i_status;
-}
-
-/*****************************************************************************
- * vlc_add_target: adds a target for playing.
+ * VLC_AddTarget: adds a target for playing.
  *****************************************************************************
  * This function adds psz_target to the current playlist. If a playlist does
  * not exist, it will create one.
  *****************************************************************************/
-vlc_error_t vlc_add_target( const char *psz_target, int i_mode, int i_pos )
+int VLC_AddTarget( int i_object, const char *psz_target, int i_mode, int i_pos )
 {
-    return vlc_add_target_r( GLOBAL_VLC,
-                             psz_target, i_mode, i_pos );
-}
-
-vlc_error_t vlc_add_target_r( vlc_t *p_vlc, const char *psz_target,
-                                            int i_mode, int i_pos )
-{
-    vlc_error_t err;
+    int i_err;
     playlist_t *p_playlist;
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
                      && p_vlc->i_status != VLC_STATUS_RUNNING ) )
@@ -741,26 +684,23 @@ vlc_error_t vlc_add_target_r( vlc_t *p_vlc, const char *psz_target,
         vlc_object_yield( p_playlist );
     }
 
-    err = playlist_Add( p_playlist, psz_target, i_mode, i_pos );
+    i_err = playlist_Add( p_playlist, psz_target, i_mode, i_pos );
 
     vlc_object_release( p_playlist );
 
-    return err;
+    return i_err;
 }
 
 /*****************************************************************************
- * vlc_set: set a vlc variable
+ * VLC_Set: set a vlc variable
  *****************************************************************************
  *
  *****************************************************************************/
-vlc_error_t vlc_set( const char *psz_var, const char *psz_val )
+int VLC_Set( int i_object, const char *psz_var, vlc_value_t value )
 {
-    return vlc_set_r( GLOBAL_VLC, psz_var, psz_val );
-}
+    vlc_t *p_vlc;
 
-vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
-{
-    module_config_t *p_config;
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     if( !p_vlc )
     {
@@ -768,101 +708,70 @@ vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
         return VLC_ESTATUS;
     }
 
-    p_config = config_FindConfig( VLC_OBJECT(p_vlc), psz_var );
-
-    if( !p_config )
+    /* FIXME: Temporary hack for Mozilla, if variable starts with conf:: then
+     * we handle it as a configuration variable. Don't tell Gildas :) -- sam */
+    if( !strncmp( psz_var, "conf::", 6 ) )
     {
-        msg_Err( p_vlc, "option %s does not exist", psz_var );
-        return VLC_EGENERIC;
-    }
+        module_config_t *p_item;
+        const char *psz_newvar = psz_var + 6;
 
-    vlc_mutex_lock( p_config->p_lock );
+        p_item = config_FindConfig( VLC_OBJECT(p_vlc), psz_newvar );
 
-    switch( p_config->i_type )
-    {
-    case CONFIG_ITEM_BOOL:
-        if( psz_val && *psz_val )
+        if( p_item )
         {
-            if( !strcmp( psz_val, "off" ) || !strcmp( psz_val, "no" ) )
+            switch( p_item->i_type )
             {
-                p_config->i_value = VLC_FALSE;
+                case CONFIG_ITEM_BOOL:
+                    config_PutInt( p_vlc, psz_newvar, value.b_bool );
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    config_PutInt( p_vlc, psz_newvar, value.i_int );
+                    break;
+                case CONFIG_ITEM_FLOAT:
+                    config_PutFloat( p_vlc, psz_newvar, value.f_float );
+                    break;
+                default:
+                    config_PutPsz( p_vlc, psz_newvar, value.psz_string );
+                    break;
             }
-            else
-            {
-                p_config->i_value = atoi( psz_val );
-            }
+            return VLC_SUCCESS;
         }
-        else
-        {
-            p_config->i_value = VLC_TRUE;
-        }
-        break;
-    case CONFIG_ITEM_INTEGER:
-        if( psz_val && *psz_val )
-        {
-            p_config->i_value = atoi( psz_val );
-        }
-        else
-        {
-            p_config->i_value = 0;
-        }
-        break;
-    case CONFIG_ITEM_FLOAT:
-        if( psz_val && *psz_val )
-        {
-            p_config->f_value = (float)atof( psz_val );
-        }
-        else
-        {
-            p_config->f_value = 0.0;
-        }
-        break;
-    case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_FILE:
-    case CONFIG_ITEM_MODULE:
-    default:
-        if( p_config->psz_value )
-        {
-            free( p_config->psz_value );
-        }
-
-        if( psz_val )
-        {
-            p_config->psz_value = strdup( psz_val );
-        }
-        else
-        {
-            p_config->psz_value = NULL;
-        }
-        break;
     }
 
-    if( p_config->pf_callback )
-    {
-        vlc_mutex_unlock( p_config->p_lock );
-        p_config->pf_callback( VLC_OBJECT(p_vlc) );
-    }
-    else
-    {
-        vlc_mutex_unlock( p_config->p_lock );
-    }
-
-    return VLC_SUCCESS;
+    return var_Set( p_vlc, psz_var, value );
 }
-
-/* XXX: temporary hacks */
 
 /*****************************************************************************
- * vlc_play: play
+ * VLC_Get: get a vlc variable
+ *****************************************************************************
+ *
  *****************************************************************************/
-vlc_error_t vlc_play( )
+int VLC_Get( int i_object, const char *psz_var, vlc_value_t *p_value )
 {
-    return vlc_play_r( GLOBAL_VLC );
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+
+    if( !p_vlc )
+    {
+        fprintf( stderr, "error: invalid status\n" );
+        return VLC_ESTATUS;
+    }
+
+    return var_Get( p_vlc, psz_var, p_value );
 }
 
-vlc_error_t vlc_play_r( vlc_t *p_vlc )
+/* FIXME: temporary hacks */
+
+/*****************************************************************************
+ * VLC_Play: play
+ *****************************************************************************/
+int VLC_Play( int i_object )
 {
     playlist_t * p_playlist;
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
@@ -898,19 +807,17 @@ vlc_error_t vlc_play_r( vlc_t *p_vlc )
 }
 
 /*****************************************************************************
- * vlc_stop: stop
+ * VLC_Stop: stop
  *****************************************************************************/
-vlc_error_t vlc_stop( )
-{
-    return vlc_stop_r( GLOBAL_VLC );
-}
-
-vlc_error_t vlc_stop_r( vlc_t *p_vlc )
+int VLC_Stop( int i_object )
 {
     intf_thread_t *   p_intf;
     playlist_t    *   p_playlist;
     vout_thread_t *   p_vout;
     aout_instance_t * p_aout;
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
     if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
@@ -973,16 +880,19 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
 }
 
 /*****************************************************************************
- * vlc_pause: toggle pause
+ * VLC_Pause: toggle pause
  *****************************************************************************/
-vlc_error_t vlc_pause( )
-{
-    return vlc_pause_r( GLOBAL_VLC );
-}
-
-vlc_error_t vlc_pause_r( vlc_t *p_vlc )
+int VLC_Pause( int i_object )
 {
     input_thread_t *p_input;
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+
+    if( !p_vlc )
+    {
+        return VLC_ESTATUS;
+    }
 
     p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
 
@@ -998,16 +908,19 @@ vlc_error_t vlc_pause_r( vlc_t *p_vlc )
 }
 
 /*****************************************************************************
- * vlc_fullscreen: toggle fullscreen mode
+ * VLC_FullScreen: toggle fullscreen mode
  *****************************************************************************/
-vlc_error_t vlc_fullscreen( )
-{
-    return vlc_fullscreen_r( GLOBAL_VLC );
-}
-
-vlc_error_t vlc_fullscreen_r( vlc_t *p_vlc )
+int VLC_FullScreen( int i_object )
 {
     vout_thread_t *p_vout;
+    vlc_t *p_vlc;
+
+    p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
+
+    if( !p_vlc )
+    {
+        return VLC_ESTATUS;
+    }
 
     p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD );
 
@@ -1036,7 +949,9 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        vlc_add_target_r( p_vlc, ppsz_argv[ i_opt ],
+        /* TODO: write an internal function of this one, to avoid
+         *       unnecessary lookups. */
+        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ i_opt ],
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
     }
 

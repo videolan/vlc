@@ -2126,7 +2126,7 @@ then
   dnl  this one is needed until automake knows what to do
   LDFLAGS_test3="${LDFLAGS_test3} -lobjc"
   PLUGINS="${PLUGINS} ${TESTS}"
-  BUILTINS="${BUILTINS} ${TESTS}"
+  #BUILTINS="${BUILTINS} ${TESTS}"
 fi
 
 dnl
@@ -2200,7 +2200,7 @@ dnl do not touch this line (bootstrap needs it)
 dnl
 dnl  Stuff used by the program
 dnl
-AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "vlc ${VERSION} ${CODENAME} Copyright 1996-2002 VideoLAN", [Simple version string])
+AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VideoLAN Client - version ${VERSION} ${CODENAME} - (c) 1996-2002 VideoLAN", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 

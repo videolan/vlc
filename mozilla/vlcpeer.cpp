@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
+ * $Id: vlcpeer.cpp,v 1.3 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -70,12 +70,12 @@ NS_IMETHODIMP VlcPeer::Play()
     {
         if( !p_plugin->b_stream && p_plugin->psz_target )
         {
-            vlc_add_target_r( p_plugin->p_vlc, p_plugin->psz_target,
-                              PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+            VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
+                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
             p_plugin->b_stream = 1;
         }
 
-        vlc_play_r( p_plugin->p_vlc );
+        VLC_Play( p_plugin->i_vlc );
     }
     return NS_OK;
 }
@@ -84,7 +84,7 @@ NS_IMETHODIMP VlcPeer::Pause()
 {
     if( p_plugin )
     {
-        vlc_pause_r( p_plugin->p_vlc );
+        VLC_Pause( p_plugin->i_vlc );
     }
     return NS_OK;
 }
@@ -93,7 +93,7 @@ NS_IMETHODIMP VlcPeer::Stop()
 {
     if( p_plugin )
     {
-        vlc_stop_r( p_plugin->p_vlc );
+        VLC_Stop( p_plugin->i_vlc );
         p_plugin->b_stream = 0;
     }
     return NS_OK;
@@ -103,7 +103,7 @@ NS_IMETHODIMP VlcPeer::Fullscreen()
 {
     if( p_plugin )
     {
-        vlc_fullscreen_r( p_plugin->p_vlc );
+        VLC_FullScreen( p_plugin->i_vlc );
     }
     return NS_OK;
 }

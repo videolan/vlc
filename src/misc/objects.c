@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.23 2002/10/04 18:07:22 sam Exp $
+ * $Id: objects.c,v 1.24 2002/10/11 22:32:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -141,11 +141,19 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     p_new->psz_object_name = NULL;
 
-    p_new->i_refcount = 0;
     p_new->b_die = VLC_FALSE;
     p_new->b_error = VLC_FALSE;
     p_new->b_dead = VLC_FALSE;
     p_new->b_attached = VLC_FALSE;
+
+    p_new->i_vars = 0;
+    p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );
+
+    if( !p_new->p_vars )
+    {
+        free( p_new );
+        return NULL;
+    }
 
     if( i_type == VLC_OBJECT_ROOT )
     {
@@ -183,6 +191,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         vlc_mutex_unlock( &structure_lock );
     }
 
+    p_new->i_refcount = 0;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -192,6 +201,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     /* Initialize mutexes and condvars */
     vlc_mutex_init( p_new, &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
+    vlc_mutex_init( p_new, &p_new->var_lock );
 
     if( i_type == VLC_OBJECT_ROOT )
     {
@@ -250,6 +260,16 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         msleep( 100000 );
     }
 
+    /* Destroy the associated variables, starting from the end so that
+     * no memmove calls have to be done. */
+    while( p_this->i_vars )
+    {
+        var_Destroy( p_this, p_this->p_vars[p_this->i_vars - 1].psz_name );
+    }
+
+    free( p_this->p_vars );
+    vlc_mutex_destroy( &p_this->var_lock );
+
     if( p_this->i_object_type == VLC_OBJECT_ROOT )
     {
         /* We are the root object ... no need to lock. */
@@ -286,6 +306,66 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
+}
+
+/*****************************************************************************
+ * vlc_object_get: find an object given its ID
+ *****************************************************************************
+ * This function looks for the object whose i_object_id field is i_id. We
+ * use a dichotomy so that lookups are in log2(n).
+ *****************************************************************************/
+void * __vlc_object_get( vlc_object_t *p_this, int i_id )
+{
+    int i_max, i_middle;
+    vlc_object_t **pp_objects;
+
+    vlc_mutex_lock( &structure_lock );
+
+    pp_objects = p_this->p_libvlc->pp_objects;
+
+    /* Perform our dichotomy */
+    for( i_max = p_this->p_libvlc->i_objects - 1 ; ; )
+    {
+        i_middle = i_max / 2;
+
+        if( pp_objects[i_middle]->i_object_id > i_id )
+        {
+            i_max = i_middle;
+        }
+        else if( pp_objects[i_middle]->i_object_id < i_id )
+        {
+            if( i_middle )
+            {
+                pp_objects += i_middle;
+                i_max -= i_middle;
+            }
+            else
+            {
+                /* This happens when there are only two remaining objects */
+                if( pp_objects[i_middle+1]->i_object_id == i_id )
+                {
+                    vlc_mutex_unlock( &structure_lock );
+                    return pp_objects[i_middle+1];
+                }
+                break;
+            }
+        }
+        else
+        {
+            vlc_mutex_unlock( &structure_lock );
+            return pp_objects[i_middle];
+        }
+
+        if( i_max == 0 )
+        {
+            /* this means that i_max == i_middle, and since we have already
+             * tested pp_objects[i_middle]), p_found is properly set. */
+            break;
+        }
+    }
+
+    vlc_mutex_unlock( &structure_lock );
+    return NULL;
 }
 
 /*****************************************************************************
