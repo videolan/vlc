@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.46 2002/12/25 23:39:01 sam Exp $
+ * $Id: input_ext-intf.c,v 1.47 2003/01/21 14:15:05 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,25 +74,29 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
         /* If we are already going too fast, go back to default rate */
         if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
         {
-            p_input->stream.i_new_status = PLAYING_S;
-            msg_Dbg( p_input, "playing at normal rate" );
+            msg_Dbg( p_input, "can not play any faster" );
         }
         else
         {
             p_input->stream.i_new_status = FORWARD_S;
-
-            if( p_input->stream.control.i_rate < DEFAULT_RATE
-                    && p_input->stream.control.i_status == FORWARD_S )
-            {
-                p_input->stream.i_new_rate =
+            p_input->stream.i_new_rate =
                                     p_input->stream.control.i_rate / 2;
-            }
-            else
+
+            if ( p_input->stream.i_new_rate < DEFAULT_RATE )
             {
-                p_input->stream.i_new_rate = DEFAULT_RATE / 2;
-            }
-            msg_Dbg( p_input, "playing at %i:1 fast forward",
+                msg_Dbg( p_input, "playing at %i:1 fast forward",
                      DEFAULT_RATE / p_input->stream.i_new_rate );
+            }
+            else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at 1:%i slow motion",
+                      p_input->stream.i_new_rate / DEFAULT_RATE );
+            }
+            else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+            {
+                p_input->stream.i_new_status = PLAYING_S;
+                msg_Dbg( p_input, "playing at normal rate" );
+            }
         }
         break;
 
@@ -100,25 +104,29 @@ void __input_SetStatus( vlc_object_t * p_this, int i_mode )
         /* If we are already going too slow, go back to default rate */
         if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
         {
-            p_input->stream.i_new_status = PLAYING_S;
-            msg_Dbg( p_input, "playing at normal rate" );
+            msg_Dbg( p_input, "can not play any slower" );
         }
         else
         {
             p_input->stream.i_new_status = FORWARD_S;
-
-            if( p_input->stream.control.i_rate > DEFAULT_RATE
-                    && p_input->stream.control.i_status == FORWARD_S )
-            {
-                p_input->stream.i_new_rate =
+            p_input->stream.i_new_rate =
                                     p_input->stream.control.i_rate * 2;
-            }
-            else
+
+            if ( p_input->stream.i_new_rate < DEFAULT_RATE )
             {
-                p_input->stream.i_new_rate = DEFAULT_RATE * 2;
+                msg_Dbg( p_input, "playing at %i:1 fast forward",
+                     DEFAULT_RATE / p_input->stream.i_new_rate );
             }
-            msg_Dbg( p_input, "playing at 1:%i slow motion",
+            else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at 1:%i slow motion",
                       p_input->stream.i_new_rate / DEFAULT_RATE );
+            }
+            else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+            {
+                p_input->stream.i_new_status = PLAYING_S;
+                msg_Dbg( p_input, "playing at normal rate" );
+            }
         }
         break;
 
