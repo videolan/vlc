@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.57 2003/04/16 00:12:36 fenrir Exp $
+ * $Id: libvlc.h,v 1.58 2003/05/04 23:38:06 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,90 +34,90 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
  * Look into configuration.h if you need to know more about the following
  * macros.
  *****************************************************************************/
-#define INTF_TEXT N_("interface module")
+#define INTF_TEXT N_("Interface module")
 #define INTF_LONGTEXT N_( \
     "This option allows you to select the interface used by VLC. " \
     "The default behavior is to automatically select the best module " \
     "available.")
 
-#define EXTRAINTF_TEXT N_("extra interface modules")
+#define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
     "This option allows you to select additional interfaces used by VLC. " \
     "They will be launched in the background in addition to the default " \
     "interface. Use a comma separated list of interface modules.")
 
-#define VERBOSE_TEXT N_("verbosity (0,1,2)")
+#define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
     "This options sets the verbosity level (0=only errors and " \
     "standard messages, 1=warnings, 2=debug).")
 
-#define QUIET_TEXT N_("be quiet")
+#define QUIET_TEXT N_("Be quiet")
 #define QUIET_LONGTEXT N_( \
     "This options turns off all warning and information messages.")
 
-#define TRANSLATION_TEXT N_("translation")
+#define TRANSLATION_TEXT N_("Translation")
 #define TRANSLATION_LONGTEXT N_( \
     "This option allows you to enable the translation of the interface.")
 
-#define COLOR_TEXT N_("color messages")
+#define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
     "When this option is turned on, the messages sent to the console will " \
     "be colorized. Your terminal needs Linux color support for this to work.")
 
-#define ADVANCED_TEXT N_("show advanced options")
+#define ADVANCED_TEXT N_("Show advanced options")
 #define ADVANCED_LONGTEXT N_( \
     "When this option is turned on, the interfaces will show all the " \
     "available options, including those that most users should never touch")
 
-#define INTF_PATH_TEXT N_("interface default search path")
+#define INTF_PATH_TEXT N_("Interface default search path")
 #define INTF_PATH_LONGTEXT N_( \
     "This option allows you to set the default path that the interface will " \
     "open when looking for a file.")
 
-#define PLUGIN_PATH_TEXT N_("plugin search path")
+#define PLUGIN_PATH_TEXT N_("Plugin search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "This option allows you to specify an additional path for VLC to look " \
     "for its plugins.")
 
-#define AOUT_TEXT N_("audio output module")
+#define AOUT_TEXT N_("Audio output module")
 #define AOUT_LONGTEXT N_( \
     "This option allows you to select the audio output method used by VLC. " \
     "The default behavior is to automatically select the best method " \
     "available.")
 
-#define AUDIO_TEXT N_("enable audio")
+#define AUDIO_TEXT N_("Enable audio")
 #define AUDIO_LONGTEXT N_( \
     "You can completely disable the audio output. In this case the audio " \
     "decoding stage won't be done, and it will save some processing power.")
 
-#define MONO_TEXT N_("force mono audio")
+#define MONO_TEXT N_("Force mono audio")
 #define MONO_LONGTEXT N_("This will force a mono audio output")
 
-#define VOLUME_TEXT N_("audio output volume")
+#define VOLUME_TEXT N_("Audio output volume")
 #define VOLUME_LONGTEXT N_( \
     "You can set the default audio output volume here, in a range from 0 to " \
     "1024.")
 
-#define VOLUME_SAVE_TEXT N_("audio output saved volume")
+#define VOLUME_SAVE_TEXT N_("Audio output saved volume")
 #define VOLUME_SAVE_LONGTEXT N_( \
     "This saves the audio output volume when you select mute.")
 
-#define AOUT_RATE_TEXT N_("audio output frequency (Hz)")
+#define AOUT_RATE_TEXT N_("Audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
     "-1 (default), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
 
-#define DESYNC_TEXT N_("compensate desynchronization of audio (in ms)")
+#define DESYNC_TEXT N_("Compensate desynchronization of audio (in ms)")
 #define DESYNC_LONGTEXT N_( \
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
 
-#define SPDIF_TEXT N_("use the S/PDIF audio output when available")
+#define SPDIF_TEXT N_("Use the S/PDIF audio output when available")
 #define SPDIF_LONGTEXT N_( \
     "This option allows you to use the S/PDIF audio output by default when " \
     "your hardware supports it as well as the audio stream being played.")
 
-#define HEADPHONE_TEXT N_("headphone virtual spatialization effect")
+#define HEADPHONE_TEXT N_("Headphone virtual spatialization effect")
 #define HEADPHONE_LONGTEXT N_( \
     "This effect gives you the feeling that you stands in a real room " \
     "with a complete 5.1 speaker set when using only a headphone, " \
@@ -126,63 +126,63 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "long periods of time.\nIt works with any source format from mono " \
     "to 5.1.")
 
-#define VOUT_TEXT N_("video output module")
+#define VOUT_TEXT N_("Video output module")
 #define VOUT_LONGTEXT N_( \
     "This option allows you to select the video output method used by VLC. " \
     "The default behavior is to automatically select the best " \
     "method available.")
 
-#define VIDEO_TEXT N_("enable video")
+#define VIDEO_TEXT N_("Enable video")
 #define VIDEO_LONGTEXT N_( \
     "You can completely disable the video output. In this case the video " \
     "decoding stage won't be done, which will save some processing power.")
 
-#define DISPLAY_TEXT N_("display identifier")
+#define DISPLAY_TEXT N_("Display identifier")
 #define DISPLAY_LONGTEXT N_( \
     "This is the local display port that will be used for X11 drawing. " \
     "For instance :0.1.")
 
-#define WIDTH_TEXT N_("video width")
+#define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
     "You can enforce the video width here. By default VLC will " \
     "adapt to the video characteristics.")
 
-#define HEIGHT_TEXT N_("video height")
+#define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
     "You can enforce the video height here. By default VLC will " \
     "adapt to the video characteristics.")
 
-#define ZOOM_TEXT N_("zoom video")
+#define ZOOM_TEXT N_("Zoom video")
 #define ZOOM_LONGTEXT N_( \
     "You can zoom the video by the specified factor.")
 
-#define GRAYSCALE_TEXT N_("grayscale video output")
+#define GRAYSCALE_TEXT N_("gGayscale video output")
 #define GRAYSCALE_LONGTEXT N_( \
     "When enabled, the color information from the video won't be decoded " \
     "(this can also allow you to save some processing power).")
 
-#define FULLSCREEN_TEXT N_("fullscreen video output")
+#define FULLSCREEN_TEXT N_("Fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
     "If this option is enabled, VLC will always start a video in fullscreen " \
     "mode.")
 
-#define OVERLAY_TEXT N_("overlay video output")
+#define OVERLAY_TEXT N_("Overlay video output")
 #define OVERLAY_LONGTEXT N_( \
     "If enabled, VLC will try to take advantage of the overlay capabilities " \
     "of your graphic card.")
 
-#define SPUMARGIN_TEXT N_("force SPU position")
+#define SPUMARGIN_TEXT N_("Force SPU position")
 #define SPUMARGIN_LONGTEXT N_( \
     "You can use this option to place the subtitles under the movie, " \
     "instead of over the movie. Try several positions.")
 
-#define FILTER_TEXT N_("video filter module")
+#define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
     "This will allow you to add a post-processing filter to enhance the " \
     "picture quality, for instance deinterlacing, or to clone or distort " \
     "the video window.")
 
-#define ASPECT_RATIO_TEXT N_("source aspect ratio")
+#define ASPECT_RATIO_TEXT N_("Source aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
     "This will force the source aspect ratio. For instance, some DVDs claim " \
     "to be 16:9 while they are actually 4:3. This can also be used as a " \
@@ -192,7 +192,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "squareness.")
 
 #if 0
-#define PIXEL_RATIO_TEXT N_("destination aspect ratio")
+#define PIXEL_RATIO_TEXT N_("Destination aspect ratio")
 #define PIXEL_RATIO_LONGTEXT N_( \
     "This will force the destination pixel size. By default VLC assumes " \
     "your pixels are square, unless your hardware has a way to tell it " \
@@ -201,7 +201,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "1.3333, etc.) expressing pixel squareness.")
 #endif
 
-#define SERVER_PORT_TEXT N_("server port")
+#define SERVER_PORT_TEXT N_("Server port")
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
 
@@ -210,48 +210,48 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "This is the typical size of UDP packets that we expect. On Ethernet " \
     "it is usually 1500.")
 
-#define NETCHANNEL_TEXT N_("enable network channel mode")
+#define NETCHANNEL_TEXT N_("Enable network channel mode")
 #define NETCHANNEL_LONGTEXT N_( \
     "Activate this option if you want to use the VideoLAN Channel Server.")
 
-#define CHAN_SERV_TEXT N_("channel server address")
+#define CHAN_SERV_TEXT N_("Channel server address")
 #define CHAN_SERV_LONGTEXT N_( \
     "Indicate here the address of the VideoLAN Channel Server.")
 
-#define CHAN_PORT_TEXT N_("channel server port")
+#define CHAN_PORT_TEXT N_("Channel server port")
 #define CHAN_PORT_LONGTEXT N_( \
     "Indicate here the port on which the VideoLAN Channel Server runs.")
 
-#define IFACE_TEXT N_("network interface")
+#define IFACE_TEXT N_("Network interface")
 #define IFACE_LONGTEXT N_( \
     "If you have several interfaces on your Linux machine and use the " \
     "VLAN solution, you may indicate here which interface to use.")
 
-#define IFACE_ADDR_TEXT N_("network interface address")
+#define IFACE_ADDR_TEXT N_("Network interface address")
 #define IFACE_ADDR_LONGTEXT N_( \
     "If you have several interfaces on your machine and use the " \
     "multicast solution, you will probably have to indicate the IP address " \
     "of your multicasting interface here.")
 
-#define TTL_TEXT N_("time to live")
+#define TTL_TEXT N_("Time to live")
 #define TTL_LONGTEXT N_( \
     "Indicate here the Time To Live of the multicast packets sent by " \
     "the stream output.")
 
-#define INPUT_PROGRAM_TEXT N_("choose program (SID)")
+#define INPUT_PROGRAM_TEXT N_("Choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.")
 
-#define INPUT_AUDIO_TEXT N_("choose audio")
+#define INPUT_AUDIO_TEXT N_("Choose audio")
 #define INPUT_AUDIO_LONGTEXT N_( \
     "Give the default type of audio you want to use in a DVD.")
 
-#define INPUT_CHAN_TEXT N_("choose channel")
+#define INPUT_CHAN_TEXT N_("Choose channel")
 #define INPUT_CHAN_LONGTEXT N_( \
     "Give the stream number of the audio channel you want to use in a DVD " \
     "(from 1 to n).")
 
-#define INPUT_SUBT_TEXT N_("choose subtitles")
+#define INPUT_SUBT_TEXT N_("Choose subtitles")
 #define INPUT_SUBT_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use in a " \
     "DVD (from 1 to n).")
@@ -270,17 +270,17 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define VCD_DEV_LONGTEXT N_( \
     "This is the default VCD device to use.")
 
-#define IPV6_TEXT N_("force IPv6")
+#define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \
     "If you check this box, IPv6 will be used by default for all UDP and " \
     "HTTP connections.")
 
-#define IPV4_TEXT N_("force IPv4")
+#define IPV4_TEXT N_("Force IPv4")
 #define IPV4_LONGTEXT N_( \
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
-#define CODEC_TEXT N_("choose preferred codec list")
+#define CODEC_TEXT N_("Choose preferred codec list")
 #define CODEC_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
     "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
@@ -289,121 +289,121 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "'any' at the end of the list to make sure there is a fallback for the " \
     "types you didn't specify.")
 
-#define ENCODER_VIDEO_TEXT N_("choose preferred video encoder list")
+#define ENCODER_VIDEO_TEXT N_("Choose preferred video encoder list")
 #define ENCODER_VIDEO_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
     "codecs. " )
-#define ENCODER_AUDIO_TEXT N_("choose preferred audio encoder list")
+#define ENCODER_AUDIO_TEXT N_("Choose preferred audio encoder list")
 #define ENCODER_AUDIO_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
     "codecs. " )
 
-#define SOUT_TEXT N_("choose a stream output")
+#define SOUT_TEXT N_("Choose a stream output")
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
 
-#define SOUT_DISPLAY_TEXT N_("display while streaming")
+#define SOUT_DISPLAY_TEXT N_("Display while streaming")
 #define SOUT_DISPLAY_LONGTEXT N_( \
     "This allows you to play the stream while streaming it.")
 
-#define SOUT_VIDEO_TEXT N_("enable video stream output")
+#define SOUT_VIDEO_TEXT N_("Enable video stream output")
 #define SOUT_VIDEO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
-#define SOUT_VCODEC_TEXT N_("video encoding codec" )
+#define SOUT_VCODEC_TEXT N_("Video encoding codec" )
 #define SOUT_VCODEC_LONGTEXT N_( \
     "This allows you to force video encoding")
 
-#define SOUT_VBITRATE_TEXT N_("video bitrate encoding (kB/s)" )
+#define SOUT_VBITRATE_TEXT N_("Video bitrate encoding (kB/s)" )
 #define SOUT_VBITRATE_LONGTEXT N_( \
     "This allows you to specify video bitrate in kB/s.")
 
-#define SOUT_AUDIO_TEXT N_("enable audio stream output")
+#define SOUT_AUDIO_TEXT N_("Enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
-#define SOUT_ACODEC_TEXT N_("audio encoding codec" )
+#define SOUT_ACODEC_TEXT N_("Audio encoding codec" )
 #define SOUT_ACODEC_LONGTEXT N_( \
     "This allows you to force audio encoding")
 
-#define SOUT_ABITRATE_TEXT N_("audio bitrate encoding (kB/s)" )
+#define SOUT_ABITRATE_TEXT N_("Audio bitrate encoding (kB/s)" )
 #define SOUT_ABITRATE_LONGTEXT N_( \
     "This allows you to specify audio bitrate in kB/s.")
 
-#define PACKETIZER_TEXT N_("choose preferred packetizer list")
+#define PACKETIZER_TEXT N_("Choose preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
     "packetizers."  )
 
-#define MUX_TEXT N_("mux module")
+#define MUX_TEXT N_("Mux module")
 #define MUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure mux modules")
 
-#define ACCESS_OUTPUT_TEXT N_("access output module")
+#define ACCESS_OUTPUT_TEXT N_("Access output module")
 #define ACCESS_OUTPUT_LONGTEXT N_( \
     "This is a legacy entry to let you configure access output modules")
 
 
-#define MMX_TEXT N_("enable CPU MMX support")
+#define MMX_TEXT N_("Enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
     "If your processor supports the MMX instructions set, VLC can take " \
     "advantage of them.")
 
-#define THREE_DN_TEXT N_("enable CPU 3D Now! support")
+#define THREE_DN_TEXT N_("Enable CPU 3D Now! support")
 #define THREE_DN_LONGTEXT N_( \
     "If your processor supports the 3D Now! instructions set, VLC can take " \
     "advantage of them.")
 
-#define MMXEXT_TEXT N_("enable CPU MMX EXT support")
+#define MMXEXT_TEXT N_("Enable CPU MMX EXT support")
 #define MMXEXT_LONGTEXT N_( \
     "If your processor supports the MMX EXT instructions set, VLC can take " \
     "advantage of them.")
 
-#define SSE_TEXT N_("enable CPU SSE support")
+#define SSE_TEXT N_("Enable CPU SSE support")
 #define SSE_LONGTEXT N_( \
     "If your processor supports the SSE instructions set, VLC can take " \
     "advantage of them.")
 
-#define ALTIVEC_TEXT N_("enable CPU AltiVec support")
+#define ALTIVEC_TEXT N_("Enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
     "If your processor supports the AltiVec instructions set, VLC can take " \
     "advantage of them.")
 
-#define RANDOM_TEXT N_("play files randomly forever")
+#define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
     "When selected, VLC will randomly play files in the playlist until " \
     "interrupted.")
 
-#define LAUNCH_TEXT N_("launch playlist on startup")
+#define LAUNCH_TEXT N_("Launch playlist on startup")
 #define LAUNCH_LONGTEXT N_( \
     "If you want VLC to start playing on startup, then enable this option.")
 
-#define ENQUEUE_TEXT N_("enqueue items in playlist")
+#define ENQUEUE_TEXT N_("Enqueue items in playlist")
 #define ENQUEUE_LONGTEXT N_( \
     "If you want VLC to add items to the playlist as you open them, then " \
     "enable this option.")
 
-#define LOOP_TEXT N_("loop playlist on end")
+#define LOOP_TEXT N_("Loop playlist on end")
 #define LOOP_LONGTEXT N_( \
     "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
 
-#define MEMCPY_TEXT N_("memory copy module")
+#define MEMCPY_TEXT N_("Memory copy module")
 #define MEMCPY_LONGTEXT N_( \
     "You can select which memory copy module you want to use. By default " \
     "VLC will select the fastest one supported by your hardware.")
 
-#define ACCESS_TEXT N_("access module")
+#define ACCESS_TEXT N_("Access module")
 #define ACCESS_LONGTEXT N_( \
     "This is a legacy entry to let you configure access modules")
 
-#define DEMUX_TEXT N_("demux module")
+#define DEMUX_TEXT N_("Demux module")
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
-#define FAST_MUTEX_TEXT N_("fast mutex on NT/2K/XP (developers only)")
+#define FAST_MUTEX_TEXT N_("Dast mutex on NT/2K/XP (developers only)")
 #define FAST_MUTEX_LONGTEXT N_( \
     "On Windows NT/2K/XP we use a slow mutex implementation but which " \
     "allows us to correctely implement condition variables. " \
