@@ -98,6 +98,9 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when the playlist changes
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
+    /* FIXME : properly handle item-append*/
+    var_AddCallback( pIntf->p_sys->p_playlist, "item-append",
+                     onIntfChange, this );
     // Called when the "interface shower" wants us to show the skin
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-show",
                      onIntfShow, this );
