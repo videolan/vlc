@@ -40,11 +40,19 @@ typedef struct thread_dvd_data_s
     /* Navigation information */
     int                     i_title;
     int                     i_vts_title;
+
     int                     i_chapter_nb;
+    int                     i_chapter;
+
+    int                     i_cell;         /* cell index in adress map */
+    int                     i_prg_cell;     /* cell index in program map */
+
+    int                     i_sector;
+    int                     i_end_sector;   /* last sector of current cell */
+
+    off_t                   i_title_start;
     off_t                   i_start;
     off_t                   i_size;
-
-    int                     i_end_cell;
 
     /* Scrambling Information */
     struct css_s *          p_css;

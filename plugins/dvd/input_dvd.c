@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.27 2001/03/04 03:12:00 sam Exp $
+ * $Id: input_dvd.c,v 1.28 2001/03/04 13:54:26 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -349,49 +349,54 @@ static int DVDCheckCSS( input_thread_t * p_input )
     return CSSTest( p_input->i_handle );
 }
 
-/*****************************************************************************
- * DVDCellToOff: synchronize navigation maps with current offset
- *****************************************************************************/
-static int DVDCellToOff( thread_dvd_data_t * p_dvd )
-{
-
-
-    return 0;
-}
 
 /*****************************************************************************
- * DVDFindCell: from cell index in adress map from index in information table.
+ * DVDFindSector: find cell index in adress map from index in
+ * information table program map and give corresponding sectors.
  *****************************************************************************/
-static int DVDFindCell( thread_dvd_data_t * p_dvd, int i_index )
+static int DVDFindSector( thread_dvd_data_t * p_dvd )
 {
     pgc_t *              p_pgc;
     int                  i_cell;
+    int                  i_index;
 
     p_pgc = &p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc;
-    i_cell = 0;
 
-    while( ( p_pgc->p_cell_pos_inf[i_index].i_vob_id >
-             p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_vob_id ) &&
-             p_dvd->ifo.vts.c_adt.i_cell_nb > i_cell )
-    {
-        //if( p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell+1].i_esector*DVD_LB_SIZE >
-        //    p_dvd->i_start ) 
+    i_index = p_dvd->i_prg_cell - 1;
+
+    do {
+        if( i_index++ > p_dvd->i_prg_cell )
+        {
+            return -1;
+        }
+        
+        i_cell = p_dvd->i_cell + 1;
+
+        while( ( ( p_pgc->p_cell_pos_inf[i_index].i_vob_id !=
+                   p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_vob_id ) ||
+                 ( p_pgc->p_cell_pos_inf[i_index].i_cell_id !=
+                   p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_cell_id ) ) &&
+                 ( i_cell < ( p_dvd->ifo.vts.c_adt.i_cell_nb ) ) )
         {
             i_cell++;
         }
-    }
-    while( ( p_pgc->p_cell_pos_inf[i_index].i_cell_id >
-             p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_cell_id ) &&
-             p_dvd->ifo.vts.c_adt.i_cell_nb > i_cell )
-    {
-        //if( p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell+1].i_esector*DVD_LB_SIZE >
-        //    p_dvd->i_start ) 
-        {
-            i_cell++;
-        }
-    }
 
-    return i_cell;
+    } while( i_cell == ( p_dvd->ifo.vts.c_adt.i_cell_nb ) );
+
+    p_dvd->i_cell = i_cell;
+    p_dvd->i_prg_cell = i_index;
+
+    /* Find start and end sectors of new cell */
+    p_dvd->i_sector = MAX(
+            p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_ssector,
+            p_pgc->p_cell_play_inf[i_index].i_entry_sector );
+    p_dvd->i_end_sector = MIN(
+            p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector,
+            p_pgc->p_cell_play_inf[i_index].i_lsector );
+
+//intf_WarnMsg( 3, "cell: %d index: %d sector1: %x sector2: %x end1: %x end2: %x", i_cell, i_index, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_ssector, p_pgc->p_cell_play_inf[i_index].i_entry_sector, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector,p_pgc->p_cell_play_inf[i_index].i_lsector  );
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -401,45 +406,29 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd, int i_index )
 static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
 {
     pgc_t *              p_pgc;
-    int                  i_start_cell;
-    int                  i_end_cell;
-    int                  i_index;
-    int                  i_last_chapter;
 
     p_pgc = &p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc;
 
     /* Find cell index in Program chain for current chapter */
-    i_index = p_pgc->prg_map.pi_entry_cell[i_chapter-1] - 1;
+    p_dvd->i_prg_cell = p_pgc->prg_map.pi_entry_cell[i_chapter-1] - 1;
+    p_dvd->i_cell = -1;
 
     /* Search for cell_index in cell adress_table */
-    i_start_cell = DVDFindCell( p_dvd, i_index );
+    DVDFindSector( p_dvd );
 
-/*    intf_WarnMsg( 3, "DVD: Cell: %d vob id: %d cell id: %d", i_start_cell, p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_vob_id, p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_cell_id );*/
+    /* initialize  navigation parameters */
+    p_dvd->i_sector = p_dvd->ifo.vts.c_adt.p_cell_inf[p_dvd->i_cell].i_ssector;
+    p_dvd->i_end_sector =
+                      p_dvd->ifo.vts.c_adt.p_cell_inf[p_dvd->i_cell].i_esector;
 
-    /* start is : beginning of vts + offset to vobs + offset to vob x */
-    p_dvd->i_start = p_dvd->ifo.vts.i_pos + DVD_LB_SIZE *
-            (off_t)( p_dvd->ifo.vts.mat.i_tt_vobs_ssector +
-                     p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector );
+    /* start is : beginning of vts vobs + offset to vob x */
+    p_dvd->i_start = p_dvd->i_title_start +
+                     DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
 
-    /* compute size of the stream */
-    if( i_chapter == 1 )
-    {
-        i_last_chapter =
-                p_dvd->ifo.vmg.ptt_srpt.p_tts[p_dvd->i_title-1].i_ptt_nb;
-        i_index = p_pgc->prg_map.pi_entry_cell[i_last_chapter - 1] - 1;
-                  
-/*        intf_WarnMsg( 3, "last: %d index: %d", i_last_chapter, i_index );*/
+    /* Position the fd pointer on the right address */
+    p_dvd->i_start = lseek( p_dvd->i_fd, p_dvd->i_start, SEEK_SET );
 
-        i_end_cell = DVDFindCell( p_dvd, i_index );
-
-/*        intf_WarnMsg( 3, "DVD: Cell: %d vob id: %d cell id: %d", i_end_cell, p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_vob_id, p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_cell_id );*/
-
-        p_dvd->i_size = (off_t)DVD_LB_SIZE *
-            ( p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_esector -
-              p_dvd->ifo.vts.c_adt.p_cell_inf[i_start_cell].i_ssector + 1 );
-        intf_WarnMsg( 3, "DVD: Start cell: %d End Cell: %d",
-                                            i_start_cell, i_end_cell );
-    }
+    p_dvd->i_chapter = i_chapter;
 
     return 0;
 }
@@ -457,7 +446,7 @@ static int DVDSetArea( input_thread_t * p_input,
                        int i_title, int i_chapter,
                        int i_audio, int i_spu )
 {
-    thread_dvd_data_t *  p_method;
+    thread_dvd_data_t *  p_dvd;
     es_descriptor_t *    p_es;
     int                  i_index;
     int                  i_nb;
@@ -468,7 +457,7 @@ static int DVDSetArea( input_thread_t * p_input,
     u8                   i;
     boolean_t            b_last;
     
-    p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -482,49 +471,70 @@ static int DVDSetArea( input_thread_t * p_input,
         /* Change the default area */
         p_input->stream.p_selected_area = p_input->stream.pp_areas[i_title];
 
-        p_method->i_title = i_title;
+        /* title number: it is not vts nb! */
+        p_dvd->i_title = i_title;
 
         /* title position inside the selected vts */
-        p_method->i_vts_title =
-                p_method->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_vts_ttn;
+        p_dvd->i_vts_title =
+                    p_dvd->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_vts_ttn;
 
         /* vts number */
-        p_method->ifo.i_title =
-                p_method->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_tts_nb;
+        p_dvd->ifo.i_title = i_title;
 
         /* ifo vts */
-        IfoReadVTS( &(p_method->ifo) );
+        IfoReadVTS( &(p_dvd->ifo) );
         intf_WarnMsg( 2, "ifo info: vts initialized" );
     
         /* css title key for current vts */
-        if( p_method->b_encrypted )
+        if( p_dvd->b_encrypted )
         {
-            p_method->p_css->i_title =
-                    p_method->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_tts_nb;
-            p_method->p_css->i_title_pos =
-                    p_method->ifo.vts.i_pos +
-                    p_method->ifo.vts.mat.i_tt_vobs_ssector * DVD_LB_SIZE;
-            CSSGetKey( p_method->p_css );
+            p_dvd->p_css->i_title =
+                    p_dvd->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_tts_nb;
+            p_dvd->p_css->i_title_pos =
+                    p_dvd->ifo.vts.i_pos +
+                    p_dvd->ifo.vts.mat.i_tt_vobs_ssector * DVD_LB_SIZE;
+            CSSGetKey( p_dvd->p_css );
             intf_WarnMsg( 2, "css info: vts key initialized" );
         }
     
         /*
          * Set selected title start and size
          */
-        DVDChapterSelect( p_method, 1 );
-    
-        p_method->i_start =
-                    lseek( p_input->i_handle, p_method->i_start, SEEK_SET );
+        
+        /* title set offset */
+        p_dvd->i_title_start = p_dvd->ifo.vts.i_pos + DVD_LB_SIZE *
+                      (off_t)( p_dvd->ifo.vts.mat.i_tt_vobs_ssector );
+
+        /* last video cell */
+        p_dvd->i_cell = -1;
+        p_dvd->i_prg_cell = -1 +
+            p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc.i_cell_nb;
+        DVDFindSector( p_dvd );
+
+        p_dvd->i_size = DVD_LB_SIZE *
+          (off_t)( p_dvd->ifo.vts.c_adt.p_cell_inf[p_dvd->i_cell].i_esector );
+
+        DVDChapterSelect( p_dvd, 1 );
+
+        p_dvd->i_size -= (off_t)( p_dvd->i_sector + 1 ) *DVD_LB_SIZE;
+
+        lseek( p_input->i_handle, p_dvd->i_start, SEEK_SET );
+
 
         intf_WarnMsg( 2, "dvd info: title: %d", i_title );
-        intf_WarnMsg( 2, "dvd info: vobstart at: %lld", p_method->i_start );
-        intf_WarnMsg( 2, "dvd info: stream size: %lld", p_method->i_size );
+        intf_WarnMsg( 2, "dvd info: vobstart at: %lld", p_dvd->i_start );
+        intf_WarnMsg( 2, "dvd info: stream size: %lld", p_dvd->i_size );
         intf_WarnMsg( 2, "dvd info: number of chapters: %d",
-                            p_input->stream.p_selected_area->i_part_nb );
+                        p_dvd->ifo.vmg.ptt_srpt.p_tts[i_title-1].i_ptt_nb );
+
+/*        intf_WarnMsg( 3, "last: %d index: %d", i_last_chapter, i_index );*/
+
+
+/*        intf_WarnMsg( 3, "DVD: Cell: %d vob id: %d cell id: %d", i_end_cell, p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_vob_id, p_dvd->ifo.vts.c_adt.p_cell_inf[i_end_cell].i_cell_id );*/
 
         /* Area definition */
-        p_input->stream.p_selected_area->i_start = p_method->i_start;
-        p_input->stream.p_selected_area->i_size = p_method->i_size;
+        p_input->stream.p_selected_area->i_start = p_dvd->i_start;
+        p_input->stream.p_selected_area->i_size = p_dvd->i_size;
 
         /*
          * Destroy obsolete ES by reinitializing program 0
@@ -547,9 +557,9 @@ static int DVDSetArea( input_thread_t * p_input,
         intf_WarnMsg( 1, "dvd info: video MPEG2 stream" );
     
         /* Audio ES, in the order they appear in .ifo */
-        i_nb = p_method->ifo.vts.mat.i_audio_nb;
+        i_nb = p_dvd->ifo.vts.mat.i_audio_nb;
     
-        i_ac3 = 0x80;
+        i_ac3 = 0x7f;
         i_mpeg = 0xc0;
 
         for( i = 1 ; i <= i_nb ; i++ )
@@ -557,26 +567,29 @@ static int DVDSetArea( input_thread_t * p_input,
 
 #if 0
     fprintf( stderr, "Audio %d: %x %x %x %x %x %x %x\n", i,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_num_channels,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_multichannel_extension,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_type,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_appl_mode,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_foo,
-            p_method->ifo.vts.mat.p_audio_atrt[i].i_bar );
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_num_channels,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_multichannel_extension,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_type,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_appl_mode,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_foo,
+            p_dvd->ifo.vts.mat.p_audio_atrt[i].i_bar );
 #endif
 
-            switch( p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode )
+            switch( p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode )
             {
             case 0x00:              /* AC3 */
-                i_id = ( ( 0x7f + i ) << 8 ) | 0xbd;
+                i_id = ( ( i_ac3 + i ) << 8 ) | 0xbd;
                 p_es = input_AddES( p_input,
                                     p_input->stream.pp_programs[0], i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = AC3_AUDIO_ES;
                 p_es->b_audio = 1;
                 strcpy( p_es->psz_desc, Language( hton16(
-                    p_method->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+                    p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+
+                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                              i, p_es->psz_desc, i_id );
 
                 break;
             case 0x02:
@@ -588,7 +601,10 @@ static int DVDSetArea( input_thread_t * p_input,
                 p_es->i_type = MPEG2_AUDIO_ES;
                 p_es->b_audio = 1;
                 strcpy( p_es->psz_desc, Language( hton16(
-                    p_method->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+                    p_dvd->ifo.vts.mat.p_audio_atrt[i-1].i_lang_code ) ) ); 
+
+                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                              i, p_es->psz_desc, i_id );
 
                 break;
             case 0x04:              /* LPCM */
@@ -597,20 +613,19 @@ static int DVDSetArea( input_thread_t * p_input,
                 break;
             case 0x06:              /* DTS */
                 i_id = 0;
+                i_ac3--;
                 intf_ErrMsg( "dvd error: DTS audio not handled yet" );
                 break;
             default:
                 i_id = 0;
                 intf_ErrMsg( "dvd error: unknown audio type %.2x",
-                         p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode );
+                         p_dvd->ifo.vts.mat.p_audio_atrt[i].i_coding_mode );
             }
         
-            intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
-                          i, p_es->psz_desc, i_id );
         }
     
         /* Sub Picture ES */
-        i_nb = p_method->ifo.vts.mat.i_subpic_nb;
+        i_nb = p_dvd->ifo.vts.mat.i_subpic_nb;
     
         b_last = 0;
         i_sub_pic = 0x20;
@@ -624,13 +639,13 @@ static int DVDSetArea( input_thread_t * p_input,
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 strcpy( p_es->psz_desc, Language( hton16(
-                    p_method->ifo.vts.mat.p_subpic_atrt[i-1].i_lang_code ) ) ); 
+                    p_dvd->ifo.vts.mat.p_subpic_atrt[i-1].i_lang_code ) ) ); 
                 intf_WarnMsg( 1, "dvd info: spu stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
     
                 /* The before the last spu has a 0x0 prefix */
                 b_last =
-                    ( p_method->ifo.vts.mat.p_subpic_atrt[i].i_prefix == 0 ); 
+                    ( p_dvd->ifo.vts.mat.p_subpic_atrt[i].i_prefix == 0 ); 
             }
         }
 
@@ -644,7 +659,7 @@ static int DVDSetArea( input_thread_t * p_input,
 
         /* Audio: we check it is in the range and
          * default it to the first if not */
-        if( i_audio > p_method->ifo.vts.mat.i_audio_nb )
+        if( i_audio > p_dvd->ifo.vts.mat.i_audio_nb )
         {
             i_audio = 1;
         }
@@ -685,11 +700,11 @@ static int DVDSetArea( input_thread_t * p_input,
 
     if( ( i_spu >= 0 ) || ( i_title >= 0 ) )
     {
-        /* For spu: no one if none or a not existed one requested */
-        if( ( i_spu <= p_method->ifo.vts.mat.i_subpic_nb ) && ( i_spu > 0 ) )
+        /* For spu: no one if none or a not existing one requested */
+        if( ( i_spu <= p_dvd->ifo.vts.mat.i_subpic_nb ) && ( i_spu > 0 ) )
         {
             input_SelectES( p_input, ( p_es = p_input->stream.pp_programs[0]->
-                pp_es[ i_spu + p_method->ifo.vts.mat.i_audio_nb ] ) );
+                pp_es[ i_spu + p_dvd->ifo.vts.mat.i_audio_nb ] ) );
     
             intf_WarnMsg( 1, "dvd info: spu   %d selected -> %s (0x%x)",
                           i_spu, p_es->psz_desc, p_es->i_id );
@@ -703,12 +718,11 @@ static int DVDSetArea( input_thread_t * p_input,
     if( ( i_chapter > 0 ) &&
         ( i_chapter <= p_input->stream.p_selected_area->i_part_nb ) )
     {
-        DVDChapterSelect( p_method, i_chapter );
+        DVDChapterSelect( p_dvd, i_chapter );
 
-        p_input->stream.p_selected_area->i_part = i_chapter; 
-
-        DVDSeek( p_input, p_method->i_start -
-                          p_input->stream.p_selected_area->i_start );
+        p_input->stream.p_selected_area->i_tell = p_dvd->i_start -
+                                p_input->stream.p_selected_area->i_start;
+        p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
         intf_WarnMsg( 2, "dvd info: chapter %d start at: %lld", i_chapter,
                                     p_input->stream.p_selected_area->i_tell );
@@ -727,47 +741,47 @@ static int DVDSetArea( input_thread_t * p_input,
  *****************************************************************************/
 static void DVDInit( input_thread_t * p_input )
 {
-    thread_dvd_data_t *  p_method;
+    thread_dvd_data_t *  p_dvd;
     int                  i_title;
     int                  i_chapter;
     int                  i_audio;
     int                  i_spu;
     int                  i;
 
-    if( (p_method = malloc( sizeof(thread_dvd_data_t) )) == NULL )
+    if( (p_dvd = malloc( sizeof(thread_dvd_data_t) )) == NULL )
     {
         intf_ErrMsg( "Out of memory" );
         p_input->b_error = 1;
         return;
     }
 
-    p_input->p_plugin_data = (void *)p_method;
+    p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
 
-    p_method->i_fd = p_input->i_handle;
+    p_dvd->i_fd = p_input->i_handle;
 
-    p_method->i_block_once = 32;
-    p_input->i_read_once = 128;
+    p_dvd->i_block_once = 1;
+    p_input->i_read_once = 8;
 
-    p_method->b_encrypted = DVDCheckCSS( p_input );
+    p_dvd->b_encrypted = DVDCheckCSS( p_input );
 
     lseek( p_input->i_handle, 0, SEEK_SET );
 
     /* Reading structures initialisation */
     p_input->p_method_data =
-    DVDNetlistInit( 4096, 16384, 4096, DVD_LB_SIZE, p_method->i_block_once ); 
+    DVDNetlistInit( 4096, 8192, 4096, DVD_LB_SIZE, p_dvd->i_block_once ); 
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo initialisation */
-    p_method->ifo = IfoInit( p_input->i_handle );
+    p_dvd->ifo = IfoInit( p_input->i_handle );
     intf_WarnMsg( 2, "ifo info: vmg initialized" );
 
     /* CSS initialisation */
-    if( p_method->b_encrypted )
+    if( p_dvd->b_encrypted )
     {
-        p_method->p_css = CSSInit( p_input->i_handle );
+        p_dvd->p_css = CSSInit( p_input->i_handle );
 
-        if( p_method->p_css == NULL )
+        if( p_dvd->p_css == NULL )
         {
             intf_ErrMsg( "css error: fatal failure" );
             p_input->b_error = 1;
@@ -783,7 +797,7 @@ static void DVDInit( input_thread_t * p_input )
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-#define srpt p_method->ifo.vmg.ptt_srpt
+#define srpt p_dvd->ifo.vmg.ptt_srpt
     intf_WarnMsg( 2, "dvd info: number of titles: %d", srpt.i_ttu_nb );
 
 #define area p_input->stream.pp_areas
@@ -807,7 +821,7 @@ static void DVDInit( input_thread_t * p_input )
         area[i]->i_part = 1;
 
         /* Offset to vts_i_0.ifo */
-        area[i]->i_plugin_data = p_method->ifo.i_off +
+        area[i]->i_plugin_data = p_dvd->ifo.i_off +
                                ( srpt.p_tts[i-1].i_ssector * DVD_LB_SIZE );
     }   
 #undef area
@@ -849,15 +863,15 @@ static void DVDInit( input_thread_t * p_input )
  *****************************************************************************/
 static void DVDEnd( input_thread_t * p_input )
 {
-    thread_dvd_data_t *     p_method;
+    thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
 
-    p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
-    CSSEnd( p_method->p_css );
-//    IfoEnd( p_method->p_ifo ) );
-    free( p_method );
+    CSSEnd( p_dvd->p_css );
+//    IfoEnd( p_dvd->p_ifo ) );
+    free( p_dvd );
     DVDNetlistEnd( p_netlist );
 }
 
@@ -870,8 +884,9 @@ static void DVDEnd( input_thread_t * p_input )
 static int DVDRead( input_thread_t * p_input,
                     data_packet_t ** pp_packets )
 {
-    thread_dvd_data_t *     p_method;
+    thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
+    pgc_t *                 p_pgc;
     struct iovec *          p_vec;
     struct data_packet_s *  pp_data[p_input->i_read_once];
     u8 *                    pi_cur;
@@ -879,9 +894,15 @@ static int DVDRead( input_thread_t * p_input,
     int                     i_iovec;
     int                     i_packet;
     int                     i_pos;
+    int                     i_read_bytes;
+    int                     i_read_blocks;
+    int                     i_chapter;
+    off_t                   i_off;
+    boolean_t               b_eof;
 
-    p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
+    p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
+    p_pgc = &p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc;
 
     /* Get an iovec pointer */
     if( ( p_vec = DVDGetiovec( p_netlist ) ) == NULL )
@@ -890,19 +911,62 @@ static int DVDRead( input_thread_t * p_input,
         return -1;
     }
 
+    /* Get the position of the next cell if we're at cell end */
+
+    if( p_dvd->i_sector > p_dvd->i_end_sector )
+    {
+        /* Find cell index in adress map */
+        if( DVDFindSector( p_dvd ) < 0 )
+        {
+            pp_packets[0] = NULL;
+            return 1;
+        }
+
+        /* Position the fd pointer on the right address */
+        i_off = lseek( p_dvd->i_fd,
+                       p_dvd->i_title_start +
+                       (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE,
+               SEEK_SET );
+
+        i_chapter = 0;
+
+        /* update chapter */
+        while( p_pgc->prg_map.pi_entry_cell[i_chapter-1] - 1 <
+               p_dvd->i_prg_cell )
+        {
+            i_chapter++;
+        }
+
+        p_dvd->i_chapter = i_chapter;
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+
+        p_input->stream.p_selected_area->i_tell = i_off -
+                                    p_input->stream.p_selected_area->i_start;
+        p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
+
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    }
+
     /* Reads from DVD */
-    readv( p_input->i_handle, p_vec, p_method->i_block_once );
+    i_read_bytes = readv( p_dvd->i_fd, p_vec, p_dvd->i_block_once );
+    i_read_blocks = ( i_read_bytes + 0x7ff ) >> 11;
 
     /* Update netlist indexes */
-    DVDMviovec( p_netlist, p_method->i_block_once, pp_data );
+    DVDMviovec( p_netlist, i_read_blocks, pp_data );
+
+    /* Update global position */
+    p_dvd->i_sector += i_read_blocks;
+
     i_packet = 0;
 
     /* Read headers to compute payload length */
-    for( i_iovec = 0 ; i_iovec < p_method->i_block_once ; i_iovec++ )
+    for( i_iovec = 0 ; i_iovec < i_read_blocks ; i_iovec++ )
     {
-        if( p_method->b_encrypted )
+        if( p_dvd->b_encrypted )
         {
-            CSSDescrambleSector( p_method->p_css->pi_title_key, 
+            CSSDescrambleSector( p_dvd->p_css->pi_title_key, 
                                  p_vec[i_iovec].iov_base );
             ((u8*)(p_vec[i_iovec].iov_base))[0x14] &= 0x8F;
         }
@@ -963,11 +1027,21 @@ static int DVDRead( input_thread_t * p_input,
     pp_packets[i_packet] = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
+
     p_input->stream.p_selected_area->i_tell +=
-                                        p_method->i_block_once *DVD_LB_SIZE;
+                                        p_dvd->i_block_once *DVD_LB_SIZE;
+    b_eof = p_input->stream.p_selected_area->i_tell < p_dvd->i_size ? 0 : 1;
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( 0 );
+    if( ( i_read_blocks == p_dvd->i_block_once ) && ( !b_eof ) )
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 
@@ -983,27 +1057,65 @@ static int DVDRewind( input_thread_t * p_input )
  * DVDSeek : Goes to a given position on the stream ; this one is used by the 
  * input and translate chronological position from input to logical postion
  * on the device
+ * ---
+ * The lock should be taken before calling this function.
  *****************************************************************************/
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
 {
-    thread_dvd_data_t *     p_method;
+    thread_dvd_data_t *     p_dvd;
+    pgc_t *                 p_pgc;
     off_t                   i_pos;
+    int                     i_prg_cell;
+    int                     i_cell;
+    int                     i_chapter;
     
-    p_method = ( thread_dvd_data_t * )p_input->p_plugin_data;
+    p_dvd = ( thread_dvd_data_t * )p_input->p_plugin_data;
+    p_pgc = &p_dvd->ifo.vts.pgci_ti.p_srp[p_dvd->i_vts_title-1].pgc;
 
-    /* We have to take care of offset of beginning of title */
+    /* update navigation data */
+    p_dvd->i_sector = i_off >> 11;
+
+    i_prg_cell = 0;
+    i_cell = 0;
+    i_chapter = 1;
+
+    /* parse vobu address map to find program cell */
+    while( p_pgc->p_cell_play_inf[i_prg_cell].i_lsector < p_dvd->i_sector  )
+    {
+        i_prg_cell++;
+    }
+    /* parse cell address map to find cell */
+    while( p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector <=
+           p_dvd->i_sector + 1 )
+    {
+        i_cell++;
+    }
+
+    p_dvd->i_prg_cell = i_prg_cell;
+    p_dvd->i_cell = i_cell - 1;             /* DVDFindSector will add one */
+
+    /* check coherence of data */
+    DVDFindSector( p_dvd );
+
+    /* update chapter */
+    while( p_pgc->prg_map.pi_entry_cell[i_chapter-1] - 1 < p_dvd->i_prg_cell )
+    {
+        i_chapter++;
+    }
+
+    p_dvd->i_chapter = i_chapter;
+
+    /* we have to take care of offset of beginning of title */
     i_pos = i_off + p_input->stream.p_selected_area->i_start;
 
-    /* With DVD, we have to be on a sector boundary */
+    /* with DVD, we have to be on a sector boundary */
     i_pos = i_pos & (~0x7ff);
 
-    i_pos = lseek( p_input->i_handle, i_pos, SEEK_SET );
+    i_pos = lseek( p_dvd->i_fd, i_pos, SEEK_SET );
 
     p_input->stream.p_selected_area->i_tell = i_pos -
                                     p_input->stream.p_selected_area->i_start;
+    p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
     return;
 }
-
-
-
