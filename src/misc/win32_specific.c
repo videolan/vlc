@@ -2,10 +2,10 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: win32_specific.c,v 1.34 2004/01/29 19:38:17 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <stdlib.h>                                                /* free() */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 #include "vlc_playlist.h"
 
 #ifdef WIN32                       /* optind, getopt(), included in unistd.h */
