@@ -29,19 +29,18 @@
 class MessagesView : public BTextView
 {
     public:
-                             MessagesView( intf_thread_t * _p_intf,
+                             MessagesView( msg_subscription_t * _p_sub,
                                            BRect rect, char * name, BRect textRect,
                                            uint32 resizingMode, uint32 flags )
                                  : BTextView( rect, name, textRect,
-                                              resizingMode, flags )
+                                              resizingMode, flags ),
+                                 p_sub(_p_sub)
                              {
-                                 p_intf = _p_intf;
                              }
         virtual void         Pulse();
 
-        intf_thread_t *      p_intf;
         msg_subscription_t * p_sub;
-        BScrollBar *         fScrollBar;
+        BScrollBar         * fScrollBar;
 };
 
 class MessagesWindow : public BWindow
@@ -55,12 +54,13 @@ class MessagesWindow : public BWindow
 
         void                 ReallyQuit();
 
-        intf_thread_t *      p_intf;
+        intf_thread_t      * p_intf;
+        msg_subscription_t * p_sub;
 
         BView *              fBackgroundView;
         MessagesView *       fMessagesView;
         BScrollView *        fScrollView;
 };
 
-#endif	// BEOS_PREFERENCES_WINDOW_H
+#endif    // BEOS_PREFERENCES_WINDOW_H
 
