@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.6 2002/05/22 21:05:18 sam Exp $
+ * $Id: i420_yuy2.h,v 1.7 2002/06/01 11:08:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,20 +37,17 @@ movl      %%ebx,%9                                                        \n\
 "
 
 #define MMX_INC "                                                         \n\
-addl         $8, %0                                                       \n\
-addl         $8, %1                                                       \n\
-addl         $4, %2                                                       \n\
-addl         $4, %3                                                       \n\
-addl         $2, %%eax                                                    \n\
-addl         $2, %%ebx                                                    \n\
+addl         $16, %0                                                      \n\
+addl         $16, %1                                                      \n\
+addl         $8, %2                                                       \n\
+addl         $8, %3                                                       \n\
+addl         $4, %%eax                                                    \n\
+addl         $4, %%ebx                                                    \n\
 "
 
 #define MMX_CALL(MMX_INSTRUCTIONS)                                  \
     __asm__ __volatile__(                                           \
         MMX_LOAD                                                    \
-        ".align 8 \n\t"                                             \
-        MMX_INSTRUCTIONS                                            \
-        MMX_INC                                                     \
         ".align 8 \n\t"                                             \
         MMX_INSTRUCTIONS                                            \
         MMX_INC                                                     \
