@@ -245,7 +245,11 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
 	if( !p_input ) return NULL;
 
-        var_Get( p_input, "spu-channel", &val );
+	if( var_Get( p_input, "spu-channel", &val ) ) {
+	  vlc_object_release( p_input );
+	  return NULL;
+	}
+	
         vlc_object_release( p_input );
 
 	/* Number could be 0bd, 1bd, 2bd, 3bd for 0..3. If so 

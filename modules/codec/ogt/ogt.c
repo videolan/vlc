@@ -244,10 +244,6 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
 	       p_block->i_buffer);
 
-#if 0
-    if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[1] )
-      return NULL;
-#else
     /* Attach to our input thread and see if subtitle is selected. */
     {
         vlc_object_t * p_input;
@@ -257,8 +253,12 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 
 	if( !p_input ) return NULL;
 
-        if( var_Get( p_input, "spu-channel", &val ) ) return NULL;
+        if( var_Get( p_input, "spu-channel", &val ) ) {
+	  vlc_object_release( p_input );
+          return NULL;
+        }
 	
+        vlc_object_release( p_input );
         dbg_print( (DECODE_DBG_PACKET), 
                    "val.i_int %x p_buffer[i] %x", val.i_int, p_buffer[1]);
 
@@ -269,7 +269,6 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	  return NULL;
         }
     }
-#endif
 
     if ( p_sys->state == SUBTITLE_BLOCK_EMPTY ) {
       i_expected_image  = p_sys->i_image+1;
