@@ -654,7 +654,8 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
             msg_Err( p_stream, "cannot export sdp as rtsp" );
         }
     }
-    else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) )
+    else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) || 
+             ( url.psz_host && !strcasecmp( url.psz_host, "sap" ) ) )
     {
         p_sys->b_export_sap = VLC_TRUE;
         SapSetup( p_stream );

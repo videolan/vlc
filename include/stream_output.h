@@ -276,6 +276,7 @@ struct announce_method_t
 struct sap_address_t
 {
     char *psz_address;
+    int i_ip_version;
     int i_port;
     int i_rfd; /* Read socket */
     int i_wfd; /* Write socket */

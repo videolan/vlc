@@ -215,6 +215,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     char *psz_head;
     vlc_bool_t b_found = VLC_FALSE;
     sap_session_t *p_sap_session;
+    mtime_t i_hash;
 
     vlc_mutex_lock( &p_sap->object_lock );
 
@@ -281,6 +282,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             return VLC_ENOMEM;
         }
         p_address->psz_address = strdup( p_method->psz_address );
+        p_address->i_ip_version = p_method->i_ip_version;
         p_address->i_port  =  9875;
         p_address->i_wfd = net_OpenUDP( p_sap, "", 0,
                                         p_address->psz_address,
@@ -319,7 +321,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     }
 
     /* Build the SAP Headers */
-    i_header_size = 8 + strlen( psz_type ) + 1;
+    i_header_size = ( p_method->i_ip_version == 6 ? 20 : 8 ) + strlen( psz_type ) + 1;
     psz_head = (char *) malloc( i_header_size * sizeof( char ) );
     if( ! psz_head )
     {
@@ -327,17 +329,52 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         return VLC_ENOMEM;
     }
 
-    psz_head[0] = 0x20; /* Means IPv4, not encrypted, not compressed */
-    psz_head[1] = 0x00; /* No authentification */
-    psz_head[2] = 0x42; /* Msg id hash */
-    psz_head[3] = 0x12; /* Msg id hash 2 */
+    psz_head[0] = 0x20; /* Means SAPv1, IPv4, not encrypted, not compressed */
+    psz_head[1] = 0x00; /* No authentification length */
 
-    psz_head[4] = 0x01; /* Source IP  FIXME: we should get the real address */
-    psz_head[5] = 0x02; /* idem */
-    psz_head[6] = 0x03; /* idem */
-    psz_head[7] = 0x04; /* idem */
+    i_hash = mdate();
+    psz_head[2] = (i_hash & 0xFF00) >> 8; /* Msg id hash */
+    psz_head[3] = (i_hash & 0xFF);        /* Msg id hash 2 */
 
-    strncpy( psz_head + 8, psz_type, 15 );
+    if( p_method->i_ip_version == 6 )
+    {
+        /* in_addr_t ip_server = inet_addr( ip ); */
+        psz_head[0] |= 0x10; /* Set IPv6 */
+
+        psz_head[4] = 0x01; /* Source IP  FIXME: we should get the real address */
+        psz_head[5] = 0x02; /* idem */
+        psz_head[6] = 0x03; /* idem */
+        psz_head[7] = 0x04; /* idem */
+
+        psz_head[8] = 0x01; /* Source IP  FIXME: we should get the real address */
+        psz_head[9] = 0x02; /* idem */
+        psz_head[10] = 0x03; /* idem */
+        psz_head[11] = 0x04; /* idem */
+
+        psz_head[12] = 0x01; /* Source IP  FIXME: we should get the real address */
+        psz_head[13] = 0x02; /* idem */
+        psz_head[14] = 0x03; /* idem */
+        psz_head[15] = 0x04; /* idem */
+
+        psz_head[16] = 0x01; /* Source IP  FIXME: we should get the real address */
+        psz_head[17] = 0x02; /* idem */
+        psz_head[18] = 0x03; /* idem */
+        psz_head[19] = 0x04; /* idem */
+
+        strncpy( psz_head + 20, psz_type, 15 );
+    }
+    else
+    {
+        /* in_addr_t ip_server = inet_addr( ip) */
+        /* Source IP  FIXME: we should get the real address */
+        psz_head[4] = 0x01; /* ip_server */
+        psz_head[5] = 0x02; /* ip_server>>8 */
+        psz_head[6] = 0x03; /* ip_server>>16 */
+        psz_head[7] = 0x04; /* ip_server>>24 */
+
+        strncpy( psz_head + 8, psz_type, 15 );
+    }
+
     psz_head[ i_header_size-1 ] = '\0';
     p_sap_session->i_length = i_header_size + strlen( p_sap_session->psz_sdp);
 
@@ -386,8 +423,9 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
         }
     }
 
-    /* XXX: Dequeue the adress too if it is not used anymore
-     * TODO: address refcount */
+    /* XXX: Dequeue the address too if it is not used anymore
+     * TODO: - address refcount
+             - send a SAP deletion packet */  
 
     msg_Dbg( p_sap,"%i announces remaining", p_sap->i_sessions );
 

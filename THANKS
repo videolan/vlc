@@ -72,6 +72,7 @@ Olivier Aubert <oaubert@bat710.univ-lyon1.fr> - clone list patch
 Olivier Pomel <pomel@via.ecp.fr> - original VLC code
 Øyvind Kolbu <oyvindk@world-online.no> - FreeBSD patches
 Paul Mackerras <paulus@linuxcare.com.au> - AltiVec IDCT and motion
+Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
 Régis Duchesne <regis@via.ecp.fr> - original VLC code
 Remco Poortinga <poortinga@telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent@u.arizona.edu> - BeOS interface fix
