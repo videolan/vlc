@@ -2,7 +2,7 @@
  * evt_scroll.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: evt_scroll.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: evt_scroll.hpp,v 1.2 2004/02/14 12:49:35 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -35,7 +35,7 @@ class EvtScroll: public EvtInput
         typedef enum
         {
             kUp,
-            kDown,
+            kDown
         } Direction_t;
 
         EvtScroll( intf_thread_t *pIntf, int xPos, int yPos,
