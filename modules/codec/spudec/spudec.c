@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.20 2003/07/14 21:32:58 sigmunau Exp $
+ * $Id: spudec.c,v 1.21 2003/07/16 17:17:05 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -121,6 +121,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      */
     p_spudec->p_vout = NULL;
     p_spudec->p_fifo = p_fifo;
+    p_spudec->iconv_handle = (iconv_t)-1;
 
     /*
      * Initialize thread and free configuration
@@ -159,7 +160,8 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         }
 #endif
 #if defined(HAVE_ICONV)
-	p_spudec->iconv_handle = iconv_open( "UTF-8", config_GetPsz( p_spudec->p_fifo, "spudec-encoding" ) );
+	p_spudec->iconv_handle = iconv_open( "UTF-8",
+            config_GetPsz( p_spudec->p_fifo, "spudec-encoding" ) );
 	if( p_spudec->iconv_handle == (iconv_t)-1 )
 	{
 	    msg_Warn( p_spudec->p_fifo, "Unable to do requested conversion" );
