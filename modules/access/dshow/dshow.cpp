@@ -625,7 +625,8 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
         // Sort out all the possible video inputs
         // The class needs to be given the capture filters ANALOGVIDEO input pin
         IEnumPins *pins = 0;
-        if( mediaType.majortype == MEDIATYPE_Video &&
+        if( ( mediaType.majortype == MEDIATYPE_Video ||
+              mediaType.majortype == MEDIATYPE_Stream ) &&
             SUCCEEDED(p_filter->EnumPins(&pins)) )
         {
             IPin        *pP = 0;
