@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.20 2003/07/18 13:22:07 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.21 2003/07/18 14:18:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -288,7 +288,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg )
 
     /* Hack to prevent popup events to be enqueued when
      * one is already active */
-    if( i_dialog_event == INTF_DIALOG_POPUPMENU &&
+    if( i_dialog_event != INTF_DIALOG_POPUPMENU ||
         !p_intf->p_sys->p_popup_menu )
     {
         p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
