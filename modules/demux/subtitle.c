@@ -1,5 +1,5 @@
 /*****************************************************************************
- * subtitle.c: Demux for text and vobsub files.
+ * subtitle.c: Demux for subtitle text files.
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
  * $Id$
@@ -35,7 +35,6 @@
 #include <vlc/input.h>
 #include "vlc_video.h"
 
-#include "ps.h"
 
 #if (!defined( WIN32 ) || defined(__MINGW32__))
 #    include <dirent.h>
@@ -58,7 +57,7 @@ static void Close( vlc_object_t *p_this );
 static char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
-    "ssa2-4", "vplayer", "sami", "vobsub"
+    "ssa2-4", "vplayer", "sami"
 };
 
 vlc_module_begin();
@@ -73,7 +72,6 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_shortcut( "subtitle" );
-    add_shortcut( "vobsub" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -89,7 +87,7 @@ enum
     SUB_TYPE_VPLAYER,
     SUB_TYPE_SAMI,
     SUB_TYPE_SUBVIEWER,
-    SUB_TYPE_VOBSUB,
+    NULL
 };
 
 typedef struct
@@ -107,7 +105,6 @@ typedef struct
     mtime_t i_stop;
 
     char    *psz_text;
-    int     i_vobsub_location;
 } subtitle_t;
 
 
@@ -125,7 +122,6 @@ struct demux_sys_t
     int         i_subtitle;
     int         i_subtitles;
     subtitle_t  *subtitle;
-    FILE        *p_vobsub_file;
     mtime_t     i_original_mspf;
 
     int64_t     i_length;
@@ -137,9 +133,6 @@ static int  ParseSubViewer( demux_t *, subtitle_t * );
 static int  ParseSSA      ( demux_t *, subtitle_t * );
 static int  ParseVplayer  ( demux_t *, subtitle_t * );
 static int  ParseSami     ( demux_t *, subtitle_t * );
-static int  ParseVobSubIDX( demux_t *, subtitle_t * );
-
-static int  DemuxVobSub( demux_t *, block_t * );
 
 static struct
 {
@@ -156,7 +149,6 @@ static struct
     { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",ParseSSA },
     { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  ParseVplayer },
     { "sami",       SUB_TYPE_SAMI,      "SAMI",     ParseSami },
-    { "vobsub",     SUB_TYPE_VOBSUB,    "VobSub",   ParseVobSubIDX },
     { NULL,         SUB_TYPE_UNKNOWN,   "Unknown",  NULL }
 };
 
@@ -164,8 +156,6 @@ static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 static void Fix( demux_t * );
-
-#define DVD_VIDEO_LB_LEN 2048
 
 /*****************************************************************************
  * Module initializer
@@ -180,8 +170,7 @@ static int Open ( vlc_object_t *p_this )
     int  (*pf_read)( demux_t *, subtitle_t* );
     int i, i_max;
 
-    if( strcmp( p_demux->psz_demux, "subtitle" ) &&
-        strcmp( p_demux->psz_demux, "vobsub" ) )
+    if( strcmp( p_demux->psz_demux, "subtitle" ) )
     {
         msg_Dbg( p_demux, "subtitle demux discarded" );
         return VLC_EGENERIC;
@@ -194,7 +183,6 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_subtitle = 0;
     p_sys->i_subtitles= 0;
     p_sys->subtitle   = NULL;
-    p_sys->p_vobsub_file = NULL;
     p_sys->i_original_mspf = 0;
 
 
@@ -296,11 +284,6 @@ static int Open ( vlc_object_t *p_this )
                 p_sys->i_type = SUB_TYPE_VPLAYER;
                 break;
             }
-            else if( strcasestr( s, "# VobSub index file" ) )
-            {
-                p_sys->i_type = SUB_TYPE_VOBSUB;
-                break;
-            }
 
             free( s );
             s = NULL;
@@ -363,10 +346,6 @@ static int Open ( vlc_object_t *p_this )
 
     /* Fix subtitle (order and time) *** */
     p_sys->i_subtitle = 0;
-    if( p_sys->i_type != SUB_TYPE_VOBSUB )
-    {
-        Fix( p_demux );
-    }
     p_sys->i_length = 0;
     if( p_sys->i_subtitles > 0 )
     {
@@ -377,24 +356,7 @@ static int Open ( vlc_object_t *p_this )
     }
 
     /* *** add subtitle ES *** */
-    if( p_sys->i_type == SUB_TYPE_VOBSUB )
-    {
-        int i_len = strlen( p_demux->psz_path );
-        char *psz_vobname = strdup( p_demux->psz_path );
-
-        strcpy( psz_vobname + i_len - 4, ".sub" );
-
-        /* open file */
-        if( !( p_sys->p_vobsub_file = fopen( psz_vobname, "rb" ) ) )
-        {
-            msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",
-                     psz_vobname );
-        }
-        free( psz_vobname );
-
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
-    }
-    else if( p_sys->i_type == SUB_TYPE_SSA1 ||
+    if( p_sys->i_type == SUB_TYPE_SSA1 ||
              p_sys->i_type == SUB_TYPE_SSA2_4 )
     {
         es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','s','a',' ' ) );
@@ -429,9 +391,6 @@ static void Close( vlc_object_t *p_this )
     }
     if( p_sys->subtitle )
         free( p_sys->subtitle );
-
-    if( p_sys->p_vobsub_file )
-        fclose( p_sys->p_vobsub_file );
 
     free( p_sys );
 }
@@ -538,104 +497,50 @@ static int Demux( demux_t *p_demux )
         i_maxdate = p_sys->subtitle[p_sys->i_subtitle].i_start + 1;
     }
 
-    if( p_sys->i_type != SUB_TYPE_VOBSUB )
+    while( p_sys->i_subtitle < p_sys->i_subtitles &&
+           p_sys->subtitle[p_sys->i_subtitle].i_start < i_maxdate )
     {
-        while( p_sys->i_subtitle < p_sys->i_subtitles &&
-               p_sys->subtitle[p_sys->i_subtitle].i_start < i_maxdate )
+        block_t *p_block;
+        int i_len = strlen( p_sys->subtitle[p_sys->i_subtitle].psz_text ) + 1;
+
+        if( i_len <= 1 )
         {
-            block_t *p_block;
-            int i_len = strlen( p_sys->subtitle[p_sys->i_subtitle].psz_text ) + 1;
-
-            if( i_len <= 1 )
-            {
-                /* empty subtitle */
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            if( ( p_block = block_New( p_demux, i_len ) ) == NULL )
-            {
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            if( p_sys->subtitle[p_sys->i_subtitle].i_start < 0 )
-            {
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            p_block->i_pts = p_sys->subtitle[p_sys->i_subtitle].i_start;
-            p_block->i_dts = p_block->i_pts;
-            if( p_sys->subtitle[p_sys->i_subtitle].i_stop > 0 )
-            {
-                p_block->i_length =
-                    p_sys->subtitle[p_sys->i_subtitle].i_stop - p_block->i_pts;
-            }
-
-            memcpy( p_block->p_buffer,
-                    p_sys->subtitle[p_sys->i_subtitle].psz_text, i_len );
-            if( p_block->i_pts > 0 )
-            {
-                es_out_Send( p_demux->out, p_sys->es, p_block );
-            }
-            else
-            {
-                block_Release( p_block );
-            }
+            /* empty subtitle */
             p_sys->i_subtitle++;
+            continue;
         }
-    }
-    else
-    {
-        while( p_sys->i_subtitle < p_sys->i_subtitles &&
-               p_sys->subtitle[p_sys->i_subtitle].i_start < i_maxdate )
+
+        if( ( p_block = block_New( p_demux, i_len ) ) == NULL )
         {
-            int i_pos = p_sys->subtitle[p_sys->i_subtitle].i_vobsub_location;
-            block_t *p_block;
-            int i_size = 0;
-
-            /* first compute SPU size */
-            if( p_sys->i_subtitle + 1 < p_sys->i_subtitles )
-            {
-                i_size = p_sys->subtitle[p_sys->i_subtitle+1].i_vobsub_location - i_pos;
-            }
-            if( i_size <= 0 ) i_size = 65535;   /* Invalid or EOF */
-
-            /* Seek at the right place */
-            if( fseek( p_sys->p_vobsub_file, i_pos, SEEK_SET ) )
-            {
-                msg_Warn( p_demux,
-                          "cannot seek at right vobsub location %d", i_pos );
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            /* allocate a packet */
-            if( ( p_block = block_New( p_demux, i_size ) ) == NULL )
-            {
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            /* read data */
-            p_block->i_buffer = fread( p_block->p_buffer, 1, i_size,
-                                       p_sys->p_vobsub_file );
-            if( p_block->i_buffer <= 6 )
-            {
-                block_Release( p_block );
-                p_sys->i_subtitle++;
-                continue;
-            }
-
-            /* pts */
-            p_block->i_pts = p_sys->subtitle[p_sys->i_subtitle].i_start;
-
-            /* demux this block */
-            DemuxVobSub( p_demux, p_block );
-
             p_sys->i_subtitle++;
+            continue;
         }
+
+        if( p_sys->subtitle[p_sys->i_subtitle].i_start < 0 )
+        {
+            p_sys->i_subtitle++;
+            continue;
+        }
+
+        p_block->i_pts = p_sys->subtitle[p_sys->i_subtitle].i_start;
+        p_block->i_dts = p_block->i_pts;
+        if( p_sys->subtitle[p_sys->i_subtitle].i_stop > 0 )
+        {
+            p_block->i_length =
+                p_sys->subtitle[p_sys->i_subtitle].i_stop - p_block->i_pts;
+        }
+
+        memcpy( p_block->p_buffer,
+                p_sys->subtitle[p_sys->i_subtitle].psz_text, i_len );
+        if( p_block->i_pts > 0 )
+        {
+            es_out_Send( p_demux->out, p_sys->es, p_block );
+        }
+        else
+        {
+            block_Release( p_block );
+        }
+        p_sys->i_subtitle++;
     }
 
     /* */
@@ -764,7 +669,6 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
     for( ;; )
@@ -820,7 +724,6 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
     for( ;; )
@@ -914,7 +817,6 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
     for( ;; )
@@ -1002,7 +904,6 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
     for( ;; )
@@ -1095,7 +996,6 @@ static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
     for( ;; )
@@ -1179,7 +1079,6 @@ static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
 
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
     p_subtitle->psz_text = NULL;
 
 #define ADDC( c ) \
@@ -1262,118 +1161,4 @@ static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
 
     return( VLC_SUCCESS );
 #undef ADDC
-}
-
-static int  ParseVobSubIDX( demux_t *p_demux, subtitle_t *p_subtitle )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    text_t      *txt = &p_sys->txt;
-
-    /*
-     * Parse the idx file. Each line:
-     * timestamp: hh:mm:ss:mss, filepos: loc
-     * hexint is the hex location of the vobsub in the .sub file
-     *
-     */
-    char *p;
-    char buffer_text[MAX_LINE + 1];
-    unsigned int    i_start, i_location;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->i_vobsub_location  = 0;
-    p_subtitle->psz_text = NULL;
-
-    for( ;; )
-    {
-        unsigned int h, m, s, ms, loc;
-
-        if( ( p = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
-        i_start = 0;
-
-        memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( p, "timestamp: %d:%d:%d:%d, filepos: %x%[^\r\n]",
-                    &h, &m, &s, &ms, &loc, buffer_text ) == 5 )
-        {
-            i_start = ( (mtime_t)h * 3600*1000 +
-                        (mtime_t)m * 60*1000 +
-                        (mtime_t)s * 1000 +
-                        (mtime_t)ms ) * 1000;
-            i_location = loc;
-            break;
-        }
-    }
-    p_subtitle->i_start = (mtime_t)i_start;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-    p_subtitle->i_vobsub_location = i_location;
-    fprintf( stderr, "time: %x, location: %x\n", i_start, i_location );
-    return( 0 );
-}
-
-static int  DemuxVobSub( demux_t *p_demux, block_t *p_bk )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t     *p = p_bk->p_buffer;
-    uint8_t     *p_end = &p_bk->p_buffer[p_bk->i_buffer];
-
-    while( p < p_end )
-    {
-        int i_size = ps_pkt_size( p, p_end - p );
-        block_t *p_pkt;
-        int      i_id;
-        int      i_spu;
-
-        if( i_size <= 0 )
-        {
-            break;
-        }
-        if( p[0] != 0 || p[1] != 0 || p[2] != 0x01 )
-        {
-            msg_Warn( p_demux, "invalid PES" );
-            break;
-        }
-
-        if( p[3] != 0xbd )
-        {
-            msg_Dbg( p_demux, "we don't need these ps packets (id=0x1%2.2x)", p[3] );
-            p += i_size;
-            continue;
-        }
-
-        /* Create a block */
-        p_pkt = block_New( p_demux, i_size );
-        memcpy( p_pkt->p_buffer, p, i_size);
-        p += i_size;
-
-        i_id = ps_pkt_id( p_pkt );
-        if( (i_id&0xffe0) != 0xbd20 ||
-            ps_pkt_parse_pes( p_pkt, 1 ) )
-        {
-            block_Release( p_pkt );
-            continue;
-        }
-        i_spu = i_id&0x1f;
-        msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size );
-
-        /* FIXME i_spu == determines which of the spu tracks we will show. */
-        if( p_sys->es && i_spu == 0 )
-        {
-            p_pkt->i_dts = p_pkt->i_pts = p_bk->i_pts;
-            p_pkt->i_length = 0;
-            es_out_Send( p_demux->out, p_sys->es, p_pkt );
-
-            p_bk->i_pts = 0;    /* only first packet has a pts */
-        }
-        else
-        {
-            block_Release( p_pkt );
-            continue;
-        }
-    }
-
-    return VLC_SUCCESS;
 }
