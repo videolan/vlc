@@ -2,7 +2,7 @@
  * postprocess.c: video postprocessing using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocess.c,v 1.6 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: postprocess.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -234,7 +234,7 @@ static int PPQCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         if( !pp_mode )
         {
-            msg_Err( p_dec, "failed geting mode for postproc" );
+            msg_Err( p_dec, "failed getting mode for postproc" );
             newval.i_int = 0;
         }
         else

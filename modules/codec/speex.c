@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.9 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: speex.c,v 1.10 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -208,7 +208,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Take care of the initial Speex header */
         if( ProcessHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
         {
-            msg_Err( p_dec, "Initial Speex header is corrupted" );
+            msg_Err( p_dec, "initial Speex header is corrupted" );
             block_Release( *pp_block );
             return NULL;
         }
@@ -246,13 +246,13 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         speex_packet_to_header( p_oggpacket->packet, p_oggpacket->bytes );
     if( !p_header )
     {
-        msg_Err( p_dec, "Cannot read Speex header" );
+        msg_Err( p_dec, "cannot read Speex header" );
         return VLC_EGENERIC;
     }
     if( p_header->mode >= SPEEX_NB_MODES )
     {
-        msg_Err( p_dec, "Mode number %d does not (yet/any longer) exist in "
-                 "this version of libspeex", p_header->mode );
+        msg_Err( p_dec, "mode number %d does not (yet/any longer) exist in "
+                 "this version of libspeex.", p_header->mode );
         return VLC_EGENERIC;
     }
 
@@ -260,20 +260,20 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     if( p_header->speex_version_id > 1 )
     {
-        msg_Err( p_dec, "This file was encoded with Speex bit-stream "
-                 "version %d, which I don't know how to decode",
+        msg_Err( p_dec, "this file was encoded with Speex bit-stream "
+                 "version %d, which I don't know how to decode.",
                  p_header->speex_version_id );
         return VLC_EGENERIC;
     }
 
     if( p_mode->bitstream_version < p_header->mode_bitstream_version )
     {
-        msg_Err( p_dec, "File encoded with a newer version of Speex" );
+        msg_Err( p_dec, "file encoded with a newer version of Speex." );
         return VLC_EGENERIC;
     }
     if( p_mode->bitstream_version > p_header->mode_bitstream_version )
     {
-        msg_Err( p_dec, "File encoded with an older version of Speex" );
+        msg_Err( p_dec, "file encoded with an older version of Speex." );
         return VLC_EGENERIC;
     }
 
@@ -287,7 +287,7 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     p_sys->p_state = p_state = speex_decoder_init( p_mode );
     if( !p_state )
     {
-        msg_Err( p_dec, "Decoder initialization failed" );
+        msg_Err( p_dec, "decoder initialization failed" );
         return VLC_EGENERIC;
     }
 
@@ -397,13 +397,13 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
         if( i_ret== -2 )
         {
-            msg_Warn( p_dec, "Decoding error: corrupted stream?" );
+            msg_Warn( p_dec, "decoding error: corrupted stream?" );
             return NULL;
         }
 
         if( speex_bits_remaining( &p_sys->bits ) < 0 )
         {
-            msg_Warn( p_dec, "Decoding overflow: corrupted stream?" );
+            msg_Warn( p_dec, "decoding overflow: corrupted stream?" );
         }
 
         if( p_sys->p_header->nb_channels == 2 )
@@ -477,14 +477,14 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     if( p_oggpacket->bytes < 8 )
     {
-        msg_Warn( p_dec, "Invalid/corrupted comments" );
+        msg_Warn( p_dec, "invalid/corrupted comments" );
         return;
     }
 
     i_len = readint( p_buf, 0 ); p_buf += 4;
     if( i_len > p_oggpacket->bytes - 4 )
     {
-        msg_Warn( p_dec, "Invalid/corrupted comments" );
+        msg_Warn( p_dec, "invalid/corrupted comments" );
         return;
     }
 

@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd.c,v 1.13 2004/01/23 08:36:48 rocky Exp $
+ * $Id: cvd.c,v 1.14 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -48,7 +48,7 @@ vlc_module_begin();
     set_callbacks( DecoderOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-                  N_("set debug mask for additional debugging."),
+                  N_("Set debug mask for additional debugging."),
                   N_(DEBUG_LONGTEXT), VLC_TRUE );
 
     add_integer ( MODULE_STRING "-horizontal-correct", 0, NULL,

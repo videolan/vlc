@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.6 2003/12/04 22:37:02 gbazin Exp $
+ * $Id: flac.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -523,7 +523,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
         p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
         break;
     default:
-        msg_Dbg( p_dec, "strange bps %d",
+        msg_Dbg( p_dec, "strange bit/sample value: %d",
                  metadata->data.stream_info.bits_per_sample );
         p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
         break;
@@ -562,14 +562,14 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
     switch( status )
     {
     case FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC:
-        msg_Err( p_dec, "An error in the stream caused the decoder to "
-                 "loose synchronization." );
+        msg_Err( p_dec, "an error in the stream caused the decoder to "
+                 "lose synchronization." );
         break;
     case FLAC__STREAM_DECODER_ERROR_STATUS_BAD_HEADER:
-        msg_Err( p_dec, "The decoder encountered a corrupted frame header." );
+        msg_Err( p_dec, "the decoder encountered a corrupted frame header." );
         break;
     case FLAC__STREAM_DECODER_ERROR_STATUS_FRAME_CRC_MISMATCH:
-        msg_Err( p_dec, "The frame's data did not match the CRC in the "
+        msg_Err( p_dec, "frame's data did not match the CRC in the "
                  "footer." );
         break;
     default:
@@ -617,32 +617,32 @@ static void decoder_state_error( decoder_t *p_dec,
     switch ( state )
     {
     case FLAC__STREAM_DECODER_SEARCH_FOR_METADATA:
-        msg_Err( p_dec, "The decoder is ready to search for metadata." );
+        msg_Err( p_dec, "the decoder is ready to search for metadata." );
         break;
     case FLAC__STREAM_DECODER_READ_METADATA:
-        msg_Err( p_dec, "The decoder is ready to or is in the process of "
+        msg_Err( p_dec, "the decoder is ready to or is in the process of "
                  "reading metadata." );
         break;
     case FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC:
-        msg_Err( p_dec, "The decoder is ready to or is in the process of "
+        msg_Err( p_dec, "the decoder is ready to or is in the process of "
                  "searching for the frame sync code." );
         break;
     case FLAC__STREAM_DECODER_READ_FRAME:
-        msg_Err( p_dec, "The decoder is ready to or is in the process of "
+        msg_Err( p_dec, "the decoder is ready to or is in the process of "
                  "reading a frame." );
         break;
     case FLAC__STREAM_DECODER_END_OF_STREAM:
-        msg_Err( p_dec, "The decoder has reached the end of the stream." );
+        msg_Err( p_dec, "the decoder has reached the end of the stream." );
         break;
     case FLAC__STREAM_DECODER_ABORTED:
-        msg_Err( p_dec, "The decoder was aborted by the read callback." );
+        msg_Err( p_dec, "the decoder was aborted by the read callback." );
         break;
     case FLAC__STREAM_DECODER_UNPARSEABLE_STREAM:
-        msg_Err( p_dec, "The decoder encountered reserved fields in use "
+        msg_Err( p_dec, "the decoder encountered reserved fields in use "
                  "in the stream." );
         break;
     case FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR:
-        msg_Err( p_dec, "An error occurred allocating memory." );
+        msg_Err( p_dec, "error when allocating memory." );
         break;
     case FLAC__STREAM_DECODER_ALREADY_INITIALIZED:
         msg_Err( p_dec, "FLAC__stream_decoder_init() was called when the "
@@ -654,7 +654,7 @@ static void decoder_state_error( decoder_t *p_dec,
                  "all callbacks being set." );
         break;
     case FLAC__STREAM_DECODER_UNINITIALIZED:
-        msg_Err( p_dec, "The decoder is in the uninitialized state." );
+        msg_Err( p_dec, "decoder in uninitialized state." );
         break;
     default:
         msg_Err(p_dec, "unknown error" );

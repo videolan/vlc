@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.15 2004/01/07 16:54:47 hartman Exp $
+ * $Id: subsdec.c,v 1.16 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -92,9 +92,9 @@ static int  pi_justification[] = { 0, 1, 2 };
 static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
 
 #define ENCODING_TEXT N_("Subtitles text encoding")
-#define ENCODING_LONGTEXT N_("Change the encoding used in text subtitles")
+#define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")
 #define ALIGN_TEXT N_("Subtitles justification")
-#define ALIGN_LONGTEXT N_("Change the justification of substitles")
+#define ALIGN_LONGTEXT N_("Set the justification of substitles")
 
 vlc_module_begin();
     set_description( _("text subtitles decoder") );
@@ -153,24 +153,24 @@ static int OpenDecoder( vlc_object_t *p_this )
         char *psz_charset =(char*)malloc( 100 );
         vlc_current_charset( &psz_charset );
         p_sys->iconv_handle = iconv_open( "UTF-8", psz_charset );
-        msg_Dbg( p_dec, "Using character encoding: %s", psz_charset );
+        msg_Dbg( p_dec, "using character encoding: %s", psz_charset );
         free( psz_charset );
     }
     else if( val.psz_string )
     {
-        msg_Dbg( p_dec, "Using character encoding: %s", val.psz_string );
+        msg_Dbg( p_dec, "using character encoding: %s", val.psz_string );
         p_sys->iconv_handle = iconv_open( "UTF-8", val.psz_string );
     }
 
     if( p_sys->iconv_handle == (iconv_t)-1 )
     {
-        msg_Warn( p_dec, "Unable to do requested conversion" );
+        msg_Warn( p_dec, "unable to do requested conversion" );
     }
 
     if( val.psz_string ) free( val.psz_string );
 #else
 
-    msg_Dbg( p_dec, "No iconv support available" );
+    msg_Dbg( p_dec, "no iconv support available" );
 #endif
 
 #if 0

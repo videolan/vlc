@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.11 2004/01/22 04:46:19 rocky Exp $
+ * $Id: subtitle.h,v 1.12 2004/01/25 18:20:12 bigben Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -61,7 +61,7 @@
     "4:3 and 16:9 respectively." \
     )
 
-#define DURATION_SCALE_TEXT N_("factor to increase subtitle display interval")
+#define DURATION_SCALE_TEXT N_("Factor to increase subtitle display interval")
 #define DURATION_SCALE_LONGTEXT N_(			    \
   "If you find you need extra time for reading subtitles, " \
   "you can set this higher and it will multiply the display "	\

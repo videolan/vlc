@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.18 2003/11/23 04:58:00 fenrir Exp $
+ * $Id: adpcm.c,v 1.19 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -182,7 +182,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_sys->i_block = (p_sys->codec == ADPCM_IMA_QT) ?
             34 * p_dec->fmt_in.audio.i_channels : 1024;
-        msg_Warn( p_dec, "block size undefined, -> using %d", p_sys->i_block );
+        msg_Warn( p_dec, "block size undefined, using %d", p_sys->i_block );
     }
     else
     {
@@ -217,7 +217,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_dec, "format: samplerate:%dHz channels:%d bits/sample:%d "
-             "blockalign:%d samplesperblock %d",
+             "blockalign:%d samplesperblock:%d",
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample, p_sys->i_block,
              p_sys->i_samplesperblock );

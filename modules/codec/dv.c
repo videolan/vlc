@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.6 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: dv.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -94,7 +94,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     p_decoder = dv_decoder_new( TRUE, FALSE, FALSE );
     if( !p_decoder )
     {
-        msg_Err( p_fifo, "cannot create DV decoder" );
+        msg_Err( p_fifo, "cannot start DV decoder" );
         free( p_buffer );
         p_fifo->b_error = 1;
         DecoderError( p_fifo );
@@ -103,7 +103,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
     if( InitBitstream( &bit_stream, p_fifo, NULL, NULL ) != VLC_SUCCESS )
     {
-        msg_Err( p_fifo, "cannot initialise bitstream" );
+        msg_Err( p_fifo, "cannot initialize bitstream" );
         free( p_buffer );
         p_fifo->b_error = 1;
         DecoderError( p_fifo );
@@ -118,19 +118,19 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         /* Parsing the beginning of the stream */
         if( dv_parse_header( p_decoder, p_buffer ) < 0 )
         {
-            fprintf(stderr, "parse error\n");
+            msg_Err(p_fifo, "parse error");
             p_fifo->b_error = 1;
             break;
         }
 
         if( dv_format_wide( p_decoder ) )
         {
-            msg_Dbg( p_fifo, "aspect is 4:3" );
+            msg_Dbg( p_fifo, "aspect ratio is 4:3" );
             i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
         }
         else if( dv_format_normal( p_decoder ) )
         {
-            msg_Dbg( p_fifo, "aspect is 16:9" );
+            msg_Dbg( p_fifo, "aspect ratio is 16:9" );
             i_aspect = VOUT_ASPECT_FACTOR * 4/3;//16 / 9;
         }
         else
@@ -190,7 +190,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 
             if( dv_parse_header( p_decoder, p_buffer ) > 0 )
             {
-                fprintf(stderr, "size changed\n");
+                msg_Warn(p_fifo, "size changed");
             }
 
             if( p_vout && ( !p_decoder->prev_frame_decoded

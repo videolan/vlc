@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.20 2003/11/24 13:40:03 gbazin Exp $
+ * $Id: quicktime.c,v 1.21 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -374,7 +374,7 @@ static int OpenAudio( decoder_t *p_dec )
 #ifndef SYS_DARWIN
     if( ( i_error = p_sys->InitializeQTML( 6 + 16 ) ) )
     {
-        msg_Dbg( p_dec, "error while InitializeQTML = %d", i_error );
+        msg_Dbg( p_dec, "error on InitializeQTML = %d", i_error );
         goto exit_error;
     }
 #endif
@@ -405,7 +405,7 @@ static int OpenAudio( decoder_t *p_dec )
                                          &p_sys->myConverter );
     if( i_error )
     {
-        msg_Err( p_dec, "error while SoundConverterOpen = %d", i_error );
+        msg_Err( p_dec, "error on SoundConverterOpen = %d", i_error );
         goto exit_error;
     }
 
@@ -421,7 +421,7 @@ static int OpenAudio( decoder_t *p_dec )
                                                 FCC( 'w', 'a', 'v', 'e' ),
                                                 ((uint8_t*)p_dec->fmt_in.p_extra) + 36 + 8 );
 
-        msg_Dbg( p_dec, "error while SoundConverterSetInfo = %d", i_error );
+        msg_Dbg( p_dec, "error on SoundConverterSetInfo = %d", i_error );
     }
 
     WantedBufferSize = p_sys->OutputFormatInfo.numChannels *
@@ -449,7 +449,7 @@ static int OpenAudio( decoder_t *p_dec )
     if( (i_error = p_sys->SoundConverterBeginConversion(p_sys->myConverter)) )
     {
         msg_Err( p_dec,
-                 "error while SoundConverterBeginConversion = %d", i_error );
+                 "error on SoundConverterBeginConversion = %d", i_error );
         goto exit_error;
     }
 
@@ -677,7 +677,7 @@ static int OpenVideo( decoder_t *p_dec )
 #ifndef SYS_DARWIN
     if( ( i_result = p_sys->InitializeQTML( 6 + 16 ) ) )
     {
-        msg_Dbg( p_dec, "error while InitializeQTML = %d", (int)i_result );
+        msg_Dbg( p_dec, "error on InitializeQTML = %d", (int)i_result );
         goto exit_error;
     }
 #endif
@@ -936,7 +936,7 @@ static int QTAudioInit( decoder_t *p_dec )
 
     if( p_sys->InitializeQTML == NULL )
     {
-        msg_Err( p_dec, "failed geting proc address InitializeQTML" );
+        msg_Err( p_dec, "failed getting proc address InitializeQTML" );
         return VLC_EGENERIC;
     }
     if( p_sys->SoundConverterOpen == NULL ||
@@ -947,7 +947,7 @@ static int QTAudioInit( decoder_t *p_dec )
         p_sys->SoundConverterEndConversion == NULL ||
         p_sys->SoundConverterBeginConversion == NULL )
     {
-        msg_Err( p_dec, "failed geting proc address" );
+        msg_Err( p_dec, "failed getting proc address" );
         return VLC_EGENERIC;
     }
 
@@ -1002,7 +1002,7 @@ static int QTVideoInit( decoder_t *p_dec )
 
     if( p_sys->InitializeQTML == NULL )
     {
-        msg_Dbg( p_dec, "failed geting proc address InitializeQTML" );
+        msg_Dbg( p_dec, "failed getting proc address InitializeQTML" );
         return VLC_EGENERIC;
     }
     if( p_sys->FindNextComponent == NULL ||
@@ -1015,7 +1015,7 @@ static int QTVideoInit( decoder_t *p_dec )
         p_sys->QTNewGWorldFromPtr == NULL ||
         p_sys->NewHandleClear == NULL )
     {
-        msg_Err( p_dec, "failed geting proc address" );
+        msg_Err( p_dec, "failed getting proc address" );
         return VLC_EGENERIC;
     }
 #endif /* SYS_DARWIN */

@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.10 2004/01/21 17:56:05 gbazin Exp $
+ * $Id: dts.c,v 1.11 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -261,7 +261,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( SyncCode( p_header ) != VLC_SUCCESS )
             {
                 msg_Dbg( p_dec, "emulated sync word "
-                         "(no sync on following frame) %2.2x%2.2x%2.2x%2.2x",
+                         "(no sync on following frame): %2.2x%2.2x%2.2x%2.2x",
                          (int)p_header[0], (int)p_header[1],
                          (int)p_header[2], (int)p_header[3] );
                 p_sys->i_state = STATE_NOSYNC;

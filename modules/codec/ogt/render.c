@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.22 2004/01/23 11:03:06 rocky Exp $
+ * $Id: render.c,v 1.23 2004/01/25 18:20:12 bigben Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from: 
@@ -813,7 +813,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
               }
 	      
 	      if (p_source >= p_src_end) {
-		msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+		msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
 			 i_x, i_y / i_yscale, i_height);
 		return;
 	      }
@@ -1002,7 +1002,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
               }
 
 	      if (p_source >= p_src_end) {
-		msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+		msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
 			 i_x, i_y / i_yscale, i_height);
 		return;
 	      }
@@ -1101,7 +1101,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
               }
 	      
 	      if (p_source >= p_src_end) {
-		msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+		msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
 			 i_x, i_y / i_yscale, i_height);
 		return;
 	      }
@@ -1300,7 +1300,7 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
               }
 
 	      if (p_source >= p_src_end) {
-		msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+		msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
 			 i_x, i_y / i_yscale, i_height);
 		return;
 	      }
@@ -1608,7 +1608,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               }
               
               if (p_source >= p_src_end) {
-                msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+                msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
                          i_x, i_y / i_yscale, i_height);
                 return;
               }
@@ -1661,7 +1661,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               }
               
               if (p_source >= p_src_end) {
-                msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+                msg_Err( p_vout, "trying to access beyond subtitle %dx%d %d",
                          i_x, i_y / i_yscale, i_height);
                 return;
               }

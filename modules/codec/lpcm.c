@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder/packetizer module
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: lpcm.c,v 1.20 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: lpcm.c,v 1.21 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -77,12 +77,12 @@ static void *DecodeFrame  ( decoder_t *, block_t ** );
  *****************************************************************************/
 vlc_module_begin();
 
-    set_description( _("linear PCM audio decoder") );
+    set_description( _("Linear PCM audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("linear PCM audio packetizer") );
+    set_description( _("Linear PCM audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 

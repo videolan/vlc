@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.24 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.25 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -256,7 +256,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_sys->i_frame_size == -1 )
             {
-                msg_Dbg( p_dec, "emulated start code" );
+                msg_Dbg( p_dec, "emulated startcode" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
                 break;
@@ -330,7 +330,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 if( i_next_frame_size == -1 )
                 {
-                    msg_Dbg( p_dec, "emulated start code on next frame" );
+                    msg_Dbg( p_dec, "emulated startcode on next frame" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
                     break;

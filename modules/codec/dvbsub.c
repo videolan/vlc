@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
  * Copyright (C) 2003 VideoLAN
- * $Id: dvbsub.c,v 1.6 2003/11/24 02:35:50 fenrir Exp $
+ * $Id: dvbsub.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -39,7 +39,7 @@ static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
-    set_description( _("subtitles decoder") );
+    set_description( _("DVB subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -468,7 +468,7 @@ static void dvbsub_decode_segment( dvbsub_all_t *p_dvbspu, bs_t *s )
             break;
         case DVBSUB_ST_STUFFING:
         default:
-            fprintf( stderr, "*** DVBSUB - Unsupported segment type ! (%04x)",
+            fprintf( stderr, "DVBSUB - Unsupported segment type : (%04x)",
                       i_type );
             bs_skip( s,  8 * ( 2 + i_size ) );
             break;
@@ -615,7 +615,7 @@ static void dvbsub_decode_page_composition( dvbsub_all_t *p_dvbsub, bs_t *s )
     /* /Special workaround */
 
     p_dvbsub->p_page->regions =
-               trox_malloc(p_dvbsub->p_page->i_regions_number*sizeof(dvbsub_region_t));
+         0      trox_malloc(p_dvbsub->p_page->i_regions_number*sizeof(dvbsub_region_t));
     for( i = 0; i < p_dvbsub->p_page->i_regions_number; i++ )
     {
         p_dvbsub->p_page->regions[i].i_id = bs_read( s, 8 );
@@ -652,14 +652,14 @@ static void dvbsub_decode_region_composition( dvbsub_all_t *p_dvbsub, bs_t *s )
         /* TODO
          * The region has never been declared before
          * Internal error */
-        fprintf( stderr, "Decoding of undeclared region N/A...\n" );
+        fprintf( stderr, "Decoding of undeclared region N/A\n" );
         return;
     }
 
     /* Skip version number and fill flag */
     if( bs_show( s, 4 ) == p_region->i_version_number )
     {
-        fprintf( stderr, "Skipping already known region N/A ...\n" );
+        fprintf( stderr, "Skipping already known region N/A\n" );
         /* TODO Skip the right number of bits */
     }
 
@@ -1173,14 +1173,14 @@ static void dvbsub_RenderDVBSUB( vout_thread_t *p_vout, picture_t *p_pic,
 
         /* RV16 target, scaling */
         case VLC_FOURCC('R','V','1','6'):
-            fprintf(stderr, "Not implemented chroma ! RV16)\n");
+            msg_Err(p_vout, _("unimplemented chroma: RV16"));
             /* RenderRV16( p_vout, p_pic, p_spu ); */
             break;
 
         /* RV32 target, scaling */
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','3','2'):
-            fprintf(stderr, "Not implemented chroma ! RV32 \n");
+            msg_Err(p_vout, _("unimplemented chroma: RV32"));
             /* RenderRV32( p_vout, p_pic, p_spu ); */
             break;
 
@@ -1229,7 +1229,7 @@ static void dvbsub_render( dvbsub_all_t *dvbsub, vout_thread_t *p_vout )
 
             if(p_object==NULL)
             {
-                fprintf(stderr, "Internal DvbSub decoder error\n");
+                msg_Err(p_vout, _("internal DvbSub decoder error"));
                 return;
             }
 
@@ -1266,7 +1266,7 @@ static void dvbsub_render( dvbsub_all_t *dvbsub, vout_thread_t *p_vout )
             dvbsub->p_spu[j] = vout_CreateSubPicture( p_vout, MEMORY_SUBPICTURE );
             if( dvbsub->p_spu[j] == NULL )
             {
-                fprintf(stderr, "Unable to allocate memory ... skipping\n");
+                msg_Err(p_vout, "Unable to allocate memory, skipping");
                 return;
             }
             /* Set the pf_render callback */

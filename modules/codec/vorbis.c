@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vorbis.c,v 1.29 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: vorbis.c,v 1.30 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -249,8 +249,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( vorbis_synthesis_headerin( &p_sys->vi, &p_sys->vc,
                                        &oggpacket ) < 0 )
         {
-            msg_Err( p_dec, "This bitstream does not contain Vorbis "
-                     "audio data");
+            msg_Err( p_dec, "this bitstream does not contain Vorbis "
+                     "audio data.");
             block_Release( *pp_block );
             return NULL;
         }
@@ -463,7 +463,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
         psz_comment = strdup( p_dec->p_sys->vc.user_comments[i] );
         if( !psz_comment )
         {
-            msg_Warn( p_dec, "Out of memory" );
+            msg_Warn( p_dec, "out of memory" );
             break;
         }
         psz_name = psz_comment;

@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: tarkin.c,v 1.10 2003/11/23 03:55:01 fenrir Exp $
+ * $Id: tarkin.c,v 1.11 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -159,7 +159,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             < 0 )
         {
             msg_Err( p_dec, "This bitstream does not contain Tarkin "
-                     "video data");
+                     "video data.");
             block_Release( p_block );
             return NULL;
         }
@@ -174,7 +174,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( tarkin_synthesis_headerin( &p_sys->ti, &p_sys->tc, &oggpacket )
             < 0 )
         {
-            msg_Err( p_dec, "2nd Tarkin header is corrupted" );
+            msg_Err( p_dec, "2nd Tarkin header is corrupted." );
             block_Release( p_block );
             return NULL;
         }
@@ -188,7 +188,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( tarkin_synthesis_headerin( &p_sys->ti, &p_sys->tc, &oggpacket )
             < 0 )
         {
-            msg_Err( p_dec, "3rd Tarkin header is corrupted" );
+            msg_Err( p_dec, "3rd Tarkin header is corrupted." );
             block_Release( p_block );
             return NULL;
         }

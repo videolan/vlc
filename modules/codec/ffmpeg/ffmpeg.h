@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.31 2004/01/08 00:12:50 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.32 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
-    "ffmpeg can make errors resiliences.          \n" \
+    "ffmpeg can make error resiliences.          \n" \
     "Nevertheless, with a buggy encoder (like ISO MPEG-4 encoder from M$) " \
     "this will produce a lot of errors.\n" \
     "Valid range is -1 to 99 (-1 disables all errors resiliences).")
@@ -103,7 +103,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "but it can produce distorted pictures.")
 
 #define TRUNC_TEXT N_("Truncated stream")
-#define TRUNC_LONGTEXT N_("truncated stream -1:auto,0:disable,:1:enable")
+#define TRUNC_LONGTEXT N_("Truncated stream -1:auto,0:disable,:1:enable")
 
 #define PP_Q_TEXT N_("Post processing quality")
 #define PP_Q_LONGTEXT N_( \
@@ -111,7 +111,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "Higher levels require considerable more CPU power, but produce " \
     "better looking pictures." )
 
-#define LIBAVCODEC_PP_TEXT N_("Ffmpeg postproc filter chains")
+#define LIBAVCODEC_PP_TEXT N_("ffmpeg postproc filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \
 "<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \

@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.22 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: theora.c,v 1.23 2004/01/25 18:20:12 bigben Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -190,7 +190,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
         {
             msg_Err( p_dec, "This bitstream does not contain Theora "
-                     "video data" );
+                     "video data." );
             block_Release( p_block );
             return NULL;
         }
@@ -208,7 +208,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->ti.frame_width / p_sys->ti.frame_height;
 
         msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
-                 "is %dx%d with offset (%d,%d)",
+                 "is %dx%d with offset (%d,%d).",
                  p_sys->ti.width, p_sys->ti.height,
                  (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
                  p_sys->ti.frame_width, p_sys->ti.frame_height,
@@ -222,7 +222,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* The next packet in order is the comments header */
         if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
         {
-            msg_Err( p_dec, "2nd Theora header is corrupted" );
+            msg_Err( p_dec, "2nd Theora header is corrupted." );
             return NULL;
         }
         p_sys->i_headers++;
@@ -239,7 +239,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
            missing or corrupted header is fatal. */
         if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
         {
-            msg_Err( p_dec, "3rd Theora header is corrupted" );
+            msg_Err( p_dec, "3rd Theora header is corrupted." );
             return NULL;
         }
         p_sys->i_headers++;
@@ -347,7 +347,7 @@ static void ParseTheoraComments( decoder_t *p_dec )
         psz_comment = strdup( p_dec->p_sys->tc.user_comments[i] );
         if( !psz_comment )
         {
-            msg_Warn( p_dec, "Out of memory" );
+            msg_Warn( p_dec, "out of memory" );
             break;
         }
         psz_name = psz_comment;
@@ -457,7 +457,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_in.video.i_height % 16 )
     {
         msg_Err( p_enc, "Theora video encoding requires dimensions which are "
-                 "multiples of 16. Which is not the case here (%dx%d)",
+                 "multiples of 16. Which is not the case here (%dx%d).",
                  p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height );
         return VLC_EGENERIC;
     }
