@@ -14,9 +14,9 @@
 #SHELL=/bin/sh
 
 # Video output settings
-#VIDEO=X11
+VIDEO=X11
 #VIDEO=DGA (not yet supported)
-VIDEO=FB
+#VIDEO=FB
 #VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
