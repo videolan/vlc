@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.70 2004/01/26 18:30:37 titer Exp $
+ * $Id: vout.m,v 1.71 2004/01/26 20:00:33 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1323,21 +1323,20 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( !i_textures_loaded )
     {
-        int i;
         glGenTextures( 3, pi_textures );
-        for( i = 0; i < 3; i++ )
-        {
-            /* Create the texture */
-            glDisable( GL_TEXTURE_2D );
-            glEnable( GL_TEXTURE_RECTANGLE_EXT );
-            glBindTexture(GL_TEXTURE_RECTANGLE_EXT, pi_textures[i]);
+        i_textures_loaded = 1;
+    }
+    else 
+    {
+        glDisable( GL_TEXTURE_2D );
+        glEnable( GL_TEXTURE_RECTANGLE_EXT );
+        glBindTexture(GL_TEXTURE_RECTANGLE_EXT, pi_textures[i_index]);
 
-            /* Map our buffer to the texture */
-            glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGB8,
-                    p_vout->output.i_width, p_vout->output.i_height, 0,
-                    GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-                    PP_OUTPUTPICTURE[i]->p_data );
-        }
+        /* Map our buffer to the texture */
+        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGB8,
+                p_vout->output.i_width, p_vout->output.i_height, 0,
+                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+                PP_OUTPUTPICTURE[i_index]->p_data );
     }
 
     glDisable( GL_TEXTURE_2D );
