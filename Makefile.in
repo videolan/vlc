@@ -82,7 +82,7 @@ LIB += -lpthread -ldl
 endif
 
 ifneq (,$(findstring solaris,$(SYS)))
-LIB += -ldl -lsocket -lnsl -lposix4 -lpthread
+LIB += -ldl -lsocket -lnsl -lposix4 -lpthread -lresolv
 endif
 
 ifeq ($(SYS),beos)
@@ -107,9 +107,9 @@ endif
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
 CFLAGS += -O6
-CFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
-CFLAGS += -funroll-all-loops -fstrict-aliasing
+CFLAGS += -ffast-math -funroll-loops -funroll-all-loops
 CFLAGS += -fomit-frame-pointer
+CFLAGS += @BIZARRE_OPTIMS@
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
@@ -438,7 +438,10 @@ snapshot:
 	mv /tmp/${SNAPSHOTDIR}.tar.bz2 ..
 	@echo "Sources are in ../${SNAPSHOTDIR}.tar.[gz,bz2]"
 
-plugins: $(PLUGINS:%=lib/%.so)
+plugins: lib $(PLUGINS:%=lib/%.so)
+
+lib:
+	mkdir -p lib
 
 FORCE:
 
@@ -490,7 +493,7 @@ ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 else
-	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic @DYNAMIC_FLAG@ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
 lib/beos.so: $(PLUGIN_BEOS)

@@ -383,11 +383,11 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     /*
      * Convert message to string
      */
-#if defined SYS_BEOS || defined SYS_SOLARIS
+#ifdef HAVE_VASPRINTF
+    vasprintf( &psz_str, psz_format, ap );
+#else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
     vsprintf( psz_str, psz_format, ap );
-#else
-    vasprintf( &psz_str, psz_format, ap );
 #endif
     if( psz_str == NULL )
     {
@@ -448,11 +448,11 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     /*
      * Convert message to string
      */
-#if defined SYS_BEOS || defined SYS_SOLARIS
+#ifdef HAVE_VASPRINTF
+    vasprintf( &psz_str, psz_format, ap );
+#else
     psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
     vsprintf( psz_str, psz_format, ap );
-#else
-    vasprintf( &psz_str, psz_format, ap );
 #endif
     if( psz_str == NULL )
     {
@@ -624,3 +624,4 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 }
 
 #endif
+

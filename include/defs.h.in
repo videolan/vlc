@@ -3,14 +3,8 @@
 /* Define to empty if the keyword does not work.  */
 #undef const
 
-/* Define if you don't have vprintf but do have _doprnt.  */
-#undef HAVE_DOPRNT
-
 /* Define if you have a working `mmap' system call.  */
 #undef HAVE_MMAP
-
-/* Define if you have the vprintf function.  */
-#undef HAVE_VPRINTF
 
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
@@ -54,6 +48,9 @@
 
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
+
+/* Define if you have the vasprintf function.  */
+#undef HAVE_VASPRINTF
 
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
@@ -151,6 +148,9 @@
 /* Define if you have the threads library (-lthreads).  */
 #undef HAVE_LIBTHREADS
 
-/* Gabuzomeu */
+/* Define if ntohl is in <sys/param.h>. */
 #undef NTOHL_IN_SYS_PARAM_H
+
+/* Define if <sys/types.h> defines boolean_t. */
+#undef BOOLEAN_T_IN_SYS_TYPES_H
 

@@ -33,8 +33,8 @@ AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
 AC_CHECK_FUNC(nanosleep,,[AC_CHECK_LIB(rt,nanosleep,,[AC_CHECK_LIB(posix4,nanosleep)])])
 AC_CHECK_FUNCS(usleep)
 AC_CHECK_FUNC(inet_aton,,[AC_CHECK_LIB(resolv,inet_aton)])
+AC_CHECK_FUNCS(vasprintf)
 AC_FUNC_MMAP
-AC_FUNC_VPRINTF
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(gnugetopt, optarg)
@@ -62,15 +62,40 @@ AC_CHECK_HEADERS(machine/param.h)
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 
-dnl Check for ntohl, etc.
+dnl Do a series of bizarre compilation tests
 save_CFLAGS=$CFLAGS
+
+dnl Check for ntohl, etc.
 CFLAGS="${CFLAGS} -Wall -Werror"
 AC_MSG_CHECKING([for ntohl in sys/param.h])
 AC_TRY_COMPILE([#include <sys/param.h>
 void foo() { int meuh; ntohl(meuh); }],,
- AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Gabuzomeu)
+ AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if ntohl is in <sys/param.h>.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+dnl Check for special optimization flags
+CFLAGS="${CFLAGS} -fargument-noalias-global -fstrict-aliasing"
+AC_MSG_CHECKING([if \$CC accepts -fargument-noalias-global -fstrict-aliasing])
+AC_TRY_COMPILE([],,
+ BIZARRE_OPTIMS="-fargument-noalias-global -fstrict-aliasing"
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+dnl Check for -rdynamic flag
+CFLAGS="${CFLAGS} -rdynamic"
+AC_MSG_CHECKING([if \$CC accepts -rdynamic])
+AC_TRY_COMPILE([],,
+ DYNAMIC_FLAG="-rdynamic"
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
+dnl End of the bizarre compilation tests
 CFLAGS=$save_CFLAGS
+
+dnl Check for boolean_t in sys/types.h
+AC_MSG_CHECKING([for boolean_t in sys/types.h])
+AC_TRY_COMPILE([#include <sys/types.h>
+void quux() { boolean_t foo; }],,
+ AC_DEFINE(BOOLEAN_T_IN_SYS_TYPES_H, 1, Define if <sys/types.h> defines boolean_t.)
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -104,7 +129,7 @@ SYS=${host_os}
 
 # special cases
 if test x$host_os = xbeos; then
-    PLUGINS=${PLUGINS}"dummy beos "
+    PLUGINS=${PLUGINS}"dummy null beos "
 
 dnl default case
 else
@@ -112,6 +137,9 @@ else
 AC_ARG_ENABLE(dummy,
   [  --disable-dummy         dummy audio and video support (default enabled)])
 if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
+AC_ARG_ENABLE(null,
+  [  --disable-null          Null module (default enabled)])
+if test x$enable_null != xno; then PLUGINS=${PLUGINS}"null "; fi
 AC_ARG_ENABLE(dsp,
   [  --disable-dsp           Linux /dev/dsp support (default enabled)])
 if test x$enable_dsp != xno; then PLUGINS=${PLUGINS}"dsp "; fi
@@ -148,9 +176,6 @@ AC_ARG_WITH(glide,
     else
       LIB_GLIDE="-lglide2x"
     fi ])
-AC_ARG_ENABLE(null,
-  [  --enable-null           Null plugin (default disabled)],
-  [if test x$enable_null = xyes; then PLUGINS=${PLUGINS}"null "; fi])
 AC_ARG_ENABLE(gnome,
   [  --enable-gnome          Gnome support (default disabled)],
   [if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi])
@@ -170,6 +195,8 @@ AC_SUBST(ALIASES)
 AC_SUBST(DEBUG)
 AC_SUBST(STATS)
 AC_SUBST(OPTIMS)
+AC_SUBST(BIZARRE_OPTIMS)
+AC_SUBST(DYNAMIC_FLAG)
 AC_SUBST(LIB_SDL)
 AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GGI)

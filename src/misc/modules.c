@@ -105,7 +105,11 @@ void module_InitBank( module_bank_t * p_bank )
             /* Parse the directory and try to load all files it contains. */
             while( (file = readdir( dir )) )
             {
-                if( memcmp( file->d_name, ".", 1 ) )
+                int i_filelen = strlen( file->d_name );
+
+                /* We only load files ending with ".so" */
+                if( i_filelen > 3
+                        && !strcmp( file->d_name + i_filelen - 3, ".so" ) )
                 {
 #ifdef SYS_BEOS
                     /* Under BeOS, we need to add beos_GetProgramPath() to
@@ -113,7 +117,7 @@ void module_InitBank( module_bank_t * p_bank )
                     if( memcmp( file->d_name, "/", 1 ) )
                     {
                         psz_file = malloc( i_programlen + i_dirlen
-                                               + strlen( file->d_name ) + 3 );
+                                               + i_filelen + 3 );
                         if( psz_file == NULL )
                         {
                             continue;
@@ -124,15 +128,13 @@ void module_InitBank( module_bank_t * p_bank )
                     else
 #endif
                     {
-                        psz_file = malloc( i_dirlen
-                                               + strlen( file->d_name ) + 2 );
+                        psz_file = malloc( i_dirlen + i_filelen + 2 );
                         if( psz_file == NULL )
                         {
                             continue;
                         }
                         sprintf( psz_file, "%s/%s", *ppsz_path, file->d_name );
                     }
-
                     /* We created a nice filename -- now we just try to load
                      * it as a dynamic module. */
                     AllocateDynModule( p_bank, psz_file );

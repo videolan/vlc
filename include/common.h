@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.20 2001/01/05 18:46:43 massiot Exp $
+ * $Id: common.h,v 1.21 2001/01/06 07:23:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -37,10 +37,10 @@
 typedef u8                  byte_t;
 
 /* Boolean type */
-#ifndef SYS_SOLARIS
-typedef int                 boolean_t;
-#else
+#ifdef BOOLEAN_T_IN_SYS_TYPES_H
 #   include <sys/types.h>
+#else
+typedef int                 boolean_t;
 #endif
 #ifdef SYS_GNU
 #   define _MACH_I386_BOOLEAN_H_

@@ -6,12 +6,12 @@ Building VideoLAN
 
 A typical way to configure the vlc is :
 
-   ./configure --prefix=/usr --enable-mmx --enable-gnome
+   ./configure --prefix=/usr --enable-gnome --with-sdl
 
 For a full compilation, you may try :
 
-   ./configure --prefix=/usr --enable-mmx --enable-gnome --enable-fb \
-           --enable-glide --enable-ggi --enable-sdl --enable-esd --enable-alsa
+   ./configure --prefix=/usr --enable-gnome --enable-fb \
+           --with-glide --with-ggi --with-sdl --enable-esd --enable-alsa
 
 See `./configure --help' for more information.
 
