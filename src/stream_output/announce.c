@@ -283,7 +283,7 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
                           "u=VideoLAN\n"
                           "t=0 0\n"
                           "m=audio %s udp 14\n"
-                          "c=IN IP4 @%s/15\n"
+                          "c=IN IP4 %s/15\n"
                           "a=type:test\n",
                  p_this->psz_name , p_this->psz_port , p_this->psz_url );
         
