@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.3 2003/11/07 07:59:00 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.4 2003/11/07 09:24:58 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -598,7 +598,14 @@ void
 onAddFileToPlaylist                    (GtkButton       *button,
                                         gpointer         user_data)
 {
+    GtkTreeView       *treeview = NULL;
 
+    g_print("onAddFileToPlaylist\n");
+    treeview = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvFileList");
+    if (treeview)
+    {
+        onFileListRow(treeview, NULL, NULL, NULL );
+    }
 }
 
 
@@ -977,4 +984,5 @@ onPreferenceCancel                     (GtkButton       *button,
 {
 
 }
+
 

@@ -248,7 +248,6 @@
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
 			      <signal name="row_activated" handler="onFileListRow" last_modification_time="Fri, 26 Sep 2003 13:30:40 GMT"/>
-			      <signal name="columns_changed" handler="onFileListColumns" last_modification_time="Fri, 26 Sep 2003 13:30:01 GMT"/>
 			      <signal name="select_cursor_row" handler="onFileListRowSelected" last_modification_time="Fri, 26 Sep 2003 13:31:20 GMT"/>
 			    </widget>
 			  </child>
@@ -2116,23 +2115,6 @@
 		      <property name="visible">True</property>
 
 		      <child>
-			<widget class="GtkImage" id="pixmap2">
-			  <property name="width_request">0</property>
-			  <property name="height_request">0</property>
-			  <property name="visible">True</property>
-			  <property name="pixbuf">vlc48x48.png</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-			<packing>
-			  <property name="x">0</property>
-			  <property name="y">0</property>
-			</packing>
-		      </child>
-
-		      <child>
 			<widget class="GtkLabel" id="labelCopyright">
 			  <property name="width_request">0</property>
 			  <property name="height_request">0</property>
@@ -2239,6 +2221,23 @@
 			<packing>
 			  <property name="x">16</property>
 			  <property name="y">192</property>
+			</packing>
+		      </child>
+
+		      <child>
+			<widget class="GtkImage" id="aboutImage">
+			  <property name="width_request">48</property>
+			  <property name="height_request">48</property>
+			  <property name="visible">True</property>
+			  <property name="pixbuf">vlc48x48.png</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+			<packing>
+			  <property name="x">0</property>
+			  <property name="y">0</property>
 			</packing>
 		      </child>
 		    </widget>

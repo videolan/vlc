@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.6 2003/11/07 07:59:00 jpsaman Exp $
+ * $Id: pda.c,v 1.7 2003/11/07 09:24:58 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -175,13 +175,6 @@ static void Run( intf_thread_t *p_intf )
         msg_Err( p_intf, "unable to create pda interface" );
     }
 
-#if 0
-    msg_Dbg( p_intf, "setting main window size ... " );
-    gtk_widget_set_usize(p_intf->p_sys->p_window,
-                         gdk_screen_width() , gdk_screen_height() - 30 );
-    msg_Dbg( p_intf, "setting main window size ... done" );
-#endif
-
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (PDA Linux interface)");
@@ -226,26 +219,31 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 0, _("Filename"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 0 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 0 );
+    gtk_tree_view_column_set_sort_column_id(column, 0);
     /* Insert columns 1 */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 1, _("Permissions"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 1 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 1 );
+    gtk_tree_view_column_set_sort_column_id(column, 1);
     /* Insert columns 2 */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 2, _("Size"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 2 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 2 );
+    gtk_tree_view_column_set_sort_column_id(column, 2);
     /* Insert columns 3 */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 3, _("Owner"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 3 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 3 );
+    gtk_tree_view_column_set_sort_column_id(column, 3);
     /* Insert columns 4 */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvfile, 4, _("Group"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvfile, 4 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 4 );
+    gtk_tree_view_column_set_sort_column_id(column, 4);
 
     /* Get new directory listing */
     msg_Dbg(p_intf, "Populating GtkTreeView FileList" );

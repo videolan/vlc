@@ -15,9 +15,6 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
 #include "pda_callbacks.h"
 #include "pda_interface.h"
 #include "pda_support.h"
@@ -147,12 +144,12 @@ create_pda (void)
   GtkWidget *scrolledwindow3;
   GtkWidget *viewport1;
   GtkWidget *fixed2;
-  GtkWidget *pixmap2;
   GtkWidget *labelCopyright;
   GtkWidget *labelProgramName;
   GtkWidget *labelAuthors;
   GtkWidget *labelDescription;
   GtkWidget *labelWebSite;
+  GtkWidget *aboutImage;
   GtkWidget *about;
 
   pda = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -914,12 +911,6 @@ create_pda (void)
   gtk_widget_show (fixed2);
   gtk_container_add (GTK_CONTAINER (viewport1), fixed2);
 
-  pixmap2 = create_pixmap (pda, "vlc48x48.png");
-  gtk_widget_set_name (pixmap2, "pixmap2");
-  gtk_widget_show (pixmap2);
-  gtk_fixed_put (GTK_FIXED (fixed2), pixmap2, 0, 0);
-  gtk_widget_set_size_request (pixmap2, 0, 0);
-
   labelCopyright = gtk_label_new (_("(c) 1996-2003 the VideoLAN team"));
   gtk_widget_set_name (labelCopyright, "labelCopyright");
   gtk_widget_show (labelCopyright);
@@ -954,6 +945,12 @@ create_pda (void)
   gtk_widget_show (labelWebSite);
   gtk_fixed_put (GTK_FIXED (fixed2), labelWebSite, 16, 192);
   gtk_widget_set_size_request (labelWebSite, 208, 16);
+
+  aboutImage = create_pixmap (pda, "vlc48x48.png");
+  gtk_widget_set_name (aboutImage, "aboutImage");
+  gtk_widget_show (aboutImage);
+  gtk_fixed_put (GTK_FIXED (fixed2), aboutImage, 0, 0);
+  gtk_widget_set_size_request (aboutImage, 48, 48);
 
   about = gtk_label_new (_("About"));
   gtk_widget_set_name (about, "about");
@@ -998,9 +995,6 @@ create_pda (void)
                     NULL);
   g_signal_connect ((gpointer) tvFileList, "row_activated",
                     G_CALLBACK (onFileListRow),
-                    NULL);
-  g_signal_connect ((gpointer) tvFileList, "columns_changed",
-                    G_CALLBACK (onFileListColumns),
                     NULL);
   g_signal_connect ((gpointer) tvFileList, "select_cursor_row",
                     G_CALLBACK (onFileListRowSelected),
@@ -1244,12 +1238,12 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, scrolledwindow3, "scrolledwindow3");
   GLADE_HOOKUP_OBJECT (pda, viewport1, "viewport1");
   GLADE_HOOKUP_OBJECT (pda, fixed2, "fixed2");
-  GLADE_HOOKUP_OBJECT (pda, pixmap2, "pixmap2");
   GLADE_HOOKUP_OBJECT (pda, labelCopyright, "labelCopyright");
   GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
   GLADE_HOOKUP_OBJECT (pda, labelAuthors, "labelAuthors");
   GLADE_HOOKUP_OBJECT (pda, labelDescription, "labelDescription");
   GLADE_HOOKUP_OBJECT (pda, labelWebSite, "labelWebSite");
+  GLADE_HOOKUP_OBJECT (pda, aboutImage, "aboutImage");
   GLADE_HOOKUP_OBJECT (pda, about, "about");
 
   return pda;
