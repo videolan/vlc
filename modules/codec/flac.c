@@ -2,9 +2,9 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.9 2004/02/25 17:48:52 fenrir Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1060,7 +1060,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('f','l','a','c') )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('f','l','a','c') &&
+        !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
@@ -1073,6 +1074,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
     p_enc->p_sys = p_sys;
     p_enc->pf_encode_audio = Encode;
+    p_enc->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
+
     p_sys->i_headers = 0;
     p_sys->p_buffer = 0;
     p_sys->i_buffer = 0;

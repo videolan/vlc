@@ -837,6 +837,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
+    if( p_stream->p_sys->psz_aenc &&
+        *p_stream->p_sys->psz_aenc ) id->p_encoder->b_force = VLC_TRUE;
 
     /* Attach object to parent so object variables inheritance works */
     vlc_object_attach( id->p_encoder, p_stream );
@@ -1308,6 +1310,8 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_vresample      = NULL;
 
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
+    if( p_stream->p_sys->psz_venc &&
+        *p_stream->p_sys->psz_venc ) id->p_encoder->b_force = VLC_TRUE;
 
     /* Attach object to parent so object variables inheritance works */
     vlc_object_attach( id->p_encoder, p_stream );

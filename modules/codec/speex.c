@@ -552,7 +552,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     SpeexMode *p_speex_mode = &speex_nb_mode;
     int i_quality;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('s','p','x',' ') )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('s','p','x',' ') &&
+        !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
@@ -567,6 +568,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_header = Headers;
     p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+    p_enc->fmt_out.i_codec = VLC_FOURCC('s','p','x',' ');
 
     speex_init_header( &p_sys->header, p_enc->fmt_in.audio.i_rate,
                        1, p_speex_mode );

@@ -100,6 +100,7 @@ struct encoder_t
     /* Module properties */
     module_t *          p_module;
     encoder_sys_t *     p_sys;
+    vlc_bool_t          b_force;
 
     block_t *           ( * pf_header )( encoder_t * );
     block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
@@ -111,8 +112,11 @@ struct encoder_t
     /* Properties of the output of the encoder */
     es_format_t         fmt_out;
 
-    /* Number of threads to use during encoding */
-    int                 i_threads;
+    /* Common encoder options */
+    int i_threads;               /* Number of threads to use during encoding */
+    int i_iframes;               /* One I frame per i_iframes */
+    int i_bframes;               /* One B frame per i_bframes */
+    int i_tolerance;             /* Bitrate tolerance */
 
     /* Encoder config */
     sout_cfg_t *p_cfg;

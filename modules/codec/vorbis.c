@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/sout.h>
 
 #include <ogg/ogg.h>
 
@@ -558,7 +559,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('v','o','r','b') )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('v','o','r','b') &&
+        !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
@@ -574,6 +576,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_header = Headers;
     p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
+    p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
 
     /* Initialize vorbis encoder */
     vorbis_info_init( &p_sys->vi );

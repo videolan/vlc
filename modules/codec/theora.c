@@ -441,7 +441,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') )
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') &&
+        !p_enc->b_force )
     {
         return VLC_EGENERIC;
     }
@@ -466,6 +467,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_header = Headers;
     p_enc->pf_encode_video = Encode;
     p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+    p_enc->fmt_out.i_codec = VLC_FOURCC('t','h','e','o');
 
 #define frame_x_offset 0
 #define frame_y_offset 0
