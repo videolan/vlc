@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.15 2004/01/07 15:31:31 fenrir Exp $
+ * $Id: es_out.c,v 1.16 2004/01/17 23:50:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -152,18 +152,28 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 
     int i_cat = es->p_es->i_cat;
 
-    if( !p_sys->b_active || ( !b_force && es->p_es->fmt.i_priority < 0 ) )
+    if( !p_sys->b_active ||
+        ( !b_force && es->p_es->fmt.i_priority < 0 ) )
     {
         return;
     }
 
     if( p_sys->i_mode == ES_OUT_MODE_ALL || b_force )
     {
-        input_SelectES( p_input, es->p_es );
+        if( !es->p_es->p_dec )
+        {
+            input_SelectES( p_input, es->p_es );
+        }
     }
     else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
     {
         int i_wanted  = -1;
+
+        if( es->p_es->p_pgrm != NULL &&
+            es->p_es->p_pgrm != p_input->stream.p_selected_program )
+        {
+            return;
+        }
 
         if( i_cat == AUDIO_ES )
         {
