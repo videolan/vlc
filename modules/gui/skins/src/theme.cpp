@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.2 2003/03/19 03:11:14 karibu Exp $
+ * $Id: theme.cpp,v 1.3 2003/03/19 18:14:48 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,18 +87,25 @@ void Theme::ShowTheme()
         ChangeTaskbar();
 
     list<Window *>::const_iterator win;
-    Event *evt;
+    Event *evt1;
+    Event *evt2;
 
     // Synchronize control to visible aspect
     for( win = WindowList.begin(); win != WindowList.end(); win++ )
     {
         // Synchronize windows visibility
         if( (*win)->OnStartThemeVisible )
-            evt = (Event *)new OSEvent( p_intf, (*win), WINDOW_OPEN, 0, 1 );
+        {
+            evt1 = (Event *)new OSEvent( p_intf, (*win), WINDOW_OPEN,  1, 0 );
+            evt2 = (Event *)new OSEvent( p_intf, (*win), WINDOW_CLOSE, 0, 0 );
+        }
         else
-            evt = (Event *)new OSEvent( p_intf, (*win), WINDOW_CLOSE, 0, 1 );
-
-        evt->PostSynchroMessage( true );
+        {
+            evt1 = (Event *)new OSEvent( p_intf, (*win), WINDOW_OPEN,  0, 0 );
+            evt2 = (Event *)new OSEvent( p_intf, (*win), WINDOW_CLOSE, 1, 0 );
+        }
+        evt1->PostSynchroMessage( true );
+        evt2->PostSynchroMessage( true );
     }
 
     // Initialize magnetism

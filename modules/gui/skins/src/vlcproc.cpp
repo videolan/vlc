@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.2 2003/03/19 18:14:48 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -78,7 +78,7 @@ bool VlcProc::EventProc( Event *evt )
                 (*win)->OnStartThemeVisible = !(*win)->IsHidden();
             }
             p_intf->p_sys->i_close_status = (int)evt->GetParam1();
-            OSAPI_PostMessage( NULL, WINDOW_CLOSE, 0, 0 );
+            OSAPI_PostMessage( NULL, WINDOW_CLOSE, 1, 0 );
             return true;
 
         case VLC_SHOW:
@@ -87,7 +87,7 @@ bool VlcProc::EventProc( Event *evt )
                  win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
                 if( (*win)->OnStartThemeVisible )
-                    OSAPI_PostMessage( (*win), WINDOW_OPEN, 0, 0 );
+                    OSAPI_PostMessage( (*win), WINDOW_OPEN, 1, 0 );
             }
             p_intf->p_sys->b_all_win_closed = false;
             return true;

@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: event.cpp,v 1.2 2003/03/19 18:14:48 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -296,11 +296,11 @@ void Event::CreateEvent()
             break;
 
         case WINDOW_OPEN:
-            Param2 = GetBool( para2 );
+            Param1 = GetBool( para2 );
             break;
 
         case WINDOW_CLOSE:
-            Param2 = GetBool( para2 );
+            Param1 = GetBool( para2 );
             break;
 
         case PLAYLIST_ID_DEL:
@@ -357,7 +357,7 @@ int Event::GetBool( string expr )
     {
         return 2;
     }
-    return 2;
+    return 1;
 }
 //---------------------------------------------------------------------------
 void Event::CreateShortcut()

@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.2 2003/03/19 02:09:56 videolan Exp $
+ * $Id: window.cpp,v 1.3 2003/03/19 18:14:48 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -185,11 +185,39 @@ bool Window::ProcessEvent( Event *evt )
             return true;
 
         case WINDOW_OPEN:
-            Open();
+            switch( p1 )
+            {
+                case 0:
+                    Close();
+                    break;
+                case 1:
+                    Open();
+                    break;
+                case 2:
+                    if( Hidden )
+                        Open();
+                    else
+                        Close();
+                    break;
+            }
             return true;
 
         case WINDOW_CLOSE:
-            Close();
+            switch( p1 )
+            {
+                case 0:
+                    Open();
+                    break;
+                case 1:
+                    Close();
+                    break;
+                case 2:
+                    if( Hidden )
+                        Open();
+                    else
+                        Close();
+                    break;
+            }
             return true;
 
         case WINDOW_SHOW:
