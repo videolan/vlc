@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vout_synchro.c,v 1.7 2004/01/25 17:16:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -99,9 +99,9 @@
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
+#include <vlc/input.h>
 
 #include "vout_synchro.h"
-#include "stream_control.h"
 
 /*
  * Local prototypes
@@ -182,7 +182,7 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
 
     now = mdate();
     period = 1000000 * 1001 / p_synchro->i_frame_rate
-                     * p_synchro->i_current_rate / DEFAULT_RATE;
+                     * p_synchro->i_current_rate / INPUT_RATE_DEFAULT;
 
     p_synchro->i_render_time = i_render_time;
 
@@ -350,7 +350,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
                              mtime_t next_dts, int i_current_rate )
 {
     mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate
-                              * i_current_rate / DEFAULT_RATE;
+                              * i_current_rate / INPUT_RATE_DEFAULT;
 #if 0
     mtime_t         now = mdate();
 #endif

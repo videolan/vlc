@@ -37,9 +37,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
+#include <vlc/input.h>
 
 #include "audio_output.h"
 

@@ -1376,6 +1376,8 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Set( p_input, "deinterlace-mode", val );
     }
 
+    /* FIXME FIXME input2 --fenrir */
+#if 0
     /* now restart all video streams */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -1395,6 +1397,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     vlc_object_release( p_input );
+#endif
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
@@ -1417,6 +1420,9 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         msg_Err( p_vout, "Input not found" );
         return( VLC_EGENERIC );
     }
+
+    /* FIXME FIXME input2 --fenrir */
+#if 0
     /* Restart the video stream */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -1436,6 +1442,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     vlc_object_release( p_input );
+#endif
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );

@@ -35,6 +35,7 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>                                              /* ENOMEM */
@@ -65,9 +66,6 @@
 #include "os_specific.h"
 
 #include "vlc_error.h"
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
 
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
@@ -1337,7 +1335,7 @@ float VLC_SpeedFaster( int i_object )
     vlc_object_release( p_input );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return val.f_float / DEFAULT_RATE;
+    return val.f_float / INPUT_RATE_DEFAULT;
 }
 
 /**
@@ -1375,7 +1373,7 @@ float VLC_SpeedSlower( int i_object )
     vlc_object_release( p_input );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return val.f_float / DEFAULT_RATE;
+    return val.f_float / INPUT_RATE_DEFAULT;
 }
 
 /**
