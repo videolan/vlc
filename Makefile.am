@@ -421,6 +421,24 @@ share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
 endif
 
 ###############################################################################
+# Building specific source packages
+###############################################################################
+
+dist-woody: distdir
+	$(remove_distdir_woody)
+	mv $(distdir) $(PACKAGE)-woody-$(VERSION)
+	$(srcdir)/toolbox --make-woody $(PACKAGE)-woody-$(VERSION)
+	$(AMTAR) chof - $(PACKAGE)-woody-$(VERSION) \
+	  | GZIP=$(GZIP_ENV) gzip -c >$(PACKAGE)-woody-$(VERSION).tar.gz
+	$(remove_distdir_woody)
+
+remove_distdir_woody = \
+  { test ! -d $(PACKAGE)-woody-$(VERSION) \
+    || { find $(PACKAGE)-woody-$(VERSION) -type d ! -perm -200 \
+           -exec chmod u+w {} ';' \
+         && rm -fr $(PACKAGE)-woody-$(VERSION); }; }
+
+###############################################################################
 # Building architecture-specific binary packages
 ###############################################################################
 

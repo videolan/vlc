@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.37 2003/07/02 20:01:51 gbazin Exp $
+##  $Id: toolbox,v 1.38 2003/07/05 14:47:53 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -28,6 +28,7 @@ recognized flags are:
   --update-flexml         generate and fix flexml and flex code
   --changelog             update the CVS changelog
   --distclean             "make distclean"
+  --make-woody <dir>      change distdir <dir> to a woody distdir
 EOF
   exit 1
 }
@@ -76,6 +77,9 @@ case "$1" in
     ;;
   --distclean)
     action=distclean
+    ;;
+  --make-woody)
+    action=woody
     ;;
   --help)
     help
@@ -539,5 +543,66 @@ then
   rm -Rf autom4te.cache
   rm -f mozilla/vlcintf.h mozilla/vlcintf.xpt
   # FIXME: a lot of Makefiles are still there
+fi
+
+if test "${action}" = "woody"
+then
+  set -ex
+  test -d "$1"
+
+  # changelog: replace (1.2.3-4) with (1.2.3-0woody.4)
+  sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc-woody (\1-0woody.\2)/' \
+      -e 's/ unstable; / stable; /' \
+      < "$1/debian/changelog" > "$1/debian/changelog.woody"
+  mv "$1/debian/changelog.woody" "$1/debian/changelog"
+
+  # control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
+  #                  libdv*-dev with libdv-dev
+  #                  kdelibs4-dev with kdelibs-dev
+  #                  libqt3-mt-dev libqt3-compat-headers with libqt-dev
+  #                  libarts1-dev with libarts-dev
+  #                  libdvdread3-dev with libdvdread2-dev
+  #                  libdvdplay0-dev (>=1.0.1-2) with libdvdplay0-dev
+  #          remove libwxgtk2.4-dev
+  #                 libflac-dev
+  #                 libidl0 (workaround for mozilla-dev's bad deps)
+  #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
+  #                 libmatroska-dev
+  #          change Source: vlc with Source: vlc-woody
+  #                 Section: gnome with Section: graphics
+  #                 Section: kde with Section: kde
+  #                 Section: libdevel with Section: devel
+  sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
+      -e 's/libdv[0-9]*-dev/libdv-dev/' \
+      -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
+      -e 's/libqt[0-9]*-mt-dev/libqt-dev/' \
+      -e 's/, libqt[0-9]*-compat-headers[^,]*//' \
+      -e 's/libarts[0-9]*-dev/libarts-dev/' \
+      -e 's/libdvdread[0-9]*-dev/libdvdread2-dev/' \
+      -e 's/, libdvdplay0-dev[^,]*/, libdvdplay0-dev/' \
+      -e 's/, libwx[^,]*//' \
+      -e '/Package: wxvlc/,/^ *$/d' \
+      -e 's/, libflac-dev[^,]*//' \
+      -e 's/, libidl0[^,]*//' \
+      -e 's/, libglib2.0-0[^,]*//' \
+      -e 's/, libmatroska-dev[^,]*//' \
+      -e 's/Source: vlc/Source: vlc-woody/' \
+      -e 's/Section: gnome/Section: graphics/' \
+      -e 's/Section: kde/Section: graphics/' \
+      -e 's/Section: libdevel/Section: devel/' \
+      < "$1/debian/control" > "$1/debian/control.woody"
+  mv "$1/debian/control.woody" "$1/debian/control"
+
+  # rules: remove wxwindows and skins stuff
+  #        remove flac support
+  #        remove matroska support
+  sed -e '/# Package: wxvlc/,/^ *$/d' \
+      -e 's,--enable-wxwindows,--disable-wxwindows,' \
+      -e 's,--enable-skins,--disable-skins,' \
+      -e 's,--enable-flac,--disable-flac,' \
+      -e 's,--enable-mkv,--disable-mkv,' \
+      < "$1/debian/rules" > "$1/debian/rules.woody"
+  mv "$1/debian/rules.woody" "$1/debian/rules"
+  chmod 0755 "$1/debian/rules"
 fi
 

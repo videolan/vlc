@@ -28,7 +28,6 @@ EXTRA_DIST = \
 	vlc-plugin-glide.dirs \
 	vlc-plugin-sdl.dirs \
 	vlc-plugin-svgalib.dirs \
-	woody-buildpackage \
 	wxvlc.dirs \
 	wxvlc.menu \
 	$(NULL)
