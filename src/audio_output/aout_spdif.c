@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.4 2001/05/07 03:14:09 stef Exp $
+ * $Id: aout_spdif.c,v 1.5 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -98,7 +98,9 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                 }
                 else if( !AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) )
                 {
-                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+//                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+//fprintf(stderr, "delay %lld\n",p_aout->fifo[i_fifo].date[p_aout->fifo[i_fifo].l_start_frame]  -mdate() );
+                   
                     /* play spdif frame to the external decoder */
                     p_aout->pf_play( p_aout,
                                      p_aout->fifo[i_fifo].buffer +

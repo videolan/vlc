@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.4 2001/05/07 03:14:09 stef Exp $
+ * $Id: intf_playlist.c,v 1.5 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,6 +77,7 @@ void intf_PlaylistInit ( playlist_t * p_playlist )
 
     p_playlist->i_mode = PLAYLIST_FORWARD;
     p_playlist->i_seed = 0;
+    p_playlist->b_stopped = 0;
 
     /* There is no current item */
     p_playlist->current.i_type = 0;
@@ -246,7 +247,9 @@ void intf_PlaylistDestroy( playlist_t * p_playlist )
 }
 
 /*****************************************************************************
- * intf_PlaylistJumpto
+ * intf_PlaylistJumpto: go to a specified position in playlist.
+ *****************************************************************************
+ * Note that this function does NOT take the lock
  *****************************************************************************/
 void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
 {
@@ -260,10 +263,12 @@ void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
         {
             free( p_playlist->current.psz_name );
         }
+
         p_playlist->current = p_playlist->p_item[ p_playlist->i_index ];
         p_playlist->current.psz_name
                             = strdup( p_playlist->current.psz_name );
-        }
+
+    }
 
     vlc_mutex_unlock( &p_playlist->change_lock );
 }   

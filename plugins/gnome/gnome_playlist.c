@@ -2,7 +2,7 @@
  * gnome_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gnome_playlist.c,v 1.2 2001/05/07 03:14:09 stef Exp $
+ * $Id: gnome_playlist.c,v 1.3 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      
@@ -68,7 +68,7 @@
  * The following callbacks are related to the playlist.
  *****************************************************************************/
 void
-on_intf_playlist_destroy               (GtkObject       *object,
+on_playlist_destroy               (GtkObject       *object,
                                         gpointer         user_data)
 {
     gtk_widget_hide( GTK_WIDGET(object));
@@ -314,6 +314,7 @@ on_playlist_clist_event                (GtkWidget       *widget,
                 p_intf->p_input->b_eof = 1;
             }
             intf_PlaylistJumpto( p_main->p_playlist, i_row - 1 );
+            p_main->p_playlist->b_stopped = 0;
         }
         return TRUE;
     }
@@ -337,6 +338,7 @@ on_playlist_clist_drag_data_received   (GtkWidget       *widget,
     GtkCList *      p_clist;
     gint            i_row;
     gint            i_col;
+    int             i_end = p_main->p_playlist->i_size;
 
     p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
         p_intf->p_sys->p_playlist ), "playlist_clist" ) );
@@ -351,6 +353,10 @@ on_playlist_clist_drag_data_received   (GtkWidget       *widget,
         /* else, put that at the end of the playlist */
         GnomeDropDataReceived( p_intf, data, info, PLAYLIST_END );
     }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    p_main->p_playlist->b_stopped = 0;
+
 }
 
 
@@ -506,6 +512,8 @@ void GnomeDropDataReceived( intf_thread_t * p_intf,
         
         /* unlock the interface */
         vlc_mutex_unlock( &p_intf->change_lock );
+
+        p_main->p_playlist->b_stopped = 0;
     }
 }
 

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.57 2001/05/07 04:42:42 sam Exp $
+ * $Id: input_dvd.c,v 1.58 2001/05/15 01:01:44 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -562,6 +562,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
+    /* we can't use the interface slider until initilization is complete */
+    p_input->stream.b_seekable = 0;
+
     if( p_area != p_input->stream.p_selected_area )
     {
 
@@ -581,7 +584,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* uodate title environnement variable so that we don't
          * loop on the same title forever */
-        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
+//        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
 
         /* ifo vts */
         if( IfoTitleSet( p_dvd->p_ifo ) < 0 )
@@ -947,7 +950,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     }
 
     /* warn interface that something has changed */
+    p_input->stream.b_seekable = 1;
     p_input->stream.b_changed = 1;
+intf_WarnMsg( 3, "Pos: %lld Size: %lld", p_input->stream.p_selected_area->i_tell,p_input->stream.p_selected_area->i_size );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -1153,6 +1158,7 @@ static int DVDRead( input_thread_t * p_input,
 
     if( b_eot )
     {
+        intf_WarnMsg( 3, "dvd info: new title" );
         p_dvd->i_title++;
         DVDSetArea( p_input, p_area );
         return 0;

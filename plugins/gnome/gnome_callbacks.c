@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.28 2001/05/10 06:47:31 sam Exp $
+ * $Id: gnome_callbacks.c,v 1.29 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -113,47 +113,6 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
                                         guint            time,
                                         gpointer         user_data)
 {
-#if 0
-    char *psz_text = data->data;
-    int i_len      = strlen( psz_text );
-
-    switch( info )
-    {
-    case DROP_ACCEPT_TEXT_PLAIN: /* FIXME: handle multiple files */
-
-        if( i_len < 1 )
-        {
-            return;
-        }
-
-        /* get rid of ' ' at the end */
-        *( psz_text + i_len - 1 ) = 0;
-
-        intf_WarnMsg( 3, "intf: dropped text/uri-list data `%s'", psz_text );
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
-
-        break;
-
-    case DROP_ACCEPT_TEXT_URI_LIST: /* FIXME: handle multiple files */
-
-        if( i_len < 2 )
-        {
-            return;
-        }
-
-        /* get rid of \r\n at the end */
-        *( psz_text + i_len - 2 ) = 0;
-
-        intf_WarnMsg( 3, "intf: dropped text/uri-list data `%s'", psz_text );
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
-        break;
-
-    default:
-
-        intf_ErrMsg( "intf error: unknown dropped type");
-        break;
-    }
-#else
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET( widget ), "intf_window" );
     int             i_end  = p_main->p_playlist->i_size;
 
@@ -166,8 +125,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
      }
      
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-
-#endif
+    p_main->p_playlist->b_stopped = 0;
 }
 
 
@@ -741,10 +699,10 @@ on_toolbar_stop_clicked                (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        p_vout_bank->pp_vout[0]->b_die = 1;
-        p_aout_bank->pp_aout[0]->b_die = 1;
-        p_intf->p_input->b_die = 1;
+        p_intf->p_input->b_eof = 1;
+        p_main->p_playlist->i_index--;
     }
+    p_main->p_playlist->b_stopped = 1;
 }
 
 
@@ -758,6 +716,20 @@ on_toolbar_play_clicked                (GtkButton       *button,
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
+    else if( p_main->p_playlist->b_stopped )
+    {
+        if( p_main->p_playlist->i_size )
+        {
+            intf_PlaylistJumpto( p_main->p_playlist,
+                                 p_main->p_playlist->i_index );
+            p_main->p_playlist->b_stopped = 0;
+        }
+        else
+        {
+            on_toolbar_open_clicked( button, user_data );
+        }
+    }
+
 }
 
 
@@ -879,6 +851,7 @@ on_popup_play_activate                 (GtkMenuItem     *menuitem,
     if( p_intf->p_input != NULL )
     {
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        p_main->p_playlist->b_stopped = 0;
     }
 }
 
@@ -1210,6 +1183,7 @@ on_fileopen_ok_clicked                 (GtkButton       *button,
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    p_main->p_playlist->b_stopped = 0;
 }
 
 
@@ -1356,6 +1330,7 @@ on_disc_ok_clicked                     (GtkButton       *button,
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    p_main->p_playlist->b_stopped = 0;
 }
 
 
@@ -1468,6 +1443,7 @@ on_network_ok_clicked                  (GtkButton       *button,
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    p_main->p_playlist->b_stopped = 0;
 }
 
 
@@ -1545,6 +1521,7 @@ on_jump_apply_clicked                  (GtkButton       *button,
     {
         input_Seek( p_intf->p_input, i_seek );
     }
+    p_main->p_playlist->b_stopped = 0;
 #endif
 }
 
@@ -1687,4 +1664,3 @@ on_preferences_cancel_clicked          (GtkButton       *button,
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
-

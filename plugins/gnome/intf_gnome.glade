@@ -73,8 +73,6 @@
 	<class>GtkMenuBar</class>
 	<name>menubar</name>
 	<border_width>2</border_width>
-	<width>500</width>
-	<height>32</height>
 	<shadow_type>GTK_SHADOW_NONE</shadow_type>
 
 	<widget>
@@ -546,8 +544,6 @@
 	  <widget>
 	    <class>GtkHScale</class>
 	    <name>slider</name>
-	    <width>500</width>
-	    <height>15</height>
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>button_press_event</name>
@@ -576,8 +572,6 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>file_box</name>
-	<width>500</width>
-	<height>24</height>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -607,8 +601,6 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>dvd_box</name>
-	<width>500</width>
-	<height>24</height>
 	<visible>False</visible>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
@@ -816,8 +808,6 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>network_box</name>
-	<width>500</width>
-	<height>24</height>
 	<visible>False</visible>
 	<homogeneous>True</homogeneous>
 	<spacing>0</spacing>
@@ -1034,7 +1024,7 @@
       <handler>on_popup_jump_activate</handler>
       <last_modification_time>Tue, 01 May 2001 22:22:49 GMT</last_modification_time>
     </signal>
-    <label>_Jump</label>
+    <label>_Jump...</label>
     <right_justify>False</right_justify>
     <stock_icon>GNOME_STOCK_MENU_JUMP_TO</stock_icon>
   </widget>
@@ -1168,7 +1158,6 @@
   <widget>
     <class>GtkPixmapMenuItem</class>
     <name>popup_preferences</name>
-    <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
       <handler>on_popup_preferences_activate</handler>
@@ -2058,6 +2047,11 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 <widget>
   <class>GnomeDialog</class>
   <name>intf_playlist</name>
+  <signal>
+    <name>destroy</name>
+    <handler>on_playlist_destroy</handler>
+    <last_modification_time>Tue, 08 May 2001 23:21:39 GMT</last_modification_time>
+  </signal>
   <title>Playlist</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -2147,6 +2141,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkFrame</class>
 	  <name>playlist_frame</name>
+	  <border_width>4</border_width>
 	  <label>Playlist</label>
 	  <label_xalign>0.05</label_xalign>
 	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
@@ -2382,7 +2377,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     <homogeneous>False</homogeneous>
     <spacing>8</spacing>
     <child>
-      <padding>4</padding>
+      <padding>0</padding>
       <expand>True</expand>
       <fill>True</fill>
     </child>
@@ -2434,6 +2429,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     <widget>
       <class>GtkFrame</class>
       <name>jump_frame</name>
+      <border_width>5</border_width>
       <label>Jump to: </label>
       <label_xalign>0.05</label_xalign>
       <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
@@ -2446,6 +2442,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
       <widget>
 	<class>GtkHBox</class>
 	<name>jump_box</name>
+	<border_width>5</border_width>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
 
@@ -2598,10 +2595,11 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     <class>GtkVBox</class>
     <child_name>GnomeDialog:vbox</child_name>
     <name>preferences_vbox</name>
+    <border_width>5</border_width>
     <homogeneous>False</homogeneous>
-    <spacing>8</spacing>
+    <spacing>10</spacing>
     <child>
-      <padding>4</padding>
+      <padding>0</padding>
       <expand>True</expand>
       <fill>True</fill>
     </child>
@@ -2690,11 +2688,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_file_table</name>
+	  <border_width>5</border_width>
 	  <rows>1</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GnomeFileEntry</class>
@@ -2772,11 +2771,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_disc_table</name>
+	  <border_width>5</border_width>
 	  <rows>2</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GnomeFileEntry</class>
@@ -2913,11 +2913,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_network_table</name>
+	  <border_width>5</border_width>
 	  <rows>7</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GtkLabel</class>
@@ -3229,11 +3230,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_network_interface_table</name>
+	  <border_width>5</border_width>
 	  <rows>1</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GtkLabel</class>
@@ -3309,11 +3311,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_video_table</name>
+	  <border_width>5</border_width>
 	  <rows>7</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GtkLabel</class>
@@ -3711,11 +3714,12 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preference_audio_table</name>
+	  <border_width>5</border_width>
 	  <rows>6</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GtkCheckButton</class>
@@ -4023,11 +4027,12 @@ Stereo
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preference_playlist_table</name>
+	  <border_width>5</border_width>
 	  <rows>3</rows>
 	  <columns>1</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
 
 	  <widget>
 	    <class>GtkCheckButton</class>
@@ -4115,11 +4120,137 @@ Stereo
 	<widget>
 	  <class>GtkTable</class>
 	  <name>preferences_misc_table</name>
+	  <border_width>5</border_width>
 	  <rows>1</rows>
 	  <columns>2</columns>
 	  <homogeneous>False</homogeneous>
-	  <row_spacing>0</row_spacing>
-	  <column_spacing>0</column_spacing>
+	  <row_spacing>5</row_spacing>
+	  <column_spacing>5</column_spacing>
+
+	  <widget>
+	    <class>GtkFrame</class>
+	    <name>preferences_misc_associated_files_frame</name>
+	    <sensitive>False</sensitive>
+	    <label>Files associated with vlc</label>
+	    <label_xalign>0.05</label_xalign>
+	    <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	    <child>
+	      <left_attach>0</left_attach>
+	      <right_attach>1</right_attach>
+	      <top_attach>0</top_attach>
+	      <bottom_attach>1</bottom_attach>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <xexpand>True</xexpand>
+	      <yexpand>False</yexpand>
+	      <xshrink>False</xshrink>
+	      <yshrink>False</yshrink>
+	      <xfill>False</xfill>
+	      <yfill>True</yfill>
+	    </child>
+
+	    <widget>
+	      <class>GtkTable</class>
+	      <name>preferences_misc_associated_table</name>
+	      <rows>4</rows>
+	      <columns>1</columns>
+	      <homogeneous>False</homogeneous>
+	      <row_spacing>0</row_spacing>
+	      <column_spacing>0</column_spacing>
+
+	      <widget>
+		<class>GtkCheckButton</class>
+		<name>preferences_misc_ts_checkbutton</name>
+		<can_focus>True</can_focus>
+		<label>ts</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>3</top_attach>
+		  <bottom_attach>4</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkCheckButton</class>
+		<name>preferences_misc_vob_checkbutton</name>
+		<can_focus>True</can_focus>
+		<label>vob</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>2</top_attach>
+		  <bottom_attach>3</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkCheckButton</class>
+		<name>preferences_misc_mp2_checkbutton</name>
+		<can_focus>True</can_focus>
+		<label>mp2</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>1</top_attach>
+		  <bottom_attach>2</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkCheckButton</class>
+		<name>preferences_misc_mpeg_checkbutton</name>
+		<can_focus>True</can_focus>
+		<label>mpeg</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>0</top_attach>
+		  <bottom_attach>1</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+	    </widget>
+	  </widget>
 
 	  <widget>
 	    <class>GtkFrame</class>
@@ -4135,7 +4266,7 @@ Stereo
 	      <xpad>0</xpad>
 	      <ypad>0</ypad>
 	      <xexpand>True</xexpand>
-	      <yexpand>True</yexpand>
+	      <yexpand>False</yexpand>
 	      <xshrink>False</xshrink>
 	      <yshrink>False</yshrink>
 	      <xfill>False</xfill>
@@ -4201,131 +4332,6 @@ Stereo
 		  <xpad>0</xpad>
 		  <ypad>0</ypad>
 		  <xexpand>True</xexpand>
-		  <yexpand>False</yexpand>
-		  <xshrink>False</xshrink>
-		  <yshrink>False</yshrink>
-		  <xfill>True</xfill>
-		  <yfill>False</yfill>
-		</child>
-	      </widget>
-	    </widget>
-	  </widget>
-
-	  <widget>
-	    <class>GtkFrame</class>
-	    <name>preferences_misc_associated_files_frame</name>
-	    <sensitive>False</sensitive>
-	    <label>Files associated with vlc</label>
-	    <label_xalign>0.05</label_xalign>
-	    <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
-	    <child>
-	      <left_attach>0</left_attach>
-	      <right_attach>1</right_attach>
-	      <top_attach>0</top_attach>
-	      <bottom_attach>1</bottom_attach>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	      <xexpand>True</xexpand>
-	      <yexpand>True</yexpand>
-	      <xshrink>False</xshrink>
-	      <yshrink>False</yshrink>
-	      <xfill>False</xfill>
-	      <yfill>True</yfill>
-	    </child>
-
-	    <widget>
-	      <class>GtkTable</class>
-	      <name>preferences_misc_associated_table</name>
-	      <rows>4</rows>
-	      <columns>1</columns>
-	      <homogeneous>False</homogeneous>
-	      <row_spacing>0</row_spacing>
-	      <column_spacing>0</column_spacing>
-
-	      <widget>
-		<class>GtkCheckButton</class>
-		<name>preferences_misc_mpeg_checkbutton</name>
-		<can_focus>True</can_focus>
-		<label>mpeg</label>
-		<active>False</active>
-		<draw_indicator>True</draw_indicator>
-		<child>
-		  <left_attach>0</left_attach>
-		  <right_attach>1</right_attach>
-		  <top_attach>0</top_attach>
-		  <bottom_attach>1</bottom_attach>
-		  <xpad>0</xpad>
-		  <ypad>0</ypad>
-		  <xexpand>False</xexpand>
-		  <yexpand>False</yexpand>
-		  <xshrink>False</xshrink>
-		  <yshrink>False</yshrink>
-		  <xfill>True</xfill>
-		  <yfill>False</yfill>
-		</child>
-	      </widget>
-
-	      <widget>
-		<class>GtkCheckButton</class>
-		<name>preferences_misc_mp2_checkbutton</name>
-		<can_focus>True</can_focus>
-		<label>mp2</label>
-		<active>False</active>
-		<draw_indicator>True</draw_indicator>
-		<child>
-		  <left_attach>0</left_attach>
-		  <right_attach>1</right_attach>
-		  <top_attach>1</top_attach>
-		  <bottom_attach>2</bottom_attach>
-		  <xpad>0</xpad>
-		  <ypad>0</ypad>
-		  <xexpand>False</xexpand>
-		  <yexpand>False</yexpand>
-		  <xshrink>False</xshrink>
-		  <yshrink>False</yshrink>
-		  <xfill>True</xfill>
-		  <yfill>False</yfill>
-		</child>
-	      </widget>
-
-	      <widget>
-		<class>GtkCheckButton</class>
-		<name>preferences_misc_vob_checkbutton</name>
-		<can_focus>True</can_focus>
-		<label>vob</label>
-		<active>False</active>
-		<draw_indicator>True</draw_indicator>
-		<child>
-		  <left_attach>0</left_attach>
-		  <right_attach>1</right_attach>
-		  <top_attach>2</top_attach>
-		  <bottom_attach>3</bottom_attach>
-		  <xpad>0</xpad>
-		  <ypad>0</ypad>
-		  <xexpand>False</xexpand>
-		  <yexpand>False</yexpand>
-		  <xshrink>False</xshrink>
-		  <yshrink>False</yshrink>
-		  <xfill>True</xfill>
-		  <yfill>False</yfill>
-		</child>
-	      </widget>
-
-	      <widget>
-		<class>GtkCheckButton</class>
-		<name>preferences_misc_ts_checkbutton</name>
-		<can_focus>True</can_focus>
-		<label>ts</label>
-		<active>False</active>
-		<draw_indicator>True</draw_indicator>
-		<child>
-		  <left_attach>0</left_attach>
-		  <right_attach>1</right_attach>
-		  <top_attach>3</top_attach>
-		  <bottom_attach>4</bottom_attach>
-		  <xpad>0</xpad>
-		  <ypad>0</ypad>
-		  <xexpand>False</xexpand>
 		  <yexpand>False</yexpand>
 		  <xshrink>False</xshrink>
 		  <yshrink>False</yshrink>

@@ -2,7 +2,7 @@
  * intf_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.h,v 1.2 2001/03/21 13:42:33 sam Exp $
+ * $Id: intf_playlist.h,v 1.3 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,6 +45,7 @@ typedef struct playlist_s
 
     int                   i_mode;  /* parse mode (random, forward, backward) */
     int                   i_seed;               /* seed used for random mode */
+    boolean_t             b_stopped;
 
     vlc_mutex_t           change_lock;
 

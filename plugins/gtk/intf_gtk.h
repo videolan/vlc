@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.3 2001/05/06 18:32:30 stef Exp $
+ * $Id: intf_gtk.h,v 1.4 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,6 +33,13 @@
 #define GTK_MENU_LABEL_SIZE 64
 
 /*****************************************************************************
+ * Convert user_data structures to title and chapter information
+ *****************************************************************************/
+#define DATA2TITLE( user_data )    ( (gint)(user_data) >> 16 )
+#define DATA2CHAPTER( user_data )  ( (gint)(user_data) & 0xffff )
+#define POS2DATA( title, chapter ) ( ((title) << 16) | ((chapter) & 0xffff) )
+
+/*****************************************************************************
  * Useful inline function
  ****************************************************************************/
 static __inline__ intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
@@ -53,10 +60,13 @@ typedef struct intf_sys_s
     boolean_t           b_menus_update;              /* menus have changed ? */
     boolean_t           b_slider_free;                      /* slider status */
 
-    int                 i_list_timeout;
-
-    /* Playlist selected item */
-    int                 i_playing;
+    /* menus handlers */
+    boolean_t           b_title_update;  /* do we need to update title menus */
+    boolean_t           b_chapter_update;            /* do we need to update
+                                                               chapter menus */
+    boolean_t           b_angle_update;  /* do we need to update angle menus */
+    boolean_t           b_audio_update;  /* do we need to update audio menus */
+    boolean_t           b_spu_update;      /* do we need to update spu menus */
 
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */
@@ -67,15 +77,43 @@ typedef struct intf_sys_s
     GtkWidget *         p_fileopen;                      /* file open window */
     GtkWidget *         p_disc;                     /* disc selection window */
     GtkWidget *         p_network;                  /* network stream window */
+    GtkWidget *         p_preferences;                 /* preferences window */
+    GtkWidget *         p_jump;                               /* jump window */
 
     /* The slider */
     GtkFrame *          p_slider_frame;
     GtkAdjustment *     p_adj;                   /* slider adjustment object */
     float               f_adj_oldvalue;                    /* previous value */
 
+    /* Playlist management */
+    int                 i_playing;                 /* playlist selected item */
+
+    /* The window labels for DVD mode */
+    GtkLabel *          p_label_title;
+    GtkLabel *          p_label_chapter;
+    gint                i_part;                           /* current chapter */
+
     /* XXX: Ugly kludge, see intf_gnome.c */
     void             ( *pf_gtk_callback ) ( void );
     void             ( *pf_gdk_callback ) ( void );
 
 } intf_sys_t;
+
+/****************************************************************************
+ * Prototypes
+ ****************************************************************************/
+
+/*
+ * from gtk_menu.c
+ */
+gint GtkSetupMenu( intf_thread_t * );
+
+/*
+ * from gtk_playlist.c
+ */
+void    GtkDropDataReceived ( intf_thread_t *, GtkSelectionData *,
+                                guint, int );
+int     GtkAppendList       ( playlist_t *, int, GList * );
+void    GtkRebuildCList     ( GtkCList *, playlist_t * );
+void    GtkPlayListManage   ( intf_thread_t * );
 

@@ -500,7 +500,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (slider);
   gtk_container_add (GTK_CONTAINER (slider_frame), slider);
-  gtk_widget_set_usize (slider, 500, 15);
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
   gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
@@ -510,7 +509,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (file_box);
   gtk_box_pack_start (GTK_BOX (vbox8), file_box, TRUE, TRUE, 0);
-  gtk_widget_set_usize (file_box, 500, 24);
 
   label_status = gtk_label_new ("");
   gtk_widget_ref (label_status);
@@ -524,7 +522,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "dvd_box", dvd_box,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_box_pack_start (GTK_BOX (vbox8), dvd_box, TRUE, TRUE, 0);
-  gtk_widget_set_usize (dvd_box, 500, 24);
 
   label21 = gtk_label_new (_("DVD  "));
   gtk_widget_ref (label21);
@@ -622,7 +619,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_box", network_box,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_box_pack_start (GTK_BOX (vbox8), network_box, FALSE, FALSE, 0);
-  gtk_widget_set_usize (network_box, 500, 24);
 
   network_address_label = gtk_label_new (_("No server"));
   gtk_widget_ref (network_address_label);
@@ -810,7 +806,7 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   {
-    GNOME_APP_UI_ITEM, N_("_Jump"),
+    GNOME_APP_UI_ITEM, N_("_Jump..."),
     N_("Got directly so specified point"),
     (gpointer) on_popup_jump_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_JUMP_TO,
@@ -988,7 +984,6 @@ create_intf_popup (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_preferences",
                             intf_popup_uiinfo[17].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (intf_popup_uiinfo[17].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[18].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator2",
@@ -1699,6 +1694,7 @@ create_intf_playlist (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (playlist_frame);
   gtk_container_add (GTK_CONTAINER (playlist_viewport), playlist_frame);
+  gtk_container_set_border_width (GTK_CONTAINER (playlist_frame), 4);
   gtk_frame_set_label_align (GTK_FRAME (playlist_frame), 0.05, 0.5);
 
   playlist_clist = gtk_clist_new (2);
@@ -1817,6 +1813,9 @@ create_intf_playlist (void)
   gtk_widget_show (playlist_cancel);
   GTK_WIDGET_SET_FLAGS (playlist_cancel, GTK_CAN_DEFAULT);
 
+  gtk_signal_connect (GTK_OBJECT (intf_playlist), "destroy",
+                      GTK_SIGNAL_FUNC (on_playlist_destroy),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (playlist_clist), "event",
                       GTK_SIGNAL_FUNC (on_playlist_clist_event),
                       NULL);
@@ -1870,6 +1869,7 @@ create_intf_jump (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (jump_frame);
   gtk_box_pack_start (GTK_BOX (jump_vbox), jump_frame, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (jump_frame), 5);
   gtk_frame_set_label_align (GTK_FRAME (jump_frame), 0.05, 0.5);
 
   jump_box = gtk_hbox_new (FALSE, 0);
@@ -1878,6 +1878,7 @@ create_intf_jump (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (jump_box);
   gtk_container_add (GTK_CONTAINER (jump_frame), jump_box);
+  gtk_container_set_border_width (GTK_CONTAINER (jump_box), 5);
 
   jump_label3 = gtk_label_new (_("s."));
   gtk_widget_ref (jump_label3);
@@ -2045,17 +2046,17 @@ create_intf_preferences (void)
   GtkWidget *preferences_playlist_enqueue_as_default_checkbutton;
   GtkWidget *preferences_playlist;
   GtkWidget *preferences_misc_table;
+  GtkWidget *preferences_misc_associated_files_frame;
+  GtkWidget *preferences_misc_associated_table;
+  GtkWidget *preferences_misc_ts_checkbutton;
+  GtkWidget *preferences_misc_vob_checkbutton;
+  GtkWidget *preferences_misc_mp2_checkbutton;
+  GtkWidget *preferences_misc_mpeg_checkbutton;
   GtkWidget *preferences_misc_message_frame;
   GtkWidget *preferences_misc_message_table;
   GtkWidget *preferences_misc_messages_label;
   GtkObject *preferences_misc_messages_spinbutton_adj;
   GtkWidget *preferences_misc_messages_spinbutton;
-  GtkWidget *preferences_misc_associated_files_frame;
-  GtkWidget *preferences_misc_associated_table;
-  GtkWidget *preferences_misc_mpeg_checkbutton;
-  GtkWidget *preferences_misc_mp2_checkbutton;
-  GtkWidget *preferences_misc_vob_checkbutton;
-  GtkWidget *preferences_misc_ts_checkbutton;
   GtkWidget *preferences_misc;
   GtkWidget *preferences_dialog;
   GtkWidget *preferences_ok;
@@ -2070,6 +2071,7 @@ create_intf_preferences (void)
   preferences_vbox = GNOME_DIALOG (intf_preferences)->vbox;
   gtk_object_set_data (GTK_OBJECT (intf_preferences), "preferences_vbox", preferences_vbox);
   gtk_widget_show (preferences_vbox);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_vbox), 5);
 
   preferences_frame = gtk_frame_new (_("Preferences"));
   gtk_widget_ref (preferences_frame);
@@ -2092,6 +2094,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_file_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_file_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_file_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_file_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_file_table), 5);
 
   preferences_file_combo = gnome_file_entry_new (NULL, NULL);
   gtk_widget_ref (preferences_file_combo);
@@ -2131,6 +2136,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_disc_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_disc_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_disc_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_disc_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_disc_table), 5);
 
   preferences_disc_dvd_combo = gnome_file_entry_new (NULL, NULL);
   gtk_widget_ref (preferences_disc_dvd_combo);
@@ -2195,6 +2203,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_network_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_network_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_network_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_network_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_network_table), 5);
 
   preferences_network_server_label = gtk_label_new (_("Default server: "));
   gtk_widget_ref (preferences_network_server_label);
@@ -2329,6 +2340,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_network_interface_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_network_interface_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_network_interface_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_network_interface_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_network_interface_table), 5);
 
   preferences_interface_label = gtk_label_new (_("Default interface: "));
   gtk_widget_ref (preferences_interface_label);
@@ -2368,6 +2382,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_video_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_video_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_video_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_video_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_video_table), 5);
 
   preferences_video_output_label = gtk_label_new (_("Default output: "));
   gtk_widget_ref (preferences_video_output_label);
@@ -2547,6 +2564,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preference_audio_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preference_audio_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preference_audio_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preference_audio_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preference_audio_table), 5);
 
   preferences_audio_spdif_checkbutton = gtk_check_button_new_with_label (_("Spdif output"));
   gtk_widget_ref (preferences_audio_spdif_checkbutton);
@@ -2708,6 +2728,9 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preference_playlist_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preference_playlist_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preference_playlist_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preference_playlist_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preference_playlist_table), 5);
 
   preferences_playlist_launch_on_startup_checkbutton = gtk_check_button_new_with_label (_("Launch on startup"));
   gtk_widget_ref (preferences_playlist_launch_on_startup_checkbutton);
@@ -2749,6 +2772,63 @@ create_intf_preferences (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (preferences_misc_table);
   gtk_container_add (GTK_CONTAINER (preferences_notebook), preferences_misc_table);
+  gtk_container_set_border_width (GTK_CONTAINER (preferences_misc_table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (preferences_misc_table), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (preferences_misc_table), 5);
+
+  preferences_misc_associated_files_frame = gtk_frame_new (_("Files associated with vlc"));
+  gtk_widget_ref (preferences_misc_associated_files_frame);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_files_frame", preferences_misc_associated_files_frame,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_associated_files_frame);
+  gtk_table_attach (GTK_TABLE (preferences_misc_table), preferences_misc_associated_files_frame, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+  gtk_widget_set_sensitive (preferences_misc_associated_files_frame, FALSE);
+  gtk_frame_set_label_align (GTK_FRAME (preferences_misc_associated_files_frame), 0.05, 0.5);
+
+  preferences_misc_associated_table = gtk_table_new (4, 1, FALSE);
+  gtk_widget_ref (preferences_misc_associated_table);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_table", preferences_misc_associated_table,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_associated_table);
+  gtk_container_add (GTK_CONTAINER (preferences_misc_associated_files_frame), preferences_misc_associated_table);
+
+  preferences_misc_ts_checkbutton = gtk_check_button_new_with_label (_("ts"));
+  gtk_widget_ref (preferences_misc_ts_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_ts_checkbutton", preferences_misc_ts_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_ts_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_ts_checkbutton, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  preferences_misc_vob_checkbutton = gtk_check_button_new_with_label (_("vob"));
+  gtk_widget_ref (preferences_misc_vob_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_vob_checkbutton", preferences_misc_vob_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_vob_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_vob_checkbutton, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  preferences_misc_mp2_checkbutton = gtk_check_button_new_with_label (_("mp2"));
+  gtk_widget_ref (preferences_misc_mp2_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mp2_checkbutton", preferences_misc_mp2_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_mp2_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_mp2_checkbutton, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  preferences_misc_mpeg_checkbutton = gtk_check_button_new_with_label (_("mpeg"));
+  gtk_widget_ref (preferences_misc_mpeg_checkbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mpeg_checkbutton", preferences_misc_mpeg_checkbutton,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences_misc_mpeg_checkbutton);
+  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_mpeg_checkbutton, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   preferences_misc_message_frame = gtk_frame_new (_("Messages"));
   gtk_widget_ref (preferences_misc_message_frame);
@@ -2757,7 +2837,7 @@ create_intf_preferences (void)
   gtk_widget_show (preferences_misc_message_frame);
   gtk_table_attach (GTK_TABLE (preferences_misc_table), preferences_misc_message_frame, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND),
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
   gtk_frame_set_label_align (GTK_FRAME (preferences_misc_message_frame), 0.05, 0.5);
 
   preferences_misc_message_table = gtk_table_new (1, 2, FALSE);
@@ -2784,60 +2864,6 @@ create_intf_preferences (void)
   gtk_widget_show (preferences_misc_messages_spinbutton);
   gtk_table_attach (GTK_TABLE (preferences_misc_message_table), preferences_misc_messages_spinbutton, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  preferences_misc_associated_files_frame = gtk_frame_new (_("Files associated with vlc"));
-  gtk_widget_ref (preferences_misc_associated_files_frame);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_files_frame", preferences_misc_associated_files_frame,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_associated_files_frame);
-  gtk_table_attach (GTK_TABLE (preferences_misc_table), preferences_misc_associated_files_frame, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND),
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
-  gtk_widget_set_sensitive (preferences_misc_associated_files_frame, FALSE);
-  gtk_frame_set_label_align (GTK_FRAME (preferences_misc_associated_files_frame), 0.05, 0.5);
-
-  preferences_misc_associated_table = gtk_table_new (4, 1, FALSE);
-  gtk_widget_ref (preferences_misc_associated_table);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_associated_table", preferences_misc_associated_table,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_associated_table);
-  gtk_container_add (GTK_CONTAINER (preferences_misc_associated_files_frame), preferences_misc_associated_table);
-
-  preferences_misc_mpeg_checkbutton = gtk_check_button_new_with_label (_("mpeg"));
-  gtk_widget_ref (preferences_misc_mpeg_checkbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mpeg_checkbutton", preferences_misc_mpeg_checkbutton,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_mpeg_checkbutton);
-  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_mpeg_checkbutton, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  preferences_misc_mp2_checkbutton = gtk_check_button_new_with_label (_("mp2"));
-  gtk_widget_ref (preferences_misc_mp2_checkbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_mp2_checkbutton", preferences_misc_mp2_checkbutton,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_mp2_checkbutton);
-  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_mp2_checkbutton, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  preferences_misc_vob_checkbutton = gtk_check_button_new_with_label (_("vob"));
-  gtk_widget_ref (preferences_misc_vob_checkbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_vob_checkbutton", preferences_misc_vob_checkbutton,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_vob_checkbutton);
-  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_vob_checkbutton, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  preferences_misc_ts_checkbutton = gtk_check_button_new_with_label (_("ts"));
-  gtk_widget_ref (preferences_misc_ts_checkbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_preferences), "preferences_misc_ts_checkbutton", preferences_misc_ts_checkbutton,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preferences_misc_ts_checkbutton);
-  gtk_table_attach (GTK_TABLE (preferences_misc_associated_table), preferences_misc_ts_checkbutton, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
   preferences_misc = gtk_label_new (_("Misc"));

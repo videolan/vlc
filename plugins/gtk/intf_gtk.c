@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.17 2001/05/07 03:14:09 stef Exp $
+ * $Id: intf_gtk.c,v 1.18 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -47,12 +47,17 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "intf_msg.h"
 #include "interface.h"
+#include "intf_msg.h"
+#include "intf_playlist.h"
+
+#include "video.h"
+#include "video_output.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
+#include "gtk_menu.h"
 #include "intf_gtk.h"
 
 #include "main.h"
@@ -66,15 +71,8 @@ static void intf_Close      ( intf_thread_t *p_intf );
 static void intf_Run        ( intf_thread_t *p_intf );
 
 static gint GtkManage       ( gpointer p_data );
-static gint GtkLanguageMenus( gpointer, GtkWidget *, es_descriptor_t *, gint,
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
-static gint GtkChapterMenu  ( gpointer, GtkWidget *,
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
-static gint GtkTitleMenu    ( gpointer, GtkWidget *, 
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
+static gint GtkModeManage   ( intf_thread_t * p_intf );
 static void GtkDisplayDate  ( GtkAdjustment *p_adj );
-
-void GtkPlayListManage( gpointer p_data );
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
@@ -151,11 +149,7 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
 
-    p_intf->p_sys->b_menus_update = 1;
     p_intf->p_sys->b_slider_free = 1;
-
-
-    p_intf->p_sys->i_playing = -1;
 
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
@@ -204,10 +198,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
-    p_intf->p_sys->p_disc = create_intf_disc( );
-    p_intf->p_sys->p_network = create_intf_network( );
     p_intf->p_sys->p_playlist = create_intf_playlist( );
-
     
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -228,20 +219,30 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_slider_frame = GTK_FRAME( gtk_object_get_data(
         GTK_OBJECT(p_intf->p_sys->p_window ), "slider_frame" ) ); 
 
+#define P_LABEL( name ) GTK_LABEL( gtk_object_get_data( \
+                         GTK_OBJECT( p_intf->p_sys->p_window ), name ) )
+    p_intf->p_sys->p_label_title = P_LABEL( "title_label" );
+    p_intf->p_sys->p_label_chapter = P_LABEL( "chapter_label" );
+#undef P_LABEL
+
     /* Connect the date display to the slider */
-    #define P_SLIDER GTK_RANGE( gtk_object_get_data( \
+#define P_SLIDER GTK_RANGE( gtk_object_get_data( \
                          GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) )
     p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
 
     gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
                          GTK_SIGNAL_FUNC( GtkDisplayDate ), NULL );
     p_intf->p_sys->f_adj_oldvalue = 0;
-    #undef P_SLIDER
+#undef P_SLIDER
 
     /* We don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_modules = NULL;
     p_intf->p_sys->p_fileopen = NULL;
+    p_intf->p_sys->p_disc = NULL;
+    p_intf->p_sys->p_network = NULL;
+    p_intf->p_sys->p_preferences = NULL;
+    p_intf->p_sys->p_jump = NULL;
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
@@ -251,12 +252,6 @@ static void intf_Run( intf_thread_t *p_intf )
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_playlist),
-                         "p_intf", p_intf );
-
-    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_disc),
-                         "p_intf", p_intf );
-
-    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_network),
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
@@ -300,8 +295,6 @@ static gint GtkManage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
 
-    GtkPlayListManage( p_data );
-
     vlc_mutex_lock( &p_intf->change_lock );
     
     /* If the "display popup" flag has changed */
@@ -318,122 +311,53 @@ static gint GtkManage( gpointer p_data )
         p_intf->b_menu_change = 0;
     }
 
-    if( p_intf->p_input != NULL )
+    /* update the playlist */
+    GtkPlayListManage( p_data );
+
+    if( p_intf->p_input != NULL && !p_intf->b_die )
     {
-        /* Used by TS input when PMT changes */
+        /* New input or stream map change */
         if( p_intf->p_input->stream.b_changed )
         {
-            p_intf->p_sys->b_menus_update = 1;
-            p_intf->p_input->stream.b_changed = 0;
-            intf_WarnMsg( 3, 
-                          "Interface menus refreshed as stream has changed" );
+            GtkModeManage( p_intf );
         }
 
-    }
-    
-    /* Update language/chapter menus after user request */
-    if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
-        p_intf->p_sys->b_menus_update )
-    {
-        es_descriptor_t *   p_audio_es;
-        es_descriptor_t *   p_spu_es;
-        GtkWidget *         p_menubar_menu;
-        GtkWidget *         p_popup_menu;
-        gint                i;
+        GtkSetupMenu( p_intf );
 
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_window ), "menubar_title" ) );
-
-        GtkTitleMenu( p_intf, p_menubar_menu, on_menubar_title_activate );
-
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_window ), "menubar_chapter" ) );
-
-        GtkChapterMenu( p_intf, p_menubar_menu, on_menubar_chapter_activate );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_navigation" ) );
-
-        GtkTitleMenu( p_intf, p_popup_menu, on_popup_navigation_activate );
-    
-        /* look for selected ES */
-        p_audio_es = NULL;
-        p_spu_es = NULL;
-
-        for( i = 0 ; i < p_intf->p_input->stream.i_selected_es_number ; i++ )
+        /* Manage the slider */
+        if( p_intf->p_input->stream.b_seekable )
         {
-            if( p_intf->p_input->stream.pp_es[i]->i_cat == AUDIO_ES )
-            {
-                p_audio_es = p_intf->p_input->stream.pp_es[i];
-            }
+            float newvalue = p_intf->p_sys->p_adj->value;
     
-            if( p_intf->p_input->stream.pp_es[i]->i_cat == SPU_ES )
-            {
-                p_spu_es = p_intf->p_input->stream.pp_es[i];
-            }
-        }
-
-        /* audio menus */
-
-        /* find audio root menu */
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                             p_intf->p_sys->p_window ), "menubar_audio" ) );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_audio" ) );
-
-        GtkLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
-                          on_menubar_audio_activate );
-        GtkLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
-                          on_popup_audio_activate );
-
-        /* sub picture menus */
-
-        /* find spu root menu */
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                          p_intf->p_sys->p_window ), "menubar_subpictures" ) );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_subpictures" ) );
-
-        GtkLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
-                          on_menubar_subpictures_activate  );
-        GtkLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
-                          on_popup_subpictures_activate );
-
-        /* everything is ready */
-        p_intf->p_sys->b_menus_update = 0;
-    }
-
-    /* Manage the slider */
-    if( p_intf->p_input != NULL && p_intf->p_input->stream.b_seekable )
-    {
-        float newvalue = p_intf->p_sys->p_adj->value;
-
 #define p_area p_intf->p_input->stream.p_selected_area
-        /* If the user hasn't touched the slider since the last time,
-         * then the input can safely change it */
-        if( newvalue == p_intf->p_sys->f_adj_oldvalue )
-        {
-            /* Update the value */
-            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
-                ( 100. * p_area->i_tell ) / p_area->i_size;
-
-            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
-                                     "value_changed" );
-        }
-        /* Otherwise, send message to the input if the user has
-         * finished dragging the slider */
-        else if( p_intf->p_sys->b_slider_free )
-        {
-            off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-
-            input_Seek( p_intf->p_input, i_seek );
-
-            /* Update the old value */
-            p_intf->p_sys->f_adj_oldvalue = newvalue;
-        }
+            /* If the user hasn't touched the slider since the last time,
+             * then the input can safely change it */
+            if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+            {
+                /* Update the value */
+                p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
+                    ( 100. * p_area->i_tell ) / p_area->i_size;
+    
+                gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                         "value_changed" );
+            }
+            /* Otherwise, send message to the input if the user has
+             * finished dragging the slider */
+            else if( p_intf->p_sys->b_slider_free )
+            {
+                off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+    
+                input_Seek( p_intf->p_input, i_seek );
+    
+                /* Update the old value */
+                p_intf->p_sys->f_adj_oldvalue = newvalue;
+            }
 #undef p_area
+        }
+    }
+    else if( !p_intf->b_die )
+    {
+        GtkModeManage( p_intf );
     }
 
     /* Manage core vlc functions through the callback */
@@ -458,294 +382,15 @@ static gint GtkManage( gpointer p_data )
 }
 
 /*****************************************************************************
- * GtkMenuRadioItem: give a menu item adapted to language/title selection,
- * ie the menu item is a radio button.
- *****************************************************************************/
-static GtkWidget * GtkMenuRadioItem( GtkWidget * p_menu,
-                                     GSList **   p_button_group,
-                                     gint        b_active,
-                                     char *      psz_name )
-{
-    GtkWidget *     p_item;
-
-#if 0
-    GtkWidget *     p_button;
-
-    /* create button */
-    p_button =
-        gtk_radio_button_new_with_label( *p_button_group, psz_name );
-
-    /* add button to group */
-    *p_button_group =
-        gtk_radio_button_group( GTK_RADIO_BUTTON( p_button ) );
-
-    /* prepare button for display */
-    gtk_widget_show( p_button );
-
-    /* create menu item to store button */
-    p_item = gtk_menu_item_new();
-
-    /* put button inside item */
-    gtk_container_add( GTK_CONTAINER( p_item ), p_button );
-
-    /* add item to menu */
-    gtk_menu_append( GTK_MENU( p_menu ), p_item );
-
-          gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-               GTK_SIGNAL_FUNC( on_audio_toggle ),
-               NULL );
-
-
-    /* prepare item for display */
-    gtk_widget_show( p_item );
-
-    /* is it the selected item ? */
-    if( b_active )
-    {
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( p_button ), TRUE );
-    }
-#else
-    p_item = gtk_menu_item_new_with_label( psz_name );
-    gtk_menu_append( GTK_MENU( p_menu ), p_item );
-    gtk_widget_show( p_item );
-#endif
-
-    return p_item;
-}
-
-/*****************************************************************************
- * GtkLanguageMenus: update interactive menus of the interface
+ * GtkDisplayDate: display stream date
  *****************************************************************************
- * Sets up menus with information from input:
- *  -languages
- *  -sub-pictures
- * Warning: since this function is designed to be called by management
- * function, the interface lock has to be taken
+ * This function displays the current date related to the position in
+ * the stream. It is called whenever the slider changes its value.
  *****************************************************************************/
-static gint GtkLanguageMenus( gpointer          p_data,
-                              GtkWidget *       p_root,
-                              es_descriptor_t * p_es,
-                              gint              i_cat,
-                        void(*pf_activate )( GtkMenuItem *, gpointer ) )
-{
-    intf_thread_t *     p_intf;
-    GtkWidget *         p_menu;
-    GtkWidget *         p_separator;
-    GtkWidget *         p_item;
-    GSList *            p_button_group;
-    char *              psz_name;
-    gint                b_active;
-    gint                i;
-
-    
-
-    /* cast */
-    p_intf = (intf_thread_t *)p_data;
-
-    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
-
-    p_button_group = NULL;
-
-    /* menu container for audio */
-    p_menu = gtk_menu_new();
-
-    /* create a set of language buttons and append them to the container */
-    b_active = ( p_es == NULL );
-    psz_name = "Off";
-
-    p_item = GtkMenuRadioItem( p_menu, &p_button_group, b_active, psz_name );
-
-    /* setup signal hanling */
-    gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-            GTK_SIGNAL_FUNC ( pf_activate ), NULL );
-
-    p_separator = gtk_menu_item_new();
-    gtk_widget_show( p_separator );
-    gtk_menu_append( GTK_MENU( p_menu ), p_separator );
-    gtk_widget_set_sensitive( p_separator, FALSE );
-
-    for( i = 0 ; i < p_intf->p_input->stream.i_es_number ; i++ )
-    {
-        if( p_intf->p_input->stream.pp_es[i]->i_cat == i_cat )
-        {
-            b_active = ( p_es == p_intf->p_input->stream.pp_es[i] ) ? 1 : 0;
-            psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
-
-            p_item = GtkMenuRadioItem( p_menu, &p_button_group,
-                                       b_active, psz_name );
-
-            /* setup signal hanling */
-            gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-               GTK_SIGNAL_FUNC( pf_activate ),
-                 (gpointer)( p_intf->p_input->stream.pp_es[i] ) );
-
-        }
-    }
-
-    /* link the new menu to the menubar item */
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
-
-    /* be sure that menu is sensitive */
-    gtk_widget_set_sensitive( p_root, TRUE );
-
-    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
-
-    return TRUE;
-}
-
-/*****************************************************************************
- * GtkChapterMenu: generate chapter menu for current title
- *****************************************************************************/
-static gint GtkChapterMenu( gpointer p_data, GtkWidget * p_chapter,
-                        void(*pf_activate )( GtkMenuItem *, gpointer ) )
-{
-    intf_thread_t *     p_intf;
-    char                psz_name[ GTK_MENU_LABEL_SIZE ];
-    GtkWidget *         p_chapter_menu;
-    GtkWidget *         p_item;
-    GSList *            p_chapter_button_group;
-    gint                i_title;
-    gint                i_chapter;
-    gint                b_active;
-
-    /* cast */
-    p_intf = (intf_thread_t*)p_data;
-
-    i_title = p_intf->p_input->stream.p_selected_area->i_id;
-    p_chapter_menu = gtk_menu_new();
-
-    for( i_chapter = 0;
-         i_chapter < p_intf->p_input->stream.pp_areas[i_title]->i_part_nb ;
-         i_chapter++ )
-    {
-        b_active = ( p_intf->p_input->stream.pp_areas[i_title]->i_part
-                     == i_chapter + 1 ) ? 1 : 0;
-        
-        snprintf( psz_name, GTK_MENU_LABEL_SIZE,
-                  "Chapter %d", i_chapter + 1 );
-        psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
-
-        p_item = GtkMenuRadioItem( p_chapter_menu, &p_chapter_button_group,
-                                   b_active, psz_name );
-        /* setup signal hanling */
-        gtk_signal_connect( GTK_OBJECT( p_item ),
-                        "activate",
-                        GTK_SIGNAL_FUNC( pf_activate ),
-                        (gpointer)(i_chapter + 1) );
-    }
-
-    /* link the new menu to the title menu item */
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_chapter ),
-                               p_chapter_menu );
-
-    /* be sure that chapter menu is sensitive */
-    gtk_widget_set_sensitive( p_chapter, TRUE );
-
-    return TRUE;
-}
-
-/*****************************************************************************
- * GtkTitleMenu: sets menus for titles and chapters selection
- *****************************************************************************
- * Generates two type of menus:
- *  -simple list of titles
- *  -cascaded lists of chapters for each title
- *****************************************************************************/
-static gint GtkTitleMenu( gpointer       p_data,
-                          GtkWidget *    p_navigation, 
-                          void(*pf_activate )( GtkMenuItem *, gpointer ) )
-{
-    intf_thread_t *     p_intf;
-    char                psz_name[ GTK_MENU_LABEL_SIZE ];
-    GtkWidget *         p_title_menu;
-    GtkWidget *         p_title_item;
-    GtkWidget *         p_chapter_menu;
-    GtkWidget *         p_item;
-    GSList *            p_title_button_group;
-    GSList *            p_chapter_button_group;
-    gint                i_title;
-    gint                i_chapter;
-    gint                b_active;
-
-    /* cast */
-    p_intf = (intf_thread_t*)p_data;
-
-    p_title_menu = gtk_menu_new();
-    p_title_button_group = NULL;
-    p_chapter_button_group = NULL;
-
-    /* loop on titles */
-    for( i_title = 1 ;
-         i_title < p_intf->p_input->stream.i_area_nb ;
-         i_title++ )
-    {
-        b_active = ( p_intf->p_input->stream.pp_areas[i_title] ==
-                     p_intf->p_input->stream.p_selected_area ) ? 1 : 0;
-        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "Title %d", i_title );
-        psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
-
-        p_title_item = GtkMenuRadioItem( p_title_menu, &p_title_button_group,
-                                         b_active, psz_name );
-
-        if( pf_activate == on_menubar_title_activate )
-        {
-            /* setup signal hanling */
-            gtk_signal_connect( GTK_OBJECT( p_title_item ),
-                     "activate",
-                     GTK_SIGNAL_FUNC( pf_activate ),
-                     (gpointer)(p_intf->p_input->stream.pp_areas[i_title]) );
-        }
-        else
-        {
-            p_chapter_menu = gtk_menu_new();
-    
-            for( i_chapter = 0;
-                 i_chapter <
-                        p_intf->p_input->stream.pp_areas[i_title]->i_part_nb ;
-                 i_chapter++ )
-            {
-                b_active = ( p_intf->p_input->stream.pp_areas[i_title]->i_part
-                             == i_chapter + 1 ) ? 1 : 0;
-                
-                snprintf( psz_name, GTK_MENU_LABEL_SIZE,
-                          "Chapter %d", i_chapter + 1 );
-                psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
-    
-                p_item = GtkMenuRadioItem( p_chapter_menu,
-                                           &p_chapter_button_group,
-                                           b_active, psz_name );
-    
-                /* setup signal hanling */
-                gtk_signal_connect( GTK_OBJECT( p_item ),
-                           "activate",
-                           GTK_SIGNAL_FUNC( pf_activate ),
-                           (gpointer)( ( i_title * 100 ) + ( i_chapter + 1) ) );
-        }
-
-        /* link the new menu to the title menu item */
-        gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_title_item ),
-                                   p_chapter_menu );
-        }
-
-        /* be sure that chapter menu is sensitive */
-        gtk_widget_set_sensitive( p_title_menu, TRUE );
-
-    }
-
-    /* link the new menu to the menubar audio item */
-    gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_navigation ), p_title_menu );
-
-    /* be sure that audio menu is sensitive */
-    gtk_widget_set_sensitive( p_navigation, TRUE );
-
-
-    return TRUE;
-}
-
 void GtkDisplayDate( GtkAdjustment *p_adj )
 {
     intf_thread_t *p_intf;
-
+   
     p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
 
     if( p_intf->p_input != NULL )
@@ -755,7 +400,7 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
 
         vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
-        gtk_frame_set_label( p_intf->p_sys->p_slider_frame,
+        gtk_frame_set_label( GTK_FRAME( p_intf->p_sys->p_slider_frame ),
                             input_OffsetToTime( p_intf->p_input, psz_time,
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
 
@@ -765,3 +410,111 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
 }
 
 
+/*****************************************************************************
+ * GtkModeManage
+ *****************************************************************************/
+static gint GtkModeManage( intf_thread_t * p_intf )
+{
+    GtkWidget *     p_dvd_box;
+    GtkWidget *     p_file_box;
+    GtkWidget *     p_network_box;
+    GtkWidget *     p_slider;
+    GtkWidget *     p_label;
+    boolean_t       b_control;
+
+#define GETWIDGET( ptr, name ) GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( \
+                           p_intf->p_sys->ptr ) , ( name ) ) )
+    /* hide all boxes except default file box */
+    p_file_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "file_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_file_box ) );
+
+    p_network_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "network_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_network_box ) );
+
+    p_dvd_box = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                 p_intf->p_sys->p_window ), "dvd_box" ) );
+    gtk_widget_hide( GTK_WIDGET( p_dvd_box ) );
+
+    /* hide slider */
+    p_slider = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                           p_intf->p_sys->p_window ), "slider_frame" ) );
+    gtk_widget_hide( GTK_WIDGET( p_slider ) );
+
+    /* controls unavailable */
+    b_control = 0;
+
+    /* show the box related to current input mode */
+    if( p_intf->p_input != NULL )
+    {
+        switch( p_intf->p_input->stream.i_method & 0xf0 )
+        {
+            case INPUT_METHOD_FILE:
+                gtk_widget_show( GTK_WIDGET( p_file_box ) );
+                p_label = gtk_object_get_data( GTK_OBJECT(
+                            p_intf->p_sys->p_window ),
+                            "label_status" );
+                gtk_label_set_text( GTK_LABEL( p_label ),
+                                    p_intf->p_input->p_source );
+                break;
+            case INPUT_METHOD_DISC:
+                gtk_widget_show( GTK_WIDGET( p_dvd_box ) );
+                break;
+            case INPUT_METHOD_NETWORK:
+                gtk_widget_show( GTK_WIDGET( p_network_box ) );
+                p_label = gtk_object_get_data( GTK_OBJECT(
+                            p_intf->p_sys->p_window ),
+                            "network_address_label" );
+                gtk_label_set_text( GTK_LABEL( p_label ),
+                                    p_intf->p_input->p_source );
+                break;
+            default:
+                intf_ErrMsg( "intf error: can't determine input method" );
+                break;
+        }
+    
+        /* slider for seekable streams */
+        if( p_intf->p_input->stream.b_seekable )
+        {
+            gtk_widget_show( GTK_WIDGET( p_slider ) );
+        }
+    
+        /* control buttons for free pace streams */
+        b_control = p_intf->p_input->stream.b_pace_control;
+
+        /* get ready for menu regeneration */
+        p_intf->p_sys->b_title_update = 1;
+        p_intf->p_sys->b_chapter_update = 1;
+        p_intf->p_sys->b_angle_update = 1;
+        p_intf->p_sys->b_audio_update = 1;
+        p_intf->p_sys->b_spu_update = 1;
+        p_intf->p_sys->i_part = 0;
+    
+        p_intf->p_input->stream.b_changed = 0;
+        intf_WarnMsg( 3, 
+                      "intf info: menus refreshed as stream has changed" );
+    }
+    else
+    {
+        p_label = gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_window ),
+                        "label_status" );
+        gtk_label_set_text( GTK_LABEL( p_label ), "" );
+        gtk_widget_show( GTK_WIDGET( p_file_box ) );
+    }
+
+    /* set control items */
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_back"), FALSE );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_stop"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_pause"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_slow"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_fast"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_back"), FALSE );
+    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_stop"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_pause"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_slow"), b_control );
+    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_fast"), b_control );
+
+#undef GETWIDGET
+    return TRUE;
+}

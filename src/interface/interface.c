@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.77 2001/05/07 03:14:09 stef Exp $
+ * $Id: interface.c,v 1.78 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -154,20 +154,37 @@ static void intf_Manage( intf_thread_t *p_intf )
     /* If no stream is being played, try to find one */
     if( p_intf->p_input == NULL && !p_intf->b_die )
     {
-        /* Select the next playlist item */
-        intf_PlaylistNext( p_main->p_playlist );
-
-        if( p_main->p_playlist->i_index == -1 )
+        if( !p_main->p_playlist->b_stopped )
         {
-            /*    FIXME: wait for user to add stuff to playlist ? */
-#if 0
-            p_intf->b_die = 1;
-#endif
+            /* Select the next playlist item */
+            intf_PlaylistNext( p_main->p_playlist );
+
+            /* don't loop by default: stop at playlist end */
+            if( p_main->p_playlist->i_index == -1 )
+            {
+                p_main->p_playlist->b_stopped = 1;
+            }
+            else
+            {
+                p_main->p_playlist->b_stopped = 0;
+                p_intf->p_input =
+                    input_CreateThread( &p_main->p_playlist->current, NULL );
+            }
         }
         else
         {
-            p_intf->p_input =
-                input_CreateThread( &p_main->p_playlist->current, NULL );
+            /* playing has been stopped: we no longer need outputs */
+            if( p_aout_bank->i_count )
+            {
+                /* FIXME kludge that does not work with several outputs */
+                aout_DestroyThread( p_aout_bank->pp_aout[0], NULL );
+                p_aout_bank->i_count--;
+            }
+            if( p_vout_bank->i_count )
+            {
+                vout_DestroyThread( p_vout_bank->pp_vout[0], NULL );
+                p_vout_bank->i_count--;
+            }
         }
     }
 }

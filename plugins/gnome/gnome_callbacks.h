@@ -2,7 +2,7 @@
  * gnome_callbacks.h : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.h,v 1.16 2001/05/06 18:32:30 stef Exp $
+ * $Id: gnome_callbacks.h,v 1.17 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -425,4 +425,8 @@ on_playlist_cancel_clicked             (GtkButton       *button,
 
 void
 on_popup_back_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_playlist_destroy                    (GtkObject       *object,
                                         gpointer         user_data);

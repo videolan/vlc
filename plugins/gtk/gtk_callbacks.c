@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.16 2001/05/06 18:32:30 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.17 2001/05/15 01:01:44 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,7 +29,7 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-#include <sys/types.h>                                              /* off_t */                           
+#include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
@@ -48,10 +48,12 @@
 #include "intf_playlist.h"
 #include "intf_msg.h"
 
+#include "video.h"
+#include "video_output.h"
+
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
 #include "gtk_support.h"
-#include "gtk_playlist.h"
 #include "intf_gtk.h"
 
 #include "main.h"
@@ -59,378 +61,75 @@
 /*****************************************************************************
  * Callbacks
  *****************************************************************************/
-void
-on_menubar_open_activate               (GtkMenuItem     *menuitem,
+
+/*
+ * Main interface callbacks
+ */
+
+gboolean
+GtkExit                                (GtkWidget       *widget,
+                                        GdkEventButton  *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
-    {
-        p_intf->p_sys->p_fileopen = create_intf_fileopen();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
-                             "p_intf", p_intf );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_fileopen );
-    gdk_window_raise( p_intf->p_sys->p_fileopen->window );
-}
-
-
-void
-on_menubar_exit_activate               (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->b_die = 1;
     vlc_mutex_unlock( &p_intf->change_lock );
+
+    return TRUE;
 }
 
-void
-on_menubar_preferences_activate        (GtkMenuItem     *menuitem,
+gboolean
+GtkWindowDelete                        (GtkWidget       *widget,
+                                        GdkEvent        *event,
                                         gpointer         user_data)
 {
+    GtkExit( GTK_WIDGET( widget ), NULL, user_data );
 
-}
-
-
-void
-on_menubar_about_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
-    {
-        p_intf->p_sys->p_about = create_intf_about();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_about ),
-                             "p_intf", p_intf );
-    }
-    gtk_widget_show( p_intf->p_sys->p_about );
-    gdk_window_raise( p_intf->p_sys->p_about->window );
+    return TRUE;
 }
 
 
-void
-on_toolbar_open_clicked                (GtkButton       *button,
+gboolean
+GtkWindowToggle                        (GtkWidget       *widget,
+                                        GdkEventButton  *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
-    {
-        p_intf->p_sys->p_fileopen = create_intf_fileopen();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
-                             "p_intf", p_intf  );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_fileopen );
-    gdk_window_raise( p_intf->p_sys->p_fileopen->window );
-}
-
-
-void
-on_toolbar_back_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_toolbar_stop_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_toolbar_play_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-    }
-}
-
-
-void
-on_toolbar_pause_clicked               (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
-    }
-}
-
-void
-on_toolbar_prev_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        /* FIXME: temporary hack */
-        intf_PlaylistPrev( p_main->p_playlist );
-        intf_PlaylistPrev( p_main->p_playlist );
-        p_intf->p_input->b_eof = 1;
-    }
-}
-
-
-void
-on_toolbar_next_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        /* FIXME: temporary hack */
-        p_intf->p_input->b_eof = 1;
-    }
-}
-
-
-void
-on_popup_play_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-    }
-}
-
-
-void
-on_popup_pause_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
-    }
-}
-
-
-void
-on_popup_exit_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->b_die = 1;
-    vlc_mutex_unlock( &p_intf->change_lock );
-}
-
-void
-on_fileopen_ok_clicked                 (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    GtkCList *playlist_clist;
-    gchar *filename;
-
-    GtkWidget *filesel = gtk_widget_get_toplevel ( GTK_WIDGET (button) );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
     
-    /* retrieve the interface */
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(filesel), "intf_fileopen" );
-    
-    /* hide the widget */
-    gtk_widget_hide (filesel);
-    filename = gtk_file_selection_get_filename (GTK_FILE_SELECTION (filesel));
-    
-    /* catch the GTK CList */
-    playlist_clist = GTK_CLIST( 
-            lookup_widget(p_intf->p_sys->p_playlist,"playlist_clist"));
-    
-    intf_PlaylistAdd( p_main->p_playlist, 
-            PLAYLIST_END, 
-            (char*)filename );
-    
-    /* update the display */
-    rebuildCList( playlist_clist , 
-            p_main->p_playlist );
-   
-}
-
-
-void
-on_fileopen_cancel_clicked             (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
-}
-
-
-void
-on_intf_fileopen_destroy               (GtkObject       *object,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_fileopen" );
-
-    p_intf->p_sys->p_fileopen = NULL;
-}
-
-
-void
-on_popup_open_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    /* If we have never used the file selector, open it */
-    if( p_intf->p_sys->p_fileopen == NULL)
+    if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_window) )
     {
-        p_intf->p_sys->p_fileopen = create_intf_fileopen();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
-                             "p_intf", p_intf );
+        gtk_widget_hide( p_intf->p_sys->p_window);
+
+    } 
+    else 
+    {
+        gtk_widget_show( p_intf->p_sys->p_window );
     }
 
-    gtk_widget_show( p_intf->p_sys->p_fileopen );
-    gdk_window_raise( p_intf->p_sys->p_fileopen->window );
+    return TRUE;
 }
 
-
-void
-on_popup_about_activate                (GtkMenuItem     *menuitem,
+gboolean
+GtkFullscreen                          (GtkWidget       *widget,
+                                        GdkEventButton  *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
+    if( p_vout_bank->i_count )
     {
-        p_intf->p_sys->p_about = create_intf_about();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_about ),
-                             "p_intf", p_intf );
+        vlc_mutex_lock( &p_vout_bank->pp_vout[0]->change_lock );
+        if( p_vout_bank->pp_vout[0]->b_fullscreen ==
+                !GTK_CHECK_MENU_ITEM( widget )->active )
+            p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
     }
-    gtk_widget_show( p_intf->p_sys->p_about );
-    gdk_window_raise( p_intf->p_sys->p_about->window );
-}
-void
-on_popup_slow_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
 
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
-    }
-}
-
-
-void
-on_popup_fast_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
-    }
-}
-
-
-void
-on_toolbar_slow_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
-    }
-}
-
-
-void
-on_toolbar_fast_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( p_intf->p_input != NULL )
-    {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
-    }
-}
-
-
-void
-on_intf_modules_destroy                (GtkObject       *object,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_modules_ok_clicked                  (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_modules" );
-
-    gtk_widget_hide( p_intf->p_sys->p_modules );
-
-}
-
-
-void
-on_modules_apply_clicked               (GtkButton       *button,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-on_modules_cancel_clicked              (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_modules" );
-
-    gtk_widget_hide( p_intf->p_sys->p_modules );
+    return TRUE;
 }
 
 void
-on_menubar_modules_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_modules ) )
-    {
-//        p_intf->p_sys->p_modules = create_intf_modules();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_modules ),
-                             "p_intf", p_intf );
-    }
-    gtk_widget_show( p_intf->p_sys->p_modules );
-    gdk_window_raise( p_intf->p_sys->p_modules->window );
-}
-
-
-void
-on_intf_window_drag_data_received      (GtkWidget       *widget,
+GtkWindowDrag                          (GtkWidget       *widget,
                                         GdkDragContext  *drag_context,
                                         gint             x,
                                         gint             y,
@@ -441,452 +140,22 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
 {
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
     int end = p_main->p_playlist->i_size;
-    on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
+    GtkDropDataReceived( p_intf, data, info, PLAYLIST_END);
 
-     if( p_intf->p_input != NULL )
-     {
-        /* FIXME: temporary hack */
-        p_intf->p_input->b_eof = 1;
-     }
+    if( p_intf->p_input != NULL )
+    {
+       /* FIXME: temporary hack */
+       p_intf->p_input->b_eof = 1;
+    }
      
     intf_PlaylistJumpto( p_main->p_playlist, end-1 );
-
+    p_main->p_playlist->b_stopped = 0;
 }
 
-
-void
-on_about_ok_clicked                    (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_about" );
-
-    gtk_widget_hide( p_intf->p_sys->p_about );
-}
-
-
-void
-on_menubar_disc_activate               (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
-    {
-        p_intf->p_sys->p_disc = create_intf_disc();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
-                             "p_intf", p_intf );
-    }
-    gtk_widget_show( p_intf->p_sys->p_disc );
-    gdk_window_raise( p_intf->p_sys->p_disc->window );
-}
-
-
-void
-on_toolbar_disc_clicked                (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
-    {
-        p_intf->p_sys->p_disc = create_intf_disc();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
-                             "p_intf", p_intf );
-    }
-    gtk_widget_show( p_intf->p_sys->p_disc );
-    gdk_window_raise( p_intf->p_sys->p_disc->window );
-}
-
-
-void
-on_disc_ok_clicked                     (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
-    char *psz_device, *psz_source, *psz_method;
-
-    psz_device = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
-                                         GTK_WIDGET(button), "disc_name" ) ) );
-
-    /* "dvd:foo" has size 5 + strlen(foo) */
-    psz_source = malloc( 5 + strlen( psz_device ) );
-    if( psz_source == NULL )
-    {
-        return;
-    }
-
-    /* Check which method was activated */
-    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                          "disc_dvd" ) )->active )
-    {
-        psz_method = "dvd";
-    }
-    else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                               "disc_vcd" ) )->active )
-    {
-        psz_method = "vcd";
-    }
-    else
-    {
-        intf_ErrMsg( "intf error: unknown toggle button configuration" );
-        free( psz_source );
-        return;
-    }
-    
-    /* Select title and chapter */
-    main_PutIntVariable( INPUT_TITLE_VAR, gtk_spin_button_get_value_as_int(
-                              GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_title" ) ) ) );
-
-    main_PutIntVariable( INPUT_CHAPTER_VAR, gtk_spin_button_get_value_as_int(
-                              GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_chapter" ) ) ) );
-
-    /* Build source name and add it to playlist */
-    sprintf( psz_source, "%s:%s", psz_method, psz_device );
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
-    free( psz_source );
-
-    gtk_widget_hide( p_intf->p_sys->p_disc );
-}
-
-
-void
-on_disc_cancel_clicked                 (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
-
-    gtk_widget_hide( p_intf->p_sys->p_disc );
-}
-
-
-void
-on_disc_dvd_toggled                    (GtkToggleButton *togglebutton,
-                                        gpointer         user_data)
-{
-    if( togglebutton->active )
-    {
-        gtk_entry_set_text( GTK_ENTRY( lookup_widget(
-            GTK_WIDGET(togglebutton), "disc_name" ) ), "/dev/dvd" );
-    }
-}
-
-
-void
-on_disc_vcd_toggled                    (GtkToggleButton *togglebutton,
-                                        gpointer         user_data)
-{
-    if( togglebutton->active )
-    {
-        gtk_entry_set_text( GTK_ENTRY( lookup_widget(
-            GTK_WIDGET(togglebutton), "disc_name" ) ), "/dev/cdrom" );
-    }
-}
-
-
-void
-on_popup_disc_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
-    {
-        p_intf->p_sys->p_disc = create_intf_disc();
-        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
-                             "p_intf", p_intf );
-    }
-    gtk_widget_show( p_intf->p_sys->p_disc );
-    gdk_window_raise( p_intf->p_sys->p_disc->window );
-}
-
-void
-on_popup_audio_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 1 );
-}
-
-
-void
-on_popup_subpictures_activate          (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 2 );
-}
-
-
-void
-on_menubar_audio_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 1 );
-}
-
-
-void
-on_menubar_subpictures_activate        (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 2 );
-}
-
-
-void
-on_popup_navigation_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    input_area_t *  p_area;
-    gint            i_title;
-    gint            i_chapter;
-
-    i_title   = (gint)(user_data) / 100 ;
-    i_chapter = (gint)(user_data) - ( 100 * i_title );
-    p_area    = p_intf->p_input->stream.pp_areas[i_title];
-    p_area->i_part = i_chapter;
-
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-}
-
-
-void
-on_menubar_title_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)user_data );
-    p_intf->p_sys->b_menus_update = 1;
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-}
-
-
-void
-on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
-    gint            i_chapter = (gint)user_data;
-
-    p_area->i_part = i_chapter;
-
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
-}
-
-gboolean
-on_intf_window_destroy                 (GtkWidget       *widget,
-                                        GdkEvent        *event,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_window" );
-
-    vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->b_die = 1;
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-    return TRUE;
-}
-
-
-void
-on_main_window_toggle                  (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem),  "intf_popup" );
-    
-    if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_window) ) {
-        gtk_widget_hide( p_intf->p_sys->p_window);
-
-    } 
-    else 
-    {
-        gtk_widget_show( p_intf->p_sys->p_window );
-    }
-}
 
 
 gboolean
-on_playlist_clist_drag_motion          (GtkWidget       *widget,
-                                        GdkDragContext  *drag_context,
-                                        gint             x,
-                                        gint             y,
-                                        guint            time,
-                                        gpointer         user_data)
-{
-    GtkCList * clist;
-    gint row,col;
-    int dummy;
-    GdkColor color;
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget),  "intf_playlist" );
-   
-    
-    clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist"
-             ));
-
-    if(!GTK_WIDGET_TOPLEVEL(widget))
-    {
-        gdk_window_raise( p_intf->p_sys->p_playlist->window );
-    }
-
-    color.red = 0xffff;
-    color.green = 0xffff;
-    color.blue = 0xffff;
-
-    gtk_clist_freeze( clist );
-    
-    for(dummy=0; dummy<clist->rows; dummy++)
-    {
-       gtk_clist_set_background ( clist, dummy , &color);
-    }
-    color.red = 0xffff;
-    color.green = 0;
-    color.blue = 0;
-    gtk_clist_set_background ( clist, p_main->p_playlist->i_index , &color);
-        
-    if( gtk_clist_get_selection_info( clist,x,y ,&row,&col )== 1)
-    {
-        color.red = 0;
-        color.green = 0x9000;
-        color.blue = 0xf000;
-        gtk_clist_set_background ( clist, row-1  , &color);
-        gtk_clist_set_background ( clist, row  , &color);
-    }
-
-    gtk_clist_thaw( clist );
-    
-    return TRUE;
-}
-
-
-void
-on_intf_network_destroy                (GtkObject       *object,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_network" );
-
-    p_intf->p_sys->p_network = NULL;
-}
-
-
-void
-on_network_ok_clicked                  (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_network" );
-    char *psz_source, *psz_server, *psz_protocol;
-    unsigned int i_port;
-
-    psz_server = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
-                                 GTK_WIDGET(button), "network_server" ) ) );
-
-    /* Check which protocol was activated */
-    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                          "network_ts" ) )->active )
-    {
-        psz_protocol = "ts";
-    }
-    else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                               "network_rtp" ) )->active )
-    {
-        psz_protocol = "rtp";
-    }
-    else
-    {
-        intf_ErrMsg( "intf error: unknown protocol toggle button position" );
-        return;
-    }
-
-    /* Get the port number and make sure it will not overflow 5 characters */
-    i_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
-                 lookup_widget( GTK_WIDGET(button), "network_port" ) ) );
-    if( i_port > 65535 )
-    {
-        intf_ErrMsg( "intf error: invalid port %i", i_port );
-    }
-
-    /* Allocate room for "protocol://server:port" */
-    psz_source = malloc( strlen( psz_protocol ) + strlen( psz_server ) + 10 );
-    if( psz_source == NULL )
-    {
-        return;
-    }
-   
-    /* Build source name and add it to playlist */
-    sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
-    free( psz_source );
-
-    gtk_widget_hide( p_intf->p_sys->p_network );
-}
-
-
-void
-on_network_cancel_clicked              (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
-}
-
-
-void
-on_menubar_network_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    gtk_widget_show( p_intf->p_sys->p_network );
-    gdk_window_raise( p_intf->p_sys->p_network->window );
-}
-
-
-void
-on_popup_network_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-
-    gtk_widget_show( p_intf->p_sys->p_network );
-    gdk_window_raise( p_intf->p_sys->p_network->window );
-}
-
-void
-on_toolbar_network_clicked             (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
-
-    gtk_widget_show( p_intf->p_sys->p_network );
-    gdk_window_raise( p_intf->p_sys->p_network->window );
-}
-
-
-gboolean
-on_slider_button_release_event         (GtkWidget       *widget,
+GtkSliderRelease                       (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data)
 {
@@ -901,7 +170,7 @@ on_slider_button_release_event         (GtkWidget       *widget,
 
 
 gboolean
-on_slider_button_press_event           (GtkWidget       *widget,
+GtkSliderPress                         (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data)
 {
@@ -916,7 +185,258 @@ on_slider_button_press_event           (GtkWidget       *widget,
 
 
 void
-on_menubar_fullscreen_activate         (GtkMenuItem     *menuitem,
+GtkTitlePrev                           (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
+
+    /* Disallow area 0 since it is used for video_ts.vob */
+    if( i_id > 0 )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_title_update = 1;
+    }
+}
+
+
+void
+GtkTitleNext                           (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+    int             i_id;
+
+    p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
+
+    if( i_id < p_intf->p_input->stream.i_area_nb )
+    {
+        p_area = p_intf->p_input->stream.pp_areas[i_id];   
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_title_update = 1;
+    }
+
+}
+
+
+void
+GtkChapterPrev                         (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+
+    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_area = p_intf->p_input->stream.p_selected_area;
+
+    if( p_area->i_part > 0 )
+    {
+        p_area->i_part--;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_chapter_update = 1;
+    }
+}
+
+
+void
+GtkChapterNext                         (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    input_area_t *  p_area;
+
+    p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    p_area = p_intf->p_input->stream.p_selected_area;
+
+    if( p_area->i_part < p_area->i_part_nb )
+    {
+        p_area->i_part++;
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+
+        p_intf->p_sys->b_chapter_update = 1;
+    }
+}
+
+/****************************************************************************
+ * About box
+ ****************************************************************************/
+
+gboolean
+GtkAboutShow                           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
+    {
+        p_intf->p_sys->p_about = create_intf_about();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_about ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_about );
+    gdk_window_raise( p_intf->p_sys->p_about->window );
+
+    return TRUE;
+}
+
+void GtkAboutOk( GtkButton * button, gpointer user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+
+    gtk_widget_hide( p_intf->p_sys->p_about );
+}
+
+
+/****************************************************************************
+ * Jump box
+ ****************************************************************************/
+
+gboolean
+GtkJumpShow                            (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_jump ) )
+    {
+        p_intf->p_sys->p_jump = create_intf_jump();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_jump ),
+                             "p_intf", p_intf );
+    }
+
+    gtk_widget_show( p_intf->p_sys->p_jump );
+    gdk_window_raise( p_intf->p_sys->p_jump->window );
+
+    return FALSE;
+}
+
+
+void
+GtkJumpOk                              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf;
+    off_t           i_seek;
+    off_t           i_size;
+    int             i_hours;
+    int             i_minutes;
+    int             i_seconds;
+
+    p_intf = GetIntf( GTK_WIDGET( button ), (char*)user_data );
+
+#define GET_VALUE( name )                                                   \
+    gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( gtk_object_get_data( \
+        GTK_OBJECT( p_intf->p_sys->p_jump ), name ) ) )
+
+    i_hours   = GET_VALUE( "jump_hour_spinbutton" );
+    i_minutes = GET_VALUE( "jump_minute_spinbutton" );
+    i_seconds = GET_VALUE( "jump_second_spinbutton" );
+
+#undef GET_VALUE
+
+    i_seconds += 60 *i_minutes + 3600* i_hours;
+
+    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+    i_seek = i_seconds * 50 * p_intf->p_input->stream.i_mux_rate;
+    i_size = p_intf->p_input->stream.p_selected_area->i_size;
+    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+
+    if( i_seek < i_size )
+    {
+        input_Seek( p_intf->p_input, i_seek );
+    }
+    p_main->p_playlist->b_stopped = 0;
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+GtkJumpCancel                          (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+GtkFileOpenActivate                    (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkFileOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkDiscOpenActivate                    (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkDiscOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkNetworkOpenActivate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkNetworkOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
+
+}
+
+
+void
+GtkExitActivate                        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkExit( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkWindowToggleActivate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkWindowToggle( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkFullscreenActivate                  (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkFullscreen( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkPlaylistActivate                    (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkPlaylistShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+void
+GtkModulesActivate                     (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
 
@@ -924,9 +444,28 @@ on_menubar_fullscreen_activate         (GtkMenuItem     *menuitem,
 
 
 void
-on_menubar_angle_activate              (GtkMenuItem     *menuitem,
+GtkPreferencesActivate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-
+    GtkPreferencesShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
+
+
+void
+GtkAboutActivate                       (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkAboutShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
+
+void
+GtkJumpActivate                        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    GtkJumpShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
 
