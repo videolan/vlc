@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.26 2003/06/22 12:54:03 asmax Exp $
+ * $Id: x11_window.cpp,v 1.27 2003/06/22 13:06:23 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -277,10 +277,18 @@ bool X11Window::ProcessOSEvent( Event *evt )
                     p_intf->p_sys->p_theme->WindowList.begin();
                     win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
             {
-                XLOCK;
-                XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
-                XUNLOCK;
+                Window id = ( (X11Window *)(*win) )->GetHandle();
+                // the current window is raised last
+                if( id != Wnd )
+                {
+                    XLOCK;
+                    XRaiseWindow( display, id );
+                    XUNLOCK;
+                }
             }
+            XLOCK;
+            XRaiseWindow( display, Wnd );
+            XUNLOCK;
             
             button = 0;
             if( ((XButtonEvent *)p2 )->state & ControlMask )
