@@ -2,7 +2,7 @@
  * idctaltivec.c : AltiVec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.27 2002/07/31 20:56:51 sam Exp $
+ * $Id: idctaltivec.c,v 1.28 2002/08/01 22:58:38 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -699,21 +699,21 @@ void idct_block_add_altivec (vector_s16_t * block, unsigned char * dest,
 
 #ifndef __BUILD_ALTIVEC_ASM__
 
+static void * IDCTFunctions[] = {
+    InitIDCT, NormScan,
+    /* FIXME : it would be a nice idea to use sparse IDCT functions */
+    idct_block_add_altivec, idct_block_copy_altivec,
+    idct_block_add_altivec, idct_block_copy_altivec
+};
+
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-static void idct_getfunctions( function_list_t * p_function_list )
+static int Open( vlc_object_t *p_this )
 {
-#define F p_function_list->functions.idct
-    F.pf_idct_init = InitIDCT;
-    F.pf_norm_scan = NormScan;
-    /* FIXME : it would be a nice idea to use sparse IDCT functions */
-    F.pf_sparse_idct_add = idct_block_add_altivec;
-    F.pf_sparse_idct_copy = idct_block_copy_altivec;
-    F.pf_idct_add = idct_block_add_altivec;
-    F.pf_idct_copy = idct_block_copy_altivec;
-#undef F
+    p_this->p_private = IDCTFunctions;
+    return VLC_SUCCESS;
 }
 
 #endif	/* __BUILD_ALTIVEC_ASM__ */
