@@ -34,7 +34,7 @@ Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
     m_pPlaylist = pIntf->p_sys->p_playlist;
 
     // Try to guess the current charset
-    char *pCharset = (char*)malloc( 100 );
+    char *pCharset;
     vlc_current_charset( &pCharset );
     iconvHandle = vlc_iconv_open( "UTF-8", pCharset );
     msg_Dbg( pIntf, "Using character encoding: %s", pCharset );

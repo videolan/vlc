@@ -149,11 +149,13 @@ bool XMLParser::parse()
                 }
 
                 handleBeginElement( eltName, attributes );
+                free( eltName );
 
                 map<const char*, const char*, ltstr> ::iterator it =
                     attributes.begin();
                 while( it != attributes.end() )
                 {
+                    free( (char *)it->first );
                     free( (char *)it->second );
                     it++;
                 }

@@ -135,6 +135,8 @@ void ThemeRepository::parseDirectory( const string &rDir )
 
         pDirContent = readdir( pDir );
     }
+
+    closedir( pDir );
 }
 
 

@@ -97,6 +97,7 @@ bool ThemeLoader::load( const string &fileName )
         // Show the windows
         pNewTheme->getWindowManager().showAll();
     }
+    if( skin_last ) free( skin_last );
 
     return true;
 }
@@ -244,6 +245,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
                 // Can we find the theme file in this subdirectory?
                 if( findThemeFile( newURI, themeFilePath ) )
                 {
+                    closedir( pCurrDir );
                     return true;
                 }
             }
@@ -254,6 +256,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
                     string( pDirContent->d_name ) )
                 {
                     themeFilePath = newURI;
+                    closedir( pCurrDir );
                     return true;
                 }
             }
@@ -262,6 +265,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
         pDirContent = readdir( pCurrDir );
     }
 
+    closedir( pCurrDir );
     return false;
 }
 

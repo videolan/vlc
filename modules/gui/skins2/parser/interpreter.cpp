@@ -186,14 +186,14 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
 {
     VarManager *pVarManager = VarManager::instance( getIntf() );
 
-   // Convert the expression into Reverse Polish Notation
-    ExprEvaluator *pEvaluator = new ExprEvaluator( getIntf() );
-    pEvaluator->parse( rName );
+    // Convert the expression into Reverse Polish Notation
+    ExprEvaluator evaluator( getIntf() );
+    evaluator.parse( rName );
 
     list<VarBool*> varStack;
 
     // Get the first token from the RPN stack
-    string token = pEvaluator->getToken();
+    string token = evaluator.getToken();
     while( !token.empty() )
     {
         if( token == "and" )
@@ -295,7 +295,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             varStack.push_back( pVar );
         }
         // Get the first token from the RPN stack
-        token = pEvaluator->getToken();
+        token = evaluator.getToken();
     }
 
     // The stack should contain a single variable

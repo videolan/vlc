@@ -45,8 +45,7 @@ void Theme::loadConfig()
 
     // Get config from vlcrc file
     char *save = config_GetPsz( getIntf(), "skins2-config" );
-    if( save == NULL )
-        return;
+    if( !save ) return;
 
     // Initialization
     map<string, TopWindowPtr>::const_iterator it;
@@ -75,6 +74,7 @@ void Theme::loadConfig()
         // Next window
         i++;
     }
+    free( save );
 }
 
 

@@ -211,8 +211,10 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
         // Set an empty mask for the window
         Region mask = XCreateRegion();
-        XShapeCombineRegion( m_pDisplay, m_mainWindow, ShapeBounding, 0, 0, mask,
-                             ShapeSet );
+        XShapeCombineRegion( m_pDisplay, m_mainWindow, ShapeBounding, 0, 0,
+                             mask, ShapeSet );
+        XDestroyRegion( mask );
+
         // Map the window
         XMapWindow( m_pDisplay, m_mainWindow);
 
