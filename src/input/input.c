@@ -1540,6 +1540,10 @@ static int InputSourceInit( input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
+    /* Hack to allow udp://@:port syntax */
+    if( !psz_access ||
+        (strncmp( psz_access, "udp", 3 ) && strncmp( psz_access, "rtp", 3 )) )
+
     /* Find optional titles and seekpoints */
     MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
                  &in->i_seekpoint_start, &in->i_seekpoint_end );
