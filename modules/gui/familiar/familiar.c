@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.25 2003/01/04 13:50:16 jpsaman Exp $
+ * $Id: familiar.c,v 1.26 2003/01/12 19:08:09 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -244,8 +244,6 @@ static void Run( intf_thread_t *p_intf )
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 #ifdef NEED_GTK_MAIN
     gdk_threads_leave();
-#else
-    gtk_main_quit();
 #endif
 }
 
