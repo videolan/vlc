@@ -751,9 +751,9 @@ static const guid_t asf_guid_video_conceal_none =
 {0x20FB5700, 0x5B55, 0x11CF, {0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B}};
 static const guid_t asf_guid_reserved_1 =
 {0xABD3D211, 0xA9BA, 0x11cf, {0x8E, 0xE6, 0x00, 0xC0, 0x0C ,0x20, 0x53, 0x65}};
-static const guid_t asf_object_codec_comment_guid =
+static const guid_t asf_object_codec_list_guid =
 {0x86D15240, 0x311D, 0x11D0, {0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6}};
-static const guid_t asf_object_codec_comment_reserved_guid =
+static const guid_t asf_object_codec_list_reserved_guid =
 {0x86D15241, 0x311D, 0x11D0, {0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6}};
 static const guid_t asf_object_content_description_guid =
 {0x75B22633, 0x668E, 0x11CF, {0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c}};
@@ -959,15 +959,18 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     }
 
     /* Codec Infos */
-    bo_add_guid ( &bo, &asf_object_codec_comment_guid );
+    bo_add_guid ( &bo, &asf_object_codec_list_guid );
     bo_addle_u64( &bo, i_ci_size );
-    bo_add_guid ( &bo, &asf_object_codec_comment_reserved_guid );
+    bo_add_guid ( &bo, &asf_object_codec_list_reserved_guid );
     bo_addle_u32( &bo, p_sys->i_track );
     for( i = 0; i < p_sys->i_track; i++ )
     {
         tk = &p_sys->track[i];
 
-        bo_addle_u16( &bo, tk->i_id );
+        if( tk->i_cat == VIDEO_ES ) bo_addle_u16( &bo, 1 /* video */ );
+        else if( tk->i_cat == AUDIO_ES ) bo_addle_u16( &bo, 2 /* audio */ );
+        else bo_addle_u16( &bo, 0xFFFF /* unknown */ );
+
         bo_addle_str16( &bo, tk->psz_name );
         bo_addle_u16( &bo, 0 );
         if( tk->i_cat == AUDIO_ES )
