@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.32 2003/10/17 21:28:21 gbazin Exp $
+ * $Id: streamout.cpp,v 1.33 2003/10/27 22:13:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -589,19 +589,24 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("I263"),
         wxT("WMV1"),
         wxT("WMV2"),
-        wxT("MJPG")
+        wxT("MJPG"),
+        wxT("theo")
     };
     static const wxString vbitrates_array[] =
     {
-        wxT("3000"),
-        wxT("2000"),
-        wxT("1000"),
-        wxT("750"),
-        wxT("500"),
-        wxT("400"),
-        wxT("200"),
-        wxT("150"),
-        wxT("100")
+        wxT("3072"),
+        wxT("2048"),
+        wxT("1024"),
+        wxT("768"),
+        wxT("512"),
+        wxT("384"),
+        wxT("256"),
+        wxT("192"),
+        wxT("128"),
+        wxT("96"),
+        wxT("64"),
+        wxT("32"),
+        wxT("16")
     };
 
     wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 4, 1, 20 );
@@ -615,7 +620,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     wxStaticText *bitrate_label =
         new wxStaticText( panel, -1, wxU(_("Bitrate (kb/s)")));
     video_bitrate_combo =
-        new wxComboBox( panel, VideoTranscBitrate_Event, wxT("1000"),
+        new wxComboBox( panel, VideoTranscBitrate_Event, wxT("1024"),
                         wxPoint(20,25), wxDefaultSize,
                         WXSIZEOF(vbitrates_array), vbitrates_array );
     video_sizer->Add( video_transc_checkbox, 0,
@@ -641,7 +646,10 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("256"),
         wxT("192"),
         wxT("128"),
-        wxT("96")
+        wxT("96"),
+        wxT("64"),
+        wxT("32"),
+        wxT("16")
     };
     static const wxString achannels_array[] =
     {
