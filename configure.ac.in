@@ -154,14 +154,11 @@ case "x${target_os}" in
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
     LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
     LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation"
-    LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
-    LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket"
-    LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket"
     dnl BONE or not BONE ? only BONE has libbind.so
     AC_CHECK_LIB( bind, inet_ntoa,
-        [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
-          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
-          LDFLAGS_httpd="${LDFLAGS_httpd} -lbind"],
+        [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket -lbind"
+          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket -lbind"
+          LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket -lbind"],
         [])
     ;;
   x*)
@@ -1326,7 +1323,7 @@ AC_ARG_ENABLE(v4l,
   [  --enable-v4l            Video4Linux input support (default disabled)])
 if test "x${enable_v4l}" = "xyes"
 then
-  AC_CHECK_HEADERS(libv4l/v4l.h, [
+  AC_CHECK_HEADERS(linux/videodev.h, [
     PLUGINS="${PLUGINS} v4l"
    ],[])
 fi
