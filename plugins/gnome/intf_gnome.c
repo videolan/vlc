@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.22 2001/03/15 01:42:19 sam Exp $
+ * $Id: intf_gnome.c,v 1.23 2001/03/15 16:29:47 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -569,8 +569,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
         if( pf_toggle == on_menubar_title_toggle )
         {
 
-            gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_title_item ),
-                                        b_active );
+//            gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_title_item ),
+//                                        b_active );
             /* setup signal hanling */
             gtk_signal_connect( GTK_OBJECT( p_title_item ),
                      "toggled",
@@ -597,8 +597,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
                                                 GTK_RADIO_MENU_ITEM( p_item ) );
                 gtk_menu_append( GTK_MENU( p_chapter_menu ), p_item );
                 gtk_widget_show( p_item );
-                gtk_check_menu_item_set_active(
-                                    GTK_CHECK_MENU_ITEM( p_item ), b_active );
+//                gtk_check_menu_item_set_active(
+//                                    GTK_CHECK_MENU_ITEM( p_item ), b_active );
 
                 /* setup signal hanling */
                 gtk_signal_connect( GTK_OBJECT( p_item ),

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.32 2001/03/15 00:37:04 stef Exp $
+ * $Id: input_dvd.c,v 1.33 2001/03/15 16:29:47 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1072,7 +1072,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     }
 
     p_dvd->i_prg_cell = i_prg_cell;
-    p_dvd->i_cell = i_cell - 1;             /* DVDFindSector will add one */
+    p_dvd->i_cell = i_cell;             /* DVDFindSector will add one */
 
     /* check coherence of data */
     DVDFindSector( p_dvd );
