@@ -91,15 +91,21 @@ class TPanelPlugin : public TPanelPref
 {
 public:
     __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config,
-            intf_thread_t *_p_intf );
+            intf_thread_t *_p_intf, bool b_multi_plugins );
+    bool b_multi_plugins;
     TCleanCheckListBox *CleanCheckListBox;
     TButton *ButtonConfig;
+    TButton *ButtonUp;
+    TButton *ButtonDown;
     TLabel *Label;
     module_t *ModuleSelected;
+    virtual void __fastcall TPanelPlugin::SetValue ( AnsiString Values );
     virtual void __fastcall UpdateChanges();
     void __fastcall CheckListBoxClick( TObject *Sender );
     void __fastcall CheckListBoxClickCheck( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
+    void __fastcall ButtonUpClick( TObject *Sender );
+    void __fastcall ButtonDownClick( TObject *Sender );
 };
 //---------------------------------------------------------------------------
 class TPanelString : public TPanelPref

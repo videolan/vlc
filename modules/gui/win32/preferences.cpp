@@ -197,9 +197,11 @@ TCSpinEdit * __fastcall TPanelPref::CreateSpinEdit( TWinControl *Parent,
  * Panel for module management
  ****************************************************************************/
 __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
-        module_config_t *p_config, intf_thread_t *_p_intf )
-        : TPanelPref( Owner, p_config, _p_intf )
+        module_config_t *p_config, intf_thread_t *_p_intf,
+        bool b_multi_plugins ) : TPanelPref( Owner, p_config, _p_intf )
 {
+    this->b_multi_plugins = b_multi_plugins;
+
     /* init configure button */
     ButtonConfig = CreateButton( this,
             LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH,
@@ -238,6 +240,35 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
     CleanCheckListBox->Hint = p_config->psz_longtext;
     CleanCheckListBox->ShowHint = true;
 
+    /* init up and down buttons */
+    if ( b_multi_plugins )
+    {
+        ButtonUp = CreateButton ( this, LIBWIN32_PREFSIZE_LEFT,
+                CleanCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
+                    - LIBWIN32_PREFSIZE_LEFT,
+                CleanCheckListBox->Top + ( CleanCheckListBox->Height
+                    - 2*LIBWIN32_PREFSIZE_BUTTON_HEIGHT ) / 3,
+                LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
+                "+" );
+        ButtonUp->Enabled = false;
+        ButtonUp->OnClick = ButtonUpClick;
+        ButtonUp->Hint = "Raise the plugin priority";
+        ButtonUp->ShowHint = true;
+
+        ButtonDown = CreateButton ( this, LIBWIN32_PREFSIZE_LEFT,
+                CleanCheckListBox->Left - LIBWIN32_PREFSIZE_HPAD
+                    - LIBWIN32_PREFSIZE_LEFT,
+                CleanCheckListBox->Top + ( CleanCheckListBox->Height
+                    - 2*LIBWIN32_PREFSIZE_BUTTON_HEIGHT ) * 2 / 3
+                    + LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
+                LIBWIN32_PREFSIZE_BUTTON_HEIGHT,
+                "-" );
+        ButtonDown->Enabled = false;
+        ButtonDown->OnClick = ButtonDownClick;
+        ButtonDown->Hint = "Decrease the plugin priority";
+        ButtonDown->ShowHint = true;
+    }
+
     /* panel height */
     Height = CleanCheckListBox->Top + CleanCheckListBox->Height
             + LIBWIN32_PREFSIZE_VPAD;
@@ -252,12 +283,29 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
     /* check that the click is valid (we are on an item, and the click
      * started on an item */
     if( CleanCheckListBox->ItemIndex == -1 )
+    {
+        ButtonUp->Enabled = false;
+        ButtonDown->Enabled = false;
         return;
+    }
 
     AnsiString Name = ((TObjectString*)CleanCheckListBox->Items->
         Objects[CleanCheckListBox->ItemIndex])->String().c_str();
     if( Name == "" )
         return;
+
+    /* enable up and down buttons */
+    if ( b_multi_plugins )
+    {
+        if ( CleanCheckListBox->ItemIndex != -1 )
+        {
+            if ( CleanCheckListBox->ItemIndex == 0 )
+                ButtonUp->Enabled = false; else ButtonUp->Enabled = true;
+            if ( CleanCheckListBox->ItemIndex
+                == CleanCheckListBox->Items->Count - 1 )
+                ButtonDown->Enabled = false; else ButtonDown->Enabled = true;
+        }
+    }
 
     /* look for module 'Name' */
     list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -279,14 +327,17 @@ void __fastcall TPanelPlugin::CheckListBoxClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::CheckListBoxClickCheck( TObject *Sender )
 {
-    /* one item maximum must be checked */
-    if( CleanCheckListBox->Checked[CleanCheckListBox->ItemIndex] )
+    if ( ! b_multi_plugins )
     {
-        for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
+        /* one item maximum must be checked */
+        if( CleanCheckListBox->Checked[CleanCheckListBox->ItemIndex] )
         {
-            if( item != CleanCheckListBox->ItemIndex )
+            for( int item = 0; item < CleanCheckListBox->Items->Count; item++ )
             {
-                CleanCheckListBox->Checked[item] = false;
+                if( item != CleanCheckListBox->ItemIndex )
+                {
+                    CleanCheckListBox->Checked[item] = false;
+                }
             }
         }
     }
@@ -298,6 +349,65 @@ void __fastcall TPanelPlugin::ButtonConfigClick( TObject *Sender )
                         CreatePreferences( ModuleSelected->psz_object_name );
 }
 //---------------------------------------------------------------------------
+void __fastcall TPanelPlugin::ButtonUpClick( TObject *Sender )
+{
+    if( CleanCheckListBox->ItemIndex != -1 && CleanCheckListBox->ItemIndex > 0 )
+    {
+        int Pos = CleanCheckListBox->ItemIndex;
+        CleanCheckListBox->Items->Move ( Pos , Pos - 1 );
+        CleanCheckListBox->ItemIndex = Pos - 1;
+        CheckListBoxClick ( Sender );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TPanelPlugin::ButtonDownClick( TObject *Sender )
+{
+    if( CleanCheckListBox->ItemIndex != -1
+        && CleanCheckListBox->ItemIndex < CleanCheckListBox->Items->Count - 1 )
+    {
+        int Pos = CleanCheckListBox->ItemIndex;
+        CleanCheckListBox->Items->Move ( Pos , Pos + 1 );
+        CleanCheckListBox->ItemIndex = Pos + 1;
+        CheckListBoxClick ( Sender );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TPanelPlugin::SetValue ( AnsiString Values )
+{
+    int TopChecked = 0;
+    while ( Values.Length() != 0 )
+    {
+        AnsiString Value;
+
+        int NextValue = Values.Pos ( "," );
+        if ( NextValue == 0 )
+        {
+            Value = Values.Trim();
+            Values = "";
+        }
+        else
+        {
+            Value = Values.SubString(1,NextValue-1).Trim();
+            Values = Values.SubString ( NextValue + 1
+                    , Values.Length() - NextValue );
+        }
+
+        if ( Value.Length() > 0 )
+        {
+            for ( int i = TopChecked; i < CleanCheckListBox->Items->Count; i++ )
+            {
+                if ( ((TObjectString*)CleanCheckListBox->Items->Objects[i])
+                        ->String() == Value )
+                {
+                    CleanCheckListBox->Checked[i] = true;
+                    CleanCheckListBox->Items->Move ( i , TopChecked );
+                    TopChecked++;
+                }
+            }
+        }
+    }
+}
+//---------------------------------------------------------------------------
 void __fastcall TPanelPlugin::UpdateChanges()
 {
     AnsiString Name = "";
@@ -307,9 +417,17 @@ void __fastcall TPanelPlugin::UpdateChanges()
     {
         if( CleanCheckListBox->Checked[item] )
         {
-            Name = ((TObjectString*)CleanCheckListBox->Items->Objects[item])
-                   ->String();
-            break;
+            if ( Name.Length() == 0 )
+            {
+                Name = ((TObjectString*)CleanCheckListBox->Items->Objects[item])
+                       ->String();
+            }
+            else
+            {
+                Name = Name + ","
+                     + ((TObjectString*)CleanCheckListBox->Items->Objects[item])
+                       ->String();
+            }
         }
     }
 
@@ -590,7 +708,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_MODULE:
 
             /* add new panel for the config option */
-            PanelPlugin = new TPanelPlugin( this, p_item, p_intf );
+            PanelPlugin = new TPanelPlugin( this, p_item, p_intf, true );
             PanelPlugin->Parent = ScrollBox;
 
             /* Look for valid modules */
@@ -609,19 +727,14 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                     else
                         ModuleDesc = AnsiString( p_parser->psz_object_name );
 
-                    int item = PanelPlugin->CleanCheckListBox->Items->AddObject(
+                    PanelPlugin->CleanCheckListBox->Items->AddObject(
                         ModuleDesc.c_str(),
                         new TObjectString( p_parser->psz_object_name ) );
-
-                    /* check the box if it's the default module */
-                    AnsiString Name = p_item->psz_value ?
-                        p_item->psz_value : "";
-                    if( !strcmp( p_parser->psz_object_name, Name.c_str() ) )
-                    {
-                        PanelPlugin->CleanCheckListBox->Checked[item] = true;
-                    }
                 }
             }
+
+            /* check relevant boxes */
+            PanelPlugin->SetValue ( AnsiString ( p_item->psz_value ) );
 
             break;
 
