@@ -1948,20 +1948,30 @@ static int GetiPodID( int64_t *p_ipod_id )
     mach_port_t port;
     io_object_t device;
     io_iterator_t iterator;
-    CFMutableDictionaryRef matching_dic;
+    CFMutableDictionaryRef match_dic;
+    CFMutableDictionaryRef smatch_dic;
 
     if( IOMasterPort( MACH_PORT_NULL, &port ) == KERN_SUCCESS )
     {
-        if( ( matching_dic = IOServiceMatching( "IOFireWireUnit" ) ) != NULL )
+        smatch_dic = IOServiceMatching( "IOFireWireUnit" );
+        match_dic = CFDictionaryCreateMutable( kCFAllocatorDefault, 0,
+                                           &kCFTypeDictionaryKeyCallBacks,
+                                           &kCFTypeDictionaryValueCallBacks );
+
+        if( smatch_dic != NULL && match_dic != NULL )
         {
-            CFDictionarySetValue( matching_dic,
+            CFDictionarySetValue( smatch_dic,
                                   CFSTR("FireWire Vendor Name"),
                                   CFSTR(VENDOR_NAME) );
-            CFDictionarySetValue( matching_dic,
+            CFDictionarySetValue( smatch_dic,
                                   CFSTR("FireWire Product Name"),
                                   CFSTR(PROD_NAME) );
 
-            if( IOServiceGetMatchingServices( port, matching_dic,
+            CFDictionarySetValue( match_dic,
+                                  CFSTR(kIOPropertyMatchKey),
+                                  smatch_dic );
+
+            if( IOServiceGetMatchingServices( port, match_dic,
                                               &iterator ) == KERN_SUCCESS )
             {
                 while( ( device = IOIteratorNext( iterator ) ) != NULL )
