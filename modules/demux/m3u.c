@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.6 2002/11/24 13:02:13 sigmunau Exp $
+ * $Id: m3u.c,v 1.7 2002/11/24 16:00:10 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -42,6 +42,7 @@
 
 #define TYPE_M3U 1
 #define TYPE_ASX 2
+#define TYPE_HTML 3
 
 struct demux_sys_t
 {
@@ -64,6 +65,7 @@ vlc_module_begin();
     set_callbacks( Activate, Deactivate );
     add_shortcut( "m3u" );
     add_shortcut( "asx" );
+    add_shortcut( "html" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -98,10 +100,42 @@ static int Activate( vlc_object_t * p_this )
     {
         i_type = TYPE_ASX;
     }
+    else if( !strcasecmp( psz_ext, ".html") ||
+             ( p_input->psz_demux && !strncmp(p_input->psz_demux, "html", 4) ) )
+    {
+        i_type = TYPE_HTML;
+    }
 
+    /* we had no luck looking at the file extention, so we have a look
+     * at the content. This is useful for .asp, .php and similar files
+     * that are actually html. Also useful for som asx files that have
+     * another extention */
     if( !i_type )
-        return -1;
-
+    {
+        byte_t *p_peek;
+        int i_size = input_Peek( p_input, &p_peek, MAX_LINE );
+        if ( i_size > 0 ) {
+            while ( i_size && *p_peek
+                    && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
+                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) )
+            {
+                p_peek++;
+                i_size--;
+            }
+            if ( !i_size )
+            {
+                return -1;
+            }
+            else if ( !strncasecmp( p_peek, "<html>", sizeof("<html>") -1 ) )
+            {
+                i_type = TYPE_HTML;
+            }
+            else if ( !strncasecmp( p_peek, "<asx", sizeof("<asx") -1 ) )
+            {
+                i_type = TYPE_ASX;
+            }
+        }
+    }
     /* Allocate p_m3u */
     if( !( p_m3u = malloc( sizeof( demux_sys_t ) ) ) )
     {
@@ -207,16 +241,21 @@ static int Demux ( input_thread_t *p_input )
                     /*line is comment or extended info, ignored for now */
                     continue;
             }
-            else
+            else if ( p_m3u->i_type == TYPE_ASX )
             {
                 /* We are dealing with ASX files.
-                 * We are looking for "href" or "param" html markups that
+                 * We are looking for "<ref href=" xml markups that
                  * begins with "mms://", "http://" or "file://" */
                 char *psz_eol;
 
                 while( *psz_bol &&
-                       strncasecmp( psz_bol, "href", sizeof("href") - 1 ) &&
-                       strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
+                       strncasecmp( psz_bol, "ref", sizeof("ref") - 1 ) )
+                    psz_bol++;
+
+                if( !*psz_bol ) continue;
+
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "href", sizeof("href") - 1 ) )
                     psz_bol++;
 
                 if( !*psz_bol ) continue;
@@ -237,6 +276,39 @@ static int Demux ( input_thread_t *p_input )
                   continue;
 
                 *psz_eol = '\0';
+            }
+            else
+            {
+                /* We are dealing with a html file with embedded
+                 * video.  We are looking for "<param name="filename"
+                 * value=" html markups that begin with "http://" */
+                char *psz_eol;
+
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
+                    psz_bol++;
+
+                if( !*psz_bol ) continue;
+
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "filename", sizeof("filename") - 1 ) )
+                    psz_bol++;
+
+                if( !*psz_bol ) continue;
+
+                while( *psz_bol &&
+                       strncasecmp( psz_bol, "http://",
+                                    sizeof("http://") - 1 ) )
+                    psz_bol++;
+
+                if( !*psz_bol ) continue;
+
+                psz_eol = strchr( psz_bol, '"');
+                if( !psz_eol )
+                  continue;
+
+                *psz_eol = '\0';
+                
             }
 
             /*
