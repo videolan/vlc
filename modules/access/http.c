@@ -749,13 +749,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             msg_Dbg( p_access, "GET META %s %s %s",
                      p_sys->psz_icy_name, p_sys->psz_icy_genre, p_sys->psz_icy_title );
             if( p_sys->psz_icy_name )
-                vlc_meta_Add( *pp_meta, VLC_META_DESCRIPTION,
+                vlc_meta_Add( *pp_meta, VLC_META_TITLE,
                               p_sys->psz_icy_name );
             if( p_sys->psz_icy_genre )
                 vlc_meta_Add( *pp_meta, VLC_META_GENRE,
                               p_sys->psz_icy_genre );
             if( p_sys->psz_icy_title )
-                vlc_meta_Add( *pp_meta, VLC_META_TITLE,
+                vlc_meta_Add( *pp_meta, VLC_META_NOW_PLAYING,
                               p_sys->psz_icy_title );
             break;
 
