@@ -623,9 +623,9 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 
     if( dialog.ShowModal() == wxID_OK )
     {
-        if( dialog.GetFilename().mb_str() )
+        if( dialog.GetPath().mb_str() )
         {
-            playlist_Export( p_playlist, dialog.GetFilename().mb_str(),
+            playlist_Export( p_playlist, dialog.GetPath().mb_str(),
                              formats[dialog.GetFilterIndex()].psz_module );
         }
     }
