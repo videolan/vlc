@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.42 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: avi.c,v 1.43 2003/04/27 11:55:03 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -334,7 +334,7 @@ static int AVI_PacketGetHeader( input_thread_t *p_input, avi_packet_t *p_pk )
     p_pk->i_fourcc  = GetFOURCC( p_peek );
     p_pk->i_size    = GetDWLE( p_peek + 4 );
     p_pk->i_pos     = AVI_TellAbsolute( p_input );
-    if( p_pk->i_fourcc == AVIFOURCC_LIST )
+    if( p_pk->i_fourcc == AVIFOURCC_LIST || p_pk->i_fourcc == AVIFOURCC_RIFF )
     {
         p_pk->i_type = GetFOURCC( p_peek + 8 );
     }
@@ -357,9 +357,14 @@ static int AVI_PacketNext( input_thread_t *p_input )
     {
         return VLC_EGENERIC;
     }
+
     if( avi_ck.i_fourcc == AVIFOURCC_LIST && avi_ck.i_type == AVIFOURCC_rec )
     {
         return AVI_SkipBytes( p_input, 12 );
+    }
+    else if( avi_ck.i_fourcc == AVIFOURCC_RIFF && avi_ck.i_type == AVIFOURCC_AVIX )
+    {
+        return AVI_SkipBytes( p_input, 24 );
     }
     else
     {
@@ -413,6 +418,7 @@ static int AVI_PacketSearch( input_thread_t *p_input )
         {
             case AVIFOURCC_JUNK:
             case AVIFOURCC_LIST:
+            case AVIFOURCC_RIFF:
             case AVIFOURCC_idx1:
                 return VLC_SUCCESS;
         }
@@ -472,7 +478,7 @@ static void AVI_IndexAddEntry( demux_sys_t *p_avi,
     }
 }
 
-static void AVI_IndexLoad( input_thread_t *p_input )
+static void AVI_IndexLoad_idx1( input_thread_t *p_input )
 {
     demux_sys_t *p_avi = p_input->p_demux_data;
 
@@ -495,12 +501,7 @@ static void AVI_IndexLoad( input_thread_t *p_input )
         msg_Warn( p_input, "cannot find idx1 chunk, no index defined" );
         return;
     }
-    for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
-    {
-        p_avi->pp_info[i_stream]->i_idxnb  = 0;
-        p_avi->pp_info[i_stream]->i_idxmax = 0;
-        p_avi->pp_info[i_stream]->p_index  = NULL;
-    }
+
     /* *** calculate offset *** */
     if( p_idx1->i_entry_count > 0 &&
         p_idx1->entry[0].i_pos < p_movi->i_chunk_pos )
@@ -531,16 +532,129 @@ static void AVI_IndexLoad( input_thread_t *p_input )
             AVI_IndexAddEntry( p_avi, i_stream, &index );
         }
     }
+}
+
+static void __Parse_indx( input_thread_t    *p_input,
+                          int               i_stream,
+                          avi_chunk_indx_t  *p_indx )
+{
+    demux_sys_t         *p_avi    = p_input->p_demux_data;
+    AVIIndexEntry_t     index;
+    int32_t             i;
+
+    msg_Dbg( p_input, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
+    if( p_indx->i_indexsubtype == 0 )
+    {
+        for( i = 0; i < p_indx->i_entriesinuse; i++ )
+        {
+            index.i_id      = p_indx->i_id;
+            index.i_flags   = p_indx->idx.std[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
+            index.i_pos     = p_indx->i_baseoffset + p_indx->idx.std[i].i_offset - 8;
+            index.i_length  = p_indx->idx.std[i].i_size&0x7fffffff;
+
+            AVI_IndexAddEntry( p_avi, i_stream, &index );
+        }
+    }
+    else if( p_indx->i_indexsubtype == AVI_INDEX_2FIELD )
+    {
+        for( i = 0; i < p_indx->i_entriesinuse; i++ )
+        {
+            index.i_id      = p_indx->i_id;
+            index.i_flags   = p_indx->idx.field[i].i_size & 0x80000000 ? 0 : AVIIF_KEYFRAME;
+            index.i_pos     = p_indx->i_baseoffset + p_indx->idx.field[i].i_offset - 8;
+            index.i_length  = p_indx->idx.field[i].i_size;
+
+            AVI_IndexAddEntry( p_avi, i_stream, &index );
+        }
+    }
+    else
+    {
+        msg_Warn( p_input, "unknow subtype index(0x%x)", p_indx->i_indexsubtype );
+    }
+}
+
+static void AVI_IndexLoad_indx( input_thread_t *p_input )
+{
+    demux_sys_t         *p_avi = p_input->p_demux_data;
+    unsigned int        i_stream;
+    int32_t             i;
+
+    avi_chunk_list_t    *p_riff;
+    avi_chunk_list_t    *p_hdrl;
+
+    p_riff = (void*)AVI_ChunkFind( &p_avi->ck_root,
+                                   AVIFOURCC_RIFF, 0);
+    p_hdrl = (void*)AVI_ChunkFind( p_riff, AVIFOURCC_hdrl, 0 );
+
+    for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
+    {
+        avi_chunk_list_t    *p_strl;
+        avi_chunk_indx_t    *p_indx;
+
+#define p_stream  p_avi->pp_info[i_stream]
+        p_strl = (void*)AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i_stream );
+        p_indx = (void*)AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0 );
+
+        if( !p_indx )
+        {
+            msg_Warn( p_input, "cannot find indx (misdetect/broken OpenDML file?)" );
+            continue;
+        }
+
+        if( p_indx->i_indextype == AVI_INDEX_OF_CHUNKS )
+        {
+            __Parse_indx( p_input, i_stream, p_indx );
+        }
+        else if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES )
+        {
+            avi_chunk_indx_t    ck_sub;
+            for( i = 0; i < p_indx->i_entriesinuse; i++ )
+            {
+                AVI_SeekAbsolute( p_input, p_indx->idx.super[i].i_offset );
+
+                if( !AVI_ChunkRead( p_input, &ck_sub, NULL, p_avi->b_seekable ) )
+                {
+                    __Parse_indx( p_input, i_stream, &ck_sub );
+                }
+            }
+        }
+        else
+        {
+            msg_Warn( p_input, "unknow type index(0x%x)", p_indx->i_indextype );
+        }
+#undef p_stream
+    }
+}
+static void AVI_IndexLoad( input_thread_t *p_input )
+{
+    demux_sys_t *p_avi = p_input->p_demux_data;
+    unsigned int i_stream;
+
+    for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
+    {
+        p_avi->pp_info[i_stream]->i_idxnb  = 0;
+        p_avi->pp_info[i_stream]->i_idxmax = 0;
+        p_avi->pp_info[i_stream]->p_index  = NULL;
+    }
+
+    if( p_avi->b_odml )
+    {
+        AVI_IndexLoad_indx( p_input );
+    }
+    else
+    {
+        AVI_IndexLoad_idx1( p_input );
+    }
+
+
     for( i_stream = 0; i_stream < p_avi->i_streams; i_stream++ )
     {
         msg_Dbg( p_input,
-                "stream[%d] creating %d index entries",
+                "stream[%d] created %d index entries",
                 i_stream,
                 p_avi->pp_info[i_stream]->i_idxnb );
     }
-
 }
-
 static void AVI_IndexCreate( input_thread_t *p_input )
 {
     demux_sys_t *p_avi = p_input->p_demux_data;
@@ -596,7 +710,22 @@ static void AVI_IndexCreate( input_thread_t *p_input )
             switch( pk.i_fourcc )
             {
                 case AVIFOURCC_idx1:
+                    if( p_avi->b_odml )
+                    {
+                        avi_chunk_list_t *p_avix;
+                        p_avix = (void*)AVI_ChunkFind( &p_avi->ck_root,
+                                                       AVIFOURCC_RIFF, 1 );
+
+                        msg_Dbg( p_input, "looking for new RIFF chunk" );
+                        if( AVI_SeekAbsolute( p_input, p_avix->i_chunk_pos + 24) )
+                        {
+                            goto print_stat;
+                        }
+                        break;
+                    }
                     goto print_stat;
+                case AVIFOURCC_RIFF:
+                        msg_Dbg( p_input, "new RIFF chunk found" );
                 case AVIFOURCC_rec:
                 case AVIFOURCC_JUNK:
                     break;
@@ -609,7 +738,8 @@ static void AVI_IndexCreate( input_thread_t *p_input )
                     }
             }
         }
-        if( pk.i_pos + pk.i_size >= i_movi_end ||
+
+        if( ( !p_avi->b_odml && pk.i_pos + pk.i_size >= i_movi_end ) ||
             AVI_PacketNext( p_input ) )
         {
             break;
@@ -844,6 +974,7 @@ static int AVIInit( vlc_object_t * p_this )
     p_avi->b_seekable = ( ( p_input->stream.b_seekable )
                         &&( p_input->stream.i_method == INPUT_METHOD_FILE ) );
     p_avi->i_movi_lastchunk_pos = 0;
+    p_avi->b_odml = VLC_FALSE;
 
     /* *** for unseekable stream, automaticaly use AVIDemux_interleaved *** */
     if( !p_avi->b_seekable || config_GetInt( p_input, "avi-interleaved" ) )
@@ -857,6 +988,29 @@ static int AVIInit( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
     AVI_ChunkDumpDebug( p_input, &p_avi->ck_root );
+
+    if( AVI_ChunkCount( &p_avi->ck_root, AVIFOURCC_RIFF ) > 1 )
+    {
+        int i_count = AVI_ChunkCount( &p_avi->ck_root, AVIFOURCC_RIFF );
+        int i;
+
+        msg_Warn( p_input, "multiple riff -> OpenDML ?" );
+        for( i = 1; i < i_count; i++ )
+        {
+            avi_chunk_list_t *p_avix;
+
+            p_avix = (avi_chunk_list_t*)AVI_ChunkFind( &p_avi->ck_root,
+                                                       AVIFOURCC_RIFF, i );
+            if( p_avix->i_type == AVIFOURCC_AVIX )
+            {
+                msg_Warn( p_input, "detected OpenDML file" );
+
+                p_avi->b_odml = VLC_TRUE;
+                break;
+            }
+        }
+        p_avi->b_odml = VLC_TRUE;
+    }
 
 
     p_riff  = (avi_chunk_list_t*)AVI_ChunkFind( &p_avi->ck_root,
@@ -1331,6 +1485,59 @@ static mtime_t AVI_GetPTS( avi_stream_t *p_info )
     }
 }
 
+#if 0
+static void AVI_FixPTS( avi_stream_t *p_stream, pes_packet_t *p_pes )
+{
+    data_packet_t *p_data;
+    uint8_t       *p;
+    int           i_pos = 0;
+
+    switch( p_stream->i_fourcc )
+    {
+        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+            p_data = p_pes->p_first;
+            while( p_data )
+            {
+                p = p_data->p_payload_start;
+                while( p < p_data->p_payload_end - 2 )
+                {
+                    if( p[0] == 0xff && ( p[1]&0xe0) == 0xe0 )
+                    {
+                        mtime_t i_diff = AVI_GetDPTS( p_stream, i_pos );
+                        p_pes->i_dts += i_diff;
+                        p_pes->i_pts += i_diff;
+                        return;
+                    }
+                    p++; i_pos++;
+                }
+                p_data = p_data->p_next;
+            }
+            return;
+        case VLC_FOURCC( 'a', '5', '2', ' ' ):
+            p_data = p_pes->p_first;
+            while( p_data )
+            {
+                p = p_data->p_payload_start;
+                while( p < p_data->p_payload_end - 2 )
+                {
+                    if( p[0] == 0x0b && p[1] == 0x77 )
+                    {
+                        mtime_t i_diff = AVI_GetDPTS( p_stream, i_pos );
+                        p_pes->i_dts += i_diff;
+                        p_pes->i_pts += i_diff;
+                    }
+                    p++; i_pos++;
+                }
+                p_data = p_data->p_next;
+            }
+            return;
+        default:
+            /* we can't fix :( */
+            return;
+    }
+}
+#endif
+
 static int AVI_StreamChunkFind( input_thread_t *p_input,
                                 unsigned int i_stream )
 {
@@ -1363,17 +1570,9 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
         if( avi_pk.i_stream >= p_avi->i_streams ||
             ( avi_pk.i_cat != AUDIO_ES && avi_pk.i_cat != VIDEO_ES ) )
         {
-            switch( avi_pk.i_fourcc )
+            if( AVI_PacketNext( p_input ) )
             {
-                case AVIFOURCC_LIST:
-                    AVI_SkipBytes( p_input, 12 );
-                    break;
-                default:
-                    if( AVI_PacketNext( p_input ) )
-                    {
-                        return VLC_EGENERIC;
-                    }
-                    break;
+                return VLC_EGENERIC;
             }
         }
         else
@@ -1585,7 +1784,7 @@ static int    AVISeek   ( input_thread_t *p_input,
         if( !p_avi->i_length )
         {
             avi_stream_t *p_stream;
-            uint64_t i_pos;
+            int64_t i_pos;
 
             /* use i_percent to create a true i_date */
             msg_Warn( p_input,
@@ -2068,6 +2267,14 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
         p_pes->i_pts = AVI_GetPTS( p_stream );
 
+#if 0
+        /* fix pts for audio: ie pts sould be for the first byte of the first frame */
+        if( p_stream->i_samplesize == 1 )
+        {
+            AVI_FixPTS( p_stream, p_pes );
+        }
+#endif
+
         /* read data */
         if( p_stream->i_samplesize )
         {
@@ -2199,8 +2406,13 @@ static int AVIDemux_UnSeekable( input_thread_t *p_input )
             {
                 case AVIFOURCC_JUNK:
                 case AVIFOURCC_LIST:
+                case AVIFOURCC_RIFF:
                     return( !AVI_PacketNext( p_input ) ? 1 : 0 );
                 case AVIFOURCC_idx1:
+                    if( p_avi->b_odml )
+                    {
+                        return( !AVI_PacketNext( p_input ) ? 1 : 0 );
+                    }
                     return( 0 );    // eof
                 default:
                     msg_Warn( p_input,

@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.8 2003/03/13 16:09:20 hartman Exp $
+ * $Id: libavi.h,v 1.9 2003/04/27 11:55:03 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@
 #define AVIFOURCC_LIST         VLC_FOURCC('L','I','S','T')
 #define AVIFOURCC_JUNK         VLC_FOURCC('J','U','N','K')
 #define AVIFOURCC_AVI          VLC_FOURCC('A','V','I',' ')
+#define AVIFOURCC_AVIX         VLC_FOURCC('A','V','I','X')
 #define AVIFOURCC_WAVE         VLC_FOURCC('W','A','V','E')
 #define AVIFOURCC_INFO         VLC_FOURCC('I','N','F','O')
 
@@ -58,6 +59,7 @@
 #define AVIFOURCC_strh         VLC_FOURCC('s','t','r','h')
 #define AVIFOURCC_strf         VLC_FOURCC('s','t','r','f')
 #define AVIFOURCC_strd         VLC_FOURCC('s','t','r','d')
+#define AVIFOURCC_indx         VLC_FOURCC('i','n','d','x')
 
 #define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
 #define AVIFOURCC_auds         VLC_FOURCC('a','u','d','s')
@@ -273,6 +275,51 @@ typedef struct avi_chunk_strd_s
     uint8_t  *p_data;
 } avi_chunk_strd_t;
 
+
+#define AVI_INDEX_OF_INDEXES    0x00
+#define AVI_INDEX_OF_CHUNKS     0x01
+#define AVI_INDEX_IS_DATA       0x80
+
+#define AVI_INDEX_2FIELD        0x01
+typedef struct
+{
+    uint32_t i_offset;
+    uint32_t i_size;
+} indx_std_entry_t;
+
+typedef struct
+{
+    uint32_t i_offset;
+    uint32_t i_size;
+    uint32_t i_offsetfield2;
+} indx_field_entry_t;
+
+typedef struct
+{
+    uint64_t i_offset;
+    uint32_t i_size;
+    uint32_t i_duration;
+} indx_super_entry_t;
+
+typedef struct avi_chunk_indx_s
+{
+    AVI_CHUNK_COMMON
+    int16_t i_longsperentry;
+    int8_t  i_indexsubtype;
+    int8_t  i_indextype;
+    int32_t i_entriesinuse;
+    vlc_fourcc_t i_id;
+
+    int64_t i_baseoffset;
+
+    union
+    {
+        indx_std_entry_t    *std;
+        indx_field_entry_t  *field;
+        indx_super_entry_t  *super;
+    } idx;
+} avi_chunk_indx_t;
+
 typedef struct avi_chunk_STRING_s
 {
     AVI_CHUNK_COMMON
@@ -289,6 +336,7 @@ typedef union avi_chunk_u
     avi_chunk_strh_t    strh;
     avi_chunk_strf_t    strf;
     avi_chunk_strd_t    strd;
+    avi_chunk_indx_t    indx;
     avi_chunk_STRING_t  strz;
 } avi_chunk_t;
 
