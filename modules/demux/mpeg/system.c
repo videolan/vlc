@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.11 2003/03/09 23:39:05 jlj Exp $
+ * $Id: system.c,v 1.12 2003/03/18 23:59:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -641,6 +641,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
             {
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
+            case MPEG2_MOTO_VIDEO_ES:
                 p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
                 p_es->i_cat = VIDEO_ES;
                 break;
