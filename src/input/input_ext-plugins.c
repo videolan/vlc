@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.6 2002/04/24 00:36:24 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.7 2002/05/15 13:07:18 marcari Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -677,6 +677,26 @@ void input_FDClose( input_thread_t * p_input )
                   p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
     close( p_access_data->i_handle );
+    free( p_access_data );
+}
+
+/*****************************************************************************
+ * input_FDNetworkClose: close the target
+ *****************************************************************************/
+void input_FDNetworkClose( input_thread_t * p_input )
+{
+    input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
+
+    intf_WarnMsg( 2, "input: closing network `%s/%s:%s'", 
+                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+ 
+    intf_ErrMsg( "input: socket close : %d", p_access_data->i_handle);
+#ifdef WIN32
+    closesocket( p_access_data->i_handle );
+#else
+    close( p_access_data->i_handle );
+#endif
+
     free( p_access_data );
 }
 

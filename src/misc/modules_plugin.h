@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.26 2002/05/14 19:33:54 bozo Exp $
+ * $Id: modules_plugin.h,v 1.27 2002/05/15 13:07:18 marcari Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -256,6 +256,7 @@ module_error( char *psz_buffer )
     (p_symbols)->input_ClockGetTS = input_ClockGetTS; \
     (p_symbols)->input_FDSeek = input_FDSeek; \
     (p_symbols)->input_FDClose = input_FDClose; \
+    (p_symbols)->input_FDNetworkClose = input_FDNetworkClose; \
     (p_symbols)->input_FDRead = input_FDRead; \
     (p_symbols)->input_FDNetworkRead = input_FDNetworkRead; \
     (p_symbols)->input_BuffersInit = input_BuffersInit; \

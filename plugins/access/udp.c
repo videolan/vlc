@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.9 2002/04/19 13:56:10 sam Exp $
+ * $Id: udp.c,v 1.10 2002/05/15 13:07:18 marcari Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -83,7 +83,7 @@ static void input_getfunctions( function_list_t * p_function_list )
 #define input p_function_list->functions.access
     input.pf_open             = UDPOpen;
     input.pf_read             = input_FDNetworkRead;
-    input.pf_close            = input_FDClose;
+    input.pf_close            = input_FDNetworkClose;
     input.pf_set_program      = input_SetProgram;
     input.pf_set_area         = NULL;
     input.pf_seek             = NULL;

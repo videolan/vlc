@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.105 2002/05/14 19:33:54 bozo Exp $
+ * $Id: common.h,v 1.106 2002/05/15 13:07:18 marcari Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -643,6 +643,7 @@ typedef struct module_symbols_s
                                              mtime_t );
     void ( * input_FDSeek )         ( struct input_thread_s *, off_t );
     void ( * input_FDClose )        ( struct input_thread_s * );
+    void ( * input_FDNetworkClose ) ( struct input_thread_s * );
     ssize_t ( * input_FDRead )          ( struct input_thread_s *, byte_t *,
                                       size_t );
     ssize_t ( * input_FDNetworkRead )   ( struct input_thread_s *, byte_t *,

@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.8 2002/04/19 13:56:10 sam Exp $
+ * $Id: http.c,v 1.9 2002/05/15 13:07:18 marcari Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -144,7 +144,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                strlen( psz_buffer ) ) == (-1) )
     {
         intf_ErrMsg( "http error: cannot send request (%s)", strerror(errno) );
-        input_FDClose( p_input );
+        input_FDNetworkClose( p_input );
         return( -1 );
     }
 
@@ -157,7 +157,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
         if( p_input->b_die || p_input->b_error )
         {
-            input_FDClose( p_input );
+            input_FDNetworkClose( p_input );
             return( -1 );
         }
     }
@@ -169,7 +169,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
         {
             intf_ErrMsg( "http error: not enough data" );
-            input_FDClose( p_input );
+            input_FDNetworkClose( p_input );
             return( -1 );
         }
 
@@ -419,7 +419,7 @@ static int HTTPOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void HTTPClose( input_thread_t * p_input )
 {
-    input_FDClose( p_input );
+    input_FDNetworkClose( p_input );
 }
 
 /*****************************************************************************
