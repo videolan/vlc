@@ -1050,8 +1050,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         if( b_start )
         {
-            int i_pos = playlist_GetPositionById( p_playlist , i_id );
-            playlist_Command( p_playlist, PLAYLIST_GOTO, i_pos );
+            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY , p_item );
         }
     }
 

@@ -147,12 +147,12 @@ struct filter {
 
 static const struct filter vfilters[] =
 {
-    { "clone", "Image clone", "Creates several clones of the image" },
-    { "distort", "Distortion", "Adds distorsion effects" },
-    { "invert", "Image inversion" , "Inverts the image colors" },
-    { "crop", "Image cropping", "Crops the image" },
-    { "motionblur", "Blurring", "Creates a motion blurring on the image" },
-    { "transform", "Transformation", "Rotates or flips the image" },
+    { "clone", N_("Image clone"), N_("Creates several clones of the image") },
+    { "distort", N_("Distortion"), N_("Adds distorsion effects") },
+    { "invert", N_("Image inversion") , N_("Inverts the image colors") },
+    { "crop", N_("Image cropping"), N_("Crops the image") },
+    { "motionblur", N_("Blurring"), N_("Creates a motion blurring on the image") },
+    { "transform",  N_("Transformation"), N_("Rotates or flips the image") },
     { NULL, NULL, NULL } /* Do not remove this line */
 };
 

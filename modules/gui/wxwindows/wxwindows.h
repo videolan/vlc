@@ -44,6 +44,7 @@
 #include <wx/wizard.h>
 #include "vlc_keys.h"
 
+
 /* Hmmm, work-around for newest wxWin */
 #ifdef wxStaticCastEvent
 #   undef wxStaticCastEvent
@@ -786,6 +787,7 @@ private:
 
     void OnSize( wxSizeEvent &event );
 
+    /* Menu Handlers */
     void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
@@ -797,7 +799,11 @@ private:
     void OnSave( wxCommandEvent& event );
 
     void OnSort( wxCommandEvent& event );
-    void OnColSelect( wxListEvent& event );
+
+    void OnMenuEvent( wxCommandEvent& event );
+    void OnMenuOpen( wxMenuEvent& event );
+
+    wxMenu *ViewMenu();
 
     void OnUp( wxCommandEvent& event);
     void OnDown( wxCommandEvent& event);
@@ -810,17 +816,26 @@ private:
     void OnRandom( wxCommandEvent& event );
     void OnRepeat( wxCommandEvent& event );
     void OnLoop ( wxCommandEvent& event );
-    void OnActivateItem( wxListEvent& event );
-    void OnKeyDown( wxListEvent& event );
+
+    void OnActivateItem( wxTreeEvent& event );
+    void OnKeyDown( wxTreeEvent& event );
     void OnNewGroup( wxCommandEvent& event );
 
     /* Popup functions */
-    void OnPopup( wxListEvent& event );
+    void OnPopup( wxContextMenuEvent& event );
     void OnPopupPlay( wxMenuEvent& event );
     void OnPopupDel( wxMenuEvent& event );
     void OnPopupEna( wxMenuEvent& event );
     void OnPopupInfo( wxMenuEvent& event );
     void Rebuild();
+
+    /* Update */
+    void UpdateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
+    void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
+
+    wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
+    void SetCurrentItem( wxTreeItemId );
+    void UpdateTreeItem( playlist_t *, wxTreeItemId );
 
     /* Custom events */
     void OnPlaylistEvent( wxCommandEvent& event );
@@ -831,44 +846,25 @@ private:
 
     wxMenu *popup_menu;
 
+    wxMenu *p_view_menu;
+
     ItemInfoDialog *iteminfo_dialog;
 
     intf_thread_t *p_intf;
-    wxListView *listview;
-    wxTreeCtrl *treeview;
+    wxTreeCtrl *treectrl;
     int i_update_counter;
     int i_sort_mode;
 
-    int i_popup_item;
+    int i_current_view;
+
+    wxTreeItemId i_popup_item;
+    playlist_item_t *p_popup_item;
+    playlist_item_t *p_popup_parent;
 
     int i_title_sorted;
     int i_author_sorted;
     int i_group_sorted;
     int i_duration_sorted;
-};
-
-class NewGroup: public wxDialog
-{
-public:
-    /* Constructor */
-    NewGroup( intf_thread_t *p_intf, wxWindow *p_parent );
-    virtual ~NewGroup();
-
-private:
-
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnOk( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-    wxTextCtrl *groupname;
-
-protected:
-    friend class Playlist;
-    friend class ItemInfoDialog;
-    char *psz_name;
 };
 
 /* ItemInfo Dialog */
@@ -889,7 +885,6 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
-    void OnNewGroup( wxCommandEvent& event );
 
     void UpdateInfo();
 
@@ -914,8 +909,6 @@ private:
     wxTreeItemId info_root;
 
     wxCheckBox *enabled_checkbox;
-    wxComboBox *group_combo;
-    int ids_array[100];
 };
 
 
