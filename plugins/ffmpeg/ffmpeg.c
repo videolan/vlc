@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.3 2002/04/27 16:13:23 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.4 2002/05/05 17:20:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -234,7 +234,8 @@ static void __PACKET_NEXT( videodec_thread_t *p_vdec )
                                     p_vdec->p_data->p_payload_start;
         }
         
-    } while( p_vdec->i_data_size <= 0 );
+    } while( ( p_vdec->i_data_size <= 0 )
+                    ||( p_vdec->p_data->b_discard_payload ) );
 }
 
 static void __PACKET_FILL( videodec_thread_t *p_vdec ) 
