@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.2 2002/08/12 09:34:15 sam Exp $
+ * $Id: scope.c,v 1.3 2003/08/18 14:57:09 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,6 +31,7 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+#include "aout_internal.h"
 
 #define SCOPE_WIDTH 320
 #define SCOPE_HEIGHT 240
@@ -42,13 +43,11 @@
  * This structure is part of the audio output thread descriptor.
  * It describes some scope specific variables.
  *****************************************************************************/
-struct aout_sys_t
+typedef struct aout_filter_sys_t
 {
     aout_fifo_t *p_aout_fifo;
-
-    aout_thread_t *p_aout;
     vout_thread_t *p_vout;
-};
+} aout_filter_sys_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -56,16 +55,15 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );             
 static void Close        ( vlc_object_t * );                   
 
-static int  SetFormat    ( aout_thread_t * );  
-static int  GetBufInfo   ( aout_thread_t *, int );
-static void Play         ( aout_thread_t *, byte_t *, int );
+static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                        aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("scope effect") ); 
-    set_capability( "audio output", 0 );
+    set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "scope" );
 vlc_module_end();
@@ -75,35 +73,37 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-    char *psz_method;
+    aout_filter_t *p_aout = (aout_filter_t *)p_this;
+    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+
+    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2') //AOUT_FMT_U16_NE
+         || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )//AOUT_FMT_U16_NE )
+    {
+        msg_Warn( p_filter, "Bad input or output format" );
+        return -1;
+    }
+
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    {
+        msg_Warn( p_filter, "input and output formats are not similar" );
+        return -1;
+    }
+
+    p_filter->pf_do_work = DoWork;
+    p_filter->b_in_place = 1;
 
     /* Allocate structure */
-    p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
+    p_aout->p_sys = malloc( sizeof( aout_filter_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
         return -1;
     }
 
-    psz_method = config_GetPsz( p_aout, "aout" );
-    if( psz_method )
-    {
-        if( !*psz_method )
-        {
-            free( psz_method );
-            return -1;
-        }
-    }
-    else
-    {
-        return -1;
-    }
-
     /* Open video output */
     p_aout->p_sys->p_vout =
-        vout_CreateThread( p_aout, SCOPE_WIDTH, SCOPE_HEIGHT,
-                           VLC_FOURCC('I','4','2','0'), SCOPE_ASPECT );
+        vout_Create( p_aout, SCOPE_WIDTH, SCOPE_HEIGHT,
+                     VLC_FOURCC('I','4','2','0'), SCOPE_ASPECT );
 
     if( p_aout->p_sys->p_vout == NULL )
     {
@@ -112,76 +112,7 @@ static int Open( vlc_object_t *p_this )
         return -1;
     }
 
-    /* Open audio output  */
-    p_aout->p_sys->p_aout = vlc_object_create( p_aout, VLC_OBJECT_AOUT );
-
-    p_aout->p_sys->p_aout->i_format   = p_aout->i_format;
-    p_aout->p_sys->p_aout->i_rate     = p_aout->i_rate;
-    p_aout->p_sys->p_aout->i_channels = p_aout->i_channels;
-
-    p_aout->p_sys->p_aout->p_module =
-                  module_Need( p_aout->p_sys->p_aout, "audio output", "" );
-    if( p_aout->p_sys->p_aout->p_module == NULL )
-    {
-        msg_Err( p_aout, "no suitable aout module" );
-        vlc_object_destroy( p_aout->p_sys->p_aout );
-        vout_DestroyThread( p_aout->p_sys->p_vout );
-        free( p_aout->p_sys );
-        return -1;
-    }
-
-    vlc_object_attach( p_aout->p_sys->p_aout, p_aout );
-
-    p_aout->pf_setformat = SetFormat;
-    p_aout->pf_getbufinfo = GetBufInfo;
-    p_aout->pf_play = Play;
-
     return( 0 );
-}
-
-/*****************************************************************************
- * SetFormat: set the output format
- *****************************************************************************/
-static int SetFormat( aout_thread_t *p_aout )
-{
-    int i_ret;
-
-    /* Force the output method */
-    p_aout->p_sys->p_aout->i_format = p_aout->i_format;
-    p_aout->p_sys->p_aout->i_channels = p_aout->i_channels;
-    p_aout->p_sys->p_aout->i_rate = p_aout->i_rate;
-
-    /*
-     * Initialize audio device
-     */
-    i_ret = p_aout->p_sys->p_aout->pf_setformat( p_aout->p_sys->p_aout );
-
-    if( i_ret )
-    {
-        return i_ret;
-    }
-
-    if( p_aout->p_sys->p_aout->i_format != p_aout->i_format
-         || p_aout->p_sys->p_aout->i_channels != p_aout->i_channels )
-    {
-        msg_Err( p_aout, "plugin is not very cooperative" );
-        return 0;
-    }
-
-    p_aout->i_channels = p_aout->p_sys->p_aout->i_channels;
-    p_aout->i_format = p_aout->p_sys->p_aout->i_format;
-    p_aout->i_rate = p_aout->p_sys->p_aout->i_rate;
-
-    return 0;
-}
-
-/*****************************************************************************
- * GetBufInfo: buffer status query
- *****************************************************************************/
-static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
-{
-    return p_aout->p_sys->p_aout->pf_getbufinfo( p_aout->p_sys->p_aout,
-                                                 i_buffer_limit );
 }
 
 /*****************************************************************************
@@ -189,33 +120,36 @@ static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
+static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     picture_t *p_outpic;
     int i_index, i_image;
-    u8  *ppp_area[2][3];
-    u16 *p_sample;
+    int i_size = p_in_buf->i_size;
+    byte_t *p_buffer = p_in_buf->p_buffer;
+    uint8_t  *ppp_area[2][3];
+    float *p_sample;
 
-    /* Play the real sound */
-    p_aout->p_sys->p_aout->pf_play( p_aout->p_sys->p_aout, p_buffer, i_size );
-
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
     for( i_image = 0; (i_image + 1) * SCOPE_WIDTH * 8 < i_size ; i_image++ )
     {
         /* Don't stay here forever */
-        if( mdate() >= p_aout->date - 10000 )
+        if( mdate() >= p_in_buf->start_date - 10000 )
         {
             break;
         }
-
         /* This is a new frame. Get a structure from the video_output. */
-        while( ( p_outpic = vout_CreatePicture( p_aout->p_sys->p_vout, 0, 0, 0 ) )
+        while( ( p_outpic = vout_CreatePicture( p_filter->p_sys->p_vout, 0, 0, 0 ) )
                   == NULL )
         {
             if( p_aout->b_die )
             {
                 return;
             }
-            msleep( VOUT_OUTMEM_SLEEP );
+            msleep( 1 );/* Not sleeping here makes us use 100% cpu,
+                         * sleeping too much absolutly kills audio
+                         * quality. 1 seems to be a good value */
         }
 
         /* Blank the picture */
@@ -233,21 +167,26 @@ static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
             {
                 ppp_area[i_index][j] =
                     p_outpic->p[j].p_pixels + i_index * p_outpic->p[j].i_lines
-                                / p_aout->i_channels * p_outpic->p[j].i_pitch;
+                                / p_filter->input.i_original_channels * p_outpic->p[j].i_pitch;
             }
         }
 
-        for( i_index = 0, p_sample = (u16*)p_buffer;
+        for( i_index = 0, p_sample = (float*)p_buffer;
              i_index < SCOPE_WIDTH;
              i_index++ )
         {
             int i;
-            u8 i_value;
+            int i_tmp_value;
+            uint8_t i_value;
 
             for( i = 0 ; i < 2 ; i++ )
             {
                 /* Left channel */
-                i_value = *p_sample++ / 256 + 128;
+                if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
+                else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
+                else i_tmp_value = *p_sample * 32768.0;
+                p_sample++;
+                i_value = i_tmp_value / 256 + 128;
                 *(ppp_area[0][0]
                    + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
                    + p_outpic->p[0].i_lines * i_value / 512
@@ -258,7 +197,11 @@ static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
                       * p_outpic->p[1].i_pitch) = 0xff;
 
                 /* Right channel */
-                i_value = *p_sample++ / 256 + 128;
+                if ( *p_sample >= 1.0 ) i_tmp_value = 32767;
+                else if ( *p_sample < -1.0 ) i_tmp_value = -32768;
+                else i_tmp_value = *p_sample * 32768.0;
+                p_sample++;
+                i_value = i_tmp_value / 256 + 128;
                 *(ppp_area[1][0]
                    + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
                    + p_outpic->p[0].i_lines * i_value / 512
@@ -271,11 +214,11 @@ static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
         }
 
         /* Display the picture - FIXME: find a better date :-) */
-        vout_DatePicture( p_aout->p_sys->p_vout, p_outpic,
-                          p_aout->date + i_image * 20000 );
-        vout_DisplayPicture( p_aout->p_sys->p_vout, p_outpic );
+        vout_DatePicture( p_filter->p_sys->p_vout, p_outpic,
+                          p_in_buf->start_date + i_image * 20000 );
+        vout_DisplayPicture( p_filter->p_sys->p_vout, p_outpic );
 
-        p_buffer += SCOPE_WIDTH * 4;
+        p_buffer += SCOPE_WIDTH * 8;
     }
 }
 
@@ -284,16 +227,11 @@ static void Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-
-    /* Kill audio output */
-    module_Unneed( p_aout->p_sys->p_aout, p_aout->p_sys->p_aout->p_module );
-    vlc_object_detach( p_aout->p_sys->p_aout );
-    vlc_object_destroy( p_aout->p_sys->p_aout );
+    aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     /* Kill video output */
-    vout_DestroyThread( p_aout->p_sys->p_vout );
+    vout_Destroy( p_filter->p_sys->p_vout );
 
-    free( p_aout->p_sys );
+    free( p_filter->p_sys );
 }
 
