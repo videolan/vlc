@@ -7,6 +7,8 @@ vlc (0.6.3+cvs-20031024-1) unstable; urgency=low
     + Don't install fortunes in /usr/share/games, they are too private for
       common mortals (Closes: #212856). They are still available in the
       /usr/share/doc/vlc directory though.
+    + Activated the speex codec.
+    + Activated the PVR input module.
   * debian/control:
     + Depend on ttf-freefont for subtitles.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # debian/rules for the VideoLAN Client - uses debhelper.
-# $Id: rules,v 1.105 2003/10/24 11:31:51 sam Exp $
+# $Id: rules,v 1.106 2003/10/24 14:45:24 sam Exp $
 # based on Joey Hess's one.
 
 # Uncomment this to turn on verbose mode.
@@ -44,6 +44,8 @@ CONFIG_FLAGS += \
 	--enable-freetype \
 	--enable-mkv \
 	--enable-v4l \
+	--enable-pvr \
+	--enable-speex \
 	$(NULL)
 
 # These ones are currently shipped with VLC
