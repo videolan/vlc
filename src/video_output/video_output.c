@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.227 2003/06/26 12:19:59 sam Exp $
+ * $Id: video_output.c,v 1.228 2003/06/28 21:18:58 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -79,25 +79,23 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         if( p_vout )
         {
             vlc_object_t *p_input;
-            char *psz_sout = config_GetPsz( p_this, "sout" );
 
             p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
 
-            if( p_input && (!psz_sout || !*psz_sout) )
+            if( p_input )
             {
                 vlc_object_detach( p_vout );
                 vlc_object_attach( p_vout, p_input );
+
+                vlc_object_release( p_input );
             }
             else
             {
                 vlc_object_detach( p_vout );
-                vlc_object_release( p_vout );
+                /* vlc_object_release( p_vout ); */
                 vout_Destroy( p_vout );
             }
-            if( psz_sout ) free( psz_sout );
-            if( p_input ) vlc_object_release( p_input );
         }
-
         return NULL;
     }
 
@@ -119,6 +117,12 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             {
                 p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT,
                                           FIND_CHILD );
+                /* only first children of p_input for unused vout */
+                if( p_vout && p_vout->p_parent != p_input )
+                {
+                    vlc_object_release( p_vout );
+                    p_vout = NULL;
+                }
                 vlc_object_release( p_input );
             }
         }
