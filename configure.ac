@@ -363,6 +363,32 @@ if test $ac_cv_struct_sockaddr_storage = no; then
   AC_DEFINE(ss_family, sa_family)
 fi
 
+dnl getnameinfo, which implies {get,free}addrinfo, but not gai_strerror,
+dnl -lws2_32 required with Mingw32, -lresolv NOT needed on Solaris.
+dnl AC_SEARCH_LIBS won't work with Mingw32
+AH_TEMPLATE(HAVE_GETNAMEINFO,
+  [Define to 1 if you have the `getnameinfo' function.])
+ac_func_getnameinfo_save_LIBS=$LIBS
+AS_IF([test "${SYS}" = "mingw32"],
+  [LIBS="-lws2_32 $LIBS"])
+  AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([
+[#include <sys/types.h>
+#if defined( UNDER_CE )
+# include <winsock.h>
+#elif defined( WIN32 )
+# include <winsock2.h>
+#else
+# include <sys/socket.h>
+# include <netdb.h>
+#endif]
+], [[getnameinfo(0,0,0,0,0,0,0);]])],
+ac_cv_func_getnameinfo=yes,
+ac_cv_func_getnameinfo=no)])
+AS_IF([test $ac_cv_func_getnameinfo = yes],
+  [AC_DEFINE(HAVE_GETNAMEINFO)])
+LIBS=$ac_func_getnameinfo_save_LIBS
+
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
   AC_TRY_LINK(
