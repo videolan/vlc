@@ -3,22 +3,20 @@ Author: Jean-Paul Saman <jpsaman@wxs.nl>
 
 Directories:
 ============
-vlc/			: adapted config.in and Makefile
-			: added libtool, ltmain.sh and ltconfig
 vlc/plugins/mad	        : mad audio decoder plugin for vlc
 
 Interface functions to implement in mad plugin are:
 =========
-adec_mad_Probe
-adec_mad_Run
-adec_mad_Init
-adec_mad_ErrorThread
+decoder_Probe
+decoder_Run
+adec_mad_InitThred
 adec_mad_EndThread
 
 libmad_input
 libmad_output
 libmad_header
 libmad_messages
+libmad_error
 
 Design: (ASCII art)
 =======
@@ -51,7 +49,7 @@ Interface view:
                             	   -----------------------
 
 Rationel:
-Keeping libmad as a separate library, either dynamic or statically linked in, makes maintenance so much simpeler.
+Keeping libmad as a separate library on the system, either dynamic or statically linked in, makes maintenance so much simpeler.
 Merging with a new libmad version should be straight forward as long as the interface stays stable.
 There is another benefit: Disk (actually flash ROM) resources and memory are very limited on a iPaq.
 Other programs or utilities like madplay and BBplay can make use of the same libmad version we do. In this way
