@@ -88,7 +88,7 @@ case x"${target_os}" in
 esac
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign valloc)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign)
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
@@ -377,9 +377,7 @@ dnl
 MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx chroma_i420_ymga_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
-if test x$SYS != xmingw32; then
-  SSE_MODULES="imdctsse downmixsse"
-fi
+SSE_MODULES="imdctsse downmixsse"
 ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],

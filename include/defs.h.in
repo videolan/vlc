@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
@@ -100,6 +100,9 @@
 /* Define if you have the munmap function.  */
 #undef HAVE_MUNMAP
 
+/* Define if you have the posix_memalign function.  */
+#undef HAVE_POSIX_MEMALIGN
+
 /* Define if you have the putenv function.  */
 #undef HAVE_PUTENV
 
@@ -147,9 +150,6 @@
 
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
-
-/* Define if you have the valloc function.  */
-#undef HAVE_VALLOC
 
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF

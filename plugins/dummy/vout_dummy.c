@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.20 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: vout_dummy.c,v 1.21 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -174,7 +174,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
 }
 
@@ -234,7 +234,8 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case FOURCC_YV12:
 
         /* Allocate the memory buffer */
-        p_pic->p_data = memalign( 16, i_width * i_height * 3 / 2 );
+        p_pic->p_data = vlc_memalign( 16, i_width * i_height * 3 / 2,
+                                      &p_pic->p_data_orig );
 
         /* Y buffer */
         p_pic->Y_PIXELS = p_pic->p_data;
@@ -268,7 +269,8 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case FOURCC_RV16:
 
         /* Allocate the memory buffer */
-        p_pic->p_data = memalign( 16, i_width * i_height * 2 );
+        p_pic->p_data = vlc_memalign( 16, i_width * i_height * 2,
+                                      &p_pic->p_data_orig );
 
         /* Fill important structures */
         p_pic->p->p_pixels = p_pic->p_data;

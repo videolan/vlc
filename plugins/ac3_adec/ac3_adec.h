@@ -2,7 +2,7 @@
  * ac3_adec.h : ac3 decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_adec.h,v 1.2 2002/01/22 23:14:26 massiot Exp $
+ * $Id: ac3_adec.h,v 1.3 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -31,6 +31,7 @@ typedef struct ac3dec_thread_s
      * Decoder properties
      */
     ac3dec_t *          ac3_decoder;
+    void *              ac3_decoder_orig;         /* pointer before memalign */
     
     /*
      * Thread properties

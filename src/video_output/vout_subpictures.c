@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.11 2002/03/15 04:41:54 sam Exp $
+ * $Id: vout_subpictures.c,v 1.12 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -125,8 +125,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
     {
         /* No free subpicture or matching destroyed subpictures have been
-         * found, but a destroyed subpicture is still avalaible */
-        free( p_destroyed_subpic->p_sys );
+         * found, but a destroyed subpicture is still available */
+        free( p_destroyed_subpic->p_sys_orig );
         p_free_subpic = p_destroyed_subpic;
     }
 
@@ -138,7 +138,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         return( NULL );
     }
 
-    p_free_subpic->p_sys = memalign( 16, i_size );
+    p_free_subpic->p_sys =
+        vlc_memalign( 16, i_size, &p_free_subpic->p_sys_orig );
 
     if( p_free_subpic->p_sys != NULL )
     {

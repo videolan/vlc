@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.47 2002/03/17 17:00:38 sam Exp $
+ * $Id: video.h,v 1.48 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -60,6 +60,7 @@ typedef struct picture_s
      * NEVER be modified. A direct buffer can be handled as the plugin
      * wishes, it can even swap p_pixels buffers. */
     u8             *p_data;
+    void           *p_data_orig;                  /* pointer before memalign */
     plane_t         p[ VOUT_MAX_PLANES ];       /* description of the planes */
     int             i_planes;                  /* number of allocated planes */
 
@@ -351,6 +352,7 @@ typedef struct subpicture_s
     /* Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */
     struct subpicture_sys_s *p_sys;                       /* subpicture data */
+    void                    *p_sys_orig;          /* pointer before memalign */
 
 } subpicture_t;
 

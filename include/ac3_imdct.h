@@ -2,7 +2,7 @@
  * ac3_imdct.h : AC3 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.h,v 1.6 2001/10/30 19:34:53 reno Exp $
+ * $Id: ac3_imdct.h,v 1.7 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -32,26 +32,41 @@ typedef struct complex_s {
 typedef struct imdct_s
 {
     complex_t * buf;
+    void *      buf_orig;                         /* pointer before memalign */
 
     /* Delay buffer for time domain interleaving */
     float * delay;
+    void *  delay_orig;                           /* pointer before memalign */
     float * delay1;
+    void *  delay1_orig;                          /* pointer before memalign */
 
     /* Twiddle factors for IMDCT */
     float * xcos1;
+    void *  xcos1_orig;                           /* pointer before memalign */
     float * xsin1;
+    void *  xsin1_orig;                           /* pointer before memalign */
     float * xcos2;
+    void *  xcos2_orig;                           /* pointer before memalign */
     float * xsin2;
+    void *  xsin2_orig;                           /* pointer before memalign */
     float * xcos_sin_sse;
+    void *  xcos_sin_sse_orig;                    /* pointer before memalign */
    
     /* Twiddle factor LUT */
     complex_t * w_2;
+    void *      w_2_orig;                         /* pointer before memalign */
     complex_t * w_4;
+    void *      w_4_orig;                         /* pointer before memalign */
     complex_t * w_8;
+    void *      w_8_orig;                         /* pointer before memalign */
     complex_t * w_16;
+    void *      w_16_orig;                        /* pointer before memalign */
     complex_t * w_32;
+    void *      w_32_orig;                        /* pointer before memalign */
     complex_t * w_64;
+    void *      w_64_orig;                        /* pointer before memalign */
     complex_t * w_1;
+    void *      w_1_orig;                         /* pointer before memalign */
     
     /* Module used and shortcuts */
     struct module_s * p_module;

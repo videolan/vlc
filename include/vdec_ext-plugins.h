@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.9 2002/01/04 14:01:34 sam Exp $
+ * $Id: vdec_ext-plugins.h,v 1.10 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,6 +29,7 @@ typedef struct idct_inner_s
 {
     /* Should be kept aligned ! */
     dctelem_t *             pi_block;                               /* block */
+    void *                  pi_block_orig;        /* pointer before memalign */
     void                ( * pf_idct )   ( dctelem_t *, yuv_data_t *, int,
                                           void *, int );
                                         /* sparse IDCT or not, add or copy ? */

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.19 2002/03/16 23:03:19 sam Exp $
+ * $Id: vout_pictures.c,v 1.20 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -504,7 +504,7 @@ void vout_AllocatePicture( picture_t *p_pic,
         i_bytes += p_pic->p[ i_index ].i_lines * p_pic->p[ i_index ].i_pitch;
     }
 
-    p_pic->p_data = memalign( 16, i_bytes );
+    p_pic->p_data = vlc_memalign( 16, i_bytes, &p_pic->p_data_orig );
 
     if( p_pic->p_data == NULL )
     {

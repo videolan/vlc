@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.91 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: common.h,v 1.92 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -357,20 +357,32 @@ struct intf_subscription_s;
 #   define ATTR_ALIGN(align)
 #endif
 
-/* Alignment of critical dynamic data structure */
+/* Alignment of critical dynamic data structure
+ *
+ * Not all platforms support memalign so we provide a vlc_memalign wrapper
+ * void *vlc_memalign( size_t align, size_t size, void **pp_orig )
+ * *pp_orig is the pointer that has to be freed afterwards.
+ */
+#if 0
+#ifdef HAVE_POSIX_MEMALIGN
+#   define vlc_memalign(align,size,pp_orig) \
+    ( !posix_memalign( pp_orig, align, size ) ? *(pp_orig) : NULL )
+#endif
+#endif
 #ifdef HAVE_MEMALIGN
     /* Some systems have memalign() but no declaration for it */
     void * memalign( size_t align, size_t size );
-#else
-#   ifdef HAVE_VALLOC
-        /* That's like using a hammer to kill a fly, but eh... */
-#       include <unistd.h>
-#       define memalign(align,size) valloc(size)
-#   else
-        /* Assume malloc alignment is sufficient */
-#       define memalign(align,size) malloc(size)
-#   endif    
+
+#   define vlc_memalign(align,size,pp_orig) \
+    ( *(pp_orig) = memalign( align, size ) )
+
+#else /* We don't have any choice but to align manually */
+#   define vlc_memalign(align,size,pp_orig) \
+    (( *(pp_orig) = malloc( size + align - 1 )) ? \
+        (void *)( (((unsigned long)*(pp_orig)) + 15) & ~0xFUL ) : NULL )
+
 #endif
+
 
 #define I64C(x)         x##LL
 

@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.6 2002/03/19 12:48:01 gbazin Exp $
+ * $Id: vpar_pool.c,v 1.7 2002/04/05 01:05:22 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -89,7 +89,8 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     for( j = 0; j < 12; j++ )
     {
         p_vpar->pool.mb.p_idcts[j].pi_block =
-        memalign( 16, 64 * sizeof(dctelem_t) );
+            vlc_memalign( 16, 64 * sizeof(dctelem_t),
+                          &p_vpar->pool.mb.p_idcts[j].pi_block_orig );
     }
 }
 
@@ -130,7 +131,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
                 for( j = 0; j < 12; j++ )
                 {
-                    free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
+                    free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block_orig );
                 }
             }
 
@@ -167,7 +168,8 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
                 for( j = 0; j < 12; j++ )
                 {
                     p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block =
-                        memalign( 16, 64 * sizeof(dctelem_t) );
+                        vlc_memalign( 16, 64 * sizeof(dctelem_t),
+                                      &p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block_orig );
                 }
 
                 p_vpar->pool.pp_vdec[i] = vdec_CreateThread( &p_vpar->pool );
@@ -209,7 +211,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
 
     for( i = 0; i < 12; i++ )
     {
-        free( p_vpar->pool.mb.p_idcts[i].pi_block );
+        free( p_vpar->pool.mb.p_idcts[i].pi_block_orig );
     }
 
     for( i = 0; i < p_vpar->pool.i_smp; i++ )
@@ -220,7 +222,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
 
         for( j = 0; j < 12; j++ )
         {
-            free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
+            free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block_orig );
         }
     }
 
