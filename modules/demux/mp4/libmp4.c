@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.11 2002/12/18 14:17:10 sam Exp $
+ * $Id: libmp4.c,v 1.12 2003/01/13 02:30:11 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1899,12 +1899,102 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif /* HAVE_ZLIB_H */
 }
 
+int MP4_ReadBox_rdrf( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    uint32_t i_len;
+    MP4_READBOX_ENTER( MP4_Box_data_rdrf_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_rdrf );
+    MP4_GETFOURCC( p_box->data.p_rdrf->i_ref_type );
+    MP4_GET4BYTES( i_len );
+    if( i_len > 0 )
+    {
+        uint32_t i;
+        p_box->data.p_rdrf->psz_ref = malloc( i_len );
+        for( i = 0; i < i_len; i++ )
+        {
+            MP4_GET1BYTE( p_box->data.p_rdrf->psz_ref[i] );
+        }
+        p_box->data.p_rdrf->psz_ref[i_len] = '\0';
+    }
+    else
+    {
+        p_box->data.p_rdrf->psz_ref = NULL;
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream->p_input,
+             "Read Box: \"rdrf\" type:%c%c%c%c ref %s",
+             p_box->data.p_rdrf->i_ref_type&0xff, (p_box->data.p_rdrf->i_ref_type>>8)&0xff,
+             (p_box->data.p_rdrf->i_ref_type>>16)&0xff, (p_box->data.p_rdrf->i_ref_type>>24)&0xff,
+             p_box->data.p_rdrf->psz_ref );
+
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+void MP4_FreeBox_rdrf( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_rdrf->psz_ref )
+}
+
+
+int MP4_ReadBox_rmdr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_rmdr_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_rmdr );
+
+    MP4_GET4BYTES( p_box->data.p_rmdr->i_rate );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream->p_input,
+             "Read Box: \"rmdr\" rate:%d",
+             p_box->data.p_rmdr->i_rate );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
+int MP4_ReadBox_rmqu( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_rmqu_t );
+
+    MP4_GET4BYTES( p_box->data.p_rmqu->i_quality );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream->p_input,
+             "Read Box: \"rmqu\" quality:%d",
+             p_box->data.p_rmqu->i_quality );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
+int MP4_ReadBox_rmvc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_rmvc_t );
+    MP4_GETVERSIONFLAGS( p_box->data.p_rmvc );
+
+    MP4_GETFOURCC( p_box->data.p_rmvc->i_gestaltType );
+    MP4_GET4BYTES( p_box->data.p_rmvc->i_val1 );
+    MP4_GET4BYTES( p_box->data.p_rmvc->i_val2 );
+    MP4_GET2BYTES( p_box->data.p_rmvc->i_checkType );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream->p_input,
+             "Read Box: \"rmvc\" gestaltType:%c%c%c%c val1:0x%x val2:0x%x checkType:0x%x",
+             p_box->data.p_rmvc->i_gestaltType&0xff, (p_box->data.p_rmvc->i_gestaltType>>8)&0xff,
+             (p_box->data.p_rmvc->i_gestaltType>>16)&0xff,(p_box->data.p_rmvc->i_gestaltType>>24)&0xff,
+             p_box->data.p_rmvc->i_val1,p_box->data.p_rmvc->i_val2,
+             p_box->data.p_rmvc->i_checkType );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
 
 /**** ------------------------------------------------------------------- ****/
 /****                   "Higher level" Functions                          ****/
 /**** ------------------------------------------------------------------- ****/
 
-static struct 
+static struct
 {
     uint32_t i_type;
     int  (*MP4_ReadBox_function )( MP4_Stream_t *p_stream, MP4_Box_t *p_box ); 
@@ -1923,6 +2013,8 @@ static struct
     { FOURCC_udta,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_nmhd,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_hnti,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_rmra,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_rmda,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
 
     /* specific box */
     { FOURCC_ftyp,  MP4_ReadBox_ftyp,       MP4_FreeBox_ftyp },
@@ -1991,12 +2083,17 @@ static struct
     { FOURCC_dpnd,  NULL,   NULL },
     { FOURCC_ipir,  NULL,   NULL },
     { FOURCC_mpod,  NULL,   NULL },
-    
+
     /* found in hnti */
     { FOURCC_rtp,   NULL,   NULL },
-    
+
+    /* found in rmra */
+    { FOURCC_rdrf,  MP4_ReadBox_rdrf,           MP4_FreeBox_rdrf   },
+    { FOURCC_rmdr,  MP4_ReadBox_rmdr,           MP4_FreeBox_Common },
+    { FOURCC_rmqu,  MP4_ReadBox_rmqu,           MP4_FreeBox_Common },
+    { FOURCC_rmvc,  MP4_ReadBox_rmvc,           MP4_FreeBox_Common },
+
     /* Last entry */
-    
     { 0,            NULL,                   NULL }
 };
 

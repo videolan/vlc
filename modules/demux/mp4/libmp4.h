@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.4 2002/11/17 06:46:56 fenrir Exp $
+ * $Id: libmp4.h,v 1.5 2003/01/13 02:30:11 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -105,8 +105,18 @@
 #define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'q', 't' )
 #define FOURCC_mjqt VLC_FOURCC( 'm', 'j', 'h', 't' )
 #define FOURCC_mjht VLC_FOURCC( 'm', 'j', 'p', 'b' )
- 
+
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
+
+
+#define FOURCC_rmra VLC_FOURCC( 'r', 'm', 'r', 'a' )
+#define FOURCC_rmda VLC_FOURCC( 'r', 'm', 'd', 'a' )
+#define FOURCC_rdrf VLC_FOURCC( 'r', 'd', 'r', 'f' )
+#define FOURCC_rmdr VLC_FOURCC( 'r', 'm', 'd', 'r' )
+#define FOURCC_rmvc VLC_FOURCC( 'r', 'm', 'v', 'c' )
+#define FOURCC_rmcd VLC_FOURCC( 'r', 'm', 'c', 'd' )
+#define FOURCC_rmqu VLC_FOURCC( 'r', 'm', 'q', 'u' )
+#define FOURCC_alis VLC_FOURCC( 'a', 'l', 'i', 's' )
 
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1
@@ -578,11 +588,57 @@ typedef struct MP4_Box_data_cmvd_s
 typedef struct MP4_Box_data_cmov_s
 {
     struct MP4_Box_s *p_moov; /* uncompressed moov */
-    
+
 } MP4_Box_data_cmov_t;
 
+typedef struct MP4_Box_data_rdrf_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_ref_type;
+    char     *psz_ref;
+
+} MP4_Box_data_rdrf_t;
+
+typedef struct MP4_Box_data_rmdr_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_rate;
+
+} MP4_Box_data_rmdr_t;
+
+typedef struct MP4_Box_data_rmvc_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_gestaltType;
+    uint32_t i_val1;
+    uint32_t i_val2;
+    uint16_t i_checkType;   /* 0: val1 is version min
+                               1: gestalt value & val2 == val1 */
+
+} MP4_Box_data_rmvc_t;
+
+typedef struct MP4_Box_data_rmcd_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+
+} MP4_Box_data_rmcd_t;
+
+typedef struct MP4_Box_data_rmqu_s
+{
+    uint32_t i_quality;
+
+} MP4_Box_data_rmqu_t;
+
 /*
-typedef struct MP4_Box_data_cmov_s
+typedef struct MP4_Box_data__s
 {
     uint8_t  i_version;
     uint32_t i_flags;
@@ -629,7 +685,12 @@ typedef union MP4_Box_data_s
     MP4_Box_data_cmov_t *p_cmov;
 
     MP4_Box_data_moviehintinformation_rtp_t p_moviehintinformation_rtp;
-    
+
+    MP4_Box_data_rdrf_t *p_rdrf;
+    MP4_Box_data_rmdr_t *p_rmdr;
+    MP4_Box_data_rmqu_t *p_rmqu;
+    MP4_Box_data_rmvc_t *p_rmvc;
+
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;
 
