@@ -1,10 +1,15 @@
 .*
+m4
+intl
 core
 core.*
 gmon.out
 configure
+config.h
+config.h.*
 config.log
 config.cache
+config.rpath
 config.status
 config.guess
 config.sub
