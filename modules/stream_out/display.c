@@ -31,27 +31,26 @@
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include "codecs.h"
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
-
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("Display stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "display" );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_t * );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 struct sout_stream_sys_t
 {
@@ -175,32 +174,31 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     while( p_buffer )
     {
-        sout_buffer_t *p_next;
-        block_t *p_block;
+        block_t *p_next = p_buffer->p_next;
 
-        if( id->p_es->p_dec && p_buffer->i_size > 0 &&
-            (p_block = block_New( p_stream, p_buffer->i_size )) )
+        p_buffer->p_next = NULL;
+
+        if( id->p_es->p_dec && p_buffer->i_buffer > 0 )
         {
-            p_block->i_dts = p_buffer->i_dts <= 0 ? 0 :
-                             p_buffer->i_dts + p_sys->i_delay;
-            p_block->i_pts = p_buffer->i_pts <= 0 ? 0 :
-                             p_buffer->i_pts + p_sys->i_delay;
+            if( p_buffer->i_dts <= 0 )
+                p_buffer->i_dts= 0;
+            else
+                p_buffer->i_dts += p_sys->i_delay;
 
-            p_stream->p_vlc->pf_memcpy( p_block->p_buffer,
-                                        p_buffer->p_buffer, p_buffer->i_size );
+            if( p_buffer->i_pts <= 0 )
+                p_buffer->i_pts= 0;
+            else
+                p_buffer->i_pts += p_sys->i_delay;
 
-            input_DecodeBlock( id->p_es->p_dec, p_block );
+            input_DecodeBlock( id->p_es->p_dec, p_buffer );
         }
 
-        /* *** go to next buffer *** */
-        p_next = p_buffer->p_next;
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
         p_buffer = p_next;
     }
 

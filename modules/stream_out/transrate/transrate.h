@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: transrate.h,v 1.1 2004/03/03 11:20:52 massiot Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -98,8 +98,8 @@ struct sout_stream_id_t
     void            *id;
     vlc_bool_t      b_transrate;
 
-    sout_buffer_t   *p_current_buffer;
-    sout_buffer_t   *p_next_gop;
+    block_t   *p_current_buffer;
+    block_t   *p_next_gop;
     mtime_t         i_next_gop_duration;
     size_t          i_next_gop_size;
 

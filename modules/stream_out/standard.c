@@ -2,7 +2,7 @@
  * standard.c: standard stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: standard.c,v 1.18 2004/01/25 14:34:25 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ static void     Close   ( vlc_object_t * );
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 /*****************************************************************************
  * Module descriptor
@@ -290,9 +290,6 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    /* XXX beurk */
-    p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -368,7 +365,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;

@@ -52,7 +52,7 @@ vlc_module_end();
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *,
-                               sout_buffer_t* );
+                               block_t* );
 
 struct sout_stream_sys_t
 {
@@ -87,7 +87,7 @@ struct sout_stream_sys_t
     uint16_t          i_sequence;
     uint32_t          i_timestamp_start;
     uint8_t           ssrc[4];
-    sout_buffer_t     *packet;
+    block_t     *packet;
 
     /* */
     int              i_es;
@@ -95,7 +95,7 @@ struct sout_stream_sys_t
 };
 
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
-                                    sout_buffer_t * );
+                                    block_t * );
 
 struct sout_stream_id_t
 {
@@ -125,7 +125,7 @@ struct sout_stream_id_t
     httpd_url_t  *p_rtsp_url;
 };
 
-static int AccessOutGrabberWrite( sout_access_out_t *, sout_buffer_t * );
+static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 static int RtspSetup( sout_stream_t *p_stream, vlc_url_t * );
@@ -274,8 +274,6 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        p_sout->i_preheader = __MAX( p_sout->i_preheader,
-                                     p_sys->p_mux->i_preheader );
 
         /* create the SDP only once */
         p_sys->psz_sdp =
@@ -362,7 +360,7 @@ static void Close( vlc_object_t * p_this )
         sout_AccessOutDelete( p_sys->p_grab );
         if( p_sys->packet )
         {
-            sout_BufferDelete( p_stream->p_sout, p_sys->packet );
+            block_Release( p_sys->packet );
         }
     }
 
@@ -475,13 +473,13 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
 /*****************************************************************************
  *
  *****************************************************************************/
-static int rtp_packetize_l16  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_l8   ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_mpa  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_mpv  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
+static int rtp_packetize_l16  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_l8   ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_mpa  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_mpv  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -728,9 +726,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
-    sout_buffer_t *p_next;
+    block_t *p_next;
 
     if( p_stream->p_sys->p_mux )
     {
@@ -745,7 +743,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 break;
             }
-            sout_BufferDelete( p_stream->p_sout, p_buffer );
+            block_Release( p_buffer );
             p_buffer = p_next;
         }
     }
@@ -754,7 +752,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
 
 static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
-                                        sout_buffer_t *p_buffer )
+                                        block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -762,10 +760,10 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     uint32_t i_timestamp = i_dts * 9 / 100;
 
     uint8_t         *p_data = p_buffer->p_buffer;
-    unsigned int    i_data  = p_buffer->i_size;
+    unsigned int    i_data  = p_buffer->i_buffer;
     unsigned int    i_max   = p_sys->i_mtu - 12;
 
-    int i_packet = ( p_buffer->i_size + i_max - 1 ) / i_max;
+    int i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
 
     while( i_data > 0 )
     {
@@ -773,7 +771,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
 
         /* output complete packet */
         if( p_sys->packet &&
-            p_sys->packet->i_size + i_data > i_max )
+            p_sys->packet->i_buffer + i_data > i_max )
         {
             sout_AccessOutWrite( p_sys->p_access, p_sys->packet );
             p_sys->packet = NULL;
@@ -782,7 +780,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
         if( p_sys->packet == NULL )
         {
             /* allocate a new packet */
-            p_sys->packet = sout_BufferNew( p_stream->p_sout, p_sys->i_mtu );
+            p_sys->packet = block_New( p_stream, p_sys->i_mtu );
             p_sys->packet->p_buffer[ 0] = 0x80;
             p_sys->packet->p_buffer[ 1] = p_sys->i_payload_type;
             p_sys->packet->p_buffer[ 2] = ( p_sys->i_sequence >> 8)&0xff;
@@ -795,7 +793,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             p_sys->packet->p_buffer[ 9] = p_sys->ssrc[1];
             p_sys->packet->p_buffer[10] = p_sys->ssrc[2];
             p_sys->packet->p_buffer[11] = p_sys->ssrc[3];
-            p_sys->packet->i_size = 12;
+            p_sys->packet->i_buffer = 12;
 
             p_sys->packet->i_dts = i_dts;
             p_sys->packet->i_length = p_buffer->i_length / i_packet;
@@ -804,13 +802,12 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             p_sys->i_sequence++;
         }
 
-        i_size = __MIN( i_data, p_sys->i_mtu - p_sys->packet->i_size );
+        i_size = __MIN( i_data, p_sys->i_mtu - p_sys->packet->i_buffer );
 
-        memcpy( &p_sys->packet->p_buffer[p_sys->packet->i_size],
-                p_data,
-                i_size );
+        memcpy( &p_sys->packet->p_buffer[p_sys->packet->i_buffer],
+                p_data, i_size );
 
-        p_sys->packet->i_size += i_size;
+        p_sys->packet->i_buffer += i_size;
         p_data += i_size;
         i_data -= i_size;
     }
@@ -819,20 +816,20 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
 }
 
 static int AccessOutGrabberWrite( sout_access_out_t *p_access,
-                                  sout_buffer_t *p_buffer )
+                                  block_t *p_buffer )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_access->p_sys;
 
-    //fprintf( stderr, "received buffer size=%d\n", p_buffer->i_size );
+    //fprintf( stderr, "received buffer size=%d\n", p_buffer->i_buffer );
     //
     while( p_buffer )
     {
-        sout_buffer_t *p_next;
+        block_t *p_next;
 
         AccessOutGrabberWriteBuffer( p_stream, p_buffer );
 
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_access->p_sout, p_buffer );
+        block_Release( p_buffer );
         p_buffer = p_next;
     }
 
@@ -1032,7 +1029,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
 /****************************************************************************
  * rtp_packetize_*:
  ****************************************************************************/
-static void rtp_packetize_common( sout_stream_id_t *id, sout_buffer_t *out,
+static void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
                                   int b_marker, int64_t i_pts )
 {
     uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / I64C(1000000);
@@ -1051,24 +1048,24 @@ static void rtp_packetize_common( sout_stream_id_t *id, sout_buffer_t *out,
     out->p_buffer[10] = id->ssrc[2];
     out->p_buffer[11] = id->ssrc[3];
 
-    out->i_size = 12;
+    out->i_buffer = 12;
     id->i_sequence++;
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
-                              sout_buffer_t *in )
+                              block_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 4; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i;
 
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 16 + i_payload );
+        block_t *out = block_New( p_stream, 16 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
@@ -1080,7 +1077,7 @@ static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->p_buffer[15] = ( (i*i_max)      )&0xff;
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_size   = 16 + i_payload;
+        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1095,13 +1092,13 @@ static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
 
 /* rfc2250 */
 static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
-                              sout_buffer_t *in )
+                              block_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 4; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i;
     int     b_sequence_start = 0;
     int     i_temporal_ref = 0;
@@ -1110,10 +1107,10 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
     int     b_start_slice = 0;
 
     /* preparse this packet to get some info */
-    if( in->i_size > 4 )
+    if( in->i_buffer > 4 )
     {
         uint8_t *p = p_data;
-        int      i_rest = in->i_size;
+        int      i_rest = in->i_buffer;
 
         for( ;; )
         {
@@ -1163,7 +1160,7 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout,
+        block_t *out = block_New( p_stream,
                                              16 + i_payload );
         uint32_t      h = ( i_temporal_ref << 16 )|
                           ( b_sequence_start << 13 )|
@@ -1184,7 +1181,7 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_size   = 16 + i_payload;
+        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1197,19 +1194,19 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
-                              sout_buffer_t *in )
+                              block_t *in )
 {
     int     i_max   = id->i_mtu - 12 - 2; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i;
 
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 14 + i_payload );
+        block_t *out = block_New( p_stream, 14 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
@@ -1220,7 +1217,7 @@ static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
         /* data */
         memcpy( &out->p_buffer[14], p_data, i_payload );
 
-        out->i_size   = 14 + i_payload;
+        out->i_buffer   = 14 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1234,26 +1231,26 @@ static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
-                                sout_buffer_t *in )
+                                block_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i;
 
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
+        block_t *out = block_New( p_stream, 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
                               (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_size   = 12 + i_payload;
+        out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1267,26 +1264,26 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
-                              sout_buffer_t *in )
+                              block_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i_packet = 0;
 
     while( i_data > 0 )
     {
         int           i_payload = (__MIN( i_max, i_data )/4)*4;
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
+        block_t *out = block_New( p_stream, 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, 0,
                               (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_size   = 12 + i_payload;
+        out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1301,26 +1298,26 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
-                             sout_buffer_t *in )
+                             block_t *in )
 {
     int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i_packet = 0;
 
     while( i_data > 0 )
     {
         int           i_payload = (__MIN( i_max, i_data )/2)*2;
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 12 + i_payload );
+        block_t *out = block_New( p_stream, 12 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, 0,
                               (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_size   = 12 + i_payload;
+        out->i_buffer   = 12 + i_payload;
         out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
@@ -1334,19 +1331,19 @@ static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
-                               sout_buffer_t *in )
+                               block_t *in )
 {
     int     i_max   = id->i_mtu - 16; /* payload max in one packet */
-    int     i_count = ( in->i_size + i_max - 1 ) / i_max;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
 
     uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_size;
+    int     i_data  = in->i_buffer;
     int     i;
 
     for( i = 0; i < i_count; i++ )
     {
         int           i_payload = __MIN( i_max, i_data );
-        sout_buffer_t *out = sout_BufferNew( p_stream->p_sout, 16 + i_payload );
+        block_t *out = block_New( p_stream, 16 + i_payload );
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
@@ -1356,12 +1353,12 @@ static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->p_buffer[12] = 0;
         out->p_buffer[13] = 2*8;
         /* for each AU length 13 bits + idx 3bits, */
-        out->p_buffer[14] = ( in->i_size >> 5 )&0xff;
-        out->p_buffer[15] = ( (in->i_size&0xff)<<3 )|0;
+        out->p_buffer[14] = ( in->i_buffer >> 5 )&0xff;
+        out->p_buffer[15] = ( (in->i_buffer&0xff)<<3 )|0;
 
         memcpy( &out->p_buffer[16], p_data, i_payload );
 
-        out->i_size   = 16 + i_payload;
+        out->i_buffer   = 16 + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 

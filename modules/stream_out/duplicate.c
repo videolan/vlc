@@ -2,7 +2,7 @@
  * duplicate.c: duplicate stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: duplicate.c,v 1.12 2004/01/25 14:34:25 gbazin Exp $
+ * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,19 +31,11 @@
 #include <vlc/sout.h>
 
 /*****************************************************************************
- * Exported prototypes
+ * Module descriptor
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *,
-                               sout_buffer_t* );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin();
     set_description( _("Duplicate stream output") );
     set_capability( "sout stream", 50 );
@@ -51,6 +43,15 @@ vlc_module_begin();
     add_shortcut( "dup" );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
+static int               Del ( sout_stream_t *, sout_stream_id_t * );
+static int               Send( sout_stream_t *, sout_stream_id_t *,
+                               block_t* );
 
 struct sout_stream_sys_t
 {
@@ -242,7 +243,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
  * Send:
  *****************************************************************************/
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_t     *p_dup_stream;
@@ -251,18 +252,18 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     /* Loop through the linked list of buffers */
     while( p_buffer )
     {
-        sout_buffer_t *p_next = p_buffer->p_next;
+        block_t *p_next = p_buffer->p_next;
 
         p_buffer->p_next = NULL;
 
         for( i_stream = 0; i_stream < p_sys->i_nb_streams - 1; i_stream++ )
         {
-            sout_buffer_t *p_dup;
+            block_t *p_dup;
             p_dup_stream = p_sys->pp_streams[i_stream];
 
             if( id->pp_ids[i_stream] )
             {
-                p_dup = sout_BufferDuplicate( p_stream->p_sout, p_buffer );
+                p_dup = block_Duplicate( p_buffer );
 
                 p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
                                        p_dup );
@@ -277,7 +278,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         }
         else
         {
-            sout_BufferDelete( p_stream->p_sout, p_buffer );
+            block_Release( p_buffer );
         }
 
         p_buffer = p_next;

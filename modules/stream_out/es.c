@@ -2,7 +2,7 @@
  * es.c: Elementary stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es.c,v 1.5 2004/01/25 14:34:25 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,7 +40,7 @@ static void     Close   ( vlc_object_t * );
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 /*****************************************************************************
  * Module descriptor
@@ -288,9 +288,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return( NULL );
     }
 
-    /* XXX beurk */
-    p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
-
     id = malloc( sizeof( sout_stream_id_t ) );
     id->p_mux = p_mux;
     id->p_input = sout_MuxAddStream( p_mux, p_fmt );
@@ -320,7 +317,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 

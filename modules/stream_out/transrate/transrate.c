@@ -2,7 +2,7 @@
  * transrate.c: MPEG2 video transrating module
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: transrate.c,v 1.7 2004/03/03 11:20:52 massiot Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -45,12 +45,12 @@ static void     Close   ( vlc_object_t * );
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t * );
 
-static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, sout_buffer_t *, sout_buffer_t ** );
+static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_t *, block_t ** );
 
 void E_(process_frame)( sout_stream_t *p_stream,
-               sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out );
+               sout_stream_id_t *id, block_t *in, block_t **out );
 
 /*****************************************************************************
  * Module descriptor
@@ -130,8 +130,6 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys     = p_sys;
 
-    p_stream->p_sout->i_padding += 200;
-
     return VLC_SUCCESS;
 }
 
@@ -205,13 +203,18 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
     if( id->b_transrate )
     {
-        sout_buffer_t *p_buffer_out;
+        block_t *p_buffer_out;
+        /* be sure to have at least 8 bytes of padding (maybe only 4) */
+        p_buffer = block_Realloc( p_buffer, 0, p_buffer->i_buffer + 8 );
+        p_buffer->i_buffer -= 8;
+        memset( &p_buffer->p_buffer[p_buffer->i_buffer], 0, 8 );
+
         transrate_video_process( p_stream, id, p_buffer, &p_buffer_out );
 
         if( p_buffer_out )
@@ -226,13 +229,13 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
     else
     {
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
+        block_Release( p_buffer );
         return VLC_EGENERIC;
     }
 }
 
 static int transrate_video_process( sout_stream_t *p_stream,
-               sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out )
+               sout_stream_id_t *id, block_t *in, block_t **out )
 {
     transrate_t    *tr = &id->tr;
     bs_transrate_t *bs = &tr->bs;
@@ -241,16 +244,16 @@ static int transrate_video_process( sout_stream_t *p_stream,
 
     while ( in != NULL )
     {
-        sout_buffer_t * p_next = in->p_next;
+        block_t * p_next = in->p_next;
         int i_flags = in->i_flags;
 
         in->p_next = NULL;
-        sout_BufferChain( &id->p_next_gop, in );
+        block_ChainAppend( &id->p_next_gop, in );
         id->i_next_gop_duration += in->i_length;
-        id->i_next_gop_size += in->i_size;
+        id->i_next_gop_size += in->i_buffer;
         in = p_next;
 
-        if( ((i_flags & (BLOCK_FLAG_TYPE_I << SOUT_BUFFER_FLAGS_BLOCK_SHIFT))
+        if( ((i_flags & BLOCK_FLAG_TYPE_I )
                 && id->i_next_gop_duration >= 300000)
               || (id->i_next_gop_duration > p_stream->p_sys->i_shaping_delay) )
         {
@@ -275,17 +278,17 @@ static int transrate_video_process( sout_stream_t *p_stream,
 
             while ( id->p_current_buffer != NULL )
             {
-                sout_buffer_t * p_next = id->p_current_buffer->p_next;
+                block_t * p_next = id->p_current_buffer->p_next;
                 if ( tr->fact_x == 1.0 )
                 {
-                    bs->i_byte_out += id->p_current_buffer->i_size;
+                    bs->i_byte_out += id->p_current_buffer->i_buffer;
                     id->p_current_buffer->p_next = NULL;
-                    sout_BufferChain( out, id->p_current_buffer );
+                    block_ChainAppend( out, id->p_current_buffer );
                 }
                 else
                 {
                     E_(process_frame)( p_stream, id, id->p_current_buffer, out );
-                    sout_BufferDelete(p_stream->p_sout, id->p_current_buffer);
+                    block_Release( id->p_current_buffer);
                 }
                 id->p_current_buffer = p_next;
             }

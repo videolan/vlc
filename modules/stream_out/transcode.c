@@ -46,22 +46,33 @@
 #endif
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("Transcode stream output") );
+    set_capability( "sout stream", 50 );
+    add_shortcut( "transcode" );
+    set_callbacks( Open, Close );
+vlc_module_end();
+
+
+/*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
-
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 static int  transcode_audio_ffmpeg_new    ( sout_stream_t *, sout_stream_id_t * );
 static void transcode_audio_ffmpeg_close  ( sout_stream_t *, sout_stream_id_t * );
-static int  transcode_audio_ffmpeg_process( sout_stream_t *, sout_stream_id_t *, sout_buffer_t *, sout_buffer_t ** );
+static int  transcode_audio_ffmpeg_process( sout_stream_t *, sout_stream_id_t *, block_t *, block_t ** );
 
 static int  transcode_video_ffmpeg_new    ( sout_stream_t *, sout_stream_id_t * );
 static void transcode_video_ffmpeg_close  ( sout_stream_t *, sout_stream_id_t * );
-static int  transcode_video_ffmpeg_process( sout_stream_t *, sout_stream_id_t *, sout_buffer_t *, sout_buffer_t ** );
+static int  transcode_video_ffmpeg_process( sout_stream_t *, sout_stream_id_t *, block_t *, block_t ** );
 
 static int  transcode_video_ffmpeg_getframebuf( struct AVCodecContext *, AVFrame *);
 
@@ -78,16 +89,6 @@ static int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin();
-    set_description( _("Transcode stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "transcode" );
-    set_callbacks( Open, Close );
-vlc_module_end();
-
 #define PICTURE_RING_SIZE 64
 
 struct sout_stream_sys_t
@@ -96,7 +97,7 @@ struct sout_stream_sys_t
 
     sout_stream_t * p_out;
     sout_stream_id_t * id_video;
-    sout_buffer_t * p_buffers;
+    block_t * p_buffers;
     vlc_mutex_t     lock_out;
     vlc_cond_t      cond;
     picture_t *     pp_pics[PICTURE_RING_SIZE];
@@ -367,9 +368,6 @@ static int Open( vlc_object_t *p_this )
     avcodec_init();
     avcodec_register_all();
 
-    /* ffmpeg needs some padding at the end of each buffer */
-    p_stream->p_sout->i_padding += FF_INPUT_BUFFER_PADDING_SIZE;
-
     return VLC_SUCCESS;
 }
 
@@ -541,13 +539,23 @@ static int     Del      ( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
-                 sout_buffer_t *p_buffer )
+                 block_t *p_buffer )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
     if( id->b_transcode )
     {
-        sout_buffer_t *p_buffer_out;
+        block_t *p_buffer_out;
+
+        /* Be sure to have padding */
+        p_buffer = block_Realloc( p_buffer, 0, p_buffer->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+        if( p_buffer == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+        p_buffer->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
+        memset( &p_buffer->p_buffer[p_buffer->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+
         if( id->f_src.i_cat == AUDIO_ES )
         {
             transcode_audio_ffmpeg_process( p_stream, id, p_buffer,
@@ -558,11 +566,11 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             if( transcode_video_ffmpeg_process( p_stream, id, p_buffer,
                 &p_buffer_out ) != VLC_SUCCESS )
             {
-                sout_BufferDelete( p_stream->p_sout, p_buffer );
+                block_Release( p_buffer );
                 return VLC_EGENERIC;
             }
         }
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
+        block_Release( p_buffer );
 
         if( p_buffer_out )
         {
@@ -576,7 +584,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
     else
     {
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
+        block_Release( p_buffer );
         return VLC_EGENERIC;
     }
 }
@@ -832,12 +840,12 @@ static void transcode_audio_ffmpeg_close( sout_stream_t *p_stream,
 
 static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                                            sout_stream_id_t *id,
-                                           sout_buffer_t *in,
-                                           sout_buffer_t **out )
+                                           block_t *in,
+                                           block_t **out )
 {
     aout_buffer_t aout_buf;
     block_t *p_block;
-    int i_buffer = in->i_size;
+    int i_buffer = in->i_buffer;
     char *p_buffer = in->p_buffer;
     id->i_dts = in->i_dts;
     *out = NULL;
@@ -947,14 +955,14 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
             p_block = id->p_encoder->pf_header( id->p_encoder );
             while( p_block )
             {
-                sout_buffer_t *p_out;
+                block_t *p_out;
                 block_t *p_prev_block = p_block;
 
-                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+                p_out = block_New( p_stream, p_block->i_buffer );
                 memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
                 p_out->i_dts = p_out->i_pts = in->i_dts;
                 p_out->i_length = 0;
-                sout_BufferChain( out, p_out );
+                block_ChainAppend( out, p_out );
 
                 p_block = p_block->p_next;
                 block_Release( p_prev_block );
@@ -1064,15 +1072,15 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
         while( p_block )
         {
-            sout_buffer_t *p_out;
+            block_t *p_out;
             block_t *p_prev_block = p_block;
 
-            p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+            p_out = block_New( p_stream, p_block->i_buffer );
             memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
             p_out->i_dts = p_block->i_dts;
             p_out->i_pts = p_block->i_pts;
             p_out->i_length = p_block->i_length;
-            sout_BufferChain( out, p_out );
+            block_ChainAppend( out, p_out );
 
             p_block = p_block->p_next;
             block_Release( p_prev_block );
@@ -1200,25 +1208,6 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
             msg_Err( p_stream, "cannot open decoder" );
             return VLC_EGENERIC;
         }
-#if 0
-        if( i_ff_codec == CODEC_ID_MPEG4 && id->ff_dec_c->extradata_size > 0 )
-        {
-            int b_gotpicture;
-            AVFrame frame;
-            uint8_t *p_vol = malloc( id->ff_dec_c->extradata_size +
-                                     FF_INPUT_BUFFER_PADDING_SIZE );
-
-            memcpy( p_vol, id->ff_dec_c->extradata,
-                    id->ff_dec_c->extradata_size );
-            memset( p_vol + id->ff_dec_c->extradata_size, 0,
-                    FF_INPUT_BUFFER_PADDING_SIZE );
-
-            avcodec_decode_video( id->ff_dec_c, &frame, &b_gotpicture,
-                                  id->ff_dec_c->extradata,
-                                  id->ff_dec_c->extradata_size );
-            free( p_vol );
-        }
-#endif
     }
 
     /* Open encoder */
@@ -1382,7 +1371,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
 }
 
 static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
-               sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out )
+               sout_stream_id_t *id, block_t *in, block_t **out )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     int     i_used;
@@ -1394,7 +1383,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
     *out = NULL;
 
-    i_data = in->i_size;
+    i_data = in->i_buffer;
     p_data = in->p_buffer;
 
     for( ;; )
@@ -1530,16 +1519,16 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 p_block = id->p_encoder->pf_header( id->p_encoder );
                 while( p_block )
                 {
-                    sout_buffer_t *p_out;
+                    block_t *p_out;
                     block_t *p_prev_block = p_block;
 
-                    p_out = sout_BufferNew( p_stream->p_sout,
+                    p_out = block_New( p_stream,
                                             p_block->i_buffer );
                     memcpy( p_out->p_buffer, p_block->p_buffer,
                             p_block->i_buffer);
                     p_out->i_dts = p_out->i_pts = in->i_dts;
                     p_out->i_length = 0;
-                    sout_BufferChain( out, p_out );
+                    block_ChainAppend( out, p_out );
 
                     p_block = p_block->p_next;
                     block_Release( p_prev_block );
@@ -1710,23 +1699,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         {
             block_t *p_block;
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-            while( p_block )
+            if( p_block )
             {
-                sout_buffer_t *p_out;
-                block_t *p_prev_block = p_block;
-
-                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-                p_out->i_dts = p_block->i_dts;
-                p_out->i_pts = p_block->i_pts;
-                p_out->i_length = p_block->i_length;
-                p_out->i_flags =
-                        (p_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
-                          & SOUT_BUFFER_FLAGS_BLOCK_MASK;
-                sout_BufferChain( out, p_out );
-
-                p_block = p_block->p_next;
-                block_Release( p_prev_block );
+                block_ChainAppend( out, p_block );
             }
             free( p_pic );
         }
@@ -1742,11 +1717,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
 static int EncoderThread( sout_stream_sys_t * p_sys )
 {
-    sout_stream_t * p_stream = p_sys->p_out;
     sout_stream_id_t * id = p_sys->id_video;
     picture_t * p_pic;
     int i_plane;
-    sout_buffer_t * p_buffer;
 
     while ( !p_sys->b_die && !p_sys->b_error )
     {
@@ -1771,23 +1744,9 @@ static int EncoderThread( sout_stream_sys_t * p_sys )
 
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         vlc_mutex_lock( &p_sys->lock_out );
-        while( p_block )
+        if( p_block )
         {
-            sout_buffer_t *p_out;
-            block_t *p_prev_block = p_block;
-
-            p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-            memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-            p_out->i_dts = p_block->i_dts;
-            p_out->i_pts = p_block->i_pts;
-            p_out->i_length = p_block->i_length;
-            p_out->i_flags =
-                (p_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
-                  & SOUT_BUFFER_FLAGS_BLOCK_MASK;
-            sout_BufferChain( &p_sys->p_buffers, p_out );
-
-            p_block = p_block->p_next;
-            block_Release( p_prev_block );
+            block_ChainAppend( &p_sys->p_buffers, p_block );
         }
         vlc_mutex_unlock( &p_sys->lock_out );
 
@@ -1810,13 +1769,7 @@ static int EncoderThread( sout_stream_sys_t * p_sys )
         free( p_pic );
     }
 
-    p_buffer = p_sys->p_buffers;
-    while ( p_buffer != NULL )
-    {
-        sout_buffer_t * p_next = p_buffer->p_next;
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
-        p_buffer = p_next;
-    }
+    block_ChainRelease( p_sys->p_buffers );
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * gather.c: gathering stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: gather.c,v 1.3 2004/01/25 14:34:25 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,7 +49,7 @@ vlc_module_end();
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *,
-                               sout_buffer_t* );
+                               block_t* );
 
 struct sout_stream_id_t
 {
@@ -187,7 +187,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
  * Send:
  *****************************************************************************/
 static int Send( sout_stream_t *p_stream,
-                 sout_stream_id_t *id, sout_buffer_t *p_buffer )
+                 sout_stream_id_t *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 

@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: frame.c,v 1.2 2004/03/03 11:39:06 massiot Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1636,56 +1636,56 @@ static int do_next_start_code( transrate_t *tr )
 }
 
 void E_(process_frame)( sout_stream_t *p_stream,
-                    sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out )
+                    sout_stream_id_t *id, block_t *in, block_t **out )
 {
     transrate_t *tr = &id->tr;
     bs_transrate_t *bs = &tr->bs;
 
-    sout_buffer_t       *p_out;
+    block_t       *p_out;
 
     double              next_fact_x = 1.0;
 
     /* The output buffer can't be bigger than the input buffer. */
-    p_out = sout_BufferNew( p_stream->p_sout, in->i_size );
+    p_out = block_New( p_stream, in->i_buffer );
 
     p_out->i_length = in->i_length;
     p_out->i_dts    = in->i_dts;
     p_out->i_pts    = in->i_pts;
     p_out->i_flags  = in->i_flags;
 
-    sout_BufferChain( out, p_out );
+    block_ChainAppend( out, p_out );
 
     bs->p_rw = bs->p_ow = bs->p_w = p_out->p_buffer;
     bs->p_c = bs->p_r = in->p_buffer;
-    bs->p_r += in->i_size + 4;
-    bs->p_rw += in->i_size;
-    *(in->p_buffer + in->i_size) = 0;
-    *(in->p_buffer + in->i_size + 1) = 0;
-    *(in->p_buffer + in->i_size + 2) = 1;
-    *(in->p_buffer + in->i_size + 3) = 0;
+    bs->p_r += in->i_buffer + 4;
+    bs->p_rw += in->i_buffer;
+    *(in->p_buffer + in->i_buffer) = 0;
+    *(in->p_buffer + in->i_buffer + 1) = 0;
+    *(in->p_buffer + in->i_buffer + 2) = 1;
+    *(in->p_buffer + in->i_buffer + 3) = 0;
 
     /* Calculate how late we are */
     tr->quant_corr = 0.0 + B_HANDICAP;
     tr->level_i = 0;
     tr->level_p = 0;
-    bs->i_byte_in = in->i_size;
+    bs->i_byte_in = in->i_buffer;
     bs->i_byte_out  = 0;
 
-    if (tr->i_current_gop_size - in->i_size > 100)
+    if (tr->i_current_gop_size - in->i_buffer > 100)
     {
-        if (tr->i_wanted_gop_size == in->i_size)
+        if (tr->i_wanted_gop_size == in->i_buffer)
         {
             next_fact_x = 1.0;
         }
-        else if ( tr->i_wanted_gop_size < in->i_size )
+        else if ( tr->i_wanted_gop_size < in->i_buffer )
         {
             /* We're really late */
             next_fact_x = 10.0;
         }
         else
         {
-            next_fact_x = ((double)(tr->i_current_gop_size - in->i_size)) /
-                          (tr->i_wanted_gop_size - in->i_size);
+            next_fact_x = ((double)(tr->i_current_gop_size - in->i_buffer)) /
+                          (tr->i_wanted_gop_size - in->i_buffer);
         }
 
         if (next_fact_x > QUANT_I)
@@ -1710,7 +1710,7 @@ void E_(process_frame)( sout_stream_t *p_stream,
 
     for ( ; ; )
     {
-        uint8_t *p_end = &in->p_buffer[in->i_size];
+        uint8_t *p_end = &in->p_buffer[in->i_buffer];
 
         /* Search next start code */
         for( ;; )
@@ -1759,15 +1759,15 @@ void E_(process_frame)( sout_stream_t *p_stream,
     }
 
     bs->i_byte_out += bs->p_w - bs->p_ow;
-    p_out->i_size = bs->p_w - bs->p_ow;
-    tr->i_current_gop_size -= in->i_size;
-    tr->i_wanted_gop_size -= p_out->i_size;
+    p_out->i_buffer = bs->p_w - bs->p_ow;
+    tr->i_current_gop_size -= in->i_buffer;
+    tr->i_wanted_gop_size -= p_out->i_buffer;
     tr->i_new_gop_size += bs->i_byte_out;
 
 #if 0
     msg_Dbg( p_stream, "%d: %d -> %d (r: %f, n:%f, corr:%f)",
-             tr->picture_coding_type, in->i_size, p_out->i_size,
-             (float)in->i_size / p_out->i_size,
+             tr->picture_coding_type, in->i_buffer, p_out->i_size,
+             (float)in->i_buffer / p_out->i_size,
              next_fact_x, tr->quant_corr);
 #endif
 }
