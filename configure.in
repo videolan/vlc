@@ -1083,15 +1083,19 @@ if test x$enable_xvideo != xno &&
   CPPFLAGS="$save_CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="$save_CFLAGS -L$x_libraries -lX11 -lXext"
-    AC_CHECK_LIB(Xv_pic,XvSetPortAttribute,
+    AC_CHECK_LIB(Xv_pic,XvPutImage,
       # We have Xv_pic, that's good, we can build an xvideo.so plugin !
       PLUGINS="${PLUGINS} xvideo"
       xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv_pic"
       xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes",
-      # We don't have Xv_pic, let's make xvideo.a as builtin
-      BUILTINS="${BUILTINS} xvideo"
-      xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv"
-      xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes")
+      AC_CHECK_LIB(Xv,XvPutImage,
+        # We don't have Xv_pic, but we have Xv, let's make xvideo.a as builtin
+        PLUGINS="${PLUGINS} xvideo"
+        xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv_pic"
+        xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes",
+        # Otherwise... well, do nothing.
+      )
+    )
   ]
   CPPFLAGS="$save_CPPFLAGS")
 fi
