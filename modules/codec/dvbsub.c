@@ -1656,7 +1656,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         if( bs_pos( s ) % 16 ) bs_write( s, 8, 0 );
 
         /* Update segment length */
-        SetWBE( &s->p_start[i_length_pos/8], (bs_pos(s) - i_length_pos -2)/8 );
+        SetWBE( &s->p_start[i_length_pos/8], (bs_pos(s) - i_length_pos)/8 -2 );
     }
 }
 
