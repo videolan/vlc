@@ -14,6 +14,7 @@
                 pause = id; 
                 play = id; 
                 prev = id; 
+                slowMotion = id; 
                 slower = id; 
                 stop = id; 
                 toggleChapter = id; 
@@ -48,7 +49,7 @@
                 "o_btn_playlist" = id; 
                 "o_btn_prefs" = id; 
                 "o_btn_prev" = id; 
-                "o_btn_slower" = id; 
+                "o_btn_slowmotion" = id; 
                 "o_btn_stop" = id; 
                 "o_controls" = id; 
                 "o_dmi_play" = id; 
