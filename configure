@@ -14,21 +14,21 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --enable-vout-dummy     dummy video support (default enabled)"
 ac_help="$ac_help
-  --enable-vout-x11       X11 video support (default enabled)"
+  --enable-x11            X11 video support (default enabled)"
 ac_help="$ac_help
-  --enable-vout-fb        Linux framebuffer video support (default disabled)"
+  --enable-fb             Linux framebuffer video support (default disabled)"
 ac_help="$ac_help
-  --enable-vout-gnome     Gnome video support (default disabled)"
+  --enable-gnome          Gnome video support (default disabled)"
 ac_help="$ac_help
-  --enable-vout-glide     Glide (3dfx) video support (default disabled)"
+  --enable-glide          Glide (3dfx) video support (default disabled)"
 ac_help="$ac_help
-  --enable-vout-ggi       GGI video support (default disabled)"
+  --enable-ggi            GGI video support (default disabled)"
 ac_help="$ac_help
   --enable-aout-dummy     dummy audio support (default enabled)"
 ac_help="$ac_help
-  --enable-aout-dsp       Linux /dev/dsp support (default enabled)"
+  --enable-dsp            Linux /dev/dsp support (default enabled)"
 ac_help="$ac_help
-  --enable-aout-esd       Esound library support (default disabled)"
+  --enable-esd            Esound library support (default disabled)"
 ac_help="$ac_help
   --enable-ppro           Enable PentiumPro optimizations (default is no)"
 ac_help="$ac_help
@@ -3049,7 +3049,7 @@ if test "${enable_dummy+set}" = set; then
   :
 fi
 
-if test x$enable_dummy != xno; then VOUT=${VOUT}"dummy "; fi
+if test x$enable_vout_dummy != xno; then VOUT=${VOUT}"dummy "; fi
 # Check whether --enable-x11 or --disable-x11 was given.
 if test "${enable_x11+set}" = set; then
   enableval="$enable_x11"
@@ -3088,7 +3088,7 @@ if test "${enable_dummy+set}" = set; then
   :
 fi
 
-if test x$enable_dummy != xno; then AOUT=${AOUT}"dummy "; fi
+if test x$enable_aout_dummy != xno; then AOUT=${AOUT}"dummy "; fi
 # Check whether --enable-dsp or --disable-dsp was given.
 if test "${enable_dsp+set}" = set; then
   enableval="$enable_dsp"

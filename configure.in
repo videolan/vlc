@@ -60,31 +60,31 @@ AC_HEADER_TIME
 
 AC_ARG_ENABLE(dummy,
   [  --enable-vout-dummy     dummy video support (default enabled)])
-if test x$enable_dummy != xno; then VOUT=${VOUT}"dummy "; fi
+if test x$enable_vout_dummy != xno; then VOUT=${VOUT}"dummy "; fi
 AC_ARG_ENABLE(x11,
-  [  --enable-vout-x11       X11 video support (default enabled)])
+  [  --enable-x11            X11 video support (default enabled)])
 if test x$enable_x11 != xno; then VOUT=${VOUT}"x11 "; fi
 AC_ARG_ENABLE(fb,
-  [  --enable-vout-fb        Linux framebuffer video support (default disabled)],
+  [  --enable-fb             Linux framebuffer video support (default disabled)],
   [if test x$enable_fb = xyes; then VOUT=${VOUT}"fb "; fi])
 AC_ARG_ENABLE(gnome,
-  [  --enable-vout-gnome     Gnome video support (default disabled)],
+  [  --enable-gnome          Gnome video support (default disabled)],
   [if test x$enable_gnome = xyes; then VOUT=${VOUT}"gnome "; fi])
 AC_ARG_ENABLE(glide,
-  [  --enable-vout-glide     Glide (3dfx) video support (default disabled)],
+  [  --enable-glide          Glide (3dfx) video support (default disabled)],
   [if test x$enable_glide = xyes; then VOUT=${VOUT}"glide "; fi])
 AC_ARG_ENABLE(ggi,
-  [  --enable-vout-ggi       GGI video support (default disabled)],
+  [  --enable-ggi            GGI video support (default disabled)],
   [if test x$enable_ggi = xyes; then VOUT=${VOUT}"ggi "; fi])
 
 AC_ARG_ENABLE(dummy,
   [  --enable-aout-dummy     dummy audio support (default enabled)])
-if test x$enable_dummy != xno; then AOUT=${AOUT}"dummy "; fi
+if test x$enable_aout_dummy != xno; then AOUT=${AOUT}"dummy "; fi
 AC_ARG_ENABLE(dsp,
-  [  --enable-aout-dsp       Linux /dev/dsp support (default enabled)])
+  [  --enable-dsp            Linux /dev/dsp support (default enabled)])
 if test x$enable_dsp != xno; then AOUT=${AOUT}"dsp "; fi
 AC_ARG_ENABLE(esd,
-  [  --enable-aout-esd       Esound library support (default disabled)],
+  [  --enable-esd            Esound library support (default disabled)],
   [if test x$enable_gnome = xyes; then AOUT=${AOUT}"esd "; fi])
 
 ARCH=${host_cpu}

@@ -132,7 +132,9 @@ static void Version                 ( void );
 
 static void InitSignalHandler       ( void );
 static void SignalHandler           ( int i_signal );
+#ifdef HAVE_MMX
 static int  TestMMX                 ( void );
+#endif
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
