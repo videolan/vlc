@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.9 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: cdrom.c,v 1.10 2003/05/18 12:18:46 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -824,7 +824,8 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
             *p_pos = 0;
 
             /* Take care of path standardization */
-            if( *line != '/' && (p_pos = strrchr( psz_cuefile, '/' )) )
+            if( *line != '/' && ((p_pos = strrchr( psz_cuefile, '/' ))
+                || (p_pos = strrchr( psz_cuefile, '\\' ) )) )
             {
                 psz_vcdfile = malloc( strlen(line) +
                                       (p_pos - psz_cuefile + 1) + 1 );

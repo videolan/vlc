@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.23 2003/05/17 22:48:09 gbazin Exp $
+ * $Id: open.cpp,v 1.24 2003/05/18 12:18:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -512,8 +512,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
         mrl = wxT("file") + demux + wxT("://") + file_combo->GetValue();
         break;
     case DISC_ACCESS:
-        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvdsimple") :
-                disc_type->GetSelection() == 1 ? wxT("dvd") :
+        mrl = ( disc_type->GetSelection() == 0 ? wxT("dvd") :
+                disc_type->GetSelection() == 1 ? wxT("dvdsimple") :
                 disc_type->GetSelection() == 2 ? wxT("vcd") : wxT("cdda") )
                   + demux + wxT("://")
                   + disc_device->GetLineText(0)
@@ -639,7 +639,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
 
     switch( disc_type->GetSelection() )
     {
-    case 1:
+    case 0:
         disc_title->SetRange( 0, 255 );
         disc_title->SetValue( 0 );
         break;

@@ -2,7 +2,7 @@
  * osd_text.c : Filter to put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: osd_text.c,v 1.3 2003/05/11 08:42:59 sigmunau Exp $
+ * $Id: osd_text.c,v 1.4 2003/05/18 12:18:46 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -37,6 +37,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
+
+#ifdef WIN32
+#define FT_RENDER_MODE_NORMAL 0
+#endif
 
 /*****************************************************************************
  * Local prototypes
