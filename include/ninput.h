@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.26 2004/01/26 20:48:09 fenrir Exp $
+ * $Id: ninput.h,v 1.27 2004/01/31 05:24:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -279,7 +279,8 @@ enum demux_query_e
 
     DEMUX_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
 
-    DEMUX_GET_FPS               /* arg1= float *        res=can fail    */
+    DEMUX_GET_FPS,              /* arg1= float *        res=can fail    */
+    DEMUX_GET_META              /* arg1= vlc_meta_t **  res=can fail    */
 };
 
 
