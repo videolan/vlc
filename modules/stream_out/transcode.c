@@ -136,8 +136,15 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-transcode-"
 
 vlc_module_begin();
+#if defined(MODULE_NAME_is_stream_out_transcodealtivec) \
+     || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
+    set_description( _("AltiVec transcode stream output") );
+    add_requirement( ALTIVEC );
+    set_capability( "sout stream", 51 );
+#else
     set_description( _("Transcode stream output") );
     set_capability( "sout stream", 50 );
+#endif
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );
 
