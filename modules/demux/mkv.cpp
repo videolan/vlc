@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: mkv.cpp,v 1.58 2004/03/02 13:53:14 kuehne Exp $
+ * $Id: mkv.cpp,v 1.59 2004/03/03 12:03:15 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,6 +36,7 @@
 
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "iso_lang.h"
+#include "vlc_meta.h"
 
 #include <iostream>
 #include <cassert>
@@ -106,8 +107,9 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux   ( input_thread_t * );
-static void Seek    ( input_thread_t *, mtime_t i_date, int i_percent );
+static int  Demux  ( input_thread_t * );
+static int  Control( input_thread_t *, int, va_list );
+static void Seek   ( input_thread_t *, mtime_t i_date, int i_percent );
 
 
 /*****************************************************************************
@@ -253,6 +255,8 @@ struct demux_sys_t
     char                    *psz_segment_filename;
     char                    *psz_title;
     char                    *psz_date_utc;
+
+    vlc_meta_t              *meta;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -275,10 +279,6 @@ static int Open( vlc_object_t * p_this )
 
     EbmlElement     *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
 
-    /* Set the demux function */
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
-
     /* peek the begining */
     if( input_Peek( p_input, &p_peek, 4 ) < 4 )
     {
@@ -295,6 +295,10 @@ static int Open( vlc_object_t * p_this )
                            p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
         return VLC_EGENERIC;
     }
+
+    /* Set the demux function */
+    p_input->pf_demux = Demux;
+    p_input->pf_demux_control = Control;
 
     p_input->p_demux_data = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
     memset( p_sys, 0, sizeof( demux_sys_t ) );
@@ -321,6 +325,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->psz_segment_filename = NULL;
     p_sys->psz_title = NULL;
     p_sys->psz_date_utc = NULL;;
+    p_sys->meta = NULL;
 
     if( p_sys->es == NULL )
     {
@@ -1251,6 +1256,37 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    int64_t     *pi64;
+
+    vlc_meta_t **pp_meta;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_META:
+            pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            *pp_meta = vlc_meta_Duplicate( p_sys->meta );
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->f_duration > 0.0 )
+            {
+                *pi64 = (int64_t)(p_sys->f_duration * 1000);
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
+}
+
 static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
@@ -2172,72 +2208,58 @@ static void LoadTags( input_thread_t *p_input )
 static void InformationsCreate( input_thread_t *p_input )
 {
     demux_sys_t           *p_sys = p_input->p_demux_data;
-    input_info_category_t *p_cat;
-    playlist_t            *p_playlist;
     int                   i_track;
 
-    p_cat = input_InfoCategory( p_input, "Matroska" );
-    if( p_sys->f_duration > 1000.1 )
-    {
-        char psz_buffer[MSTRTIME_MAX_SIZE];
-        input_AddInfo( p_cat, _("Duration"),
-                       msecstotimestr( psz_buffer, (int)p_sys->f_duration ) );
-    }
+    p_sys->meta = vlc_meta_New();
 
     if( p_sys->psz_title )
     {
-        input_AddInfo( p_cat, _("Title"), "%s" ,p_sys->psz_title );
+        vlc_meta_Add( p_sys->meta, VLC_META_TITLE, p_sys->psz_title );
     }
     if( p_sys->psz_date_utc )
     {
-        input_AddInfo( p_cat, _("UTC date"), "%s" ,p_sys->psz_date_utc );
+        vlc_meta_Add( p_sys->meta, VLC_META_DATE, p_sys->psz_date_utc );
     }
     if( p_sys->psz_segment_filename )
     {
-        input_AddInfo( p_cat, _("Segment filename"), "%s" ,p_sys->psz_segment_filename );
+        vlc_meta_Add( p_sys->meta, _("Segment filename"), p_sys->psz_segment_filename );
     }
     if( p_sys->psz_muxing_application )
     {
-        input_AddInfo( p_cat, _("Muxing application"), "%s" ,p_sys->psz_muxing_application );
+        vlc_meta_Add( p_sys->meta, _("Muxing application"), p_sys->psz_muxing_application );
     }
     if( p_sys->psz_writing_application )
     {
-        input_AddInfo( p_cat, _("Writing application"), "%s" ,p_sys->psz_writing_application );
+        vlc_meta_Add( p_sys->meta, _("Writing application"), p_sys->psz_writing_application );
     }
-    input_AddInfo( p_cat, _("Number of streams"), "%d" , p_sys->i_track );
 
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
-        char psz_cat[strlen( "Stream " ) + 10];
-#define tk  p_sys->track[i_track]
+        mkv_track_t *tk = &p_sys->track[i_track];
+        vlc_meta_t *mtk = vlc_meta_New();
 
-        sprintf( psz_cat, "Stream %d", i_track );
-        p_cat = input_InfoCategory( p_input, psz_cat);
-        if( tk.fmt.psz_description )
+        TAB_APPEND( p_sys->meta->i_track, p_sys->meta->track, mtk );
+
+        if( tk->fmt.psz_description )
         {
-            input_AddInfo( p_cat, _("Name"), "%s", tk.fmt.psz_description );
+            vlc_meta_Add( p_sys->meta, VLC_META_DESCRIPTION, tk->fmt.psz_description );
         }
-        if( tk.fmt.psz_language )
+        if( tk->psz_codec_name )
         {
-            input_AddInfo( p_cat, _("Language"), "%s", tk.fmt.psz_language );
+            vlc_meta_Add( p_sys->meta, VLC_META_CODEC_NAME, tk->psz_codec_name );
         }
-        if( tk.psz_codec_name )
+        if( tk->psz_codec_settings )
         {
-            input_AddInfo( p_cat, _("Codec name"), "%s", tk.psz_codec_name );
+            vlc_meta_Add( p_sys->meta, VLC_META_SETTING, tk->psz_codec_settings );
         }
-        if( tk.psz_codec_settings )
+        if( tk->psz_codec_info_url )
         {
-            input_AddInfo( p_cat, _("Codec setting"), "%s", tk.psz_codec_settings );
+            vlc_meta_Add( p_sys->meta, VLC_META_CODEC_DESCRIPTION, tk->psz_codec_info_url );
         }
-        if( tk.psz_codec_info_url )
+        if( tk->psz_codec_download_url )
         {
-            input_AddInfo( p_cat, _("Codec info"), "%s", tk.psz_codec_info_url );
+            vlc_meta_Add( p_sys->meta, VLC_META_URL, tk->psz_codec_download_url );
         }
-        if( tk.psz_codec_download_url )
-        {
-            input_AddInfo( p_cat, _("Codec download"), "%s", tk.psz_codec_download_url );
-        }
-#undef  tk
     }
 
     if( p_sys->i_tags_position >= 0 )
