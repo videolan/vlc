@@ -507,7 +507,7 @@ public:
     void ParseTrackEntry( EbmlMaster *m );
     void IndexAppendCluster( KaxCluster *cluster );
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
-    bool Select( );
+    bool Select( mtime_t i_start_time );
     void UnSelect( );
 };
 
@@ -759,7 +759,7 @@ static int Open( vlc_object_t * p_this )
         p_segment->b_cues = VLC_FALSE;
     }
 
-    if ( !p_segment->Select() )
+    if ( !p_segment->Select( 0 ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
@@ -1126,6 +1126,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         {
             p_block->i_length = i_duration * 1000;
         }
+msg_Warn( p_demux, "Sending block %d", p_block );
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
         /* use time stamp only for first block */
@@ -1232,7 +1233,7 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
     return p_stream1;
 }
 
-bool matroska_segment_t::Select( )
+bool matroska_segment_t::Select( mtime_t i_start_time )
 {
     size_t i_track;
 
@@ -1522,7 +1523,7 @@ bool matroska_segment_t::Select( )
 
         tk->p_es = es_out_Add( sys.demuxer.out, &tk->fmt );
 
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk->p_es, 0 );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk->p_es, i_start_time );
 #undef tk
     }
     
@@ -1804,10 +1805,12 @@ static int Demux( demux_t *p_demux)
                 return 0;
             p_segment->UnSelect( );
             
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
             /* switch to the next segment (TODO update the duration) */
             p_stream->i_current_segment++;
             p_segment = p_stream->Segment();
-            if ( !p_segment || !p_segment->Select( ) )
+            if ( !p_segment || !p_segment->Select( 0 ) )
                 return 0;
             continue;
         }
@@ -1833,7 +1836,7 @@ static int Demux( demux_t *p_demux)
             /* switch to the next segment (TODO update the duration) */
             p_stream->i_current_segment++;
             p_segment = p_stream->Segment();
-            if ( !p_segment || !p_segment->Select( ) )
+            if ( !p_segment || !p_segment->Select( 0 ) )
                 return 0;
 
             continue;
