@@ -93,6 +93,7 @@ static vlc_t *    p_static_vlc;
  *****************************************************************************/
 static void SetLanguage   ( char const * );
 static int  GetFilenames  ( vlc_t *, int, char *[] );
+static void Help          ( vlc_t *, char const *psz_help_name );
 static void Usage         ( vlc_t *, char const *psz_module_name );
 static void ListModules   ( vlc_t * );
 static void Version       ( void );
@@ -318,10 +319,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
     {
-        fprintf( stdout, _("Usage: %s [options] [items]...\n"),
-                         p_vlc->psz_object_name );
-        Usage( p_vlc, "main" );
-        Usage( p_vlc, "help" );
+        Help( p_vlc, "help" );
         b_exit = VLC_TRUE;
     }
     /* Check for version option */
@@ -457,14 +455,14 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Check for help on modules */
     if( (p_tmp = config_GetPsz( p_vlc, "module" )) )
     {
-        Usage( p_vlc, p_tmp );
+        Help( p_vlc, p_tmp );
         free( p_tmp );
         b_exit = VLC_TRUE;
     }
     /* Check for long help option */
     else if( config_GetInt( p_vlc, "longhelp" ) )
     {
-        Usage( p_vlc, NULL );
+        Help( p_vlc, "longhelp" );
         b_exit = VLC_TRUE;
     }
     /* Check for module list option */
@@ -1842,7 +1840,39 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 }
 
 /*****************************************************************************
- * Usage: print program usage
+ * Help: print program help
+ *****************************************************************************
+ * Print a short inline help. Message interface is initialized at this stage.
+ *****************************************************************************/
+static void Help( vlc_t *p_this, char const *psz_help_name )
+{
+#ifdef WIN32
+    ShowConsole();
+#endif
+
+    if( psz_help_name && !strcmp( psz_help_name, "help" ) )
+    {
+        fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        Usage( p_this, "help" );
+        Usage( p_this, "main" );
+    }
+    else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
+    {
+        fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        Usage( p_this, NULL );
+    }
+    else if( psz_help_name )
+    {
+        Usage( p_this, psz_help_name );
+    }
+
+#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
+    PauseConsole();
+#endif
+}
+
+/*****************************************************************************
+ * Usage: print module usage
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
@@ -1881,10 +1911,6 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
     psz_spaces_longtext[LINE_START+2] = '\0';
 
     strcpy( psz_format, FORMAT_STRING );
-
-#ifdef WIN32
-    ShowConsole();
-#endif
 
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -2126,10 +2152,6 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 
     /* Release the module list */
     vlc_list_release( p_list );
-
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-    PauseConsole();
-#endif
 }
 
 /*****************************************************************************
@@ -2150,12 +2172,6 @@ static void ListModules( vlc_t *p_this )
 #ifdef WIN32
     ShowConsole();
 #endif
-
-    /* Usage */
-    fprintf( stdout, _("Usage: %s [options] [items]...\n\n"),
-                     p_this->p_vlc->psz_object_name );
-
-    fprintf( stdout, _("[module]              [description]\n") );
 
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );

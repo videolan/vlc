@@ -832,11 +832,25 @@ static char *ppsz_clock_descriptions[] =
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
-#define PLAYLIST_USAGE N_( \
-    "\nPlaylist MRL syntax:" \
-    "\n  URL[@[title][:chapter][-[title][:chapter]]] [:option=value]" \
+#define VLC_USAGE N_( \
+    "Usage: %s [options] [playlistitems] ..." \
+    "\nYou can specify multiple playlistitems on the commandline. They will be enqueued in the playlist." \
+    "\nThe first item specified will be played first." \
+    "\n" \
+    "\nOptions-styles:" \
+    "\n  --option  A global option that is set for the duration of the program." \
+    "\n   -option  A single letter version of a global --option." \
+    "\n   :option  An option that only applies to the playlistitem directly before it" \
+    "\n            and that overrides previous settings." \
+    "\n" \
+    "\nPlaylistitem MRL syntax:" \
+    "\n  URL[@[title][:chapter][-[title][:chapter]]] [:option=value ...]" \
+    "\n" \
+    "\n  Many of the global --options can also be used as MRL specific :options." \
+    "\n  Multiple :option=value pairs can be specified." \
+    "\n" \
     "\nURL syntax:" \
-    "\n  [file://]filename              plain media file" \
+    "\n  [file://]filename              Plain media file" \
     "\n  http://ip:port/file            HTTP URL" \
     "\n  ftp://ip:port/file             FTP URL" \
     "\n  mms://ip:port/file             MMS URL" \
@@ -846,8 +860,8 @@ static char *ppsz_clock_descriptions[] =
     "\n  [cdda://][device]              Audio CD device" \
     "\n  udp:[[<source address>]@[<bind address>][:<bind port>]]" \
     "\n                                 UDP stream sent by a streaming server"\
-    "\n  vlc:pause                      pause execution of playlist items" \
-    "\n  vlc:quit                       quit VLC" \
+    "\n  vlc:pause                      Special item to pause the playlist" \
+    "\n  vlc:quit                       Special item to quit VLC" \
     "\n")
 
 
@@ -869,9 +883,11 @@ static char *ppsz_clock_descriptions[] =
  */
 
 vlc_module_begin();
-    /* Audio options */
+/* Audio options */
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_GENERAL );
+    add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , VLC_FALSE );
+
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
@@ -896,9 +912,11 @@ vlc_module_begin();
     add_module( "audio-visual", "visualization",NULL, NULL,AUDIO_VISUAL_TEXT,
                 AUDIO_VISUAL_LONGTEXT, VLC_FALSE );
 
-    /* Video options */
+/* Video options */
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_GENERAL );
+    add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );
+
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT,
               GRAYSCALE_LONGTEXT, VLC_FALSE );
@@ -949,9 +967,10 @@ vlc_module_begin();
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
 
-    /* Subpictures options */
+/* Subpictures options */
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_section( N_("On Screen Display") , NULL );
+    add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , VLC_FALSE );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Subtitles") , NULL );
@@ -975,9 +994,10 @@ vlc_module_begin();
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
 
-    /* Input options */
+/* Input options */
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
+    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
     add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_INPUT_DEMUX );
@@ -1074,7 +1094,7 @@ vlc_module_begin();
                  CLOCK_SYNCHRO_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_clock_values, ppsz_clock_descriptions, 0 );
 
-    /* Decoder options */
+/* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
     add_string( "codec", NULL, NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, VLC_TRUE );
@@ -1082,7 +1102,7 @@ vlc_module_begin();
                 ENCODER_LONGTEXT, VLC_TRUE );
 
 
-    /* Stream output options */
+/* Stream output options */
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_GENERAL );
     add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , VLC_TRUE );
@@ -1118,9 +1138,10 @@ vlc_module_begin();
                                ANN_SAPINTV_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_SOUT_VOD );
 
-    /* CPU options */
+/* CPU options */
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_CPU );
+    add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, VLC_TRUE );
 #if defined( __i386__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
@@ -1131,9 +1152,11 @@ vlc_module_begin();
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
     add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );
 #endif
-    /* Misc options */
+
+/* Misc options */
     set_subcategory( SUBCAT_ADVANCED_MISC );
     set_section( N_("Special modules"), NULL );
+    add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "audio-channel-mixer", "audio mixer", NULL, NULL,
@@ -1180,7 +1203,7 @@ vlc_module_begin();
         change_short('d');
 #endif
 
-    /* Playlist options */
+/* Playlist options */
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_GENERAL );
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
@@ -1197,10 +1220,10 @@ vlc_module_begin();
                           NULL, SD_TEXT, SD_LONGTEXT, VLC_FALSE );
         change_short('S');
 
-    /* Interface options */
+/* Interface options */
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
-
+    add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
     set_section ( N_("Interface module" ), NULL );
     add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_FALSE );
@@ -1228,7 +1251,7 @@ vlc_module_begin();
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
                          CONTROL_TEXT, CONTROL_LONGTEXT, VLC_FALSE );
 
-    /* Hotkey options*/
+/* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS );
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
 
@@ -1493,7 +1516,7 @@ vlc_module_begin();
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
 
     /* Usage (mainly useful for cmd line stuff) */
-    add_usage_hint( PLAYLIST_USAGE );
+    /* add_usage_hint( PLAYLIST_USAGE ); */
 
     set_description( N_("main program") );
     set_capability( "main", 100 );
@@ -1502,15 +1525,17 @@ vlc_module_end();
 static module_config_t p_help_config[] =
 {
     { CONFIG_ITEM_BOOL, NULL, "help", 'h',
-      N_("print help (can be combined with --advanced)") },
+      N_("print help for VLC (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "longhelp", 'H',
-      N_("print detailed help (can be combined with --advanced)") },
+      N_("print help for VLC and all it's modules (can be combined with --advanced)") },
+    { CONFIG_ITEM_BOOL, NULL, "advanced", '\0',
+      N_("print help for the advanced options") },
     { CONFIG_ITEM_BOOL, NULL, "help-verbose", '\0',
       N_("ask for extra verbosity when displaying help") },
     { CONFIG_ITEM_BOOL, NULL, "list", 'l',
       N_("print a list of available modules") },
     { CONFIG_ITEM_STRING, NULL, "module", 'p',
-      N_("print help on module (can be combined with --advanced)") },
+      N_("print help on a specific module (can be combined with --advanced)") },
     { CONFIG_ITEM_BOOL, NULL, "save-config", '\0',
       N_("save the current command line options in the config") },
     { CONFIG_ITEM_BOOL, NULL, "reset-config", '\0',
