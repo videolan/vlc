@@ -1503,8 +1503,11 @@ void Playlist::OnPopupSort( wxMenuEvent& event )
 
         if( p_playlist )
         {
-            playlist_NodeSort( p_playlist, p_wxitem->p_item,
-                               SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
+            vlc_mutex_lock( &p_playlist->object_lock );
+            playlist_RecursiveNodeSort( p_playlist, p_wxitem->p_item,
+                                        SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            b_need_update = VLC_TRUE;
             vlc_object_release( p_playlist );
         }
     }

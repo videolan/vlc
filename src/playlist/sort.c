@@ -81,6 +81,9 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 
 /**
  * Sort a node.
+ *
+ * This function must be entered with the playlist lock !
+ *
  * \param p_playlist the playlist
  * \param p_node the node to sort
  * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_RANDOM
@@ -90,22 +93,44 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
                        int i_mode, int i_type )
 {
-    vlc_value_t val;
-    val.b_bool = VLC_TRUE;
-
-    vlc_mutex_lock( &p_playlist->object_lock );
 
     playlist_ItemArraySort( p_playlist,p_node->i_children,
                             p_node->pp_children, i_mode, i_type );
 
     p_node->i_serial++;
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    return VLC_SUCCESS;
+}
 
-    /* Notify the interfaces */
-    var_Set( p_playlist, "intf-change", val );
+/**
+ *
+ * Sort a node recursively.
+ *
+ * This function must be entered with the playlist lock !
+ *
+ * \param p_playlist the playlist
+ * \param p_node the node to sort
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_RANDOM
+ * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
+ * \return VLC_SUCCESS on success
+ */
+int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
+                                int i_mode, int i_type )
+{
+    int i;
+
+    playlist_NodeSort( p_playlist, p_node, i_mode, i_type );
+    for( i = 0 ; i< p_node->i_children; i++ )
+    {
+        if( p_node->pp_children[i]->i_children != -1 )
+        {
+            playlist_RecursiveNodeSort( p_playlist, p_node->pp_children[i],
+                                        i_mode,i_type );
+        }
+    }
 
     return VLC_SUCCESS;
+
 }
 
 
