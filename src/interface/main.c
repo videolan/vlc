@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.167 2002/03/21 22:10:33 gbazin Exp $
+ * $Id: main.c,v 1.168 2002/03/25 02:06:24 jobi Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -223,6 +223,15 @@
 #define VCD_DEV_TEXT "VCD device"
 #define VCD_DEV_LONGTEXT NULL
 
+#define SAT_FREQ_TEXT "Satellite transponder frequency"
+#define SAT_FREQ_LONGTEXT NULL
+
+#define SAT_POL_TEXT "Satellite transponder polarization"
+#define SAT_POL_LONGTEXT NULL
+
+#define SAT_SRATE_TEXT "Satellite transponder symbol rate"
+#define SAT_SRATE_LONGTEXT NULL
+                       
 #define IPV6_TEXT "force IPv6"
 #define IPV6_LONGTEXT NULL
 
@@ -328,6 +337,13 @@ ADD_INTEGER ( "input_subtitle", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 
 ADD_STRING  ( "dvd_device", "/dev/dvd", NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
 ADD_STRING  ( "vcd_device", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
+#ifdef HAVE_SATELLITE
+ADD_INTEGER ( "sat_frequency", 12553, NULL, SAT_FREQ_TEXT, SAT_FREQ_LONGTEXT )
+ADD_INTEGER ( "sat_polarization", 0, NULL, SAT_POL_TEXT, SAT_POL_LONGTEXT )
+ADD_INTEGER ( "sat_symbol_rate", 27500, NULL, SAT_SRATE_TEXT, 
+            SAT_SRATE_LONGTEXT )
+#endif
+
 ADD_BOOL    ( "ipv6", NULL, IPV6_TEXT, IPV6_LONGTEXT )
 ADD_BOOL    ( "ipv4", NULL, IPV4_TEXT, IPV4_LONGTEXT )
 

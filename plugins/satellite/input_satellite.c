@@ -109,7 +109,7 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
 static int SatelliteOpen( input_thread_t * p_input )
 {
     input_socket_t *   p_satellite;
-    char *                      psz_parser; 
+    char *                      psz_parser;
     char *                      psz_next;
     int                         i_fd = 0;
     int                         i_freq = 0;
@@ -117,16 +117,16 @@ static int SatelliteOpen( input_thread_t * p_input )
     boolean_t                   b_pol = 0;
 
     /* parse the options passed in command line : */
-    
+
     psz_parser = strdup( p_input->psz_name );
-    
+
     if( !psz_parser )
     {
         return( -1 );
     }
- 
+
     i_freq = (int)strtol( psz_parser, &psz_next, 10 );
-    
+
     if ( *psz_next )
     {
         psz_parser = psz_next + 1;
@@ -139,10 +139,15 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     }
 
-    
+    i_freq = i_freq ? i_freq : config_GetIntVariable( "sat_frequency" );
+    i_srate = i_srate ? i_srate : config_GetIntVariable( "sat_symbol_rate" );
+    if ( !b_pol && b_pol != 1 )
+        b_pol = config_GetIntVariable( "sat_polarization" );
+
+
     /* Initialise structure */
     p_satellite = malloc( sizeof( input_socket_t ) );
-    
+
     if( p_satellite == NULL )
     {
         intf_ErrMsg( "input: satellite: Out of memory" );
@@ -150,11 +155,11 @@ static int SatelliteOpen( input_thread_t * p_input )
     }
 
     p_input->p_access_data = (void *)p_satellite;
-    
+
     /* Open the DVR device */
-    
+
     intf_WarnMsg( 2, "input: opening file `%s'", DVR);
-    
+
     if( (p_satellite->i_handle = open( DVR,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
@@ -162,52 +167,52 @@ static int SatelliteOpen( input_thread_t * p_input )
         return -1;
     }
 
-    
+
     /* Initialize the Satellite Card */
 
     intf_WarnMsg( 2, "Initializing Sat Card with Freq: %d, Pol: %d, Srate: %d",
                         i_freq, b_pol, i_srate );
-    
+
     if ( ioctl_SECControl( i_freq * 1000, b_pol, LNB_SLOF, DISEQC ) < 0 )
     {
         intf_ErrMsg("input: satellite: An error occured when controling SEC");
         return -1;
     }
-    
+
     intf_WarnMsg( 3, "Initializing Frontend device" );
     switch (ioctl_SetQPSKFrontend ( i_freq * 1000, i_srate* 1000, FEC,
                          LNB_LOF_1, LNB_LOF_2, LNB_SLOF))
     {
         case -2:
-            intf_ErrMsg( "input: satellite: Frontend returned 
+            intf_ErrMsg( "input: satellite: Frontend returned\
                     an unexpected event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -3:
-            intf_ErrMsg( "input: satellite: Frontend returned 
+            intf_ErrMsg( "input: satellite: Frontend returned\
                     no event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -4:
-            intf_ErrMsg( "input: satellite: Frontend: time out 
+            intf_ErrMsg( "input: satellite: Frontend: time out\
                     when polling for event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -5:
-             intf_ErrMsg( "input: satellite: An error occured when polling 
+             intf_ErrMsg( "input: satellite: An error occured when polling\
                     Frontend device" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -1:
-             intf_ErrMsg( "input: satellite: Frontend returned 
+             intf_ErrMsg( "input: satellite: Frontend returned\
                     an failure event" );
             close( p_satellite->i_handle );
             free( p_satellite );
@@ -218,35 +223,35 @@ static int SatelliteOpen( input_thread_t * p_input )
     }
 
     intf_WarnMsg( 3, " Setting filter on PAT " );
-    
+
     if ( ioctl_SetDMXFilter( 0, &i_fd, 3 ) < 0 )
     {
-        intf_ErrMsg( "input: satellite: An error occured when setting 
+        intf_ErrMsg( "input: satellite: An error occured when setting\
                 filter on PAT" );
         return -1;
     }
 
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
-        intf_ErrMsg( "input: satellite: Not enough memory to allow stream
+        intf_ErrMsg( "input: satellite: Not enough memory to allow stream\
                         structure" );
         return( -1 );
     }
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 0;
     p_input->stream.p_selected_area->i_tell = 0;
-    
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_input->i_mtu = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
     p_input->stream.i_method = INPUT_METHOD_SATELLITE;
     p_input->psz_demux = "satellite";
-    
+
     return 0;
-    
+
    }
 
 /*****************************************************************************
@@ -261,7 +266,7 @@ static void SatelliteClose( input_thread_t * p_input )
     {
         for ( i_es_index = 1 ;
                 i_es_index < p_input->stream.p_selected_program->
-                    i_es_number ; 
+                    i_es_number ;
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
@@ -272,11 +277,11 @@ static void SatelliteClose( input_thread_t * p_input )
 #undef p_es
         }
     }
-    
+
     p_satellite = (input_socket_t *)p_input;
     close( p_satellite->i_handle );
 }
-    
+
 /*****************************************************************************
  * SatelliteSetArea : Does nothing
  *****************************************************************************/
@@ -286,32 +291,37 @@ static int SatelliteSetArea( input_thread_t * p_input, input_area_t * p_area )
 }
 
 /*****************************************************************************
- * SatelliteSetProgram : Sets the card filters according to the 
+ * SatelliteSetProgram : Sets the card filters according to the
  *                 selected program,
  *                 and makes the appropriate changes to stream structure.
  *****************************************************************************/
-int SatelliteSetProgram( input_thread_t    * p_input, 
+int SatelliteSetProgram( input_thread_t    * p_input,
                          pgrm_descriptor_t * p_new_prg )
 {
     int                 i_es_index;
 
     if ( p_input->stream.p_selected_program )
     {
-        for ( i_es_index = 1 ;
+        for ( i_es_index = 1 ; /* 0 should be the PMT */
                 i_es_index < p_input->stream.p_selected_program->
-                    i_es_number ; 
+                    i_es_number ;
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
             if ( p_es->p_decoder_fifo )
             {
                 input_UnselectES( p_input , p_es );
+                p_es->p_pes = NULL; /* FIXME */
             }
-            ioctl_UnsetDMXFilter( p_es->i_dmx_fd );
+            if ( p_es->i_dmx_fd )
+            {
+                ioctl_UnsetDMXFilter( p_es->i_dmx_fd );
+                p_es->i_dmx_fd = 0;
+            }
 #undef p_es
         }
     }
-    
+
     for (i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
 #define p_es p_new_prg->pp_es[i_es_index]
@@ -416,8 +426,8 @@ static int SatelliteDemux( input_thread_t * p_input )
                        3 );
         }
     }
-            
-        
+
+
     for( i = 0; i < SATELLITE_READ_ONCE; i++ )
     {
         data_packet_t *     p_data;

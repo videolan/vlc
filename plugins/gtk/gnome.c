@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.12 2002/03/11 20:14:16 gbazin Exp $
+ * $Id: gnome.c,v 1.13 2002/03/25 02:06:24 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -248,6 +248,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_fileopen = NULL;
     p_intf->p_sys->p_disc = NULL;
     p_intf->p_sys->p_network = NULL;
+    p_intf->p_sys->p_sat = NULL;
     p_intf->p_sys->p_jump = NULL;
 
     /* Store p_intf to keep an eye on it */

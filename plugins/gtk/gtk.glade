@@ -447,6 +447,20 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_sat</name>
+	  <tooltip>Open a Satellite Card</tooltip>
+	  <signal>
+	    <name>button_press_event</name>
+	    <handler>GtkSatOpenShow</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Sun, 24 Mar 2002 15:08:57 GMT</last_modification_time>
+	  </signal>
+	  <label>Sat</label>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_back</name>
 	  <sensitive>False</sensitive>
 	  <tooltip>Go Backwards</tooltip>
@@ -531,6 +545,9 @@
 	    <last_modification_time>Sun, 13 May 2001 15:11:20 GMT</last_modification_time>
 	  </signal>
 	  <label>Slow</label>
+	  <child>
+	    <new_group>True</new_group>
+	  </child>
 	</widget>
 
 	<widget>
@@ -560,9 +577,6 @@
 	    <last_modification_time>Sun, 13 May 2001 15:11:38 GMT</last_modification_time>
 	  </signal>
 	  <label>Playlist</label>
-	  <child>
-	    <new_group>True</new_group>
-	  </child>
 	</widget>
 
 	<widget>
@@ -2982,6 +2996,330 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	<can_focus>True</can_focus>
 	<editable>False</editable>
 	<text></text>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkDialog</class>
+  <name>intf_sat</name>
+  <title>Open Satellite card</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>True</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <child_name>Dialog:vbox</child_name>
+    <name>vbox10</name>
+    <border_width>5</border_width>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkHBox</class>
+      <child_name>Dialog:action_area</child_name>
+      <name>hbox15</name>
+      <border_width>5</border_width>
+      <homogeneous>True</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox16</name>
+	<homogeneous>True</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>True</fill>
+	  <pack>GTK_PACK_END</pack>
+	</child>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>sat_ok</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>GtkSatOpenOk</handler>
+	    <data>&quot;intf_disc&quot;</data>
+	    <last_modification_time>Sun, 24 Mar 2002 15:36:12 GMT</last_modification_time>
+	  </signal>
+	  <label>OK</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>sat_cancel</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>GtkSatOpenCancel</handler>
+	    <data>&quot;intf_disc&quot;</data>
+	    <last_modification_time>Sun, 24 Mar 2002 15:36:03 GMT</last_modification_time>
+	  </signal>
+	  <label>Cancel</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkVBox</class>
+      <name>vbox11</name>
+      <border_width>5</border_width>
+      <homogeneous>False</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox17</name>
+	<homogeneous>False</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkFrame</class>
+	  <name>frame8</name>
+	  <label>Transponder settings</label>
+	  <label_xalign>0</label_xalign>
+	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkTable</class>
+	    <name>table3</name>
+	    <border_width>5</border_width>
+	    <rows>4</rows>
+	    <columns>2</columns>
+	    <homogeneous>False</homogeneous>
+	    <row_spacing>5</row_spacing>
+	    <column_spacing>5</column_spacing>
+
+	    <widget>
+	      <class>GtkSpinButton</class>
+	      <name>sat_freq</name>
+	      <can_focus>True</can_focus>
+	      <climb_rate>1</climb_rate>
+	      <digits>0</digits>
+	      <numeric>False</numeric>
+	      <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	      <snap>False</snap>
+	      <wrap>False</wrap>
+	      <value>12553</value>
+	      <lower>1</lower>
+	      <upper>65536</upper>
+	      <step>1</step>
+	      <page>10</page>
+	      <page_size>10</page_size>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>0</top_attach>
+		<bottom_attach>1</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>True</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkSpinButton</class>
+	      <name>sat_srate</name>
+	      <can_focus>True</can_focus>
+	      <climb_rate>1</climb_rate>
+	      <digits>0</digits>
+	      <numeric>False</numeric>
+	      <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	      <snap>False</snap>
+	      <wrap>False</wrap>
+	      <value>27500</value>
+	      <lower>1</lower>
+	      <upper>65536</upper>
+	      <step>1</step>
+	      <page>10</page>
+	      <page_size>10</page_size>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>1</top_attach>
+		<bottom_attach>2</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>True</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label24</name>
+	      <label>Symbol Rate</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <child>
+		<left_attach>0</left_attach>
+		<right_attach>1</right_attach>
+		<top_attach>1</top_attach>
+		<bottom_attach>2</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label25</name>
+	      <label>Frequency</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <child>
+		<left_attach>0</left_attach>
+		<right_attach>1</right_attach>
+		<top_attach>0</top_attach>
+		<bottom_attach>1</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label26</name>
+	      <label>Polarization</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <child>
+		<left_attach>0</left_attach>
+		<right_attach>1</right_attach>
+		<top_attach>2</top_attach>
+		<bottom_attach>3</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>sat_pol_vert</name>
+	      <can_focus>True</can_focus>
+	      <label>Vertical</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>2</top_attach>
+		<bottom_attach>3</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>sat_pol_hor</name>
+	      <can_focus>True</can_focus>
+	      <label>Horizontal</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <child>
+		<left_attach>1</left_attach>
+		<right_attach>2</right_attach>
+		<top_attach>3</top_attach>
+		<bottom_attach>4</bottom_attach>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<xexpand>False</xexpand>
+		<yexpand>False</yexpand>
+		<xshrink>False</xshrink>
+		<yshrink>False</yshrink>
+		<xfill>True</xfill>
+		<yfill>False</yfill>
+	      </child>
+	    </widget>
+	  </widget>
+	</widget>
       </widget>
     </widget>
   </widget>

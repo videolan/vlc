@@ -150,3 +150,16 @@ GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
 void
 GnomeMenubarMessagesActivate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+gboolean
+GtkSatOpenShow                         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+GtkSatOpenOk                           (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSatOpenCancel                       (GtkButton       *button,
+                                        gpointer         user_data);

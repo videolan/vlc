@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.19 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: gtk_open.c,v 1.20 2002/03/25 02:06:24 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -499,6 +499,94 @@ void GtkNetworkOpenChannel( GtkToggleButton * togglebutton,
             "network_broadcast" ), b_broadcast && ! b_channel );
 }
 
+/*****************************************************************************
+ * Open satellite callbacks
+ *****************************************************************************
+ * The following callbacks are related to the satellite card manager.
+ *****************************************************************************/
+gboolean GtkSatOpenShow( GtkWidget       *widget,
+                          GdkEventButton  *event,
+                          gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_sat ) )
+    {
+        p_intf->p_sys->p_sat = create_intf_sat();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_sat ),
+                             "p_intf", p_intf );
+    }
+
+    gtk_widget_show( p_intf->p_sys->p_sat );
+    gdk_window_raise( p_intf->p_sys->p_sat->window );
+
+    return TRUE;
+}
+
+void GtkSatOpenOk( GtkButton * button, gpointer user_data )
+{
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_sat" );
+    GtkCList *      p_playlist_clist;
+    char *          psz_source;
+    int             i_end = p_main->p_playlist->i_size;
+    int             i_freq, i_srate;
+    boolean_t       b_pol;
+
+    gtk_widget_hide( p_intf->p_sys->p_sat );
+
+    /* Check which polarization was activated */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                          "sat_pol_vert" ) )->active )
+    {
+        b_pol = 0;
+    }
+    else
+    {
+        b_pol = 1;
+    }
+    
+    /* Select frequency and symbol rate */
+    i_freq = gtk_spin_button_get_value_as_int(
+                              GTK_SPIN_BUTTON( lookup_widget(
+                                  GTK_WIDGET(button), "sat_freq" ) ) );
+
+    i_srate = gtk_spin_button_get_value_as_int(
+                              GTK_SPIN_BUTTON( lookup_widget(
+                                  GTK_WIDGET(button), "sat_srate" ) ) );
+    
+    psz_source = malloc( 22 );
+    if( psz_source == NULL )
+    {
+        return;
+    }
+
+    /* Build source name and add it to playlist */
+    sprintf( psz_source, "%s:%d,%d,%d",
+             "satellite", i_freq, b_pol, i_srate );
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    free( psz_source );
+
+    /* catch the GTK CList */
+    p_playlist_clist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+
+    /* update the display */
+    GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+
+    /* stop current item, select added item */
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+}
+
+
+void GtkSatOpenCancel( GtkButton * button, gpointer user_data )
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
 
 /****************************************************************************
  * Callbacks for menuitem

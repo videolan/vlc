@@ -158,6 +158,7 @@ create_intf_window (void)
   GtkWidget *toolbar_file;
   GtkWidget *toolbar_disc;
   GtkWidget *toolbar_network;
+  GtkWidget *toolbar_sat;
   GtkWidget *toolbar_back;
   GtkWidget *toolbar_stop;
   GtkWidget *toolbar_eject;
@@ -394,6 +395,18 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_network);
 
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_MIC);
+  toolbar_sat = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Sat"),
+                                _("Open a Satellite Card"), NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_sat);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_sat", toolbar_sat,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_sat);
+
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_BACK);
@@ -458,6 +471,8 @@ create_intf_window (void)
   gtk_widget_show (toolbar_pause);
   gtk_widget_set_sensitive (toolbar_pause, FALSE);
 
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER_STOP);
   toolbar_slow = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
@@ -483,8 +498,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_fast);
   gtk_widget_set_sensitive (toolbar_fast, FALSE);
-
-  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_INDEX);
   toolbar_playlist = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -718,6 +731,9 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_network), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_sat), "button_press_event",
+                      GTK_SIGNAL_FUNC (GtkSatOpenShow),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (toolbar_back), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkControlBack),
@@ -2607,5 +2623,163 @@ create_intf_messages (void)
                       "intf_messages");
 
   return intf_messages;
+}
+
+GtkWidget*
+create_intf_sat (void)
+{
+  GtkWidget *intf_sat;
+  GtkWidget *vbox15;
+  GtkWidget *hbox10;
+  GtkWidget *frame13;
+  GtkWidget *table5;
+  GtkWidget *label30;
+  GtkObject *sat_freq_adj;
+  GtkWidget *sat_freq;
+  GtkWidget *label31;
+  GSList *table5_group = NULL;
+  GtkWidget *sat_pol_hor;
+  GtkWidget *sat_pol_vert;
+  GtkWidget *label33;
+  GtkObject *sat_srate_adj;
+  GtkWidget *sat_srate;
+  GtkWidget *hbuttonbox2;
+  GtkWidget *sat_ok;
+  GtkWidget *sat_cancel;
+
+  intf_sat = gnome_dialog_new (_("Open Satellite Card"), NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_sat), "intf_sat", intf_sat);
+  gtk_window_set_modal (GTK_WINDOW (intf_sat), TRUE);
+  gtk_window_set_policy (GTK_WINDOW (intf_sat), FALSE, FALSE, FALSE);
+
+  vbox15 = GNOME_DIALOG (intf_sat)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_sat), "vbox15", vbox15);
+  gtk_widget_show (vbox15);
+
+  hbox10 = gtk_hbox_new (FALSE, 5);
+  gtk_widget_ref (hbox10);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "hbox10", hbox10,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox10);
+  gtk_box_pack_start (GTK_BOX (vbox15), hbox10, TRUE, TRUE, 0);
+
+  frame13 = gtk_frame_new (_("Transponder Settings"));
+  gtk_widget_ref (frame13);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "frame13", frame13,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame13);
+  gtk_box_pack_start (GTK_BOX (hbox10), frame13, TRUE, TRUE, 0);
+
+  table5 = gtk_table_new (4, 2, FALSE);
+  gtk_widget_ref (table5);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "table5", table5,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (table5);
+  gtk_container_add (GTK_CONTAINER (frame13), table5);
+  gtk_container_set_border_width (GTK_CONTAINER (table5), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (table5), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (table5), 5);
+
+  label30 = gtk_label_new (_("Frequency"));
+  gtk_widget_ref (label30);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "label30", label30,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label30);
+  gtk_table_attach (GTK_TABLE (table5), label30, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
+
+  sat_freq_adj = gtk_adjustment_new (12553, 1, 65536, 1, 10, 10);
+  sat_freq = gtk_spin_button_new (GTK_ADJUSTMENT (sat_freq_adj), 1, 0);
+  gtk_widget_ref (sat_freq);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_freq", sat_freq,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_freq);
+  gtk_table_attach (GTK_TABLE (table5), sat_freq, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label31 = gtk_label_new (_("Polarization"));
+  gtk_widget_ref (label31);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "label31", label31,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label31);
+  gtk_table_attach (GTK_TABLE (table5), label31, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label31), 0, 0.5);
+
+  sat_pol_hor = gtk_radio_button_new_with_label (table5_group, _("Horizontal"));
+  table5_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_hor));
+  gtk_widget_ref (sat_pol_hor);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_pol_hor", sat_pol_hor,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_pol_hor);
+  gtk_table_attach (GTK_TABLE (table5), sat_pol_hor, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sat_pol_vert = gtk_radio_button_new_with_label (table5_group, _("Vertical"));
+  table5_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_vert));
+  gtk_widget_ref (sat_pol_vert);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_pol_vert", sat_pol_vert,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_pol_vert);
+  gtk_table_attach (GTK_TABLE (table5), sat_pol_vert, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (sat_pol_vert), TRUE);
+
+  label33 = gtk_label_new (_("Symbol Rate"));
+  gtk_widget_ref (label33);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "label33", label33,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label33);
+  gtk_table_attach (GTK_TABLE (table5), label33, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label33), 0, 0.5);
+
+  sat_srate_adj = gtk_adjustment_new (27500, 0, 100, 1, 10, 10);
+  sat_srate = gtk_spin_button_new (GTK_ADJUSTMENT (sat_srate_adj), 1, 0);
+  gtk_widget_ref (sat_srate);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_srate", sat_srate,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_srate);
+  gtk_table_attach (GTK_TABLE (table5), sat_srate, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  hbuttonbox2 = GNOME_DIALOG (intf_sat)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_sat), "hbuttonbox2", hbuttonbox2);
+  gtk_widget_show (hbuttonbox2);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox2), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (hbuttonbox2), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_sat), GNOME_STOCK_BUTTON_OK);
+  sat_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_sat)->buttons)->data);
+  gtk_widget_ref (sat_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_ok", sat_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_ok);
+  GTK_WIDGET_SET_FLAGS (sat_ok, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_sat), GNOME_STOCK_BUTTON_CANCEL);
+  sat_cancel = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_sat)->buttons)->data);
+  gtk_widget_ref (sat_cancel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_cancel", sat_cancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_cancel);
+  GTK_WIDGET_SET_FLAGS (sat_cancel, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (sat_ok), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSatOpenOk),
+                      "intf_disc");
+  gtk_signal_connect (GTK_OBJECT (sat_cancel), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSatOpenCancel),
+                      "intf_disc");
+
+  return intf_sat;
 }
 

@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.17 2002/02/19 03:54:55 sam Exp $
+ * $Id: gtk_callbacks.h,v 1.18 2002/03/25 02:06:24 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -92,4 +92,17 @@ GtkMessagesOk                          (GtkButton       *button,
 gboolean
 GtkMessagesDelete                      (GtkWidget       *widget,
                                         GdkEvent        *event,
+                                        gpointer         user_data);
+
+gboolean
+GtkSatOpenShow                         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+GtkSatOpenOk                           (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSatOpenCancel                       (GtkButton       *button,
                                         gpointer         user_data);
