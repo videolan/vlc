@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +33,8 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
+#include "vlc_filter.h"
 #include "filter_common.h"
-
 
 /*****************************************************************************
  * Local prototypes
@@ -47,22 +48,22 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 static int  SendEvents( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
-
-static int MouseEvent( vlc_object_t *, char const *,
-                       vlc_value_t , vlc_value_t , void * );
+static int MouseEvent ( vlc_object_t *, char const *,
+                        vlc_value_t , vlc_value_t , void * );
+static int Control    ( vout_thread_t *, int, va_list );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
 #define FILE_TEXT N_("Logo filename")
 #define FILE_LONGTEXT N_("The file must be in PNG RGBA 8bits format (for now).")
 #define POSX_TEXT N_("X coordinate of the logo")
 #define POSX_LONGTEXT N_("You can move the logo by left-clicking on it." )
 #define POSY_TEXT N_("Y coordinate of the logo")
 #define POSY_LONGTEXT N_("You can move the logo by left-clicking on it." )
-#define TRANS_TEXT N_("Transparency of the logo (255-0)")
-#define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right.")
+#define TRANS_TEXT N_("Transparency of the logo")
+#define TRANS_LONGTEXT N_("You can set the logo transparency value here " \
+  "(from 0 for full transparency to 255 for full opacity)." )
 
 vlc_module_begin();
     set_description( _("Logo video filter") );
@@ -87,25 +88,99 @@ vlc_module_end();
 struct vout_sys_t
 {
     vout_thread_t *p_vout;
-    png_uint_32 height;
-    int bit_depth;
-    png_uint_32 width;
-    uint8_t * png_image[3];
-    uint8_t * png_image_u;
-    uint8_t * png_image_v;
-    uint8_t * png_image_a[3];
-    uint8_t * png_image_a_little;
-    int error;
+
+    filter_t *p_blend;
+    picture_t *p_pic;
+
+    int i_width, i_height;
     int posx, posy;
-    int trans;
 };
 
 /*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
+ * LoadPNG: loads the PNG logo into memory
  *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+static picture_t *LoadPNG( vlc_object_t *p_this )
 {
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
+    picture_t *p_pic;
+    char *psz_filename;
+    vlc_value_t val;
+    FILE *file;
+    int i, j, i_trans;
+
+    png_uint_32 i_width, i_height;
+    int i_color_type, i_interlace_type, i_compression_type, i_filter_type;
+    int i_bit_depth;
+    png_bytep *p_row_pointers;
+    png_structp p_png;
+    png_infop p_info, p_end_info;
+
+    var_Create( p_this, "logo-file", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-file", &val );
+    psz_filename = val.psz_string;
+    if( !psz_filename ) return 0;
+
+    if( !(file = fopen( psz_filename , "rb" )) )
+    {
+        msg_Err( p_this , "logo file (%s) not found", psz_filename );
+        free( psz_filename );
+        return 0;
+    }
+    free( psz_filename );
+
+    p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
+    p_info = png_create_info_struct( p_png );
+    p_end_info = png_create_info_struct( p_png );
+    png_init_io( p_png, file );
+    png_read_info( p_png, p_info );
+    png_get_IHDR( p_png, p_info, &i_width, &i_height,
+                  &i_bit_depth, &i_color_type, &i_interlace_type,
+                  &i_compression_type, &i_filter_type);
+
+    p_row_pointers = malloc( sizeof(png_bytep) * i_height );
+    for( i = 0; i < (int)i_height; i++ )
+    {
+        p_row_pointers[i] = malloc( 4 * ( i_bit_depth + 7 ) / 8 * i_width );
+    }
+    png_read_image( p_png, p_row_pointers );
+    png_read_end( p_png, p_end_info );
+
+    fclose( file );
+    png_destroy_read_struct( &p_png, &p_info, &p_end_info );
+
+    /* Convert to YUVA */
+    p_pic = malloc( sizeof(picture_t) );
+    if( vout_AllocatePicture( p_this, p_pic, VLC_FOURCC('Y','U','V','A'),
+                              i_width, i_height, VOUT_ASPECT_FACTOR ) !=
+        VLC_SUCCESS )
+    {
+        free( p_row_pointers );
+        return 0;
+    }
+
+    var_Create(p_this, "logo-transparency", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
+    var_Get( p_this, "logo-transparency", &val );
+    i_trans = val.i_int;
+
+    for( j = 0; j < (int)i_height ; j++ )
+    {
+        for( i = 0; i < (int)i_width ; i++ )
+        {
+            uint8_t (*p)[4];
+            int i_offset = i + j * p_pic->p[Y_PLANE].i_pitch;
+
+            p = (void *)p_row_pointers[j];
+            p_pic->p[Y_PLANE].p_pixels[i_offset] =
+                (p[i][0] * 257L + p[i][1] * 504 + p[i][2] * 98)/1000 + 16;
+            p_pic->p[U_PLANE].p_pixels[i_offset] =
+                (p[i][2] * 439L - p[i][0] * 148 - p[i][1] * 291)/1000 + 128;
+            p_pic->p[V_PLANE].p_pixels[i_offset] =
+                (p[i][0] * 439L - p[i][1] * 368 - p[i][2] * 71)/1000 + 128;
+            p_pic->p[A_PLANE].p_pixels[i_offset] = (p[i][3] * i_trans) / 255;
+        }
+    }
+
+    free( p_row_pointers );
+    return p_pic;
 }
 
 /*****************************************************************************
@@ -116,10 +191,12 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_sys_t *p_sys;
+    vlc_value_t val;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_sys = p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
@@ -132,6 +209,23 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
+    var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-x", &val );
+    p_sys->posx = val.i_int;
+    var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "logo-y", &val );
+    p_sys->posy = val.i_int;
+
+    p_sys->p_pic = LoadPNG( p_this );
+    if( !p_sys->p_pic )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
+
     return VLC_SUCCESS;
 }
 
@@ -140,122 +234,9 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_pic;
-    char * filename;
-    FILE * fp;
-    int color_type;
-    int interlace_type;
-    int compression_type;
-    int filter_type;
-    png_structp png_ptr;
-    png_bytep * row_pointers;
-    png_infop info_ptr;
-    unsigned int i;
-//    unsigned int j;
-    unsigned int x;
-    unsigned int y;
-    int temp;
-    int i_size;
-    int i_parity_width;
-    int i_parity_height;
-
-    /*  read png file  */
-    filename = config_GetPsz( p_vout, "logo-file" );
-    fp = fopen( filename , "rb");
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL , NULL , NULL);
-    info_ptr = png_create_info_struct(png_ptr);
-
-    if (fp == NULL)
-    {
-        p_vout->p_sys->error=1;
-        msg_Err( p_vout , "file not found %s", filename );
-        free( filename );
-    }
-    else
-    {
-        free( filename );
-        p_vout->p_sys->error=0;
-        png_init_io(png_ptr, fp);
-        png_read_info(png_ptr, info_ptr);
-        png_get_IHDR(png_ptr, info_ptr, &p_vout->p_sys->width, &p_vout->p_sys->height,
-                     &p_vout->p_sys->bit_depth, &color_type, &interlace_type,
-                     &compression_type, &filter_type);
-        row_pointers= malloc( sizeof(png_bytep) * p_vout->p_sys->height );
-        for( i = 0; i < p_vout->p_sys->height; i++ )
-        {
-            row_pointers[i] = malloc( 4 * ( p_vout->p_sys->bit_depth + 7 ) / 8 * p_vout->p_sys->width );
-        }
-        png_read_image(png_ptr, row_pointers);
-        fclose(fp);
-        /* finish to read the image in the file. Now We have to convert it YUV */
-        /* initialize yuv plans of the image */
-        i_parity_width = p_vout->p_sys->width % 2;
-        i_parity_height = p_vout->p_sys->height % 2;
-
-        p_vout->p_sys->height = p_vout->p_sys->height
-                             + (p_vout->p_sys->height % 2);
-        p_vout->p_sys->width = p_vout->p_sys->width
-                            + (p_vout->p_sys->width % 2);
-        i_size = p_vout->p_sys->height * p_vout->p_sys->width;
-
-        p_vout->p_sys->png_image[0] = malloc( i_size );
-        p_vout->p_sys->png_image[1] = malloc( i_size / 4 );
-        p_vout->p_sys->png_image[2] = malloc( i_size / 4 );
-
-        p_vout->p_sys->png_image_a[0] = malloc( i_size );
-        p_vout->p_sys->png_image_a[1] = malloc( i_size / 4 );
-        p_vout->p_sys->png_image_a[2] = p_vout->p_sys->png_image_a[1];
-
-        for( y = 0; y < p_vout->p_sys->height ; y++)
-        {
-            for( x = 0; x < p_vout->p_sys->width ; x++)
-            {
-                uint8_t (*p)[4];
-                int idx;
-                int idxc;
-
-                /* FIXME FIXME */
-                p = (void*)row_pointers[y];
-                idx = x + y * p_vout->p_sys->width;
-                idxc= x/2 + (y/2) * (p_vout->p_sys->width/2);
-
-                if( ((i_parity_width == 0) || (x != (p_vout->p_sys->width - 1))) &&
-                    ((i_parity_height == 0) || (y != (p_vout->p_sys->height - 1))))
-                {
-                    p_vout->p_sys->png_image_a[0][idx]= p[x][3];
-                    p_vout->p_sys->png_image[0][idx]= (p[x][0] * 257
-                                                     + p[x][1] * 504
-                                                     + p[x][2] * 98)/1000 + 16;
-
-                    if( ( x % 2 == 0 ) && ( y % 2 == 0 ) )
-                    {
-
-                        temp = (p[x][2] * 439
-                              - p[x][0] * 148
-                              - p[x][1] * 291)/1000 + 128;
-
-                        temp = __MAX( __MIN( temp, 255 ), 0 );
-                        p_vout->p_sys->png_image[1][idxc] = temp;
-
-                        temp = ( p[x][0] * 439
-                               - p[x][1] * 368
-                               - p[x][2] * 71)/1000 + 128;
-                        temp = __MAX( __MIN( temp, 255 ), 0 );
-                        p_vout->p_sys->png_image[2][idxc] = temp;
-                        p_vout->p_sys->png_image_a[1][idxc] = p_vout->p_sys->png_image_a[0][idx];
-
-                    }
-
-                } else
-                {
-                    p_vout->p_sys->png_image_a[0][idx]= 0;
-                }
-            }
-        }
-        /* now we can free row_pointers*/
-        free(row_pointers);
-    }
+    int i_index;
 
     I_OUTPUTPICTURES = 0;
 
@@ -265,34 +246,60 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video output" );
+    /* Load the video blending filter */
+    p_sys->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
+    vlc_object_attach( p_sys->p_blend, p_vout );
+    p_sys->p_blend->fmt_out.video.i_x_offset =
+        p_sys->p_blend->fmt_out.video.i_y_offset = 0;
+    p_sys->p_blend->fmt_in.video.i_x_offset =
+        p_sys->p_blend->fmt_in.video.i_y_offset = 0;
+    p_sys->p_blend->fmt_out.video.i_aspect = p_vout->render.i_aspect;
+    p_sys->p_blend->fmt_out.video.i_chroma = p_vout->output.i_chroma;
+    p_sys->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','A');
+    p_sys->p_blend->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR;
+    p_sys->p_blend->fmt_in.video.i_width =
+        p_sys->p_blend->fmt_in.video.i_visible_width =
+            p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+    p_sys->p_blend->fmt_in.video.i_height =
+        p_sys->p_blend->fmt_in.video.i_visible_height =
+            p_sys->p_pic->p[Y_PLANE].i_visible_lines;
+    p_sys->p_blend->fmt_out.video.i_width =
+        p_sys->p_blend->fmt_out.video.i_visible_width =
+           p_vout->output.i_width;
+    p_sys->p_blend->fmt_out.video.i_height =
+        p_sys->p_blend->fmt_out.video.i_visible_height =
+            p_vout->output.i_height;
 
-    p_vout->p_sys->p_vout = vout_Create( p_vout,
-                           p_vout->render.i_width, p_vout->render.i_height,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
+    p_sys->p_blend->p_module =
+        module_Need( p_sys->p_blend, "video blending", 0, 0 );
+    if( !p_sys->p_blend->p_module )
     {
-        msg_Err( p_vout, "can't open vout, aborting" );
-
+        msg_Err( p_vout, "can't open blending filter, aborting" );
+        vlc_object_detach( p_sys->p_blend );
+        vlc_object_destroy( p_sys->p_blend );
         return VLC_EGENERIC;
     }
 
-    var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
-    var_AddCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
+    /* Try to open the real video output */
+    msg_Dbg( p_vout, "spawning the real video output" );
 
+    p_sys->p_vout =
+        vout_Create( p_vout, p_vout->render.i_width, p_vout->render.i_height,
+                     p_vout->render.i_chroma, p_vout->render.i_aspect );
+
+    /* Everything failed */
+    if( p_sys->p_vout == NULL )
+    {
+        msg_Err( p_vout, "can't open vout, aborting" );
+        return VLC_EGENERIC;
+    }
+
+    var_AddCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
+    var_AddCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
+    ADD_CALLBACKS( p_sys->p_vout, SendEvents );
     ADD_PARENT_CALLBACKS( SendEventsToChild );
-
-    p_vout->p_sys->posx = config_GetInt( p_vout, "logo-x" );
-    p_vout->p_sys->posy = config_GetInt( p_vout, "logo-y" );
-    p_vout->p_sys->trans = config_GetInt( p_vout, "logo-transparency");
 
     return VLC_SUCCESS;
 }
@@ -302,6 +309,7 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
 
     /* Free the fake output buffers we allocated */
@@ -311,27 +319,20 @@ static void End( vout_thread_t *p_vout )
         free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
 
-    var_DelCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
-    var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
+    var_DelCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
+    var_DelCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
 
-    if( p_vout->p_sys->p_vout )
+    if( p_sys->p_vout )
     {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-        vlc_object_detach( p_vout->p_sys->p_vout );
-        vout_Destroy( p_vout->p_sys->p_vout );
+        DEL_CALLBACKS( p_sys->p_vout, SendEvents );
+        vlc_object_detach( p_sys->p_vout );
+        vout_Destroy( p_sys->p_vout );
     }
 
-    config_PutInt( p_vout, "logo-x", p_vout->p_sys->posx );
-    config_PutInt( p_vout, "logo-y", p_vout->p_sys->posy );
-
-    if (p_vout->p_sys->error == 0)
-    {
-        free(p_vout->p_sys->png_image[0]);
-        free(p_vout->p_sys->png_image[1]);
-        free(p_vout->p_sys->png_image[2]);
-        free(p_vout->p_sys->png_image_a[0]);
-        free(p_vout->p_sys->png_image_a[1]);
-    }
+    if( p_sys->p_blend->p_module )
+        module_Unneed( p_sys->p_blend, p_sys->p_blend->p_module );
+    vlc_object_detach( p_sys->p_blend );
+    vlc_object_destroy( p_sys->p_blend );
 }
 
 /*****************************************************************************
@@ -342,96 +343,39 @@ static void End( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
 
-    free( p_vout->p_sys );
+    if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
+        free( p_sys->p_pic->p_data_orig );
+    if( p_sys->p_pic ) free( p_sys->p_pic );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
- * Render: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Invert image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
+ * Render: render the logo onto the video
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_outpic;
-    int i_index;
-    int tr;
 
     /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
+    while( !(p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 )) )
     {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            return;
-        }
+        if( p_vout->b_die || p_vout->b_error ) return;
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
-    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
+    vout_CopyPicture( p_vout, p_outpic, p_pic );
+    vout_DatePicture( p_sys->p_vout, p_outpic, p_pic->date );
 
+    p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic, p_outpic,
+                                    p_sys->p_pic, p_sys->posx, p_sys->posy );
 
-    tr = p_vout->p_sys->trans;
-
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-    {
-        memcpy( p_outpic->p[i_index].p_pixels,
-                p_pic->p[i_index].p_pixels,
-                p_pic->p[i_index].i_visible_lines * p_pic->p[i_index].i_pitch);
-
-
-        if (p_vout->p_sys->error == 0)
-        {
-            unsigned int i;
-            unsigned int j;
-            uint8_t *p_out, *p_in_a, *p_in;
-            int i_delta;
-            unsigned int i_max;
-            unsigned int j_max;
-
-            if (i_index == 0)
-            {
-                p_out  = p_outpic->p[i_index].p_pixels +
-                            p_vout->p_sys->posy * p_outpic->p[i_index].i_pitch +
-                            p_vout->p_sys->posx;
-                i_max = p_vout->p_sys->height;
-                j_max = p_vout->p_sys->width;
-            } else
-            {
-                p_out  = p_outpic->p[i_index].p_pixels +
-                            p_vout->p_sys->posy / 2 * p_outpic->p[i_index].i_pitch +
-                         p_vout->p_sys->posx / 2;
-                i_max = p_vout->p_sys->height / 2;
-                j_max = p_vout->p_sys->width / 2;
-            }
-            i_delta = p_outpic->p[i_index].i_pitch - j_max;
-
-            p_in_a = p_vout->p_sys->png_image_a[i_index];
-            p_in   = p_vout->p_sys->png_image[i_index];
-
-
-            for( i = 0; i < i_max ; i++ )
-            {
-                for( j = 0 ; j < j_max ; j++)
-                {
-                    *p_out = ( *p_out * ( 65025 - *p_in_a * tr) + *p_in * *p_in_a * tr ) >> 16;
-                    p_out++;
-                    p_in++;
-                    p_in_a++;
-                }
-                p_out += i_delta;
-            }
-         }
-    }
-
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
-
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+    vout_DisplayPicture( p_sys->p_vout, p_outpic );
 }
 
 /*****************************************************************************
@@ -441,37 +385,25 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
     return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
  * MouseEvent: callback for mouse events
- ******************************************************************************/
+ *****************************************************************************/
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t*)p_data;
+    vout_sys_t *p_sys = p_vout->p_sys;
     vlc_value_t valb;
     int i_delta;
-
-    #define posx p_vout->p_sys->posx
-    #define posy p_vout->p_sys->posy
-    #define width p_vout->p_sys->width
-    #define height p_vout->p_sys->height
-    #define trans p_vout->p_sys->trans
 
     var_Get( p_vout->p_sys->p_vout, "mouse-button-down", &valb );
 
     i_delta = newval.i_int - oldval.i_int;
 
-    if ((valb.i_int & 0x2) == 2 && psz_var[6] == 'x' )
-    {
-        trans = __MIN( __MAX( trans + i_delta , 0 ) , 255 );
-        return VLC_SUCCESS;
-    }
-    if ((valb.i_int & 0x1) == 0)
+    if( (valb.i_int & 0x1) == 0 )
     {
         return VLC_SUCCESS;
     }
@@ -480,41 +412,38 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     {
         vlc_value_t valy;
         var_Get( p_vout->p_sys->p_vout, "mouse-y", &valy );
-        if ((newval.i_int >= (int)posx) && (valy.i_int >= (int)posy) && (newval.i_int <= (int)(posx + width)) && (valy.i_int <= (int)(posy + height)))
+        if( newval.i_int >= (int)p_sys->posx &&
+            valy.i_int >= (int)p_sys->posy &&
+            newval.i_int <= (int)(p_sys->posx + p_sys->i_width) &&
+            valy.i_int <= (int)(p_sys->posy + p_sys->i_height) )
         {
-            posx = __MIN( __MAX( posx + i_delta , 0 ) , p_vout->output.i_width - width );
+            p_sys->posx = __MIN( __MAX( p_sys->posx + i_delta, 0 ),
+                          p_vout->output.i_width - p_sys->i_width );
         }
-
     }
     else if( psz_var[6] == 'y' )
     {
         vlc_value_t valx;
         var_Get( p_vout->p_sys->p_vout, "mouse-x", &valx );
-        if ((valx.i_int >= (int)posx) && (newval.i_int >= (int)posy) && (valx.i_int <= (int)(posx + width)) && (newval.i_int <= (int)(posy + height)))
+        if( valx.i_int >= (int)p_sys->posx &&
+            newval.i_int >= (int)p_sys->posy &&
+            valx.i_int <= (int)(p_sys->posx + p_sys->i_width) &&
+            newval.i_int <= (int)(p_sys->posy + p_sys->i_height) )
         {
-            posy = __MIN( __MAX( posy + i_delta , 0 ) , p_vout->output.i_height - height );
-        }
-
-    }
-    else if( psz_var[6] == 'c' )
-    {
-        if ((valb.i_int & 0x8) == 1)
-        {
-            p_vout->p_sys->trans++;
-        }
-        else if ((valb.i_int & 0x10) == 1)
-        {
-            p_vout->p_sys->trans--;
+            p_sys->posy = __MIN( __MAX( p_sys->posy + i_delta, 0 ),
+                          p_vout->output.i_height - p_sys->i_height );
         }
     }
-
-    #undef posx
-    #undef posy
-    #undef width
-    #undef height
-    #undef trans
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout (forwards to child vout)
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
 }
 
 /*****************************************************************************
