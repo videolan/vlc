@@ -1,37 +1,35 @@
 <!DOCTYPE Theme SYSTEM "skin.dtd">
 
 <Theme>
-    <ThemeInfo name="skin-test" author="Emmanuel Puig"
-            email="magic@karibu.org" webpage=""/>
+    <ThemeInfo name="default" author="Emmanuel Puig"
+               email="magic@karibu.org" webpage=""/>
 
-    <Bitmap id="body" file="skin-test/body.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="q_up" file="skin-test/quit_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="q_down" file="skin-test/quit_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b1_up" file="skin-test/b1_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b1_down" file="skin-test/b1_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b2_up" file="skin-test/b2_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b2_down" file="skin-test/b2_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b3_up" file="skin-test/b3_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b3_down" file="skin-test/b3_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b3_dis" file="skin-test/b3_disabled.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b4_up" file="skin-test/b4_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b4_down" file="skin-test/b4_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b4_dis" file="skin-test/b4_disabled.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b5_up" file="skin-test/b5_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b5_down" file="skin-test/b5_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b5_dis" file="skin-test/b5_disabled.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b6_up" file="skin-test/b6_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b6_down" file="skin-test/b6_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b7_up" file="skin-test/b7_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="b7_down" file="skin-test/b7_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="slider" file="skin-test/slider.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="cursor_up" file="skin-test/cursor_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="cursor_down" file="skin-test/cursor_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="log_up" file="skin-test/log_up.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="log_down" file="skin-test/log_down.bmp" alphacolor="#FF0000"/>
-    <Bitmap id="playlist" file="skin-test/playlist.bmp" alphacolor="#FF0000"/>
-
-    <Bitmap id="DEFAULT_VLC_NULL_IMAGE" file="skin-test/cursor_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="body" file="body.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="q_up" file="quit_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="q_down" file="quit_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b1_up" file="b1_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b1_down" file="b1_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b2_up" file="b2_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b2_down" file="b2_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b3_up" file="b3_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b3_down" file="b3_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b3_dis" file="b3_disabled.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b4_up" file="b4_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b4_down" file="b4_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b4_dis" file="b4_disabled.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b5_up" file="b5_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b5_down" file="b5_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b5_dis" file="b5_disabled.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b6_up" file="b6_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b6_down" file="b6_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b7_up" file="b7_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="b7_down" file="b7_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="slider" file="slider.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="cursor_up" file="cursor_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="cursor_down" file="cursor_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="log_up" file="log_up.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="log_down" file="log_down.bmp" alphacolor="#FF0000"/>
+    <Bitmap id="playlist" file="playlist.bmp" alphacolor="#FF0000"/>
 
     <Event id="move_main" event="WINDOW_MOVE(mainwindow)"/>
     <Event id="move_main2" event="WINDOW_MOVE(mainwindow2)"/>
@@ -96,7 +94,7 @@
             <ButtonControl x="0" y="0" up="q_up" down="q_down" onclick="quit"/>
             <ImageControl x="0" y="0" image="playlist" onclick="move_child"/>
             <PlayListControl font="playlist" playfont="playlist2" abs="119,87,100" ord="36,182,200">
-				 <SliderControl up="cursor_up" down="cursor_down" abs="265,310,321,330,327,315,308" ord="20,36,62,87,107,119,134"/>
+                <SliderControl up="cursor_up" down="cursor_down" abs="265,310,321,330,327,315,308" ord="20,36,62,87,107,119,134"/>
             </PlayListControl>
         </ControlGroup>
     </Window>
