@@ -168,7 +168,6 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Preferences.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
-	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \
 	extras/MacOSX/Resources/asf.icns \
@@ -228,6 +227,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/volumetrack.png \
 	extras/MacOSX/Resources/about_bg.png \
 	extras/MacOSX/Resources/vlc.scriptSuite \
+	extras/MacOSX/Resources/vlc.scriptTerminology \
 	extras/MacOSX/Resources/README \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/macosx-dmg \
@@ -577,8 +577,6 @@ VLC.app: vlc
 	  ln -sf ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	  ln -sf ../English.lproj/MainMenu.nib \
-	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/vlc.scriptTerminology \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
