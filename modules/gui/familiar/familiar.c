@@ -2,9 +2,10 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.29 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: familiar.c,v 1.30 2003/02/26 15:44:22 marcari Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
+ *          Marc Ariberti <marcari@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -169,12 +170,17 @@ static void Run( intf_thread_t *p_intf )
 // FIXME: magic path
     add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/vlc");
+    /* Path for pixmaps under linupy */
+    add_pixmap_directory("/usr/local/share/pixmaps/vlc");
+
 
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
     {
         msg_Err( p_intf, "unable to create familiar interface" );
     }
+    gtk_widget_set_usize(p_intf->p_sys->p_window, 
+                        gdk_screen_width() , gdk_screen_height() - 30 );
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -215,7 +221,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
-    ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
+    ReadDirectory(p_intf->p_sys->p_clist, ".");
 
 #ifdef NEED_GTK_MAIN
     msg_Dbg( p_intf, "Manage GTK keyboard events using threads" );
