@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.23 2003/03/31 23:37:36 sigmunau Exp $
+ * $Id: ogg.c,v 1.24 2003/04/14 03:23:30 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -416,6 +416,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         input_DeletePES( p_input->p_method_data, p_pes );
         return;
     }
+    p_data->p_payload_end = p_data->p_payload_start + p_oggpacket->bytes;
 
     /* Convert the pcr into a pts */
     if( p_stream->i_cat != SPU_ES )

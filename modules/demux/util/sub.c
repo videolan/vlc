@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.11 2003/03/30 14:24:20 gbazin Exp $
+ * $Id: sub.c,v 1.12 2003/04/14 03:23:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -486,6 +486,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             p_sub->i_subtitle++;
             continue;
         }
+        p_data->p_payload_end = p_data->p_payload_start + i_len;
 
         p_pes->i_pts =
             input_ClockGetTS( p_sub->p_input,

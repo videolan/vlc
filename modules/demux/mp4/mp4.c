@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.20 2003/04/06 17:48:06 gbazin Exp $
+ * $Id: mp4.c,v 1.21 2003/04/14 03:23:30 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -465,6 +465,8 @@ static int MP4Demux( input_thread_t *p_input )
                     input_DeletePES( p_input->p_method_data, p_pes );
                     break;
                 }
+                p_data->p_payload_end = p_data->p_payload_start + i_size;
+
                 /* initialisation of all the field */
                 p_pes->i_dts = p_pes->i_pts = 0;
                 p_pes->p_first = p_pes->p_last  = p_data;
@@ -993,6 +995,8 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
                         p_pes_init = input_NewPES( p_input->p_method_data );
                         p_data = input_NewPacket( p_input->p_method_data,
                                                   i_decoder_specific_info_len);
+                        p_data->p_payload_end = p_data->p_payload_start + i_decoder_specific_info_len;
+
                         memcpy( p_data->p_payload_start,
                                 p_decoder_specific_info,
                                 i_decoder_specific_info_len );
