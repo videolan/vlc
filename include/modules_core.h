@@ -2,7 +2,7 @@
  * modules_core.h : Module management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_core.h,v 1.5 2001/03/21 13:42:33 sam Exp $
+ * $Id: modules_core.h,v 1.6 2001/05/31 12:45:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,12 +37,17 @@ module_load( char * psz_filename, module_handle_t * handle )
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
     return( *handle < 0 );
+
+#elif defined(WIN32)
+    *handle = LoadLibrary( psz_filename );
+    return( *handle == NULL ); 
+
 #else
     /* Do not open modules with RTLD_GLOBAL, or we are going to get namespace
      * collisions when two modules have common public symbols */
     *handle = dlopen( psz_filename, RTLD_NOW );
-
     return( *handle == NULL );
+
 #endif
 }
 
@@ -58,8 +63,13 @@ module_unload( module_handle_t handle )
 {
 #ifdef SYS_BEOS
     unload_add_on( handle );
+
+#elif defined(WIN32)
+    FreeLibrary( handle );
+
 #else
     dlclose( handle );
+
 #endif
     return;
 }
@@ -101,6 +111,9 @@ module_getsymbol( module_handle_t handle, char * psz_function )
     free( psz_call );
     return( p_return );
 
+#elif defined(WIN32)
+    return( (void *)GetProcAddress( handle, psz_function ) );
+
 #else
     return( dlsym( handle, psz_function ) );
 #endif
@@ -116,10 +129,12 @@ module_getsymbol( module_handle_t handle, char * psz_function )
 static __inline__ const char *
 module_error( void )
 {
-#ifdef SYS_BEOS
+#if defined(SYS_BEOS) || defined(WIN32)
     return( "failed" );
+
 #else
     return( dlerror() );
+
 #endif
 }
 

@@ -212,6 +212,9 @@ DCFLAGS += -MM
 LCFLAGS += @LCFLAGS@ $(LIB)
 LCFLAGS += -Wall
 #LCFLAGS += -s
+ifneq (,$(findstring mingw32,$(SYS)))
+LCFLAGS += -Xlinker --force-exe-suffix
+endif
 
 #
 # Debugging and profiling support

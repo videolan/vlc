@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.117 2001/05/31 03:57:54 sam Exp $
+ * $Id: input.c,v 1.118 2001/05/31 12:45:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -519,7 +519,7 @@ static void FileOpen( input_thread_t * p_input )
             psz_name += 4;
             i_stat = stat( psz_name, &stat_info );
 #if defined( WIN32 )
-            snprintf( buf, 7, "\\\\.\\%c:", psz_name[0] );
+            _snprintf( buf, 7, "\\\\.\\%c:", psz_name[0] );
 #endif
         }
         else if( ( i_size > 5 )

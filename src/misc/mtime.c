@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.20 2001/05/31 03:12:49 sam Exp $
+ * $Id: mtime.c,v 1.21 2001/05/31 12:45:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -68,13 +68,13 @@ static __inline__ void usleep( unsigned int i_useconds )
     {
         QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
 
-        i_now = ( cur * 1000 * 1000 / i_freq );
+        i_now = ( i_cur * 1000 * 1000 / i_freq );
         i_then = i_now + i_useconds;
 
         while( i_now < i_then )
         {
             QueryPerformanceCounter( (LARGE_INTEGER *) &i_cur );
-            now = cur * 1000 * 1000 / i_freq;
+            i_now = i_cur * 1000 * 1000 / i_freq;
         }
     }
     else
