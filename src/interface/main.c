@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.155 2002/02/26 01:17:13 stef Exp $
+ * $Id: main.c,v 1.156 2002/02/26 18:25:40 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,6 +155,7 @@ ADD_INTEGER ( VOUT_SPUMARGIN_VAR, -1, NULL, "force SPU position", NULL )
 /* Input options */
 ADD_CATEGORY_HINT( "Input Options", NULL )
 ADD_STRING  ( INPUT_METHOD_VAR, NULL, NULL, "input method", NULL )
+ADD_INTEGER ( INPUT_PORT_VAR, 1234, NULL, "server port", NULL )
 ADD_BOOL    ( INPUT_NETWORK_CHANNEL_VAR, NULL, "enable network channel mode",
               NULL )
 ADD_STRING  ( INPUT_CHANNEL_SERVER_VAR, "localhost", NULL,

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.78 2002/02/24 22:06:50 sam Exp $
+ * $Id: audio_output.c,v 1.79 2002/02/26 18:25:40 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -86,6 +86,7 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
 #if 0
     int             i_status;                               /* thread status */
 #endif
+    char *psz_name;
 
     /* Allocate descriptor */
     p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );
@@ -117,10 +118,10 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     }
 
     /* Choose the best module */
-    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
-                           config_GetPszVariable( AOUT_METHOD_VAR ), 
-                           (void *)p_aout );
-
+    psz_name = config_GetPszVariable( AOUT_METHOD_VAR );
+    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT, psz_name,
+                                    (void *)p_aout );
+    if( psz_name ) free( psz_name );
     if( p_aout->p_module == NULL )
     {
         intf_ErrMsg( "aout error: no suitable aout module" );
