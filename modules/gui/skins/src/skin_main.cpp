@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.44 2003/07/13 14:55:17 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.45 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,17 +28,6 @@
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 
-//--- GENERAL ---------------------------------------------------------------
-#if !defined(MODULE_NAME_IS_basic_skins)
-#ifdef WIN32                                               /* mingw32 hack */
-#   undef Yield
-#   undef CreateDialog
-#endif
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-#include <wx/wx.h>
-#endif
-
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
 #include "event.h"
@@ -50,10 +39,6 @@
 #include "vlcproc.h"
 #include "skin_common.h"
 #include "dialogs.h"
-
-#if !defined(MODULE_NAME_IS_basic_skins)
-#include "../../wxwindows/wxwindows.h"
-#endif
 
 #ifdef X11_SKINS
 #include <X11/Xlib.h>
@@ -102,6 +87,7 @@ static int Open ( vlc_object_t *p_this )
     };
 
     p_intf->pf_run = Run;
+    p_intf->p_sys->pf_showdialog = Dialogs::ShowDialog;
 
 
     // Suscribe to messages bank
@@ -249,12 +235,9 @@ static void Run( intf_thread_t *p_intf )
 
     int a = OSAPI_GetTime();
 
-#if !defined(MODULE_NAME_IS_basic_skins)
     // Initialize the dialog boxes
     p_intf->p_sys->p_dialogs = new Dialogs( p_intf );
-    if( !p_intf->p_sys->p_dialogs ||
-        !p_intf->p_sys->p_dialogs->OpenDlg ) return;
-#endif
+    if( !p_intf->p_sys->p_dialogs ) return;
 
     // Load a theme
     char *skin_last = config_GetPsz( p_intf, "skin_last" );
@@ -286,6 +269,7 @@ static void Run( intf_thread_t *p_intf )
         if( !Loader->Load( user_skin ) && !Loader->Load( default_skin ) )
         {
 #endif
+#if 0
 #if !defined(MODULE_NAME_IS_basic_skins)
             wxMutexGuiEnter();
             wxFileDialog dialog( NULL,
@@ -307,10 +291,13 @@ static void Run( intf_thread_t *p_intf )
             }
             else
 #endif
+#endif
             {
                 delete Loader;
+#if 0
 #if !defined(MODULE_NAME_IS_basic_skins)
                 wxMutexGuiLeave();
+#endif
 #endif
                 return;
             }
@@ -329,10 +316,8 @@ static void Run( intf_thread_t *p_intf )
 
     OSRun( p_intf );
 
-#if !defined(MODULE_NAME_IS_basic_skins)
     // clean up the dialog boxes
     delete p_intf->p_sys->p_dialogs;
-#endif
 }
 
 //---------------------------------------------------------------------------
@@ -359,9 +344,6 @@ vlc_module_begin();
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
-#if !defined(WIN32) && !defined(MODULE_NAME_IS_basic_skins)
-    linked_with_a_crap_library_which_uses_atexit();
-#endif
 vlc_module_end();
 
 
@@ -383,14 +365,6 @@ int SkinManage( intf_thread_t *p_intf )
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
     }
-
-#if !defined(MODULE_NAME_IS_basic_skins) //FIXME
-    // Update the log window
-    p_intf->p_sys->p_dialogs->MessagesDlg->UpdateLog();
-
-    // Update the file info window
-    p_intf->p_sys->p_dialogs->FileInfoDlg->UpdateFileInfo();
-#endif
 
     //-------------------------------------------------------------------------
     if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )

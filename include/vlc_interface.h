@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.1 2003/06/24 13:33:49 sam Exp $
+ * $Id: vlc_interface.h,v 1.2 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -44,6 +44,9 @@ struct intf_thread_t
     module_t *   p_module;
     void      ( *pf_run )    ( intf_thread_t * );
 
+    /* Specific for dialogs providers */
+    void      ( *pf_show_dialog ) ( intf_thread_t *, int, int );
+
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
     vlc_bool_t   b_menu_change;
@@ -76,3 +79,15 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #else
 #    define CONSOLE_INTRO_MSG
 #endif
+
+/* Interface dialog ids for dialog providers */
+#define INTF_DIALOG_FILE_SIMPLE 1
+#define INTF_DIALOG_FILE        2
+#define INTF_DIALOG_DISC        3
+#define INTF_DIALOG_NET         4
+#define INTF_DIALOG_SAT         5
+
+#define INTF_DIALOG_PLAYLIST   10
+#define INTF_DIALOG_MESSAGES   11
+#define INTF_DIALOG_FILEINFO   12
+#define INTF_DIALOG_PREFS      13

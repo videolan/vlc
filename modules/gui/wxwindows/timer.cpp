@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.25 2003/06/23 16:09:13 gbazin Exp $
+ * $Id: timer.cpp,v 1.26 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,8 +51,8 @@
 void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
 /* Callback prototype */
-int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
-                 vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 /*****************************************************************************
  * Constructor.
@@ -110,15 +110,6 @@ void Timer::Notify()
 
         p_intf->p_sys->b_popup_change = VLC_FALSE;
     }
-
-    /* Update the log window */
-    p_intf->p_sys->p_messages_window->UpdateLog();
-
-    /* Update the playlist */
-    p_intf->p_sys->p_playlist_window->UpdatePlaylist();
-
-    /* Update the fileinfo windows */
-    p_intf->p_sys->p_fileinfo_window->UpdateFileInfo();
 
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
@@ -301,8 +292,8 @@ void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
  *  We don't show the menu directly here because we don't want the
  *  caller to block for a too long time.
  *****************************************************************************/
-int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
-                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
 

@@ -2,6 +2,7 @@ SOURCES_wxwindows = \
 	wxwindows.cpp \
 	wxwindows.h \
 	interface.cpp \
+	dialogs.cpp \
 	open.cpp \
 	streamout.cpp \
 	messages.cpp \

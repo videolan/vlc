@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.17 2003/07/05 15:35:28 sam Exp $
+ * $Id: wxwindows.cpp,v 1.18 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -56,8 +56,12 @@ int wxEntry( int argc, char *argv[] , bool enterLoop = TRUE );
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
+static int  OpenDialogs  ( vlc_object_t * );
 
 static void Run          ( intf_thread_t * );
+static void Init         ( intf_thread_t * );
+
+static void ShowDialog   ( intf_thread_t *, int, int );
 
 /*****************************************************************************
  * Local classes declarations.
@@ -86,6 +90,12 @@ vlc_module_begin();
     add_shortcut( "wxwin" );
     add_shortcut( "wx" );
     set_program( "wxvlc" );
+
+    add_submodule();
+    set_description( _("wxWindows dialogs provider") );
+    set_capability( "dialogs provider", 50 );
+    set_callbacks( OpenDialogs, Close );
+
 #if !defined(WIN32)
     linked_with_a_crap_library_which_uses_atexit();
 #endif
@@ -121,7 +131,19 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_popup_menu = NULL;
     p_intf->p_sys->b_popup_change = VLC_FALSE;
 
+    p_intf->pf_show_dialog = NULL;
+
     return VLC_SUCCESS;
+}
+
+static int OpenDialogs( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    int i_ret = Open( p_this );
+
+    p_intf->pf_show_dialog = ShowDialog;
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -157,8 +179,30 @@ DllMain (HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
 
 static void Run( intf_thread_t *p_intf )
 {
+    if( p_intf->pf_show_dialog )
+    {
+        /* The module is used in dialog provider mode */
+
+        /* Create a new thread for wxWindows */
+        if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
+                               Init, 0, VLC_TRUE ) )
+        {
+            msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
+            p_intf->pf_show_dialog = NULL;
+        }
+    }
+    else
+    {
+        /* The module is used in interface mode */
+        Init( p_intf );
+    }
+}
+
+static void Init( intf_thread_t *p_intf )
+{
 #if !defined( WIN32 )
     static char  *p_args[] = { "" };
+    int i_args = 1;
 #endif
 
     /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
@@ -166,12 +210,12 @@ static void Run( intf_thread_t *p_intf )
 
 #if defined( WIN32 )
 #if !defined(__BUILTIN__)
-    wxEntry( hInstance/*GetModuleHandle(NULL)*/, NULL, NULL, SW_SHOW, TRUE );
+    wxEntry( hInstance/*GetModuleHandle(NULL)*/, NULL, NULL, SW_SHOW );
 #else
-    wxEntry( GetModuleHandle(NULL), NULL, NULL, SW_SHOW, TRUE );
+    wxEntry( GetModuleHandle(NULL), NULL, NULL, SW_SHOW );
 #endif
 #else
-    wxEntry( 1, p_args );
+    wxEntry( i_args, p_args );
 #endif
 }
 
@@ -206,27 +250,41 @@ bool Instance::OnInit()
     locale.Init( wxLANGUAGE_DEFAULT );
 
     /* Make an instance of your derived frame. Passing NULL (the default value
-     * of Frame's constructor is NULL) as the frame doesn't have a frame
+     * of Frame's constructor is NULL) as the frame doesn't have a parent
      * since it is the first window */
-    Interface *MainInterface = new Interface( p_intf );
 
-    /* Create the playlist window */
-    p_intf->p_sys->p_playlist_window = new Playlist( p_intf, MainInterface );
+    if( !p_intf->pf_show_dialog )
+    {
+        /* The module is used in interface mode */
+        Interface *MainInterface = new Interface( p_intf );
+        p_intf->p_sys->p_wxwindow = MainInterface;
 
-    /* Create the log window */
-    p_intf->p_sys->p_messages_window = new Messages( p_intf, MainInterface );
+        /* Show the interface */
+        MainInterface->Show( TRUE );
 
-    /* Create the fileinfo window */
-    p_intf->p_sys->p_fileinfo_window = new FileInfo ( p_intf, MainInterface );
+        SetTopWindow( MainInterface );
 
-    /* Show the interface */
-    MainInterface->Show( TRUE );
+        /* Start timer */
+        new Timer( p_intf, MainInterface );
+    }
 
-    SetTopWindow( MainInterface );
+    /* Creates the dialogs provider */
+    p_intf->p_sys->p_wxwindow =
+        new DialogsProvider( p_intf, p_intf->pf_show_dialog ?
+                             NULL : p_intf->p_sys->p_wxwindow );
 
-    /* Start timer */
-    new Timer( p_intf, MainInterface );
+    p_intf->p_sys->pf_show_dialog = ShowDialog;
+
+    /* OK, initialization is over */
+    vlc_thread_ready( p_intf );
 
     /* Return TRUE to tell program to continue (FALSE would terminate) */
     return TRUE;
+}
+
+static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg )
+{
+    wxCommandEvent event( wxEVT_DIALOG, i_dialog_event );
+    event.SetInt( i_arg );
+    p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
 }

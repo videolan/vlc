@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.27 2003/06/14 21:18:36 gbazin Exp $
+ * $Id: open.cpp,v 1.28 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -94,7 +94,7 @@ enum
     DemuxDumpBrowse_Event,
 };
 
-BEGIN_EVENT_TABLE(OpenDialog, wxDialog)
+BEGIN_EVENT_TABLE(OpenDialog, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, OpenDialog::OnOk)
     EVT_BUTTON(wxID_CANCEL, OpenDialog::OnCancel)
@@ -141,14 +141,17 @@ BEGIN_EVENT_TABLE(OpenDialog, wxDialog)
     EVT_TEXT(DemuxDump_Event, OpenDialog::OnDemuxDumpChange)
     EVT_BUTTON(DemuxDumpBrowse_Event, OpenDialog::OnDemuxDumpBrowse)
 
+    /* Hide the window when the user closes the window */
+    EVT_CLOSE(OpenDialog::OnCancel)
+
 END_EVENT_TABLE()
 
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
-                        int i_access_method ):
-    wxDialog( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
+                        int i_access_method, int i_arg ):
+    wxFrame( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -327,15 +330,23 @@ OpenDialog::~OpenDialog()
     if( demuxdump_dialog ) delete demuxdump_dialog;
 }
 
-int OpenDialog::ShowModal( int i_access_method )
+int OpenDialog::Show( int i_access_method, int i_arg )
 {
+    int i_ret;
     notebook->SetSelection( i_access_method );
-    return wxDialog::ShowModal();
+    i_ret = wxFrame::Show();
+    Raise();
+    SetFocus();
+    return i_ret;
 }
 
-int OpenDialog::ShowModal()
+int OpenDialog::Show()
 {
-    return wxDialog::ShowModal();
+    int i_ret;
+    i_ret = wxFrame::Show();
+    Raise();
+    SetFocus();
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -636,12 +647,32 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     mrl_combo->Append( mrl_combo->GetValue() );
     if( mrl_combo->GetCount() > 10 ) mrl_combo->Delete( 0 );
     mrl_combo->SetSelection( mrl_combo->GetCount() - 1 );
-    EndModal( wxID_OK );
+
+    /* Update the playlist */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+				       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    for( size_t i = 0; i < mrl.GetCount(); i++ )
+    {
+        playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
+		      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+    }
+
+    //TogglePlayButton( PLAYING_S );
+
+    vlc_object_release( p_playlist );
+
+    Hide();
 }
 
 void OpenDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
-    EndModal( wxID_CANCEL );
+    Hide();
 }
 
 void OpenDialog::OnPageChange( wxNotebookEvent& event )
@@ -782,7 +813,7 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
     if( subsfile_dialog == NULL )
-        subsfile_dialog = new SubsFileDialog( p_intf, p_parent );
+        subsfile_dialog = new SubsFileDialog( p_intf, this );
 
     if( subsfile_dialog && subsfile_dialog->ShowModal() == wxID_OK )
     {
@@ -818,7 +849,7 @@ void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
     if( sout_dialog == NULL )
-        sout_dialog = new SoutDialog( p_intf, p_parent );
+        sout_dialog = new SoutDialog( p_intf, this );
 
     if( sout_dialog && sout_dialog->ShowModal() == wxID_OK )
     {

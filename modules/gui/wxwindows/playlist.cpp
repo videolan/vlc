@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.12 2003/07/12 13:33:10 gbazin Exp $
+ * $Id: playlist.cpp,v 1.13 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -100,13 +100,12 @@ END_EVENT_TABLE()
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxFrame( _p_main_interface, -1, wxU(_("Playlist")), wxDefaultPosition,
+Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
+    wxFrame( p_parent, -1, wxU(_("Playlist")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
-    p_main_interface = _p_main_interface;
     i_update_counter = 0;
     b_need_update = VLC_FALSE;
     vlc_mutex_init( p_intf, &lock );
@@ -364,66 +363,20 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnAddFile( wxCommandEvent& WXUNUSED(event) )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE, 0 );
 
-    if( p_main_interface->p_file_dialog == NULL )
-        p_main_interface->p_file_dialog =
-            new wxFileDialog( this, wxU(_("Open file")), wxT(""), wxT(""),
-                              wxT("*"), wxOPEN | wxMULTIPLE );
-
-    if( p_main_interface->p_file_dialog &&
-        p_main_interface->p_file_dialog->ShowModal() == wxID_OK )
-    {
-        wxArrayString paths;
-
-        p_main_interface->p_file_dialog->GetPaths( paths );
-
-        for( size_t i = 0; i < paths.GetCount(); i++ )
-            playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                          PLAYLIST_APPEND, PLAYLIST_END );
-    }
-
-    vlc_object_release( p_playlist );
-
+#if 0
     Rebuild();
+#endif
 }
 
 void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )
 {
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE, 0 );
 
-    /* Show/hide the open dialog */
-    if( p_main_interface->p_open_dialog == NULL )
-        p_main_interface->p_open_dialog =
-            new OpenDialog( p_intf, this, FILE_ACCESS );
-
-    if( p_main_interface->p_open_dialog &&
-        p_main_interface->p_open_dialog->ShowModal() == wxID_OK )
-    {
-        for( size_t i = 0;
-             i < p_main_interface->p_open_dialog->mrl.GetCount(); i++ )
-        {
-            playlist_Add( p_playlist,
-                (const char *)p_main_interface->p_open_dialog->mrl[i].mb_str(),
-                PLAYLIST_APPEND, PLAYLIST_END );
-        }
-    }
-
-    vlc_object_release( p_playlist );
-
+#if 0
     Rebuild();
+#endif
 }
 
 void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.21 2003/06/13 21:18:53 asmax Exp $
+ * $Id: skin_common.h,v 1.22 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -74,6 +74,9 @@ struct intf_sys_t
 
     // Interface dialogs
     Dialogs *p_dialogs;
+
+    // Send an event to show a dialog
+    void (*pf_showdialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg );
 
     // Popup menu
     vlc_bool_t b_popup_change;

@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.6 2003/06/11 10:42:34 gbazin Exp $
+ * $Id: dialogs.h,v 1.7 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,32 +32,6 @@ using namespace std;
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 
-#if !defined(MODULE_NAME_IS_basic_skins)
-
-#ifdef WIN32                                               /* mingw32 hack */
-#   undef Yield
-#   undef CreateDialog
-#endif
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-#include <wx/wx.h>
-
-class OpenDialog;
-class Messages;
-class SoutDialog;
-class PrefsDialog;
-class FileInfo;
-class wxIcon;
-
-typedef struct dialogs_thread_t
-{
-    VLC_COMMON_MEMBERS
-    intf_thread_t * p_intf;
-
-} dialogs_thread_t;
-
-#endif
-
 //---------------------------------------------------------------------------
 class Dialogs
 {
@@ -71,6 +45,7 @@ class Dialogs
         // Destructor
         virtual ~Dialogs();
 
+        static void ShowDialog( intf_thread_t *, int, int );
         void ShowOpen( bool b_play );
         void ShowOpenSkin();
         void ShowMessages();
@@ -80,24 +55,12 @@ class Dialogs
 
         vlc_bool_t b_popup_change;
 
-#if !defined(MODULE_NAME_IS_basic_skins)
-        // Dialogs
-        OpenDialog  *OpenDlg;
-        Messages    *MessagesDlg;
-        PrefsDialog *PrefsDlg;
-        FileInfo    *FileInfoDlg;
-
-        dialogs_thread_t *p_thread;
-
-        void OnShowOpen( wxCommandEvent& event );
-        void OnShowOpenSkin( wxCommandEvent& event );
-        void OnShowMessages( wxCommandEvent& event );
-        void OnShowPrefs( wxCommandEvent& event );
-        void OnShowFileInfo( wxCommandEvent& event );
-        void OnShowPopup( wxCommandEvent& event );
-        void OnExitThread( wxCommandEvent& event );
-#endif
+    private:
+        /* Dialogs provider module */
+        intf_thread_t *p_provider;
+        module_t *p_module;
 };
+
 //---------------------------------------------------------------------------
 
 #endif

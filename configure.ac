@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.33 2003/07/17 14:54:26 sam Exp $
+dnl $Id: configure.ac,v 1.34 2003/07/17 17:30:39 gbazin Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1705,7 +1705,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  AX_ADD_LDFLAGS([mp4 skins basic_skins],[-lz])
+  AX_ADD_LDFLAGS([mp4 skins],[-lz])
 ] )
 
 
@@ -1713,7 +1713,7 @@ dnl
 dnl skins module
 dnl
 AC_CHECK_HEADERS(libtar.h, [
-  AX_ADD_LDFLAGS([skins basic_skins],[-ltar])
+  AX_ADD_LDFLAGS([skins],[-ltar])
 ] )
 
 
@@ -2422,72 +2422,25 @@ dnl
 AC_ARG_ENABLE(skins,
   [  --enable-skins          Skins interface module (default enabled on Win32)])
 if test "${enable_skins}" != "no"; then
-  WXWINDOWS_PATH="${PATH}"
-  AC_ARG_WITH(skins-wx-config-path,
-    [    --with-skins-wx-config-path=PATH wx-config path for the skins plugin (default search in \$PATH)],
-    [ if test "${with_skins_wx_config_path}" != "no"
-      then
-        WXWINDOWS_PATH="${with_skins_wx_config_path}:${PATH}"
-      fi ])
-  # look for wx-config
-  AC_PATH_PROG(WX_CONFIG_SKINS, wx-config, no, ${WXWINDOWS_PATH})
-  if test "${WX_CONFIG_SKINS}" != "no"
-  then
-    if expr 2.3.0 \> `${WX_CONFIG_SKINS} --version` >/dev/null
-    then
-      AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-skins.])
-    fi
-    AX_ADD_CPPFLAGS([skins],[`${WX_CONFIG_SKINS} --cxxflags` -DWX_SKINS])
-    AX_ADD_LDFLAGS([skins],[`${WX_CONFIG_SKINS} --libs`])
-  fi
-
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+
     AX_ADD_PLUGINS([skins])
     AX_ADD_CPPFLAGS([skins],[-U_OFF_T_ -U_off_t -Imodules/gui/skins])
     AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
-  else
-    if test "${enable_skins}" = "yes"; then
-      IMLIB2_PATH="${PATH}"
-      AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-      if test "${IMLIB2_CONFIG_SKINS}" = "no"; then
-        AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
-      fi
 
-      AX_ADD_PLUGINS([skins])
-      AX_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS])
-      AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
-      AX_ADD_LDFLAGS([skins],[-L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`])
-      AX_ADD_PLUGINS([skins])
-    fi
-  fi
-fi
-
-dnl
-dnl Basic skins module (i.e. without wxWindows dialogs)
-dnl
-AC_ARG_ENABLE(basic-skins,
-  [  --enable-basic-skins    Skins interface module without wxWindows dialogs (default disabled)])
-if test "${enable_basic_skins}" = "yes"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
-
-    AX_ADD_CPPFLAGS([basic_skins],[-U_OFF_T_ -U_off_t -Imodules/gui/skins])
-    AX_ADD_CXXFLAGS([basic_skins],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([basic_skins],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
-
-  else
+  else if test "${enable_skins}" = "yes"; then
     IMLIB2_PATH="${PATH}"
     AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
     if test "${IMLIB2_CONFIG_SKINS}" = "no"; then
-    AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
+    AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
     fi
 
-    AX_ADD_CPPFLAGS([basic_skins],[-Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS])
-    AX_ADD_CXXFLAGS([basic_skins],[-O2 -fno-rtti])
-    AX_ADD_LDFLAGS([basic_skins],[-L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`])
-  fi
-
-  AX_ADD_PLUGINS([basic_skins])
+    AX_ADD_PLUGINS([skins])
+    AX_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS])
+    AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
+    AX_ADD_LDFLAGS([skins],[-L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`])
+  fi fi
 fi
 
 dnl

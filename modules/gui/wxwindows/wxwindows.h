@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.42 2003/07/12 13:33:10 gbazin Exp $
+ * $Id: wxwindows.h,v 1.43 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -29,6 +29,18 @@
 #include <wx/treectrl.h>
 #include <wx/gauge.h>
 
+DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
+
+enum
+{
+    FILE_ACCESS,
+    DISC_ACCESS,
+    NET_ACCESS,
+    SAT_ACCESS,
+    FILE_SIMPLE_ACCESS
+};
+
+class OpenDialog;
 class Playlist;
 class Messages;
 class FileInfo;
@@ -52,11 +64,6 @@ struct intf_sys_t
     wxWindow            *p_wxwindow;
     wxIcon              *p_icon;
 
-    /* secondary windows */
-    Playlist            *p_playlist_window;
-    Messages            *p_messages_window;
-    FileInfo            *p_fileinfo_window;
-
     /* special actions */
     vlc_bool_t          b_playing;
 
@@ -73,6 +80,9 @@ struct intf_sys_t
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
+
+    /* Send an event to show a dialog */
+    void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg );
 
     /* Popup menu */
     wxMenu              *p_popup_menu;
@@ -108,7 +118,6 @@ private:
 };
 
 /* Main Interface */
-class OpenDialog;
 class Interface: public wxFrame
 {
 public:
@@ -126,13 +135,6 @@ public:
 
     wxGauge     *volctrl;
 
-    /* So we don't recreate the open dialog box each time
-     * (and keep the last settings) */
-    OpenDialog  *p_open_dialog;
-
-    /* idem for the simple open file dialog */
-    wxFileDialog *p_file_dialog;
-
 private:
     void CreateOurMenuBar();
     void CreateOurToolBar();
@@ -142,17 +144,8 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
-    void OnMessages( wxCommandEvent& event );
-    void OnPlaylist( wxCommandEvent& event );
-    void OnLogs( wxCommandEvent& event );
-    void OnFileInfo( wxCommandEvent& event );
-    void OnPreferences( wxCommandEvent& event );
 
-    void OnOpenFileSimple( wxCommandEvent& event );
-    void OnOpenFile( wxCommandEvent& event );
-    void OnOpenDisc( wxCommandEvent& event );
-    void OnOpenNet( wxCommandEvent& event );
-    void OnOpenSat( wxCommandEvent& event );
+    void OnShowDialog( wxCommandEvent& event );
 
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
@@ -174,8 +167,7 @@ private:
     Timer *timer;
     intf_thread_t *p_intf;
 
-    wxFrame *p_prefs_dialog;
-
+private:
     int i_old_playing_status;
 
     /* For auto-generated menus */
@@ -187,19 +179,59 @@ private:
     vlc_bool_t b_navig_menu;
 };
 
+/* Dialogs Provider */
+class DialogsProvider: public wxFrame
+{
+public:
+    /* Constructor */
+    DialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~DialogsProvider();
+
+private:
+    void Open( int i_access_method, int i_arg );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnExit( wxCommandEvent& event );
+    void OnPlaylist( wxCommandEvent& event );
+    void OnMessages( wxCommandEvent& event );
+    void OnFileInfo( wxCommandEvent& event );
+    void OnPreferences( wxCommandEvent& event );
+
+    void OnOpenFileSimple( wxCommandEvent& event );
+    void OnOpenFile( wxCommandEvent& event );
+    void OnOpenDisc( wxCommandEvent& event );
+    void OnOpenNet( wxCommandEvent& event );
+    void OnOpenSat( wxCommandEvent& event );
+
+    void OnIdle( wxIdleEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+
+public:
+    /* Secondary windows */
+    OpenDialog          *p_open_dialog;
+    wxFileDialog        *p_file_dialog;
+    Playlist            *p_playlist_dialog;
+    Messages            *p_messages_dialog;
+    FileInfo            *p_fileinfo_dialog;
+    wxFrame             *p_prefs_dialog;
+};
+
 /* Open Dialog */
 class SoutDialog;
 class SubsFileDialog;
-class OpenDialog: public wxDialog
+class OpenDialog: public wxFrame
 {
 public:
     /* Constructor */
     OpenDialog( intf_thread_t *p_intf, wxWindow *p_parent,
-                int i_access_method );
+                int i_access_method, int i_arg = 0 );
     virtual ~OpenDialog();
 
-    int ShowModal();
-    int ShowModal( int i_access_method );
+    int Show();
+    int Show( int i_access_method, int i_arg = 0 );
 
     wxArrayString mrl;
 
@@ -286,15 +318,6 @@ private:
     wxButton *demuxdump_button;
     wxCheckBox *demuxdump_checkbox;
     wxFileDialog *demuxdump_dialog;
-};
-
-enum
-{
-    FILE_ACCESS = 0,
-    DISC_ACCESS,
-    NET_ACCESS,
-    SAT_ACCESS,
-    FILE_SIMPLE_ACCESS
 };
 
 /* Stream output Dialog */
@@ -461,7 +484,7 @@ class Playlist: public wxFrame
 {
 public:
     /* Constructor */
-    Playlist( intf_thread_t *p_intf, Interface *p_main_interface );
+    Playlist( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~Playlist();
 
     void UpdatePlaylist();
@@ -489,7 +512,6 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
     wxListView *listview;
     int i_update_counter;
 };
@@ -543,7 +565,8 @@ public:
     MenuEvtHandler( intf_thread_t *p_intf, Interface *p_main_interface );
     virtual ~MenuEvtHandler();
 
-    void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event );
+    void OnMenuEvent( wxCommandEvent& event );
+    void OnShowDialog( wxCommandEvent& event );
 
 private:
 
@@ -564,6 +587,7 @@ public:
 private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnClose( wxCommandEvent& event );
+    void OnShowDialog( wxCommandEvent& event );
     void OnEntrySelected( wxCommandEvent& event );
 
     wxMenu *Menu::CreateDummyMenu();

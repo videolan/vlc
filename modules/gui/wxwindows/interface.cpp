@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.45 2003/07/12 13:33:10 gbazin Exp $
+ * $Id: interface.cpp,v 1.46 2003/07/17 17:30:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,10 +155,11 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Menu events */
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
-    EVT_MENU(Playlist_Event, Interface::OnPlaylist)
-    EVT_MENU(Logs_Event, Interface::OnLogs)
-    EVT_MENU(FileInfo_Event, Interface::OnFileInfo)
-    EVT_MENU(Prefs_Event, Interface::OnPreferences)
+
+    EVT_MENU(Playlist_Event, Interface::OnShowDialog)
+    EVT_MENU(Logs_Event, Interface::OnShowDialog)
+    EVT_MENU(FileInfo_Event, Interface::OnShowDialog)
+    EVT_MENU(Prefs_Event, Interface::OnShowDialog)
 
     EVT_MENU_OPEN(Interface::OnMenuOpen)
 
@@ -168,11 +169,11 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_RIGHT_UP(Interface::OnContextMenu)
 
     /* Toolbar events */
-    EVT_MENU(OpenFileSimple_Event, Interface::OnOpenFileSimple)
-    EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
-    EVT_MENU(OpenDisc_Event, Interface::OnOpenDisc)
-    EVT_MENU(OpenNet_Event, Interface::OnOpenNet)
-    EVT_MENU(OpenSat_Event, Interface::OnOpenSat)
+    EVT_MENU(OpenFileSimple_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenFile_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenDisc_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
@@ -182,6 +183,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
+
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -193,14 +195,10 @@ Interface::Interface( intf_thread_t *_p_intf ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    p_prefs_dialog = NULL;
     i_old_playing_status = PAUSE_S;
-    p_open_dialog = NULL;
-    p_file_dialog = NULL;
 
     /* Give our interface a nice little icon */
-    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
-    SetIcon( *p_intf->p_sys->p_icon );
+    SetIcon( wxIcon( vlc_xpm ) );
 
     /* Create a sizer for the main frame */
     frame_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -225,7 +223,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
     statusbar->SetStatusWidths( 3, i_status_width );
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
-
     /* Make sure we've got the right background colour */
     SetBackgroundColour( slider_frame->GetBackgroundColour() );
 
@@ -243,10 +240,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
 Interface::~Interface()
 {
     /* Clean up */
-    if( p_open_dialog ) delete p_open_dialog;
-    if( p_prefs_dialog ) p_prefs_dialog->Destroy();
-    if( p_file_dialog ) delete p_file_dialog;
-    if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
 }
 
 /*****************************************************************************
@@ -444,37 +437,6 @@ void Interface::CreateOurSlider()
     slider_frame->Hide();
 }
 
-void Interface::Open( int i_access_method )
-{
-    /* Show/hide the open dialog */
-    if( p_open_dialog == NULL )
-        p_open_dialog = new OpenDialog( p_intf, this, i_access_method );
-
-    if( p_open_dialog &&
-        p_open_dialog->ShowModal( i_access_method ) == wxID_OK )
-    {
-        /* Update the playlist */
-        playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            return;
-        }
-
-        for( size_t i = 0; i < p_open_dialog->mrl.GetCount(); i++ )
-        {
-            playlist_Add( p_playlist,
-                (const char *)p_open_dialog->mrl[i].mb_str(),
-                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-        }
-
-        TogglePlayButton( PLAYING_S );
-
-        vlc_object_release( p_playlist );
-    }
-}
-
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
@@ -607,97 +569,49 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
                   wxT("VLC media player")), wxOK | wxICON_INFORMATION, this );
 }
 
-void Interface::OnPlaylist( wxCommandEvent& WXUNUSED(event) )
+void Interface::OnShowDialog( wxCommandEvent& event )
 {
-    /* Show/hide the playlist window */
-    Playlist *p_playlist_window = p_intf->p_sys->p_playlist_window;
-    if( p_playlist_window )
+    if( p_intf->p_sys->pf_show_dialog )
     {
-        p_playlist_window->ShowPlaylist( ! p_playlist_window->IsShown() );
+        int i_id;
+
+        switch( event.GetId() )
+        {
+        case OpenFileSimple_Event:
+            i_id = INTF_DIALOG_FILE_SIMPLE;
+            break;
+        case OpenFile_Event:
+            i_id = INTF_DIALOG_FILE;
+            break;
+        case OpenDisc_Event:
+            i_id = INTF_DIALOG_DISC;
+            break;
+        case OpenNet_Event:
+            i_id = INTF_DIALOG_NET;
+            break;
+        case OpenSat_Event:
+            i_id = INTF_DIALOG_SAT;
+            break;
+        case Playlist_Event:
+            i_id = INTF_DIALOG_PLAYLIST;
+            break;
+        case Logs_Event:
+            i_id = INTF_DIALOG_MESSAGES;
+            break;
+        case FileInfo_Event:
+            i_id = INTF_DIALOG_FILEINFO;
+            break;
+        case Prefs_Event:
+            i_id = INTF_DIALOG_PREFS;
+            break;
+        default:
+            i_id = INTF_DIALOG_FILE;
+            break;
+
+        }
+
+        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1 );
     }
-}
-
-void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
-{
-    /* Show/hide the log window */
-    wxFrame *p_messages_window = p_intf->p_sys->p_messages_window;
-    if( p_messages_window )
-    {
-        p_messages_window->Show( ! p_messages_window->IsShown() );
-    }
-}
-
-void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
-{
-    /* Show/hide the file info window */
-    wxFrame *p_fileinfo_window = p_intf->p_sys->p_fileinfo_window;
-    if( p_fileinfo_window )
-    {
-        p_fileinfo_window->Show( ! p_fileinfo_window->IsShown() );
-    }
-}
-
-void Interface::OnPreferences( wxCommandEvent& WXUNUSED(event) )
-{
-    /* Show/hide the open dialog */
-    if( p_prefs_dialog == NULL )
-    {
-        p_prefs_dialog = new PrefsDialog( p_intf, this );
-    }
-
-    if( p_prefs_dialog )
-    {
-        p_prefs_dialog->Show( true );
-    }
-}
-
-void Interface::OnOpenFileSimple( wxCommandEvent& WXUNUSED(event) )
-{
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    if( p_file_dialog == NULL )
-        p_file_dialog = new wxFileDialog( this, wxU(_("Open file")),
-            wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
-
-    if( p_file_dialog && p_file_dialog->ShowModal() == wxID_OK )
-    {
-        wxArrayString paths;
-
-        p_file_dialog->GetPaths( paths );
-
-        for( size_t i = 0; i < paths.GetCount(); i++ )
-            playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                          PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO),
-                          PLAYLIST_END );
-    }
-
-    vlc_object_release( p_playlist );
-}
-
-void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )
-{
-    Open( FILE_ACCESS );
-}
-
-void Interface::OnOpenDisc( wxCommandEvent& WXUNUSED(event) )
-{
-    Open( DISC_ACCESS );
-}
-
-void Interface::OnOpenNet( wxCommandEvent& WXUNUSED(event) )
-{
-    Open( NET_ACCESS );
-}
-
-void Interface::OnOpenSat( wxCommandEvent& WXUNUSED(event) )
-{
-    Open( SAT_ACCESS );
 }
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
@@ -709,15 +623,12 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
     if( p_playlist == NULL )
     {
         /* If the playlist is empty, open a file requester instead */
-        OnOpenFile( dummy );
+        OnShowDialog( dummy );
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-
         input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf,
                                                        VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
@@ -750,7 +661,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
-        OnOpenFile( dummy );
+        OnShowDialog( dummy );
     }
 }
 
