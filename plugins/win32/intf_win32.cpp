@@ -106,7 +106,10 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_window = new TMainFrameDlg( NULL );
     p_intf->p_sys->p_playlist = new TPlaylistDlg( NULL );
     p_intf->p_sys->p_messages = new TMessagesDlg( NULL );
+
+    /* show main window and wait until it is closed */
     p_intf->p_sys->p_window->ShowModal();
+
     if( p_intf->p_sys->p_disc ) delete p_intf->p_sys->p_disc;
     if( p_intf->p_sys->p_network ) delete p_intf->p_sys->p_network;
     if( p_intf->p_sys->p_preferences ) delete p_intf->p_sys->p_preferences;
@@ -219,7 +222,6 @@ int Win32Manage( intf_thread_t *p_intf )
 
         /* Prepare to die, young Skywalker */
         p_intf->p_sys->p_window->ModalResult = mrOk;
-        delete p_intf->p_sys->p_window;
 
         /* Just in case */
         return( FALSE );
