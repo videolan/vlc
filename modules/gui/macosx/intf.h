@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.h,v 1.38 2003/05/11 19:09:51 hartman Exp $
+ * $Id: intf.h,v 1.39 2003/05/15 01:23:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -56,6 +56,8 @@
 #define _ANS(s) [[NSApp localizedString: _(s)] substringFromIndex:2]
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
+int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 /*****************************************************************************
  * intf_sys_t: description and status of the interface

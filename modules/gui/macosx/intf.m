@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.82 2003/05/12 01:17:10 hartman Exp $
+ * $Id: intf.m,v 1.83 2003/05/15 01:23:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -271,6 +271,19 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 }
 
 /*****************************************************************************
+ * playlistChanged: Callback triggered by the intf-change playlist
+ * variable, to let the intf update the playlist.
+ *****************************************************************************/
+int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_intf_update = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * VLCMain implementation 
  *****************************************************************************/
 @implementation VLCMain
@@ -468,6 +481,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         if( p_playlist != NULL )
         {
+            var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
             vlc_mutex_lock( &p_playlist->object_lock );
             
             [self manage: p_playlist];
@@ -492,13 +506,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     vlc_value_t val;
 
     intf_thread_t * p_intf = [NSApp getIntf];
-
-    if( var_Get( (vlc_object_t *)p_playlist, "intf-change", &val ) >= 0 &&
-        val.b_bool )
-    {
-        p_intf->p_sys->b_playlist_update = VLC_TRUE;
-        p_intf->p_sys->b_intf_update = VLC_TRUE;
-    }
 
 #define p_input p_playlist->p_input
 
@@ -622,13 +629,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     if ( p_intf->p_sys->b_playlist_update )
     {
-        vlc_value_t val;
-
-        val.b_bool = FALSE;
-        var_Set( (vlc_object_t *)p_playlist, "intf-change", val );
-
         [o_playlist playlistUpdated];
-
         p_intf->p_sys->b_playlist_update = VLC_FALSE;
     }
 
