@@ -376,7 +376,7 @@ static int Init( vout_thread_t *p_vout )
     if( !I_OUTPUTPICTURES )
     {
         /* hmmm, it didn't work! Let's try commonly supported chromas */
-        if( p_vout->output.i_chroma != VLC_FOURCC('Y','V','1','2') )
+        if( p_vout->output.i_chroma != VLC_FOURCC('I','4','2','0') )
         {
             p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
             NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
@@ -1623,6 +1623,10 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             break;
 
         case VLC_FOURCC('Y','V','1','2'):
+
+            /* U and V inverted compared to I420
+             * Fixme: this should be handled by the vout core */
+            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
