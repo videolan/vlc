@@ -525,11 +525,11 @@ static int ReadICYMeta( access_t *p_access )
     if( i_read <= 0 )
         return VLC_EGENERIC;
 
-    msg_Dbg( p_access, "ICY meta size=%d", buffer[0] * 16);
 
     if( buffer[0] <= 0 )
         return VLC_SUCCESS;
 
+    msg_Dbg( p_access, "ICY meta size=%d", buffer[0] * 16);
 
     psz_meta = malloc( buffer[0] * 16 + 1 );
     i_read = net_Read( p_access, p_sys->fd, NULL,
