@@ -47,7 +47,10 @@
   <Bitmap id="add3" file="add3.bmp" alphacolor="#FF0000"/>
   <Bitmap id="del1" file="del1.bmp" alphacolor="#FF0000"/>
   <Bitmap id="del2" file="del2.bmp" alphacolor="#FF0000"/>
-  <Bitmap id="del3" file="del3.bmp" alphacolor="#FF0000"/>
+  <Bitmap id="del3" file="del3.bmp" alphacolor="#FF0000"/> 
+  <Bitmap id="prefs1" file="prefs1.bmp" alphacolor="#FF0000"/>
+  <Bitmap id="prefs2" file="prefs2.bmp" alphacolor="#FF0000"/>
+  <Bitmap id="prefs3" file="prefs3.bmp" alphacolor="#FF0000"/>
 
   <Event id="hide1" event="CTRL_ID_VISIBLE(img1,FALSE)"/>
   <Event id="hide2" event="CTRL_ID_VISIBLE(img2,FALSE)"/>
@@ -70,10 +73,12 @@
   <Event id="hideOpen" event="CTRL_ID_VISIBLE(Open,FALSE)"/>
   <Event id="hideAdd"  event="CTRL_ID_VISIBLE(Add,FALSE)"/>
   <Event id="hideDel"  event="CTRL_ID_VISIBLE(Del,FALSE)"/>
+  <Event id="hidePrefs"  event="CTRL_ID_VISIBLE(Prefs,FALSE)"/>
 
   <Event id="showOpen" event="CTRL_ID_VISIBLE(Open,TRUE)"/>
   <Event id="showAdd"  event="CTRL_ID_VISIBLE(Add,TRUE)"/>
   <Event id="showDel"  event="CTRL_ID_VISIBLE(Del,TRUE)"/>
+  <Event id="showPrefs"  event="CTRL_ID_VISIBLE(Prefs,TRUE)"/>
 
   <Event id="MoveWindow" event="WINDOW_MOVE(Window)"/>
   <Event id="MovePlaylist" event="WINDOW_MOVE(PlaylistWindow)"/>
@@ -135,9 +140,11 @@
         <ImageControl id="Open" x="0"  y="0" image="open3" visible="false"/>
         <ImageControl id="Add"  x="26" y="0" image="add3"  visible="false"/>
         <ImageControl id="Del"  x="52" y="0" image="del3"  visible="false"/>
+        <ImageControl id="Prefs"  x="78" y="0" image="prefs3"  visible="false"/>
         <ButtonControl x="3"   y="3" up="open1" down="open2" onclick="open" onmouseover="showOpen" onmouseout="hideOpen" tooltiptext="Open a file"/>
         <ButtonControl x="29"  y="3" up="add1"  down="add2"  onclick="add_file" onmouseover="showAdd"  onmouseout="hideAdd"  tooltiptext="Add files"/>
         <ButtonControl x="55"  y="3" up="del1"  down="del2"  onclick="Del" onmouseover="showDel"  onmouseout="hideDel"  tooltiptext="Remove items"/>
+        <ButtonControl x="81"  y="3" up="prefs1"  down="prefs2"  onclick="show_prefs" onmouseover="showPrefs"  onmouseout="hidePrefs"  tooltiptext="Show preferences"/>
       </ControlGroup>
       <PlayListControl id="playlist" width="180" selcolor="#C0D0E0" font="playlist1" playfont="playlist2" abs="9,9" ord="35,115">
         <SliderControl x="201" up="slider1" down="slider2" abs="0,0" ord="36,149"/>

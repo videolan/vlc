@@ -2,3 +2,8 @@ Gnome Interface
 CONFIG_GNOME
   to be written
 
+Skins Interface
+CONFIG_SKINS
+  Enables the skins interface.
+  BE CAREFUL: under linux, you must have the wxWindows library compiled 
+  with GTK2 support ! (see http://www.wxwindows.org)
