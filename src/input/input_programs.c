@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.16 2000/12/22 15:34:24 massiot Exp $
+ * $Id: input_programs.c,v 1.17 2000/12/22 17:53:30 massiot Exp $
  *
  * Authors:
  *
@@ -390,7 +390,7 @@ void input_DumpStream( input_thread_t * p_input )
 static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
                           decoder_config_t * p_config )
 {
-    p_config->i_stream_id = p_es->i_stream_id;
+    p_config->i_id = p_es->i_id;
     p_config->i_type = p_es->i_type;
     p_config->p_stream_ctrl =
         &p_input->stream.control;

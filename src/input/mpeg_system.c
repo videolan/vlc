@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.17 2000/12/22 15:00:42 sam Exp $
+ * $Id: mpeg_system.c,v 1.18 2000/12/22 17:53:30 massiot Exp $
  *
  * Authors: 
  *
@@ -753,7 +753,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
                                 == REQUESTED_MPEG
                           && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
-                                == (p_es->i_stream_id & 0x1F) )
+                                == (p_es->i_id & 0x1F) )
                         {
                             input_SelectES( p_input, p_es );
                         }
@@ -767,7 +767,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
                                 == REQUESTED_AC3
                          && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
-                                == ((p_es->i_stream_id & 0xF00) >> 8) )
+                                == ((p_es->i_id & 0xF00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );
                         }
@@ -779,7 +779,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = DVD_SPU_ES;
 #ifdef AUTO_SPAWN
                         if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 )
-                                == ((p_es->i_stream_id & 0x1F00) >> 8) )
+                                == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );
                         }

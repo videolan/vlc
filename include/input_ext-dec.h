@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.4 2000/12/21 19:24:26 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.5 2000/12/22 17:53:30 massiot Exp $
  *
  * Authors:
  *
@@ -441,7 +441,7 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
  *****************************************************************************/
 typedef struct decoder_config_s
 {
-    u16                     i_stream_id;
+    u16                     i_id;
     u8                      i_type;         /* type of the elementary stream */
 
     struct stream_ctrl_s *  p_stream_ctrl;
