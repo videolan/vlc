@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.75 2004/02/18 13:21:33 fenrir Exp $
+ * $Id: transcode.c,v 1.76 2004/02/20 18:34:28 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -61,6 +61,8 @@ static int  transcode_video_ffmpeg_process( sout_stream_t *, sout_stream_id_t *,
 
 static int  transcode_video_ffmpeg_getframebuf( struct AVCodecContext *, AVFrame *);
 
+static int  EncoderThread( struct sout_stream_sys_t * p_sys );
+
 static int pi_channels_maps[6] =
 {
     0,
@@ -82,9 +84,19 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
+#define PICTURE_RING_SIZE 64
+
 struct sout_stream_sys_t
 {
-    sout_stream_t   *p_out;
+    VLC_COMMON_MEMBERS
+
+    sout_stream_t * p_out;
+    sout_stream_id_t * id_video;
+    sout_buffer_t * p_buffers;
+    vlc_mutex_t     lock_out;
+    vlc_cond_t      cond;
+    picture_t *     pp_pics[PICTURE_RING_SIZE];
+    int             i_first_pic, i_last_pic;
 
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
     int             i_sample_rate;
@@ -103,9 +115,17 @@ struct sout_stream_sys_t
     int             i_qmax;
     vlc_bool_t      i_hq;
     vlc_bool_t      b_deinterlace;
+    vlc_bool_t      b_interlace;
     vlc_bool_t      b_strict_rc;
     vlc_bool_t      b_pre_me;
     vlc_bool_t      b_hurry_up;
+    int             i_rc_buffer_size;
+    float           f_rc_buffer_aggressivity;
+    float           f_i_quant_factor;
+    int             i_noise_reduction;
+    vlc_bool_t      b_mpeg4_matrix;
+    int             i_threads;
+    vlc_bool_t      b_trellis;
 
     int             i_crop_top;
     int             i_crop_bottom;
@@ -125,8 +145,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
     char *codec;
 
-    p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    memset( p_sys, 0, sizeof(struct sout_stream_sys_t) );
+    p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
     p_sys->p_out = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
 
     p_sys->f_scale      = 1;
@@ -134,11 +153,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_key_int    = -1;
     p_sys->i_qmin       = 2;
     p_sys->i_qmax       = 31;
+    p_sys->f_i_quant_factor = 0.0;
 #if LIBAVCODEC_BUILD >= 4673
     p_sys->i_hq         = FF_MB_DECISION_SIMPLE;
 #else
     p_sys->i_hq         = VLC_FALSE;
 #endif
+    p_sys->i_rc_buffer_size = 224*1024*8 * 3/2;
+    p_sys->f_rc_buffer_aggressivity = 0.1;
+    p_sys->i_threads = 0;
+    p_sys->b_trellis = 0;
 
     if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "acodec" ) ) )
     {
@@ -168,7 +192,7 @@ static int Open( vlc_object_t *p_this )
 
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s", fcc,
                  p_sys->i_sample_rate, p_sys->i_channels,
-                 p_sys->i_abitrate / 1024 );
+                 p_sys->i_abitrate / 1000 );
     }
 
     if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "vcodec" ) ) )
@@ -208,6 +232,10 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->b_deinterlace = VLC_TRUE;
         }
+        if( sout_cfg_find( p_stream->p_cfg, "interlace" ) )
+        {
+            p_sys->b_interlace = VLC_TRUE;
+        }
         if( sout_cfg_find( p_stream->p_cfg, "strict_rc" ) )
         {
             p_sys->b_strict_rc = VLC_TRUE;
@@ -219,6 +247,28 @@ static int Open( vlc_object_t *p_this )
         if( sout_cfg_find( p_stream->p_cfg, "hurry_up" ) )
         {
             p_sys->b_hurry_up = VLC_TRUE;
+            /* hurry up mode needs noise reduction, even small */
+            p_sys->i_noise_reduction = 1;
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "rc_buffer_size" ) ) )
+        {
+            p_sys->i_rc_buffer_size = atoi( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "rc_buffer_aggressivity" ) ) )
+        {
+            p_sys->f_rc_buffer_aggressivity = atof( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "i_quant_factor" ) ) )
+        {
+            p_sys->f_i_quant_factor = atof( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "noise_reduction" ) ) )
+        {
+            p_sys->i_noise_reduction = atoi( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "mpeg4_matrix" ) ) )
+        {
+            p_sys->b_mpeg4_matrix = VLC_TRUE;
         }
         /* crop */
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "croptop" ) ) )
@@ -279,10 +329,18 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->i_qmax   = atoi( val );
         }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "threads" ) ) )
+        {
+            p_sys->i_threads = atoi( val );
+        }
+        if( sout_cfg_find( p_stream->p_cfg, "trellis" ) )
+        {
+            p_sys->b_trellis = VLC_TRUE;
+        }
 
         msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
                  fcc, p_sys->i_width, p_sys->i_height, p_sys->f_scale,
-                 p_sys->i_vbitrate / 1024 );
+                 p_sys->i_vbitrate / 1000 );
     }
 
     if( !p_sys->p_out )
@@ -315,7 +373,7 @@ static void Close( vlc_object_t * p_this )
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
     sout_stream_delete( p_sys->p_out );
-    free( p_sys );
+    vlc_object_destroy( p_sys );
 }
 
 struct sout_stream_id_t
@@ -798,6 +856,12 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 
             i_buffer -= i_used;
             p_buffer += i_used;
+
+            if ( id->i_buffer_pos < 0 )
+            {
+                msg_Warn( p_stream, "weird error audio decoding");
+                break;
+            }
         }
         else
         {
@@ -1084,6 +1148,14 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->b_strict_rc = p_sys->b_strict_rc;
     id->p_encoder->b_pre_me = p_sys->b_pre_me;
     id->p_encoder->b_hurry_up = p_sys->b_hurry_up;
+    id->p_encoder->b_interlace = p_sys->b_interlace;
+    id->p_encoder->i_rc_buffer_size = p_sys->i_rc_buffer_size;
+    id->p_encoder->f_rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
+    id->p_encoder->f_i_quant_factor = p_sys->f_i_quant_factor;
+    id->p_encoder->i_noise_reduction = p_sys->i_noise_reduction;
+    id->p_encoder->b_mpeg4_matrix = p_sys->b_mpeg4_matrix;
+    id->p_encoder->i_threads = p_sys->i_threads;
+    id->p_encoder->b_trellis = p_sys->b_trellis;
 
     id->p_ff_pic         = avcodec_alloc_frame();
     id->p_ff_pic_tmp0    = NULL;
@@ -1107,6 +1179,25 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->p_module = NULL;
 
     id->b_enc_inited = VLC_FALSE;
+
+    if ( p_sys->i_threads >= 1 )
+    {
+        p_sys->id_video = id;
+        vlc_mutex_init( p_stream, &p_sys->lock_out );
+        vlc_cond_init( p_stream, &p_sys->cond );
+        memset( p_sys->pp_pics, 0, sizeof(p_sys->pp_pics) );
+        p_sys->i_first_pic = 0;
+        p_sys->i_last_pic = 0;
+        p_sys->p_buffers = NULL;
+        p_sys->b_die = p_sys->b_error = 0;
+        if( vlc_thread_create( p_sys, "encoder", EncoderThread,
+                               VLC_THREAD_PRIORITY_VIDEO, VLC_FALSE ) )
+        {
+            vlc_object_destroy( id->p_encoder );
+            msg_Err( p_stream, "cannot spawn encoder thread" );
+            return VLC_EGENERIC;
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1151,6 +1242,13 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
     {
         img_resample_close( id->p_vresample );
     }
+    if ( p_stream->p_sys->i_threads >= 1 )
+    {
+       p_stream->p_sys->b_die = 1;
+       vlc_thread_join( p_stream->p_sys );
+       vlc_mutex_destroy( &p_stream->p_sys->lock_out );
+       vlc_cond_destroy( &p_stream->p_sys->cond );
+    }
 }
 
 static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
@@ -1172,8 +1270,10 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
     for( ;; )
     {
         block_t *p_block;
-        picture_t pic;
+        picture_t * p_pic;
         int i_plane;
+
+        p_pic = malloc(sizeof(picture_t));
 
         /* decode frame */
         frame = id->p_ff_pic;
@@ -1336,6 +1436,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                                    id->ff_dec_c->pix_fmt,
                                    id->ff_dec_c->width, id->ff_dec_c->height );
 
+            id->p_ff_pic_tmp0->interlaced_frame = 0;
+            id->p_ff_pic_tmp0->repeat_pict = frame->repeat_pict;
             frame = id->p_ff_pic_tmp0;
         }
 
@@ -1362,6 +1464,11 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                          (AVPicture*)frame, id->ff_dec_c->pix_fmt,
                          id->ff_dec_c->width, id->ff_dec_c->height );
 
+            id->p_ff_pic_tmp1->interlaced_frame = frame->interlaced_frame;
+            id->p_ff_pic_tmp1->repeat_pict = frame->repeat_pict;
+#if LIBAVCODEC_BUILD >= 4684
+            id->p_ff_pic_tmp1->top_field_first = frame->top_field_first;
+#endif
             frame = id->p_ff_pic_tmp1;
         }
 
@@ -1399,29 +1506,42 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             img_resample( id->p_vresample, (AVPicture*)id->p_ff_pic_tmp2,
                           (AVPicture*)frame );
 
+            id->p_ff_pic_tmp2->interlaced_frame = frame->interlaced_frame;
+            id->p_ff_pic_tmp2->repeat_pict = frame->repeat_pict;
+#if LIBAVCODEC_BUILD >= 4684
+            id->p_ff_pic_tmp2->top_field_first = frame->top_field_first;
+#endif
             frame = id->p_ff_pic_tmp2;
         }
 
         /* Encoding */
-        vout_InitPicture( VLC_OBJECT(p_stream), &pic,
+        vout_InitPicture( VLC_OBJECT(p_stream), p_pic,
                           id->p_encoder->fmt_in.i_codec,
                           id->f_dst.video.i_width, id->f_dst.video.i_height,
                           id->f_dst.video.i_width * VOUT_ASPECT_FACTOR /
                           id->f_dst.video.i_height );
 
-        for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            pic.p[i_plane].p_pixels = frame->data[i_plane];
-            pic.p[i_plane].i_pitch = frame->linesize[i_plane];
+            p_pic->p[i_plane].i_pitch = frame->linesize[i_plane];
+            if ( p_sys->i_threads >= 1 )
+            {
+                p_pic->p[i_plane].p_pixels = malloc(p_pic->p[i_plane].i_lines * p_pic->p[i_plane].i_pitch);
+                p_stream->p_vlc->pf_memcpy(p_pic->p[i_plane].p_pixels, frame->data[i_plane], p_pic->p[i_plane].i_lines * p_pic->p[i_plane].i_pitch);
+            }
+            else
+            {
+                p_pic->p[i_plane].p_pixels = frame->data[i_plane];
+            }
         }
 
         /* Set the pts of the frame being encoded */
-        pic.date = p_sys->i_output_pts;
+        p_pic->date = p_sys->i_output_pts;
 
-        pic.b_progressive = 1; /* ffmpeg doesn't support interlaced encoding */
-        pic.i_nb_fields = frame->repeat_pict;
+        p_pic->b_progressive = !frame->interlaced_frame;
+        p_pic->i_nb_fields = frame->repeat_pict;
 #if LIBAVCODEC_BUILD >= 4684
-        pic.b_top_field_first = frame->top_field_first;
+        p_pic->b_top_field_first = frame->top_field_first;
 #endif
 
         /* Interpolate the next PTS
@@ -1432,7 +1552,78 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
               id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
         }
 
-        p_block = id->p_encoder->pf_encode_video( id->p_encoder, &pic );
+        if ( p_sys->i_threads >= 1 )
+        {
+            vlc_mutex_lock( &p_sys->lock_out );
+            p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
+            p_sys->i_last_pic %= PICTURE_RING_SIZE;
+            *out = p_sys->p_buffers;
+            p_sys->p_buffers = NULL;
+            vlc_cond_signal( &p_sys->cond );
+            vlc_mutex_unlock( &p_sys->lock_out );
+        }
+        else
+        {
+            block_t *p_block;
+            p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+            while( p_block )
+            {
+                sout_buffer_t *p_out;
+                block_t *p_prev_block = p_block;
+
+                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+                p_out->i_dts = p_block->i_dts;
+                p_out->i_pts = p_block->i_pts;
+                p_out->i_length = p_block->i_length;
+                sout_BufferChain( out, p_out );
+
+                p_block = p_block->p_next;
+                block_Release( p_prev_block );
+            }
+            free( p_pic );
+        }
+
+        if( i_data <= 0 )
+        {
+            return VLC_SUCCESS;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int EncoderThread( sout_stream_sys_t * p_sys )
+{
+    sout_stream_t * p_stream = p_sys->p_out;
+    sout_stream_id_t * id = p_sys->id_video;
+    picture_t * p_pic;
+    int i_plane;
+    sout_buffer_t * p_buffer;
+
+    while ( !p_sys->b_die && !p_sys->b_error )
+    {
+        block_t *p_block;
+
+        vlc_mutex_lock( &p_sys->lock_out );
+        while ( p_sys->i_last_pic == p_sys->i_first_pic )
+        {
+            vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
+            if ( p_sys->b_die || p_sys->b_error )
+                break;
+        }
+        if ( p_sys->b_die || p_sys->b_error )
+        {
+            vlc_mutex_unlock( &p_sys->lock_out );
+            break;
+        }
+
+        p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
+        p_sys->i_first_pic %= PICTURE_RING_SIZE;
+        vlc_mutex_unlock( &p_sys->lock_out );
+
+        p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
+        vlc_mutex_lock( &p_sys->lock_out );
         while( p_block )
         {
             sout_buffer_t *p_out;
@@ -1443,19 +1634,41 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             p_out->i_dts = p_block->i_dts;
             p_out->i_pts = p_block->i_pts;
             p_out->i_length = p_block->i_length;
-            sout_BufferChain( out, p_out );
+            sout_BufferChain( &p_sys->p_buffers, p_out );
 
             p_block = p_block->p_next;
             block_Release( p_prev_block );
         }
+        vlc_mutex_unlock( &p_sys->lock_out );
 
-        if( i_data <= 0 )
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            return VLC_SUCCESS;
+            free( p_pic->p[i_plane].p_pixels );
         }
+        free( p_pic );
     }
 
-    return VLC_SUCCESS;
+    while ( p_sys->i_last_pic != p_sys->i_first_pic )
+    {
+        p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
+        p_sys->i_first_pic %= PICTURE_RING_SIZE;
+
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            free( p_pic->p[i_plane].p_pixels );
+        }
+        free( p_pic );
+    }
+
+    p_buffer = p_sys->p_buffers;
+    while ( p_buffer != NULL )
+    {
+        sout_buffer_t * p_next = p_buffer->p_next;
+        sout_BufferDelete( p_stream->p_sout, p_buffer );
+        p_buffer = p_next;
+    }
+
+    return 0;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.7 2003/11/27 22:44:50 massiot Exp $
+ * $Id: vlc_codec.h,v 1.8 2004/02/20 18:34:28 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -118,6 +118,14 @@ struct encoder_t
     vlc_bool_t          b_strict_rc;
     vlc_bool_t          b_pre_me;
     vlc_bool_t          b_hurry_up;
+    vlc_bool_t          b_interlace;
+    int                 i_rc_buffer_size;
+    float               f_rc_buffer_aggressivity;
+    float               f_i_quant_factor;
+    int                 i_noise_reduction;
+    vlc_bool_t          b_mpeg4_matrix;
+    int                 i_threads;
+    vlc_bool_t          b_trellis;
 };
 
 /**

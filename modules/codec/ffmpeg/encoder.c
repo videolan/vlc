@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.21 2004/01/04 15:32:13 fenrir Exp $
+ * $Id: encoder.c,v 1.22 2004/02/20 18:34:28 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -41,7 +41,9 @@
 #include "ffmpeg.h"
 
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
-#define HURRY_UP_GUARD (200000)
+#define HURRY_UP_GUARD1 (1000000)
+#define HURRY_UP_GUARD2 (1000000)
+#define HURRY_UP_GUARD3 (200000)
 
 /*****************************************************************************
  * Local prototypes
@@ -51,6 +53,31 @@ void E_(CloseEncoder)( vlc_object_t * );
 
 static block_t *EncodeVideo( encoder_t *, picture_t * );
 static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
+
+struct thread_context_t;
+static int FfmpegThread( struct thread_context_t *p_context );
+static int FfmpegExecute( AVCodecContext *s,
+                          int (*pf_func)(AVCodecContext *c2, void *arg2),
+                          void **arg, int *ret, int count );
+
+/*****************************************************************************
+ * thread_context_t : for multithreaded encoding
+ *****************************************************************************/
+#if LIBAVCODEC_BUILD >= 4702
+struct thread_context_t
+{
+    VLC_COMMON_MEMBERS
+
+    AVCodecContext  *p_context;
+    int             (* pf_func)(AVCodecContext *c, void *arg);
+    void            *arg;
+    int             i_ret;
+
+    vlc_mutex_t     lock;
+    vlc_cond_t      cond;
+    vlc_bool_t      b_work, b_done;
+};
+#endif
 
 /*****************************************************************************
  * encoder_sys_t : ffmpeg encoder descriptor
@@ -70,10 +97,11 @@ struct encoder_sys_t
     char *p_buffer_out;
 
     /*
-     * Videoo properties
+     * Video properties
      */
     mtime_t i_last_ref_pts;
     mtime_t i_buggy_pts_detect;
+    vlc_bool_t b_inited;
 
     /*
      * Audio properties
@@ -86,6 +114,9 @@ struct encoder_sys_t
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
+extern const int16_t ff_mpeg4_default_intra_matrix[];
+extern const int16_t ff_mpeg4_default_non_intra_matrix[];
+
 int E_(OpenEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
@@ -145,6 +176,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     p_sys->p_buffer_out = NULL;
     p_sys->p_buffer = NULL;
+    p_sys->b_inited = 0;
 
     p_sys->p_context = p_context = avcodec_alloc_context();
 
@@ -189,6 +221,19 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->frame_rate = p_enc->fmt_in.video.i_frame_rate;
         p_context->frame_rate_base= p_enc->fmt_in.video.i_frame_rate_base;
 
+        /* Defaults from ffmpeg.c */
+        p_context->qblur = 0.5;
+        p_context->qcompress = 0.5;
+        p_context->b_quant_offset = 1.25;
+        p_context->b_quant_factor = 1.25;
+        p_context->i_quant_offset = 0.0;
+        p_context->i_quant_factor = -0.8;
+
+        p_context->gop_size = p_enc->i_key_int > 0 ? p_enc->i_key_int : 50;
+        p_context->max_b_frames =
+            __MIN( p_enc->i_b_frames, FF_MAX_B_FRAMES );
+        p_context->b_frame_strategy = 0;
+
 #if LIBAVCODEC_BUILD >= 4687
         p_context->sample_aspect_ratio =
             (AVRational){ p_enc->fmt_in.video.i_aspect *
@@ -206,8 +251,21 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if ( p_enc->b_strict_rc )
         {
             p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
-            p_context->rc_buffer_size = p_context->bit_rate / 2;
-            p_context->rc_buffer_aggressivity = 1000.0; /* FIXME */
+            p_context->rc_buffer_size = p_enc->i_rc_buffer_size;
+            p_context->rc_buffer_aggressivity = p_enc->f_rc_buffer_aggressivity;
+        }
+
+        if ( p_enc->f_i_quant_factor != 0.0 )
+        {
+            p_context->i_quant_factor = p_enc->f_i_quant_factor;
+        }
+
+        p_context->noise_reduction = p_enc->i_noise_reduction;
+
+        if ( p_enc->b_mpeg4_matrix )
+        {
+            p_context->intra_matrix = ff_mpeg4_default_intra_matrix;
+            p_context->inter_matrix = ff_mpeg4_default_non_intra_matrix;
         }
 
         if ( p_enc->b_pre_me )
@@ -215,6 +273,35 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             p_context->pre_me = 1;
             p_context->me_pre_cmp = FF_CMP_CHROMA;
         }
+
+        if ( p_enc->b_interlace )
+        {
+            p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
+#if LIBAVCODEC_BUILD >= 4698
+            p_context->flags |= CODEC_FLAG_INTERLACED_ME;
+#endif
+        }
+
+        if ( p_enc->b_trellis )
+        {
+            p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
+        }
+
+        if ( p_enc->i_threads >= 1 )
+        {
+            p_context->thread_count = p_enc->i_threads;
+        }
+
+        if( p_enc->i_vtolerance > 0 )
+        {
+            p_context->bit_rate_tolerance = p_enc->i_vtolerance;
+        }
+
+        p_context->mb_qmin = p_context->qmin = p_enc->i_qmin;
+        p_context->mb_qmax = p_context->qmax = p_enc->i_qmax;
+        p_context->max_qdiff = 3;
+
+        p_context->mb_decision = p_enc->i_hq;
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
@@ -228,20 +315,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     /* Misc parameters */
     p_context->bit_rate = p_enc->fmt_out.i_bitrate;
-    p_context->gop_size = p_enc->i_key_int > 0 ? p_enc->i_key_int : 50;
-    p_context->max_b_frames =
-        __MIN( p_enc->i_b_frames, FF_MAX_B_FRAMES );
-    p_context->b_frame_strategy = 0;
-    p_context->b_quant_factor = 2.0;
-
-    if( p_enc->i_vtolerance > 0 )
-    {
-        p_context->bit_rate_tolerance = p_enc->i_vtolerance;
-    }
-    p_context->qmin = p_enc->i_qmin;
-    p_context->qmax = p_enc->i_qmax;
-
-    p_context->mb_decision = p_enc->i_hq;
 
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
@@ -298,6 +371,80 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 }
 
 /****************************************************************************
+ * Ffmpeg threading system
+ ****************************************************************************/
+#if LIBAVCODEC_BUILD >= 4702
+static int FfmpegThread( struct thread_context_t *p_context )
+{
+    while ( !p_context->b_die && !p_context->b_error )
+    {
+        vlc_mutex_lock( &p_context->lock );
+        while ( !p_context->b_work && !p_context->b_die && !p_context->b_error )
+        {
+            vlc_cond_wait( &p_context->cond, &p_context->lock );
+        }
+        p_context->b_work = 0;
+        vlc_mutex_unlock( &p_context->lock );
+        if ( p_context->b_die || p_context->b_error )
+            break;
+
+        if ( p_context->pf_func )
+        {
+            p_context->i_ret = p_context->pf_func( p_context->p_context,
+                                                   p_context->arg );
+        }
+
+        vlc_mutex_lock( &p_context->lock );
+        p_context->b_done = 1;
+        vlc_cond_signal( &p_context->cond );
+        vlc_mutex_unlock( &p_context->lock );
+    }
+
+    return 0;
+}
+
+static int FfmpegExecute( AVCodecContext *s,
+                          int (*pf_func)(AVCodecContext *c2, void *arg2),
+                          void **arg, int *ret, int count )
+{
+    struct thread_context_t ** pp_contexts =
+                         (struct thread_context_t **)s->thread_opaque;
+    int i;
+
+    /* Note, we can be certain that this is not called with the same
+     * AVCodecContext by different threads at the same time */
+    for ( i = 0; i < count; i++ )
+    {
+        vlc_mutex_lock( &pp_contexts[i]->lock );
+        pp_contexts[i]->arg = arg[i];
+        pp_contexts[i]->pf_func = pf_func;
+        pp_contexts[i]->i_ret = 12345;
+        pp_contexts[i]->b_work = 1;
+        vlc_cond_signal( &pp_contexts[i]->cond );
+        vlc_mutex_unlock( &pp_contexts[i]->lock );
+    }
+    for ( i = 0; i < count; i++ )
+    {
+        vlc_mutex_lock( &pp_contexts[i]->lock );
+        while ( !pp_contexts[i]->b_done )
+        {
+            vlc_cond_wait( &pp_contexts[i]->cond, &pp_contexts[i]->lock );
+        }
+        pp_contexts[i]->b_done = 0;
+        pp_contexts[i]->pf_func = NULL;
+        vlc_mutex_unlock( &pp_contexts[i]->lock );
+
+        if ( ret )
+        {
+            ret[i] = pp_contexts[i]->i_ret;
+        }
+    }
+
+    return 0;
+}
+#endif
+
+/****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
@@ -305,7 +452,38 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     encoder_sys_t *p_sys = p_enc->p_sys;
     AVFrame frame;
     int i_out, i_plane;
-    vlc_bool_t b_hurry_up = 0;
+
+#if LIBAVCODEC_BUILD >= 4702
+    if ( !p_sys->b_inited && p_enc->i_threads >= 1 )
+    {
+        struct thread_context_t ** pp_contexts;
+        int i;
+
+        p_sys->b_inited = 1;
+        pp_contexts = malloc( sizeof(struct thread_context_t *)
+                                 * p_enc->i_threads );
+        p_sys->p_context->thread_opaque = (void *)pp_contexts;
+
+        for ( i = 0; i < p_enc->i_threads; i++ )
+        {
+            pp_contexts[i] = vlc_object_create( p_enc,
+                                     sizeof(struct thread_context_t) );
+            pp_contexts[i]->p_context = p_sys->p_context;
+            vlc_mutex_init( p_enc, &pp_contexts[i]->lock );
+            vlc_cond_init( p_enc, &pp_contexts[i]->cond );
+            pp_contexts[i]->b_work = 0;
+            pp_contexts[i]->b_done = 0;
+            if ( vlc_thread_create( pp_contexts[i], "encoder", FfmpegThread,
+                                    VLC_THREAD_PRIORITY_VIDEO, VLC_FALSE ) )
+            {
+                msg_Err( p_enc, "cannot spawn encoder thread, expect to die soon" );
+                return NULL;
+            }
+        }
+
+        p_sys->p_context->execute = FfmpegExecute;
+    }
+#endif
 
     memset( &frame, 0, sizeof( AVFrame ) );
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
@@ -320,12 +498,83 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
     {
         frame.pts = p_pict->date;
-        if ( frame.pts && mdate() + HURRY_UP_GUARD > frame.pts
-              && p_enc->b_hurry_up )
+
+        if ( p_enc->b_hurry_up )
         {
-            msg_Dbg( p_enc, "hurry up mode" );
-            p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
-            b_hurry_up = 1;
+            mtime_t current_date = mdate();
+#if LIBAVCODEC_BUILD >= 4702
+            struct thread_context_t ** pp_contexts =
+                (struct thread_context_t **)p_sys->p_context->thread_opaque;
+#endif
+
+            if ( frame.pts && current_date + HURRY_UP_GUARD3 > frame.pts )
+            {
+                p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
+                p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
+#if LIBAVCODEC_BUILD >= 4702
+                if ( p_enc->i_threads >= 2 )
+                {
+                    int i;
+
+                    for ( i = 0; i < p_enc->i_threads; i++ )
+                    {
+                        vlc_thread_set_priority( pp_contexts[i],
+                                            VLC_THREAD_PRIORITY_VIDEO + 4 );
+                    }
+                }
+#endif
+                msg_Dbg( p_enc, "hurry up mode 3" );
+            }
+            else
+            {
+                p_sys->p_context->mb_decision = p_enc->i_hq;
+
+                if ( frame.pts && current_date + HURRY_UP_GUARD2 > frame.pts )
+                {
+                    p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
+#if LIBAVCODEC_BUILD >= 4702
+                    if ( p_enc->i_threads >= 2 )
+                    {
+                        int i;
+
+                        for ( i = 0; i < p_enc->i_threads; i++ )
+                        {
+                            vlc_thread_set_priority( pp_contexts[i],
+                                             VLC_THREAD_PRIORITY_VIDEO + 2 );
+                        }
+                    }
+#endif
+                    msg_Dbg( p_enc, "hurry up mode 2" );
+                }
+                else
+                {
+                    if ( p_enc->b_trellis )
+                        p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
+
+#if LIBAVCODEC_BUILD >= 4702
+                    if ( p_enc->i_threads >= 2 )
+                    {
+                        int i;
+
+                        for ( i = 0; i < p_enc->i_threads; i++ )
+                        {
+                            vlc_thread_set_priority( pp_contexts[i],
+                                                   VLC_THREAD_PRIORITY_VIDEO );
+                        }
+                    }
+#endif
+                }
+            }
+
+            if ( frame.pts && current_date + HURRY_UP_GUARD1 > frame.pts )
+            {
+                p_sys->p_context->noise_reduction = p_enc->i_noise_reduction
+                         + (HURRY_UP_GUARD1 + current_date - frame.pts) / 1500;
+            }
+            else
+            {
+                p_sys->p_context->noise_reduction = p_enc->i_noise_reduction;
+            }
         }
     }
     else
@@ -335,20 +584,16 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;
+
+    frame.interlaced_frame = !p_pict->b_progressive;
     frame.repeat_pict = p_pict->i_nb_fields;
 
 #if LIBAVCODEC_BUILD >= 4685
-    frame.interlaced_frame = !p_pict->b_progressive;
     frame.top_field_first = p_pict->b_top_field_first;
 #endif
 
     i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
                                   AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
-
-    if ( b_hurry_up )
-    {
-        p_sys->p_context->mb_decision = p_enc->i_hq;
-    }
 
     if( i_out > 0 )
     {
@@ -491,6 +736,26 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
+
+#if LIBAVCODEC_BUILD >= 4702
+    if ( p_sys->b_inited && p_enc->i_threads >= 1 )
+    {
+        int i;
+        struct thread_context_t ** pp_contexts =
+                (struct thread_context_t **)p_sys->p_context->thread_opaque;
+        for ( i = 0; i < p_enc->i_threads; i++ )
+        {
+            pp_contexts[i]->b_die = 1;
+            vlc_cond_signal( &pp_contexts[i]->cond );
+            vlc_thread_join( pp_contexts[i] );
+            vlc_mutex_destroy( &pp_contexts[i]->lock );
+            vlc_cond_destroy( &pp_contexts[i]->cond );
+            vlc_object_destroy( pp_contexts[i] );
+        }
+
+        free(pp_contexts);
+    }
+#endif
 
     avcodec_close( p_sys->p_context );
     free( p_sys->p_context );
