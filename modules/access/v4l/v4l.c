@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.8 2003/04/27 23:16:35 gbazin Exp $
+ * $Id: v4l.c,v 1.9 2003/04/30 19:20:32 gbazin Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -700,6 +700,9 @@ static int AccessOpen( vlc_object_t *p_this )
             break;
         case VIDEO_PALETTE_YUV422P:
             i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
+            break;
+        case VIDEO_PALETTE_YUV420P:
+            i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
             break;
         case VIDEO_PALETTE_YUV411P:
             i_chroma = VLC_FOURCC( 'I', '4', '1', '1' );
