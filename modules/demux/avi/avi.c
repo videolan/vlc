@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.15 2002/12/03 17:00:16 fenrir Exp $
+ * $Id: avi.c,v 1.16 2002/12/04 15:47:31 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -939,16 +939,16 @@ static int AVIInit( vlc_object_t * p_this )
                 p_info->i_cat = AUDIO_ES;
                 p_info->i_fourcc = 
                     AVI_FourccGetCodec( AUDIO_ES, 
-                                        p_avi_strf_auds->i_formattag );
+                                        p_avi_strf_auds->p_wf->wFormatTag );
                 p_info->i_codec  = p_info->i_fourcc;
                 i_init_size = p_avi_strf_auds->i_chunk_size;
-                p_init_data = p_avi_strf_auds->p_wfx;
+                p_init_data = p_avi_strf_auds->p_wf;
                 msg_Dbg( p_input, "stream[%d] audio(0x%x) %d channels %dHz %dbits",
                         i,
-                        p_avi_strf_auds->i_formattag,
-                        p_avi_strf_auds->i_channels,
-                        p_avi_strf_auds->i_samplespersec,
-                        p_avi_strf_auds->i_bitspersample );
+                        p_avi_strf_auds->p_wf->wFormatTag,
+                        p_avi_strf_auds->p_wf->nChannels,
+                        p_avi_strf_auds->p_wf->nSamplesPerSec,
+                        p_avi_strf_auds->p_wf->wBitsPerSample );
                 break;
                 
             case( AVIFOURCC_vids ):

@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.7 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: libavi.c,v 1.8 2002/12/04 15:47:31 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -513,28 +513,35 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
     switch( p_strh->strh.i_type )
     {
         case( AVIFOURCC_auds ):
-            AVI_READ2BYTES( p_chk->strf.auds.i_formattag );
-            AVI_READ2BYTES( p_chk->strf.auds.i_channels );
-            AVI_READ4BYTES( p_chk->strf.auds.i_samplespersec );
-            AVI_READ4BYTES( p_chk->strf.auds.i_avgbytespersec );
-            AVI_READ2BYTES( p_chk->strf.auds.i_blockalign );
-            AVI_READ2BYTES( p_chk->strf.auds.i_bitspersample );
-            if( p_chk->strf.auds.i_formattag != WAVE_FORMAT_PCM )
+            p_chk->strf.auds.p_wf = malloc( p_chk->common.i_chunk_size );
+            AVI_READ2BYTES( p_chk->strf.auds.p_wf->wFormatTag );
+            AVI_READ2BYTES( p_chk->strf.auds.p_wf->nChannels );
+            AVI_READ4BYTES( p_chk->strf.auds.p_wf->nSamplesPerSec );
+            AVI_READ4BYTES( p_chk->strf.auds.p_wf->nAvgBytesPerSec );
+            AVI_READ2BYTES( p_chk->strf.auds.p_wf->nBlockAlign );
+            AVI_READ2BYTES( p_chk->strf.auds.p_wf->wBitsPerSample );
+            if( p_chk->strf.auds.p_wf->wFormatTag != WAVE_FORMAT_PCM )
             {
-                AVI_READ2BYTES( p_chk->strf.auds.i_size );
+                AVI_READ2BYTES( p_chk->strf.auds.p_wf->cbSize );
             }
-            p_chk->strf.auds.p_wfx = malloc( p_chk->common.i_chunk_size );
-            memcpy( p_chk->strf.auds.p_wfx, 
-                    p_buff + 8, 
-                    p_chk->common.i_chunk_size );
+            else
+            {
+                p_chk->strf.auds.p_wf->cbSize = 0;
+            }
+            if( p_chk->strf.auds.p_wf->cbSize > 0 )
+            {
+                memcpy( &p_chk->strf.auds.p_wf[1] , 
+                        p_buff + sizeof( WAVEFORMATEX ), 
+                        p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX ));
+            }
 #ifdef AVI_DEBUG
             msg_Dbg( p_input, 
                      "strf: audio:0x%4.4x channels:%d %dHz %dbits/sample %dkb/s",
-                     p_chk->strf.auds.i_formattag,
-                     p_chk->strf.auds.i_channels,
-                     p_chk->strf.auds.i_samplespersec,
-                     p_chk->strf.auds.i_bitspersample,
-                     p_chk->strf.auds.i_avgbytespersec * 8 / 1024 );
+                     p_chk->strf.auds.p_wf->wFormatTag,
+                     p_chk->strf.auds.p_wf->nChannels,
+                     p_chk->strf.auds.p_wf->nSamplesPerSec,
+                     p_chk->strf.auds.p_wf->wBitsPerSample,
+                     p_chk->strf.auds.p_wf->nAvgBytesPerSec * 8 / 1024 );
 #endif
             break;
         case( AVIFOURCC_vids ):
