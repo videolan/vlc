@@ -651,7 +651,6 @@ gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
     {
         msg_Err( p_server, "Cannot add trusted CA (%s) : %s", psz_ca_path,
                  gnutls_strerror( val ) );
-        gnutls_ServerDelete( p_server );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_server, " %d trusted CA added (%s)", val, psz_ca_path );
@@ -682,7 +681,6 @@ gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
     {
         msg_Err( p_server, "Cannot add CRL (%s) : %s", psz_crl_path,
                  gnutls_strerror( val ) );
-        gnutls_ServerDelete( p_server );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_server, "%d CRL added (%s)", val, psz_crl_path );
