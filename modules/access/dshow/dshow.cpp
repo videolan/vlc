@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: dshow.cpp,v 1.22 2003/12/20 11:55:12 rocky Exp $
+ * $Id: dshow.cpp,v 1.23 2003/12/22 16:42:47 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1446,11 +1446,9 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     if( !list_devices.size() ) return VLC_SUCCESS;
 
+    p_item->ppsz_list_text = NULL;
     p_item->ppsz_list =
         (char **)realloc( p_item->ppsz_list,
-                          (list_devices.size()+3) * sizeof(char *) );
-    p_item->ppsz_list_text =
-        (char **)realloc( p_item->ppsz_list_text,
                           (list_devices.size()+3) * sizeof(char *) );
 
     list<string>::iterator iter;
@@ -1458,11 +1456,9 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
          iter++, i++ )
     {
         p_item->ppsz_list[i] = strdup( iter->c_str() );
-        p_item->ppsz_list_text[i] = strdup( iter->c_str() );
         p_item->i_list++;
     }
     p_item->ppsz_list[i] = NULL;
-    p_item->ppsz_list_text[i] = NULL;
 
     return VLC_SUCCESS;
 }
