@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.35 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: libmp4.c,v 1.36 2003/11/27 20:50:48 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -159,125 +159,6 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
 static MP4_Box_t *MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_father );
 
 /*****************************************************************************
- * Some basic functions to manipulate stream more easily in vlc
- *
- * MP4_TellAbsolute get file position
- *
- * MP4_SeekAbsolute seek in the file
- *
- * MP4_ReadData read data from the file in a buffer
- *
- *****************************************************************************/
-static off_t MP4_TellAbsolute( input_thread_t *p_input )
-{
-    off_t i_pos;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    i_pos= p_input->stream.p_selected_area->i_tell;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return( i_pos );
-}
-
-static int MP4_SeekAbsolute( input_thread_t *p_input, off_t i_pos)
-{
-    off_t i_filepos;
-
-    //msg_Warn( p_input, "seek to %lld/%lld", i_pos, p_input->stream.p_selected_area->i_size  );
-
-    if( p_input->stream.p_selected_area->i_size > 0 &&
-        i_pos >= p_input->stream.p_selected_area->i_size )
-    {
-        msg_Warn( p_input, "seek:after end of file" );
-        return VLC_EGENERIC;
-    }
-
-    i_filepos = MP4_TellAbsolute( p_input );
-
-    if( i_filepos == i_pos )
-    {
-        return VLC_SUCCESS;
-    }
-
-    if( p_input->stream.b_seekable &&
-        ( p_input->stream.i_method == INPUT_METHOD_FILE ||
-          i_pos - i_filepos < 0 ||
-          i_pos - i_filepos > 1024 ) )
-    {
-        input_AccessReinit( p_input );
-        p_input->pf_seek( p_input, i_pos );
-        return VLC_SUCCESS;
-    }
-    else if( i_pos - i_filepos > 0 )
-    {
-        data_packet_t   *p_data;
-        int             i_skip = i_pos - i_filepos;
-
-        msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
-
-        while (i_skip > 0 )
-        {
-            int i_read;
-
-            i_read = input_SplitBuffer( p_input, &p_data, 
-                                        __MIN( 4096, i_skip ) );
-            if( i_read <= 0 )
-            {
-                msg_Warn( p_input, "seek:cannot read" );
-                return VLC_EGENERIC;
-            }
-            i_skip -= i_read;
-
-            input_DeletePacket( p_input->p_method_data, p_data );
-            if( i_read == 0 && i_skip > 0 )
-            {
-                msg_Warn( p_input, "seek:cannot read" );
-                return VLC_EGENERIC;
-            }
-        }
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        msg_Warn( p_input, "seek:failed" );
-        return VLC_EGENERIC;
-    }
-}
-
-/* return 1 if success, 0 if fail */
-static int MP4_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
-{
-    data_packet_t *p_data;
-
-    int i_read;
-
-
-    if( !i_size )
-    {
-        return( VLC_SUCCESS );
-    }
-
-    do
-    {
-        i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
-        if( i_read <= 0 )
-        {
-            return( VLC_EGENERIC );
-        }
-        memcpy( p_buff, p_data->p_payload_start, i_read );
-        input_DeletePacket( p_input->p_method_data, p_data );
-
-        p_buff += i_read;
-        i_size -= i_read;
-
-    } while( i_size );
-
-    return( VLC_SUCCESS );
-}
-
-/*****************************************************************************
  * Some basic functions to manipulate MP4_Stream_t, an abstraction o p_input
  *  in the way that you can read from a memory buffer or from an input
  *
@@ -360,7 +241,7 @@ int MP4_ReadStream( MP4_Stream_t *p_stream, uint8_t *p_buff, int i_size )
     }
     else
     {
-        return( MP4_ReadData( p_stream->p_input, p_buff, i_size ) );
+        return( stream_Read( p_stream->p_input->s, p_buff, i_size ) < i_size ? VLC_EGENERIC : VLC_SUCCESS);
     }
 }
 
@@ -382,13 +263,13 @@ int MP4_PeekStream( MP4_Stream_t *p_stream, uint8_t **pp_peek, int i_size )
         if( p_stream->p_input->stream.p_selected_area->i_size > 0 )
         {
             int64_t i_max =
-                p_stream->p_input->stream.p_selected_area->i_size - MP4_TellAbsolute( p_stream->p_input );
+                p_stream->p_input->stream.p_selected_area->i_size - stream_Tell( p_stream->p_input->s );
             if( i_size > i_max )
             {
                 i_size = i_max;
             }
         }
-        return( input_Peek( p_stream->p_input, pp_peek, i_size ) );
+        return( stream_Peek( p_stream->p_input->s, pp_peek, i_size ) );
     }
 }
 
@@ -404,7 +285,7 @@ off_t MP4_TellStream( MP4_Stream_t *p_stream )
     }
     else
     {
-        return( MP4_TellAbsolute( p_stream->p_input ) );
+        return( stream_Tell( p_stream->p_input->s ) );
     }
 }
 
@@ -428,7 +309,7 @@ int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos)
     }
     else
     {
-        return( MP4_SeekAbsolute( p_stream->p_input, i_pos ) );
+        return( stream_Seek( p_stream->p_input->s, (int64_t)i_pos ) );
     }
 }
 
