@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_help.h,v 1.6 2003/12/22 02:24:53 sam Exp $
+ * $Id: vlc_help.h,v 1.7 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -32,13 +32,13 @@
 #define GENERAL_TITLE N_( "VLC preferences" )
 #define GENERAL_HELP N_( \
     "Configure some global options in General Settings " \
-     "and configure each VLC plugin in the Plugins section.\n" \
-     "Click on \"Advanced Options\" to see all options." )
+    "and configure each VLC module in the Modules section.\n" \
+    "Click on \"Advanced Options\" to see all options." )
 
-#define PLUGIN_TITLE N_( "VLC plugins preferences" )
+#define PLUGIN_TITLE N_( "VLC modules preferences" )
 #define PLUGIN_HELP N_( \
-    "In this tree, you can set options for every plugin used by VLC.\n" \
-    "Plugins are sorted by type.\nHave fun tuning VLC!" )
+    "In this tree, you can set options for every module used by VLC.\n" \
+    "Modules are sorted by type.\nHave fun tuning VLC!" )
 
 /*
  *  Then, help for each module capabilities.
@@ -59,7 +59,8 @@
 #define AOUT_HELP N_("These are general settings for audio output modules.")
 
 #define AOUT_ENC_TITLE N_("Audio encoders settings")
-#define AOUT_ENC_HELP N_("These are general settings for audio encoding modules.")
+#define AOUT_ENC_HELP N_( \
+    "These are general settings for audio encoding modules.")
 
 #define CHROMA_TITLE N_("Chroma modules settings")
 #define CHROMA_HELP N_("These settings affect chroma transformation modules.")
@@ -102,7 +103,7 @@
     "Video filters can be enabled in the Video section and configured " \
     "here.\n" \
     "Configure the \"adjust\" filter to modify contrast/hue/saturation " \
-    " settings.")
+    "settings.")
 
 /*
  *  A little help for modules with unknown capabilities

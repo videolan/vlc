@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -108,7 +108,7 @@
  * Channel method
  */
 
-/* Delay between channel changes - this is required to avoid flooding the 
+/* Delay between channel changes - this is required to avoid flooding the
  * channel server */
 #define INPUT_CHANNEL_CHANGE_DELAY      (mtime_t)(5*CLOCK_FREQ)
 

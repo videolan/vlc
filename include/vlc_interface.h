@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.8 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: vlc_interface.h,v 1.9 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -27,8 +27,8 @@ typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
  * \file
- * This file contains structures and function prototypes for 
- * interface management in vlc 
+ * This file contains structures and function prototypes for
+ * interface management in vlc
  */
 
 

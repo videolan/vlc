@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.12 2003/12/12 23:03:35 yoann Exp $
+ * $Id: vlc_keys.h,v 1.13 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -198,27 +198,27 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_JUMP_FORWARD_1MIN     21
 #define ACTIONID_JUMP_BACKWARD_5MIN    22
 #define ACTIONID_JUMP_FORWARD_5MIN     23
-#define ACTIONID_POSITION              24 
-#define ACTIONID_VOL_MUTE              25 
+#define ACTIONID_POSITION              24
+#define ACTIONID_VOL_MUTE              25
 /* let ACTIONID_SET_BOOMARK* and ACTIONID_PLAY_BOOKMARK* be contiguous */
-#define ACTIONID_SET_BOOKMARK1         26 
-#define ACTIONID_SET_BOOKMARK2         27 
-#define ACTIONID_SET_BOOKMARK3         28 
-#define ACTIONID_SET_BOOKMARK4         29 
-#define ACTIONID_SET_BOOKMARK5         30 
-#define ACTIONID_SET_BOOKMARK6         31 
-#define ACTIONID_SET_BOOKMARK7         32 
-#define ACTIONID_SET_BOOKMARK8         33 
-#define ACTIONID_SET_BOOKMARK9         34 
-#define ACTIONID_SET_BOOKMARK10        35 
-#define ACTIONID_PLAY_BOOKMARK1        36 
-#define ACTIONID_PLAY_BOOKMARK2        37 
-#define ACTIONID_PLAY_BOOKMARK3        38 
-#define ACTIONID_PLAY_BOOKMARK4        39 
-#define ACTIONID_PLAY_BOOKMARK5        40 
-#define ACTIONID_PLAY_BOOKMARK6        41 
-#define ACTIONID_PLAY_BOOKMARK7        42 
-#define ACTIONID_PLAY_BOOKMARK8        43 
-#define ACTIONID_PLAY_BOOKMARK9        44 
-#define ACTIONID_PLAY_BOOKMARK10       45 
+#define ACTIONID_SET_BOOKMARK1         26
+#define ACTIONID_SET_BOOKMARK2         27
+#define ACTIONID_SET_BOOKMARK3         28
+#define ACTIONID_SET_BOOKMARK4         29
+#define ACTIONID_SET_BOOKMARK5         30
+#define ACTIONID_SET_BOOKMARK6         31
+#define ACTIONID_SET_BOOKMARK7         32
+#define ACTIONID_SET_BOOKMARK8         33
+#define ACTIONID_SET_BOOKMARK9         34
+#define ACTIONID_SET_BOOKMARK10        35
+#define ACTIONID_PLAY_BOOKMARK1        36
+#define ACTIONID_PLAY_BOOKMARK2        37
+#define ACTIONID_PLAY_BOOKMARK3        38
+#define ACTIONID_PLAY_BOOKMARK4        39
+#define ACTIONID_PLAY_BOOKMARK5        40
+#define ACTIONID_PLAY_BOOKMARK6        41
+#define ACTIONID_PLAY_BOOKMARK7        42
+#define ACTIONID_PLAY_BOOKMARK8        43
+#define ACTIONID_PLAY_BOOKMARK9        44
+#define ACTIONID_PLAY_BOOKMARK10       45
 /* end of contiguous zone */

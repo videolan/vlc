@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.10 2003/12/04 17:15:59 gbazin Exp $
+ * $Id: vlc_messages.h,v 1.11 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,9 +55,9 @@ typedef struct
 
 /* Message types */
 /** standard messages */
-#define VLC_MSG_INFO  0                               
+#define VLC_MSG_INFO  0
 /** error messages */
-#define VLC_MSG_ERR   1                                  
+#define VLC_MSG_ERR   1
 /** warning messages */
 #define VLC_MSG_WARN  2
 /** debug messages */

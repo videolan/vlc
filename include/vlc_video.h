@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.8 2004/01/10 13:59:25 rocky Exp $
+ * $Id: vlc_video.h,v 1.9 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -95,7 +95,7 @@ struct picture_t
     unsigned int    i_nb_fields;                  /**< # of displayed fields */
     vlc_bool_t      b_top_field_first;             /**< which field is first */
     /**@}*/
-    
+
     /** The picture heap we are attached to */
     picture_heap_t* p_heap;
 

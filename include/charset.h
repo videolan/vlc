@@ -2,7 +2,7 @@
  * charset.h: Determine a canonical name for the current locale's character encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.h,v 1.1 2003/08/23 12:59:31 hartman Exp $
+ * $Id: charset.h,v 1.2 2004/01/25 18:17:08 zorglub Exp $
  *
  * Author: Derk-Jan Hartman <thedj at users.sourceforge.net>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

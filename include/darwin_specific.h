@@ -1,8 +1,8 @@
 /*****************************************************************************
- * darwin_specific.h: Darwin specific features 
+ * darwin_specific.h: Darwin specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.7 2003/01/19 03:16:24 sam Exp $
+ * $Id: darwin_specific.h,v 1.8 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

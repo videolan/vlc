@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.9 2004/01/04 04:50:24 sam Exp $
+ * $Id: codecs.h,v 1.10 2004/01/25 18:17:08 zorglub Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,7 +155,7 @@ static inline void wf_tag_to_fourcc( uint16_t i_tag,
 typedef struct es_sys_t
 {
     char        *psz_header; /* for 'ssa ' and 'subt' */
-    
+
     /* for spudec */
     unsigned int        i_orig_height;
     unsigned int        i_orig_width;

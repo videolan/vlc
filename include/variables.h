@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: variables.h,v 1.21 2004/01/09 22:11:04 hartman Exp $
+ * $Id: variables.h,v 1.22 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,8 +36,8 @@
 typedef struct callback_entry_t callback_entry_t;
 
 /**
- * The structure describing a variable. 
- * \note vlc_value_t is the common union for variable values  
+ * The structure describing a variable.
+ * \note vlc_value_t is the common union for variable values
  */
 struct variable_t
 {

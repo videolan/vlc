@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vlc_playlist.h,v 1.25 2004/01/23 10:48:08 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.26 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -232,7 +232,7 @@ static inline vlc_bool_t playlist_IsPlaying( playlist_t * p_playlist )
     vlc_bool_t b_playing;
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    b_playing = p_playlist->i_status == PLAYLIST_RUNNING; 
+    b_playing = p_playlist->i_status == PLAYLIST_RUNNING;
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     return( b_playing );

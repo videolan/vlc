@@ -1,8 +1,8 @@
 /*****************************************************************************
- * beos_specific.h: BeOS specific features 
+ * beos_specific.h: BeOS specific features
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.h,v 1.8 2003/01/19 03:16:24 sam Exp $
+ * $Id: beos_specific.h,v 1.9 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

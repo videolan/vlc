@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.29 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: vlc.h,v 1.30 2004/01/25 18:17:08 zorglub Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ int     VLC_Play         ( int );
 int     VLC_Pause        ( int );
 int     VLC_Stop         ( int );
 int     VLC_FullScreen   ( int );
-int	VLC_ClearPlaylist( int );
+int     VLC_ClearPlaylist( int );
 vlc_bool_t VLC_IsPlaying ( int );
 
 # ifdef __cplusplus

@@ -2,7 +2,7 @@
  * vout_synchro.h: frame-dropping structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vout_synchro.h,v 1.3 2003/11/04 17:46:18 gbazin Exp $
+ * $Id: vout_synchro.h,v 1.4 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -70,7 +70,7 @@ struct vout_synchro_t
 /* Pictures types */
 #define I_CODING_TYPE           1
 #define P_CODING_TYPE           2
-#define B_CODING_TYPE           3     
+#define B_CODING_TYPE           3
 #define D_CODING_TYPE           4 /* MPEG-1 ONLY */
 /* other values are reserved */
 

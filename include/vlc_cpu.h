@@ -2,7 +2,7 @@
  * cpu.h: CPU type detection
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_cpu.h,v 1.5 2002/11/11 14:39:11 sam Exp $
+ * $Id: vlc_cpu.h,v 1.6 2004/01/25 18:17:08 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
