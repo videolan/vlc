@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.30 2003/06/04 16:03:33 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.31 2003/06/04 16:44:39 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -98,7 +98,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_OPEN:
-            p_intf->p_sys->p_dialogs->ShowOpen( TRUE );
+            p_intf->p_sys->p_dialogs->ShowOpen( true );
             InterfaceRefresh();
             return true;
 
@@ -131,7 +131,7 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
-            p_intf->p_sys->p_dialogs->ShowOpen( FALSE );
+            p_intf->p_sys->p_dialogs->ShowOpen( false );
             InterfaceRefresh();
             return true;
 
