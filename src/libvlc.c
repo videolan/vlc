@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.10 2002/06/11 09:44:22 gbazin Exp $
+ * $Id: libvlc.c,v 1.11 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -92,6 +92,7 @@ void *             p_global_data;
 
 /* A list of all the currently allocated vlc objects */
 static volatile int i_vlc = 0;
+static volatile int i_unique = 0;
 static volatile vlc_t **pp_vlc = NULL;
 
 /*****************************************************************************
@@ -155,6 +156,8 @@ vlc_t * vlc_create( void )
     pp_vlc = realloc( pp_vlc, (i_vlc+1) * sizeof( vlc_t * ) );
     pp_vlc[ i_vlc ] = p_vlc;
     i_vlc++;
+    p_vlc->i_unique = i_unique;
+    i_unique++;
     vlc_mutex_unlock( p_vlc->p_global_lock );
 
     /* Update the handle status */

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.23 2002/06/26 23:11:12 fenrir Exp $
+ * $Id: avi.c,v 1.24 2002/06/27 19:05:17 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -33,9 +33,8 @@
 
 #include "video.h"
 
-/*****************************************************************************
- * Constants
- *****************************************************************************/
+#include "libioRIFF.h"
+#include "avi.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -62,12 +61,6 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Definition of structures and libraries for this plugins 
- *****************************************************************************/
-#include "libioRIFF.h"
-#include "avi.h"
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that

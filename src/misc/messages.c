@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.2 2002/06/01 18:04:49 sam Exp $
+ * $Id: messages.c,v 1.3 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -333,13 +333,15 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 #           define GRAY    "\033[0m"
             static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
 
-            fprintf( stderr, "[" GREEN "%.8x" GRAY "] " "%s%s"
-                     ": %s%s" GRAY "\n", p_this->i_object_id, psz_module,
-                     ppsz_type[i_type], ppsz_color[i_type], psz_str );
+            fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
+                             "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
+                             p_this->i_object_id, psz_module,
+                             ppsz_type[i_type], ppsz_color[i_type], psz_str );
         }
         else
         {
-            fprintf( stderr, "[%.8x] %s%s: %s\n", p_this->i_object_id,
+            fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
+                             p_this->p_vlc->i_unique, p_this->i_object_id,
                              psz_module, ppsz_type[i_type], psz_str );
         }
     }

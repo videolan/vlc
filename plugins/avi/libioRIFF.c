@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.8 2002/06/27 18:10:16 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.9 2002/06/27 19:05:17 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,10 +20,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <stdlib.h>
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-#include <video.h>
+
+#include "video.h"
 
 #include "libioRIFF.h"
 

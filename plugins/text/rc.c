@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.19 2002/06/07 23:05:03 sam Exp $
+ * $Id: rc.c,v 1.20 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -100,6 +100,15 @@ static void intf_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Open( intf_thread_t *p_intf )
 {
+#ifdef HAVE_ISATTY
+    /* Check that stdin is a TTY */
+    if( !isatty( 0 ) )
+    {
+        msg_Warn( p_intf, "fd 0 is not a TTY" );
+        return 1;
+    }
+#endif
+
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
@@ -108,7 +117,7 @@ static int intf_Open( intf_thread_t *p_intf )
     if( p_intf->p_sys == NULL )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return 1;
     }
 
 #ifdef WIN32
@@ -120,7 +129,7 @@ static int intf_Open( intf_thread_t *p_intf )
 #endif
 
     printf( "remote control interface initialized, `h' for help\n" );
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.4 2002/06/11 09:44:22 gbazin Exp $
+ * $Id: libvlc.h,v 1.5 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,6 +54,11 @@
 #define INTF_PATH_LONGTEXT N_( \
     "This option allows you to set the default path that the interface will " \
     "open when looking for a file.")
+
+#define PLUGIN_PATH_TEXT N_("plugin search path")
+#define PLUGIN_PATH_LONGTEXT N_( \
+    "This option allows you to specify an additional path for vlc to look" \
+    "for its plugins.")
 
 #define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
@@ -318,6 +323,7 @@ ADD_BOOL_WITH_SHORT ( "verbose", 'v', 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT )
 ADD_BOOL_WITH_SHORT ( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT )
 ADD_BOOL            ( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT )
 ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
+ADD_STRING  ( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)

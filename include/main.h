@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.38 2002/06/01 17:09:25 sam Exp $
+ * $Id: main.h,v 1.39 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -71,13 +71,14 @@ struct vlc_s
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
     vlc_mutex_t            structure_lock;        /* lock for the p_vlc tree */
+    int                    i_unique;                    /* p_vlc occurence # */
     int                    i_counter;                      /* object counter */
 
     /* Pointer to the big, evil global lock */
     vlc_mutex_t *          p_global_lock;
     void **                pp_global_data;
 
-    /* Private data */
+    /* System-specific variables */
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
 #elif defined( WIN32 )

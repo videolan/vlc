@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.204 2002/06/08 14:08:46 sam Exp $
+ * $Id: input.c,v 1.205 2002/06/27 19:05:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -456,7 +456,7 @@ static int InitThread( input_thread_t * p_input )
 
     if( p_input->p_access_module == NULL )
     {
-        msg_Err( p_input, "no suitable access module for `%s/%s:%s'",
+        msg_Err( p_input, "no suitable access module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         return -1;
     }
@@ -499,7 +499,7 @@ static int InitThread( input_thread_t * p_input )
 
     if( p_input->p_demux_module == NULL )
     {
-        msg_Err( p_input, "no suitable demux module for `%s/%s:%s'",
+        msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         module_Unneed( p_input->p_access_module );
         return -1;
