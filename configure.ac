@@ -1224,7 +1224,6 @@ dnl
 
 AC_ARG_WITH(,[Input plugins:])
 
-dnl
 dnl  live.com input
 dnl
 AC_ARG_ENABLE(livedotcom,
@@ -3752,6 +3751,20 @@ then
       AC_MSG_ERROR([cannot find ${with_slp}/slp.h])
     fi
   fi
+fi
+
+dnl
+dnl DAAP access plugin and services discovery 
+dnl
+AC_ARG_ENABLE(daap,
+  [  --enable-daap	     DAAP shares services discovery support (default enabled)])
+if test "$enable_daap" != "no"
+then
+   PKG_CHECK_MODULES(DAAP, opendaap >= 0.3.0,
+      [ VLC_ADD_PLUGINS([daap])
+       VLC_ADD_LDFLAGS([daap],[$DAAP_LIBS])
+       VLC_ADD_CFLAGS([daap],[$DAAP_CFLAGS])]:,
+      [AC_MSG_WARN(DAAP library not found)])
 fi
 
 dnl

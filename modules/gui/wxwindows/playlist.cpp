@@ -351,7 +351,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Reduce font size */
     wxFont font= treectrl->GetFont();
-    font.SetPointSize(8);
+    font.SetPointSize(9);
     treectrl->SetFont( font );
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
