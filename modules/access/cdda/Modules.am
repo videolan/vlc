@@ -1,6 +1,4 @@
 SOURCES_cddax = \
-        ../vcdx/cdrom.c \
-        ../vcdx/cdrom.h \
 	access.c \
 	cdda.c \
 	cdda.h \

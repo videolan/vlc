@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "../vcdx/cdrom.h"
+#include <cdio/cdio.h>
 #include "vlc_meta.h"
 
 #ifdef HAVE_LIBCDDB
@@ -56,13 +56,14 @@
  *****************************************************************************/
 typedef struct cdda_data_s
 {
-    cddev_t     *p_cddev;                 /* CD device descriptor */
+    CdIo       *p_cdio;                   /* libcdio CD device */
     int         i_tracks;                 /* # of tracks (titles) */
+    int         i_first_track;            /* # of first track */
 
     /* Current position */
     int         i_track;                  /* Current track */
-    lsn_t       i_sector;                 /* Current Sector */
-    lsn_t *     p_sectors;                /* Track sectors */
+    lsn_t       i_lsn;                    /* Current Logical Sector Number */
+    lsn_t *     p_lsns;                   /* Track LSNs */
 
     int         i_debug;                  /* Debugging mask */
     char *      psz_mcn;                  /* Media Catalog Number            */
