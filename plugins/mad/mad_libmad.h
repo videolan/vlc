@@ -41,7 +41,6 @@ enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header
 
 /* enum mad_flow (*output_func)(void *, struct mad_header const *, struct mad_pcm *); */
 enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header, struct mad_pcm *p_libmad_pcm);
-enum mad_flow libmad_output2(void *data, struct mad_header const *p_libmad_header, struct mad_pcm *p_libmad_pcm);
 
 /* enum mad_flow (*error_func)(void *, struct mad_stream *, struct mad_frame *); */
 enum mad_flow libmad_error(void *data, struct mad_stream *p_libmad_stream, struct mad_frame *p_libmad_frame);
