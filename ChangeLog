@@ -3,6 +3,24 @@
 #===================#
 
 HEAD
+  * Speed optimization in the handling of the unusual ephemer DVD subtitles.
+  * Little optimization to bozo's UnalignedShowBits fix.
+  * Race fix in the packet cache by Jon Lech Johansen <jon-vl@nanocrew.net>.
+  * Fixed a bug in UnalignedShowBits that makes some unaligned streams
+    not wotk correctly (for instance VLS' generated TS streams)
+  * Added support for some terribly braindead DVD subtitles in Kenshin
+    which do not have a "stop display" command. Anime fans rejoice!
+  * Fixed the BeOS interface to use p_aout_bank instead of p_main->p_aout.
+  * Coding-style butchery (mostly tabs).
+  * Changed the level arg in intf_WarnMsg so that it makes more sense.
+  * Beginning of the backport of Gnome to Gtk.
+  * Improved ac3 spdif output ( and made it work again :)).
+  * Added p_input->stream.p_selected_area->i_tell in input TS so that the
+    slider work with Transport Stream files.
+  * Moved b_fullscreen from p_vout->p_sys to p_vout and unified way of
+    toggling fullscreen.
+  * Tuned the Gnome interface appearance, added a Preferences window and
+    a Jump window, added Oct's playlist.
   * Fixed a few warnings with gcc 3.0.
   * aout and vout are now allocated in banks, making it possible to have
     several of them at the same time.

@@ -112,6 +112,10 @@ E: bbp@via.ecp.fr
 C: bbp
 D: Bug fixes
 
+N: Jon Lech Johansen
+E: jon-vl@nanocrew.net
+D: PS input fixes
+
 N: Michel Kaempf
 E: maxx@via.ecp.fr
 C: maxx

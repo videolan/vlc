@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.22 2001/05/07 04:42:42 sam Exp $
+ * $Id: input_ps.c,v 1.23 2001/05/08 00:43:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -166,6 +166,9 @@ static void PSInit( input_thread_t * p_input )
         return;
     }
     p_input->p_method_data = (void *)p_packet_cache;
+
+    /* Initialize packet cache mutex */
+    vlc_mutex_init( &p_packet_cache->lock );
     
     /* allocates the data cache */
     p_packet_cache->data.p_stack = malloc( DATA_CACHE_SIZE * 
@@ -362,6 +365,7 @@ static void PSInit( input_thread_t * p_input )
  *****************************************************************************/
 static void PSEnd( input_thread_t * p_input )
 {
+    vlc_mutex_destroy( &((packet_cache_t *)p_input->p_plugin_data)->lock );
     free( p_input->p_plugin_data );
 }
 
@@ -571,6 +575,8 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         return NULL;
     }
 
+    vlc_mutex_lock( &p_cache->lock );
+
     /* Checks whether the data cache is empty */
     if( p_cache->data.l_index == 0 )
     {
@@ -578,6 +584,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
         if ( (p_data = malloc( sizeof(data_packet_t) )) == NULL )
         {
             intf_ErrMsg( "Out of memory" );
+            vlc_mutex_unlock( &p_cache->lock );
             return NULL;
         }
 #ifdef TRACE_INPUT
@@ -591,6 +598,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             == NULL )
         {
             intf_ErrMsg( "NULL packet in the data cache" );
+            vlc_mutex_unlock( &p_cache->lock );
             return NULL;
         }
     }
@@ -607,6 +615,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             {
                 intf_DbgMsg( "Out of memory" );
                 free( p_data );
+                vlc_mutex_unlock( &p_cache->lock );
                 return NULL;
             }
 #ifdef TRACE_INPUT
@@ -623,6 +632,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             {
                 intf_ErrMsg( "NULL packet in the small buffer cache" );
                 free( p_data );
+                vlc_mutex_unlock( &p_cache->lock );
                 return NULL;
             }
             /* Reallocates the packet if it is too small or too large */
@@ -650,6 +660,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             {
                 intf_ErrMsg( "Out of memory" );
                 free( p_data );
+                vlc_mutex_unlock( &p_cache->lock );
                 return NULL;
             }
 #ifdef TRACE_INPUT
@@ -666,6 +677,7 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             {
                 intf_ErrMsg( "NULL packet in the small buffer cache" );
                 free( p_data );
+                vlc_mutex_unlock( &p_cache->lock );
                 return NULL;
             }
             /* Reallocates the packet if it is too small or too large */
@@ -681,6 +693,8 @@ static struct data_packet_s * NewPacket( void * p_packet_cache,
             }
         }
     }
+
+    vlc_mutex_unlock( &p_cache->lock );
 
     /* Initialize data */
     p_data->p_next = NULL;
@@ -711,6 +725,8 @@ static pes_packet_t * NewPES( void * p_packet_cache )
     }
 #endif
 
+    vlc_mutex_lock( &p_cache->lock );	
+
     /* Checks whether the PES cache is empty */
     if( p_cache->pes.l_index == 0 )
     {
@@ -718,6 +734,7 @@ static pes_packet_t * NewPES( void * p_packet_cache )
         if ( (p_pes = malloc( sizeof(pes_packet_t) )) == NULL )
         {
             intf_DbgMsg( "Out of memory" );
+            vlc_mutex_unlock( &p_cache->lock );	
             return NULL;
         }
 #ifdef TRACE_INPUT
@@ -731,9 +748,12 @@ static pes_packet_t * NewPES( void * p_packet_cache )
             == NULL )
         {
             intf_ErrMsg( "NULL packet in the data cache" );
+            vlc_mutex_unlock( &p_cache->lock );
             return NULL;
         }
     }
+
+    vlc_mutex_unlock( &p_cache->lock );
 
     p_pes->b_data_alignment = p_pes->b_discontinuity =
         p_pes->i_pts = p_pes->i_dts = 0;
@@ -763,6 +783,8 @@ static void DeletePacket( void * p_packet_cache,
 #endif
 
     ASSERT( p_data );
+
+    vlc_mutex_lock( &p_cache->lock );
 
     /* Checks whether the data cache is full */
     if ( p_cache->data.l_index < DATA_CACHE_SIZE )
@@ -819,6 +841,7 @@ static void DeletePacket( void * p_packet_cache,
 #endif
     }
 
+    vlc_mutex_unlock( &p_cache->lock );
 }
 
 /*****************************************************************************
@@ -851,6 +874,8 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
         p_data = p_next;
     }
 
+    vlc_mutex_lock( &p_cache->lock );
+
     /* Checks whether the PES cache is full */
     if ( p_cache->pes.l_index < PES_CACHE_SIZE )
     {
@@ -865,5 +890,7 @@ static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
         intf_DbgMsg( "PS input: PES packet freed" );
 #endif
     }
+
+    vlc_mutex_unlock( &p_cache->lock );
 }
 

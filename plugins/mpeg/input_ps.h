@@ -2,7 +2,7 @@
  * input_ps.h: thread structure of the PS plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ps.h,v 1.5 2001/04/16 12:34:28 asmax Exp $
+ * $Id: input_ps.h,v 1.6 2001/05/08 00:43:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -75,6 +75,7 @@ typedef struct
 
 typedef struct
 {
+    vlc_mutex_t             lock;
     data_packet_cache_t     data;
     pes_packet_cache_t      pes;
     small_buffer_cache_t    small;

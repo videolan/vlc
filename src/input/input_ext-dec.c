@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.15 2001/05/07 13:52:39 bozo Exp $
+ * $Id: input_ext-dec.c,v 1.16 2001/05/08 00:43:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -181,20 +181,19 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                      * of the packet in a temporary buffer, and we'll see
                      * later. */
                     int     i;
-                    /* number of bytes to trash from the last payload */
+
+                    /* sizeof(WORD_TYPE) - number of bytes to trash
+                     * from the last payload */
                     int     j;
 
                     p_bit_stream->i_showbits_buffer = 0;
 
-                    /* is this initialization really usefull ? -- bozo */
-                    j = sizeof(WORD_TYPE);
-
-                    for( i = 0; i < sizeof(WORD_TYPE) ; i++ )
+                    for( j = i = 0 ; i < sizeof(WORD_TYPE) ; i++ )
                     {
                         if( p_bit_stream->p_byte >= p_bit_stream->p_end )
                         {
+                            j = i;
                             p_bit_stream->pf_next_data_packet( p_bit_stream );
-                            j = sizeof(WORD_TYPE) - i;
                         }
                         ((byte_t *)&p_bit_stream->i_showbits_buffer)[i] =
                             * p_bit_stream->p_byte;
@@ -202,7 +201,8 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                     }
 
                     /* This is kind of kludgy. */
-                    p_bit_stream->p_data->p_payload_start += j;
+                    p_bit_stream->p_data->p_payload_start +=
+                                                         sizeof(WORD_TYPE) - j;
                     p_bit_stream->p_byte =
                         (byte_t *)&p_bit_stream->i_showbits_buffer;
                     p_bit_stream->p_end =

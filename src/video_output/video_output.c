@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.126 2001/05/07 04:42:42 sam Exp $
+ * $Id: video_output.c,v 1.127 2001/05/08 00:43:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -108,7 +108,7 @@ void vout_EndBank ( void )
     {
         vout_DestroyThread(
                 p_vout_bank->pp_vout[ --p_vout_bank->i_count ], NULL );
-    }                       
+    }
 
     vlc_mutex_destroy( &p_vout_bank->lock );
 }
@@ -181,11 +181,11 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->i_screen_depth        = main_GetIntVariable( VOUT_DEPTH_VAR,
                                                          VOUT_DEPTH_DEFAULT );
     p_vout->i_bytes_per_pixel     = 2;
-    p_vout->f_gamma               = VOUT_GAMMA_DEFAULT; // FIXME: replace with 
+    p_vout->f_gamma               = VOUT_GAMMA_DEFAULT; // FIXME: replace with
                                                         // variable
     p_vout->b_need_render         = 1;
     p_vout->b_YCbr                = 0;
-    
+
     p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
                                                      VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info                = 0;
@@ -415,8 +415,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             }
             else if( p_destroyed_subpic == NULL )
             {
-                /* Memory size do not match, but subpicture index will be kept in
-                 * case no other place are left */
+                /* Memory size do not match, but subpicture index will be kept
+                 * in case we find no other place */
                 p_destroyed_subpic = &p_vout->p_subpicture[i_subpic];
             }
         }
@@ -731,7 +731,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 
         /* Initialize mutex */
         vlc_mutex_init( &(p_free_picture->lock_deccount) );
-        
+
         return( p_free_picture );
     }
 
@@ -771,7 +771,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* destroy the lock that had been initialized in CreatePicture */
     vlc_mutex_destroy( &(p_pic->lock_deccount) );
-   
+
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -966,7 +966,7 @@ static int InitThread( vout_thread_t *p_vout )
     p_vout->b_active =          1;
     *p_vout->pi_status =        THREAD_READY;
 
-    
+
     intf_DbgMsg("thread ready");
     return( 0 );
 }
@@ -984,8 +984,12 @@ static void RunThread( vout_thread_t *p_vout)
     mtime_t         current_date;                            /* current date */
     mtime_t         display_date;                            /* display date */
     boolean_t       b_display;                               /* display flag */
+
     picture_t *     p_pic;                                /* picture pointer */
+
     subpicture_t *  p_subpic;                          /* subpicture pointer */
+    subpicture_t *  p_ephemer;        /* youngest ephemer subpicture pointer */
+    mtime_t         ephemer_date;                /* earliest subpicture date */
 
     /*
      * Initialize thread
@@ -1006,6 +1010,8 @@ static void RunThread( vout_thread_t *p_vout)
         /* Initialize loop variables */
         p_pic =         NULL;
         p_subpic =      NULL;
+        p_ephemer =     NULL;
+        ephemer_date =  0;
         display_date =  0;
         current_date =  mdate();
 #ifdef STATS
@@ -1073,6 +1079,11 @@ static void RunThread( vout_thread_t *p_vout)
          * Find the subpictures to display - this operation does not need
          * lock, since only READY_SUBPICTURE are handled. If no picture
          * has been selected, display_date will depend on the subpicture.
+         *
+         * We also check for ephemer DVD subpictures (subpictures that have
+         * to be removed if a newer one is available), which makes it a lot
+         * more difficult to guess if a subpicture has to be rendered or not.
+         *
          * We get an easily parsable chained list of subpictures which
          * ends with NULL since p_subpic was initialized to NULL.
          */
@@ -1080,8 +1091,86 @@ static void RunThread( vout_thread_t *p_vout)
         {
             if( p_vout->p_subpicture[i_index].i_status == READY_SUBPICTURE )
             {
-                p_vout->p_subpicture[i_index].p_next = p_subpic;
-                p_subpic = &p_vout->p_subpicture[i_index];
+                /* If it is a DVD subpicture, check its date */
+                if( p_vout->p_subpicture[i_index].i_type == DVD_SUBPICTURE )
+                {
+                    if( display_date > p_vout->p_subpicture[i_index].i_stop )
+                    {
+                        /* Too late, destroy the subpic */
+                        vout_DestroySubPicture( p_vout,
+                                        &p_vout->p_subpicture[i_index] );
+                        continue;
+                    }
+
+                    if( display_date < p_vout->p_subpicture[i_index].i_start )
+                    {
+                        /* Too early, come back next monday */
+                        continue;
+                    }
+
+                    /* If this is an ephemer subpic, see if it's the
+                     * youngest we have */
+                    if( p_vout->p_subpicture[i_index].b_ephemer )
+                    {
+                        if( p_ephemer == NULL )
+                        {
+                            p_ephemer = &p_vout->p_subpicture[i_index];
+                            continue;
+                        }
+
+                        if( p_vout->p_subpicture[i_index].i_start
+                                                         < p_ephemer->i_start )
+                        {
+                            /* Link the previous ephemer subpicture and
+                             * replace it with the current one */
+                            p_ephemer->p_next = p_subpic;
+                            p_subpic = p_ephemer;
+                            p_ephemer = &p_vout->p_subpicture[i_index];
+
+                            /* If it's the 2nd youngest subpicture,
+                             * register its date */
+                            if( !ephemer_date
+                                  || ephemer_date > p_subpic->i_start )
+                            {
+                                ephemer_date = p_subpic->i_start;
+                            }
+
+                            continue;
+                        }
+                    }
+
+                    p_vout->p_subpicture[i_index].p_next = p_subpic;
+                    p_subpic = &p_vout->p_subpicture[i_index];
+
+                    /* If it's the 2nd youngest subpicture, register its date */
+                    if( !ephemer_date || ephemer_date > p_subpic->i_start )
+                    {
+                        ephemer_date = p_subpic->i_start;
+                    }
+                }
+                /* If it's not a DVD subpicture, just register it */
+                else
+                {
+                    p_vout->p_subpicture[i_index].p_next = p_subpic;
+                    p_subpic = &p_vout->p_subpicture[i_index];
+                }
+            }
+        }
+
+        /* If we found an ephemer subpicture, check if it has to be
+         * displayed */
+        if( p_ephemer != NULL )
+        {
+            if( p_ephemer->i_start < ephemer_date )
+            {
+                /* Ephemer subpicture has lived too long */
+                vout_DestroySubPicture( p_vout, p_ephemer );
+            }
+            else
+            {
+                /* Ephemer subpicture can still live a bit */
+                p_ephemer->p_next = p_subpic;
+                p_subpic = p_ephemer;
             }
         }
 
@@ -1122,7 +1211,7 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
         }
-        else if( p_vout->b_active && p_vout->b_need_render 
+        else if( p_vout->b_active && p_vout->b_need_render
                   && p_vout->init_display_date == 0)
         {
             /* Idle or interface screen alone */
@@ -1157,21 +1246,21 @@ static void RunThread( vout_thread_t *p_vout)
          * Check for the current time and
          * display splash screen if everything is on time
          */
-        if( p_vout->init_display_date > 0 && p_vout->b_need_render ) 
+        if( p_vout->init_display_date > 0 && p_vout->b_need_render )
         {
-            if( p_vout->b_active && 
+            if( p_vout->b_active &&
                     mdate()-p_vout->init_display_date < 5000000)
             {
                 /* there is something to display ! */
                     b_display = 1;
                     RenderSplash( p_vout );
-                
+
             } else {
                 /* no splash screen ! */
                 p_vout->init_display_date=0;
             }
         }
-            
+
 
         /*
          * Sleep, wake up and display rendered picture
@@ -1342,7 +1431,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->subpicture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
-                
+
     /* Release the module */
     module_Unneed( p_vout->p_module );
 
@@ -1705,9 +1794,9 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef TRACE_VOUT
     render_time = mdate();
 #endif
- 
 
-    
+
+
     /*
      * Choose appropriate rendering function and render picture
      */
@@ -1869,8 +1958,8 @@ int RenderIdle( vout_thread_t *p_vout )
 
 
     current_date = mdate();
-    if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY 
-//            && (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY 
+    if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY
+//            && (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY
     )
     {
         /* FIXME: idle screen disabled */
@@ -1880,7 +1969,7 @@ int RenderIdle( vout_thread_t *p_vout )
                        &i_width, &i_height );
         if( !Align( p_vout, &i_x, &i_y, i_width, i_height * 2, CENTER_RALIGN, CENTER_RALIGN ) )
         {
-            i_amount = (int) ((current_date - p_vout->last_display_date ) / 5000LL);            
+            i_amount = (int) ((current_date - p_vout->last_display_date ) / 5000LL);
             vout_Print( p_vout->p_large_font,
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
@@ -1894,7 +1983,7 @@ int RenderIdle( vout_thread_t *p_vout )
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
                     WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/5)%110 );
-            
+
 
             SetBufferArea( p_vout, i_x, i_y, i_width, i_height * 2 );
         }
@@ -1952,61 +2041,12 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     p_vout_font_t       p_font;                                 /* text font */
     int                 i_width, i_height;          /* subpicture dimensions */
-    mtime_t             i_date = mdate();
-
-    subpicture_t       *p_ephemer = NULL;
-    subpicture_t       *p_tmp = p_subpic;
-
-    /* Look for the youngest ephemer */
-    while( p_tmp != NULL )
-    {
-        if( p_tmp->i_type == DVD_SUBPICTURE && p_tmp->b_ephemer
-             && i_date >= p_tmp->i_start && i_date <= p_tmp->i_stop )
-	{
-            if( p_ephemer == NULL || p_tmp->i_start < p_ephemer->i_start )
-	    {
-                p_ephemer = p_tmp;
-	    }
-        }
-
-        p_tmp = p_tmp->p_next;
-    }
-
-    /* If we found an ephemer, kill it if we find a more recent one */
-    if( p_ephemer != NULL )
-    {
-        p_tmp = p_subpic;
-
-        while( p_tmp != NULL )
-        {
-            if( p_tmp->i_type == DVD_SUBPICTURE
-                 && i_date >= p_tmp->i_start && i_date >= p_tmp->i_start
-                 && p_tmp != p_ephemer && p_tmp->i_start > p_ephemer->i_start )
-            {
-                p_ephemer->i_stop = 0;
-            }
-
-            p_tmp = p_tmp->p_next;
-        }
-    }
 
     while( p_subpic != NULL )
     {
         switch( p_subpic->i_type )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            /* test if the picture really has to be displayed */
-            if( i_date < p_subpic->i_start )
-            {
-                /* not yet, see you later */
-                break;
-            }
-            if( i_date > p_subpic->i_stop )
-            {
-                /* too late, destroying the subpic */
-                vout_DestroySubPicture( p_vout, p_subpic );
-                break;
-            }
             vout_RenderSPU( &p_vout->p_buffer[ p_vout->i_buffer_index ],
                             p_subpic, p_vout->i_bytes_per_pixel,
                             p_vout->i_bytes_per_line );
