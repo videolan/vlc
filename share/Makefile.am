@@ -103,6 +103,7 @@ DIST_http = \
 	http/vlm/index.html \
 	http/vlm/new.html \
 	http/style.css \
+	http/webcam.html \
 	http/favicon.ico \
 	http/cone_minus.png \
 	http/cone_plus.png \

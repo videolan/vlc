@@ -132,11 +132,12 @@ function changeMe(item)
                <vlc id="else" />
                  <li>
                    <form method="get" action="">
-                   <img alt="[-]" src="cone_minus.png" onclick='changeMe(this)'/>
                    <vlc id="if" param1="first_item value 0 ="/>
+                   <img alt="Cone" src="cone_plus.png" />
                      Playlist
                      <vlc id="rpn" param1="first_item 1 store" />
                    <vlc id="else"/>
+                   <img alt="[-]" src="cone_minus.png" onclick='changeMe(this)'/>
                      <vlc id="value" param1="pl.name" /> (<vlc id="value" param1="pl.i_children" /> item<vlc id="if" param1="pl.i_children 1 >" />s<vlc id="end" />)
                    <vlc id="end"/>
                      <input type="hidden" name="item" value="<vlc id="value" param1="pl.index" />" />
