@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.39 2003/07/08 13:09:30 sam Exp $
+##  $Id: toolbox,v 1.40 2003/07/08 16:21:00 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -124,8 +124,8 @@ then
     srcdir="`sed -ne 's/^srcdir *= *//p' < Makefile`"
   fi
 
-  #  The evil ^M
-  M="`printf '\r'`"
+  #  The evil ^M. printf '\r' does not work in Cygwin.
+  M=''
 
   #  Variables we get from configure.ac
   LIBVLC_VERSION=`sed -ne '/AC_INIT/s/.*,\(.*\))/\1/p' < configure.ac`
@@ -163,7 +163,7 @@ then
     do
       cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 # End Source File${M}
 EOF
@@ -179,7 +179,7 @@ EOF
       then
         cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 !IF "\$(CFG)" == "libvlc - Win32 (WCE MIPS) Release"${M}
 # PROP Output_Dir "MIPSRel\\${subdir}"${M}
@@ -217,7 +217,7 @@ EOF
         else
           cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\".\\" /D DATA_PATH=\\"share\\"${M}
 !IF "\$(CFG)" == "libvlc - Win32 Release"${M}
 # PROP Output_Dir "Release\\${subdir}"${M}
@@ -240,7 +240,7 @@ EOF
     do
       cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 # End Source File${M}
 EOF
     done
@@ -251,7 +251,7 @@ EOF
     do
       cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
+SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 # End Source File${M}
 EOF
     done
@@ -273,11 +273,11 @@ EOF
       allfiles=`grep -v '[^-_a-zA-Z0-9]*#' ${mf} | awk 'BEGIN{a=0}{if(!a&&$0~/^SOURCES_'${mod}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if($0~/^[a-zA-Z]/){exit;}print $0}}' | tr '\\ ' '\n\n' | grep '\.'`
       hfiles=`for i in ${allfiles} ; do echo "$i" ; done | grep '\.h$'`
       cfiles=`for i in ${allfiles} ; do echo "$i" ; done | grep -v '\.h$'`
-      for dir in evc msvc
+      for msdir in evc msvc
       do
-        test "${dir}" = "evc" && suf="vcp" || suf="dsp"
-        source="${dir}/plugins.${suf}.in"
-        target="${dir}/plugin_${mod}.${suf}"
+        test "${msdir}" = "evc" && suf="vcp" || suf="dsp"
+        source="${msdir}/plugins.${suf}.in"
+        target="${msdir}/plugin_${mod}.${suf}"
         echo "${target}"
         perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${mod}'/g' < ${source} > ${target}
         for cfile in ${cfiles}
