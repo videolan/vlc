@@ -426,21 +426,24 @@ void __fastcall TMainFrameDlg::PrevTitleActionExecute( TObject *Sender )
     input_area_t  * p_area;
     int             i_id;
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
     /* Disallow area 0 since it is used for video_ts.vob */
     if( i_id > 0 )
     {
         p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
-        p_intf->p_sys->b_title_update = 1;
+        p_intf->p_sys->b_title_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_intf->p_sys->p_menus->SetupMenus();
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
+
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
@@ -448,60 +451,69 @@ void __fastcall TMainFrameDlg::NextTitleActionExecute( TObject *Sender )
     input_area_t  * p_area;
     unsigned int    i_id;
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
     if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
         p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
-        p_intf->p_sys->b_title_update = 1;
+        p_intf->p_sys->b_title_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_intf->p_sys->p_menus->SetupMenus();
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
+
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PrevChapterActionExecute( TObject *Sender )
 {
     input_area_t  * p_area;
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
-    if( p_area->i_part > 0 )
+    if( p_area->i_part - 1 > 0 )
     {
         p_area->i_part--;
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
-        p_intf->p_sys->b_chapter_update = 1;
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_intf->p_sys->p_menus->SetupMenus();
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
+
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::NextChapterActionExecute( TObject *Sender )
 {
     input_area_t  * p_area;
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
-    if( p_area->i_part < p_area->i_part_nb )
+    if( p_area->i_part + 1 < p_area->i_part_nb )
     {
         p_area->i_part++;
-        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
-        p_intf->p_sys->b_chapter_update = 1;
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_intf->p_sys->p_menus->SetupMenus();
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
+
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 }
 //---------------------------------------------------------------------------
 

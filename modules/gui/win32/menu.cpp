@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.5 2003/01/16 09:02:46 sam Exp $
+ * $Id: menu.cpp,v 1.6 2003/01/17 19:35:22 sam Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -135,10 +135,18 @@ void __fastcall TMenusGen::MenuTitleClick( TObject *Sender )
 {
     TMenuItem     * Item = (TMenuItem *)Sender;
     TMenuItem     * ItemTitle;
+    input_area_t  * p_area;
     int             i_title = Item->Tag;
 
-    input_ChangeArea( p_intf->p_sys->p_input,
-                      p_intf->p_sys->p_input->stream.pp_areas[i_title] );
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+    i_title = __MIN( i_title,
+                     p_intf->p_sys->p_input->stream.i_area_nb - 1 );
+    i_title = __MAX( i_title, 1 );
+    p_area = p_intf->p_sys->p_input->stream.pp_areas[i_title];
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+    input_ChangeArea( p_intf->p_sys->p_input, p_area );
+
     Item->Checked = true;
     ItemTitle = Index2Item( PopupNavigation, i_title - 1, false );
     Index2Item( ItemTitle, 0, false )->Checked = true;
@@ -158,14 +166,21 @@ void __fastcall TMenusGen::MenuChapterClick( TObject *Sender )
     int             i_title;
     int             i_chapter = Item->Tag;
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
+    i_chapter = __MIN( i_chapter, p_area->.i_part_nb - 1 );
+    i_chapter = __MAX( i_chapter, 1 );
     p_area->i_part = i_chapter;
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-    input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+    input_ChangeArea( p_intf->p_sys->p_input, p_area );
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     i_title = p_intf->p_sys->p_input->stream.p_selected_area->i_id;
-    ItemTitle = Index2Item( PopupNavigation, i_title - 1, false );
-    Index2Item( ItemTitle, i_chapter - 1, false )->Checked = true;
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+    ItemTitle = Index2Item( PopupNavigation, i_title, false );
+    Index2Item( ItemTitle, i_chapter, false )->Checked = true;
 
     input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 }
@@ -182,17 +197,24 @@ void __fastcall TMenusGen::PopupNavigationClick( TObject *Sender )
     int             i_title   = Data2Title( Item->Tag );
     int             i_chapter = Data2Chapter( Item->Tag );
 
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+    i_title = __MIN( i_title,
+                     p_intf->p_sys->p_input->stream.i_area_nb - 1 );
+    i_title = __MAX( i_title, 1 );
     p_area = p_intf->p_sys->p_input->stream.pp_areas[i_title];
+    i_chapter = __MIN( i_chapter, p_area->.i_part_nb - 1 );
+    i_chapter = __MAX( i_chapter, 1 );
     p_area->i_part = i_chapter;
+    vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-    input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
+    input_ChangeArea( p_intf->p_sys->p_input, p_area );
 
     Item->Checked = true;
-    ItemTitle = Index2Item( MenuTitle, i_title - 1, false );
+    ItemTitle = Index2Item( MenuTitle, i_title, false );
     if( ItemTitle->Checked )
     {
         /* same title, new chapter */
-        Index2Item( MenuChapter, i_chapter - 1, false )->Checked = true;
+        Index2Item( MenuChapter, i_chapter, false )->Checked = true;
     }
     else
     {
@@ -273,12 +295,13 @@ void __fastcall TMenusGen::SetupMenus()
         ProgramMenu( MenuProgram, p_pgrm, MenuProgramClick );
         ProgramMenu( PopupProgram, p_pgrm, PopupProgramClick );
 
-        p_intf->p_sys->b_program_update = 0;
+        p_intf->p_sys->b_program_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_title_update )
     {
 // why "-1" ?
+// because if the titles go from 1 to X-1, there are X-1 titles
         RadioMenu( MenuTitle, "Title",
                    p_input->stream.i_area_nb - 1,
                    p_input->stream.p_selected_area->i_id,
@@ -288,13 +311,13 @@ void __fastcall TMenusGen::SetupMenus()
         CurrentTitle.sprintf( "%d", p_input->stream.p_selected_area->i_id );
         p_window->LabelTitleCurrent->Caption = CurrentTitle;
 
-        p_intf->p_sys->b_title_update = 0;
+        p_intf->p_sys->b_title_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_chapter_update )
     {
         RadioMenu( MenuChapter, "Chapter",
-                   p_input->stream.p_selected_area->i_part_nb,
+                   p_input->stream.p_selected_area->i_part_nb - 1,
                    p_input->stream.p_selected_area->i_part,
                    MenuChapterClick );
 
@@ -306,7 +329,7 @@ void __fastcall TMenusGen::SetupMenus()
 
         p_intf->p_sys->i_part = p_input->stream.p_selected_area->i_part;
 
-        p_intf->p_sys->b_chapter_update = 0;
+        p_intf->p_sys->b_chapter_update = VLC_FALSE;
     }
 
     /* look for selected ES */
@@ -336,7 +359,7 @@ void __fastcall TMenusGen::SetupMenus()
         LanguageMenu( MenuLanguage, p_audio_es, AUDIO_ES, MenuLanguageClick );
         LanguageMenu( PopupLanguage, p_audio_es, AUDIO_ES, PopupLanguageClick );
 
-        p_intf->p_sys->b_audio_update = 0;
+        p_intf->p_sys->b_audio_update = VLC_FALSE;
     }
 
     /* sub picture menus */
@@ -345,7 +368,7 @@ void __fastcall TMenusGen::SetupMenus()
         LanguageMenu( PopupSubtitles, p_spu_es, SPU_ES, PopupSubtitleClick );
         LanguageMenu( MenuSubtitles, p_spu_es, SPU_ES, MenuSubtitleClick );
 
-        p_intf->p_sys->b_spu_update = 0;
+        p_intf->p_sys->b_spu_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_aout_update )
@@ -357,7 +380,7 @@ void __fastcall TMenusGen::SetupMenus()
         if( p_aout != NULL )
         {
             vlc_value_t val;
-            val.b_bool = 0;
+            val.b_bool = VLC_FALSE;
 
             var_Set( (vlc_object_t *)p_aout, "intf-change", val );
 
@@ -374,7 +397,7 @@ void __fastcall TMenusGen::SetupMenus()
             vlc_object_release( (vlc_object_t *)p_aout );
         }
 
-        p_intf->p_sys->b_aout_update = 0;
+        p_intf->p_sys->b_aout_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_vout_update )
@@ -386,7 +409,7 @@ void __fastcall TMenusGen::SetupMenus()
         if( p_vout != NULL )
         {
             vlc_value_t val;
-            val.b_bool = 0;
+            val.b_bool = VLC_FALSE;
 
             var_Set( (vlc_object_t *)p_vout, "intf-change", val );
 
@@ -398,7 +421,7 @@ void __fastcall TMenusGen::SetupMenus()
             vlc_object_release( (vlc_object_t *)p_vout );
         }
 
-        p_intf->p_sys->b_vout_update = 0;
+        p_intf->p_sys->b_vout_update = VLC_FALSE;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -541,13 +564,13 @@ void __fastcall TMenusGen::ProgramChange( TMenuItem *Item,
     Index2Item( RootOther, i_program - 1, true )->Checked = true;
 
     /* update audio/subtitles menus */
-    p_intf->p_sys->b_audio_update = 1;
-    p_intf->p_sys->b_spu_update = 1;
+    p_intf->p_sys->b_audio_update = VLC_TRUE;
+    p_intf->p_sys->b_spu_update = VLC_TRUE;
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     SetupMenus();
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-    p_intf->p_sys->b_audio_update = 0;
-    p_intf->p_sys->b_spu_update = 0;
+    p_intf->p_sys->b_audio_update = VLC_FALSE;
+    p_intf->p_sys->b_spu_update = VLC_FALSE;
 
     input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 }
@@ -670,17 +693,17 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
     Root->Enabled = false;
     Root->Clear();
 
-    for( int i_item = 0; i_item < i_nb; i_item++ )
+    for( int i_item = 1; i_item <= i_nb; i_item++ )
     {
         /* we group titles/chapters in packets of ten for small screens */
-        if( ( i_item % 10 == 0 ) && ( i_nb > 20 ) )
+        if( ( i_item % 10 == 1 ) && ( i_nb > 20 ) )
         {
-            if( i_item != 0 )
+            if( i_item != 1 )
             {
                 Root->Add( ItemGroup );
             }
 
-            Name.sprintf( "%ss %d to %d", ItemName, i_item + 1, i_item + 10 );
+            Name.sprintf( "%ss %d to %d", ItemName, i_item, i_item + 9 );
             ItemGroup = new TMenuItem( Root );
             ItemGroup->Hint = Name;
             ItemGroup->RadioItem = true;
@@ -690,7 +713,7 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
             ItemGroup->Caption = Name;
         }
 
-        Name.sprintf( "%s %d", ItemName, i_item + 1 );
+        Name.sprintf( "%s %d", ItemName, i_item );
         Item = new TMenuItem( Root );
         Item->RadioItem = true;
         Item->Hint = Name;
@@ -701,10 +724,10 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
 
         /* FIXME: temporary hack to save i_item with the Item
          * It will be used in the callback. */
-        Item->Tag = i_item + 1;
+        Item->Tag = i_item;
 
         /* check the currently selected chapter */
-        if( i_selected == i_item + 1 )
+        if( i_selected == i_item )
         {
             Item->Checked = true;
         }
@@ -841,7 +864,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     i_title_nb = p_intf->p_sys->p_input->stream.i_area_nb;
 
     /* loop on titles */
-    for( unsigned int i_title = 1; i_title < i_title_nb; i_title++ )
+    for( unsigned int i_title = 1; i_title <= i_title_nb; i_title++ )
     {
         /* we group titles in packets of ten for small screens */
         if( ( i_title % 10 == 1 ) && ( i_title_nb > 20 ) )
@@ -859,7 +882,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
         }
 
         Name.sprintf( "Title %d (%d)", i_title,
-            p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb );
+            p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb - 1 );
         {
             TitleItem = new TMenuItem( Root );
             TitleItem->RadioItem = true;
@@ -867,28 +890,28 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
             TitleItem->Caption = Name;
 
             i_chapter_nb =
-                p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb;
+                p_intf->p_sys->p_input->stream.pp_areas[i_title]->i_part_nb - 1;
 
             /* loop on chapters */
-            for( unsigned int i_chapter = 0; i_chapter < i_chapter_nb;
+            for( unsigned int i_chapter = 1; i_chapter <= i_chapter_nb;
                  i_chapter++ )
             {
                 /* we group chapters in packets of ten for small screens */
-                if( ( i_chapter % 10 == 0 ) && ( i_chapter_nb > 20 ) )
+                if( ( i_chapter % 10 == 1 ) && ( i_chapter_nb > 20 ) )
                 {
-                    if( i_chapter != 0 )
+                    if( i_chapter != 1 )
                     {
                         TitleItem->Add( ChapterGroup );
                     }
 
-                    Name.sprintf( "%d - %d", i_chapter + 1, i_chapter + 10 );
+                    Name.sprintf( "%d - %d", i_chapter, i_chapter + 9 );
                     ChapterGroup = new TMenuItem( TitleItem );
                     ChapterGroup->RadioItem = true;
                     ChapterGroup->Hint = Name;
                     ChapterGroup->Caption = Name;
                 }
 
-                Name.sprintf( "Chapter %d", i_chapter + 1 );
+                Name.sprintf( "Chapter %d", i_chapter );
 
                 ChapterItem = new TMenuItem( TitleItem );
                 ChapterItem->RadioItem = true;
@@ -897,13 +920,13 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
 
                 /* FIXME: temporary hack to save i_title and i_chapter with
                  * ChapterItem, since we will need them in the callback */
-                ChapterItem->Tag = Pos2Data( i_title, i_chapter + 1 );
+                ChapterItem->Tag = Pos2Data( i_title, i_chapter );
 
 #define p_area p_intf->p_sys->p_input->stream.pp_areas[i_title]
                 /* check the currently selected chapter */
                 if( ( p_area ==
                         p_intf->p_sys->p_input->stream.p_selected_area ) &&
-                    ( p_area->i_part == i_chapter + 1 ) )
+                    ( p_area->i_part == i_chapter ) )
                 {
                     ChapterItem->Checked = true;
                 }
