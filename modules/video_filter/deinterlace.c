@@ -508,7 +508,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
 
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
-                             * p_outpic->p[i_plane].i_lines;
+                             * p_outpic->p[i_plane].i_visible_lines;
 
         switch( p_vout->render.i_chroma )
         {
@@ -577,7 +577,7 @@ static void RenderBob( vout_thread_t *p_vout,
         p_in = p_pic->p[i_plane].p_pixels;
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
-                             * p_outpic->p[i_plane].i_lines;
+                             * p_outpic->p[i_plane].i_visible_lines;
 
         switch( p_vout->render.i_chroma )
         {
@@ -697,7 +697,7 @@ static void RenderLinear( vout_thread_t *p_vout,
         p_in = p_pic->p[i_plane].p_pixels;
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
-                             * p_outpic->p[i_plane].i_lines;
+                             * p_outpic->p[i_plane].i_visible_lines;
 
         /* For BOTTOM field we need to add the first line */
         if( i_field == 1 )
@@ -753,7 +753,7 @@ static void RenderMean( vout_thread_t *p_vout,
 
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
-                             * p_outpic->p[i_plane].i_lines;
+                             * p_outpic->p[i_plane].i_visible_lines;
 
         /* All lines: mean value */
         for( ; p_out < p_out_end ; )
@@ -782,7 +782,7 @@ static void RenderBlend( vout_thread_t *p_vout,
 
         p_out = p_outpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
-                             * p_outpic->p[i_plane].i_lines;
+                             * p_outpic->p[i_plane].i_visible_lines;
 
         switch( p_vout->render.i_chroma )
         {

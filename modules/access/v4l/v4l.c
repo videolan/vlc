@@ -438,6 +438,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = (int64_t)var_GetInteger( p_demux, "v4l-caching" ) * 1000;
             return VLC_SUCCESS;
 
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = mdate();
+            return VLC_SUCCESS;
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
@@ -1109,7 +1114,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         p_sys->i_video_frame_size = 0;
         for( i = 0; i < p_sys->pic.i_planes; i++ )
         {
-            p_sys->i_video_frame_size += p_sys->pic.p[i].i_lines *
+            p_sys->i_video_frame_size += p_sys->pic.p[i].i_visible_lines *
               p_sys->pic.p[i].i_visible_pitch;
         }
 

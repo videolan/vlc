@@ -397,10 +397,10 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
     uint8_t *p_line1 = p_dest->p->p_pixels +
-                       p_dest->p->i_lines * p_dest->p->i_pitch
+                       p_dest->p->i_visible_lines * p_dest->p->i_pitch
                        + p_dest->p->i_pitch;
     uint8_t *p_line2 = p_dest->p->p_pixels +
-                       p_dest->p->i_lines * p_dest->p->i_pitch;
+                       p_dest->p->i_visible_lines * p_dest->p->i_pitch;
     uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;

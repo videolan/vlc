@@ -1468,6 +1468,7 @@ int Init( vout_thread_t *p_vout )
        }
        p_pic->p->p_pixels = (uint8_t*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
        p_pic->p->i_lines = p_vout->p_sys->i_height;
+       p_pic->p->i_visible_lines = p_vout->p_sys->i_height;
 
        p_pic->p->i_pixel_pitch = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
        p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;

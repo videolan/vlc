@@ -318,18 +318,21 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_pic->Y_PIXELS = p_pic->p_data;
     p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+    p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
     p_pic->p[Y_PLANE].i_pitch = CEIL32( p_vout->output.i_width );
     p_pic->p[Y_PLANE].i_pixel_pitch = 1;
     p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
 
     p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2/4;
     p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
     p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
     p_pic->p[U_PLANE].i_pixel_pitch = 1;
     p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
     p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3/4;
     p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
     p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
     p_pic->p[V_PLANE].i_pixel_pitch = 1;
     p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;

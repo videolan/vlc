@@ -689,7 +689,8 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
             i_dst_stride = p_pic->p[i_plane].i_pitch;
 
             i_size = __MIN( i_src_stride, i_dst_stride );
-            for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+            for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
+                 i_line++ )
             {
                 p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_size );
                 p_src += i_src_stride;

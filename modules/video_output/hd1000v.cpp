@@ -213,6 +213,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Allocate the picture */
     p_pic->p->i_lines = p_vout->p_sys->i_height;
+    p_pic->p->i_visible_lines = p_vout->p_sys->i_height;
     p_pic->p->i_pitch = p_vout->p_sys->i_width;
     p_pic->p->i_pixel_pitch = 1;
     p_pic->p->i_visible_pitch = p_vout->p_sys->i_width;
@@ -277,6 +278,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
     
     p_pic->p->i_lines = p_vout->output.i_height;
+    p_pic->p->i_visible_lines = p_vout->output.i_height;
     p_pic->p->p_pixels = (uint8_t*) p_pic->p_sys->p_image->MapLock();
     p_pic->p->i_pitch = p_vout->p_sys->i_screen_depth;
     p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch

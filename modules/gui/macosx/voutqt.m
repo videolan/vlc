@@ -630,6 +630,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_pic->p[0].p_pixels = p_pic->p_data;
             p_pic->p[0].i_lines = p_vout->output.i_height;
+            p_pic->p[0].i_visible_lines = p_vout->output.i_height;
             p_pic->p[0].i_pitch = p_vout->output.i_width * 2;
             p_pic->p[0].i_pixel_pitch = 1;
             p_pic->p[0].i_visible_pitch = p_vout->output.i_width * 2;

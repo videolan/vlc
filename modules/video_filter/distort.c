@@ -297,7 +297,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
         p_in = p_inpic->p[i_index].p_pixels;
         p_out = p_outpic->p[i_index].p_pixels;
 
-        i_num_lines = p_inpic->p[i_index].i_lines;
+        i_num_lines = p_inpic->p[i_index].i_visible_lines;
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
@@ -363,7 +363,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
-        i_num_lines = p_inpic->p[i_index].i_lines;
+        i_num_lines = p_inpic->p[i_index].i_visible_lines;
 
         i_first_line = i_num_lines * 4 / 5;
 

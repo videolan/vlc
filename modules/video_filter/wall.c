@@ -402,7 +402,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 p_in = p_pic->p[i_plane].p_pixels
                         + pi_top_skip[i_plane] + pi_left_skip[i_plane];
 
-                p_in_end = p_in + p_outpic->p[i_plane].i_lines
+                p_in_end = p_in + p_outpic->p[i_plane].i_visible_lines
                                    * p_pic->p[i_plane].i_pitch;
 
                 p_out = p_outpic->p[i_plane].p_pixels;
@@ -428,7 +428,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
             pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
-                                     * p_pic->p[i_plane].i_lines
+                                     * p_pic->p[i_plane].i_visible_lines
                                      / p_vout->output.i_height
                                      * p_pic->p[i_plane].i_pitch;
         }

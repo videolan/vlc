@@ -1392,7 +1392,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 int i,j;
                 for( i = 0; i < front_pic.i_planes; i++ )
-                    for( j = 0; j < front_pic.p[i].i_lines; j++)
+                    for( j = 0; j < front_pic.p[i].i_visible_lines; j++)
                         memset( front_pic.p[i].p_pixels + j *
                                 front_pic.p[i].i_pitch, 127,
                                 front_pic.p[i].i_visible_pitch );
@@ -1597,6 +1597,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
         case VLC_FOURCC('R','V','3','2'):
             p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_visible_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
             switch( p_vout->output.i_chroma )
             {
@@ -1625,6 +1626,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
             p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
@@ -1633,6 +1635,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->V_PIXELS =  p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
             p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
@@ -1641,6 +1644,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->U_PIXELS = p_pic->V_PIXELS
               + p_pic->p[V_PLANE].i_lines * p_pic->p[V_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
             p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
@@ -1653,6 +1657,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+            p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p[Y_PLANE].i_pixel_pitch = 1;
             p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
@@ -1661,6 +1666,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->U_PIXELS = p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
             p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
@@ -1669,6 +1675,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->V_PIXELS =  p_pic->U_PIXELS
               + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+            p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
             p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
@@ -1682,6 +1689,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_visible_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
             p_pic->p->i_pixel_pitch = 2;
             p_pic->p->i_visible_pitch = p_vout->output.i_width *

@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.6 2003/11/23 13:25:32 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -173,7 +173,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_src = p_sys->context.p_pix[i_plane];
 
             i_lines = __MIN( p_sys->context.i_lines[i_plane],
-                             p_pic->p[i_plane].i_lines );
+                             p_pic->p[i_plane].i_visible_lines );
             for( i_line = 0; i_line < i_lines; i_line++ )
             {
                 memcpy( p_dst, p_src,

@@ -757,6 +757,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
         p_pic->p->p_pixels = p_pic->p_sys->p_image->image;
         p_pic->p->i_lines = p_pic->p_sys->p_image->size.h;
+        p_pic->p->i_visible_lines = p_pic->p_sys->p_image->size.h;
         p_pic->p->i_pitch = p_pic->p_sys->p_image->bpl;
         p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
         p_pic->p->i_visible_pitch = p_vout->p_sys->i_bytes_per_pixel
@@ -792,6 +793,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
         p_pic->p->p_pixels = p_pic->p_sys->p_buf[0];
         p_pic->p->i_lines = p_pic->p_sys->p_ctx[0]->dim.h;
+        p_pic->p->i_visible_lines = p_pic->p_sys->p_ctx[0]->dim.h;
         p_pic->p->i_pitch = p_pic->p_sys->p_ctx[0]->pitch;
         p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
         p_pic->p->i_visible_pitch = p_vout->p_sys->i_bytes_per_pixel
@@ -837,18 +839,21 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->Y_PIXELS = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p[Y_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p[Y_PLANE].i_pixel_pitch = 1;
                 p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
                 p_pic->U_PIXELS = p_pic->p_sys->p_buf[U_PLANE];
                 p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
+                p_pic->p[U_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
                 p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_ctx[U_PLANE]->pitch;
                 p_pic->p[U_PLANE].i_pixel_pitch = 1;
                 p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
                 p_pic->V_PIXELS = p_pic->p_sys->p_buf[V_PLANE];
                 p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
+                p_pic->p[V_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
                 p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_ctx[V_PLANE]->pitch;
                 p_pic->p[V_PLANE].i_pixel_pitch = 1;
                 p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
@@ -871,18 +876,21 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->Y_PIXELS = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p[Y_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p[Y_PLANE].i_pixel_pitch = 1;
                 p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
                 p_pic->U_PIXELS = p_pic->p_sys->p_buf[U_PLANE];
                 p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
+                p_pic->p[U_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
                 p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_ctx[U_PLANE]->pitch;
                 p_pic->p[U_PLANE].i_pixel_pitch = 1;
                 p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
                 p_pic->V_PIXELS = p_pic->p_sys->p_buf[V_PLANE];
                 p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
+                p_pic->p[V_PLANE].i_visible_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
                 p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_ctx[V_PLANE]->pitch;
                 p_pic->p[V_PLANE].i_pixel_pitch = 1;
                 p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
@@ -903,6 +911,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p->i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p->i_pixel_pitch = 4;
                 p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
@@ -918,6 +927,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p->i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p->i_pixel_pitch = 2;
                 p_pic->p->i_visible_pitch = 2 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
@@ -933,6 +943,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p->i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p->i_pixel_pitch = 4;
                 p_pic->p->i_visible_pitch = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
@@ -948,6 +959,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
+                p_pic->p->i_visible_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
                 p_pic->p->i_pixel_pitch = 4;
                 p_pic->p->i_visible_pitch = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
@@ -965,6 +977,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->offsets[0];
             p_pic->p->i_lines = p_vout->output.i_height;
+            p_pic->p->i_visible_lines = p_vout->output.i_height;
             /* XXX: this just looks so plain wrong... check it out ! */
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
             p_pic->p->i_pixel_pitch = 4;

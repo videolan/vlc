@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo video decoder/packetizer for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.13 2004/02/27 14:02:05 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -235,7 +235,7 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
         p_dst = p_pic->p[i_plane].p_pixels;
         i_width = p_pic->p[i_plane].i_visible_pitch;
 
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
             p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += i_width;

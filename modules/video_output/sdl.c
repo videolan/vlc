@@ -814,6 +814,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         p_pic->p->p_pixels = p_vout->p_sys->p_display->pixels;
         p_pic->p->i_lines = p_vout->p_sys->p_display->h;
+        p_pic->p->i_visible_lines = p_vout->p_sys->p_display->h;
         p_pic->p->i_pitch = p_vout->p_sys->p_display->pitch;
         p_pic->p->i_visible_pitch =
             p_pic->p->i_pixel_pitch * p_vout->p_sys->p_display->w;
@@ -846,6 +847,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         p_pic->Y_PIXELS = p_pic->p_sys->p_overlay->pixels[0];
         p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_overlay->h;
+        p_pic->p[Y_PLANE].i_visible_lines = p_pic->p_sys->p_overlay->h;
         p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[0];
 
         switch( p_vout->output.i_chroma )
@@ -856,12 +858,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+            p_pic->p[U_PLANE].i_visible_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
             p_pic->p[U_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+            p_pic->p[V_PLANE].i_visible_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
             p_pic->p[V_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
@@ -875,12 +879,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+            p_pic->p[U_PLANE].i_visible_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
             p_pic->p[U_PLANE].i_pixel_pitch = 1;
             p_pic->p[U_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
+            p_pic->p[V_PLANE].i_visible_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
             p_pic->p[V_PLANE].i_pixel_pitch = 1;
             p_pic->p[V_PLANE].i_visible_pitch = p_pic->p_sys->p_overlay->w / 2;

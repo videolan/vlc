@@ -293,8 +293,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-                uint8_t *p_out_end = p_out + p_outpic->p[i_index].i_lines
-                                              * p_outpic->p[i_index].i_pitch;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
@@ -302,7 +303,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                     p_out_end -= p_outpic->p[i_index].i_pitch
                                   - p_outpic->p[i_index].i_visible_pitch;
-                    p_line_end = p_in + p_pic->p[i_index].i_lines * i_pitch;
+                    p_line_end = p_in + p_pic->p[i_index].i_visible_lines *
+                        i_pitch;
 
                     for( ; p_in < p_line_end ; )
                     {
@@ -319,7 +321,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
                                             * p_pic->p[i_index].i_pitch;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;
@@ -350,14 +352,16 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;
-                uint8_t *p_out_end = p_out + p_outpic->p[i_index].i_lines
-                                              * p_outpic->p[i_index].i_pitch;
+                uint8_t *p_out_end = p_out +
+                    p_outpic->p[i_index].i_visible_lines *
+                    p_outpic->p[i_index].i_pitch;
 
                 for( ; p_out < p_out_end ; )
                 {
                     uint8_t *p_in_end;
 
-                    p_in_end = p_in + p_pic->p[i_index].i_lines * i_pitch;
+                    p_in_end = p_in + p_pic->p[i_index].i_visible_lines *
+                        i_pitch;
 
                     for( ; p_in < p_in_end ; )
                     {
@@ -376,7 +380,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
                                             * p_pic->p[i_index].i_pitch;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;
@@ -395,7 +399,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
             {
                 uint8_t *p_in = p_pic->p[i_index].p_pixels;
-                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_lines
+                uint8_t *p_in_end = p_in + p_pic->p[i_index].i_visible_lines
                                             * p_pic->p[i_index].i_pitch;
 
                 uint8_t *p_out = p_outpic->p[i_index].p_pixels;

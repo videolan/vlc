@@ -293,7 +293,7 @@ static void CopyPicture( vout_thread_t * p_vout,
             /* There are margins, but with the same width : perfect ! */
             p_vout->p_vlc->pf_memcpy(
                          p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                         p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                         p_src->p[i].i_pitch * p_src->p[i].i_visible_lines );
         }
         else
         {
@@ -302,7 +302,7 @@ static void CopyPicture( vout_thread_t * p_vout,
             uint8_t *p_out = p_dest->p[i].p_pixels;
             int i_line;
 
-            for( i_line = p_src->p[i].i_lines; i_line--; )
+            for( i_line = p_src->p[i].i_visible_lines; i_line--; )
             {
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                           p_src->p[i].i_visible_pitch );
@@ -329,7 +329,7 @@ static void RenderBlur( vout_thread_t *p_vout, picture_t *p_oldpic,
         p_new = p_newpic->p[i_plane].p_pixels;
         p_old = p_oldpic->p[i_plane].p_pixels;
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch *
-                             p_outpic->p[i_plane].i_lines;
+                             p_outpic->p[i_plane].i_visible_lines;
         while ( p_out < p_out_end )
         {
             p_out_line_end = p_out + p_outpic->p[i_plane].i_visible_pitch;

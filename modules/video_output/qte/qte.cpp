@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2003 VideoLAN
- * $Id: qte.cpp,v 1.22 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -462,6 +462,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
     p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
     p_pic->p->i_lines = p_vout->output.i_height;
+    p_pic->p->i_visible_lines = p_vout->output.i_height;
     p_pic->p->i_visible_pitch =
             p_pic->p->i_pixel_pitch * p_vout->output.i_width;
 

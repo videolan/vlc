@@ -248,7 +248,7 @@ static void I422_IUYV( vout_thread_t *p_vout, picture_t *p_source,
 static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_lines * p_dest->p->i_pitch;
+    uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_visible_lines * p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;
@@ -283,7 +283,7 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 static void I422_Y211( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_lines * p_dest->p->i_pitch;
+    uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_visible_lines * p_dest->p->i_pitch;
     uint8_t *p_y = p_source->Y_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;

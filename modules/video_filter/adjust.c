@@ -286,7 +286,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
      */
 
     p_in = p_pic->p[0].p_pixels;
-    p_in_end = p_in + p_pic->p[0].i_lines * p_pic->p[0].i_pitch - 8;
+    p_in_end = p_in + p_pic->p[0].i_visible_lines * p_pic->p[0].i_pitch - 8;
 
     p_out = p_outpic->p[0].p_pixels;
 
@@ -320,7 +320,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_in = p_pic->p[1].p_pixels;
     p_in_v = p_pic->p[2].p_pixels;
-    p_in_end = p_in + p_pic->p[1].i_lines * p_pic->p[1].i_pitch - 8;
+    p_in_end = p_in + p_pic->p[1].i_visible_lines * p_pic->p[1].i_pitch - 8;
 
     p_out = p_outpic->p[1].p_pixels;
     p_out_v = p_outpic->p[2].p_pixels;

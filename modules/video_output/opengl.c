@@ -275,6 +275,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_picture[0].i_planes = 1;
     p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[0];
     p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
+    p_vout->p_picture[0].p->i_visible_lines = p_vout->output.i_height;
     p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
     p_vout->p_picture[0].p->i_pitch = p_vout->output.i_width *
         p_vout->p_picture[0].p->i_pixel_pitch;

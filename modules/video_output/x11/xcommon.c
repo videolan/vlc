@@ -1252,6 +1252,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         case VLC_FOURCC('R','V','3','2'):
 
             p_pic->p->i_lines = p_pic->p_sys->p_image->height;
+            p_pic->p->i_visible_lines = p_pic->p_sys->p_image->height;
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->xoffset;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;

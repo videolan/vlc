@@ -209,6 +209,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Allocate the picture */
     p_pic->p->i_lines = p_vout->output.i_height;
+    p_pic->p->i_visible_lines = p_vout->output.i_height;
     p_pic->p->i_pitch = 4 * ((p_vout->output.i_width + 15) & ~15);
     p_pic->p->i_pixel_pitch = 4;
     p_pic->p->i_visible_pitch = 4 * p_vout->output.i_width;

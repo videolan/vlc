@@ -298,6 +298,7 @@ static int Init( vout_thread_t *p_vout )
     p_pic->p->p_pixels = p_vout->p_sys->p_video;
     p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
     p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
+    p_pic->p->i_visible_lines = p_vout->p_sys->var_info.yres;
 
     if( p_vout->p_sys->var_info.xres_virtual )
     {

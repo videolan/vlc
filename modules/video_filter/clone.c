@@ -341,11 +341,12 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                  && i_out_pitch == i_copy_pitch )
             {
                 p_vout->p_vlc->pf_memcpy( p_out, p_in, i_in_pitch
-                                           * p_outpic->p[i_plane].i_lines );
+                                     * p_outpic->p[i_plane].i_visible_lines );
             }
             else
             {
-                p_in_end = p_in + i_in_pitch * p_outpic->p[i_plane].i_lines;
+                p_in_end = p_in + i_in_pitch *
+                    p_outpic->p[i_plane].i_visible_lines;
 
                 while( p_in < p_in_end )
                 {

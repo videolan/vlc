@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.3 2003/10/25 00:49:14 sam Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -147,6 +147,7 @@ static int Init( vout_thread_t *p_vout )
     /* Allocate the picture */
     p_pic->p->p_pixels = aa_image( p_vout->p_sys->aa_context );
     p_pic->p->i_lines = p_vout->p_sys->i_height;
+    p_pic->p->i_visible_lines = p_vout->p_sys->i_height;
     p_pic->p->i_pitch = p_vout->p_sys->i_width;
     p_pic->p->i_pixel_pitch = 1;
     p_pic->p->i_visible_pitch = p_vout->p_sys->i_width;

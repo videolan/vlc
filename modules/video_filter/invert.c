@@ -208,7 +208,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
 
         p_in = p_pic->p[i_index].p_pixels;
-        p_in_end = p_in + p_pic->p[i_index].i_lines
+        p_in_end = p_in + p_pic->p[i_index].i_visible_lines
                            * p_pic->p[i_index].i_pitch;
 
         p_out = p_outpic->p[i_index].p_pixels;

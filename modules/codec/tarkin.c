@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: tarkin.c,v 1.11 2004/01/25 18:20:12 bigben Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -306,7 +306,7 @@ static void tarkin_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
         i_dst_stride = p_pic->p[i_plane].i_pitch;
         i_src_stride = i_pitch;
 
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
             p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_src_stride );
 

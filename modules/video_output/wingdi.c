@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.8 2003/12/04 14:48:24 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,7 +271,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     SelectObject( p_vout->p_sys->off_dc, p_vout->p_sys->off_bitmap );
 
     /* Stupid GDI is upside-down */
-    i_src_bytes = p_pic->p->i_lines * p_pic->p->i_pitch;
+    i_src_bytes = p_pic->p->i_visible_lines * p_pic->p->i_pitch;
     i_dest_bytes = 0;
 
     while( i_src_bytes )

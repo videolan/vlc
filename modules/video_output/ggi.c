@@ -190,6 +190,7 @@ static int Init( vout_thread_t *p_vout )
     p_pic->p->p_pixels = p_b[ 0 ]->write;
     p_pic->p->i_pixel_pitch = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
     p_pic->p->i_lines = p_vout->p_sys->mode.visible.y;
+    p_pic->p->i_visible_lines = p_vout->p_sys->mode.visible.y;
 
     p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
 
