@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.263 2003/11/24 20:50:45 fenrir Exp $
+ * $Id: input.c,v 1.264 2003/11/26 18:48:24 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -309,7 +309,7 @@ static int RunThread( input_thread_t *p_input )
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = 1;
         ErrorThread( p_input );
-        p_input->b_dead = 1;
+        EndThread( p_input );
         return 0;
     }
 
@@ -804,13 +804,13 @@ static void EndThread( input_thread_t * p_input )
     input_DumpStream( p_input );
 
     /* Free demultiplexer's data */
-    module_Unneed( p_input, p_input->p_demux );
+    if( p_input->p_demux ) module_Unneed( p_input, p_input->p_demux );
 
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );
 
     /* Close optional stream output instance */
-    if ( p_input->stream.p_sout != NULL )
+    if( p_input->stream.p_sout )
     {
         vlc_object_t *p_pl =
             vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -835,26 +835,29 @@ static void EndThread( input_thread_t * p_input )
     }
 
     /* Destroy subtitles demuxers */
-    for( i = 0; i < p_input->p_sys->i_sub; i++ )
+    if( p_input->p_sys )
     {
-        subtitle_Close( p_input->p_sys->sub[i] );
-    }
-    if( p_input->p_sys->i_sub > 0 )
-    {
-        free( p_input->p_sys->sub );
-    }
+        for( i = 0; i < p_input->p_sys->i_sub; i++ )
+        {
+            subtitle_Close( p_input->p_sys->sub[i] );
+        }
+        if( p_input->p_sys->i_sub > 0 )
+        {
+            free( p_input->p_sys->sub );
+        }
 
-    /* Free input_thread_sys_t */
-    free( p_input->p_sys );
+        /* Free input_thread_sys_t */
+        free( p_input->p_sys );
+    }
 
     /* Destroy the stream_t facilities */
-    stream_Release( p_input->s );
+    if( p_input->s ) stream_Release( p_input->s );
 
     /* Destroy es out */
-    input_EsOutDelete( p_input->p_es_out );
+    if( p_input->p_es_out ) input_EsOutDelete( p_input->p_es_out );
 
     /* Close the access plug-in */
-    module_Unneed( p_input, p_input->p_access );
+    if( p_input->p_access ) module_Unneed( p_input, p_input->p_access );
 
     input_AccessEnd( p_input );
 
@@ -863,7 +866,7 @@ static void EndThread( input_thread_t * p_input )
     input_DelInfo( p_input );
 
     free( p_input->psz_source );
-    if ( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );
+    if( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );
 
     /* Tell we're dead */
     p_input->b_dead = 1;
