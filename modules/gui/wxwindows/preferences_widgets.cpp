@@ -695,14 +695,13 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
   : ConfigControl( p_this, p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-// FIXME -- Hack for nonstandard wxwin wxSpinCtrl operation under WIN32
-#ifdef WIN32
+#ifdef WIN32 //WIN32 only uses a 16 bit integer
     spin = new wxSpinCtrl( this, -1,
                            wxString::Format(wxT("%d"),
                                             p_item->i_value),
                            wxDefaultPosition, wxDefaultSize,
                            wxSP_ARROW_KEYS,
-                           100000000, -100000000, p_item->i_value);
+                           -32768,32767, p_item->i_value);
 #else
     spin = new wxSpinCtrl( this, -1,
                            wxString::Format(wxT("%d"),
