@@ -932,7 +932,7 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
     /* Check if we need to load the VOD server */
     if( i_type == VOD_TYPE && !vlm->i_vod )
     {
-        vlm->vod = vlc_object_create( vlm, sizeof(vod_t) );
+        vlm->vod = vlc_object_create( vlm, VLC_OBJECT_VOD );
         vlc_object_attach( vlm->vod, vlm );
         vlm->vod->p_module = module_Need( vlm->vod, "vod server", 0, 0 );
         if( !vlm->vod->p_module )
@@ -1098,11 +1098,50 @@ static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
     {
         if( !media->b_enabled && media->vod_media )
         {
+            int i;
+
+            for( i = 0; i < media->item.i_es; i++ )
+            {
+                es_format_Clean( media->item.es[i] );
+                free( media->item.es[i] );
+            }
+            if( media->item.es ) free( media->item.es );
+            media->item.es = 0;
+            media->item.i_es = 0;
+
             vlm->vod->pf_media_del( vlm->vod, media->vod_media );
             media->vod_media = 0;
         }
         else if( media->b_enabled && !media->vod_media )
         {
+            /* Pre-parse the input */
+            char *psz_output = media->psz_output;
+            if( media->psz_output )
+            {
+                asprintf( &media->psz_output, "%s:description",
+                          media->psz_output );
+            }
+            else
+            {
+                asprintf( &media->psz_output, "#description" );
+            }
+
+            if( !vlm_MediaControl( vlm, media, "play", 0 ) && media->p_input )
+            {
+                while( !media->p_input->b_eof && !media->p_input->b_error )
+                {
+                    msleep( 100000 );
+                }
+
+                input_StopThread( media->p_input );
+                input_DestroyThread( media->p_input );
+                vlc_object_detach( media->p_input );
+                vlc_object_destroy( media->p_input );
+                media->p_input = NULL;
+            }
+            free( media->psz_output );
+            media->psz_output = psz_output;
+
             media->vod_media =
                 vlm->vod->pf_media_new( vlm->vod, media->psz_name,
                                         &media->item );

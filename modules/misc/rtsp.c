@@ -214,8 +214,9 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 {
     vod_sys_t *p_sys = p_vod->p_sys;
     vod_media_t *p_media = malloc( sizeof(vod_media_t) );
-    memset( p_media, 0, sizeof(vod_media_t) );
+    int i;
 
+    memset( p_media, 0, sizeof(vod_media_t) );
     asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
 
     p_media->p_rtsp_url =
@@ -246,6 +247,12 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
     p_media->p_vod = p_vod;
 
     TAB_APPEND( p_sys->i_media, p_sys->media, p_media );
+
+    vlc_mutex_lock( &p_item->lock );
+    msg_Dbg( p_vod, "media has %i declared ES", p_item->i_es );
+    for( i = 0; i < p_item->i_es; i++ )
+    msg_Dbg( p_vod, "  - ES %i: %4.4s", i, (char *)&p_item->es[i]->i_codec );
+    vlc_mutex_unlock( &p_item->lock );
 
     return p_media;
 }

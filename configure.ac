@@ -1181,7 +1181,7 @@ then
   VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   VLC_ADD_PLUGINS([packetizer_copy])
 
-  VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp])
+  VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
   VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
 
