@@ -28,7 +28,8 @@ MRL handling:
    support)
 
 Features:
--  Can customize the what to show in the play-list title 
+-  Can customize the what to show in the play-list title and author. 
+-  Duration of each track is shown
 -  Media information is shown using CDDB
 -  Dynamic debugging
 -  Will scan for a CD-ROM drive with a CD-DA loaded in it.
@@ -272,16 +273,16 @@ Determination: start at step 5.
 
    When you run the vlc GUI, under Settings/Preferences you should see
    a "plugins" expandable list and under that another "access" list do
-   you see a expandalbe entry under "access" labeled "cddax"? If so,
+   you see a expandable entry under "access" labeled "cddax"? If so,
    skip on to step 2.
 
-   a) If no "cddax" expandable list, thent the CDDAX plugin isn't
+   a) If no "cddax" expandable list, then the CDDAX plugin isn't
    loaded. Does a shared object exist?  The plugin shared object is
    called "libcddax_plugin.so" It should be in the directory that has
    ...vlc/access. If this isn't around you need to build and install
    the CDDAX plugin.
 
-   b) if libcddax_plugin.so is in the fileystem, there might be a
+   b) if libcddax_plugin.so is in the filesystem, there might be a
    loader error; perhaps libcdio is not installed or
    are the wrong version. Use ldd on the file to see that it has all
    of the libraries dependencies satisfied. Also you might be able
@@ -289,8 +290,8 @@ Determination: start at step 5.
    calls. On Linux and other OS's) "strace" can be used to see if the
    file gets accessed. On Solaris use "truss". 
 
-   For example on Linux, amonst the many line of output when I run
-   "strace -e trace=file vlc" I see this amongst lots of other
+   For example on Linux, among the many line of output when I run
+   "strace -e trace=file vlc" I see this along with a lot of other
    output:
 
    ...
@@ -319,7 +320,7 @@ Determination: start at step 5.
    no track, you should see in the playlist a list of tracks on the CD.
    
    a. If not something's wrong like step 2. Another tack may be to try
-   to read a disk image of a CD and thus elimate any problems with
+   to read a disk image of a CD and thus eliminate any problems with
    hardware. If this works, then this is a hardware problem. 
 
 4. (You have a list of entries describing the CD-DA or disk-file of
@@ -364,7 +365,7 @@ you see what's going on dynamically. Various debugging settings will
 cause output to appear on vlc's plugin log and/or "standard error"
 (assuming you've run vlc in a way that you can capture this).
 
-You think of debug switches as a bit mask, that you specifiy as an
+You think of debug switches as a bit mask, that you specify as an
 integers the various "bit" values (given in decimal) are listed below.
 
    name    value  description
@@ -376,8 +377,8 @@ integers the various "bit" values (given in decimal) are listed below.
    CALL       16  all calls
    LSN        32  LSN changes
    SEEK       64  Seeks to set location
-   CDIO      128  Debugging from CDIO
-   CDDB      256  CDDB debugging
+   CDIO      128  Debugging from CDIO library routines
+   CDDB      256  debugging from CDDB library routines
 
 **CD debugging...
 
@@ -387,4 +388,4 @@ analyze the contents of a CD.
 The tool cd-read from libcdio can be used to show the sectors of 
 the CD or CD image or extract sectors. 
 
-$Id: intf-cdda.txt,v 1.3 2003/12/02 03:33:22 rocky Exp $
+$Id: intf-cdda.txt,v 1.4 2003/12/18 12:35:26 rocky Exp $
