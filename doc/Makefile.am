@@ -14,4 +14,7 @@ EXTRA_DIST = \
 	common/stylesheet-html.dsl \
 	common/stylesheet-print-noicones.dsl \
 	lirc/example.lircrc \
+	subtitles/readme \
+	subtitles/vlc-gimp.pl \
+	subtitles/vlc-font.pl \
 	$(NULL)
