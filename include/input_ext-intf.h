@@ -80,12 +80,6 @@ struct es_descriptor_t
     vlc_bool_t              b_force_decoder;
 };
 
-/* Special PID values - note that the PID is only on 13 bits, and that values
- * greater than 0x1fff have no meaning in a stream */
-#define PROGRAM_ASSOCIATION_TABLE_PID   0x0000
-#define CONDITIONNAL_ACCESS_TABLE_PID   0x0001                   /* not used */
-#define EMPTY_ID                        0xffff    /* empty record in a table */
-
 /*****************************************************************************
  * pgrm_descriptor_t
  *****************************************************************************
@@ -354,21 +348,6 @@ struct input_thread_t
 #define INPUT_METHOD_SATELLITE   0x40               /* stream is read from a */
                                                            /* satellite card */
 #define INPUT_METHOD_SLP         0x50                          /* SLP stream */
-
-/* Status changing methods */
-#define INPUT_STATUS_END            0
-#define INPUT_STATUS_PLAY           1
-#define INPUT_STATUS_PAUSE          2
-#define INPUT_STATUS_FASTER         3
-#define INPUT_STATUS_SLOWER         4
-
-/* Seek modes */
-#define INPUT_SEEK_SET       0x00
-#define INPUT_SEEK_CUR       0x01
-#define INPUT_SEEK_END       0x02
-#define INPUT_SEEK_BYTES     0x00
-#define INPUT_SEEK_SECONDS   0x10
-#define INPUT_SEEK_PERCENT   0x20
 
 /*****************************************************************************
  * Prototypes
