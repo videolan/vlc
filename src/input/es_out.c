@@ -461,15 +461,16 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             p_pgrm = p_sys->p_input->stream.p_selected_program;
         }
 
+        /* +11 -> avoid null value with non null dts/pts */
         if( p_block->i_dts > 0 && p_pgrm )
         {
             p_block->i_dts =
-                input_ClockGetTS( p_input, p_pgrm, p_block->i_dts * 9 / 100 );
+                input_ClockGetTS( p_input, p_pgrm, ( p_block->i_dts + 11 ) * 9 / 100 );
         }
         if( p_block->i_pts > 0 && p_pgrm )
         {
             p_block->i_pts =
-                input_ClockGetTS( p_input, p_pgrm, p_block->i_pts * 9 / 100 );
+                input_ClockGetTS( p_input, p_pgrm, ( p_block->i_pts + 11 )* 9 / 100 );
         }
     }
 
