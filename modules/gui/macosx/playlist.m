@@ -137,6 +137,8 @@
     [o_table_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
     [o_window setExcludedFromWindowsMenu: TRUE];
 
+    [o_mi_toggleItemsEnabled setTarget:self];
+
 //    [o_tbv_info setDataSource: [VLCInfoDataSource init]];
 
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
@@ -171,6 +173,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
+    [o_mi_toggleItemsEnabled setTitle: _NS("Item Enabled")];
     [o_mi_info setTitle: _NS("Properties")];
 
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
@@ -260,6 +263,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                            FIND_ANYWHERE );
+
+    bool b_state = FALSE;
+
     NSPoint pt;
     vlc_bool_t b_rows;
     vlc_bool_t b_item_sel;
@@ -274,6 +283,17 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setEnabled: b_item_sel];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
+    [o_mi_toggleItemsEnabled setEnabled: b_item_sel];
+
+
+    if (p_playlist)
+    {
+        b_state = ([o_table_view selectedRow] > -1) ?
+            p_playlist->pp_items[[o_table_view selectedRow]]->b_enabled : FALSE;
+        vlc_object_release(p_playlist);
+    }
+
+    [o_mi_toggleItemsEnabled setState: b_state];
 
     return( o_ctx_menu );
 }
@@ -362,6 +382,52 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
      * delay of .5 sec or so when we delete an item */
     [self playlistUpdated];
     [self updateRowSelection];
+}
+
+- (IBAction)toggleItemsEnabled:(id)sender
+{
+    int i, c, i_row;
+    NSMutableArray *o_selected;
+    NSNumber *o_number;
+
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    o_selected = [NSMutableArray arrayWithArray:[[o_table_view selectedRowEnumerator] allObjects]];
+    c = (int)[o_selected count];
+
+    if (p_playlist->pp_items[[o_table_view selectedRow]]->b_enabled)
+    {
+        for( i = 0; i < c; i++ )
+        {
+            o_number = [o_selected lastObject];
+            i_row = [o_number intValue];
+            if( p_playlist->i_index == i_row && p_playlist->i_status )
+            {
+                playlist_Stop( p_playlist );
+            }
+            [o_selected removeObject: o_number];
+            playlist_Disable( p_playlist, i_row );
+        }
+    }
+    else
+    {
+        for( i = 0; i < c; i++ )
+        {
+            o_number = [o_selected lastObject];
+            i_row = [o_number intValue];
+            [o_selected removeObject: o_number];
+            playlist_Enable( p_playlist, i_row );
+        }
+    }
+    vlc_object_release( p_playlist );
+    [self playlistUpdated];
 }
 
 - (IBAction)selectAll:(id)sender
@@ -623,50 +689,51 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (NSColor *)getColor:(int)i_group
 {
+    NSColor * o_color = nil;
     switch ( i_group % 8 )
     {
         case 1:
             /*white*/
-            return [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:1.0];
+            o_color = [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:1.0];
         break;
 
         case 2:
             /*red*/
-           return [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:0.76471 alpha:1.0];
         break;
 
 	    case 3:
               /*dark blue*/
-		   return [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0];
+		   o_color = [NSColor colorWithDeviceRed:0.76471 green:0.76471 blue:1.0 alpha:1.0];
         break; 
 
         case 4:
                /*orange*/
-           return [NSColor colorWithDeviceRed:1.0 green:0.89804 blue:0.76471 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:1.0 green:0.89804 blue:0.76471 alpha:1.0];
         break;
 
         case 5:
                /*purple*/
-           return [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:1.0 green:0.76471 blue:1.0 alpha:1.0];
         break;
  
         case 6:
               /*green*/
-           return [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:0.76471 alpha:1.0];
         break; 
 
         case 7:
               /*light blue*/
-           return [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:1.0 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:0.76471 green:1.0 blue:1.0 alpha:1.0];
         break;
 
         case 0:
               /*yellow*/
-           return [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0];
+           o_color = [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.76471 alpha:1.0];
         break;
    	}
+    return o_color;
 }
-
 
 @end
 
@@ -751,20 +818,31 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (void)tableView:(NSTableView *)o_tv
 	            willDisplayCell:(id)o_cell
 	            forTableColumn:(NSTableColumn *)o_tc
-	            row:(int)o_rows
+	            row:(int)i_rows
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    if ((p_playlist->i_groups) > 1 )
+    if (p_playlist)
     {
-       [o_cell setDrawsBackground: VLC_TRUE];
-       [o_cell setBackgroundColor:
-                [self getColor:p_playlist->pp_items[o_rows]->i_group]];
+        if ((p_playlist->i_groups) > 1 )
+        {
+            [o_cell setDrawsBackground: VLC_TRUE];
+            [o_cell setBackgroundColor:
+                [self getColor:p_playlist->pp_items[i_rows]->i_group]];
+       
+        }
 
-    
+        if (!p_playlist->pp_items[i_rows]->b_enabled)
+        {
+            [o_cell setTextColor: [NSColor colorWithDeviceRed:0.3686 green:0.3686 blue:0.3686 alpha:1.0]];
+        }
+        else
+        {
+            [o_cell setTextColor:[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:1.0]];
+        }
+    vlc_object_release( p_playlist );
     }
-vlc_object_release( p_playlist );
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv

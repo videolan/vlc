@@ -276,6 +276,7 @@
     }
 }
 
+
 - (IBAction)volumeUp:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];

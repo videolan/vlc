@@ -56,6 +56,7 @@
     IBOutlet id o_mi_play;
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_selectall;
+    IBOutlet id o_mi_toggleItemsEnabled;
 
     IBOutlet id o_random_ckb;
 
@@ -88,6 +89,7 @@
 - (IBAction)savePlaylist:(id)sender;
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItems:(id)sender;
+- (IBAction)toggleItemsEnabled:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)searchItem:(id)sender;
 - (IBAction)handlePopUp:(id)sender;
