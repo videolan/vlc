@@ -120,7 +120,6 @@ void vout_SDLEnd( vout_thread_t *p_vout )
     {
         SDL_UnlockSurface ( p_vout->p_sys->p_display );
     }
-    free( p_vout->p_sys );
 }
 
 /*****************************************************************************
@@ -194,7 +193,6 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_data )
 {
-    SDL_Rect    clipping_rect;
     
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO) < 0 )
@@ -258,11 +256,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
 */
 		
     /* Set clipping for text */
-    clipping_rect.x = 0;
-    clipping_rect.y = 0;
-    clipping_rect.w = p_vout->p_sys->p_display->w;
-    clipping_rect.h = p_vout->p_sys->p_display->h;
-    SDL_SetClipRect(p_vout->p_sys->p_display, &clipping_rect);
+    SDL_SetClipping(p_vout->p_sys->p_display, 0, 0, 
+                    p_vout->p_sys->p_display->w,
+                    p_vout->p_sys->p_display->h);
 
 
 	
