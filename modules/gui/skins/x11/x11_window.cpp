@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.23 2003/06/14 18:49:02 gbazin Exp $
+ * $Id: x11_window.cpp,v 1.24 2003/06/17 18:13:18 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -51,7 +51,8 @@
 #include "x11_timer.h"
 
 
-bool ToolTipCallback( void *data );
+static bool ToolTipCallback( void *data );
+static void DrawToolTipText( tooltip_t *tooltip );
 
 
 //---------------------------------------------------------------------------
@@ -145,6 +146,7 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     X11Timer *timer = new X11Timer( p_intf, 500000, ToolTipCallback, &ToolTip );
     ToolTip.p_intf = p_intf;
     ToolTip.timer = timer;
+    ToolTip.active = False;
 
     // Double-click handling
     ClickedX = 0;
@@ -491,9 +493,39 @@ bool ToolTipCallback( void *data )
     XDrawString( disp, win, gc, 4, overall.ascent+4, text.c_str(), 
                  text.size() );
     XSync( disp, 0 );
+    ((tooltip_t*)data)->active = True;
     XUNLOCK;
     
     return False;
+}
+
+
+
+void DrawToolTipText( tooltip_t *tooltip )
+{
+    int direction, fontAscent, fontDescent;
+
+    Display *disp = tooltip->display;
+    Window win = tooltip->window;
+    Font font = tooltip->font;
+    GC gc = tooltip->gc;
+    string text = tooltip->text;
+    int curX = tooltip->curX;
+    int curY = tooltip->curY;
+ 
+    XLOCK;
+    XClearWindow( disp, win );
+    XCharStruct overall;
+    XQueryTextExtents( disp, font, text.c_str(), text.size(), &direction, 
+                       &fontAscent, &fontDescent, &overall );
+    int w = overall.rbearing - overall.lbearing;
+    int h = overall.ascent + overall.descent;
+    XMoveWindow( disp, win, curX - w/4, curY + 20 );
+    XResizeWindow( disp, win, w+8, h+8 );
+    XDrawString( disp, win, gc, 4, overall.ascent+4, text.c_str(), 
+                 text.size() );
+    XSync( disp, 0 );
+    XUNLOCK;
 }
 
 
@@ -511,6 +543,7 @@ void X11Window::ChangeToolTipText( string text )
             XUnmapWindow( display, ToolTip.window );
             XResizeWindow( display, ToolTip.window, 1, 1 );
             XSync( display, 0 );
+            ToolTip.active = False;
             XUNLOCK;
         }
     }
@@ -520,9 +553,18 @@ void X11Window::ChangeToolTipText( string text )
         {
             ToolTipText = text;
             ToolTip.text = text;
-            OSAPI_GetMousePos( ToolTip.curX, ToolTip.curY );
-            X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
-            timerManager->addTimer( ToolTip.timer );
+            if( !ToolTip.active )
+            {
+                // Create the tooltip
+                OSAPI_GetMousePos( ToolTip.curX, ToolTip.curY );
+                X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
+                timerManager->addTimer( ToolTip.timer );
+            }
+            else
+            {
+                // Refresh the tooltip
+                DrawToolTipText( &ToolTip );
+            }
         }
     }
 }

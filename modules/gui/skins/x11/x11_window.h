@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.5 2003/06/08 00:32:07 asmax Exp $
+ * $Id: x11_window.h,v 1.6 2003/06/17 18:13:18 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -47,6 +47,7 @@ typedef struct
     Font font;
     int curX;
     int curY;
+    bool active;
 } tooltip_t;
 
 

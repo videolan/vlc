@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.29 2003/06/10 11:43:40 gbazin Exp $
+ * $Id: window.cpp,v 1.30 2003/06/17 18:13:18 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -456,7 +456,18 @@ void SkinWindow::MouseScroll( int x, int y, int direction )
         {
             break;
         }
+    } 
+    
+    // Checking for change in Tool Tip
+    for( int i = ControlList.size() - 1; i >= 0; i-- )
+    {
+        if( ControlList[i]->IsVisible() &&
+            ControlList[i]->ToolTipTest( x, y ) )
+        {
+            break;
+        }
     }
+
 }
 //---------------------------------------------------------------------------
 void SkinWindow::Init()
