@@ -62,6 +62,10 @@ static void Close( vlc_object_t * );
 #define AGENT_LONGTEXT N_("Allows you to modify the user agent that will be " \
     "used for the connection.")
 
+#define RECONNECT_TEXT N_("Auto re-connect")
+#define RECONNECT_LONGTEXT N_("Will automatically attempt a re-connection " \
+    "in case it was untimely closed.")
+
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access2", 0 );
@@ -74,6 +78,8 @@ vlc_module_begin();
     add_string( "http-pwd", NULL , NULL, PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
                 AGENT_LONGTEXT, VLC_FALSE );
+    add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
+              RECONNECT_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "http" );
     add_shortcut( "http4" );
@@ -110,6 +116,7 @@ struct access_sys_t
     int64_t    i_chunk;
 
     vlc_bool_t b_seekable;
+    vlc_bool_t b_reconnect;
 };
 
 /* */
@@ -245,6 +252,8 @@ static int  Open ( vlc_object_t *p_this )
                  p_sys->psz_user, p_sys->psz_passwd );
     }
 
+    p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
+
     /* Connect */
     if( Connect( p_access, 0 ) )
     {
@@ -266,7 +275,8 @@ static int  Open ( vlc_object_t *p_this )
 
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
-        p_playlist = vlc_object_find( p_access, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        p_playlist = vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
+                                      FIND_ANYWHERE );
         if( !p_playlist )
         {
             msg_Err( p_access, "redirection failed: can't find playlist" );
@@ -292,8 +302,10 @@ static int  Open ( vlc_object_t *p_this )
                   p_access->psz_demux );
     }
 
-    /* Pts delay */
-    var_Create( p_access, "http-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
+
+    /* PTS delay */
+    var_Create( p_access, "http-caching", VLC_VAR_INTEGER |VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
 
@@ -346,8 +358,8 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 {
-    access_sys_t *p_sys   = p_access->p_sys;
-    int          i_read;
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_read;
 
     if( p_sys->fd < 0 )
     {
@@ -411,17 +423,31 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             {
                 /* read the empty line */
                 char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd );
-                if( psz )
-                {
-                    free( psz );
-                }
+                if( psz ) free( psz );
             }
         }
     }
     else if( i_read == 0 )
     {
-        p_access->info.b_eof = VLC_TRUE;
+        if( p_sys->b_reconnect )
+        {
+            msg_Dbg( p_access, "got disconnected, trying to reconnect" );
+            net_Close( p_sys->fd ); p_sys->fd = -1;
+            if( Connect( p_access, p_access->info.i_pos ) )
+            {
+                msg_Dbg( p_access, "reconnection failed" );
+            }
+            else
+            {
+                p_sys->b_reconnect = VLC_FALSE;
+                i_read = Read( p_access, p_buffer, i_len );
+                p_sys->b_reconnect = VLC_TRUE;
+            }
+        }
+
+        if( i_read == 0 ) p_access->info.b_eof = VLC_TRUE;
     }
+
     return i_read;
 }
 
@@ -669,6 +695,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
     {
         p_sys->psz_protocol = "ICY";
         p_sys->i_code = atoi( &psz[4] );
+        p_sys->b_reconnect = VLC_TRUE;
     }
     else
     {
@@ -737,6 +764,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
             if( p_sys->psz_mime ) free( p_sys->psz_mime );
             p_sys->psz_mime = strdup( p );
             msg_Dbg( p_access, "Content-Type: %s", p_sys->psz_mime );
+        }
+        else if( !strcasecmp( psz, "Server" ) &&
+                 !strncasecmp( p, "Icecast", 7 ) )
+        {
+            p_sys->b_reconnect = VLC_TRUE;
+            msg_Dbg( p_access, "Server: %s", p );
         }
         else if( !strcasecmp( psz, "Transfer-Encoding" ) )
         {
