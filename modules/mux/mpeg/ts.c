@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.35 2003/11/17 14:46:37 massiot Exp $
+ * $Id: ts.c,v 1.36 2003/11/20 18:26:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -1547,12 +1547,12 @@ static void GetPMT( sout_mux_t *p_mux,
 
             /* private DIV3 descripor */
             memcpy( &data[0], &p_stream->i_bih_codec, 4 );
-            data[4] = ( p_stream->i_bih_width >> 8 )&&0xff;
-            data[5] = ( p_stream->i_bih_width      )&&0xff;
-            data[6] = ( p_stream->i_bih_height>> 8 )&&0xff;
-            data[7] = ( p_stream->i_bih_height     )&&0xff;
-            data[8] = ( i_extra >> 8 )&&0xff;
-            data[9] = ( i_extra      )&&0xff;
+            data[4] = ( p_stream->i_bih_width >> 8 )&0xff;
+            data[5] = ( p_stream->i_bih_width      )&0xff;
+            data[6] = ( p_stream->i_bih_height>> 8 )&0xff;
+            data[7] = ( p_stream->i_bih_height     )&0xff;
+            data[8] = ( i_extra >> 8 )&0xff;
+            data[9] = ( i_extra      )&0xff;
             if( i_extra > 0 )
             {
                 memcpy( &data[10], p_stream->p_decoder_specific_info, i_extra );
