@@ -406,7 +406,7 @@ static int ftp_SendCommand( access_t *p_access, char *psz_fmt, ... )
     if( ( i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd,
                               "%s", psz_cmd ) ) > 0 )
     {
-        i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, "\n" );
+        i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, "\r\n" );
     }
 
     if( i_ret < 0 )
