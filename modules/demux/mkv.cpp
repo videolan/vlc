@@ -93,9 +93,9 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Matroska stream demuxer" ) );
-    set_capability( "demux", 50 );
+    set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
-    
+
     add_bool( "mkv-seek-percent", 1, NULL,
             N_("Seek based on percent not time"),
             N_("Seek based on percent not time"), VLC_TRUE );
@@ -107,9 +107,9 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux  ( input_thread_t * );
-static int  Control( input_thread_t *, int, va_list );
-static void Seek   ( input_thread_t *, mtime_t i_date, int i_percent );
+static int  Demux  ( demux_t * );
+static int  Control( demux_t *, int, va_list );
+static void Seek   ( demux_t *, mtime_t i_date, int i_percent );
 
 
 /*****************************************************************************
@@ -261,28 +261,28 @@ struct demux_sys_t
 
 #define MKVD_TIMECODESCALE 1000000
 
-static void IndexAppendCluster  ( input_thread_t *p_input, KaxCluster *cluster );
+static void IndexAppendCluster  ( demux_t *p_demux, KaxCluster *cluster );
 static char *UTF8ToStr          ( const UTFstring &u );
-static void LoadCues            ( input_thread_t *);
-static void InformationsCreate  ( input_thread_t *p_input );
+static void LoadCues            ( demux_t * );
+static void InformationsCreate  ( demux_t * );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
-    uint8_t        *p_peek;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+    uint8_t     *p_peek;
 
-    int             i_track;
+    int          i_track;
 
-    EbmlElement     *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
+    EbmlElement *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
 
     /* peek the begining */
-    if( input_Peek( p_input, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Warn( p_input, "cannot peek" );
+        msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
 
@@ -290,20 +290,19 @@ static int Open( vlc_object_t * p_this )
     if( p_peek[0] != 0x1a || p_peek[1] != 0x45 ||
         p_peek[2] != 0xdf || p_peek[3] != 0xa3 )
     {
-        msg_Warn( p_input, "matroska module discarded "
+        msg_Warn( p_demux, "matroska module discarded "
                            "(invalid header 0x%.2x%.2x%.2x%.2x)",
                            p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
         return VLC_EGENERIC;
     }
 
     /* Set the demux function */
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = Control;
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
 
-    p_input->p_demux_data = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
     memset( p_sys, 0, sizeof( demux_sys_t ) );
-
-    p_sys->in = new vlc_stream_io_callback( p_input->s );
+    p_sys->in = new vlc_stream_io_callback( p_demux->s );
     p_sys->es = new EbmlStream( *p_sys->in );
     p_sys->f_duration   = -1;
     p_sys->i_timescale     = MKVD_TIMECODESCALE;
@@ -329,7 +328,7 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->es == NULL )
     {
-        msg_Err( p_input, "failed to create EbmlStream" );
+        msg_Err( p_demux, "failed to create EbmlStream" );
         delete p_sys->in;
         free( p_sys );
         return VLC_EGENERIC;
@@ -338,10 +337,10 @@ static int Open( vlc_object_t * p_this )
     el = p_sys->es->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
     if( el == NULL )
     {
-        msg_Err( p_input, "cannot find EbmlHead" );
+        msg_Err( p_demux, "cannot find EbmlHead" );
         goto error;
     }
-    msg_Dbg( p_input, "EbmlHead" );
+    msg_Dbg( p_demux, "EbmlHead" );
     /* skip it */
     el->SkipData( *p_sys->es, el->Generic().Context );
     delete el;
@@ -350,10 +349,10 @@ static int Open( vlc_object_t * p_this )
     el = p_sys->es->FindNextID( KaxSegment::ClassInfos, 0xFFFFFFFFL);
     if( el == NULL )
     {
-        msg_Err( p_input, "cannot find KaxSegment" );
+        msg_Err( p_demux, "cannot find KaxSegment" );
         goto error;
     }
-    msg_Dbg( p_input, "+ Segment" );
+    msg_Dbg( p_demux, "+ Segment" );
     p_sys->segment = (KaxSegment*)el;
     p_sys->cluster = NULL;
 
@@ -363,7 +362,7 @@ static int Open( vlc_object_t * p_this )
     {
         if( EbmlId( *el1 ) == KaxInfo::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Informations" );
+            msg_Dbg( p_demux, "|   + Informations" );
 
             p_sys->ep->Down();
             while( ( el2 = p_sys->ep->Get() ) != NULL )
@@ -375,7 +374,7 @@ static int Open( vlc_object_t * p_this )
                     tcs.ReadData( p_sys->es->I_O() );
                     p_sys->i_timescale = uint64(tcs);
 
-                    msg_Dbg( p_input, "|   |   + TimecodeScale="I64Fd,
+                    msg_Dbg( p_demux, "|   |   + TimecodeScale="I64Fd,
                              p_sys->i_timescale );
                 }
                 else if( EbmlId( *el2 ) == KaxDuration::ClassInfos.GlobalId )
@@ -385,7 +384,7 @@ static int Open( vlc_object_t * p_this )
                     dur.ReadData( p_sys->es->I_O() );
                     p_sys->f_duration = float(dur);
 
-                    msg_Dbg( p_input, "|   |   + Duration=%f",
+                    msg_Dbg( p_demux, "|   |   + Duration=%f",
                              p_sys->f_duration );
                 }
                 else if( EbmlId( *el2 ) == KaxMuxingApp::ClassInfos.GlobalId )
@@ -396,7 +395,7 @@ static int Open( vlc_object_t * p_this )
 
                     p_sys->psz_muxing_application = UTF8ToStr( UTFstring( mapp ) );
 
-                    msg_Dbg( p_input, "|   |   + Muxing Application=%s",
+                    msg_Dbg( p_demux, "|   |   + Muxing Application=%s",
                              p_sys->psz_muxing_application );
                 }
                 else if( EbmlId( *el2 ) == KaxWritingApp::ClassInfos.GlobalId )
@@ -407,7 +406,7 @@ static int Open( vlc_object_t * p_this )
 
                     p_sys->psz_writing_application = UTF8ToStr( UTFstring( wapp ) );
 
-                    msg_Dbg( p_input, "|   |   + Writing Application=%s",
+                    msg_Dbg( p_demux, "|   |   + Writing Application=%s",
                              p_sys->psz_writing_application );
                 }
                 else if( EbmlId( *el2 ) == KaxSegmentFilename::ClassInfos.GlobalId )
@@ -418,7 +417,7 @@ static int Open( vlc_object_t * p_this )
 
                     p_sys->psz_segment_filename = UTF8ToStr( UTFstring( sfn ) );
 
-                    msg_Dbg( p_input, "|   |   + Segment Filename=%s",
+                    msg_Dbg( p_demux, "|   |   + Segment Filename=%s",
                              p_sys->psz_segment_filename );
                 }
                 else if( EbmlId( *el2 ) == KaxTitle::ClassInfos.GlobalId )
@@ -429,7 +428,7 @@ static int Open( vlc_object_t * p_this )
 
                     p_sys->psz_title = UTF8ToStr( UTFstring( title ) );
 
-                    msg_Dbg( p_input, "|   |   + Title=%s", p_sys->psz_title );
+                    msg_Dbg( p_demux, "|   |   + Title=%s", p_sys->psz_title );
                 }
 #if defined( HAVE_GMTIME_R ) && !defined( SYS_DARWIN )
                 else if( EbmlId( *el2 ) == KaxDateUTC::ClassInfos.GlobalId )
@@ -448,27 +447,27 @@ static int Open( vlc_object_t * p_this )
                     {
                         buffer[strlen( buffer)-1]= '\0';
                         p_sys->psz_date_utc = strdup( buffer );
-                        msg_Dbg( p_input, "|   |   + Date=%s", p_sys->psz_date_utc );
+                        msg_Dbg( p_demux, "|   |   + Date=%s", p_sys->psz_date_utc );
                     }
                 }
 #endif
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el2).name() );
+                    msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid(*el2).name() );
                 }
             }
             p_sys->ep->Up();
         }
         else if( EbmlId( *el1 ) == KaxTracks::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Tracks" );
+            msg_Dbg( p_demux, "|   + Tracks" );
 
             p_sys->ep->Down();
             while( ( el2 = p_sys->ep->Get() ) != NULL )
             {
                 if( EbmlId( *el2 ) == KaxTrackEntry::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   |   + Track Entry" );
+                    msg_Dbg( p_demux, "|   |   + Track Entry" );
 
                     p_sys->i_track++;
                     p_sys->track = (mkv_track_t*)realloc( p_sys->track, sizeof( mkv_track_t ) * (p_sys->i_track + 1 ) );
@@ -507,7 +506,7 @@ static int Open( vlc_object_t * p_this )
                             tnum.ReadData( p_sys->es->I_O() );
 
                             tk.i_number = uint32( tnum );
-                            msg_Dbg( p_input, "|   |   |   + Track Number=%u",
+                            msg_Dbg( p_demux, "|   |   |   + Track Number=%u",
                                      uint32( tnum ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackUID::ClassInfos.GlobalId )
@@ -515,7 +514,7 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackUID &tuid = *(KaxTrackUID*)el3;
                             tuid.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track UID=%u",
+                            msg_Dbg( p_demux, "|   |   |   + Track UID=%u",
                                      uint32( tuid ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackType::ClassInfos.GlobalId )
@@ -543,7 +542,7 @@ static int Open( vlc_object_t * p_this )
                                     break;
                             }
 
-                            msg_Dbg( p_input, "|   |   |   + Track Type=%s",
+                            msg_Dbg( p_demux, "|   |   |   + Track Type=%s",
                                      psz_type );
                         }
 //                         else  if( EbmlId( *el3 ) == KaxTrackFlagEnabled::ClassInfos.GlobalId )
@@ -552,7 +551,7 @@ static int Open( vlc_object_t * p_this )
 //                             fenb.ReadData( p_sys->es->I_O() );
 
 //                             tk.b_enabled = uint32( fenb );
-//                             msg_Dbg( p_input, "|   |   |   + Track Enabled=%u",
+//                             msg_Dbg( p_demux, "|   |   |   + Track Enabled=%u",
 //                                      uint32( fenb )  );
 //                         }
                         else  if( EbmlId( *el3 ) == KaxTrackFlagDefault::ClassInfos.GlobalId )
@@ -561,7 +560,7 @@ static int Open( vlc_object_t * p_this )
                             fdef.ReadData( p_sys->es->I_O() );
 
                             tk.b_default = uint32( fdef );
-                            msg_Dbg( p_input, "|   |   |   + Track Default=%u",
+                            msg_Dbg( p_demux, "|   |   |   + Track Default=%u",
                                      uint32( fdef )  );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackFlagLacing::ClassInfos.GlobalId )
@@ -569,7 +568,7 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackFlagLacing &lac = *(KaxTrackFlagLacing*)el3;
                             lac.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track Lacing=%d",
+                            msg_Dbg( p_demux, "|   |   |   + Track Lacing=%d",
                                      uint32( lac ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackMinCache::ClassInfos.GlobalId )
@@ -577,7 +576,7 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackMinCache &cmin = *(KaxTrackMinCache*)el3;
                             cmin.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track MinCache=%d",
+                            msg_Dbg( p_demux, "|   |   |   + Track MinCache=%d",
                                      uint32( cmin ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackMaxCache::ClassInfos.GlobalId )
@@ -585,7 +584,7 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackMaxCache &cmax = *(KaxTrackMaxCache*)el3;
                             cmax.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track MaxCache=%d",
+                            msg_Dbg( p_demux, "|   |   |   + Track MaxCache=%d",
                                      uint32( cmax ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackDefaultDuration::ClassInfos.GlobalId )
@@ -594,7 +593,7 @@ static int Open( vlc_object_t * p_this )
                             defd.ReadData( p_sys->es->I_O() );
 
                             tk.i_default_duration = uint64(defd);
-                            msg_Dbg( p_input, "|   |   |   + Track Default Duration="I64Fd, uint64(defd) );
+                            msg_Dbg( p_demux, "|   |   |   + Track Default Duration="I64Fd, uint64(defd) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackTimecodeScale::ClassInfos.GlobalId )
                         {
@@ -602,7 +601,7 @@ static int Open( vlc_object_t * p_this )
                             ttcs.ReadData( p_sys->es->I_O() );
 
                             tk.f_timecodescale = float( ttcs );
-                            msg_Dbg( p_input, "|   |   |   + Track TimeCodeScale=%f", tk.f_timecodescale );
+                            msg_Dbg( p_demux, "|   |   |   + Track TimeCodeScale=%f", tk.f_timecodescale );
                         }
                         else if( EbmlId( *el3 ) == KaxTrackName::ClassInfos.GlobalId )
                         {
@@ -610,7 +609,7 @@ static int Open( vlc_object_t * p_this )
                             tname.ReadData( p_sys->es->I_O() );
 
                             tk.fmt.psz_description = UTF8ToStr( UTFstring( tname ) );
-                            msg_Dbg( p_input, "|   |   |   + Track Name=%s",
+                            msg_Dbg( p_demux, "|   |   |   + Track Name=%s",
                                      tk.fmt.psz_description );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackLanguage::ClassInfos.GlobalId )
@@ -619,7 +618,7 @@ static int Open( vlc_object_t * p_this )
                             lang.ReadData( p_sys->es->I_O() );
 
                             tk.fmt.psz_language = strdup( string( lang ).c_str() );
-                            msg_Dbg( p_input,
+                            msg_Dbg( p_demux,
                                      "|   |   |   + Track Language=`%s'",
                                      tk.fmt.psz_language );
                         }
@@ -629,7 +628,7 @@ static int Open( vlc_object_t * p_this )
                             codecid.ReadData( p_sys->es->I_O() );
 
                             tk.psz_codec = strdup( string( codecid ).c_str() );
-                            msg_Dbg( p_input, "|   |   |   + Track CodecId=%s",
+                            msg_Dbg( p_demux, "|   |   |   + Track CodecId=%s",
                                      string( codecid ).c_str() );
                         }
                         else  if( EbmlId( *el3 ) == KaxCodecPrivate::ClassInfos.GlobalId )
@@ -643,7 +642,7 @@ static int Open( vlc_object_t * p_this )
                                 tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
                                 memcpy( tk.p_extra_data, cpriv.GetBuffer(), tk.i_extra_data );
                             }
-                            msg_Dbg( p_input, "|   |   |   + Track CodecPrivate size="I64Fd, cpriv.GetSize() );
+                            msg_Dbg( p_demux, "|   |   |   + Track CodecPrivate size="I64Fd, cpriv.GetSize() );
                         }
                         else if( EbmlId( *el3 ) == KaxCodecName::ClassInfos.GlobalId )
                         {
@@ -651,7 +650,7 @@ static int Open( vlc_object_t * p_this )
                             cname.ReadData( p_sys->es->I_O() );
 
                             tk.psz_codec_name = UTF8ToStr( UTFstring( cname ) );
-                            msg_Dbg( p_input, "|   |   |   + Track Codec Name=%s", tk.psz_codec_name );
+                            msg_Dbg( p_demux, "|   |   |   + Track Codec Name=%s", tk.psz_codec_name );
                         }
 //                         else if( EbmlId( *el3 ) == KaxCodecSettings::ClassInfos.GlobalId )
 //                         {
@@ -659,7 +658,7 @@ static int Open( vlc_object_t * p_this )
 //                             cset.ReadData( p_sys->es->I_O() );
 
 //                             tk.psz_codec_settings = UTF8ToStr( UTFstring( cset ) );
-//                             msg_Dbg( p_input, "|   |   |   + Track Codec Settings=%s", tk.psz_codec_settings );
+//                             msg_Dbg( p_demux, "|   |   |   + Track Codec Settings=%s", tk.psz_codec_settings );
 //                         }
 //                         else if( EbmlId( *el3 ) == KaxCodecInfoURL::ClassInfos.GlobalId )
 //                         {
@@ -667,7 +666,7 @@ static int Open( vlc_object_t * p_this )
 //                             ciurl.ReadData( p_sys->es->I_O() );
 
 //                             tk.psz_codec_info_url = strdup( string( ciurl ).c_str() );
-//                             msg_Dbg( p_input, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_info_url );
+//                             msg_Dbg( p_demux, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_info_url );
 //                         }
 //                         else if( EbmlId( *el3 ) == KaxCodecDownloadURL::ClassInfos.GlobalId )
 //                         {
@@ -675,25 +674,25 @@ static int Open( vlc_object_t * p_this )
 //                             cdurl.ReadData( p_sys->es->I_O() );
 
 //                             tk.psz_codec_download_url = strdup( string( cdurl ).c_str() );
-//                             msg_Dbg( p_input, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_download_url );
+//                             msg_Dbg( p_demux, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_download_url );
 //                         }
 //                         else if( EbmlId( *el3 ) == KaxCodecDecodeAll::ClassInfos.GlobalId )
 //                         {
 //                             KaxCodecDecodeAll &cdall = *(KaxCodecDecodeAll*)el3;
 //                             cdall.ReadData( p_sys->es->I_O() );
 
-//                             msg_Dbg( p_input, "|   |   |   + Track Codec Decode All=%u <== UNUSED", uint8( cdall ) );
+//                             msg_Dbg( p_demux, "|   |   |   + Track Codec Decode All=%u <== UNUSED", uint8( cdall ) );
 //                         }
 //                         else if( EbmlId( *el3 ) == KaxTrackOverlay::ClassInfos.GlobalId )
 //                         {
 //                             KaxTrackOverlay &tovr = *(KaxTrackOverlay*)el3;
 //                             tovr.ReadData( p_sys->es->I_O() );
 
-//                             msg_Dbg( p_input, "|   |   |   + Track Overlay=%u <== UNUSED", uint32( tovr ) );
+//                             msg_Dbg( p_demux, "|   |   |   + Track Overlay=%u <== UNUSED", uint32( tovr ) );
 //                         }
                         else  if( EbmlId( *el3 ) == KaxTrackVideo::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   + Track Video" );
+                            msg_Dbg( p_demux, "|   |   |   + Track Video" );
                             tk.f_fps = 0.0;
 
                             p_sys->ep->Down();
@@ -705,14 +704,14 @@ static int Open( vlc_object_t * p_this )
 //                                     KaxVideoFlagInterlaced &fint = *(KaxVideoFlagInterlaced*)el4;
 //                                     fint.ReadData( p_sys->es->I_O() );
 
-//                                     msg_Dbg( p_input, "|   |   |   |   + Track Video Interlaced=%u", uint8( fint ) );
+//                                     msg_Dbg( p_demux, "|   |   |   |   + Track Video Interlaced=%u", uint8( fint ) );
 //                                 }
 //                                 else if( EbmlId( *el4 ) == KaxVideoStereoMode::ClassInfos.GlobalId )
 //                                 {
 //                                     KaxVideoStereoMode &stereo = *(KaxVideoStereoMode*)el4;
 //                                     stereo.ReadData( p_sys->es->I_O() );
 
-//                                     msg_Dbg( p_input, "|   |   |   |   + Track Video Stereo Mode=%u", uint8( stereo ) );
+//                                     msg_Dbg( p_demux, "|   |   |   |   + Track Video Stereo Mode=%u", uint8( stereo ) );
 //                                 }
 //                                 else 
                               if( EbmlId( *el4 ) == KaxVideoPixelWidth::ClassInfos.GlobalId )
@@ -721,7 +720,7 @@ static int Open( vlc_object_t * p_this )
                                     vwidth.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.video.i_width = uint16( vwidth );
-                                    msg_Dbg( p_input, "|   |   |   |   + width=%d", uint16( vwidth ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + width=%d", uint16( vwidth ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoPixelHeight::ClassInfos.GlobalId )
                                 {
@@ -729,7 +728,7 @@ static int Open( vlc_object_t * p_this )
                                     vheight.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.video.i_height = uint16( vheight );
-                                    msg_Dbg( p_input, "|   |   |   |   + height=%d", uint16( vheight ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + height=%d", uint16( vheight ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoDisplayWidth::ClassInfos.GlobalId )
                                 {
@@ -737,7 +736,7 @@ static int Open( vlc_object_t * p_this )
                                     vwidth.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.video.i_visible_width = uint16( vwidth );
-                                    msg_Dbg( p_input, "|   |   |   |   + display width=%d", uint16( vwidth ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + display width=%d", uint16( vwidth ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoDisplayHeight::ClassInfos.GlobalId )
                                 {
@@ -745,7 +744,7 @@ static int Open( vlc_object_t * p_this )
                                     vheight.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.video.i_visible_height = uint16( vheight );
-                                    msg_Dbg( p_input, "|   |   |   |   + display height=%d", uint16( vheight ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + display height=%d", uint16( vheight ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxVideoFrameRate::ClassInfos.GlobalId )
                                 {
@@ -753,14 +752,14 @@ static int Open( vlc_object_t * p_this )
                                     vfps.ReadData( p_sys->es->I_O() );
 
                                     tk.f_fps = float( vfps );
-                                    msg_Dbg( p_input, "   |   |   |   + fps=%f", float( vfps ) );
+                                    msg_Dbg( p_demux, "   |   |   |   + fps=%f", float( vfps ) );
                                 }
 //                                 else if( EbmlId( *el4 ) == KaxVideoDisplayUnit::ClassInfos.GlobalId )
 //                                 {
 //                                      KaxVideoDisplayUnit &vdmode = *(KaxVideoDisplayUnit*)el4;
 //                                     vdmode.ReadData( p_sys->es->I_O() );
 
-//                                     msg_Dbg( p_input, "|   |   |   |   + Track Video Display Unit=%s",
+//                                     msg_Dbg( p_demux, "|   |   |   |   + Track Video Display Unit=%s",
 //                                              uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
 //                                 }
 //                                 else if( EbmlId( *el4 ) == KaxVideoAspectRatio::ClassInfos.GlobalId )
@@ -768,25 +767,25 @@ static int Open( vlc_object_t * p_this )
 //                                     KaxVideoAspectRatio &ratio = *(KaxVideoAspectRatio*)el4;
 //                                     ratio.ReadData( p_sys->es->I_O() );
 
-//                                     msg_Dbg( p_input, "   |   |   |   + Track Video Aspect Ratio Type=%u", uint8( ratio ) );
+//                                     msg_Dbg( p_demux, "   |   |   |   + Track Video Aspect Ratio Type=%u", uint8( ratio ) );
 //                                 }
 //                                 else if( EbmlId( *el4 ) == KaxVideoGamma::ClassInfos.GlobalId )
 //                                 {
 //                                     KaxVideoGamma &gamma = *(KaxVideoGamma*)el4;
 //                                     gamma.ReadData( p_sys->es->I_O() );
 
-//                                     msg_Dbg( p_input, "   |   |   |   + fps=%f", float( gamma ) );
+//                                     msg_Dbg( p_demux, "   |   |   |   + fps=%f", float( gamma ) );
 //                                 }
                                 else
                                 {
-                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
+                                    msg_Dbg( p_demux, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
                                 }
                             }
                             p_sys->ep->Up();
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackAudio::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   + Track Audio" );
+                            msg_Dbg( p_demux, "|   |   |   + Track Audio" );
 
                             p_sys->ep->Down();
 
@@ -798,7 +797,7 @@ static int Open( vlc_object_t * p_this )
                                     afreq.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.audio.i_rate = (int)float( afreq );
-                                    msg_Dbg( p_input, "|   |   |   |   + afreq=%d", tk.fmt.audio.i_rate );
+                                    msg_Dbg( p_demux, "|   |   |   |   + afreq=%d", tk.fmt.audio.i_rate );
                                 }
                                 else if( EbmlId( *el4 ) == KaxAudioChannels::ClassInfos.GlobalId )
                                 {
@@ -806,7 +805,7 @@ static int Open( vlc_object_t * p_this )
                                     achan.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.audio.i_channels = uint8( achan );
-                                    msg_Dbg( p_input, "|   |   |   |   + achan=%u", uint8( achan ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + achan=%u", uint8( achan ) );
                                 }
                                 else if( EbmlId( *el4 ) == KaxAudioBitDepth::ClassInfos.GlobalId )
                                 {
@@ -814,18 +813,18 @@ static int Open( vlc_object_t * p_this )
                                     abits.ReadData( p_sys->es->I_O() );
 
                                     tk.fmt.audio.i_bitspersample = uint8( abits );
-                                    msg_Dbg( p_input, "|   |   |   |   + abits=%u", uint8( abits ) );
+                                    msg_Dbg( p_demux, "|   |   |   |   + abits=%u", uint8( abits ) );
                                 }
                                 else
                                 {
-                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
+                                    msg_Dbg( p_demux, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
                                 }
                             }
                             p_sys->ep->Up();
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)",
+                            msg_Dbg( p_demux, "|   |   |   + Unknown (%s)",
                                      typeid(*el3).name() );
                         }
                     }
@@ -833,7 +832,7 @@ static int Open( vlc_object_t * p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknown (%s)",
+                    msg_Dbg( p_demux, "|   |   + Unknown (%s)",
                              typeid(*el2).name() );
                 }
 #undef tk
@@ -842,7 +841,7 @@ static int Open( vlc_object_t * p_this )
         }
         else if( EbmlId( *el1 ) == KaxSeekHead::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Seek head" );
+            msg_Dbg( p_demux, "|   + Seek head" );
             p_sys->ep->Down();
             while( ( el = p_sys->ep->Get() ) != NULL )
             {
@@ -851,7 +850,7 @@ static int Open( vlc_object_t * p_this )
                     EbmlId id = EbmlVoid::ClassInfos.GlobalId;
                     int64_t i_pos = -1;
 
-                    //msg_Dbg( p_input, "|   |   + Seek" );
+                    //msg_Dbg( p_demux, "|   |   + Seek" );
                     p_sys->ep->Down();
                     while( ( el = p_sys->ep->Get() ) != NULL )
                     {
@@ -873,7 +872,7 @@ static int Open( vlc_object_t * p_this )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)",
+                            msg_Dbg( p_demux, "|   |   |   + Unknown (%s)",
                                      typeid(*el).name() );
                         }
                     }
@@ -883,19 +882,19 @@ static int Open( vlc_object_t * p_this )
                     {
                         if( id == KaxCues::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = cues at "I64Fd,
+                            msg_Dbg( p_demux, "|   |   |   = cues at "I64Fd,
                                      i_pos );
                             p_sys->i_cues_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxChapters::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = chapters at "I64Fd,
+                            msg_Dbg( p_demux, "|   |   |   = chapters at "I64Fd,
                                      i_pos );
                             p_sys->i_chapters_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxTags::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = tags at "I64Fd,
+                            msg_Dbg( p_demux, "|   |   |   = tags at "I64Fd,
                                      i_pos );
                             p_sys->i_tags_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
@@ -904,7 +903,7 @@ static int Open( vlc_object_t * p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknown (%s)",
+                    msg_Dbg( p_demux, "|   |   + Unknown (%s)",
                              typeid(*el).name() );
                 }
             }
@@ -912,11 +911,11 @@ static int Open( vlc_object_t * p_this )
         }
         else if( EbmlId( *el1 ) == KaxCues::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Cues" );
+            msg_Dbg( p_demux, "|   + Cues" );
         }
         else if( EbmlId( *el1 ) == KaxCluster::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Cluster" );
+            msg_Dbg( p_demux, "|   + Cluster" );
 
             p_sys->cluster = (KaxCluster*)el1;
 
@@ -930,31 +929,31 @@ static int Open( vlc_object_t * p_this )
         else if( EbmlId( *el1 ) == KaxAttachements::ClassInfos.GlobalId )
 #endif
         {
-            msg_Dbg( p_input, "|   + Attachments FIXME TODO (but probably never supported)" );
+            msg_Dbg( p_demux, "|   + Attachments FIXME TODO (but probably never supported)" );
         }
         else if( EbmlId( *el1 ) == KaxChapters::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Chapters FIXME TODO" );
+            msg_Dbg( p_demux, "|   + Chapters FIXME TODO" );
         }
         else if( EbmlId( *el1 ) == KaxTag::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "|   + Tags FIXME TODO" );
+            msg_Dbg( p_demux, "|   + Tags FIXME TODO" );
         }
         else
         {
-            msg_Dbg( p_input, "|   + Unknown (%s)", typeid(*el1).name() );
+            msg_Dbg( p_demux, "|   + Unknown (%s)", typeid(*el1).name() );
         }
     }
 
     if( p_sys->cluster == NULL )
     {
-        msg_Err( p_input, "cannot find any cluster, damaged file ?" );
+        msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
         goto error;
     }
 
     if( p_sys->i_chapters_position >= 0 )
     {
-        msg_Warn( p_input, "chapters unsupported" );
+        msg_Warn( p_demux, "chapters unsupported" );
     }
 
     /* *** Load the cue if found *** */
@@ -962,65 +961,39 @@ static int Open( vlc_object_t * p_this )
     {
         vlc_bool_t b_seekable;
 
-        stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
         if( b_seekable )
         {
-            LoadCues( p_input );
+            LoadCues( p_demux );
         }
     }
 
     if( !p_sys->b_cues || p_sys->i_index <= 0 )
     {
-        msg_Warn( p_input, "no cues/empty cues found->seek won't be precise" );
+        msg_Warn( p_demux, "no cues/empty cues found->seek won't be precise" );
 
-        IndexAppendCluster( p_input, p_sys->cluster );
+        IndexAppendCluster( p_demux, p_sys->cluster );
 
         p_sys->b_cues = VLC_FALSE;
     }
 
-    /* Create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        goto error;
-    }
-    p_input->stream.i_mux_rate = 0;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    if( p_sys->f_duration > 1001.0 )
-    {
-        mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000.0 );
-        p_input->stream.i_mux_rate = stream_Size( p_input->s )/50 / i_duration;
-    }
-
     /* add all es */
-    msg_Dbg( p_input, "found %d es", p_sys->i_track );
+    msg_Dbg( p_demux, "found %d es", p_sys->i_track );
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
 #define tk  p_sys->track[i_track]
         if( tk.fmt.i_cat == UNKNOWN_ES )
         {
-            msg_Warn( p_input, "invalid track[%d, n=%d]", i_track, tk.i_number );
+            msg_Warn( p_demux, "invalid track[%d, n=%d]", i_track, tk.i_number );
             tk.p_es = NULL;
             continue;
         }
 
-        if( tk.fmt.i_cat == SPU_ES )
-        {
-            vlc_value_t val;
-            val.psz_string = "UTF-8";
-#if defined(HAVE_ICONV)
-            var_Create( p_input, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-            var_Set( p_input, "subsdec-encoding", val );
-#endif
-        }
         if( !strcmp( tk.psz_codec, "V_MS/VFW/FOURCC" ) )
         {
             if( tk.i_extra_data < (int)sizeof( BITMAPINFOHEADER ) )
             {
-                msg_Err( p_input, "missing/invalid BITMAPINFOHEADER" );
+                msg_Err( p_demux, "missing/invalid BITMAPINFOHEADER" );
                 tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
@@ -1059,7 +1032,7 @@ static int Open( vlc_object_t * p_this )
         {
             if( tk.i_extra_data < (int)sizeof( WAVEFORMATEX ) )
             {
-                msg_Err( p_input, "missing/invalid WAVEFORMATEX" );
+                msg_Err( p_demux, "missing/invalid WAVEFORMATEX" );
                 tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
@@ -1146,7 +1119,7 @@ static int Open( vlc_object_t * p_this )
                     break;
                 }
             }
-            msg_Dbg( p_input, "profile=%d srate=%d", i_profile, i_srate );
+            msg_Dbg( p_demux, "profile=%d srate=%d", i_profile, i_srate );
 
             tk.fmt.i_extra = 2;
             tk.fmt.p_extra = malloc( tk.fmt.i_extra );
@@ -1170,18 +1143,14 @@ static int Open( vlc_object_t * p_this )
         else if( !strcmp( tk.psz_codec, "S_TEXT/UTF8" ) )
         {
             tk.fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            tk.fmt.subs.psz_encoding = strdup( "UTF-8" );
         }
         else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
                  !strcmp( tk.psz_codec, "S_SSA" ) ||
                  !strcmp( tk.psz_codec, "S_ASS" ))
         {
             tk.fmt.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
-#if 0
-            /* FIXME */
-            tk.fmt.i_extra = sizeof( subtitle_data_t );
-            tk.fmt.p_extra = malloc( tk.fmt.i_extra );
-            ((es_sys_t*)tk->fmt.p_extra)->psz_header = strdup( (char *)tk.p_extra_data );
-#endif
+            tk.fmt.subs.psz_encoding = strdup( "UTF-8" );
         }
         else if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
@@ -1189,16 +1158,16 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            msg_Err( p_input, "unknow codec id=`%s'", tk.psz_codec );
+            msg_Err( p_demux, "unknow codec id=`%s'", tk.psz_codec );
             tk.fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
 
-        tk.p_es = es_out_Add( p_input->p_es_out, &tk.fmt );
+        tk.p_es = es_out_Add( p_demux->out, &tk.fmt );
 #undef tk
     }
 
     /* add informations */
-    InformationsCreate( p_input );
+    InformationsCreate( p_demux );
 
     return VLC_SUCCESS;
 
@@ -1214,10 +1183,9 @@ error:
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
-
-    int             i_track;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys   = p_demux->p_sys;
+    int         i_track;
 
     for( i_track = 0; i_track < p_sys->i_track; i_track++ )
     {
@@ -1259,10 +1227,11 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( input_thread_t *p_input, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int64_t     *pi64;
+    double      *pf, f;
 
     vlc_meta_t **pp_meta;
 
@@ -1282,14 +1251,41 @@ static int Control( input_thread_t *p_input, int i_query, va_list args )
             }
             return VLC_EGENERIC;
 
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            *pf = (double)p_sys->in->getFilePointer() / (double)stream_Size( p_demux->s );
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_POSITION:
+            f = (double)va_arg( args, double );
+            Seek( p_demux, -1, (int)(100.0 * f) );
+            return VLC_EGENERIC;
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->f_duration > 0.0 )
+            {
+                mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000 );
+
+                /* FIXME */
+                *pi64 = (mtime_t)1000000 *
+                        (mtime_t)i_duration*
+                        (mtime_t)p_sys->in->getFilePointer() /
+                        (mtime_t)stream_Size( p_demux->s );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+
+        case DEMUX_SET_TIME:
+        case DEMUX_GET_FPS:
         default:
-            return demux_vaControlDefault( p_input, i_query, args );
+            return VLC_EGENERIC;
     }
 }
 
-static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     *pp_block = NULL;
     *pi_ref1  = -1;
@@ -1300,7 +1296,7 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
         EbmlElement *el;
         int         i_level;
 
-        if( p_input->b_die )
+        if( p_demux->b_die )
         {
             return VLC_EGENERIC;
         }
@@ -1328,7 +1324,7 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
                 p_sys->ep->Up();
                 continue;
             }
-            msg_Warn( p_input, "EOF" );
+            msg_Warn( p_demux, "EOF" );
             return VLC_EGENERIC;
         }
 
@@ -1343,19 +1339,19 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
                 if( p_sys->i_index == 0 ||
                     ( p_sys->i_index > 0 && p_sys->index[p_sys->i_index - 1].i_position < (int64_t)p_sys->cluster->GetElementPosition() ) )
                 {
-                    IndexAppendCluster( p_input, p_sys->cluster );
+                    IndexAppendCluster( p_demux, p_sys->cluster );
                 }
 
                 p_sys->ep->Down();
             }
             else if( EbmlId( *el ) == KaxCues::ClassInfos.GlobalId )
             {
-                msg_Warn( p_input, "find KaxCues FIXME" );
+                msg_Warn( p_demux, "find KaxCues FIXME" );
                 return VLC_EGENERIC;
             }
             else
             {
-                msg_Dbg( p_input, "unknown (%s)", typeid( el ).name() );
+                msg_Dbg( p_demux, "unknown (%s)", typeid( el ).name() );
             }
         }
         else if( i_level == 2 )
@@ -1407,24 +1403,24 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
         }
         else
         {
-            msg_Err( p_input, "invalid level = %d", i_level );
+            msg_Err( p_demux, "invalid level = %d", i_level );
             return VLC_EGENERIC;
         }
     }
 }
 
-static block_t *MemToBlock( input_thread_t *p_input, uint8_t *p_mem, int i_mem)
+static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
 {
     block_t *p_block;
-    if( !(p_block = block_New( p_input, i_mem ) ) ) return NULL;
+    if( !(p_block = block_New( p_demux, i_mem ) ) ) return NULL;
     memcpy( p_block->p_buffer, p_mem, i_mem );
     //p_block->i_rate = p_input->stream.control.i_rate;
     return p_block;
 }
 
-static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
+static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
 {
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     int             i_track;
     unsigned int    i;
@@ -1441,19 +1437,14 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 
     if( i_track >= p_sys->i_track )
     {
-        msg_Err( p_input, "invalid track number=%d", block->TrackNum() );
+        msg_Err( p_demux, "invalid track number=%d", block->TrackNum() );
         return;
     }
 
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, tk.p_es, &b );
+    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk.p_es, &b );
     if( !b )
     {
         tk.b_inited = VLC_FALSE;
-        return;
-    }
-
-    if( tk.fmt.i_cat == AUDIO_ES && p_input->stream.control.b_mute )
-    {
         return;
     }
 
@@ -1462,7 +1453,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     {
         block_t *p_init;
 
-        msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
+        msg_Dbg( p_demux, "sending header (%d bytes)", tk.i_data_init );
 
         if( tk.fmt.i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
         {
@@ -1473,7 +1464,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             /* XXX hack split the 3 headers */
             if( tk.p_data_init[0] != 0x02 )
             {
-                msg_Err( p_input, "invalid vorbis header" );
+                msg_Err( p_demux, "invalid vorbis header" );
             }
 
             for( i = 0; i < 2; i++ )
@@ -1492,28 +1483,28 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             i_size[1] = __MIN( i_size[1], tk.i_data_init - i_offset - i_size[0] );
             i_size[2] = tk.i_data_init - i_offset - i_size[0] - i_size[1];
 
-            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset], i_size[0] );
+            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset], i_size[0] );
             if( p_init )
             {
-                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
+                es_out_Send( p_demux->out, tk.p_es, p_init );
             }
-            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
+            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
             if( p_init )
             {
-                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
+                es_out_Send( p_demux->out, tk.p_es, p_init );
             }
-            p_init = MemToBlock( p_input, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
+            p_init = MemToBlock( p_demux, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
             if( p_init )
             {
-                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
+                es_out_Send( p_demux->out, tk.p_es, p_init );
             }
         }
         else
         {
-            p_init = MemToBlock( p_input, tk.p_data_init, tk.i_data_init );
+            p_init = MemToBlock( p_demux, tk.p_data_init, tk.i_data_init );
             if( p_init )
             {
-                es_out_Send( p_input->p_es_out, tk.p_es, p_init );
+                es_out_Send( p_demux->out, tk.p_es, p_init );
             }
         }
     }
@@ -1525,7 +1516,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         block_t *p_block;
         DataBuffer &data = block->GetBuffer(i);
 
-        p_block = MemToBlock( p_input, data.Buffer(), data.Size() );
+        p_block = MemToBlock( p_demux, data.Buffer(), data.Size() );
         if( p_block == NULL )
         {
             break;
@@ -1550,7 +1541,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
                 p_block->i_dts = 0;
             }
         }
-        es_out_Send( p_input->p_es_out, tk.p_es, p_block );
+        es_out_Send( p_demux->out, tk.p_es, p_block );
 
         /* use time stamp only for first block */
         i_pts = 0;
@@ -1559,9 +1550,9 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
 #undef tk
 }
 
-static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
+static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
 {
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     KaxBlock    *block;
     int64_t     i_block_duration;
@@ -1572,7 +1563,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     int         i_track_skipping;
     int         i_track;
 
-    msg_Dbg( p_input, "seek request to "I64Fd" (%d%%)", i_date, i_percent );
+    msg_Dbg( p_demux, "seek request to "I64Fd" (%d%%)", i_date, i_percent );
     if( i_date < 0 && i_percent < 0 )
     {
         return;
@@ -1583,11 +1574,11 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     p_sys->cluster = NULL;
 
     /* seek without index or without date */
-    if( config_GetInt( p_input, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
+    if( config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
     {
-        int64_t i_pos = i_percent * stream_Size( p_input->s ) / 100;
+        int64_t i_pos = i_percent * stream_Size( p_demux->s ) / 100;
 
-        msg_Dbg( p_input, "inacurate way of seeking" );
+        msg_Dbg( p_demux, "inacurate way of seeking" );
         for( i_index = 0; i_index < p_sys->i_index; i_index++ )
         {
             if( p_sys->index[i_index].i_position >= i_pos)
@@ -1607,7 +1598,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
         {
             EbmlElement *el;
 
-            msg_Warn( p_input, "searching for cluster, could take some time" );
+            msg_Warn( p_demux, "searching for cluster, could take some time" );
 
             /* search a cluster */
             while( ( el = p_sys->ep->Get() ) != NULL )
@@ -1617,7 +1608,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
                     KaxCluster *cluster = (KaxCluster*)el;
 
                     /* add it to the index */
-                    IndexAppendCluster( p_input, cluster );
+                    IndexAppendCluster( p_demux, cluster );
 
                     if( (int64_t)cluster->GetElementPosition() >= i_pos )
                     {
@@ -1644,10 +1635,10 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
             i_index--;
         }
 
-        msg_Dbg( p_input, "seek got "I64Fd" (%d%%)",
+        msg_Dbg( p_demux, "seek got "I64Fd" (%d%%)",
                  p_sys->index[i_index].i_time,
                  (int)( 100 * p_sys->index[i_index].i_position /
-                        stream_Size( p_input->s ) ) );
+                        stream_Size( p_demux->s ) ) );
 
         p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
                                    seek_beginning );
@@ -1667,9 +1658,9 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
 
     while( i_track_skipping > 0 )
     {
-        if( BlockGet( p_input, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
-            msg_Warn( p_input, "cannot get block EOF?" );
+            msg_Warn( p_demux, "cannot get block EOF?" );
 
             return;
         }
@@ -1693,7 +1684,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
             }
             if( tk.fmt.i_cat == VIDEO_ES && !tk.b_search_keyframe )
             {
-                BlockDecode( p_input, block, 0, 0 );
+                BlockDecode( p_demux, block, 0, 0 );
             }
         }
 
@@ -1707,9 +1698,9 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux)
 {
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     mtime_t        i_start_pts;
     int            i_block_count = 0;
 
@@ -1718,37 +1709,13 @@ static int Demux( input_thread_t * p_input )
     int64_t i_block_ref1;
     int64_t i_block_ref2;
 
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000 );
-        mtime_t i_date = -1;
-        int i_percent  = -1;
-
-        if( i_duration > 0 )
-        {
-            i_date = (mtime_t)1000000 *
-                     (mtime_t)i_duration*
-                     (mtime_t)p_sys->in->getFilePointer() /
-                     (mtime_t)stream_Size( p_input->s );
-        }
-        if( stream_Size( p_input->s ) > 0 )
-        {
-            i_percent = 100 * p_sys->in->getFilePointer() /
-                        stream_Size( p_input->s );
-        }
-
-        Seek( p_input, i_date, i_percent);
-    }
-
     i_start_pts = -1;
 
     for( ;; )
     {
-        mtime_t i_pts;
-
-        if( BlockGet( p_input, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
-            msg_Warn( p_input, "cannot get block EOF?" );
+            msg_Warn( p_demux, "cannot get block EOF?" );
 
             return 0;
         }
@@ -1757,18 +1724,10 @@ static int Demux( input_thread_t * p_input )
 
         if( p_sys->i_pts > 0 )
         {
-            input_ClockManageRef( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_sys->i_pts * 9 / 100 );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
 
-        i_pts = input_ClockGetTS( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_sys->i_pts * 9 / 100 );
-
-
-
-        BlockDecode( p_input, block, i_pts, i_block_duration );
+        BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
 
         delete block;
         i_block_count++;
@@ -1972,20 +1931,20 @@ EbmlElement *EbmlParser::Get( void )
  *  * InformationsCreate : create all informations, load tags if present
  *
  *****************************************************************************/
-static void LoadCues( input_thread_t *p_input )
+static void LoadCues( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int64_t     i_sav_position = p_sys->in->getFilePointer();
     EbmlParser  *ep;
     EbmlElement *el, *cues;
 
-    msg_Dbg( p_input, "loading cues" );
+    msg_Dbg( p_demux, "loading cues" );
     p_sys->in->setFilePointer( p_sys->i_cues_position, seek_beginning );
     cues = p_sys->es->FindNextID( KaxCues::ClassInfos, 0xFFFFFFFFL);
 
     if( cues == NULL )
     {
-        msg_Err( p_input, "cannot load cues (broken seekhead or file)" );
+        msg_Err( p_demux, "cannot load cues (broken seekhead or file)" );
         p_sys->in->setFilePointer( i_sav_position, seek_beginning );
         return;
     }
@@ -2042,20 +2001,20 @@ static void LoadCues( input_thread_t *p_input )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "         * Unknown (%s)", typeid(*el).name() );
+                            msg_Dbg( p_demux, "         * Unknown (%s)", typeid(*el).name() );
                         }
                     }
                     ep->Up();
                 }
                 else
                 {
-                    msg_Dbg( p_input, "     * Unknown (%s)", typeid(*el).name() );
+                    msg_Dbg( p_demux, "     * Unknown (%s)", typeid(*el).name() );
                 }
             }
             ep->Up();
 
 #if 0
-            msg_Dbg( p_input, " * added time="I64Fd" pos="I64Fd
+            msg_Dbg( p_demux, " * added time="I64Fd" pos="I64Fd
                      " track=%d bnum=%d", idx.i_time, idx.i_position,
                      idx.i_track, idx.i_block_number );
 #endif
@@ -2070,7 +2029,7 @@ static void LoadCues( input_thread_t *p_input )
         }
         else
         {
-            msg_Dbg( p_input, " * Unknown (%s)", typeid(*el).name() );
+            msg_Dbg( p_demux, " * Unknown (%s)", typeid(*el).name() );
         }
     }
     delete ep;
@@ -2078,139 +2037,139 @@ static void LoadCues( input_thread_t *p_input )
 
     p_sys->b_cues = VLC_TRUE;
 
-    msg_Dbg( p_input, "loading cues done." );
+    msg_Dbg( p_demux, "loading cues done." );
     p_sys->in->setFilePointer( i_sav_position, seek_beginning );
 }
 
-static void LoadTags( input_thread_t *p_input )
+static void LoadTags( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int64_t     i_sav_position = p_sys->in->getFilePointer();
     EbmlParser  *ep;
     EbmlElement *el, *tags;
 
-    msg_Dbg( p_input, "loading tags" );
+    msg_Dbg( p_demux, "loading tags" );
     p_sys->in->setFilePointer( p_sys->i_tags_position, seek_beginning );
     tags = p_sys->es->FindNextID( KaxTags::ClassInfos, 0xFFFFFFFFL);
 
     if( tags == NULL )
     {
-        msg_Err( p_input, "cannot load tags (broken seekhead or file)" );
+        msg_Err( p_demux, "cannot load tags (broken seekhead or file)" );
         p_sys->in->setFilePointer( i_sav_position, seek_beginning );
         return;
     }
 
-    msg_Dbg( p_input, "Tags" );
+    msg_Dbg( p_demux, "Tags" );
     ep = new EbmlParser( p_sys->es, tags );
     while( ( el = ep->Get() ) != NULL )
     {
         if( EbmlId( *el ) == KaxTag::ClassInfos.GlobalId )
         {
-            msg_Dbg( p_input, "+ Tag" );
+            msg_Dbg( p_demux, "+ Tag" );
             ep->Down();
             while( ( el = ep->Get() ) != NULL )
             {
                 if( EbmlId( *el ) == KaxTagTargets::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Targets" );
+                    msg_Dbg( p_demux, "|   + Targets" );
                     ep->Down();
                     while( ( el = ep->Get() ) != NULL )
                     {
-                        msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid( *el ).name() );
+                        msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid( *el ).name() );
                     }
                     ep->Up();
                 }
                 else if( EbmlId( *el ) == KaxTagGeneral::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + General" );
+                    msg_Dbg( p_demux, "|   + General" );
                     ep->Down();
                     while( ( el = ep->Get() ) != NULL )
                     {
-                        msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid( *el ).name() );
+                        msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid( *el ).name() );
                     }
                     ep->Up();
                 }
                 else if( EbmlId( *el ) == KaxTagGenres::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Genres" );
+                    msg_Dbg( p_demux, "|   + Genres" );
                     ep->Down();
                     while( ( el = ep->Get() ) != NULL )
                     {
-                        msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid( *el ).name() );
+                        msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid( *el ).name() );
                     }
                     ep->Up();
                 }
                 else if( EbmlId( *el ) == KaxTagAudioSpecific::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Audio Specific" );
+                    msg_Dbg( p_demux, "|   + Audio Specific" );
                     ep->Down();
                     while( ( el = ep->Get() ) != NULL )
                     {
-                        msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid( *el ).name() );
+                        msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid( *el ).name() );
                     }
                     ep->Up();
                 }
                 else if( EbmlId( *el ) == KaxTagImageSpecific::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Images Specific" );
+                    msg_Dbg( p_demux, "|   + Images Specific" );
                     ep->Down();
                     while( ( el = ep->Get() ) != NULL )
                     {
-                        msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid( *el ).name() );
+                        msg_Dbg( p_demux, "|   |   + Unknown (%s)", typeid( *el ).name() );
                     }
                     ep->Up();
                 }
                 else if( EbmlId( *el ) == KaxTagMultiComment::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Comment" );
+                    msg_Dbg( p_demux, "|   + Multi Comment" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiCommercial::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Commercial" );
+                    msg_Dbg( p_demux, "|   + Multi Commercial" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiDate::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Date" );
+                    msg_Dbg( p_demux, "|   + Multi Date" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiEntity::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Entity" );
+                    msg_Dbg( p_demux, "|   + Multi Entity" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiIdentifier::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Identifier" );
+                    msg_Dbg( p_demux, "|   + Multi Identifier" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiLegal::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Legal" );
+                    msg_Dbg( p_demux, "|   + Multi Legal" );
                 }
                 else if( EbmlId( *el ) == KaxTagMultiTitle::ClassInfos.GlobalId )
                 {
-                    msg_Dbg( p_input, "|   + Multi Title" );
+                    msg_Dbg( p_demux, "|   + Multi Title" );
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   + Unknown (%s)", typeid( *el ).name() );
+                    msg_Dbg( p_demux, "|   + Unknown (%s)", typeid( *el ).name() );
                 }
             }
             ep->Up();
         }
         else
         {
-            msg_Dbg( p_input, "+ Unknown (%s)", typeid( *el ).name() );
+            msg_Dbg( p_demux, "+ Unknown (%s)", typeid( *el ).name() );
         }
     }
     delete ep;
     delete tags;
 
-    msg_Dbg( p_input, "loading tags done." );
+    msg_Dbg( p_demux, "loading tags done." );
     p_sys->in->setFilePointer( i_sav_position, seek_beginning );
 }
 
-static void InformationsCreate( input_thread_t *p_input )
+static void InformationsCreate( demux_t *p_demux )
 {
-    demux_sys_t           *p_sys = p_input->p_demux_data;
-    int                   i_track;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int         i_track;
 
     p_sys->meta = vlc_meta_New();
 
@@ -2270,10 +2229,10 @@ static void InformationsCreate( input_thread_t *p_input )
     {
         vlc_bool_t b_seekable;
 
-        stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
         if( b_seekable )
         {
-            LoadTags( p_input );
+            LoadTags( p_demux );
         }
     }
 }
@@ -2283,9 +2242,9 @@ static void InformationsCreate( input_thread_t *p_input )
  * Divers
  *****************************************************************************/
 
-static void IndexAppendCluster( input_thread_t *p_input, KaxCluster *cluster )
+static void IndexAppendCluster( demux_t *p_demux, KaxCluster *cluster )
 {
-    demux_sys_t    *p_sys   = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
 #define idx p_sys->index[p_sys->i_index]
     idx.i_track       = -1;
