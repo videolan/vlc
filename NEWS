@@ -1,33 +1,40 @@
-$Id: NEWS,v 1.68 2003/10/13 05:48:08 zorglub Exp $
+$Id: NEWS,v 1.69 2003/10/22 21:08:15 gbazin Exp $
 
 Changes between 0.6.2 and 0.6.3:
 ---------------------------------
 
 Core support:
- * Video outputs are recycled if possible. This removes any 'flicker' between two similiar video files.
+ * Video outputs are recycled if possible.
+   This removes any 'flicker' between two similiar video files.
  * Fixed the video filters. Video should no longer go black when these are used.
  * New input core. Advantages are: better seeking, more responsive, support for subtitle files at the core, and much much more.
  * Added a repeat mode to repeat a single file over and over.
 
 Stream output:
+ * Added packetization for MPEG AAC ADTS streams.
+ * Improved mp4 muxing and added AAC/MP4V support when transcoding.
+ * Improved Ogg muxing and added theora, speex and subtitles support.
+ * Theora video encoding.
  * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
 
 Input:
  * MPEG TS demuxer also handles A52 audio in DVB streams.
  * Fixed seeking support in FLAC files.
- * cddax and vcdx
- * Reworked DVB tuning
- * Better Icecast support
+ * cddax and vcdx plugins using libcdio, libvcd and libvcdinfo.
+ * Reworked DVB tuning.
+ * Better Icecast support.
 
 Codecs:
+ * Support for Speex audio.
  * Support for AAC + SBR.
  * MPEG 2.5 support.
  * removed old a52, mpeg_video and mpeg_audio codecs, since we are using others now.
 
 Interface:
- * Improvements to the wxwindows playlist 
-   (Sort,Search, mode buttons)
- * Help in the preferences window
+ * Allow on the fly switching of the main interface.
+ * Bug fixes / improvements in the skins (eg. "stay on top" option).
+ * Improvements to the wxwindows playlist  (Sort,Search, mode buttons).
+ * Help in the preferences window.
 
 Mac OS X port:
  * Mozilla plugin for Mac OS X (experimental).
@@ -38,6 +45,7 @@ Win32 port:
  * New DirectShow input module (for video acquisition cards, webcams...).
  * VLC can be installed as a Windows NT service.
  * Support for 3F2R in audio output.
+ * New --one-instance option to "force" only one running instance of VLC.
  * Mozilla plugin for Windows (experimental).
 
 Subtitles:
@@ -51,7 +59,7 @@ Miscellaneous:
  * Audio visual effects filters (spectrum, scope and random).
  * Audio visual effects filter using goom.
  * Spanish and Portugese Brazilian translations.
- * SAP now supports HTTP streams
+ * SAP now supports HTTP streams.
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------

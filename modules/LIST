@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
+$Id: LIST,v 1.14 2003/10/22 21:08:15 gbazin Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -103,10 +103,6 @@ $Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
 
  * dv: DV video decoder
  
- * encoder_ffmpeg: Encoder using the ffmpeg library
-
- * encoder_xvid: Encoder for the xvid codec using libxvidcore
-
  * esd: audio output module using the Esound sound daemon.
 
  * es: input module for MPEG ES decapsulation.
@@ -244,6 +240,8 @@ $Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
 
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
 
+ * mux_asf: ASF muxer
+
  * mux_avi: AVI muxer
 
  * mux_dummy: dummy muxer
@@ -324,6 +322,8 @@ $Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
 
  * spdif_mixer: dummy audio mixer for the S/PDIF output
 
+ * speex: a speex audio decoder/packetizer using the libspeex library.
+
  * spudec: DVD subtitles decoder.
 
  * stream_out_display: displays a stream output chain 
@@ -333,6 +333,8 @@ $Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
  * stream_out_duplicate: duplicates a stream output chain
 
  * stream_out_es: stream out module outputing ES
+
+ * stream_out_gather: stream out module gathering inputs for seemless transitions
 
  * stream_out_standard: standard stream output module
  
@@ -352,7 +354,7 @@ $Id: LIST,v 1.13 2003/10/04 18:55:13 gbazin Exp $
 
  * test4: Stress test module
 
- * theora: a theora video decoder/packetizer using the libtheora library.
+ * theora: a theora video decoder/packetizer/encoder using the libtheora library.
 
  * transform: filter for horizontal and vertical image flips and
                      90° rotations.
