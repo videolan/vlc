@@ -57,7 +57,7 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
 {
     int i, i_matches;
     cddb_conn_t  *conn = cddb_new();
-    const CdIo *p_cdio = p_cdda->p_cdio;
+    const CdIo_t *p_cdio = p_cdda->p_cdio;
 
     dbg_print( (INPUT_DBG_CALL), "" );
 
@@ -754,7 +754,7 @@ CDDAFormatMRL( const access_t *p_access, track_t i_track )
     const unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) 
       + strlen(p_cdda->psz_source) +
       + strlen("@T") + strlen("100") + 1;
-    char *psz_mrl = malloc( psz_mrl_max );
+    char *psz_mrl = calloc( 1, psz_mrl_max );
     
     if (CDIO_INVALID_TRACK == i_track)
       snprintf(psz_mrl, psz_mrl_max, "%s%s",

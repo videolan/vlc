@@ -58,7 +58,10 @@
   General definitions and structures.
 ---------------------------------------------------------------------*/
 
-#define VCDPLAYER_IN_STILL  65535
+/* Value for indefinite wait period on a still frame */
+#define STILL_INDEFINITE_WAIT 255
+/* Value when we have yet to finish reading blocks of a frame. */
+#define STILL_READING          -5
 
 typedef struct {
   lsn_t  start_LSN; /* LSN where play item starts */
@@ -151,7 +154,7 @@ typedef struct vcdplayer_input_s
   /* Probably gets moved into another structure...*/
   intf_thread_t *p_intf;
   int            i_audio_nb;
-  int            i_still_time;
+  int            i_still;
   bool           b_end_of_cell;
   input_thread_t *p_input;
   demux_t        *p_demux;

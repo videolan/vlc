@@ -1,7 +1,7 @@
 /*****************************************************************************
  * access.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000, 2003, 2004 VideoLAN
+ * Copyright (C) 2000, 2003, 2004, 2005 VideoLAN
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
@@ -35,6 +35,7 @@
 #include <cdio/cdio.h>
 #include <cdio/logging.h>
 #include <cdio/cd_types.h>
+#include <cdio/cdda.h>
 
 #include <stdio.h>
 
@@ -232,21 +233,57 @@ static block_t * CDDAReadBlocks( access_t * p_access )
                i_blocks * CDIO_CD_FRAMESIZE_RAW );
       return NULL;
     }
-
-    if( cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
-                                 p_cdda->i_lsn, i_blocks) != 0 )
+    
     {
-        msg_Err( p_access, "could not read sector %lu",
-                 (long unsigned int) p_cdda->i_lsn );
-        block_Release( p_block );
+#if LIBCDIO_VERSION_NUM >= 72
+      driver_return_code_t rc = DRIVER_OP_SUCCESS;
 
-        /* If we had problems above, assume the problem is with
-           the first sector of the read and set to skip it.  In
-           the future libcdio may have cdparanoia support.
-        */
-        p_cdda->i_lsn++;
-        p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
-        return NULL;
+      if ( p_cdda->b_paranoia_enabled ) 
+	{
+	  int i;
+	  for( i = 0; i < i_blocks; i++ )
+	    {
+	      int16_t *p_readbuf=paranoia_read(p_cdda->paranoia, NULL);
+	      char *psz_err=cdio_cddap_errors(p_cdda->paranoia_cd);
+	      char *psz_mes=cdio_cddap_messages(p_cdda->paranoia_cd);
+
+	      if (psz_mes || psz_err)
+		msg_Err( p_access, "%s%s\n", psz_mes ? psz_mes: "", 
+			psz_err ? psz_err: "" );
+	      
+	      if (psz_err) free(psz_err);
+	      if (psz_mes) free(psz_mes);
+	      if( !p_readbuf ) {
+		msg_Err( p_access, "paranoia read error on frame %i\n", 
+			 p_cdda->i_lsn+i );
+	      } else 
+		memcpy(p_block + i * CDIO_CD_FRAMESIZE_RAW, p_readbuf, 
+		       CDIO_CD_FRAMESIZE_RAW);
+	    }
+	}
+      else 
+	rc = cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
+				      p_cdda->i_lsn, i_blocks);
+#else
+#define DRIVER_OP_SUCCESS 0
+      int rc;
+      rc = cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
+				    p_cdda->i_lsn, i_blocks);
+#endif    
+      if( rc != DRIVER_OP_SUCCESS )
+	{
+	  msg_Err( p_access, "could not read %d sectors starting from %lu",
+		   i_blocks, (long unsigned int) p_cdda->i_lsn );
+	  block_Release( p_block );
+	  
+	  /* If we had problems above, assume the problem is with
+	     the first sector of the read and set to skip it.  In
+	     the future libcdio may have cdparanoia support.
+	  */
+	  p_cdda->i_lsn++;
+	  p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
+	  return NULL;
+	}
     }
 
     p_cdda->i_lsn        += i_blocks;
@@ -264,6 +301,11 @@ static int CDDASeek( access_t * p_access, int64_t i_pos )
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
 
     p_cdda->i_lsn = (i_pos / CDIO_CD_FRAMESIZE_RAW);
+
+#if LIBCDIO_VERSION_NUM >= 72
+    if ( p_cdda->b_paranoia_enabled ) 
+      cdio_paranoia_seek(p_cdda->paranoia, p_cdda->i_lsn, SEEK_SET);
+#endif
 
     if ( ! p_cdda->b_nav_mode ) 
       p_cdda->i_lsn += cdio_get_track_lsn(p_cdda->p_cdio, p_cdda->i_track);
@@ -309,7 +351,7 @@ CDDAOpen( vlc_object_t *p_this )
     access_t    *p_access = (access_t*)p_this;
     char *      psz_source = NULL;
     cdda_data_t *p_cdda    = NULL;
-    CdIo        *p_cdio;
+    CdIo_t      *p_cdio;
     track_t     i_track = 1;
     vlc_bool_t  b_single_track = false;
     int         i_rc = VLC_EGENERIC;
@@ -382,14 +424,13 @@ CDDAOpen( vlc_object_t *p_this )
 	return VLC_EGENERIC;
     }
 
-    p_cdda = malloc( sizeof(cdda_data_t) );
+    p_cdda = calloc( 1, sizeof(cdda_data_t) );
     if( p_cdda == NULL )
     {
         msg_Err( p_access, "out of memory" );
         free( psz_source );
         return VLC_ENOMEM;
     }
-    memset( p_cdda, 0, sizeof(cdda_data_t) );
 
 #ifdef HAVE_LIBCDDB
     cddb_log_set_handler ( cddb_log_handler );
@@ -458,6 +499,32 @@ CDDAOpen( vlc_object_t *p_this )
 
     CDDAFixupPlaylist( p_access, p_cdda, b_single_track );
 
+#if LIBCDIO_VERSION_NUM >= 72
+    p_cdda->b_paranoia_enabled =
+      config_GetInt( p_access, MODULE_STRING "-paranoia-enabled" );
+
+    /* Use CD Paranoia? */
+    if ( p_cdda->b_paranoia_enabled ) {
+      p_cdda->paranoia_cd = cdio_cddap_identify_cdio(p_cdio, 1, NULL);
+      /* We'll set for verbose paranoia messages. */
+      cdio_cddap_verbose_set(p_cdda->paranoia_cd, CDDA_MESSAGE_PRINTIT, 
+			    CDDA_MESSAGE_PRINTIT);
+      if ( 0 != cdio_cddap_open(p_cdda->paranoia_cd) ) {
+	msg_Warn( p_cdda_input, "Unable to get paranoia support - "
+		  "continuing without it." );
+	p_cdda->b_paranoia_enabled = VLC_FALSE;
+      } else {
+	p_cdda->paranoia = cdio_paranoia_init(p_cdda->paranoia_cd);
+	cdio_paranoia_seek(p_cdda->paranoia, p_cdda->i_lsn, SEEK_SET);
+
+	/* Set reading mode for full paranoia, but allow skipping sectors. */
+	cdio_paranoia_modeset(p_cdda->paranoia, 
+			      PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
+      }
+      
+    }
+#endif    
+
     /* Build a WAV header to put in front of the output data.
        This gets sent back in the Block (read) routine.
      */
@@ -515,19 +582,26 @@ CDDAClose (vlc_object_t *p_this )
         vlc_input_title_Delete( p_cdda->p_title[i] );
     }
 
-    cdio_destroy( p_cdda->p_cdio );
-
-    cdio_log_set_handler (uninit_log_handler);
-
 #ifdef HAVE_LIBCDDB
     cddb_log_set_handler ((cddb_log_handler_t) uninit_log_handler);
     if (p_cdda->b_cddb_enabled)
       cddb_disc_destroy(p_cdda->cddb.disc);
 #endif
 
+    cdio_destroy( p_cdda->p_cdio );
+    cdio_log_set_handler (uninit_log_handler);
+
+#if LIBCDIO_VERSION_NUM >= 72
+    if (p_cdda->paranoia)
+      cdio_paranoia_free(p_cdda->paranoia);
+    if (p_cdda->paranoia_cd) 
+      cdio_cddap_close_no_free_cdio(p_cdda->paranoia_cd);
+#endif
+
     if (p_cdda->psz_mcn)    free( p_cdda->psz_mcn );
     if (p_cdda->psz_source) free( p_cdda->psz_source );
     free( p_cdda );
+    p_cdda = NULL;
     p_cdda_input = NULL;
 }
 
@@ -624,7 +698,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             *pi_int = p_cdda->i_titles;
-            *ppp_title = malloc(sizeof( input_title_t **) * p_cdda->i_titles );
+            *ppp_title = calloc(1, 
+				sizeof( input_title_t **) * p_cdda->i_titles );
 
             if (!*ppp_title) return VLC_ENOMEM;
 

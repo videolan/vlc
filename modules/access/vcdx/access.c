@@ -238,8 +238,8 @@ VCDReadBlock( access_t * p_access )
       if ( VCDINFO_ITEM_TYPE_ENTRY == p_vcdplayer->play_item.type )
       {
 	unsigned int i_entry = p_vcdplayer->play_item.num+1;
-	lsn_t        i_lsn   = vcdinfo_get_entry_lba(p_vcdplayer->vcd, i_entry);
-	if ( p_vcdplayer->i_lsn >= i_lsn && i_lsn != VCDINFO_NULL_LBA )
+	lsn_t        i_lsn   = vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i_entry);
+	if ( p_vcdplayer->i_lsn >= i_lsn && i_lsn != VCDINFO_NULL_LSN )
         {
 	    const track_t i_track = p_vcdplayer->i_track;
 	    p_vcdplayer->play_item.num = i_entry;
@@ -373,11 +373,11 @@ VCDEntryPoints( access_t * p_access )
 	  
 	  snprintf(psz_entry, sizeof(psz_entry), "%s%02d", _("Entry "), i );
 
-	  p_vcdplayer->p_entries[i] = vcdinfo_get_entry_lba(p_vcdplayer->vcd, i);
+	  p_vcdplayer->p_entries[i] = vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i);
 	  
 	  s->psz_name      = strdup(psz_entry);
 	  s->i_byte_offset = 
-	    (p_vcdplayer->p_entries[i] - vcdinfo_get_track_lba(p_vcdplayer->vcd, i_track))
+	    (p_vcdplayer->p_entries[i] - vcdinfo_get_track_lsn(p_vcdplayer->vcd, i_track))
 	    * M2F2_SECTOR_SIZE;
 	  
 	  dbg_print( INPUT_DBG_MRL, 
@@ -779,7 +779,7 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
 	p_vcdplayer->track[i].size  = 
 	  vcdinfo_get_track_sect_count(p_vcdobj, track_num);
 	p_vcdplayer->track[i].start_LSN = 
-	  vcdinfo_get_track_lba(p_vcdobj, track_num);
+	  vcdinfo_get_track_lsn(p_vcdobj, track_num);
       }
     } else 
       p_vcdplayer->track = NULL;
@@ -791,7 +791,7 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
       for (i=0; i<p_vcdplayer->i_entries; i++) { 
 	p_vcdplayer->entry[i].size = 
 	  vcdinfo_get_entry_sect_count(p_vcdobj, i);
-	p_vcdplayer->entry[i].start_LSN = vcdinfo_get_entry_lba(p_vcdobj, i);
+	p_vcdplayer->entry[i].start_LSN = vcdinfo_get_entry_lsn(p_vcdobj, i);
       }
     } else 
       p_vcdplayer->entry = NULL;
@@ -1142,7 +1142,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 		itemid.type = VCDINFO_ITEM_TYPE_TRACK;
 		
 		VCDSetOrigin(p_access, 
-			     vcdinfo_get_entry_lba(p_vcdplayer->vcd, i_entry),
+			     vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i_entry),
 			     i_track, &itemid );
 	    }
             break;
@@ -1168,7 +1168,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 		{
 		    p_vcdplayer->play_item.num  = i;
 		    p_vcdplayer->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
-		    lsn = vcdinfo_get_entry_lba(p_vcdplayer->vcd, i);
+		    lsn = vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i);
 		} else if ( i < p_vcdplayer->i_entries + p_vcdplayer->i_lids ) 
 		{
 		    p_vcdplayer->play_item.num  = i 
@@ -1184,7 +1184,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
 		}
 		
 		VCDSetOrigin( p_access, 
-			      vcdinfo_get_entry_lba(p_vcdplayer->vcd, i),
+			      vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i),
 			      i_track, &(p_vcdplayer->play_item) );
             }
             return VLC_SUCCESS;

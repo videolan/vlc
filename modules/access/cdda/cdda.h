@@ -58,12 +58,18 @@
 #define dbg_print(mask, s, args...)
 #endif
 
+#if LIBCDIO_VERSION_NUM >= 72
+#include <cdio/cdda.h>
+#else
+#define CdIo_t CdIo
+#endif    
+
 /*****************************************************************************
  * cdda_data_t: CD audio information
  *****************************************************************************/
 typedef struct cdda_data_s
 {
-  CdIo          *p_cdio;                   /* libcdio CD device */
+  CdIo_t         *p_cdio;                   /* libcdio CD device */
   track_t        i_tracks;                 /* # of tracks */
   track_t        i_first_track;            /* # of first track */
   track_t        i_titles;                 /* # of titles in playlist */
@@ -81,7 +87,15 @@ typedef struct cdda_data_s
   char *         psz_source;               /* CD drive or CD image filename */
   input_title_t *p_title[CDIO_CD_MAX_TRACKS]; /* This *is* 0 origin, not
 					         track number origin */
-  
+
+#if LIBCDIO_VERSION_NUM >= 72
+  /* Paranoia support */
+  vlc_bool_t     b_paranoia_enabled;       /* Use cd paranoia for reads? */
+  cdrom_drive_t *paranoia_cd;              /* Place to store drive
+					      handle given by paranoia. */
+  cdrom_paranoia_t *paranoia;
+
+#endif    
   
 #ifdef HAVE_LIBCDDB
   vlc_bool_t     b_cddb_enabled;      /* Use CDDB at all? */

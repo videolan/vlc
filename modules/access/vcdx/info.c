@@ -336,7 +336,7 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
 
     case 'S':
       if ( VCDINFO_ITEM_TYPE_SEGMENT==itemid->type ) {
-        char seg_type_str[10];
+        char seg_type_str[30];
 
         sprintf(seg_type_str, " %s",
                 vcdinfo_video_type2str(p_vcdplayer->vcd, itemid->num));

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cdda.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000, 2003, 2004 VideoLAN
+ * Copyright (C) 2000, 2003, 2004, 2005 VideoLAN
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
@@ -27,6 +27,7 @@
 
 #include "callback.h"
 #include "access.h"
+#include <cdio/version.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -131,7 +132,7 @@ vlc_module_begin();
                 N_("Format to use in playlist \"title\" field when using CDDB"),
                 CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
-    add_bool( MODULE_STRING "-cddb-enabled", 1, CDDBEnabledCB,
+    add_bool( MODULE_STRING "-cddb-enabled", VLC_TRUE, CDDBEnabledCB,
               N_("Do CDDB lookups?"),
               N_("If set, lookup CD-DA track information using the CDDB "
                  "protocol"),
@@ -197,5 +198,15 @@ vlc_module_begin();
               N_("If set, tracks are navigated via Navagation rather than "
 		 "a playlist entries"),
               VLC_FALSE );
+
+#if LIBCDIO_VERSION_NUM >= 72
+    add_bool( MODULE_STRING "-paranoia-enabled", 
+	      //	      VLC_FALSE, NULL,
+	      VLC_TRUE, NULL,
+              N_("Enable CD paranoia?"),
+              N_("If set, CD-DA reading will go through paranoia "
+                 "jitter/error correction"),
+              VLC_FALSE );
+#endif    
 
 vlc_module_end();
