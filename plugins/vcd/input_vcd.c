@@ -176,7 +176,7 @@ static int VCDOpen( struct input_thread_s *p_input )
         return( -1 );
     }
     
-    if( !S_ISBLK(stat_info.st_mode) )
+    if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode))
     {
         intf_WarnMsg( 3, "input : VCD plugin discarded"
                          " (not a valid drive)" );
