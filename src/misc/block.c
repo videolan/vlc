@@ -408,7 +408,10 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
 
     vlc_mutex_lock( &p_fifo->lock );
 
-    if( p_fifo->p_first == NULL )
+    /* We do a while here because there is a race condition in the
+     * win32 implementation of vlc_cond_wait() (We can't be sure the fifo
+     * hasn't been emptied again since we were signaled). */
+    while( p_fifo->p_first == NULL )
     {
         vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
     }
