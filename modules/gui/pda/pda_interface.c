@@ -82,42 +82,42 @@ create_pda (void)
   GtkWidget *tableV4L;
   GtkWidget *labelV4lVideDevice;
   GtkWidget *labelV4LAudioDevice;
+  GtkWidget *labelV4LChannel;
+  GtkWidget *labelV4LNorm;
+  GtkWidget *labelV4LSize;
+  GtkWidget *labelV4LFrequency;
+  GtkWidget *labelV4LSampleRate;
+  GtkWidget *labelV4LQuality;
+  GtkWidget *labelV4LTuner;
+  GtkWidget *labelV4LSoundDirection;
+  GtkWidget *labelV4LMJPEG;
+  GtkWidget *labelV4LDecimation;
   GtkWidget *comboV4lVideoDevice;
   GList *comboV4lVideoDevice_items = NULL;
   GtkWidget *entryV4LVideoDevice;
   GtkWidget *comboV4lAudioDevice;
   GList *comboV4lAudioDevice_items = NULL;
   GtkWidget *entryV4LAudioDevice;
-  GtkWidget *labelV4LChannel;
   GtkObject *entryV4LChannel_adj;
   GtkWidget *entryV4LChannel;
-  GtkWidget *labelV4LNorm;
   GtkWidget *comboV4LNorm;
   GList *comboV4LNorm_items = NULL;
   GtkWidget *entryV4LNorm;
-  GtkWidget *labelV4LSize;
   GtkWidget *comboV4LSize;
   GList *comboV4LSize_items = NULL;
   GtkWidget *entryV4LSize;
-  GtkWidget *labelV4LFrequency;
   GtkObject *entryV4LFrequency_adj;
   GtkWidget *entryV4LFrequency;
-  GtkWidget *labelV4LSampleRate;
   GtkObject *entryV4LSampleRate_adj;
   GtkWidget *entryV4LSampleRate;
-  GtkWidget *labelV4LQuality;
   GtkObject *entryV4LQuality_adj;
   GtkWidget *entryV4LQuality;
-  GtkWidget *labelV4LTuner;
-  GtkObject *entryV4LTuner_adj;
-  GtkWidget *entryV4LTuner;
-  GtkWidget *labelV4LSoundDirection;
   GtkWidget *comboV4LSoundDirection;
   GList *comboV4LSoundDirection_items = NULL;
   GtkWidget *entryV4LSoundDirection;
-  GtkWidget *labelV4LMJPEG;
+  GtkObject *entryV4LTuner_adj;
+  GtkWidget *entryV4LTuner;
   GtkWidget *checkV4LMJPEG;
-  GtkWidget *labelV4LDecimation;
   GtkObject *entryV4LDecimation_adj;
   GtkWidget *entryV4LDecimation;
   GtkWidget *hbox16;
@@ -493,12 +493,13 @@ create_pda (void)
   gtk_widget_set_name (scrolledV4Lwindow, "scrolledV4Lwindow");
   gtk_widget_show (scrolledV4Lwindow);
   gtk_box_pack_start (GTK_BOX (vbox7), scrolledV4Lwindow, TRUE, TRUE, 0);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledV4Lwindow), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledV4Lwindow), GTK_SHADOW_ETCHED_OUT);
 
   viewportV4L = gtk_viewport_new (NULL, NULL);
   gtk_widget_set_name (viewportV4L, "viewportV4L");
   gtk_widget_show (viewportV4L);
   gtk_container_add (GTK_CONTAINER (scrolledV4Lwindow), viewportV4L);
+  gtk_viewport_set_shadow_type (GTK_VIEWPORT (viewportV4L), GTK_SHADOW_OUT);
 
   tableV4L = gtk_table_new (12, 2, FALSE);
   gtk_widget_set_name (tableV4L, "tableV4L");
@@ -523,13 +524,103 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelV4LAudioDevice), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelV4LAudioDevice), 0, 0.5);
 
+  labelV4LChannel = gtk_label_new (_("Channel:"));
+  gtk_widget_set_name (labelV4LChannel, "labelV4LChannel");
+  gtk_widget_show (labelV4LChannel);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LChannel, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LChannel), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LChannel), 0, 0.5);
+
+  labelV4LNorm = gtk_label_new (_("Norm:"));
+  gtk_widget_set_name (labelV4LNorm, "labelV4LNorm");
+  gtk_widget_show (labelV4LNorm);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LNorm, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LNorm), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LNorm), 0, 0.5);
+
+  labelV4LSize = gtk_label_new (_("Size:"));
+  gtk_widget_set_name (labelV4LSize, "labelV4LSize");
+  gtk_widget_show (labelV4LSize);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSize, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LSize), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LSize), 0, 0.5);
+
+  labelV4LFrequency = gtk_label_new (_("Frequency:"));
+  gtk_widget_set_name (labelV4LFrequency, "labelV4LFrequency");
+  gtk_widget_show (labelV4LFrequency);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LFrequency, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LFrequency), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LFrequency), 0, 0.5);
+
+  labelV4LSampleRate = gtk_label_new (_("Samplerate:"));
+  gtk_widget_set_name (labelV4LSampleRate, "labelV4LSampleRate");
+  gtk_widget_show (labelV4LSampleRate);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSampleRate, 0, 1, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LSampleRate), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LSampleRate), 0, 0.5);
+
+  labelV4LQuality = gtk_label_new (_("Quality:"));
+  gtk_widget_set_name (labelV4LQuality, "labelV4LQuality");
+  gtk_widget_show (labelV4LQuality);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LQuality, 0, 1, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LQuality), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LQuality), 0, 0.5);
+
+  labelV4LTuner = gtk_label_new (_("Tuner:"));
+  gtk_widget_set_name (labelV4LTuner, "labelV4LTuner");
+  gtk_widget_show (labelV4LTuner);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LTuner, 0, 1, 9, 10,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LTuner), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LTuner), 0, 0.5);
+
+  labelV4LSoundDirection = gtk_label_new (_("Sound:"));
+  gtk_widget_set_name (labelV4LSoundDirection, "labelV4LSoundDirection");
+  gtk_widget_show (labelV4LSoundDirection);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSoundDirection, 0, 1, 8, 9,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LSoundDirection), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LSoundDirection), 0, 0.5);
+
+  labelV4LMJPEG = gtk_label_new (_("MJPEG:"));
+  gtk_widget_set_name (labelV4LMJPEG, "labelV4LMJPEG");
+  gtk_widget_show (labelV4LMJPEG);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LMJPEG, 0, 1, 10, 11,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LMJPEG), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LMJPEG), 0, 0.5);
+
+  labelV4LDecimation = gtk_label_new (_("Decimation:"));
+  gtk_widget_set_name (labelV4LDecimation, "labelV4LDecimation");
+  gtk_widget_show (labelV4LDecimation);
+  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LDecimation, 0, 1, 11, 12,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelV4LDecimation), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelV4LDecimation), 0, 0.5);
+
   comboV4lVideoDevice = gtk_combo_new ();
   g_object_set_data (G_OBJECT (GTK_COMBO (comboV4lVideoDevice)->popwin),
                      "GladeParentKey", comboV4lVideoDevice);
   gtk_widget_set_name (comboV4lVideoDevice, "comboV4lVideoDevice");
   gtk_widget_show (comboV4lVideoDevice);
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4lVideoDevice, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_combo_set_value_in_list (GTK_COMBO (comboV4lVideoDevice), TRUE, TRUE);
   comboV4lVideoDevice_items = g_list_append (comboV4lVideoDevice_items, (gpointer) _("/dev/video"));
@@ -550,7 +641,7 @@ create_pda (void)
   gtk_widget_set_name (comboV4lAudioDevice, "comboV4lAudioDevice");
   gtk_widget_show (comboV4lAudioDevice);
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4lAudioDevice, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/dsp"));
   comboV4lAudioDevice_items = g_list_append (comboV4lAudioDevice_items, (gpointer) _("/dev/audio"));
@@ -565,32 +656,14 @@ create_pda (void)
   gtk_entry_set_text (GTK_ENTRY (entryV4LAudioDevice), _("/dev/dsp"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LAudioDevice), TRUE);
 
-  labelV4LChannel = gtk_label_new (_("Channel:"));
-  gtk_widget_set_name (labelV4LChannel, "labelV4LChannel");
-  gtk_widget_show (labelV4LChannel);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LChannel, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LChannel), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LChannel), 0, 0.5);
-
   entryV4LChannel_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 10);
   entryV4LChannel = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LChannel_adj), 1, 0);
   gtk_widget_set_name (entryV4LChannel, "entryV4LChannel");
   gtk_widget_show (entryV4LChannel);
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LChannel, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LChannel), TRUE);
-
-  labelV4LNorm = gtk_label_new (_("Norm:"));
-  gtk_widget_set_name (labelV4LNorm, "labelV4LNorm");
-  gtk_widget_show (labelV4LNorm);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LNorm, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LNorm), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LNorm), 0, 0.5);
 
   comboV4LNorm = gtk_combo_new ();
   g_object_set_data (G_OBJECT (GTK_COMBO (comboV4LNorm)->popwin),
@@ -598,7 +671,7 @@ create_pda (void)
   gtk_widget_set_name (comboV4LNorm, "comboV4LNorm");
   gtk_widget_show (comboV4LNorm);
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4LNorm, 1, 2, 3, 4,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   comboV4LNorm_items = g_list_append (comboV4LNorm_items, (gpointer) _("pal"));
   comboV4LNorm_items = g_list_append (comboV4LNorm_items, (gpointer) _("ntsc"));
@@ -613,22 +686,13 @@ create_pda (void)
   gtk_entry_set_text (GTK_ENTRY (entryV4LNorm), _("pal"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LNorm), TRUE);
 
-  labelV4LSize = gtk_label_new (_("Size:"));
-  gtk_widget_set_name (labelV4LSize, "labelV4LSize");
-  gtk_widget_show (labelV4LSize);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSize, 0, 1, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LSize), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LSize), 0, 0.5);
-
   comboV4LSize = gtk_combo_new ();
   g_object_set_data (G_OBJECT (GTK_COMBO (comboV4LSize)->popwin),
                      "GladeParentKey", comboV4LSize);
   gtk_widget_set_name (comboV4LSize, "comboV4LSize");
   gtk_widget_show (comboV4LSize);
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4LSize, 1, 2, 4, 5,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   comboV4LSize_items = g_list_append (comboV4LSize_items, (gpointer) _("240x192"));
   comboV4LSize_items = g_list_append (comboV4LSize_items, (gpointer) _("320x240"));
@@ -646,86 +710,32 @@ create_pda (void)
   gtk_entry_set_text (GTK_ENTRY (entryV4LSize), _("240x192"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LSize), TRUE);
 
-  labelV4LFrequency = gtk_label_new (_("Frequency:"));
-  gtk_widget_set_name (labelV4LFrequency, "labelV4LFrequency");
-  gtk_widget_show (labelV4LFrequency);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LFrequency, 0, 1, 5, 6,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LFrequency), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LFrequency), 0, 0.5);
-
   entryV4LFrequency_adj = gtk_adjustment_new (8692, 0, 65535, 1, 10, 10);
   entryV4LFrequency = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LFrequency_adj), 1, 0);
   gtk_widget_set_name (entryV4LFrequency, "entryV4LFrequency");
   gtk_widget_show (entryV4LFrequency);
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LFrequency, 1, 2, 5, 6,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LFrequency), TRUE);
-
-  labelV4LSampleRate = gtk_label_new (_("Samplerate:"));
-  gtk_widget_set_name (labelV4LSampleRate, "labelV4LSampleRate");
-  gtk_widget_show (labelV4LSampleRate);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSampleRate, 0, 1, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LSampleRate), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LSampleRate), 0, 0.5);
 
   entryV4LSampleRate_adj = gtk_adjustment_new (44100, 0, 65535, 1, 10, 10);
   entryV4LSampleRate = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LSampleRate_adj), 1, 0);
   gtk_widget_set_name (entryV4LSampleRate, "entryV4LSampleRate");
   gtk_widget_show (entryV4LSampleRate);
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LSampleRate, 1, 2, 6, 7,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LSampleRate), TRUE);
-
-  labelV4LQuality = gtk_label_new (_("Quality:"));
-  gtk_widget_set_name (labelV4LQuality, "labelV4LQuality");
-  gtk_widget_show (labelV4LQuality);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LQuality, 0, 1, 7, 8,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LQuality), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LQuality), 0, 0.5);
 
   entryV4LQuality_adj = gtk_adjustment_new (100, 0, 65535, 1, 10, 10);
   entryV4LQuality = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LQuality_adj), 1, 0);
   gtk_widget_set_name (entryV4LQuality, "entryV4LQuality");
   gtk_widget_show (entryV4LQuality);
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LQuality, 1, 2, 7, 8,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LQuality), TRUE);
-
-  labelV4LTuner = gtk_label_new (_("Tuner:"));
-  gtk_widget_set_name (labelV4LTuner, "labelV4LTuner");
-  gtk_widget_show (labelV4LTuner);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LTuner, 0, 1, 9, 10,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LTuner), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LTuner), 0, 0.5);
-
-  entryV4LTuner_adj = gtk_adjustment_new (0, -1, 100, 1, 10, 10);
-  entryV4LTuner = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LTuner_adj), 1, 0);
-  gtk_widget_set_name (entryV4LTuner, "entryV4LTuner");
-  gtk_widget_show (entryV4LTuner);
-  gtk_table_attach (GTK_TABLE (tableV4L), entryV4LTuner, 1, 2, 9, 10,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LTuner), TRUE);
-
-  labelV4LSoundDirection = gtk_label_new (_("Sound:"));
-  gtk_widget_set_name (labelV4LSoundDirection, "labelV4LSoundDirection");
-  gtk_widget_show (labelV4LSoundDirection);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LSoundDirection, 0, 1, 8, 9,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LSoundDirection), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LSoundDirection), 0, 0.5);
 
   comboV4LSoundDirection = gtk_combo_new ();
   g_object_set_data (G_OBJECT (GTK_COMBO (comboV4LSoundDirection)->popwin),
@@ -733,52 +743,43 @@ create_pda (void)
   gtk_widget_set_name (comboV4LSoundDirection, "comboV4LSoundDirection");
   gtk_widget_show (comboV4LSoundDirection);
   gtk_table_attach (GTK_TABLE (tableV4L), comboV4LSoundDirection, 1, 2, 8, 9,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_combo_set_value_in_list (GTK_COMBO (comboV4LSoundDirection), TRUE, TRUE);
   gtk_combo_set_use_arrows_always (GTK_COMBO (comboV4LSoundDirection), TRUE);
-  comboV4LSoundDirection_items = g_list_append (comboV4LSoundDirection_items, (gpointer) _("Mono"));
-  comboV4LSoundDirection_items = g_list_append (comboV4LSoundDirection_items, (gpointer) _("Stereo"));
+  comboV4LSoundDirection_items = g_list_append (comboV4LSoundDirection_items, (gpointer) _("mono"));
+  comboV4LSoundDirection_items = g_list_append (comboV4LSoundDirection_items, (gpointer) _("stereo"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboV4LSoundDirection), comboV4LSoundDirection_items);
   g_list_free (comboV4LSoundDirection_items);
 
   entryV4LSoundDirection = GTK_COMBO (comboV4LSoundDirection)->entry;
   gtk_widget_set_name (entryV4LSoundDirection, "entryV4LSoundDirection");
   gtk_widget_show (entryV4LSoundDirection);
-  gtk_entry_set_text (GTK_ENTRY (entryV4LSoundDirection), _("Mono"));
+  gtk_entry_set_text (GTK_ENTRY (entryV4LSoundDirection), _("mono"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryV4LSoundDirection), TRUE);
 
-  labelV4LMJPEG = gtk_label_new (_("MJPEG:"));
-  gtk_widget_set_name (labelV4LMJPEG, "labelV4LMJPEG");
-  gtk_widget_show (labelV4LMJPEG);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LMJPEG, 0, 1, 10, 11,
-                    (GtkAttachOptions) (GTK_FILL),
+  entryV4LTuner_adj = gtk_adjustment_new (0, -1, 100, 1, 10, 10);
+  entryV4LTuner = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LTuner_adj), 1, 0);
+  gtk_widget_set_name (entryV4LTuner, "entryV4LTuner");
+  gtk_widget_show (entryV4LTuner);
+  gtk_table_attach (GTK_TABLE (tableV4L), entryV4LTuner, 1, 2, 9, 10,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LMJPEG), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LMJPEG), 0, 0.5);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LTuner), TRUE);
 
   checkV4LMJPEG = gtk_check_button_new_with_mnemonic (_("enable"));
   gtk_widget_set_name (checkV4LMJPEG, "checkV4LMJPEG");
   gtk_widget_show (checkV4LMJPEG);
   gtk_table_attach (GTK_TABLE (tableV4L), checkV4LMJPEG, 1, 2, 10, 11,
-                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-
-  labelV4LDecimation = gtk_label_new (_("Decimation:"));
-  gtk_widget_set_name (labelV4LDecimation, "labelV4LDecimation");
-  gtk_widget_show (labelV4LDecimation);
-  gtk_table_attach (GTK_TABLE (tableV4L), labelV4LDecimation, 0, 1, 11, 12,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelV4LDecimation), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelV4LDecimation), 0, 0.5);
 
   entryV4LDecimation_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
   entryV4LDecimation = gtk_spin_button_new (GTK_ADJUSTMENT (entryV4LDecimation_adj), 1, 0);
   gtk_widget_set_name (entryV4LDecimation, "entryV4LDecimation");
   gtk_widget_show (entryV4LDecimation);
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LDecimation, 1, 2, 11, 12,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
   hbox16 = gtk_hbox_new (FALSE, 0);
@@ -1017,39 +1018,6 @@ create_pda (void)
   g_signal_connect ((gpointer) AddNetworkPlaylist, "pressed",
                     G_CALLBACK (onAddNetworkPlaylist),
                     NULL);
-  g_signal_connect ((gpointer) entryV4LVideoDevice, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LAudioDevice, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LChannel, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LNorm, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LSize, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LFrequency, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LSampleRate, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LQuality, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LTuner, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LSoundDirection, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
-  g_signal_connect ((gpointer) entryV4LDecimation, "changed",
-                    G_CALLBACK (V4LBuildMRL),
-                    NULL);
   g_signal_connect ((gpointer) AddCameraToPlaylist, "pressed",
                     G_CALLBACK (onAddCameraToPlaylist),
                     NULL);
@@ -1135,32 +1103,32 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, tableV4L, "tableV4L");
   GLADE_HOOKUP_OBJECT (pda, labelV4lVideDevice, "labelV4lVideDevice");
   GLADE_HOOKUP_OBJECT (pda, labelV4LAudioDevice, "labelV4LAudioDevice");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LChannel, "labelV4LChannel");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LNorm, "labelV4LNorm");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LSize, "labelV4LSize");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LFrequency, "labelV4LFrequency");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LSampleRate, "labelV4LSampleRate");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LQuality, "labelV4LQuality");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LTuner, "labelV4LTuner");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LSoundDirection, "labelV4LSoundDirection");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LMJPEG, "labelV4LMJPEG");
+  GLADE_HOOKUP_OBJECT (pda, labelV4LDecimation, "labelV4LDecimation");
   GLADE_HOOKUP_OBJECT (pda, comboV4lVideoDevice, "comboV4lVideoDevice");
   GLADE_HOOKUP_OBJECT (pda, entryV4LVideoDevice, "entryV4LVideoDevice");
   GLADE_HOOKUP_OBJECT (pda, comboV4lAudioDevice, "comboV4lAudioDevice");
   GLADE_HOOKUP_OBJECT (pda, entryV4LAudioDevice, "entryV4LAudioDevice");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LChannel, "labelV4LChannel");
   GLADE_HOOKUP_OBJECT (pda, entryV4LChannel, "entryV4LChannel");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LNorm, "labelV4LNorm");
   GLADE_HOOKUP_OBJECT (pda, comboV4LNorm, "comboV4LNorm");
   GLADE_HOOKUP_OBJECT (pda, entryV4LNorm, "entryV4LNorm");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LSize, "labelV4LSize");
   GLADE_HOOKUP_OBJECT (pda, comboV4LSize, "comboV4LSize");
   GLADE_HOOKUP_OBJECT (pda, entryV4LSize, "entryV4LSize");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LFrequency, "labelV4LFrequency");
   GLADE_HOOKUP_OBJECT (pda, entryV4LFrequency, "entryV4LFrequency");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LSampleRate, "labelV4LSampleRate");
   GLADE_HOOKUP_OBJECT (pda, entryV4LSampleRate, "entryV4LSampleRate");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LQuality, "labelV4LQuality");
   GLADE_HOOKUP_OBJECT (pda, entryV4LQuality, "entryV4LQuality");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LTuner, "labelV4LTuner");
-  GLADE_HOOKUP_OBJECT (pda, entryV4LTuner, "entryV4LTuner");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LSoundDirection, "labelV4LSoundDirection");
   GLADE_HOOKUP_OBJECT (pda, comboV4LSoundDirection, "comboV4LSoundDirection");
   GLADE_HOOKUP_OBJECT (pda, entryV4LSoundDirection, "entryV4LSoundDirection");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LMJPEG, "labelV4LMJPEG");
+  GLADE_HOOKUP_OBJECT (pda, entryV4LTuner, "entryV4LTuner");
   GLADE_HOOKUP_OBJECT (pda, checkV4LMJPEG, "checkV4LMJPEG");
-  GLADE_HOOKUP_OBJECT (pda, labelV4LDecimation, "labelV4LDecimation");
   GLADE_HOOKUP_OBJECT (pda, entryV4LDecimation, "entryV4LDecimation");
   GLADE_HOOKUP_OBJECT (pda, hbox16, "hbox16");
   GLADE_HOOKUP_OBJECT (pda, AddCameraToPlaylist, "AddCameraToPlaylist");

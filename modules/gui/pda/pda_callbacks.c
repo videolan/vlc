@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.11 2003/11/09 18:52:29 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.12 2003/11/09 19:49:48 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -333,7 +333,7 @@ onRewind                               (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input != NULL )
+    if (p_intf->p_sys->p_input != NULL)
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
@@ -346,7 +346,7 @@ onPause                                (GtkButton       *button,
 {
     intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input != NULL )
+    if (p_intf->p_sys->p_input != NULL)
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
@@ -360,10 +360,10 @@ onPlay                                 (GtkButton       *button,
     intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ) );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-    if( p_playlist  )
+    if (p_playlist)
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        if( p_playlist->i_size )
+        if (p_playlist->i_size)
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             playlist_Play( p_playlist );
@@ -384,7 +384,7 @@ onStop                                 (GtkButton       *button,
     intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ) );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist)
+    if (p_playlist)
     {
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
@@ -396,9 +396,9 @@ void
 onForward                              (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *  p_intf = GtkGetIntf( button );
+    intf_thread_t *p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input != NULL )
+    if (p_intf->p_sys->p_input != NULL)
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
@@ -648,7 +648,107 @@ void
 onAddCameraToPlaylist                  (GtkButton       *button,
                                         gpointer         user_data)
 {
+    GtkTreeView  *p_tvplaylist = NULL;
+    GtkTreeModel *p_play_model;
+    GtkTreeIter   p_play_iter;
 
+    GtkSpinButton *entryV4LChannel = NULL;
+    GtkSpinButton *entryV4LFrequency = NULL;
+    GtkSpinButton *entryV4LSampleRate = NULL;
+    GtkSpinButton *entryV4LQuality = NULL;
+    GtkSpinButton *entryV4LTuner = NULL;
+    gint    i_v4l_channel;
+    gint    i_v4l_frequency;
+    gint    i_v4l_samplerate;
+    gint    i_v4l_quality;
+    gint    i_v4l_tuner;
+
+    GtkEntry      *entryV4LVideoDevice = NULL;
+    GtkEntry      *entryV4LAudioDevice = NULL;
+    GtkEntry      *entryV4LNorm = NULL;
+    GtkEntry      *entryV4LSize = NULL;
+    GtkEntry      *entryV4LSoundDirection = NULL;
+    const gchar   *p_v4l_video_device;
+    const gchar   *p_v4l_audio_device;
+    const gchar   *p_v4l_norm;
+    const gchar   *p_v4l_size;
+    const gchar   *p_v4l_sound_direction;
+
+    /* MJPEG only */
+    GtkCheckButton *checkV4LMJPEG = NULL;
+    GtkSpinButton  *entryV4LDecimation = NULL;
+    gboolean        b_v4l_mjpeg;
+    gint            i_v4l_decimation;
+    /* end MJPEG only */
+
+    char v4l_mrl[VLC_MAX_MRL];
+    int pos;
+
+    pos = snprintf( &v4l_mrl[0], VLC_MAX_MRL, "v4l://");
+
+    entryV4LChannel    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LChannel" );
+    entryV4LFrequency  = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LFrequency" );
+    entryV4LSampleRate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LSampleRate" );
+    entryV4LQuality    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LQuality" );
+    entryV4LTuner      = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LTuner" );
+
+    entryV4LVideoDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryV4LVideoDevice" );
+    entryV4LAudioDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryV4LAudioDevice" );
+    entryV4LNorm  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryV4LNorm" );
+    entryV4LSize  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryV4LSize" );
+    entryV4LSoundDirection  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryV4LSoundDirection" );
+
+    i_v4l_channel = gtk_spin_button_get_value_as_int(entryV4LChannel);
+    i_v4l_frequency = gtk_spin_button_get_value_as_int(entryV4LFrequency);
+    i_v4l_samplerate = gtk_spin_button_get_value_as_int(entryV4LSampleRate);
+    i_v4l_quality = gtk_spin_button_get_value_as_int(entryV4LQuality);
+    i_v4l_tuner = gtk_spin_button_get_value_as_int(entryV4LTuner);
+
+    p_v4l_video_device = gtk_entry_get_text(GTK_ENTRY(entryV4LVideoDevice));
+    p_v4l_audio_device = gtk_entry_get_text(GTK_ENTRY(entryV4LAudioDevice));
+    p_v4l_norm = gtk_entry_get_text(GTK_ENTRY(entryV4LNorm));
+    p_v4l_size  = gtk_entry_get_text(GTK_ENTRY(entryV4LSize));
+    p_v4l_sound_direction = gtk_entry_get_text(GTK_ENTRY(entryV4LSoundDirection));
+
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_video_device );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":adev=%s", (char*)p_v4l_audio_device );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":norm=%s", (char*)p_v4l_norm );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":size=%s", (char*)p_v4l_size );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_sound_direction );
+
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":channel=%d", (int)i_v4l_channel );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":frequency=%d", (int)i_v4l_frequency );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":samplerate=%d", (int)i_v4l_samplerate );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":quality=%d", (int)i_v4l_quality );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":tuner=%d", (int)i_v4l_tuner );
+
+    /* MJPEG only */
+    checkV4LMJPEG      = (GtkCheckButton*) lookup_widget( GTK_WIDGET(button), "checkV4LMJPEG" );
+    b_v4l_mjpeg = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkV4LMJPEG));
+    if (b_v4l_mjpeg)
+    {
+        entryV4LDecimation = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryV4LDecimation" );
+        i_v4l_decimation = gtk_spin_button_get_value_as_int(entryV4LDecimation);
+        pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":mjpeg:%d", (int)i_v4l_decimation );
+    }
+    /* end MJPEG only */
+
+    if (pos >= VLC_MAX_MRL)
+        v4l_mrl[VLC_MAX_MRL-1]='\0';
+
+    g_print( "%s\n", v4l_mrl );
+    p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
+    if (NULL != p_tvplaylist)
+    {
+        p_play_model = gtk_tree_view_get_model(p_tvplaylist);
+
+        /* Add a new row to the playlist treeview model */
+        gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
+        gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
+                                0, &v4l_mrl,
+                                1, "no info",
+                                -1 );
+    }
 }
 
 
@@ -747,104 +847,11 @@ onNetworkMRLAdd                        (GtkContainer    *container,
 
 }
 
-
-
-void
-V4LBuildMRL                            (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-    GtkSpinButton *entryV4LChannel = NULL;
-    GtkSpinButton *entryV4LFrequency = NULL;
-    GtkSpinButton *entryV4LSampleRate = NULL;
-    GtkSpinButton *entryV4LQuality = NULL;
-    GtkSpinButton *entryV4LTuner = NULL;
-    gint    i_v4l_channel;
-    gint    i_v4l_frequency;
-    gint    i_v4l_samplerate;
-    gint    i_v4l_quality;
-    gint    i_v4l_tuner;
-
-    GtkEntry      *entryV4LVideoDevice = NULL;
-    GtkEntry      *entryV4LAudioDevice = NULL;
-    GtkEntry      *entryV4LNorm = NULL;
-    GtkEntry      *entryV4LSize = NULL;
-    GtkEntry      *entryV4LSoundDirection = NULL;
-    const gchar   *p_v4l_video_device;
-    const gchar   *p_v4l_audio_device;
-    const gchar   *p_v4l_norm;
-    const gchar   *p_v4l_size;
-    const gchar   *p_v4l_sound_direction;
-
-    /* MJPEG only */
-    GtkCheckButton *checkV4LMJPEG = NULL;
-    GtkSpinButton  *entryV4LDecimation = NULL;
-    gboolean        b_v4l_mjpeg;
-    gint            i_v4l_decimation;
-    /* end MJPEG only */
-
-    char v4l_mrl[VLC_MAX_MRL];
-    int pos;
-
-    pos = snprintf( &v4l_mrl[0], VLC_MAX_MRL, "v4l://");
-
-    entryV4LChannel    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LChannel" );
-    entryV4LFrequency  = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LFrequency" );
-    entryV4LSampleRate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LSampleRate" );
-    entryV4LQuality    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LQuality" );
-    entryV4LTuner      = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LTuner" );
-
-    entryV4LVideoDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LVideoDevice" );
-    entryV4LAudioDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LAudioDevice" );
-    entryV4LNorm  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LNorm" );
-    entryV4LSize  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LSize" );
-    entryV4LSoundDirection  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LSoundDirection" );
-    
-    i_v4l_channel = gtk_spin_button_get_value_as_int(entryV4LChannel);
-    i_v4l_frequency = gtk_spin_button_get_value_as_int(entryV4LFrequency);
-    i_v4l_samplerate = gtk_spin_button_get_value_as_int(entryV4LSampleRate);
-    i_v4l_quality = gtk_spin_button_get_value_as_int(entryV4LQuality);
-    i_v4l_tuner = gtk_spin_button_get_value_as_int(entryV4LTuner);
-
-    p_v4l_video_device = gtk_entry_get_text(GTK_ENTRY(entryV4LVideoDevice));
-    p_v4l_audio_device = gtk_entry_get_text(GTK_ENTRY(entryV4LAudioDevice));
-    p_v4l_norm = gtk_entry_get_text(GTK_ENTRY(entryV4LNorm));
-    p_v4l_size  = gtk_entry_get_text(GTK_ENTRY(entryV4LSize));
-    p_v4l_sound_direction = gtk_entry_get_text(GTK_ENTRY(entryV4LSoundDirection));
-
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_video_device );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":adev=%s", (char*)p_v4l_audio_device );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":norm=%s", (char*)p_v4l_norm );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":size=%s", (char*)p_v4l_size );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_sound_direction );
-
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":channel=%d", (int)i_v4l_channel );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":frequency=%d", (int)i_v4l_frequency );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":samplerate=%d", (int)i_v4l_samplerate );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":quality=%d", (int)i_v4l_quality );
-    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":tuner=%d", (int)i_v4l_tuner );
-
-    /* MJPEG only */
-    checkV4LMJPEG      = (GtkCheckButton*) lookup_widget( GTK_WIDGET(editable), "checkV4LMJPEG" );
-    b_v4l_mjpeg = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkV4LMJPEG));
-    if (b_v4l_mjpeg)
-    {
-        entryV4LDecimation = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LDecimation" );
-        i_v4l_decimation = gtk_spin_button_get_value_as_int(entryV4LDecimation);
-        pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":mjpeg:%d", (int)i_v4l_decimation );
-    }
-    /* end MJPEG only */
-
-    if (pos >= VLC_MAX_MRL)
-        v4l_mrl[VLC_MAX_MRL-1]='\0';
-
-    g_print( "%s\n", v4l_mrl );
-}
-
-
 void
 onAddTranscodeToPlaylist               (GtkButton       *button,
                                         gpointer         user_data)
 {
 
 }
+
 
