@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.5 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: subsdec.c,v 1.6 2003/11/15 15:40:19 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -110,7 +110,7 @@ vlc_module_begin();
                  VLC_TRUE );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
 #if defined(HAVE_ICONV)
-    add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
+    add_string( "subsdec-encoding", "UTF-8", NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_encodings, 0, 0 );
 #endif
@@ -186,7 +186,7 @@ static int InitDecoder( decoder_t *p_dec )
     msg_Dbg( p_dec, "No iconv support available" );
 #endif
 
-#if 1
+#if 0
     if( p_demux_data )
         msg_Dbg( p_dec, p_demux_data->psz_header );
 #endif
