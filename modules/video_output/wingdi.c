@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.2 2002/11/22 15:19:47 sam Exp $
+ * $Id: wingdi.c,v 1.3 2002/11/22 20:27:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,7 +34,6 @@
 #include <windows.h>
 
 #define MAX_DIRECTBUFFERS 10
-#define DEFAULT_BPP 8
 
 /*****************************************************************************
  * Local prototypes
@@ -51,7 +50,7 @@ static void SetPalette( vout_thread_t *, u16 *, u16 *, u16 * );
 
 static void EventThread        ( vlc_object_t * );
 static long FAR PASCAL WndProc ( HWND, UINT, WPARAM, LPARAM );
-static void InitOffscreen      ( vout_thread_t * );
+static void InitBuffers        ( vout_thread_t * );
 
 /*****************************************************************************
  * Private structure
@@ -63,6 +62,7 @@ struct vout_sys_t
 
     /* Our video output window */
     HWND window;
+    int  i_depth;
 
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
@@ -143,16 +143,28 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    /* Initialize the output structure - we can use either 8 or 15bpp */
-#if DEFAULT_BPP == 8
-    p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
-    p_vout->output.pf_setpalette = SetPalette;
-#else
-    p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
-    p_vout->output.i_rmask  = 0x7c00;
-    p_vout->output.i_gmask  = 0x03e0;
-    p_vout->output.i_bmask  = 0x001f;
-#endif
+    /* Initialize the output structure */
+    switch( p_vout->p_sys->i_depth )
+    {
+        case 8:
+            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+            p_vout->output.pf_setpalette = SetPalette;
+            break;
+        case 24:
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+            p_vout->output.i_rmask  = 0x00ff0000;
+            p_vout->output.i_gmask  = 0x0000ff00;
+            p_vout->output.i_bmask  = 0x000000ff;
+            break;
+        default:
+        case 16:
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+            p_vout->output.i_rmask  = 0x7c00;
+            p_vout->output.i_gmask  = 0x03e0;
+            p_vout->output.i_bmask  = 0x001f;
+            break;
+    }
+
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
@@ -283,6 +295,14 @@ static void EventThread ( vlc_object_t *p_event )
     WNDCLASS   wc;
     MSG        msg;
 
+#ifdef UNDER_CE
+    wchar_t *psz_class = L"VOUT";
+    wchar_t *psz_title = L"Video Output";
+#else
+    char *psz_class = "VOUT";
+    char *psz_title = "Video Output";
+#endif
+
     var_Get( p_event, "p_vout", &val );
     p_vout = (vout_thread_t *)val.p_address;
 
@@ -299,24 +319,28 @@ static void EventThread ( vlc_object_t *p_event )
     wc.hCursor        = 0;
     wc.hbrBackground  = (HBRUSH)GetStockObject( BLACK_BRUSH );
     wc.lpszMenuName   = 0;
-    wc.lpszClassName  = L"VOUT";
+    wc.lpszClassName  = psz_class;
 
     RegisterClass( &wc );
 
     /* Create output window */
     p_vout->p_sys->window =
-             CreateWindow( L"VOUT", L"Video Output",
+             CreateWindow( psz_class, psz_title,
                            WS_VISIBLE | WS_SIZEBOX | WS_CAPTION,
                            CW_USEDEFAULT, CW_USEDEFAULT,
                            p_vout->render.i_width,
                            p_vout->render.i_height + 10,
                            NULL, NULL, instance, (LPVOID)p_vout );
 
+    /* Initialize offscreen buffer */
+    InitBuffers( p_vout );
+
+    /* Tell the video output we're ready to receive data */
+    vlc_thread_ready( p_event );
+
     /* Display our window */
     ShowWindow( p_vout->p_sys->window, SW_SHOWNORMAL );
     UpdateWindow( p_vout->p_sys->window );
-
-    vlc_thread_ready( p_event );
 
     while( !p_event->b_die
              && GetMessage( &msg, p_vout->p_sys->window, 0, 0 ) )
@@ -326,10 +350,39 @@ static void EventThread ( vlc_object_t *p_event )
             break;
         }
 
-        DispatchMessage( &msg );
+        switch( msg.message )
+        {
+        case WM_KEYDOWN:
+            switch( msg.wParam )
+            {
+            case VK_ESCAPE:
+                p_event->p_vlc->b_die = VLC_TRUE;
+                break;
+            }
+            TranslateMessage( &msg );
+            break;
+
+        case WM_CHAR:
+            switch( msg.wParam )
+            {
+            case 'q':
+            case 'Q':
+                p_event->p_vlc->b_die = VLC_TRUE;
+                break;
+            }
+            break;
+
+        default:
+            TranslateMessage( &msg );
+            DispatchMessage( &msg );
+            break;
+        }
     }
 
     DestroyWindow( p_vout->p_sys->window );
+
+    DeleteDC( p_vout->p_sys->off_dc );
+    DeleteObject( p_vout->p_sys->off_bitmap );
 }
 
 /*****************************************************************************
@@ -362,12 +415,9 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
             break;
 
         case WM_CREATE:
-            InitOffscreen( p_vout );
             break;
 
         case WM_DESTROY:
-            DeleteDC( p_vout->p_sys->off_dc );
-            DeleteObject( p_vout->p_sys->off_bitmap );
             PostQuitMessage( 0 );
             break;
 
@@ -379,27 +429,41 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
 }
 
 /*****************************************************************************
- * InitOffscreen: initialize an offscreen bitmap for direct buffer operations.
+ * InitBuffers: initialize an offscreen bitmap for direct buffer operations.
  *****************************************************************************/
-static void InitOffscreen( vout_thread_t *p_vout )
+static void InitBuffers( vout_thread_t *p_vout )
 {
     BITMAPINFOHEADER *p_header = &p_vout->p_sys->bitmapinfo.bmiHeader;
+    int   i_pixels = p_vout->render.i_height * p_vout->render.i_width;
     HDC   window_dc;
 
     window_dc = GetDC( p_vout->p_sys->window );
 
+    /* Get screen properties */
+    p_vout->p_sys->i_depth = GetDeviceCaps( window_dc, PLANES )
+                              * GetDeviceCaps( window_dc, BITSPIXEL );
+    msg_Dbg( p_vout, "GDI depth is %i", p_vout->p_sys->i_depth );
+
+    /* Initialize offscreen bitmap */
     p_header->biSize = sizeof( BITMAPINFOHEADER );
     p_header->biPlanes = 1;
     p_header->biCompression = BI_RGB;
-#if DEFAULT_BPP == 8
-    p_header->biBitCount = 8;
-    p_header->biSizeImage =
-                    p_vout->render.i_height * p_vout->render.i_width;
-#else
-    p_header->biBitCount = 16;
-    p_header->biSizeImage =
-                    p_vout->render.i_height * p_vout->render.i_width * 2;
-#endif
+    switch( p_vout->p_sys->i_depth )
+    {
+        case 8:
+            p_header->biBitCount = 8;
+            p_header->biSizeImage = i_pixels;
+            break;
+        case 24:
+            p_header->biBitCount = 32;
+            p_header->biSizeImage = i_pixels * 4;
+            break;
+        case 16:
+        default:
+            p_header->biBitCount = 16;
+            p_header->biSizeImage = i_pixels * 2;
+            break;
+    }
     p_header->biWidth = p_vout->render.i_width;
     p_header->biHeight = p_vout->render.i_height;
     p_header->biClrImportant = 0;
