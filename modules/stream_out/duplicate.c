@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.5 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: duplicate.c,v 1.6 2003/12/14 17:56:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -153,7 +153,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                             p_sys->pp_streams[i_stream], p_fmt );
 
         /* Append failed attempts as well to keep track of which pp_id
-	 * belong to which duplicated stream */
+	 * belongs to which duplicated stream */
         TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
         if( id_new ) i_valid_streams++;
     }
@@ -190,33 +190,43 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  sout_buffer_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_t     *p_dup_stream;
     int               i_stream;
 
-    for( i_stream = 0; i_stream < p_sys->i_nb_streams - 1; i_stream++ )
+    /* Loop through the linked list of buffers */
+    while( p_buffer )
     {
-        sout_buffer_t *p_dup;
+        sout_buffer_t *p_next = p_buffer->p_next;
+        block_t *p_block;
 
-        if( id->pp_ids[i_stream] )
+        p_buffer->p_next = NULL;
+
+        for( i_stream = 0; i_stream < p_sys->i_nb_streams - 1; i_stream++ )
         {
-            p_dup = sout_BufferDuplicate( p_stream->p_sout, p_buffer );
+            sout_buffer_t *p_dup;
+            p_dup_stream = p_sys->pp_streams[i_stream];
 
-            p_sys->pp_streams[i_stream]->pf_send( p_sys->pp_streams[i_stream],
-                                                  id->pp_ids[i_stream],
-                                                  p_dup );
+            if( id->pp_ids[i_stream] )
+            {
+                p_dup = sout_BufferDuplicate( p_stream->p_sout, p_buffer );
+
+                p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
+                                       p_dup );
+            }
         }
-    }
 
-    i_stream = p_sys->i_nb_streams - 1;
-    if( id->pp_ids[i_stream] )
-    {
-        p_sys->pp_streams[i_stream]->pf_send( p_sys->pp_streams[i_stream],
-                                              id->pp_ids[i_stream],
-                                              p_buffer);
-    }
-    else
-    {
-        sout_BufferDelete( p_stream->p_sout, p_buffer );
-    }
+        if( i_stream < p_sys->i_nb_streams && id->pp_ids[i_stream] )
+        {
+            p_dup_stream = p_sys->pp_streams[i_stream];
+            p_dup_stream->pf_send( p_dup_stream, id->pp_ids[i_stream],
+                                   p_buffer );
+        }
+        else
+        {
+            sout_BufferDelete( p_stream->p_sout, p_buffer );
+        }
 
+        p_buffer = p_next;
+    }
     return VLC_SUCCESS;
 }
