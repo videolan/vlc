@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.188 2004/03/03 13:24:31 fenrir Exp $
+dnl $Id: configure.ac,v 1.189 2004/03/03 14:22:47 fenrir Exp $
 
-AC_INIT(vlc,0.7.1)
+AC_INIT(vlc,0.7.2-cvs)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Bond"
@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.7.1)
+AM_INIT_AUTOMAKE(vlc,0.7.2-cvs)
 AM_CONFIG_HEADER(config.h)
 
 dnl

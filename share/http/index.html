@@ -113,7 +113,8 @@
                   <vlc id="if" param1="pl.current" />
                   <b>
                   <vlc id="end" />
-                  <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>
+                  <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />">
+                  <vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.uri" /><vlc id="if" param1="pl.uri value pl.name value strcmp"/>  (<vlc id="value" param1="pl.name" />)<vlc id="end"/></a>
                   <vlc id="if" param1="pl.current" />
                   </b>
                   <vlc id="end" />

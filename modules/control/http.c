@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.54 2004/03/03 13:26:50 fenrir Exp $
+ * $Id: http.c,v 1.55 2004/03/03 14:22:47 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -842,6 +842,8 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
         mvar_AppendNewVar( itm, "index", value );
 
         mvar_AppendNewVar( itm, "name", p_pl->pp_items[i]->psz_name );
+
+        mvar_AppendNewVar( itm, "uri", p_pl->pp_items[i]->psz_uri );
 
         sprintf( value, "%d", p_pl->pp_items[i]->i_group );
         mvar_AppendNewVar( itm, "group", value );
