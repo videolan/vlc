@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.19 2002/12/18 14:17:11 sam Exp $
+ * $Id: variables.c,v 1.20 2003/03/09 19:25:08 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -386,8 +386,9 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
         case VLC_VAR_GETLIST:
             p_val->p_list = malloc( sizeof(vlc_list_t) );
-            p_val->p_list->p_values = malloc( p_var->choices.i_count
-                                              * sizeof(vlc_value_t) );
+            if( p_var->choices.i_count )
+                p_val->p_list->p_values = malloc( p_var->choices.i_count
+                                                  * sizeof(vlc_value_t) );
             p_val->p_list->i_count = p_var->choices.i_count;
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
             {
@@ -400,8 +401,9 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             {
                 p_var->pf_free( &p_val->p_list->p_values[i] );
             }
-            free( p_val->p_list->p_values );
-	    free( p_val->p_list );
+            if( p_val->p_list->i_count )
+                free( p_val->p_list->p_values );
+            free( p_val->p_list );
             break;
 
         default:
@@ -611,7 +613,7 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
     for( i_entry = p_var->i_entries ; i_entry-- ; )
     {
         if( p_var->p_entries[i_entry].pf_callback == pf_callback
-            || p_var->p_entries[i_entry].p_data == p_data )
+            && p_var->p_entries[i_entry].p_data == p_data )
         {
             break;
         }

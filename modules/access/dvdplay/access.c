@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.11 2003/01/29 11:17:44 gbazin Exp $
+ * $Id: access.c,v 1.12 2003/03/09 19:25:09 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -290,9 +290,13 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
 
         dvdNewArea( p_input, p_area );
 
+        /* Reinit ES */
+        dvdNewPGC( p_input );
+
         dvdplay_start( p_dvd->vmg, p_area->i_id );
 
         p_area->i_part = i_chapter;
+
     } /* i_title >= 0 */
     else
     {
@@ -417,6 +421,13 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
         /* update current chapter */
         p_input->stream.p_selected_area->i_part =
             dvdplay_chapter_cur( p_dvd->vmg );
+
+        p_input->stream.p_selected_area->i_tell =
+            LB2OFF( dvdplay_position( p_dvd->vmg ) ) -
+            p_input->stream.p_selected_area->i_start;
+
+        /* warn interface that something has changed */
+        p_input->stream.b_changed = 1;
         break;
     case NEW_CELL:
         p_dvd->b_end_of_cell = 0;
@@ -511,8 +522,6 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
 
     dvdplay_SetProgram( p_input,
                         p_input->stream.pp_programs[i_angle-1] );
-
-//    dvdNewPGC( p_input );
 
     /* No PSM to read in DVD mode, we already have all information */
     p_input->stream.p_selected_program->b_is_ok = 1;

@@ -813,8 +813,14 @@ PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm a52sys"
 PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp"
-PLUGINS="${PLUGINS} sap screensaver"
-PLUGINS="${PLUGINS} httpd"
+PLUGINS="${PLUGINS} sap httpd"
+
+dnl
+dnl Some plugins aren't useful on some platforms
+dnl
+if test "x${SYS}" != "xmingw32"
+    PLUGINS="${PLUGINS} screensaver"
+fi
 
 dnl
 dnl  Accelerated modules

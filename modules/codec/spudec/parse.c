@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.10 2003/01/30 19:14:17 gbazin Exp $
+ * $Id: parse.c,v 1.11 2003/03/09 19:25:08 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -166,8 +166,6 @@ void E_(ParsePacket)( spudec_thread_t *p_spudec )
 
             vlc_mutex_lock( p_mutex );
             UpdateSPU( p_spu, VLC_OBJECT(p_spu->p_sys->p_input) );
-            var_DelCallback( p_spu->p_sys->p_input,
-                             "highlight", CropCallback, p_spu );
             var_AddCallback( p_spu->p_sys->p_input,
                              "highlight", CropCallback, p_spu );
             vlc_mutex_unlock( p_mutex );
