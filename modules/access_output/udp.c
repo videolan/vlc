@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.3 2003/02/16 14:03:56 fenrir Exp $
+ * $Id: udp.c,v 1.4 2003/02/16 14:51:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -63,8 +63,8 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int     Write( sout_instance_t *, sout_buffer_t * );
-static int     Seek( sout_instance_t *, off_t  );
+static int     Write( sout_access_out_t *, sout_buffer_t * );
+static int     Seek ( sout_access_out_t *, off_t  );
 
 static void    ThreadWrite( vlc_object_t *p_this );
 
@@ -91,7 +91,7 @@ typedef struct sout_access_thread_s
 
 } sout_access_thread_t;
 
-typedef struct sout_access_data_s
+struct sout_access_out_sys_t
 {
     int                 b_rtpts;  // 1 if add rtp/ts header
     uint16_t            i_sequence_number;
@@ -103,15 +103,15 @@ typedef struct sout_access_data_s
 
     sout_access_thread_t *p_thread;
 
-} sout_access_data_t;
+};
 
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_access_data_t  *p_access;
+    sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
+    sout_access_out_sys_t   *p_sys;
 
     char                *psz_parser;
     char                *psz_dst_addr;
@@ -120,31 +120,33 @@ static int Open( vlc_object_t *p_this )
     module_t            *p_network;
     network_socket_t    socket_desc;
 
-    if( !( p_access = malloc( sizeof( sout_access_data_t ) ) ) )
+    if( !( p_sys = p_access->p_sys =
+                malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
-        msg_Err( p_sout, "Not enough memory" );
-        return( -1 );
+        msg_Err( p_access, "Not enough memory" );
+        return( VLC_EGENERIC );
     }
 
-    if( p_sout->psz_access != NULL &&
-        !strcmp( p_sout->psz_access, "rtp" ) )
+    if( p_access->psz_access != NULL &&
+        !strcmp( p_access->psz_access, "rtp" ) )
     {
-         if( p_sout->psz_mux != NULL && *p_sout->psz_mux &&
-             strcmp( p_sout->psz_mux, "ts" ) &&
-             strcmp( p_sout->psz_mux, "ts_dvbpsi" ))
+         if( p_access->p_sout->psz_mux != NULL && 
+             *p_access->p_sout->psz_mux &&
+             strcmp( p_access->p_sout->psz_mux, "ts" ) &&
+             strcmp( p_access->p_sout->psz_mux, "ts_dvbpsi" ) )
         {
-            msg_Err( p_sout, "rtp ouput work only with ts payload" );
-            free( p_access );
-            return( -1 );
+            msg_Err( p_access, "rtp ouput work only with ts payload" );
+            free( p_sys );
+            return( VLC_EGENERIC );
         }
-        p_access->b_rtpts = 1;
+        p_sys->b_rtpts = 1;
     }
     else
     {
-        p_access->b_rtpts = 0;
+        p_sys->b_rtpts = 0;
     }
 
-    psz_parser = strdup( p_sout->psz_name );
+    psz_parser = strdup( p_access->psz_name );
 
     psz_dst_addr = psz_parser;
     i_dst_port = 0;
@@ -164,54 +166,53 @@ static int Open( vlc_object_t *p_this )
         i_dst_port = DEFAULT_PORT;
     }
 
-    p_access->p_thread = vlc_object_create( p_sout,
-                                            sizeof( sout_access_thread_t ) );
-    if( !p_access->p_thread )
+    p_sys->p_thread =
+        vlc_object_create( p_access,
+                           sizeof( sout_access_thread_t ) );
+    if( !p_sys->p_thread )
     {
-        msg_Err( p_sout, "out of memory" );
-        return( -1 );
+        msg_Err( p_access, "out of memory" );
+        return( VLC_EGENERIC );
     }
 
-    p_access->p_thread->p_sout = p_sout;
-    p_access->p_thread->b_die  = 0;
-    p_access->p_thread->b_error= 0;
-    p_access->p_thread->p_fifo = sout_FifoCreate( p_sout );
+    p_sys->p_thread->p_sout = p_access->p_sout;
+    p_sys->p_thread->b_die  = 0;
+    p_sys->p_thread->b_error= 0;
+    p_sys->p_thread->p_fifo = sout_FifoCreate( p_access->p_sout );
 
     socket_desc.i_type = NETWORK_UDP;
     socket_desc.psz_server_addr = psz_dst_addr;
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
-    p_access->p_thread->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_access->p_thread, 
+    p_sys->p_thread->p_private = (void*)&socket_desc;
+    if( !( p_network = module_Need( p_sys->p_thread,
                                     "network", "" ) ) )
     {
-        msg_Err( p_sout, "failed to open a connection (udp)" );
-        return( -1 );
+        msg_Err( p_access, "failed to open a connection (udp)" );
+        return( VLC_EGENERIC );
     }
-    module_Unneed( p_access->p_thread, p_network );
+    module_Unneed( p_sys->p_thread, p_network );
 
-    p_access->p_thread->i_handle = socket_desc.i_handle;
-    p_access->i_mtu     = socket_desc.i_mtu;
+    p_sys->p_thread->i_handle = socket_desc.i_handle;
+    p_sys->i_mtu     = socket_desc.i_mtu;
 
-    if( vlc_thread_create( p_access->p_thread, "sout write thread",
+    if( vlc_thread_create( p_sys->p_thread, "sout write thread",
                            ThreadWrite, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
-        msg_Err( p_sout, "cannot spawn sout access thread" );
-        vlc_object_destroy( p_access->p_thread );
-        return( -1 );
+        msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
+        vlc_object_destroy( p_sys->p_thread );
+        return( VLC_EGENERIC );
     }
 
-    p_access->p_buffer  = NULL;
-    p_access->i_sequence_number = 12;   // FIXME should be random, used by rtp
-    p_access->i_ssrc            = 4212; // FIXME   "    "    "       "  "   "
+    p_sys->p_buffer          = NULL;
+    p_sys->i_sequence_number = 12;   // FIXME should be random, used by rtp
+    p_sys->i_ssrc            = 4212; // FIXME   "    "    "       "  "   "
 
-    p_sout->i_method        = SOUT_METHOD_NETWORK;
-    p_sout->p_access_data   = (void*)p_access;
-    p_sout->pf_write        = Write;
-    p_sout->pf_seek         = Seek;
+    p_access->pf_write       = Write;
+    p_access->pf_seek        = Seek;
 
-    msg_Info( p_sout,
+    msg_Info( p_access,
               "Open: addr:`%s' port:`%d'",
               psz_dst_addr, i_dst_port );
 
@@ -224,55 +225,57 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
+    sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
+    sout_access_out_sys_t   *p_sys = p_access->p_sys;
     int                 i;
 
-    p_access->p_thread->b_die = 1;
+    p_sys->p_thread->b_die = 1;
     for( i = 0; i < 10; i++ )
     {
         sout_buffer_t       *p_dummy;
 
-        p_dummy = sout_BufferNew( p_sout, p_access->i_mtu );
+        p_dummy = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
         p_dummy->i_dts = 0;
         p_dummy->i_pts = 0;
         p_dummy->i_length = 0;
-        sout_FifoPut( p_access->p_thread->p_fifo, p_dummy );
+        sout_FifoPut( p_sys->p_thread->p_fifo, p_dummy );
     }
-    vlc_thread_join( p_access->p_thread );
+    vlc_thread_join( p_sys->p_thread );
 
-    sout_FifoDestroy( p_sout, p_access->p_thread->p_fifo );
+    sout_FifoDestroy( p_access->p_sout, p_sys->p_thread->p_fifo );
 
-    if( p_access->p_buffer )
+    if( p_sys->p_buffer )
     {
-        sout_BufferDelete( p_sout, p_access->p_buffer );
+        sout_BufferDelete( p_access->p_sout, p_sys->p_buffer );
     }
 
 #if defined( UNDER_CE )
-    CloseHandle( (HANDLE)p_access->p_thread->i_handle );
+    CloseHandle( (HANDLE)p_sys->p_thread->i_handle );
 #elif defined( WIN32 )
-    closesocket( p_access->p_thread->i_handle );
+    closesocket( p_sys->p_thread->i_handle );
 #else
-    close( p_access->p_thread->i_handle );
+    close( p_sys->p_thread->i_handle );
 #endif
-    msg_Info( p_sout, "Close" );
+
+    free( p_sys );
+    msg_Info( p_access, "Close" );
 }
 
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
-    sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
+    sout_access_out_sys_t   *p_sys = p_access->p_sys;
     unsigned int i_write;
 
     while( p_buffer )
     {
         sout_buffer_t *p_next;
-        if( p_buffer->i_size > p_access->i_mtu )
+        if( p_buffer->i_size > p_sys->i_mtu )
         {
-            msg_Warn( p_sout, "arggggggggggggg packet size > mtu" );
-            i_write = p_access->i_mtu;
+            msg_Warn( p_access, "arggggggggggggg packet size > mtu" );
+            i_write = p_sys->i_mtu;
         }
         else
         {
@@ -280,70 +283,70 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
         }
 
         /* if we have enough data, enque the buffer */
-        if( p_access->p_buffer &&
-            p_access->p_buffer->i_size + i_write > p_access->i_mtu )
+        if( p_sys->p_buffer &&
+            p_sys->p_buffer->i_size + i_write > p_sys->i_mtu )
         {
-            sout_FifoPut( p_access->p_thread->p_fifo, p_access->p_buffer );
-            p_access->p_buffer = NULL;
+            sout_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
+            p_sys->p_buffer = NULL;
         }
 
-        if( !p_access->p_buffer )
+        if( !p_sys->p_buffer )
         {
-            p_access->p_buffer = sout_BufferNew( p_sout, p_access->i_mtu );
-            p_access->p_buffer->i_dts = p_buffer->i_dts;
-            p_access->p_buffer->i_size = 0;
-            if( p_access->b_rtpts )
+            p_sys->p_buffer = sout_BufferNew( p_access->p_sout, p_sys->i_mtu );
+            p_sys->p_buffer->i_dts = p_buffer->i_dts;
+            p_sys->p_buffer->i_size = 0;
+            if( p_sys->b_rtpts )
             {
-                mtime_t i_timestamp = p_access->p_buffer->i_dts * 9 / 100;
+                mtime_t i_timestamp = p_sys->p_buffer->i_dts * 9 / 100;
 
                 /* add rtp/ts header */
-                p_access->p_buffer->p_buffer[0] = 0x80;
-                p_access->p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
-                p_access->p_buffer->p_buffer[2] =
-                    ( p_access->i_sequence_number >> 8 )&0xff;
-                p_access->p_buffer->p_buffer[3] =
-                    p_access->i_sequence_number&0xff;
+                p_sys->p_buffer->p_buffer[0] = 0x80;
+                p_sys->p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
+                p_sys->p_buffer->p_buffer[2] =
+                    ( p_sys->i_sequence_number >> 8 )&0xff;
+                p_sys->p_buffer->p_buffer[3] =
+                    p_sys->i_sequence_number&0xff;
 
-                p_access->p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
-                p_access->p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
-                p_access->p_buffer->p_buffer[6] = ( i_timestamp >>  8 )&0xff;
-                p_access->p_buffer->p_buffer[7] = i_timestamp&0xff;
+                p_sys->p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
+                p_sys->p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
+                p_sys->p_buffer->p_buffer[6] = ( i_timestamp >>  8 )&0xff;
+                p_sys->p_buffer->p_buffer[7] = i_timestamp&0xff;
 
-                p_access->p_buffer->p_buffer[ 8] =
-                    ( p_access->i_ssrc >> 24 )&0xff;
-                p_access->p_buffer->p_buffer[ 9] =
-                    ( p_access->i_ssrc >> 16 )&0xff;
-                p_access->p_buffer->p_buffer[10] =
-                    ( p_access->i_ssrc >>  8 )&0xff;
-                p_access->p_buffer->p_buffer[11] = p_access->i_ssrc&0xff;
+                p_sys->p_buffer->p_buffer[ 8] =
+                    ( p_sys->i_ssrc >> 24 )&0xff;
+                p_sys->p_buffer->p_buffer[ 9] =
+                    ( p_sys->i_ssrc >> 16 )&0xff;
+                p_sys->p_buffer->p_buffer[10] =
+                    ( p_sys->i_ssrc >>  8 )&0xff;
+                p_sys->p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
 
-                p_access->p_buffer->i_size = 12;
+                p_sys->p_buffer->i_size = 12;
             }
         }
 
 
         if( p_buffer->i_size > 0 )
         {
-            memcpy( p_access->p_buffer->p_buffer + p_access->p_buffer->i_size,
+            memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_size,
                     p_buffer->p_buffer,
                     i_write );
-            p_access->p_buffer->i_size += i_write;
+            p_sys->p_buffer->i_size += i_write;
         }
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_sout, p_buffer );
+        sout_BufferDelete( p_access->p_sout, p_buffer );
         p_buffer = p_next;
     }
 
-    return( p_access->p_thread->b_error ? -1 : 0 );
+    return( p_sys->p_thread->b_error ? -1 : 0 );
 }
 
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( sout_instance_t *p_sout, off_t i_pos )
+static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
 
-    msg_Err( p_sout, "udp sout access cannot seek" );
+    msg_Err( p_access, "udp sout access cannot seek" );
     return( -1 );
 }
 
