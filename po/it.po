@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-28 20:57+0100\n"
+"POT-Creation-Date: 2003-01-29 16:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Vella Bruno <allevb@tin.it>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -1075,7 +1075,7 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/audio_output/alsa.c:90 modules/audio_output/oss.c:101
+#: modules/audio_output/alsa.c:90
 msgid "Try to use S/PDIF output"
 msgstr ""
 
@@ -1133,7 +1133,7 @@ msgstr ""
 msgid "2 Front 2 Rear"
 msgstr ""
 
-#: modules/audio_output/arts.c:67
+#: modules/audio_output/arts.c:66
 msgid "aRts audio module"
 msgstr ""
 
@@ -1141,7 +1141,7 @@ msgstr ""
 msgid "DirectX audio module"
 msgstr ""
 
-#: modules/audio_output/esd.c:66
+#: modules/audio_output/esd.c:64
 msgid "EsounD audio module"
 msgstr ""
 
@@ -1182,7 +1182,7 @@ msgstr ""
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/audio_output/oss.c:95
-msgid "Try to work around buggy OSS drivers"
+msgid "try to work around buggy OSS drivers"
 msgstr ""
 
 #: modules/audio_output/oss.c:97
@@ -1190,6 +1190,10 @@ msgid ""
 "Some buggy OSS drivers just don't like when their internal buffers are "
 "completely filled (the sound gets heavily hashed). If you have one of these "
 "drivers, then you need to enable this option."
+msgstr ""
+
+#: modules/audio_output/oss.c:101
+msgid "try to use S/PDIF output"
 msgstr ""
 
 #: modules/audio_output/oss.c:108
@@ -1380,7 +1384,7 @@ msgstr ""
 #. * Module descriptor.
 #. ****************************************************************************
 #: modules/codec/spudec/spudec.c:47
-msgid "Font used by the text subtitler"
+msgid "font used by the text subtitler"
 msgstr ""
 
 #: modules/codec/spudec/spudec.c:49
@@ -1504,7 +1508,7 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:392
 #: modules/gui/macosx/open.m:428 modules/gui/macosx/open.m:589
-#: modules/gui/macosx/open.m:851 modules/gui/macosx/controls.m:584
+#: modules/gui/macosx/open.m:851 modules/gui/macosx/controls.m:531
 msgid "Open"
 msgstr "Apri"
 
@@ -1531,8 +1535,8 @@ msgstr "Riavvolgi sorgente"
 
 #: modules/gui/familiar/interface.c:131 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:965 modules/gui/gtk/gtk_interface.c:696
-#: modules/gui/gtk/gtk_interface.c:1132 modules/gui/macosx/intf.m:679
-#: modules/gui/macosx/intf.m:680 modules/gui/macosx/intf.m:681
+#: modules/gui/gtk/gtk_interface.c:1132 modules/gui/macosx/intf.m:670
+#: modules/gui/macosx/intf.m:671 modules/gui/macosx/intf.m:672
 #: modules/gui/win32/strings.cpp:103
 msgid "Pause"
 msgstr "Pausa"
@@ -1545,8 +1549,8 @@ msgstr "Pausa sorgente"
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:583
 #: modules/gui/gtk/gnome_interface.c:958 modules/gui/gtk/gtk_interface.c:685
 #: modules/gui/macosx/intf.m:197 modules/gui/macosx/intf.m:236
-#: modules/gui/macosx/intf.m:277 modules/gui/macosx/intf.m:686
-#: modules/gui/macosx/intf.m:687 modules/gui/macosx/intf.m:688
+#: modules/gui/macosx/intf.m:277 modules/gui/macosx/intf.m:677
+#: modules/gui/macosx/intf.m:678 modules/gui/macosx/intf.m:679
 #: modules/gui/macosx/playlist.m:89 modules/gui/win32/strings.cpp:101
 #: modules/gui/win32/strings.cpp:205
 msgid "Play"
@@ -1560,7 +1564,7 @@ msgstr "Riproduci sorgente"
 #: modules/gui/gtk/gnome_interface.c:972 modules/gui/gtk/gtk_interface.c:663
 #: modules/gui/gtk/gtk_interface.c:1140 modules/gui/macosx/intf.m:198
 #: modules/gui/macosx/intf.m:237 modules/gui/macosx/intf.m:278
-#: modules/gui/macosx/controls.m:686 modules/gui/win32/strings.cpp:105
+#: modules/gui/macosx/controls.m:639 modules/gui/win32/strings.cpp:105
 msgid "Stop"
 msgstr "Interrompi"
 
@@ -1887,7 +1891,7 @@ msgstr "Schermo"
 #: modules/gui/gtk/gnome_interface.c:188
 #: modules/gui/gtk/gnome_interface.c:1022 modules/gui/gtk/gtk_interface.c:547
 #: modules/gui/gtk/gtk_interface.c:1208 modules/gui/macosx/intf.m:259
-#: modules/gui/macosx/controls.m:725
+#: modules/gui/macosx/controls.m:682
 msgid "Deinterlace"
 msgstr "Deinterlaccia"
 
@@ -2010,7 +2014,7 @@ msgstr "File Precedente"
 #: modules/gui/gtk/gnome_interface.c:1066 modules/gui/gtk/gtk_interface.c:756
 #: modules/gui/gtk/gtk_interface.c:839 modules/gui/gtk/gtk_interface.c:883
 #: modules/gui/gtk/gtk_interface.c:1266 modules/gui/macosx/intf.m:201
-#: modules/gui/macosx/intf.m:241 modules/gui/macosx/controls.m:691
+#: modules/gui/macosx/intf.m:241 modules/gui/macosx/controls.m:647
 #: modules/gui/win32/strings.cpp:115 modules/gui/win32/strings.cpp:135
 #: modules/gui/win32/strings.cpp:139
 msgid "Next"
@@ -2096,12 +2100,12 @@ msgid "Playlist..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1338 modules/gui/gtk/gtk_interface.c:1554
-#: modules/gui/kde/kde.cpp:116 modules/gui/win32/strings.cpp:9
+#: modules/gui/kde/kde.cpp:111 modules/gui/win32/strings.cpp:9
 msgid "(C) 1996-2003 - the VideoLAN Team"
 msgstr "© 1996-2003, il Team VideoLAN"
 
 #: modules/gui/gtk/gnome_interface.c:1340 modules/gui/gtk/gtk_interface.c:1580
-#: modules/gui/kde/kde.cpp:113 modules/gui/win32/strings.cpp:10
+#: modules/gui/kde/kde.cpp:108 modules/gui/win32/strings.cpp:10
 msgid ""
 "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG "
 "and MPEG2 files from a file or from a network source."
@@ -2622,11 +2626,11 @@ msgstr "Info Sorgente..."
 msgid "Off"
 msgstr "Spento"
 
-#: modules/gui/kde/kde.cpp:59
-msgid "Path to ui.rc file"
+#: modules/gui/kde/kde.cpp:55
+msgid "path to ui.rc file"
 msgstr ""
 
-#: modules/gui/kde/kde.cpp:60
+#: modules/gui/kde/kde.cpp:56
 msgid "KDE interface module"
 msgstr ""
 
@@ -2640,7 +2644,7 @@ msgid "VLC - Controller"
 msgstr "Controlli"
 
 #: modules/gui/macosx/intf.m:195 modules/gui/macosx/intf.m:240
-#: modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/controls.m:646
 #, fuzzy
 msgid "Previous"
 msgstr "File Precedente"
@@ -2713,7 +2717,7 @@ msgid "Open Recent"
 msgstr "Apri Recenti"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:226 modules/gui/macosx/intf.m:1252
+#: modules/gui/macosx/intf.m:226 modules/gui/macosx/intf.m:1243
 msgid "Clear Menu"
 msgstr "Cancella Menu"
 
@@ -2745,15 +2749,15 @@ msgstr "Seleziona Tutto"
 msgid "Controls"
 msgstr "Controlli"
 
-#: modules/gui/macosx/intf.m:238 modules/gui/macosx/controls.m:670
+#: modules/gui/macosx/intf.m:238 modules/gui/macosx/controls.m:625
 msgid "Faster"
 msgstr "Veloce"
 
-#: modules/gui/macosx/intf.m:239 modules/gui/macosx/controls.m:671
+#: modules/gui/macosx/intf.m:239 modules/gui/macosx/controls.m:626
 msgid "Slower"
 msgstr "Lento"
 
-#: modules/gui/macosx/intf.m:242
+#: modules/gui/macosx/intf.m:242 modules/gui/macosx/controls.m:658
 msgid "Loop"
 msgstr "Ripeti"
 
@@ -2761,7 +2765,7 @@ msgstr "Ripeti"
 msgid "Language"
 msgstr "Lingua"
 
-#: modules/gui/macosx/intf.m:257 modules/gui/macosx/controls.m:708
+#: modules/gui/macosx/intf.m:257 modules/gui/macosx/controls.m:665
 msgid "Fullscreen"
 msgstr "A schermo pieno"
 
@@ -2834,7 +2838,7 @@ msgstr "Apri la finestra messaggi"
 msgid "Dismiss"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:962
+#: modules/gui/macosx/intf.m:953
 msgid "Load from file.."
 msgstr ""
 
@@ -2882,7 +2886,7 @@ msgstr ""
 msgid "Save File"
 msgstr "Seleziona File"
 
-#: modules/gui/macosx/controls.m:583
+#: modules/gui/macosx/controls.m:530
 #, fuzzy
 msgid "Open subtitlefile"
 msgstr "Seleziona canale sottotitoli"
@@ -3484,8 +3488,9 @@ msgstr ""
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/video_filter/clone.c:53
-msgid "Number of clones"
-msgstr ""
+#, fuzzy
+msgid "number of clones"
+msgstr "numero di righe"
 
 #: modules/video_filter/clone.c:54
 msgid "Select the number of video windows in which to clone the video"
@@ -3556,7 +3561,7 @@ msgstr ""
 #. * Module descriptor
 #. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
-msgid "Blur factor"
+msgid "blur factor"
 msgstr ""
 
 #: modules/video_filter/motionblur.c:55
