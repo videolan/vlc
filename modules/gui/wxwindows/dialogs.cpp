@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.5 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.6 2003/07/25 22:50:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -329,6 +329,5 @@ void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
 
 void DialogsProvider::OnExitThread( wxCommandEvent& WXUNUSED(event) )
 {
-    delete this;
     wxTheApp->ExitMainLoop();
 }

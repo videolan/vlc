@@ -2,7 +2,7 @@
  * x11_timer.cpp: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.cpp,v 1.4 2003/06/09 12:33:17 asmax Exp $
+ * $Id: x11_timer.cpp,v 1.5 2003/07/25 22:50:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -75,7 +75,6 @@ bool X11Timer::Execute()
 
 X11TimerManager *X11TimerManager::_instance = NULL;
 
-
 X11TimerManager::X11TimerManager( intf_thread_t *p_intf )
 {
     _p_intf = p_intf;
@@ -97,6 +96,10 @@ X11TimerManager::~X11TimerManager()
     vlc_mutex_destroy( &_lock );
 }
 
+void X11TimerManager::Initialize()
+{
+    _instance = NULL;
+}
 
 // Return the instance of X11TimerManager (design pattern singleton)
 X11TimerManager *X11TimerManager::Instance( intf_thread_t *p_intf )

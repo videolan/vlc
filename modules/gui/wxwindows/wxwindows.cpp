@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.26 2003/07/25 13:24:29 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.27 2003/07/25 22:50:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -162,8 +162,6 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
     if( p_intf->pf_show_dialog )
     {
         /* We must destroy the dialogs thread */
@@ -171,6 +169,8 @@ static void Close( vlc_object_t *p_this )
         p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
         vlc_thread_join( p_intf );
     }
+
+    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -229,6 +229,12 @@ static void Init( intf_thread_t *p_intf )
 #else
     wxEntry( i_args, p_args );
 #endif
+
+    if( p_intf->pf_show_dialog )
+    {
+        /* We need to manually clean up the dialogs class */
+        if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
+    }
 }
 
 /* following functions are local */

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.23 2003/06/22 12:46:49 asmax Exp $
+ * $Id: x11_run.cpp,v 1.24 2003/07/25 22:50:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -168,6 +168,7 @@ void OSRun( intf_thread_t *p_intf )
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
 
+    X11TimerManager::Initialize();
 
     // Timer for SkinManage
     X11Timer *refreshTimer = new X11Timer( p_intf, 100000, RefreshCallback,
