@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.23 2004/01/31 18:02:32 alexis Exp $
+ * $Id: ipv4.c,v 1.24 2004/02/01 14:43:08 alexis Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -73,6 +73,7 @@
 #ifndef IN_MULTICAST
 #   define IN_MULTICAST(a) IN_CLASSD(a)
 #endif
+
 
 /*****************************************************************************
  * Local prototypes
@@ -152,6 +153,18 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_handle, i_opt;
     socklen_t i_opt_size;
     struct sockaddr_in sock;
+
+    /* If IP_ADD_SOURCE_MEMBERSHIP is not defined in the headers
+       (because it's not in glibc for example), we have to define the
+       headers required for IGMPv3 here */
+#ifndef IP_ADD_SOURCE_MEMBERSHIP
+    #define IP_ADD_SOURCE_MEMBERSHIP  39
+    struct ip_mreq_source {
+        struct in_addr  imr_multiaddr;
+        struct in_addr  imr_interface;
+        struct in_addr  imr_sourceaddr;
+     };
+#endif
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
@@ -282,10 +295,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
     }
 
-#if defined( WIN32 )
-/* Only Win32 has the support for IP_ADD_SOURCE_MEMBERSHIP
-   with the headers that are included */
-
+#if !defined( UNDER_CE ) && !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
@@ -316,13 +326,16 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             msg_Dbg( p_this, "IP_ADD_SOURCE_MEMBERSHIP multicast request" );
             /* Join Multicast group with source filter */
             if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
-                         (char*)&imr, sizeof(struct ip_mreq_source) ) == -1 )
+                         (char*)&imr,
+                         sizeof(struct ip_mreq_source) ) == -1 )
             {
 #ifdef HAVE_ERRNO_H
                 msg_Err( p_this, "failed to join IP multicast group (%s)",
                                   strerror(errno) );
+                msg_Err( p_this, "are you sure your OS supports IGMPv3?" );
 #else
                 msg_Err( p_this, "failed to join IP multicast group" );
+                msg_Err( p_this, "are you sure your OS supports IGMPv3?" );
 #endif
                 close( i_handle );
                 return( -1 );
@@ -360,46 +373,6 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                 return( -1 );
             }
          }
-    }
-#endif
-
-#if !defined( UNDER_CE ) && !defined( SYS_BEOS ) && !defined( WIN32 )
-/* This code is for the OSes that have multicast support but
-   don't have IP_ADD_SOURCE_MEMBERSHIP with the headers included */
-
-    /* Join the multicast group if the socket is a multicast address */
-    if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
-    {
-        struct ip_mreq imr;
-
-        /* Determine interface to be used for multicast */
-        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
-        imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
-        if( psz_if_addr != NULL && *psz_if_addr
-            && inet_addr(psz_if_addr) != INADDR_NONE )
-        {
-            imr.imr_interface.s_addr = inet_addr(psz_if_addr);
-        }
-        else
-        {
-            imr.imr_interface.s_addr = INADDR_ANY;
-        }
-        if( psz_if_addr != NULL ) free( psz_if_addr );
-
-        msg_Dbg( p_this, "IP_ADD_MEMBERSHIP multicast request" );
-        /* Join Multicast group */
-        if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                        (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
-        {
-#ifdef HAVE_ERRNO_H
-            msg_Err( p_this, "failed to join IP multicast group (%s)",
-                              strerror(errno) );
-#else
-            msg_Err( p_this, "failed to join IP multicast group" );
-#endif
-            close( i_handle );
-            return( -1 );
-        }
     }
 #endif
 
