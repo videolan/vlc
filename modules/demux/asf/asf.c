@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.2 2002/10/21 09:18:37 fenrir Exp $
+ * $Id: asf.c,v 1.3 2002/10/28 11:49:57 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -189,13 +189,7 @@ static int Activate( vlc_object_t * p_this )
             input_AddES( p_input,
                          p_input->stream.p_selected_program,
                          p_sp->i_stream_number,
-                         p_sp->i_type_specific_data_length );
-        if( p_sp->i_type_specific_data_length > 11 )
-        {
-            memcpy( p_stream->p_es->p_demux_data,
-                    p_sp->p_type_specific_data + 11,
-                    p_sp->i_type_specific_data_length - 11 );
-        }
+                         0 );
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) )
@@ -231,13 +225,24 @@ static int Activate( vlc_object_t * p_this )
                         VLC_FOURCC( 'a','5','2',' ' );
                     break;
                 case( 0x160 ):
+                    p_stream->p_es->i_fourcc = 
+                        VLC_FOURCC( 'w','m','a','1' );
+                    break;
                 case( 0x161 ):
                     p_stream->p_es->i_fourcc = 
-                        VLC_FOURCC( 'w','m','a',' ' );
+                        VLC_FOURCC( 'w','m','a','2' );
                     break;
                 default:
                     p_stream->p_es->i_fourcc = 
                         VLC_FOURCC( 'u','n','d','f' );
+            }
+            if( p_sp->i_type_specific_data_length > 0 )
+            {
+                p_stream->p_es->p_demux_data = 
+                    malloc( p_sp->i_type_specific_data_length );
+                memcpy( p_stream->p_es->p_demux_data,
+                        p_sp->p_type_specific_data,
+                        p_sp->i_type_specific_data_length );
             }
             
         }
@@ -257,6 +262,14 @@ static int Activate( vlc_object_t * p_this )
             {
                 p_stream->p_es->i_fourcc = 
                     VLC_FOURCC( 'u','n','d','f' );
+            }
+            if( p_sp->i_type_specific_data_length > 11 )
+            {
+                p_stream->p_es->p_demux_data =
+                    malloc( p_sp->i_type_specific_data_length - 11);
+                memcpy( p_stream->p_es->p_demux_data,
+                        p_sp->p_type_specific_data + 11,
+                        p_sp->i_type_specific_data_length - 11 );
             }
 
         }
