@@ -212,6 +212,12 @@ SOURCE="..\\`echo ${file} | sed -e 's%/%\\\\%g'`"${M}
 !ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARM) Debug"${M}
 # PROP Output_Dir "ARMDbg\\${subdir}"${M}
 # PROP Intermediate_Dir "ARMDbg\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARMV4) Release"${M}
+# PROP Output_Dir "ARMV4Rel\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMV4Rel\\${subdir}"${M}
+!ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE ARMV4) Debug"${M}
+# PROP Output_Dir "ARMV4Dbg\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMV4Dbg\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "libvlc - Win32 (WCE x86em) Release"${M}
 # PROP Output_Dir "X86EMRel\\${subdir}"${M}
 # PROP Intermediate_Dir "X86EMRel\\${subdir}"${M}
