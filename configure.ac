@@ -1008,12 +1008,7 @@ then
   PLUGINS="${PLUGINS} stream_out_dummy stream_out_standard stream_out_es"
   PLUGINS="${PLUGINS} stream_out_duplicate stream_out_display"
 
-    dnl Ogg/ogm
-    AC_CHECK_HEADERS(ogg/ogg.h, [
-      AC_CHECK_LIB( ogg, ogg_stream_packetin, [
-        PLUGINS="${PLUGINS} mux_ogg"
-        LDFLAGS_mux_ogg="${LDFLAGS_mux_ogg} -logg" ])
-    ],[])
+  dnl Ogg and vorbis are handled in their respective section
 fi
 
 
@@ -1425,7 +1420,9 @@ then
       PLUGINS="${PLUGINS} ogg"
       LDFLAGS_ogg="${LDFLAGS_ogg} -logg"
       AC_CHECK_LIB( ogg, oggpackB_read, [
-        CPPFLAGS_ogg="${CPPFLAGS_ogg} -DHAVE_OGGPACKB"])])
+        CPPFLAGS_ogg="${CPPFLAGS_ogg} -DHAVE_OGGPACKB"])
+      PLUGINS="${PLUGINS} mux_ogg"
+      LDFLAGS_mux_ogg="${LDFLAGS_mux_ogg} -logg"])
    ],[])
 fi
 
@@ -1889,7 +1886,10 @@ then
   AC_CHECK_HEADERS(vorbis/codec.h, [
     PLUGINS="${PLUGINS} vorbis"
     LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis -logg"
-   ],[])
+    if test "${enable_sout}" != "no"; then
+      PLUGINS="${PLUGINS} packetizer_vorbis"
+      LDFLAGS_packetizer_vorbis="${LDFLAGS_packetizer_vorbis} -lvorbis -logg"
+    fi ],[])
 fi
 
 dnl

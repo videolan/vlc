@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.26 2003/06/11 15:53:50 gbazin Exp $
+ * $Id: ogg.c,v 1.27 2003/06/23 23:51:31 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -70,6 +70,7 @@ typedef struct logical_stream_s
     /* info from logical streams */
     double f_rate;
     int i_bitrate;
+    int i_channels;
     int b_reinit;
 
     /* codec specific stuff */
@@ -543,7 +544,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
 
                     /* Cheat and get additionnal info ;) */
                     oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
-                    oggpack_adv( &opb, 96 );
+                    oggpack_adv( &opb, 88 );
+                    p_stream->i_channels = oggpack_read( &opb, 8 );
                     p_stream->f_rate = oggpack_read( &opb, 32 );
                     oggpack_adv( &opb, 32 );
                     p_stream->i_bitrate = oggpack_read( &opb, 32 );
@@ -556,6 +558,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         input_AddInfo( p_cat, _("Codec"), _("Vorbis") );
                         input_AddInfo( p_cat, _("Sample Rate"), "%f",
                                        p_stream->f_rate );
+                        input_AddInfo( p_cat, _("Channels"), "%d",
+                                       p_stream->i_channels );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
                                        p_stream->i_bitrate );
                     }

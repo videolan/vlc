@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.14 2003/05/09 16:01:17 gbazin Exp $
+ * $Id: httpd.c,v 1.15 2003/06/23 23:51:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1612,14 +1612,15 @@ search_file:
 
     p_con->i_state = HTTPD_CONNECTION_SENDING_HEADER;
 
+    p_con->i_buffer_size = 4096;
+    p_con->i_buffer = 0;
+
     /* we send stream header with this one */
     if( p_con->i_http_error == 200 && p_con->p_file->b_stream )
     {
-        p_con->i_buffer_size = 4096 + p_con->p_file->i_header_size;
+        p_con->i_buffer_size += p_con->p_file->i_header_size;
     }
 
-    p_con->i_buffer_size = 4096;
-    p_con->i_buffer = 0;
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
 
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
@@ -1633,7 +1634,8 @@ search_file:
 
     p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
 
-    if( p_con->i_http_error == 200 && p_con->p_file->b_stream && p_con->p_file->i_header_size > 0 )
+    if( p_con->i_http_error == 200 && p_con->p_file->b_stream &&
+        p_con->p_file->i_header_size > 0 )
     {
         /* add stream header */
         memcpy( &p_con->p_buffer[p_con->i_buffer_size],
