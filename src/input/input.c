@@ -604,8 +604,21 @@ static int RunThread( input_thread_t *p_input )
             }
             if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) )
             {
+                vlc_value_t old_val;
+                var_Get( p_input, "length", &old_val );
                 val.i_time = i_length;
                 var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+                if( old_val.i_time != val.i_time )
+                {
+                    char psz_buffer[MSTRTIME_MAX_SIZE];
+
+                    vlc_mutex_lock( &p_input->p_item->lock );
+                    p_input->p_item->i_duration = i_length;
+                    vlc_mutex_unlock( &p_input->p_item->lock );
+
+                    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
+                       msecstotimestr( psz_buffer, i_length / 1000 ) );
+                }
             }
 
             /* Check stop-time */
