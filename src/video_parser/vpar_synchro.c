@@ -183,14 +183,31 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
+    mtime_t i_delay =
+        p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_pts - mdate();
+    
+    if ( i_coding_type == B_CODING_TYPE )
+        return (0);
 
-    if( p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_decode_date + ((p_vpar->synchro.i_fifo_stop - p_vpar->synchro.i_fifo_start) & 0xf) * p_vpar->synchro.i_mean_decode_time > mdate() )
-    {
-        //fprintf( stderr, "chooser : we are à la bourre !\n");
-        return( i_coding_type == I_CODING_TYPE );
+    if( i_delay > 300000 )
+    {	    
+        return (1);
     }
-
-    return( i_coding_type == I_CODING_TYPE || (i_coding_type == P_CODING_TYPE));
+    else if( i_delay > 150000 )
+    {
+        return ( i_coding_type == I_CODING_TYPE
+                    || i_coding_type == P_CODING_TYPE );
+    }
+    else if( i_delay > 100000 )
+    {	    
+        return ( i_coding_type == I_CODING_TYPE );
+    }
+    else
+    {	    
+        //fprintf( stderr, "chooser : we are à la bourre - trashing a %i\n", i_coding_type);
+        //return ( i_coding_type == I_CODING_TYPE );
+        return (0);
+    }
 
 }
 
@@ -241,17 +258,14 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
  *****************************************************************************/
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
-    decoder_fifo_t * fifo;
     mtime_t i_displaydate;
-    mtime_t i_delay;
+    static mtime_t i_delta = 0;
 
     i_displaydate =
-        p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_decode_date;
-    /* this value should be removed */
-    i_displaydate += 500000;
-    i_delay = i_displaydate - mdate();
+        p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_pts;
     
-    //fprintf(stderr, "displaying type %i with delay %lli)\n", p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type, i_delay);
+    //fprintf(stderr, "displaying type %i with delay %lli and delta %lli\n", p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type, i_displaydate - mdate(), i_displaydate - i_delta);
+    i_delta = i_displaydate;
 
     return i_displaydate;
 }
