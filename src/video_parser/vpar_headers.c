@@ -33,10 +33,10 @@
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
-#include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
 #include "vpar_motion.h"
+#include "video_fifo.h"
 
 /*
  * Local prototypes
@@ -681,7 +681,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             {
                 return;
             }
-            mwait( VPAR_IDLE_SLEEP );
+            msleep( VPAR_OUTMEM_SLEEP );
         }
 
         /* Initialize values. */
@@ -703,7 +703,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         vlc_mutex_init( &p_vpar->picture.p_picture->lock_deccount );
         memset( p_vpar->picture.pp_mb, 0, MAX_MB );
 /* FIXME ! remove asap */
-memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
+//memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );

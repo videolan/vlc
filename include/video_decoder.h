@@ -75,13 +75,6 @@ typedef struct vdec_thread_s
 } vdec_thread_t;
 
 /*****************************************************************************
- * Function pointers
- *****************************************************************************/
-#ifndef OLD_DECODER
-typedef void (*f_addb_t)( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
-#endif
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 #ifndef OLD_DECODER
@@ -96,7 +89,4 @@ void             vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_sta
 #else
 vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*, int *pi_status */ );
 void vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
-void vdec_AddBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
-void vdec_CopyBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
-void vdec_DummyBlock( vdec_thread_t *, dctelem_t*, yuv_data_t*, int );
 #endif

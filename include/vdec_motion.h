@@ -19,7 +19,6 @@ struct vpar_thread_s;
 struct motion_arg_s;
 
 typedef void (*f_motion_t)( struct macroblock_s* );
-typedef void (*f_chroma_motion_t)( struct macroblock_s*, struct motion_arg_s* );
 
 /*****************************************************************************
  * Prototypes
@@ -29,14 +28,21 @@ typedef void (*f_chroma_motion_t)( struct macroblock_s*, struct motion_arg_s* );
 void vdec_MotionDummy( struct macroblock_s * p_mb );
 
 /* Motion compensation */
-void vdec_MotionFieldField( struct macroblock_s * p_mb );
-void vdec_MotionField16x8( struct macroblock_s * p_mb );
+void vdec_MotionFieldField420( struct macroblock_s * p_mb );
+void vdec_MotionField16x8420( struct macroblock_s * p_mb );
 void vdec_MotionFieldDMV( struct macroblock_s * p_mb );
-void vdec_MotionFrameFrame( struct macroblock_s * p_mb );
-void vdec_MotionFrameField( struct macroblock_s * p_mb );
+void vdec_MotionFrameFrame420( struct macroblock_s * p_mb );
+void vdec_MotionFrameField420( struct macroblock_s * p_mb );
 void vdec_MotionFrameDMV( struct macroblock_s * p_mb );
-
-/* Motion compensation functions for the 3 chroma formats */
-void vdec_Motion420( struct macroblock_s * p_mb, struct motion_arg_s * p_motion );
-void vdec_Motion422( struct macroblock_s * p_mb, struct motion_arg_s * p_motion );
-void vdec_Motion444( struct macroblock_s * p_mb, struct motion_arg_s * p_motion );
+void vdec_MotionFieldField422( struct macroblock_s * p_mb );
+void vdec_MotionField16x8422( struct macroblock_s * p_mb );
+void vdec_MotionFieldDMV( struct macroblock_s * p_mb );
+void vdec_MotionFrameFrame422( struct macroblock_s * p_mb );
+void vdec_MotionFrameField422( struct macroblock_s * p_mb );
+void vdec_MotionFrameDMV( struct macroblock_s * p_mb );
+void vdec_MotionFieldField444( struct macroblock_s * p_mb );
+void vdec_MotionField16x8444( struct macroblock_s * p_mb );
+void vdec_MotionFieldDMV( struct macroblock_s * p_mb );
+void vdec_MotionFrameFrame444( struct macroblock_s * p_mb );
+void vdec_MotionFrameField444( struct macroblock_s * p_mb );
+void vdec_MotionFrameDMV( struct macroblock_s * p_mb );

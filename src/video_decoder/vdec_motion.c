@@ -33,204 +33,432 @@
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
-#include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
+#include "video_fifo.h"
 
 /*****************************************************************************
  * vdec_MotionComponent : last stage of motion compensation
  *****************************************************************************/
-static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
-                                   int i_width, int i_height, int i_x_step,
-                                   int i_x_stride, int i_select )
+static __inline__ void MotionComponent(
+                    yuv_data_t * p_src,     /* source block */
+                    yuv_data_t * p_dest,    /* dest block */
+                    int i_width,            /* (explicit) width of block */
+                    int i_height,           /* (explicit) height of block */
+                    int i_stride,           /* number of coeffs to jump
+                                             * between each predicted line */
+                    int i_step,             /* number of coeffs to jump to
+                                             * go to the next line of the
+                                             * field */
+                    int i_select,           /* half-pel vectors */
+                    boolean_t b_average     /* (explicit) averaging of several
+                                             * predictions */ )
 {
     int i_x, i_y, i_x1, i_y1;
     unsigned int i_dummy;
 
-    switch( i_select )
+    if( !b_average )
     {
-    case 4:
-        /* !xh, !yh, average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
-            {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
-                {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         i_dummy = p_dest[i_x + i_x1] + p_src[i_x + i_x1];
-                         p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                     }
-                }
-                p_dest += i_x_step;
-                p_src += i_x_step;
-            }
-        }
-        break;
+        /* Please note that b_average will be expanded at compile time */
 
-    case 0:
-        /* !xh, !yh, !average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
+        switch( i_select )
         {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
+        case 0:
+            /* !xh, !yh, !average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
             {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
                 {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         p_dest[i_x+i_x1] = p_src[i_x+i_x1];
-                     }
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             p_dest[i_x+i_x1] = p_src[i_x+i_x1];
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
                 }
-                p_dest += i_x_step;
-                p_src += i_x_step;
             }
-        }
-        break;
+            break;
 
-    case 6:
-        /* !xh, yh, average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
+        case 1:
+            /* xh, !yh, !average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
             {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
                 {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         i_dummy = p_dest[i_x+i_x1]
-                            + ((unsigned int)(p_src[i_x+i_x1] + 1
-                                     + p_src[i_x+i_x1 + i_x_stride]) >> 1);
-                         p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                     }
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1]
+                                                      + p_src[i_x+i_x1 + 1] + 1)
+                                                    >> 1;
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
                 }
-                p_dest += i_x_step;
-                p_src += i_x_step;
             }
-        }
-        break;
+            break;
 
-    case 2:
-        /* !xh, yh, !average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
+        case 2:
+            /* !xh, yh, !average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
             {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
                 {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1] + 1
-                                            + p_src[i_x+i_x1 + i_x_stride])
-                                          >> 1;  
-                     }
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1] + 1
+                                                + p_src[i_x+i_x1 + i_step])
+                                              >> 1;  
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
                 }
-                p_dest += i_x_step;
-                p_src += i_x_step;
             }
-        }
-        break;
+            break;
 
-    case 5:
-        /* xh, !yh, average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
+        case 3:
+            /* xh, yh, !average (3) */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
             {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
                 {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         i_dummy = p_dest[i_x+i_x1]
-                            + ((unsigned int)(p_src[i_x+i_x1]
-                                              + p_src[i_x+i_x1 + 1] + 1) >> 1);
-                         p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                     }
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             p_dest[i_x+i_x1]
+                                = ((unsigned int)(
+                                      p_src[i_x+i_x1]
+                                    + p_src[i_x+i_x1 + 1] 
+                                    + p_src[i_x+i_x1 + i_step]
+                                    + p_src[i_x+i_x1 + i_step + 1]
+                                    + 2) >> 2);
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
                 }
-                p_dest += i_x_step;
-                p_src += i_x_step;
             }
+            break;
         }
-        break;
 
-    case 1:
-        /* xh, !yh, !average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
-            {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
-                {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1]
-                                                  + p_src[i_x+i_x1 + 1] + 1)
-                                                >> 1;
-                     }
-                }
-                p_dest += i_x_step;
-                p_src += i_x_step;
-            }
-        }
-        break;
-
-    case 7:
-        /* xh, yh, average */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
-            {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
-                {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         i_dummy = p_dest[i_x+i_x1]
-                            + ((unsigned int)(
-                                  p_src[i_x+i_x1]
-                                + p_src[i_x+i_x1 + 1]
-                                + p_src[i_x+i_x1 + i_x_stride]
-                                + p_src[i_x+i_x1 + i_x_stride + 1]
-                                + 2) >> 2);
-                         p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                     }
-                }
-                p_dest += i_x_step;
-                p_src += i_x_step;
-            }
-        }
-        break;
-
-    default:
-        /* xh, yh, !average (3) */
-        for( i_y = 0; i_y < i_height; i_y += 4 )
-        {
-            for( i_y1 = 0; i_y1 < 4; i_y1++ )
-            {
-                for( i_x = 0; i_x < i_width; i_x += 8 )
-                {
-                     for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                     {
-                         p_dest[i_x+i_x1]
-                            = ((unsigned int)(
-                                  p_src[i_x+i_x1]
-                                + p_src[i_x+i_x1 + 1] 
-                                + p_src[i_x+i_x1 + i_x_stride]
-                                + p_src[i_x+i_x1 + i_x_stride + 1]
-                                + 2) >> 2);
-                     }
-                }
-                p_dest += i_x_step;
-                p_src += i_x_step;
-            }
-        }
-        break;
     }
+    else
+    {
+        /* b_average */
+        switch( i_select )
+        {
+        case 0:
+            /* !xh, !yh, average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
+            {
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
+                {
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             i_dummy = p_dest[i_x + i_x1] + p_src[i_x + i_x1];
+                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
+                }
+            }
+            break;
+
+        case 1:
+            /* xh, !yh, average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
+            {
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
+                {
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             i_dummy = p_dest[i_x+i_x1]
+                                + ((unsigned int)(p_src[i_x+i_x1]
+                                                  + p_src[i_x+i_x1 + 1] + 1) >> 1);
+                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
+                }
+            }
+            break;
+
+        case 2:
+            /* !xh, yh, average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
+            {
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
+                {
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             i_dummy = p_dest[i_x+i_x1]
+                                + ((unsigned int)(p_src[i_x+i_x1] + 1
+                                         + p_src[i_x+i_x1 + i_step]) >> 1);
+                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
+                }
+            }
+            break;
+
+        case 3:
+            /* xh, yh, average */
+            for( i_y = 0; i_y < i_height; i_y += 4 )
+            {
+                for( i_y1 = 0; i_y1 < 4; i_y1++ )
+                {
+                    for( i_x = 0; i_x < i_width; i_x += 8 )
+                    {
+                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
+                         {
+                             i_dummy = p_dest[i_x+i_x1]
+                                + ((unsigned int)(
+                                      p_src[i_x+i_x1]
+                                    + p_src[i_x+i_x1 + 1]
+                                    + p_src[i_x+i_x1 + i_step]
+                                    + p_src[i_x+i_x1 + i_step + 1]
+                                    + 2) >> 2);
+                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
+                         }
+                    }
+                    p_dest += i_stride;
+                    p_src += i_stride;
+                }
+            }
+            break;
+        }
+    }
+}
+
+/*****************************************************************************
+ * Motion420 : motion compensation for a 4:2:0 macroblock
+ *****************************************************************************/
+static __inline__ void Motion420(
+                    macroblock_t * p_mb,        /* destination macroblock */
+                    picture_t * p_source,       /* source picture */
+                    boolean_t b_source_field,   /* source field */
+                    boolean_t b_dest_field,     /* destination field */
+                    int i_mv_x, int i_mv_y,     /* motion vector coordinates,
+                                                 * in half pels */
+                    int i_l_stride,             /* number of coeffs to jump to
+                                                 * go to the next predicted
+                                                 * line */
+                    int i_c_stride,
+                    int i_height,               /* height of the block to
+                                                 * predict, in luminance
+                                                 * (explicit) */
+                    int i_offset,               /* position of the first
+                                                 * predicted line (explicit) */
+                    boolean_t b_average         /* (explicit) averaging of
+                                                 * several predictions */ )
+{
+    /* Temporary variables to avoid recalculating things twice */
+    int     i_source_offset, i_dest_offset, i_c_height, i_c_select;
+
+    /* Luminance */
+    MotionComponent( /* source */
+                     p_source->p_y
+                       + (p_mb->i_l_x + (i_mv_x >> 1))
+                       + (p_mb->i_motion_l_y + i_offset
+                          + (i_mv_y >> 1)
+                          + b_source_field)
+                         * p_mb->p_picture->i_width,
+                     /* destination */
+                     p_mb->p_picture->p_y
+                       + (p_mb->i_l_x)
+                       + (p_mb->i_motion_l_y + b_dest_field)
+                         * p_mb->p_picture->i_width,
+                     /* prediction width and height */
+                     16, i_height,
+                     /* stride */
+                     i_l_stride, p_mb->i_l_stride,
+                     /* select */
+                     ((i_mv_y & 1) << 1) | (i_mv_x & 1),
+                     b_average );
+
+    i_source_offset = (p_mb->i_c_x + ((i_mv_x/2) >> 1))
+                        + ((p_mb->i_motion_c_y + (i_offset >> 1)
+                           + ((i_mv_y/2) >> 1))
+                           + b_source_field)
+                          * p_mb->p_picture->i_chroma_width;
+    i_dest_offset = (p_mb->i_c_x)
+                      + (p_mb->i_motion_c_y + b_dest_field)
+                        * p_mb->p_picture->i_chroma_width;
+    i_c_height = i_height >> 1;
+    i_c_select = (((i_mv_y/2) & 1) << 1) | ((i_mv_x/2) & 1);
+
+    /* Chrominance Cr */
+    MotionComponent( p_source->p_u
+                       + i_source_offset,
+                     p_mb->p_picture->p_u
+                       + i_dest_offset,
+                     8, i_c_height, i_c_stride, p_mb->i_c_stride,
+                     i_c_select, b_average );
+
+    /* Chrominance Cb */
+    MotionComponent( p_source->p_v
+                       + i_source_offset,
+                     p_mb->p_picture->p_v
+                       + i_dest_offset,
+                     8, i_c_height, i_c_stride, p_mb->i_c_stride,
+                     i_c_select, b_average );
+}
+
+/*****************************************************************************
+ * Motion422 : motion compensation for a 4:2:2 macroblock
+ *****************************************************************************/
+static __inline__ void Motion422(
+                    macroblock_t * p_mb,        /* destination macroblock */
+                    picture_t * p_source,       /* source picture */
+                    boolean_t b_source_field,   /* source field */
+                    boolean_t b_dest_field,     /* destination field */
+                    int i_mv_x, int i_mv_y,     /* motion vector coordinates,
+                                                 * in half pels */
+                    int i_l_stride,             /* number of coeffs to jump to
+                                                 * go to the next predicted
+                                                 * line */
+                    int i_c_stride,
+                    int i_height,               /* height of the block to
+                                                 * predict, in luminance
+                                                 * (explicit) */
+                    int i_offset,               /* position of the first
+                                                 * predicted line (explicit) */
+                    boolean_t b_average         /* (explicit) averaging of
+                                                 * several predictions */ )
+{
+    int     i_source_offset, i_dest_offset, i_c_select;
+
+    /* Luminance */
+    MotionComponent( /* source */
+                     p_source->p_y
+                       + (p_mb->i_l_x + (i_mv_x >> 1))
+                       + (p_mb->i_motion_l_y + i_offset
+                          + (i_mv_y >> 1)
+                          + b_source_field)
+                         * p_mb->p_picture->i_width,
+                     /* destination */
+                     p_mb->p_picture->p_y
+                       + (p_mb->i_l_x)
+                       + (p_mb->i_motion_l_y + b_dest_field)
+                         * p_mb->p_picture->i_width,
+                     /* prediction width and height */
+                     16, i_height,
+                     /* stride */
+                     i_l_stride, p_mb->i_l_stride,
+                     /* select */
+                     ((i_mv_y & 1) << 1) | (i_mv_x & 1),
+                     b_average );
+
+    i_source_offset = (p_mb->i_c_x + ((i_mv_x/2) >> 1))
+                        + ((p_mb->i_motion_c_y + (i_offset)
+                           + ((i_mv_y) >> 1))
+                           + b_source_field)
+                          * p_mb->p_picture->i_chroma_width;
+    i_dest_offset = (p_mb->i_c_x)
+                      + (p_mb->i_motion_c_y + b_dest_field)
+                        * p_mb->p_picture->i_chroma_width;
+    i_c_select = ((i_mv_y & 1) << 1) | ((i_mv_x/2) & 1);
+
+    /* Chrominance Cr */
+    MotionComponent( p_source->p_u
+                       + i_source_offset,
+                     p_mb->p_picture->p_u
+                       + i_dest_offset,
+                     8, i_height, i_c_stride, p_mb->i_c_stride,
+                     i_c_select, b_average );
+
+    /* Chrominance Cb */
+    MotionComponent( p_source->p_v
+                       + i_source_offset,
+                     p_mb->p_picture->p_u
+                       + i_dest_offset,
+                     8, i_height, i_c_stride, p_mb->i_c_stride,
+                     i_c_select, b_average );
+}
+
+/*****************************************************************************
+ * Motion444 : motion compensation for a 4:4:4 macroblock
+ *****************************************************************************/
+static __inline__ void Motion444(
+                    macroblock_t * p_mb,        /* destination macroblock */
+                    picture_t * p_source,       /* source picture */
+                    boolean_t b_source_field,   /* source field */
+                    boolean_t b_dest_field,     /* destination field */
+                    int i_mv_x, int i_mv_y,     /* motion vector coordinates,
+                                                 * in half pels */
+                    int i_l_stride,             /* number of coeffs to jump to
+                                                 * go to the next predicted
+                                                 * line */
+                    int i_c_stride,
+                    int i_height,               /* height of the block to
+                                                 * predict, in luminance
+                                                 * (explicit) */
+                    int i_offset,               /* position of the first
+                                                 * predicted line (explicit) */
+                    boolean_t b_average         /* (explicit) averaging of
+                                                 * several predictions */ )
+{
+    int     i_source_offset, i_dest_offset, i_select;
+
+    i_source_offset = (p_mb->i_l_x + (i_mv_x >> 1))
+                        + (p_mb->i_motion_l_y + i_offset
+                           + (i_mv_y >> 1)
+                           + b_source_field)
+                          * p_mb->p_picture->i_width;
+    i_dest_offset = (p_mb->i_l_x)
+                      + (p_mb->i_motion_l_y + b_dest_field)
+                        * p_mb->p_picture->i_width;
+    i_select = ((i_mv_y & 1) << 1) | (i_mv_x & 1);
+
+
+    /* Luminance */
+    MotionComponent( p_source->p_y
+                       + i_source_offset,
+                     p_mb->p_picture->p_y
+                       + i_dest_offset,
+                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     i_select, b_average );
+
+    /* Chrominance Cr */
+    MotionComponent( p_source->p_u
+                       + i_source_offset,
+                     p_mb->p_picture->p_u
+                       + i_dest_offset,
+                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     i_select, b_average );
+
+    /* Chrominance Cb */
+    MotionComponent( p_source->p_v
+                       + i_source_offset,
+                     p_mb->p_picture->p_v
+                       + i_dest_offset,
+                     16, i_height, i_l_stride, p_mb->i_l_stride,
+                     i_select, b_average );
 }
 
 /*****************************************************************************
  * DualPrimeArithmetic : Dual Prime Additional arithmetic (7.6.3.6)
  *****************************************************************************/ 
-static void __inline__ DualPrimeArithmetic( macroblock_t * p_mb,
+static __inline__ void DualPrimeArithmetic( macroblock_t * p_mb,
                                             int ppi_dmv[2][2],
                                             int i_mv_x, int i_mv_y )
 {
@@ -272,17 +500,6 @@ static void __inline__ DualPrimeArithmetic( macroblock_t * p_mb,
 }
 
 
-typedef struct motion_arg_s
-{
-    picture_t *     p_source;
-    boolean_t       b_source_field;
-    boolean_t       b_dest_field;
-    int             i_height, i_offset;
-    int             i_mv_x, i_mv_y;
-    boolean_t       b_average;
-    int             i_l_x_step, i_c_x_step;
-} motion_arg_t;
-
 /*****************************************************************************
  * vdec_MotionDummy : motion compensation for an intra macroblock
  *****************************************************************************/
@@ -294,103 +511,141 @@ void vdec_MotionDummy( macroblock_t * p_mb )
 /*****************************************************************************
  * vdec_MotionFieldField : motion compensation for field motion type (field)
  *****************************************************************************/
-void vdec_MotionFieldField( macroblock_t * p_mb )
+#define FIELDFIELD( MOTION )                                            \
+    picture_t *     p_pred;                                             \
+                                                                        \
+    if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
+    {                                                                   \
+        if( p_mb->b_P_coding_type                                       \
+             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )\
+            p_pred = p_mb->p_picture;                                   \
+        else                                                            \
+            p_pred = p_mb->p_forward;                                   \
+                                                                        \
+        MOTION( p_mb, p_pred, p_mb->ppi_field_select[0][0],             \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[0][0][0],                     \
+                p_mb->pppi_motion_vectors[0][0][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 0 );         \
+                                                                        \
+        if( p_mb->i_mb_type & MB_MOTION_BACKWARD )                      \
+        {                                                               \
+            MOTION( p_mb, p_mb->p_backward,                             \
+                    p_mb->ppi_field_select[0][1],                       \
+                    p_mb->b_motion_field,                               \
+                    p_mb->pppi_motion_vectors[0][1][0],                 \
+                    p_mb->pppi_motion_vectors[0][1][1],                 \
+                    p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 1 );     \
+    }                                                                   \
+                                                                        \
+    else /* MB_MOTION_BACKWARD */                                       \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[0][1],   \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[0][1][0],                     \
+                p_mb->pppi_motion_vectors[0][1][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 0 );         \
+    }                                                                   \
+}
+
+void vdec_MotionFieldField420( macroblock_t * p_mb )
 {
-#if 1
-    motion_arg_t    args;
+    FIELDFIELD( Motion420 )
+}
 
-    args.i_height = 16;
-    args.b_average = 0;
-    args.b_dest_field = p_mb->b_motion_field;
-    args.i_offset = 0;
-    args.i_l_x_step = p_mb->i_l_stride;
-    args.i_c_x_step = p_mb->i_c_stride;
+void vdec_MotionFieldField422( macroblock_t * p_mb )
+{
+    FIELDFIELD( Motion422 )
+}
 
-    if( p_mb->i_mb_type & MB_MOTION_FORWARD )
-    {
-        if( p_mb->b_P_coding_type
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )
-            args.p_source = p_mb->p_picture;
-        else
-            args.p_source = p_mb->p_forward;
-        args.b_source_field = p_mb->ppi_field_select[0][0];
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-
-        args.b_average = 1;
-    }
-
-    if( p_mb->i_mb_type & MB_MOTION_BACKWARD )
-    {
-        args.b_source_field = p_mb->ppi_field_select[0][1];
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-    }
-#endif
+void vdec_MotionFieldField444( macroblock_t * p_mb )
+{
+    FIELDFIELD( Motion444 )
 }
 
 /*****************************************************************************
- * vdec_MotionField16x8 : motion compensation for 16x8 motion type (field)
+ * vdec_MotionField16x8XXX : motion compensation for 16x8 motion type (field)
  *****************************************************************************/
-void vdec_MotionField16x8( macroblock_t * p_mb )
+#define FIELD16X8( MOTION )                                             \
+{                                                                       \
+    picture_t *     p_pred;                                             \
+                                                                        \
+    if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
+    {                                                                   \
+        if( p_mb->b_P_coding_type                                       \
+             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )\
+            p_pred = p_mb->p_picture;                                   \
+        else                                                            \
+            p_pred = p_mb->p_forward;                                   \
+                                                                        \
+        MOTION( p_mb, p_pred, p_mb->ppi_field_select[0][0],             \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[0][0][0],                     \
+                p_mb->pppi_motion_vectors[0][0][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 8, 0, 0 );          \
+                                                                        \
+        if( p_mb->b_P_coding_type                                       \
+             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+             && (p_mb->b_motion_field != p_mb->ppi_field_select[1][0]) )\
+            p_pred = p_mb->p_picture;                                   \
+        else                                                            \
+            p_pred = p_mb->p_forward;                                   \
+                                                                        \
+        MOTION( p_mb, p_pred, p_mb->ppi_field_select[1][0],             \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[1][0][0],                     \
+                p_mb->pppi_motion_vectors[1][0][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 8, 8, 0 );          \
+                                                                        \
+        if( p_mb->i_mb_type & MB_MOTION_BACKWARD )                      \
+        {                                                               \
+            MOTION( p_mb, p_mb->p_backward,                             \
+                    p_mb->ppi_field_select[0][1],                       \
+                    p_mb->b_motion_field,                               \
+                    p_mb->pppi_motion_vectors[0][1][0],                 \
+                    p_mb->pppi_motion_vectors[0][1][1],                 \
+                    p_mb->i_l_stride, p_mb->i_c_stride, 8, 0, 1 );      \
+                                                                        \
+            MOTION( p_mb, p_mb->p_backward,                             \
+                    p_mb->ppi_field_select[1][1],                       \
+                    p_mb->b_motion_field,                               \
+                    p_mb->pppi_motion_vectors[1][1][0],                 \
+                    p_mb->pppi_motion_vectors[1][1][1],                 \
+                    p_mb->i_l_stride, p_mb->i_c_stride, 8, 8, 1 );      \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    else /* MB_MOTION_BACKWARD */                                       \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[0][1],   \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[0][1][0],                     \
+                p_mb->pppi_motion_vectors[0][1][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 8, 0, 0 );          \
+                                                                        \
+        MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[1][1],   \
+                p_mb->b_motion_field,                                   \
+                p_mb->pppi_motion_vectors[1][1][0],                     \
+                p_mb->pppi_motion_vectors[1][1][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 8, 8, 0 );          \
+    }                                                                   \
+}
+
+void vdec_MotionField16x8420( macroblock_t * p_mb )
 {
-#if 1
-    motion_arg_t    args;
+    FIELD16X8( Motion420 )
+}
 
-    args.i_height = 8;
-    args.b_average = 0;
-    args.b_dest_field = p_mb->b_motion_field;
-    args.i_offset = 0;
-    args.i_l_x_step = p_mb->i_l_stride;
-    args.i_c_x_step = p_mb->i_c_stride;
+void vdec_MotionField16x8422( macroblock_t * p_mb )
+{
+    FIELD16X8( Motion422 )
+}
 
-    if( p_mb->i_mb_type & MB_MOTION_FORWARD )
-    {
-        if( p_mb->b_P_coding_type
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )
-            args.p_source = p_mb->p_picture;
-        else
-            args.p_source = p_mb->p_forward;
-        args.b_source_field = p_mb->ppi_field_select[0][0];
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-
-        if( p_mb->b_P_coding_type
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)
-             && (p_mb->b_motion_field != p_mb->ppi_field_select[1][0]) )
-            args.p_source = p_mb->p_picture;
-        else
-            args.p_source = p_mb->p_forward;
-        args.b_source_field = p_mb->ppi_field_select[1][0];
-        args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1];
-        args.i_offset = 8;
-        p_mb->pf_chroma_motion( p_mb, &args );
-
-        args.b_average = 1;
-        args.i_offset = 0;
-    }
-
-    if( p_mb->i_mb_type & MB_MOTION_BACKWARD )
-    {
-        args.p_source = p_mb->p_backward;
-        args.b_source_field = p_mb->ppi_field_select[0][1];
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-
-        args.b_source_field = p_mb->ppi_field_select[1][1];
-        args.i_mv_x = p_mb->pppi_motion_vectors[1][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][1][1];
-        args.i_offset = 8;
-        p_mb->pf_chroma_motion( p_mb, &args );
-    }
-#endif
+void vdec_MotionField16x8444( macroblock_t * p_mb )
+{
+    FIELD16X8( Motion444 )
 }
 
 /*****************************************************************************
@@ -398,6 +653,7 @@ void vdec_MotionField16x8( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFieldDMV( macroblock_t * p_mb )
 {
+#if 0
     /* This is necessarily a MOTION_FORWARD only macroblock */
     motion_arg_t    args;
     picture_t *     p_pred;
@@ -430,94 +686,117 @@ void vdec_MotionFieldDMV( macroblock_t * p_mb )
     args.i_mv_x = ppi_dmv[0][0];
     args.i_mv_y = ppi_dmv[0][1];
     p_mb->pf_chroma_motion( p_mb, &args );
-}
-
-/*****************************************************************************
- * vdec_MotionFrameFrame : motion compensation for frame motion type (frame)
- *****************************************************************************/
-void vdec_MotionFrameFrame( macroblock_t * p_mb )
-{
-#if 1
-    motion_arg_t    args;
-
-    args.b_source_field = args.b_dest_field = 0;
-    args.i_height = 16;
-    args.b_average = 0;
-    args.i_offset = 0;
-    args.i_l_x_step = p_mb->i_l_stride;
-    args.i_c_x_step = p_mb->i_c_stride;
-
-    if( p_mb->i_mb_type & MB_MOTION_FORWARD )
-    {
-        args.p_source = p_mb->p_forward;
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-
-        args.b_average = 1;
-    }
-
-    if( p_mb->i_mb_type & MB_MOTION_BACKWARD ) 
-    {
-        args.p_source = p_mb->p_backward;
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-    }
 #endif
 }
 
 /*****************************************************************************
- * vdec_MotionFrameField : motion compensation for field motion type (frame)
+ * vdec_MotionFrameFrameXXX : motion compensation for frame motion type (frame)
  *****************************************************************************/
-void vdec_MotionFrameField( macroblock_t * p_mb )
+#define FRAMEFRAME( MOTION )                                            \
+{                                                                       \
+    if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_forward, 0, 0,                            \
+                p_mb->pppi_motion_vectors[0][0][0],                     \
+                p_mb->pppi_motion_vectors[0][0][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 0 );         \
+                                                                        \
+        if( p_mb->i_mb_type & MB_MOTION_BACKWARD )                      \
+        {                                                               \
+            MOTION( p_mb, p_mb->p_backward, 0, 0,                       \
+                    p_mb->pppi_motion_vectors[0][1][0],                 \
+                    p_mb->pppi_motion_vectors[0][1][1],                 \
+                    p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 1 );     \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    else /* MB_MOTION_BACKWARD */                                       \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_backward, 0, 0,                           \
+                p_mb->pppi_motion_vectors[0][1][0],                     \
+                p_mb->pppi_motion_vectors[0][1][1],                     \
+                p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 0 );         \
+    }                                                                   \
+} /* FRAMEFRAME */
+
+void vdec_MotionFrameFrame420( macroblock_t * p_mb )
 {
-#if 1
-    motion_arg_t    args;
+    FRAMEFRAME( Motion420 )
+}
 
-    args.i_height = 8;
-    args.b_average = 0;
-    args.i_offset = 0;
-    args.i_l_x_step = p_mb->i_l_stride << 1;
-    args.i_c_x_step = p_mb->i_c_stride << 1;
+void vdec_MotionFrameFrame422( macroblock_t * p_mb )
+{
+    FRAMEFRAME( Motion422 )
+}
 
-    if( p_mb->i_mb_type & MB_MOTION_FORWARD )
-    {
-        args.p_source = p_mb->p_forward;
-#if 1
-        args.b_source_field = p_mb->ppi_field_select[0][0];
-        args.b_dest_field = 0;
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-#endif
-#if 1
-        args.b_source_field = p_mb->ppi_field_select[1][0];
-        args.b_dest_field = 1;
-        args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-#endif
-        args.b_average = 1;
-    }
+void vdec_MotionFrameFrame444( macroblock_t * p_mb )
+{
+    FRAMEFRAME( Motion444 )
+}
 
-    if( p_mb->i_mb_type & MB_MOTION_BACKWARD )
-    {
-        args.p_source = p_mb->p_backward;
+/*****************************************************************************
+ * vdec_MotionFrameFieldXXX : motion compensation for field motion type (frame)
+ *****************************************************************************/
+#define FRAMEFIELD( MOTION )                                            \
+{                                                                       \
+    int i_l_stride = p_mb->i_l_stride << 1;                             \
+    int i_c_stride = p_mb->i_c_stride << 1;                             \
+                                                                        \
+    if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_forward, p_mb->ppi_field_select[0][0], 0, \
+                p_mb->pppi_motion_vectors[0][0][0],                     \
+                p_mb->pppi_motion_vectors[0][0][1],                     \
+                i_l_stride, i_c_stride, 8, 0, 0 );                      \
+                                                                        \
+        MOTION( p_mb, p_mb->p_forward, p_mb->ppi_field_select[1][0], 1, \
+                p_mb->pppi_motion_vectors[1][0][0],                     \
+                p_mb->pppi_motion_vectors[1][0][1],                     \
+                i_l_stride, i_c_stride, 8, 0, 0 );                      \
+                                                                        \
+        if( p_mb->i_mb_type & MB_MOTION_BACKWARD )                      \
+        {                                                               \
+            MOTION( p_mb, p_mb->p_backward,                             \
+                    p_mb->ppi_field_select[0][1], 0,                    \
+                    p_mb->pppi_motion_vectors[0][1][0],                 \
+                    p_mb->pppi_motion_vectors[0][1][1],                 \
+                    i_l_stride, i_c_stride, 8, 0, 1 );                  \
+                                                                        \
+            MOTION( p_mb, p_mb->p_backward,                             \
+                    p_mb->ppi_field_select[1][1], 1,                    \
+                    p_mb->pppi_motion_vectors[1][1][0],                 \
+                    p_mb->pppi_motion_vectors[1][1][1],                 \
+                    i_l_stride, i_c_stride, 8, 0, 1 );                  \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    else /* MB_MOTION_BACKWARD only */                                  \
+    {                                                                   \
+        MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[0][1], 0,\
+                p_mb->pppi_motion_vectors[0][1][0],                     \
+                p_mb->pppi_motion_vectors[0][1][1],                     \
+                i_l_stride, i_c_stride, 8, 0, 0 );                      \
+                                                                        \
+        MOTION( p_mb, p_mb->p_backward, p_mb->ppi_field_select[1][1], 1,\
+                p_mb->pppi_motion_vectors[1][1][0],                     \
+                p_mb->pppi_motion_vectors[1][1][1],                     \
+                i_l_stride, i_c_stride, 8, 0, 0 );                      \
+    }                                                                   \
+} /* FRAMEFIELD */
 
-        args.b_source_field = p_mb->ppi_field_select[0][1];
-        args.b_dest_field = 0;
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
+void vdec_MotionFrameField420( macroblock_t * p_mb )
+{
+    FRAMEFIELD( Motion420 )
+}
 
-        args.b_source_field = p_mb->ppi_field_select[1][1];
-        args.b_dest_field = 1;
-        args.i_mv_x = p_mb->pppi_motion_vectors[1][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][1][1];
-        p_mb->pf_chroma_motion( p_mb, &args );
-    }
-#endif
+void vdec_MotionFrameField422( macroblock_t * p_mb )
+{
+    FRAMEFIELD( Motion422 )
+}
+
+void vdec_MotionFrameField444( macroblock_t * p_mb )
+{
+    FRAMEFIELD( Motion444 )
 }
 
 /*****************************************************************************
@@ -525,6 +804,7 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFrameDMV( macroblock_t * p_mb )
 {
+#if 0
     /* This is necessarily a MOTION_FORWARD only macroblock */
     motion_arg_t    args;
     int             ppi_dmv[2][2];
@@ -567,180 +847,6 @@ void vdec_MotionFrameDMV( macroblock_t * p_mb )
     args.i_mv_x = ppi_dmv[1][0];
     args.i_mv_y = ppi_dmv[1][1];
     p_mb->pf_chroma_motion( p_mb, &args );
-}
-
-/*****************************************************************************
- * vdec_Motion420 : motion compensation for a 4:2:0 macroblock
- *****************************************************************************/
-void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
-{
-//    p_motion->i_mv_x = p_motion->i_mv_y = 0;
-//fprintf( stderr, " x %d, y %d \n", p_motion->i_mv_x, p_motion->i_mv_y );
-    /* Luminance */
-    MotionComponent( /* source */
-                     p_motion->p_source->p_y
-                       + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
-                       + (p_mb->i_motion_l_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1)
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_width,
-                     /* destination */
-                     p_mb->p_picture->p_y
-                       + (p_mb->i_l_x)
-                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_width,
-                     /* prediction width and height */
-                     16, p_motion->i_height,
-                     /* step */
-                     p_motion->i_l_x_step, p_mb->i_l_stride,
-                     /* select */
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | (p_motion->i_mv_x & 1) );
-
-    /* Chrominance Cr */
-    MotionComponent( p_motion->p_source->p_u
-                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_motion_c_y + (p_motion->i_offset >> 1)
-                          + ((p_motion->i_mv_y/2) >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_u
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height >> 1, p_motion->i_c_x_step,
-                     p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | (((p_motion->i_mv_y/2) & 1) << 1)
-                       | ((p_motion->i_mv_x/2) & 1) );
-
-    /* Chrominance Cb */
-    MotionComponent( p_motion->p_source->p_v
-                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_motion_c_y + (p_motion->i_offset >> 1)
-                          + ((p_motion->i_mv_y/2) >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_v
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height >> 1, p_motion->i_c_x_step,
-                     p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | (((p_motion->i_mv_y/2) & 1) << 1)
-                       | ((p_motion->i_mv_x/2) & 1) );
-}
-
-/*****************************************************************************
- * vdec_Motion422 : motion compensation for a 4:2:2 macroblock
- *****************************************************************************/
-void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
-{
-#if 0
-    /* Luminance */
-    MotionComponent( p_motion->p_source->p_y
-                       + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
-                       + (p_mb->i_motion_l_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1)
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_width,
-                     p_mb->p_picture->p_y
-                       + (p_mb->i_l_x)
-                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_width,
-                     16, p_motion->i_height, p_mb->i_l_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | (p_motion->i_mv_x & 1) );
-
-    /* Chrominance Cr */
-    MotionComponent( p_motion->p_source->p_u
-                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_motion_c_y + p_motion->i_offset
-                          + ((p_motion->i_mv_y) >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_u
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height, p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | ((p_motion->i_mv_x/2) & 1) );
-
-    /* Chrominance Cb */
-    MotionComponent( p_motion->p_source->p_v
-                       + (p_mb->i_c_x + ((p_motion->i_mv_x/2) >> 1))
-                       + ((p_mb->i_motion_c_y + p_motion->i_offset
-                          + ((p_motion->i_mv_y) >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_v
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height, p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | ((p_motion->i_mv_x/2) & 1) );
 #endif
 }
 
-/*****************************************************************************
- * vdec_Motion444 : motion compensation for a 4:4:4 macroblock
- *****************************************************************************/
-void vdec_Motion444( macroblock_t * p_mb, motion_arg_t * p_motion )
-{
-#if 0
-    /* Luminance */
-    MotionComponent( p_motion->p_source->p_y
-                       + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
-                       + (p_mb->i_motion_l_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1)
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_width,
-                     p_mb->p_picture->p_y
-                       + (p_mb->i_l_x)
-                       + (p_mb->i_motion_l_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_width,
-                     16, p_motion->i_height, p_mb->i_l_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | (p_motion->i_mv_x & 1) );
-
-    /* Chrominance Cr */
-    MotionComponent( p_motion->p_source->p_u
-                       + (p_mb->i_c_x + (p_motion->i_mv_x >> 1))
-                       + ((p_mb->i_motion_c_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_u
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     16, p_motion->i_height, p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | (p_motion->i_mv_x & 1) );
-
-    /* Chrominance Cb */
-    MotionComponent( p_motion->p_source->p_v
-                       + (p_mb->i_c_x + (p_motion->i_mv_x >> 1))
-                       + ((p_mb->i_motion_c_y + p_motion->i_offset
-                          + (p_motion->i_mv_y >> 1))
-                          + p_motion->b_source_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     p_mb->p_picture->p_v
-                       + (p_mb->i_c_x)
-                       + (p_mb->i_motion_c_y + p_motion->b_dest_field)
-                         * p_mb->p_picture->i_chroma_width,
-                     16, p_motion->i_height, p_mb->i_c_stride,
-                     (p_motion->b_average << 2)
-                       | ((p_motion->i_mv_y & 1) << 1)
-                       | (p_motion->i_mv_x & 1) );
-#endif
-}

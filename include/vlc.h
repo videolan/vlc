@@ -80,9 +80,9 @@
 #include "vdec_motion.h"
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
-#include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
+#include "video_fifo.h"
 #endif
 
 /* Interface */

@@ -62,7 +62,7 @@
 #define DEBUG_INTF
 #define DEBUG_INPUT
 #define DEBUG_AUDIO
-#define DEBUG_VIDEO
+//#define DEBUG_VIDEO
 
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
@@ -285,6 +285,8 @@
 
 #define VPAR_IDLE_SLEEP                 100000
 
+#define VPAR_OUTMEM_SLEEP               50000
+                                        
 /* Number of macroblock buffers available. It should be always greater than
  * twice the number of macroblocks in a picture. VFIFO_SIZE + 1 should also
  * be a power of two. */

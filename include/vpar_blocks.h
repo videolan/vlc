@@ -21,6 +21,7 @@
 typedef struct macroblock_s
 {
     int                     i_mb_type;                    /* macroblock type */
+    int                     i_coded_block_pattern;
     int                     i_structure;
     int                     i_current_structure;
     boolean_t               b_P_coding_type;        /* Is it P_CODING_TYPE ? */
@@ -39,7 +40,6 @@ typedef struct macroblock_s
 
     /* Motion compensation information */
     f_motion_t              pf_motion;    /* function to use for motion comp */
-    f_chroma_motion_t       pf_chroma_motion;
     picture_t *             p_backward;
     picture_t *             p_forward;
     int                     ppi_field_select[2][2];
@@ -51,7 +51,6 @@ typedef struct macroblock_s
     boolean_t               b_motion_field;
   
     /* AddBlock information */
-    f_addb_t                pf_addb[12];      /* pointer to the Add function */
     yuv_data_t *            p_data[12];              /* pointer to the position
                                                       * in the final picture */
     int                     i_addb_l_stride, i_addb_c_stride;

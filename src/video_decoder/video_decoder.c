@@ -37,9 +37,9 @@
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
-#include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
+#include "video_fifo.h"
 
 /*
  * Local prototypes
@@ -166,6 +166,148 @@ static int InitThread( vdec_thread_t *p_vdec )
 }
 
 /*******************************************************************************
+ * ErrorThread: RunThread() error loop
+ *******************************************************************************
+ * This function is called when an error occured during thread main's loop. The
+ * thread can still receive feed, but must be ready to terminate as soon as
+ * possible.
+ *******************************************************************************/
+static void ErrorThread( vdec_thread_t *p_vdec )
+{
+    macroblock_t *       p_mb;
+
+    /* Wait until a `die' order */
+    while( !p_vdec->b_die )
+    {
+        p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo );
+        vpar_DestroyMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
+    }
+}
+
+/*******************************************************************************
+ * EndThread: thread destruction
+ *******************************************************************************
+ * This function is called when the thread ends after a sucessfull 
+ * initialization.
+ *******************************************************************************/
+static void EndThread( vdec_thread_t *p_vdec )
+{
+    intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
+}
+
+/*******************************************************************************
+ * AddBlock : add a block
+ *******************************************************************************/
+static __inline__ void AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                                 yuv_data_t * p_data, int i_incr )
+{
+    int i_x, i_y;
+ 
+    for( i_y = 0; i_y < 8; i_y++ )
+    {
+        for( i_x = 0; i_x < 8; i_x++ )
+        {
+            *p_data = p_vdec->pi_crop[*p_data + *p_block++];
+            p_data++;
+        }
+        p_data += i_incr;
+    }
+}
+
+/*******************************************************************************
+ * CopyBlock : copy a block
+ *******************************************************************************/
+static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                                  yuv_data_t * p_data, int i_incr )
+{
+    int i_x, i_y;
+
+    for( i_y = 0; i_y < 8; i_y++ )
+    {
+        for( i_x = 0; i_x < 8; i_x++ )
+        {
+            *p_data++ = p_vdec->pi_crop[*p_block++];
+        }
+        p_data += i_incr;
+    }
+}
+
+/*******************************************************************************
+ * DecodeMacroblock : decode a macroblock of a picture
+ *******************************************************************************/
+#define DECODEBLOCKS( OPBLOCK )                                         \
+{                                                                       \
+    int             i_b, i_mask;                                        \
+                                                                        \
+    i_mask = 1 << (3 + p_mb->i_chroma_nb_blocks);                       \
+                                                                        \
+    /* luminance */                                                     \
+    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )                        \
+    {                                                                   \
+        if( p_mb->i_coded_block_pattern & i_mask )                      \
+        {                                                               \
+            /*                                                          \
+             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
+             */                                                         \
+            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+                                  p_mb->pi_sparse_pos[i_b] );           \
+                                                                        \
+            /*                                                          \
+             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
+             * section 7.6.8)                                           \
+             */                                                         \
+            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
+                     p_mb->p_data[i_b], p_mb->i_addb_l_stride );        \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    /* chrominance */                                                   \
+    for( i_b = 4; i_b < 4 + p_mb->i_chroma_nb_blocks;                   \
+         i_b++, i_mask >>= 1 )                                          \
+    {                                                                   \
+        if( p_mb->i_coded_block_pattern & i_mask )                      \
+        {                                                               \
+            /*                                                          \
+             * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
+             */                                                         \
+            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+                                  p_mb->pi_sparse_pos[i_b] );           \
+                                                                        \
+            /*                                                          \
+             * Adding prediction and coefficient data (ISO/IEC 13818-2  \
+             * section 7.6.8)                                           \
+             */                                                         \
+            OPBLOCK( p_vdec, p_mb->ppi_blocks[i_b],                     \
+                     p_mb->p_data[i_b], p_mb->i_addb_c_stride );        \
+        }                                                               \
+    }                                                                   \
+}
+
+static __inline__ void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+{
+    if( !(p_mb->i_mb_type & MB_INTRA) )
+    {
+        /*
+         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
+         */
+        p_mb->pf_motion( p_mb );
+
+        DECODEBLOCKS( AddBlock )
+    }
+    else
+    {
+        DECODEBLOCKS( CopyBlock )
+    }
+
+    /*
+     * Decoding is finished, release the macroblock and free
+     * unneeded memory.
+     */
+    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
+}
+
+
+/*******************************************************************************
  * RunThread: video decoder thread
  *******************************************************************************
  * Video decoder thread. This function does only return when the thread is
@@ -205,136 +347,10 @@ static void RunThread( vdec_thread_t *p_vdec )
      */
     if( p_vdec->b_error )
     {
-        ErrorThread( p_vdec );        
+        ErrorThread( p_vdec );
     }
 
     /* End of thread */
     EndThread( p_vdec );
     p_vdec->b_run = 0;
-}
-
-/*******************************************************************************
- * ErrorThread: RunThread() error loop
- *******************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *******************************************************************************/
-static void ErrorThread( vdec_thread_t *p_vdec )
-{
-    macroblock_t *       p_mb;
-
-    /* Wait until a `die' order */
-    while( !p_vdec->b_die )
-    {
-        p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo );
-        vpar_DestroyMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-    }
-}
-
-/*******************************************************************************
- * EndThread: thread destruction
- *******************************************************************************
- * This function is called when the thread ends after a sucessfull 
- * initialization.
- *******************************************************************************/
-static void EndThread( vdec_thread_t *p_vdec )
-{
-    intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
-}
-
-/*******************************************************************************
- * DecodeMacroblock : decode a macroblock of a picture
- *******************************************************************************/
-static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-{
-    int             i_b;
-
-    /*
-     * Motion Compensation (ISO/IEC 13818-2 section 7.6)
-     */
-    (*p_mb->pf_motion)( p_mb );
-
-    /* luminance */
-    for( i_b = 0; i_b < 4; i_b++ )
-    {
-        /*
-         * Inverse DCT (ISO/IEC 13818-2 section Annex A)
-         */
-        (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
-                              p_mb->pi_sparse_pos[i_b] );
-
-        /*
-         * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
-         */
-        (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
-                              p_mb->p_data[i_b], p_mb->i_addb_l_stride );
-    }
-
-    /* chrominance */
-    for( i_b = 4; i_b < 4 + p_mb->i_chroma_nb_blocks; i_b++ )
-    {
-        /*
-         * Inverse DCT (ISO/IEC 13818-2 section Annex A)
-         */
-        (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
-                              p_mb->pi_sparse_pos[i_b] );
-        
-        /*
-         * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
-         */
-        (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
-                              p_mb->p_data[i_b], p_mb->i_addb_c_stride );
-    }
-
-    /*
-     * Decoding is finished, release the macroblock and free
-     * unneeded memory.
-     */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-}
-
-/*******************************************************************************
- * vdec_AddBlock : add a block
- *******************************************************************************/
-void vdec_AddBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
-{
-    int i_x, i_y;
- 
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            *p_data = p_vdec->pi_crop[*p_data + *p_block++];
-            p_data++;
-        }
-        p_data += i_incr;
-    }
-}
-
-/*******************************************************************************
- * vdec_CopyBlock : copy a block
- *******************************************************************************/
-void vdec_CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
-{
-    int i_y;
-
-    for( i_y = 0; i_y < 8; i_y++ )
-    {
-        int i_x;
-
-        for( i_x = 0; i_x < 8; i_x++ )
-        {
-            /* ??? Why does the reference decoder add 128 ??? */
-            *p_data++ = p_vdec->pi_crop[*p_block++];
-        }
-        p_data += i_incr;
-    }
-}
-
-/*******************************************************************************
- * vdec_DummyBlock : dummy function that does nothing
- *******************************************************************************/
-void vdec_DummyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block, yuv_data_t * p_data, int i_incr )
-{
 }

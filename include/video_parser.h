@@ -17,6 +17,41 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ * video_fifo_t
+ *****************************************************************************
+ * This rotative FIFO contains undecoded macroblocks that are to be decoded
+ *****************************************************************************/
+struct vpar_thread_s;
+
+typedef struct video_fifo_s
+{
+    vlc_mutex_t         lock;                              /* fifo data lock */
+    vlc_cond_t          wait;              /* fifo data conditional variable */
+
+    /* buffer is an array of undec_picture_t pointers */
+    macroblock_t *              buffer[VFIFO_SIZE + 1];
+    int                         i_start;
+    int                         i_end;
+
+    struct vpar_thread_s *      p_vpar;
+} video_fifo_t;
+
+/*****************************************************************************
+ * video_buffer_t
+ *****************************************************************************
+ * This structure enables the parser to maintain a list of free
+ * macroblock_t structures
+ *****************************************************************************/
+typedef struct video_buffer_s
+{
+    vlc_mutex_t         lock;                            /* buffer data lock */
+
+    macroblock_t        p_macroblocks[VFIFO_SIZE + 1];
+    macroblock_t *      pp_mb_free[VFIFO_SIZE+1];          /* this is a LIFO */
+    int                 i_index;
+} video_buffer_t;
+
+/*****************************************************************************
  * vpar_thread_t: video parser thread descriptor
  *****************************************************************************
  * ??

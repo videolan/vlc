@@ -33,9 +33,9 @@
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"
-#include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
+#include "video_fifo.h"
 
 
 /*
@@ -571,9 +571,6 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
 static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb )
 {
-    static f_chroma_motion_t pf_chroma_motion[4] =
-    { NULL, vdec_Motion420, vdec_Motion422, vdec_Motion444 };
-
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
     p_mb->i_current_structure = p_vpar->picture.i_current_structure;
@@ -583,7 +580,6 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     p_mb->i_c_x = p_vpar->mb.i_c_x;
     p_mb->i_motion_c_y = p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
-    p_mb->pf_chroma_motion = pf_chroma_motion[p_vpar->sequence.i_chroma_format];
     p_mb->b_P_coding_type = ( p_vpar->picture.i_coding_type == P_CODING_TYPE );
 
     if( (p_vpar->picture.i_coding_type == P_CODING_TYPE) ||
@@ -649,9 +645,21 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb )
 {
-    static f_motion_t   pf_motion[2][4] =
-        { {NULL, vdec_MotionFieldField, vdec_MotionField16x8, vdec_MotionFieldDMV},
-          {NULL, vdec_MotionFrameField, vdec_MotionFrameFrame, vdec_MotionFrameDMV} };
+    static f_motion_t   pppf_motion[4][2][4] =
+      {
+        { {NULL, NULL, NULL, NULL},
+          {NULL, NULL, NULL, NULL}
+        },
+        { {NULL, vdec_MotionFieldField420, vdec_MotionField16x8420, vdec_MotionFieldDMV},
+          {NULL, vdec_MotionFrameField420, vdec_MotionFrameFrame420, vdec_MotionFrameDMV}
+        },
+        { {NULL, vdec_MotionFieldField422, vdec_MotionField16x8422, vdec_MotionFieldDMV},
+          {NULL, vdec_MotionFrameField422, vdec_MotionFrameFrame422, vdec_MotionFrameDMV}
+        },
+        { {NULL, vdec_MotionFieldField444, vdec_MotionField16x8444, vdec_MotionFieldDMV},
+          {NULL, vdec_MotionFrameField444, vdec_MotionFrameFrame444, vdec_MotionFrameDMV}
+        }
+      };
     static int          ppi_mv_count[2][4] = { {0, 1, 2, 1}, {0, 2, 1, 1} };
     static int          ppi_mv_format[2][4] = { {0, 1, 1, 1}, {0, 1, 2, 1} };
 
@@ -699,8 +707,9 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     }
     else
     {
-        p_mb->pf_motion = pf_motion[p_vpar->picture.b_frame_structure]
-                                   [p_vpar->mb.i_motion_type];
+        p_mb->pf_motion = pppf_motion[p_vpar->sequence.i_chroma_format]
+                                     [p_vpar->picture.b_frame_structure]
+                                     [p_vpar->mb.i_motion_type];
     }
 
     p_vpar->mb.i_mv_count = ppi_mv_count[p_vpar->picture.b_frame_structure]
@@ -737,7 +746,6 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
 void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
                            int i_mb_previous, int i_mb_base )
 {
-    static f_addb_t ppf_addb_intra[2] = {vdec_AddBlock, vdec_CopyBlock};
     static f_decode_block_t pppf_decode_block[2][2] =
                 { {vpar_DecodeMPEG1Non, vpar_DecodeMPEG1Intra},
                   {vpar_DecodeMPEG2Non, vpar_DecodeMPEG2Intra} };
@@ -747,7 +755,6 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
 
     int             i_mb, i_b, i_mask;
     macroblock_t *  p_mb;
-    f_addb_t        pf_addb;
     yuv_data_t *    p_data1;
     yuv_data_t *    p_data2;
 
@@ -764,8 +771,13 @@ i_count++;
     {
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
-        static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionFieldField,
-                                vdec_MotionFieldField, vdec_MotionFrameFrame};
+        static f_motion_t   pf_motion_skipped[4][4] =
+          {
+            {NULL, NULL, NULL, NULL},
+            {NULL, vdec_MotionFieldField420, vdec_MotionFieldField420, vdec_MotionFrameFrame420},
+            {NULL, vdec_MotionFieldField422, vdec_MotionFieldField422, vdec_MotionFrameFrame422},
+            {NULL, vdec_MotionFieldField444, vdec_MotionFieldField444, vdec_MotionFrameFrame444},
+          };
 
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
@@ -788,16 +800,11 @@ i_count++;
 
         InitMacroblock( p_vpar, p_mb );
        
-        /* No IDCT nor AddBlock. */
-        for( i_b = 0; i_b < 12; i_b++ )
-        {
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-        }
-
         /* Motion type is picture structure. */
-        p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
+        p_mb->pf_motion = pf_motion_skipped[p_vpar->sequence.i_chroma_format]
+                                           [p_vpar->picture.i_structure];
         p_mb->i_mb_type = MB_MOTION_FORWARD;
+        p_mb->i_coded_block_pattern = 0;
         memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
 
         /* Set the field we use for motion compensation */
@@ -859,17 +866,16 @@ if( 0 )
 
     if( p_vpar->mb.i_mb_type & MB_PATTERN )
     {
-        p_vpar->mb.i_coded_block_pattern = (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
+        p_mb->i_coded_block_pattern = p_vpar->mb.i_coded_block_pattern = (*p_vpar->sequence.pf_decode_pattern)( p_vpar );
 //fprintf( stderr, "pattern : %d\n", p_vpar->mb.i_coded_block_pattern );
     }
     else
     {
         int     pi_coded_block_pattern[2] = {0,
                     (1 << (4+p_vpar->sequence.i_chroma_nb_blocks)) - 1};
-        p_vpar->mb.i_coded_block_pattern = pi_coded_block_pattern
+        p_mb->i_coded_block_pattern = p_vpar->mb.i_coded_block_pattern = pi_coded_block_pattern
                                     [p_vpar->mb.i_mb_type & MB_INTRA];
     }
-    pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
             
     /*
      * Effectively decode blocks.
@@ -889,21 +895,12 @@ if( 0 )
             (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
                                [p_vpar->mb.i_mb_type & MB_INTRA])
                 ( p_vpar, p_mb, i_b );
-        
-            /* decode_block has already set pf_idct and pi_sparse_pos. */
-            p_mb->pf_addb[i_b] = pf_addb;
      
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = p_data1
                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
                                 * p_vpar->sequence.i_width
                                 + pi_x[i_b];
-        }
-        else
-        {
-            /* Block not coded, so no IDCT, nor AddBlock */
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
         }
     }
 
@@ -929,20 +926,11 @@ if( 0 )
                                [p_vpar->mb.i_mb_type & MB_INTRA])
                 ( p_vpar, p_mb, i_b );
 
-            /* decode_block has already set pf_idct and pi_sparse_pos. */
-            p_mb->pf_addb[i_b] = pf_addb;
-
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = pp_data[i_b & 1]
                                  + pi_y[p_vpar->mb.b_dct_type][i_b]
                                    * p_vpar->sequence.i_chroma_width
                                  + pi_x[i_b];
-        }
-        else
-        {
-            /* Block not coded, so no IDCT, nor AddBlock */
-            p_mb->pf_addb[i_b] = vdec_DummyBlock;
-            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
         }
     }
 
