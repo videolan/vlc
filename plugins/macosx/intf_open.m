@@ -2,7 +2,7 @@
  * intf_open.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.m,v 1.3 2002/05/23 22:18:55 jlj Exp $
+ * $Id: intf_open.m,v 1.4 2002/06/02 22:31:52 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -139,18 +139,12 @@ static Intf_Open *o_open = nil;
 
 - (void)awakeFromNib
 {
-    [o_net_channel_pstepper setEnabled: FALSE];
-    
-    [o_net_server_addr addItemWithObjectValue: @"vls"];
-    [o_net_server_addr selectItemAtIndex: 0];
-    
-    [o_net_server_baddr setStringValue: @"138.195.159.255"];
+    [o_net_server_addr setEnabled: NSOffState];
+    [o_net_server_addr_label setStringValue: @"Address"];
+    [o_net_server_port setEnabled: NSOnState];
     [o_net_server_port setIntValue: 1234];
+    [o_net_server_pstepper setEnabled: NSOnState];
     [o_net_server_pstepper setIntValue: [o_net_server_port intValue]];
-
-    [o_net_channel_addr setStringValue: @"vlcs"];
-    [o_net_channel_port setIntValue: 6010];
-    [o_net_channel_pstepper setIntValue: [o_net_channel_port intValue]];
 }
 
 - (IBAction)openDisc:(id)sender
@@ -242,89 +236,70 @@ static Intf_Open *o_open = nil;
 
     if( i_result )
     {
-        BOOL b_channel;
-        BOOL b_broadcast;
         NSString *o_protocol;
+        int i_port = [o_net_server_port intValue];
+        NSString *o_addr = [o_net_server_addr stringValue];
 
         o_protocol = [[o_net_protocol selectedCell] title];
-        b_channel = [o_net_channel_checkbox state] == NSOnState;
-        b_broadcast = [o_net_server_bcheckbox state] == NSOnState;
 
-        if( [o_protocol isEqualToString: @"TS"] )
+        if( [o_protocol isEqualToString: @"UDP"] )
         {
-            o_protocol = @"udpstream";
+            [[Intf_VLCWrapper instance] openNet: @"" port: i_port]; 
         }
-        else if( [o_protocol isEqualToString: @"RTP"] ) 
+        else if( [o_protocol isEqualToString: @"UDP - multicast"] ) 
         {
-            o_protocol = @"rtp";
+            [[Intf_VLCWrapper instance] openNet: o_addr port: i_port]; 
         }
-
-        if( b_channel )
+        else if( [o_protocol isEqualToString: @"Channel server"] ) 
         {
-            NSString *o_channel_addr = [o_net_channel_addr stringValue];
-            int i_channel_port = [o_net_channel_port intValue];
-
-            [[Intf_VLCWrapper instance]
-                openNetChannel: o_channel_addr port: i_channel_port];
+            [[Intf_VLCWrapper instance] openNetChannel: o_addr port: i_port]; 
         }
-        else
+        else if( [o_protocol isEqualToString: @"HTTP"] ) 
         {
-            NSString *o_addr = [o_net_server_addr stringValue];
-            int i_port = [o_net_server_port intValue];
-
-            if( b_broadcast )
-            {
-                NSString *o_baddr = [o_net_server_baddr stringValue];
-
-                [[Intf_VLCWrapper instance]
-                    openNet: o_protocol addr: o_addr
-                        port: i_port baddr: o_baddr]; 
-            }
-            else
-            {
-                [[Intf_VLCWrapper instance]
-                    openNet: o_protocol addr: o_addr
-                        port: i_port baddr: nil];
-            } 
-        } 
+            [[Intf_VLCWrapper instance] openNetHTTP: o_addr]; 
+        }
     }
 }
 
-- (IBAction)openNetBroadcast:(id)sender
+- (IBAction)openNetProtocol:(id)sender
 {
-    BOOL b_broadcast;
-    
-    b_broadcast = [o_net_server_bcheckbox state] == NSOnState;
-    [o_net_server_baddr setEnabled: b_broadcast];
-}
+    NSString *o_protocol;
 
-- (IBAction)openNetChannel:(id)sender
-{
-    BOOL b_channel;
-    BOOL b_broadcast;
-    NSColor *o_color;
+    o_protocol = [[o_net_protocol selectedCell] title];
     
-    b_channel = [o_net_channel_checkbox state] == NSOnState;
-    b_broadcast = [o_net_server_bcheckbox state] == NSOnState;
-    
-    o_color = b_channel ? [NSColor controlTextColor] : 
-        [NSColor disabledControlTextColor];
-
-    [o_net_channel_addr setEnabled: b_channel];
-    [o_net_channel_port setEnabled: b_channel];
-    [o_net_channel_port_label setTextColor: o_color];
-    [o_net_channel_pstepper setEnabled: b_channel];
-    
-    o_color = !b_channel ? [NSColor controlTextColor] : 
-        [NSColor disabledControlTextColor];    
-        
-    [o_net_server_addr setEnabled: !b_channel];
-    [o_net_server_addr_label setTextColor: o_color];
-    [o_net_server_port setEnabled: !b_channel];
-    [o_net_server_port_label setTextColor: o_color];
-    [o_net_server_pstepper setEnabled: !b_channel];
-    [o_net_server_bcheckbox setEnabled: !b_channel];
-    [o_net_server_baddr setEnabled: b_broadcast && !b_channel];
+    if( [o_protocol isEqualToString: @"UDP"] )
+    {
+        [o_net_server_addr setEnabled: NSOffState];
+        [o_net_server_port setEnabled: NSOnState];
+        [o_net_server_port setIntValue: 1234];
+        [o_net_server_pstepper setEnabled: NSOnState];
+    }
+    else if( [o_protocol isEqualToString: @"UDP - multicast"] ) 
+    {
+        [o_net_server_addr setEnabled: NSOnState];
+        [o_net_server_addr_label setStringValue: @"Mult. addr."];
+        [o_net_server_port setEnabled: NSOnState];
+        [o_net_server_port setIntValue: 1234];
+        [o_net_server_pstepper setEnabled: NSOnState];
+    }
+    else if( [o_protocol isEqualToString: @"Channel server"] ) 
+    {
+        [o_net_server_addr setEnabled: NSOnState];
+        [o_net_server_addr_label setStringValue: @"Server"];
+        [o_net_server_addr setStringValue: @"vlcs"];
+        [o_net_server_port setEnabled: NSOnState];
+        [o_net_server_port setIntValue: 6010];
+        [o_net_server_pstepper setEnabled: NSOnState];
+    }
+    else if( [o_protocol isEqualToString: @"HTTP"] ) 
+    {
+        [o_net_server_addr setEnabled: NSOnState];
+        [o_net_server_addr_label setStringValue: @"URL"];
+        [o_net_server_addr setStringValue: @"http://"];
+        [o_net_server_port setEnabled: NSOffState];
+        [o_net_server_pstepper setEnabled: NSOffState];
+    }
+    [o_net_server_pstepper setIntValue: [o_net_server_port intValue]];
 }
 
 - (IBAction)panelCancel:(id)sender
