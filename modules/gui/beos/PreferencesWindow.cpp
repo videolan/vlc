@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.21 2003/05/13 14:11:33 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.22 2003/05/17 18:30:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -39,18 +39,12 @@ int compare_func( const BListItem * _first, const BListItem * _second )
 {
     StringItemWithView * first = (StringItemWithView*) _first;
     StringItemWithView * second = (StringItemWithView*) _second;
-    
-    /* the beos module first */
-    if( !strcmp( first->Text(), "beos" ) )
-        return -1;
-    if( !strcmp( second->Text(), "beos" ) )
-        return 1;
 
-    /* the main module in second */
-    if( !strcmp( first->Text(), "main" ) )
-        return -1;
-    if( !strcmp( second->Text(), "main" ) )
+    /* The Modules tree at last */
+    if( !strcmp( first->Text(), _( "Modules" ) ) )
         return 1;
+    if( !strcmp( second->Text(), _( "Modules" ) ) )
+        return -1;
 
     /* alphabetic order */
     return( strcmp( first->Text(), second->Text() ) );
@@ -75,7 +69,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     fPrefsView = new BView( Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
     fPrefsView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     AddChild( fPrefsView );
-    
+
     /* Create the preferences tree */
     rect = Bounds();
     rect.InsetBy( 10, 10 );
@@ -87,7 +81,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
                                                 B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
                                                 0, false, true );
     fPrefsView->AddChild( scrollview );
-    
+
     /* We need to be informed if the user selects an item */
     fOutline->SetSelectionMessage( new BMessage( PREFS_ITEM_SELECTED ) );
 
@@ -96,14 +90,14 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect.left = rect.right + 15 + B_V_SCROLL_BAR_WIDTH;
     rect.right = Bounds().right - 15;
     fDummyView = new BView( rect, "", B_FOLLOW_ALL_SIDES, B_WILL_DRAW );
+    fDummyView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     fPrefsView->AddChild( fDummyView );
 
     /* Add a category for modules configuration */
     StringItemWithView * modulesItem;
     modulesItem = new StringItemWithView( _("Modules") );
-    modulesItem->fConfigView = NULL;
     fOutline->AddItem( modulesItem );
-   
+
     /* Fill the tree */
     vlc_list_t * p_list;
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -113,139 +107,110 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         return;
     }
 
-    module_t * p_module;
+
+    /* First, handle the main module */
+    module_t * p_module = NULL;
+    module_config_t * p_item;
     for( int i = 0; i < p_list->i_count; i++ )
     {
         p_module = (module_t*) p_list->p_values[i].p_object;
-        
+
+        if( !strcmp( p_module->psz_object_name, "main" ) &&
+            ( p_item = p_module->p_config ) )
+            break;
+        else
+            p_module = NULL;
+    }
+
+    if( p_module )
+    {
+        /* We found the main module */
+        while( p_item->i_type == CONFIG_HINT_CATEGORY )
+        {
+            StringItemWithView * stringItem;
+            stringItem = new StringItemWithView( p_item->psz_text );
+            p_item++;
+            stringItem->fConfigView = BuildConfigView( &p_item, true );
+            fOutline->AddItem( stringItem );
+        }
+    }
+
+    for( int i = 0; i < p_list->i_count; i++ )
+    {
+        p_module = (module_t*) p_list->p_values[i].p_object;
+
+        if( !strcmp( p_module->psz_object_name, "main" ) )
+            continue;
+
         /* If the module has no config option, ignore it */
-        module_config_t * p_item;
         p_item = p_module->p_config;
         if( !p_item )
             continue;
-        do
-        {
+        do {
             if( p_item->i_type & CONFIG_ITEM )
                 break;
         } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
         if( p_item->i_type == CONFIG_HINT_END )
             continue;
-        
-        /* Build the config view for this module */
-        rect = fDummyView->Bounds();
-        rect.right -= B_V_SCROLL_BAR_WIDTH;
-        BView * configView;
-        configView = new BView( rect, "config view",
-                                B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW );
-        configView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
-        
-        rect = configView->Bounds();
-        rect.InsetBy( 10, 10 );
-        rect.bottom = rect.top + TEXT_HEIGHT;
-        ConfigTextControl * textControl;
-        ConfigCheckBox * checkBox;
-        ConfigMenuField * menuField;
-        BPopUpMenu * popUp;
 
-        p_item = p_module->p_config;
-        bool firstItem = true;
-        do
+        /* Create the capability tree if it doesn't already exist */
+        char * psz_capability;
+        psz_capability = p_module->psz_capability;
+        if( !psz_capability || !*psz_capability )
         {
-            switch( p_item->i_type )
+            /* Empty capability ? Let's look at the submodules */
+            module_t * p_submodule;
+            for( int j = 0; j < p_module->i_children; j++ )
             {
-                case CONFIG_ITEM_STRING:
-                case CONFIG_ITEM_FILE:
-                case CONFIG_ITEM_MODULE:
-                case CONFIG_ITEM_DIRECTORY:
-                    if( !firstItem )
-                        rect.OffsetBy( 0, 25 );
-                    else
-                        firstItem = false;
-                    
-                    if( p_item->ppsz_list && p_item->ppsz_list[0] )
-                    {
-                        popUp = new BPopUpMenu( "" );
-                        menuField = new ConfigMenuField( rect, p_item->psz_text,
-                                                         popUp, p_item->psz_name );
-                        BMenuItem * menuItem;
-                        for( int i = 0; p_item->ppsz_list[i]; i++ )
-                        {
-                            menuItem = new BMenuItem( p_item->ppsz_list[i], new BMessage() );
-                            popUp->AddItem( menuItem );
-                        }
-                        configView->AddChild( menuField );
-                    }
-                    else
-                    {
-                        textControl = new ConfigTextControl( rect, p_item->psz_text,
-                                                             CONFIG_ITEM_STRING, p_item->psz_name );
-                        configView->AddChild( textControl );
-                    }
+                p_submodule = (module_t*)p_module->pp_children[ j ];
+                if( p_submodule->psz_capability && *p_submodule->psz_capability )
+                {
+                    psz_capability = p_submodule->psz_capability;
                     break;
-
-                case CONFIG_ITEM_INTEGER:
-                    if( !firstItem )
-                        rect.OffsetBy( 0, 25 );
-                    else
-                        firstItem = false;
-                        
-                    textControl = new ConfigTextControl( rect, p_item->psz_text,
-                                                         CONFIG_ITEM_INTEGER, p_item->psz_name );
-                    configView->AddChild( textControl );
-                    break;
-
-                case CONFIG_ITEM_FLOAT:
-                    if( !firstItem )
-                        rect.OffsetBy( 0, 25 );
-                    else
-                        firstItem = false;
-                        
-                    textControl = new ConfigTextControl( rect, p_item->psz_text,
-                                                         CONFIG_ITEM_FLOAT, p_item->psz_name );
-                    configView->AddChild( textControl );
-                    break;
-            
-                case CONFIG_ITEM_BOOL:
-                    if( !firstItem )
-                        rect.OffsetBy( 0,25 );
-                    else
-                       firstItem = false;
-                       
-                    checkBox = new ConfigCheckBox( rect, p_item->psz_text,
-                                                   p_item->psz_name );
-                    configView->AddChild( checkBox );
-                    break;
+                }
             }
+        }
 
-        } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-    
-        /* Adjust the configView size */
-        rect.bottom += 10;
-        configView->ResizeTo( configView->Bounds().Width(), rect.bottom );
+        StringItemWithView * capabilityItem;
+        capabilityItem = NULL;
+        for( int j = 0; j < fOutline->CountItemsUnder( modulesItem, true ); j++ )
+        {
+            if( !strcmp( ((StringItemWithView*)
+                             fOutline->ItemUnderAt( modulesItem, true, j ))->Text(),
+                         psz_capability ) )
+            {
+                capabilityItem = (StringItemWithView*)
+                    fOutline->ItemUnderAt( modulesItem, true, j );
+                break;
+            }
+        }
+        if( !capabilityItem )
+        {
+             capabilityItem = new StringItemWithView( psz_capability );
+             fOutline->AddUnder( capabilityItem, modulesItem );
+        }
 
-        /* Add the item to the tree */
+        /* Now add the item ! */
         StringItemWithView * stringItem;
         stringItem = new StringItemWithView( p_module->psz_object_name );
-        stringItem->fConfigView = configView;
-        if( !strcmp( p_module->psz_object_name, "beos" )
-            || !strcmp( p_module->psz_object_name, "main" ) )
-            fOutline->AddItem( stringItem );
-        else
-            fOutline->AddUnder( stringItem, modulesItem );
+        stringItem->fConfigView = BuildConfigView( &p_item, false );
+        fOutline->AddUnder( stringItem, capabilityItem );
     }
-    
+
     vlc_list_release( p_list );
-    
+
     /* Set the correct values */
     ApplyChanges( false );
-    
-    /* Sort items, collapse the Modules one */
+
+    /* Sort items, collapse the tree */
     fOutline->FullListSortItems( compare_func );
     fOutline->Collapse( modulesItem );
-    
+    for( int i = 0; i < fOutline->CountItemsUnder( modulesItem, true ); i++ )
+        fOutline->Collapse( fOutline->ItemUnderAt( modulesItem, true, i ) );
+
     /* Select the first item */
     fOutline->Select( 0 );
-    
+
     /* Add the buttons */
     BButton * button;
     rect = Bounds();
@@ -264,7 +229,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     button = new BButton( rect, "", _("Defaults"), new BMessage( PREFS_DEFAULTS ),
                           B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM );
     fPrefsView->AddChild( button );
-    
+
     Hide();
     Show();
 }
@@ -296,16 +261,16 @@ void PreferencesWindow::MessageReceived( BMessage * message )
         case PREFS_ITEM_SELECTED:
             Update();
             break;
-        
+
         case PREFS_DEFAULTS:
             config_ResetAll( p_intf );
             ApplyChanges( false );
             break;
-        
+
         case PREFS_APPLY:
             ApplyChanges( true );
             break;
-        
+
         case PREFS_SAVE:
             SaveChanges();
             break;
@@ -321,7 +286,7 @@ void PreferencesWindow::MessageReceived( BMessage * message )
 void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
-    
+
     /* Get the current config BView */
     BView * view;
     view = fConfigScroll->ChildAt( 0 );
@@ -339,9 +304,9 @@ void PreferencesWindow::Update()
         return;
     StringItemWithView * selectedItem =
         (StringItemWithView*) fOutline->ItemAt( fOutline->CurrentSelection() );
-    
+
     if( !selectedItem->fConfigView )
-        /* This must be the "Modules" item */
+        /* This is a category */
         return;
 
     if( fConfigScroll )
@@ -357,7 +322,7 @@ void PreferencesWindow::Update()
         fDummyView->RemoveChild( fConfigScroll );
         delete fConfigScroll;
     }
-    
+
     /* Create a BScrollView with the new config BView in it */
     BRect oldBounds = selectedItem->fConfigView->Bounds();
     selectedItem->fConfigView->ResizeTo( fDummyView->Bounds().Width() -
@@ -380,15 +345,15 @@ void PreferencesWindow::UpdateScrollBar()
 {
     /* We have to fix the scrollbar manually because it doesn't handle
        correctly simple BViews */
-       
+
     /* Get the current config view */
     BView * view;
     view = fConfigScroll->ChildAt( 0 );
-    
+
     /* Get the available BRect for display */
     BRect display = fConfigScroll->Bounds();
     display.right -= B_V_SCROLL_BAR_WIDTH;
-    
+
     /* Fix the scrollbar */
     BScrollBar * scrollBar;
     long max;
@@ -417,9 +382,9 @@ void PreferencesWindow::ApplyChanges( bool doIt )
     {
         item = (StringItemWithView*) fOutline->ItemAt( i );
         view = item->fConfigView;
-        
+
         if( !view )
-            /* This must be the "Modules" item */
+            /* This is a category */
             continue;
 
         for( int j = 0; j < view->CountChildren(); j++ )
@@ -521,3 +486,115 @@ void PreferencesWindow::ReallyQuit()
     Hide();
     Quit();
 }
+
+/*****************************************************************************
+ * PreferencesWindow::BuildConfigView
+ *****************************************************************************/
+BView * PreferencesWindow::BuildConfigView( module_config_t ** pp_item,
+                                            bool stop_after_category )
+{
+    /* Build the config view for this module */
+    BRect rect = fDummyView->Bounds();
+    rect.right -= B_V_SCROLL_BAR_WIDTH;
+    BView * configView;
+    configView = new BView( rect, "config view",
+                            B_FOLLOW_NONE, B_WILL_DRAW );
+    configView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+
+    rect = configView->Bounds();
+    rect.InsetBy( 10, 10 );
+    rect.bottom = rect.top + TEXT_HEIGHT;
+    ConfigTextControl * textControl;
+    ConfigCheckBox * checkBox;
+    ConfigMenuField * menuField;
+    BPopUpMenu * popUp;
+
+    bool firstItem = true;
+    bool categoryHit = false;
+    do
+    {
+        switch( (*pp_item)->i_type )
+        {
+            case CONFIG_ITEM_STRING:
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_MODULE:
+            case CONFIG_ITEM_DIRECTORY:
+                if( !firstItem )
+                    rect.OffsetBy( 0, 25 );
+                else
+                    firstItem = false;
+
+                if( (*pp_item)->ppsz_list && (*pp_item)->ppsz_list[0] )
+                {
+                    popUp = new BPopUpMenu( "" );
+                    menuField = new ConfigMenuField( rect, (*pp_item)->psz_text,
+                                                     popUp, (*pp_item)->psz_name );
+                    BMenuItem * menuItem;
+                    for( int i = 0; (*pp_item)->ppsz_list[i]; i++ )
+                    {
+                        menuItem = new BMenuItem( (*pp_item)->ppsz_list[i], new BMessage() );
+                        popUp->AddItem( menuItem );
+                    }
+                    configView->AddChild( menuField );
+                }
+                else
+                {
+                    textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
+                                                         CONFIG_ITEM_STRING, (*pp_item)->psz_name );
+                    configView->AddChild( textControl );
+                }
+                break;
+
+            case CONFIG_ITEM_INTEGER:
+                if( !firstItem )
+                    rect.OffsetBy( 0, 25 );
+                else
+                    firstItem = false;
+
+                textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
+                                                     CONFIG_ITEM_INTEGER, (*pp_item)->psz_name );
+                configView->AddChild( textControl );
+                break;
+
+            case CONFIG_ITEM_FLOAT:
+                if( !firstItem )
+                    rect.OffsetBy( 0, 25 );
+                else
+                    firstItem = false;
+
+                textControl = new ConfigTextControl( rect, (*pp_item)->psz_text,
+                                                     CONFIG_ITEM_FLOAT, (*pp_item)->psz_name );
+                configView->AddChild( textControl );
+                break;
+
+            case CONFIG_ITEM_BOOL:
+                if( !strcmp( (*pp_item)->psz_name, "advanced" ) )
+                    /* Don't show this one, the interface doesn't handle it anyway */
+                    break;
+
+                if( !firstItem )
+                    rect.OffsetBy( 0,25 );
+                else
+                   firstItem = false;
+
+                checkBox = new ConfigCheckBox( rect, (*pp_item)->psz_text,
+                                               (*pp_item)->psz_name );
+                configView->AddChild( checkBox );
+                break;
+
+            case CONFIG_HINT_CATEGORY:
+                if( stop_after_category )
+                    categoryHit = true;
+        }
+
+    } while( !categoryHit &&
+             (*pp_item)->i_type != CONFIG_HINT_END &&
+             (*pp_item)++ );
+
+    /* Adjust the configView size */
+    rect.bottom += 10;
+    configView->ResizeTo( configView->Bounds().Width(), rect.bottom );
+
+    return configView;
+}
+

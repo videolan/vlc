@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.14 2003/05/13 14:11:33 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.15 2003/05/17 18:30:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,7 +26,7 @@
 
 #include <InterfaceKit.h>
 
-#define PREFS_WINDOW_WIDTH   600
+#define PREFS_WINDOW_WIDTH   700
 #define PREFS_WINDOW_HEIGHT  400
 #define PREFS_ITEM_SELECTED  'pris'
 #define PREFS_DEFAULTS       'prde'
@@ -38,7 +38,10 @@ class StringItemWithView : public BStringItem
 {
   public:
                             StringItemWithView( const char * text )
-                                : BStringItem( text ) {}
+                                : BStringItem( text )
+                            {
+                                fConfigView = NULL;
+                            }
 
     /* Here we store the config BView associated to this module */
     BView *                 fConfigView;
@@ -108,6 +111,9 @@ class PreferencesWindow : public BWindow
             void            ReallyQuit();
 
   private:
+    BView *                 BuildConfigView( module_config_t ** pp_item,
+                                             bool stop_after_category );
+
     BView *                 fPrefsView;
     BOutlineListView *      fOutline;
     BView *                 fDummyView;

@@ -2,7 +2,7 @@
  * MessagesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.h,v 1.3 2003/02/10 15:23:46 titer Exp $
+ * $Id: MessagesWindow.h,v 1.4 2003/05/17 18:30:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,6 +26,25 @@
 
 #include <Window.h>
 
+class MessagesView : public BTextView
+{
+    public:
+                             MessagesView( intf_thread_t * _p_intf,
+                                           BRect rect, char * name, BRect textRect,
+                                           uint32 resizingMode, uint32 flags )
+                                 : BTextView( rect, name, textRect,
+                                              resizingMode, flags )
+                             {
+                                 p_intf = _p_intf;
+                                 p_sub = ((intf_sys_t*)p_intf->p_sys)->p_sub;
+                             }
+        virtual void         Pulse();
+
+        intf_thread_t *      p_intf;
+        msg_subscription_t * p_sub;
+        BScrollBar *         fScrollBar;
+};
+
 class MessagesWindow : public BWindow
 {
     public:
@@ -34,15 +53,14 @@ class MessagesWindow : public BWindow
         virtual              ~MessagesWindow();
         virtual void         FrameResized( float, float );
         virtual bool         QuitRequested();
-        
+
         void                 ReallyQuit();
 
         intf_thread_t *      p_intf;
-        
+
         BView *              fBackgroundView;
-        BTextView *          fMessagesView;
+        MessagesView *       fMessagesView;
         BScrollView *        fScrollView;
-        BScrollBar *         fScrollBar;
 };
 
 #endif	// BEOS_PREFERENCES_WINDOW_H

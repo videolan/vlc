@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.9 2003/05/17 15:20:46 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.10 2003/05/17 18:30:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -34,7 +34,85 @@
 #include "InterfaceWindow.h"
 #include "MessagesWindow.h"
 
-static int UpdateMessages( intf_thread_t * p_intf );
+/*****************************************************************************
+ * MessagesView::Pulse
+ *****************************************************************************/
+void MessagesView::Pulse()
+{
+    int i_start, oldLength;
+    char * psz_module_type = NULL;
+    rgb_color red = { 200, 0, 0 };
+    rgb_color gray = { 150, 150, 150 };
+    rgb_color green = { 0, 150, 0 };
+    rgb_color orange = { 230, 180, 00 };
+    rgb_color color;
+
+    vlc_mutex_lock( p_sub->p_lock );
+    int i_stop = *p_sub->pi_stop;
+    vlc_mutex_unlock( p_sub->p_lock );
+
+    if( p_sub->i_start != i_stop )
+    {
+        for( i_start = p_sub->i_start;
+             i_start != i_stop;
+                 i_start = (i_start+1) % VLC_MSG_QSIZE )
+        {
+            /* Add message */
+            switch( p_sub->p_msg[i_start].i_type )
+            {
+                case VLC_MSG_INFO: color = green; break;
+                case VLC_MSG_WARN: color = orange; break;
+                case VLC_MSG_ERR: color = red; break;
+                case VLC_MSG_DBG: color = gray; break;
+            }
+
+            switch( p_sub->p_msg[i_start].i_object_type )
+            {
+                case VLC_OBJECT_ROOT: psz_module_type = "root"; break;
+                case VLC_OBJECT_VLC: psz_module_type = "vlc"; break;
+                case VLC_OBJECT_MODULE: psz_module_type = "module"; break;
+                case VLC_OBJECT_INTF: psz_module_type = "interface"; break;
+                case VLC_OBJECT_PLAYLIST: psz_module_type = "playlist"; break;
+                case VLC_OBJECT_ITEM: psz_module_type = "item"; break;
+                case VLC_OBJECT_INPUT: psz_module_type = "input"; break;
+                case VLC_OBJECT_DECODER: psz_module_type = "decoder"; break;
+                case VLC_OBJECT_VOUT: psz_module_type = "video output"; break;
+                case VLC_OBJECT_AOUT: psz_module_type = "audio output"; break;
+                case VLC_OBJECT_SOUT: psz_module_type = "stream output"; break;
+            }
+
+            if( LockLooper() )
+            {
+                oldLength = TextLength();
+    	        BString string;
+    	        string << p_sub->p_msg[i_start].psz_module
+    	            << " " << psz_module_type << " : "
+    	            << p_sub->p_msg[i_start].psz_msg << "\n";
+    	        Insert( TextLength(), string.String(), strlen( string.String() ) );
+    	        SetFontAndColor( oldLength, TextLength(), NULL, 0, &color );
+    	        Draw( Bounds() );
+	            UnlockLooper();
+            }
+        }
+
+        vlc_mutex_lock( p_sub->p_lock );
+        p_sub->i_start = i_start;
+        vlc_mutex_unlock( p_sub->p_lock );
+    }
+
+    /* Scroll at the end unless the is user is selecting something */
+    int32 start, end;
+    GetSelection( &start, &end );
+    if( start == end && fScrollBar->LockLooper() )
+    {
+        float min, max;
+        fScrollBar->GetRange( &min, &max );
+        fScrollBar->SetValue( max );
+        fScrollBar->UnlockLooper();
+    }
+
+    BTextView::Pulse();
+}
 
 /*****************************************************************************
  * MessagesWindow::MessagesWindow
@@ -54,25 +132,19 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	textRect = rect;
 	textRect.InsetBy( 5, 5 );
-	fMessagesView = new BTextView( rect, "messages", textRect,
-	                               B_FOLLOW_ALL, B_WILL_DRAW );
+	fMessagesView = new MessagesView( p_intf,
+	                                  rect, "messages", textRect,
+	                                  B_FOLLOW_ALL, B_WILL_DRAW );
 	fMessagesView->MakeEditable( false );
 	fMessagesView->SetStylable( true );
 	fScrollView = new BScrollView( "scrollview", fMessagesView, B_WILL_DRAW,
 	                               B_FOLLOW_ALL, false, true );
-	fScrollBar = fScrollView->ScrollBar( B_VERTICAL );
+	fMessagesView->fScrollBar = fScrollView->ScrollBar( B_VERTICAL );
 	AddChild( fScrollView );
 	
     /* start window thread in hidden state */
     Hide();
     Show();
-
-    /* update it */
-    if( vlc_thread_create( p_intf, "update messages", UpdateMessages,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-    {
-        msg_Err( p_intf, "cannot create update messages thread" );
-    }
 }
 
 /*****************************************************************************
@@ -80,7 +152,6 @@ MessagesWindow::MessagesWindow( intf_thread_t * p_intf,
  *****************************************************************************/
 MessagesWindow::~MessagesWindow()
 {
-    vlc_thread_join( p_intf );
 }
 
 /*****************************************************************************
@@ -111,99 +182,4 @@ void MessagesWindow::ReallyQuit()
     Lock();
     Hide();
     Quit();
-}
-
-/*****************************************************************************
- * UpdateMessages
- *****************************************************************************/
-static int UpdateMessages( intf_thread_t * p_intf )
-{
-    /* workaround: wait a bit or it'll crash */
-    msleep( 500000 );
-
-    intf_sys_t * p_sys = (intf_sys_t*)p_intf->p_sys;
-    msg_subscription_t * p_sub = p_sys->p_sub;
-    MessagesWindow * messagesWindow = p_sys->p_window->fMessagesWindow;
-    BTextView * messagesView = messagesWindow->fMessagesView;
-    BScrollBar * scrollBar = messagesWindow->fScrollBar;
-
-    while( !p_intf->b_die )
-    {
-        int i_start, oldLength;
-        char * psz_module_type = NULL;
-        rgb_color red = { 200, 0, 0 };
-        rgb_color gray = { 150, 150, 150 };
-        rgb_color green = { 0, 150, 0 };
-        rgb_color orange = { 230, 180, 00 };
-        rgb_color color;
-    
-        vlc_mutex_lock( p_sub->p_lock );
-        int i_stop = *p_sub->pi_stop;
-        vlc_mutex_unlock( p_sub->p_lock );
-
-        if( p_sub->i_start != i_stop )
-        {
-            for( i_start = p_sub->i_start;
-                 i_start != i_stop;
-                 i_start = (i_start+1) % VLC_MSG_QSIZE )
-            {
-                /* Add message */
-                switch( p_sub->p_msg[i_start].i_type )
-                {
-                    case VLC_MSG_INFO: color = green; break;
-                    case VLC_MSG_WARN: color = orange; break;
-                    case VLC_MSG_ERR: color = red; break;
-                    case VLC_MSG_DBG: color = gray; break;
-                }
-            
-                switch( p_sub->p_msg[i_start].i_object_type )
-                {
-                    case VLC_OBJECT_ROOT: psz_module_type = "root"; break;
-                    case VLC_OBJECT_VLC: psz_module_type = "vlc"; break;
-                    case VLC_OBJECT_MODULE: psz_module_type = "module"; break;
-                    case VLC_OBJECT_INTF: psz_module_type = "interface"; break;
-                    case VLC_OBJECT_PLAYLIST: psz_module_type = "playlist"; break;
-                    case VLC_OBJECT_ITEM: psz_module_type = "item"; break;
-                    case VLC_OBJECT_INPUT: psz_module_type = "input"; break;
-                    case VLC_OBJECT_DECODER: psz_module_type = "decoder"; break;
-                    case VLC_OBJECT_VOUT: psz_module_type = "video output"; break;
-                    case VLC_OBJECT_AOUT: psz_module_type = "audio output"; break;
-                    case VLC_OBJECT_SOUT: psz_module_type = "stream output"; break;
-                }
-   
-                if ( messagesView->LockLooper() )
-                {
-    	            oldLength = messagesView->TextLength();
-    	            BString string;
-    	            string << p_sub->p_msg[i_start].psz_module << " " << psz_module_type << " : " <<
-    	                p_sub->p_msg[i_start].psz_msg << "\n";
-    	            messagesView->Insert( messagesView->TextLength(),
-    	                                  string.String(),
-    	                                  strlen( string.String() ) );
-    	            messagesView->SetFontAndColor( oldLength,
-    	                                           messagesView->TextLength(),
-    	                                           NULL, 0, &color );
-    	            messagesView->Draw( messagesView->Bounds() );
-	                messagesView->UnlockLooper();
-                }
-            
-                /* Scroll at the end */
-                
-                if( scrollBar->LockLooper() )
-                {
-                    float min, max;
-                    scrollBar->GetRange( &min, &max );
-                    scrollBar->SetValue( max );
-                    scrollBar->UnlockLooper();
-                }
-            }
-
-            vlc_mutex_lock( p_sub->p_lock );
-            p_sub->i_start = i_start;
-            vlc_mutex_unlock( p_sub->p_lock );
-        }
-        /* Wait a bit */
-        msleep( INTF_IDLE_SLEEP );
-    }
-    return 0;
 }
