@@ -106,8 +106,8 @@ vlc_module_begin();
     set_description( _("MPEG audio layer I/II/III parser") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
-#if defined(SYS_DARWIN)
-    set_capability( "decoder", 5 );
+#if defined(SYS_DARWIN) || defined(UNDER_CE)
+   set_capability( "decoder", 5 );
 #else
     set_capability( "decoder", 100 );
 #endif
