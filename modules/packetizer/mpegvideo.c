@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.28 2004/01/27 14:05:33 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.29 2004/02/20 18:24:41 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -76,7 +76,7 @@ struct decoder_sys_t
     int i_offset;
     uint8_t p_startcode[3];
 
-    /* Sequence header and extention */
+    /* Sequence header and extension */
     block_t *p_seq;
     block_t *p_ext;
 
@@ -92,6 +92,7 @@ struct decoder_sys_t
     vlc_bool_t  b_seq_progressive;
     vlc_bool_t  b_low_delay;
     int         i_aspect_ratio_info;
+    vlc_bool_t  b_inited;
 
     /* Picture properties */
     int i_temporal_ref;
@@ -105,7 +106,7 @@ struct decoder_sys_t
     mtime_t i_old_duration;
     mtime_t i_last_ref_pts;
 
-    /* Number of pictues since last sequence header */
+    /* Number of pictures since last sequence header */
     int i_seq_old;
 
 };
@@ -162,6 +163,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_top_field_first = 0;
     p_sys->i_repeat_first_field = 0;
     p_sys->i_progressive_frame = 0;
+    p_sys->b_inited = 0;
 
     p_sys->i_interpolated_dts = 0;
     p_sys->i_old_duration = 0;
@@ -484,11 +486,13 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->b_seq_progressive = VLC_TRUE;
         p_sys->b_low_delay = VLC_TRUE;
 
-#if 0
-        msg_Dbg( p_dec, "Size %dx%d fps=%.3f",
+        if ( !p_sys->b_inited )
+        {
+            msg_Dbg( p_dec, "Size %dx%d fps=%.3f",
                  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
                  p_sys->i_frame_rate / (float)p_sys->i_frame_rate_base );
-#endif
+            p_sys->b_inited = 1;
+        }
     }
     else if( p_frag->p_buffer[3] == 0xb5 )
     {
