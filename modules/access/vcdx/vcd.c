@@ -75,11 +75,11 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
 "   %L : The playlist ID prefixed with \" LID\" if it exists\n" \
 "   %N : The current number of the %I - a decimal number\n" \
 "   %P : The publisher ID\n" \
-"   %p : The preparer I\n" \
+"   %p : The preparer ID\n" \
 "   %S : If we are in a segment (menu), the kind of segment\n" \
-"   %T : The track number\n" \
-"   %V : The volume set I\n" \
-"   %v : The volume I\n" \
+"   %T : The MPEG track number (starts at 1)\n" \
+"   %V : The volume set ID\n" \
+"   %v : The volume ID\n" \
 "       A number between 1 and the volume count.\n" \
 "   %% : a % \n")
 
@@ -91,8 +91,11 @@ vlc_module_begin();
     add_usage_hint( N_("vcdx://[device-or-file][@{P,S,T}num]") );
     set_description( _("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") );
     set_capability( "access2", 55 /* slightly lower than vcd */ );
+    set_shortname( N_("(Super) Video CD"));
     set_callbacks( E_(VCDOpen), E_(VCDClose) );
     add_shortcut( "vcdx" );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ACCESS );
 
     /* Configuration options */
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback),
@@ -112,7 +115,7 @@ vlc_module_begin();
                 VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-title-format",
-                "%I %N%L%S - %M",
+                "%I %N%L%S - %M %A %v - disc %c of %C %F",
                 NULL,
                 N_("Format to use in playlist \"title\" field"),
                 VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );

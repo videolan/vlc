@@ -66,13 +66,10 @@ typedef enum {
 typedef struct thread_vcd_data_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
-  vlc_bool_t   in_still;                /*  true if in still */
-  vlc_bool_t   b_svd;                   /*  true if we have SVD info */
-  track_t      i_tracks;                /* # of tracks */
-  unsigned int i_segments;              /* # of segments */
-  unsigned int i_entries;               /* # of entries */
-  unsigned int i_lids;                  /* # of List IDs */
-  unsigned int i_titles;                /* # of navigatable titles. */
+
+  /* Current State: position */
+  int          i_debug;                 /* Debugging mask */
+  vlc_bool_t   in_still;                /* true if in still */
   vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY 
                                            if none */
   int          i_lid;                   /* LID that play item is in. Implies 
@@ -93,21 +90,26 @@ typedef struct thread_vcd_data_s
   lsn_t        end_lsn;                 /* LSN of end of current 
                                            entry/segment/track. */
   lsn_t        origin_lsn;              /* LSN of start of seek/slider */
-  lsn_t *      p_sectors;               /* Track sectors. This is 0 origin
-                                           so the first VCD track will be
-                                           at 0 and this is the ISO9660 
-                                           filesystem. The first Mode2 form2
-                                           MPEG track is probably track 2 or
-                                           p_sectors[1].
-                                         */
+
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
   vlc_bool_t   b_valid_ep;              /* Valid entry points flag */
   vlc_bool_t   b_end_of_track;          /* If the end of track was reached */
-  int          i_debug;                 /* Debugging mask */
 
-  /* Information about CD */
-  vlc_meta_t    *p_meta;
+  /* Information about (S)VCD */
+  char *       psz_source;              /* (S)VCD drive or image filename */
+  vlc_bool_t   b_svd;                   /* true if we have SVD info */
+  vlc_meta_t  *p_meta;
+  track_t      i_tracks;                /* # of playable MPEG tracks. This is 
+                                           generally one less than the number
+                                           of CD tracks as the first CD track
+                                           is an ISO-9660 track and is not
+                                           playable.
+                                        */
+  unsigned int i_segments;              /* # of segments */
+  unsigned int i_entries;               /* # of entries */
+  unsigned int i_lids;                  /* # of List IDs */
+  unsigned int i_titles;                /* # of navigatable titles. */
 
   input_title_t *p_title[CDIO_CD_MAX_TRACKS];
 

@@ -31,9 +31,9 @@ int VCDFixupPlayList( access_t *p_access, access_vcd_data_t *p_vcd,
 /*
  Sets VCD meta information and navigation/playlist entries. 
  */
-void VCDMetaInfo( access_t *p_access  );
+void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );
 
-char *
-VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
-             const char format_str[], const char *mrl,
-             const vcdinfo_itemid_t *itemid);
+
+char * VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
+		    const char format_str[], const char *mrl,
+		    const vcdinfo_itemid_t *itemid);

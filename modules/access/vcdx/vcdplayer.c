@@ -91,8 +91,8 @@ vcdplayer_non_pbc_nav ( access_t * p_access )
   case VCDINFO_ITEM_TYPE_TRACK:
   case VCDINFO_ITEM_TYPE_ENTRY: {
 
-    dbg_print( INPUT_DBG_LSN, "new track %d, lsn %d", p_vcd->i_track, 
-               p_vcd->p_sectors[p_vcd->i_track+1] );
+    dbg_print( INPUT_DBG_LSN, "new track %d, lsn %d", p_vcd->i_track+1, 
+               vcdinfo_get_track_lsn(p_vcd->vcd, p_vcd->i_track+1) );
     return READ_END;
     break;
   }

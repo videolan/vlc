@@ -36,6 +36,10 @@
 #include <libvcd/info.h>
 #include <libvcd/logging.h>
 
+static char *VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
+			  const char format_str[], const char *mrl,
+			  const vcdinfo_itemid_t *itemid);
+
 static inline void
 MetaInfoAddStr(access_t *p_access, char *p_cat,
                char *title, const char *str)
@@ -63,7 +67,7 @@ MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
   MetaInfoAddNum( p_access, psz_cat, title, num );
 
 void 
-VCDMetaInfo( access_t *p_access  )
+VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 {
   access_vcd_data_t *p_vcd = (access_vcd_data_t *) p_access->p_sys;
   unsigned int i_entries = vcdinfo_get_num_entries(p_vcd->vcd);
@@ -96,8 +100,8 @@ VCDMetaInfo( access_t *p_access  )
   for( i_track = 1 ; i_track < p_vcd->i_tracks ; i_track++ ) {
     unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcd->vcd, 
 							   i_track);
-    uint32_t i_secsize = 
-      p_vcd->p_sectors[i_track+1] - p_vcd->p_sectors[i_track];
+    uint32_t i_secsize = vcdinfo_get_track_sect_count(p_vcd->vcd, i_track);
+
     if (p_vcd->b_svd) {
       addnum(_("Audio Channels"),  
 	     vcdinfo_audio_type_num_channels(p_vcd->vcd, audio_type) );
@@ -110,6 +114,17 @@ VCDMetaInfo( access_t *p_access  )
     addnum(_("Last Entry Point"), last_entry-1 );
     addnum(_("Track size (in sectors)"), i_secsize );
   }
+
+  if ( CDIO_INVALID_TRACK != i_track )
+  { 
+    char *psz_name = 
+      VCDFormatStr( p_access, p_vcd,
+		    config_GetPsz( p_access, MODULE_STRING "-title-format" ),
+		    psz_mrl, &(p_vcd->play_item) );
+    
+    input_Control( p_vcd->p_input, INPUT_SET_NAME, psz_name );
+  }
+
 }
 
 #define add_format_str_info(val)			       \
