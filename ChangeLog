@@ -4,6 +4,7 @@
 
 HEAD
 
+  * MacOS X icon is now correctly added to the app 
   * Fixed a compilation issue in the DVDioctl driver.
   * Added a call to ranlib after a built-in module compilation.
 
