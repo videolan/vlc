@@ -229,6 +229,10 @@ VLC_EXPORT( int, __net_Read, ( vlc_object_t *p_this, int fd, uint8_t *p_data, in
 #define net_ReadNonBlock(a,b,c,d,e) __net_ReadNonBlock(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_ReadNonBlock, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, mtime_t i_wait ) );
 
+#define net_Select(a,b,c,d,e,f) __net_Select(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( int, __net_Select, ( vlc_object_t *p_this, int *pi_fd, int i_fd,uint8_t *p_data, int i_data, mtime_t i_wait ) );
+
+
 #define net_Write(a,b,c,d) __net_Write(VLC_OBJECT(a),b,c,d)
 VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data ) );
 

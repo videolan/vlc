@@ -448,6 +448,88 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
     return -1;
 }
 
+/*****************************************************************************
+ * __net_Select:
+ *****************************************************************************
+ * Read from several sockets (with timeout)
+ *****************************************************************************/
+int __net_Select( vlc_object_t *p_this, int *pi_fd, int i_fd, uint8_t *p_data,
+                      int i_data, mtime_t i_wait )
+{
+    struct timeval  timeout;
+    fd_set          fds_r, fds_e;
+    int             i_recv;
+    int             i_ret;
+    int             i;
+    int             i_max_fd = 0;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds_r );
+    FD_ZERO( &fds_e );
+
+    for( i = 0 ; i < i_fd ; i++)
+    {
+        if( pi_fd[i] > i_max_fd ) i_max_fd = pi_fd[i];
+        FD_SET( pi_fd[i], &fds_r );
+        FD_SET( pi_fd[i], &fds_e );
+    }
+
+    timeout.tv_sec = 0;
+    timeout.tv_usec = i_wait;
+
+    i_ret = select( i_max_fd + 1, &fds_r, NULL, &fds_e, &timeout );
+
+    if( i_ret < 0 && errno == EINTR )
+    {
+        return 0;
+    }
+    else if( i_ret < 0 )
+    {
+        msg_Err( p_this, "network select error (%s)", strerror(errno) );
+        return -1;
+    }
+    else if( i_ret == 0 )
+    {
+        return 0;
+    }
+    else
+    {
+        for( i = 0 ; i < i_fd ; i++)
+        {
+            if( FD_ISSET( pi_fd[i], &fds_r ) )
+            {
+                i_recv = recv( pi_fd[i], p_data, i_data, 0 );
+                if( i_recv <= 0 )
+                {
+#ifdef WIN32
+                    /* For udp only */
+                    /* On win32 recv() will fail if the datagram doesn't
+                     * fit inside the passed buffer, even though the buffer
+                     *  will be filled with the first part of the datagram. */
+                    if( WSAGetLastError() == WSAEMSGSIZE )
+                    {
+                        msg_Err( p_this, "recv() failed. "
+                             "Increase the mtu size (--mtu option)" );
+                    }
+                    else
+                        msg_Err( p_this, "recv failed (%i)",
+                                        WSAGetLastError() );
+#else
+                     msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+#endif
+                    return VLC_EGENERIC;
+                }
+
+                return i_recv;
+            }
+        }
+    }
+
+    /* We will never be here */
+    return -1;
+}
+
+
 /* Write exact amount requested */
 int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
 {
