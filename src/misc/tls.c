@@ -46,7 +46,6 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
 {
     tls_t *p_tls;
     tls_server_t *p_server;
-    const char *psz_pem;
 
     p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
     vlc_object_attach( p_tls, p_this );
