@@ -90,6 +90,8 @@ static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s * );
+static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
+                             u16 *blue, u16 *transp );
 
 static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
 static void SDLCloseDisplay     ( vout_thread_t *p_vout );
@@ -107,7 +109,7 @@ void vout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.vout.pf_destroy    = vout_Destroy;
     p_function_list->functions.vout.pf_manage     = vout_Manage;
     p_function_list->functions.vout.pf_display    = vout_Display;
-    p_function_list->functions.vout.pf_setpalette = NULL;
+    p_function_list->functions.vout.pf_setpalette = vout_SetPalette;
 }
 
 /*****************************************************************************
@@ -133,7 +135,7 @@ static int vout_Probe( probedata_t *p_data )
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int vout_Create( vout_thread_t *p_vout )
+static int vout_Create( vout_thread_t *p_vout )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -212,7 +214,7 @@ int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************
  * This function initialize the SDL display device.
  *****************************************************************************/
-int vout_Init( vout_thread_t *p_vout )
+static int vout_Init( vout_thread_t *p_vout )
 {
     return( 0 );
 }
@@ -222,7 +224,7 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-void vout_End( vout_thread_t *p_vout )
+static void vout_End( vout_thread_t *p_vout )
 {
     SDLCloseDisplay( p_vout );
     SDL_Quit();
@@ -233,7 +235,7 @@ void vout_End( vout_thread_t *p_vout )
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-void vout_Destroy( vout_thread_t *p_vout )
+static void vout_Destroy( vout_thread_t *p_vout )
 {
     free( p_vout->p_sys );
 }
@@ -244,7 +246,7 @@ void vout_Destroy( vout_thread_t *p_vout )
  * This function should be called regularly by video output thread. It returns
  * a non null value if an error occured.
  *****************************************************************************/
-int vout_Manage( vout_thread_t *p_vout )
+static int vout_Manage( vout_thread_t *p_vout )
 {
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
@@ -411,7 +413,7 @@ int vout_Manage( vout_thread_t *p_vout )
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
+static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
                          u16 *blue, u16 *transp)
 {
      /* Create a display surface with a grayscale palette */
@@ -440,7 +442,7 @@ void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
  * This function send the currently rendered image to the display, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-void vout_Display( vout_thread_t *p_vout )
+static void vout_Display( vout_thread_t *p_vout )
 {
     SDL_Rect    disp;
     if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)

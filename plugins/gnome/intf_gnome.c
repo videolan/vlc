@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.11 2001/02/14 07:48:18 sam Exp $
+ * $Id: intf_gnome.c,v 1.12 2001/02/15 07:59:38 sam Exp $
  *
  * Authors:
  *
@@ -30,12 +30,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
-
-#include "glib.h"
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 
 #include <gnome.h>
 
