@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.15 2002/06/01 12:31:59 sam Exp $
+ * $Id: esd.c,v 1.16 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes some esd specific variables.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     esd_format_t esd_format;
     int          i_fd;

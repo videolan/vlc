@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.6 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_rgb.h,v 1.7 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
  * This structure is part of the chroma transformation descriptor, it
  * describes the yuv2rgb specific properties.
  *****************************************************************************/
-struct chroma_sys_s
+struct chroma_sys_t
 {
     u8  *p_buffer;
     int *p_offset;

@@ -178,3 +178,8 @@
 
   -- #videolan
 %
+The VCR is to the American film producer and the American public as
+the Boston strangler is to the woman home alone.
+
+  -- Jack Valenti (president of the MPAA) on April 12, 1982
+%

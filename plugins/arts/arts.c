@@ -40,7 +40,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes some arts specific variables.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     arts_stream_t stream;
 };

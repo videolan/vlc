@@ -8891,6 +8891,10 @@ CPPFLAGS="${save_CPPFLAGS}"
 CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
+libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
+for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} `eval echo '$'{${i}_LDFLAGS}`" ; done
+
+
 
 
 
@@ -9093,7 +9097,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile.config Makefile.opts po/Makefile.in include/defs.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile.config Makefile.opts po/Makefile.in vlc-config include/defs.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -9183,6 +9187,7 @@ s%@GNOME_CONFIG@%$GNOME_CONFIG%g
 s%@MOZILLA_CONFIG@%$MOZILLA_CONFIG%g
 s%@DATA_PATH@%$DATA_PATH%g
 s%@PLUGIN_PATH@%$PLUGIN_PATH%g
+s%@libvlc_LDFLAGS@%$libvlc_LDFLAGS%g
 s%@SYS@%$SYS%g
 s%@ARCH@%$ARCH%g
 s%@PLUGINS@%$PLUGINS%g
@@ -9317,7 +9322,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile.config Makefile.opts po/Makefile.in"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile.config Makefile.opts po/Makefile.in vlc-config"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
@@ -9525,6 +9530,7 @@ chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 
+chmod a+x vlc-config
 
 echo "
 vlc configuration

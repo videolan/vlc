@@ -2,7 +2,7 @@
  * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dsp.c,v 1.17 2002/06/01 12:31:58 sam Exp $
+ * $Id: dsp.c,v 1.18 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes the dsp specific properties of an audio device.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     audio_buf_info        audio_buf;
 

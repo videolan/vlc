@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.3 2002/07/15 19:15:05 sam Exp $
+ * $Id: vlc_messages.h,v 1.4 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,7 @@ typedef struct
  *****************************************************************************
  * Store all data requiered by messages interfaces.
  *****************************************************************************/
-struct msg_bank_s
+struct msg_bank_t
 {
     /* Message queue lock */
     vlc_mutex_t             lock;
@@ -77,7 +77,7 @@ struct msg_bank_s
  *****************************************************************************
  * Used by interface plugins which subscribe to the message bank.
  *****************************************************************************/
-struct msg_subscription_s
+struct msg_subscription_t
 {
     int   i_start;
     int*  pi_stop;

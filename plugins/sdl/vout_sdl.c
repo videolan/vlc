@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.95 2002/06/04 00:11:12 sam Exp $
+ * $Id: vout_sdl.c,v 1.96 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -52,7 +52,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     SDL_Surface *   p_display;                             /* display device */
 
@@ -77,7 +77,7 @@ struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * SDL specific properties of a direct buffer.
  *****************************************************************************/
-struct picture_sys_s
+struct picture_sys_t
 {
     SDL_Overlay *p_overlay;
 };

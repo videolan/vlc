@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.9 2002/06/03 07:22:36 gbazin Exp $
+ * $Id: waveout.c,v 1.10 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -77,7 +77,7 @@ MODULE_DEACTIVATE_STOP
 
 #define NUMBUF 3           /* We use triple buffering to be on the safe side */
 
-struct aout_sys_s
+struct aout_sys_t
 {
     HWAVEOUT h_waveout;                        /* handle to waveout instance */
 

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.21 2002/06/01 12:31:58 sam Exp $
+ * $Id: aout_dummy.c,v 1.22 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,7 +35,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the dummy specific properties of an output thread.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     /* Prevent malloc(0) */
     int i_dummy;

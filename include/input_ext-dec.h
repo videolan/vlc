@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.61 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: input_ext-dec.h,v 1.62 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -51,7 +51,7 @@
  *****************************************************************************
  * Describe a data packet.
  *****************************************************************************/
-struct data_packet_s
+struct data_packet_t
 {
     /* Used to chain the packets that carry data for a same PES or PSI */
     data_packet_t *  p_next;
@@ -74,7 +74,7 @@ struct data_packet_s
  * Describes an PES packet, with its properties, and pointers to the TS packets
  * containing it.
  *****************************************************************************/
-struct pes_packet_s
+struct pes_packet_t
 {
     /* Chained list to the next PES packet (depending on the context) */
     pes_packet_t *  p_next;
@@ -104,7 +104,7 @@ struct pes_packet_s
  *****************************************************************************
  * This rotative FIFO contains PES packets that are to be decoded.
  *****************************************************************************/
-struct decoder_fifo_s
+struct decoder_fifo_t
 {
     VLC_COMMON_MEMBERS
 
@@ -135,7 +135,7 @@ struct decoder_fifo_s
  *****************************************************************************/
 typedef u32         WORD_TYPE;
 
-typedef struct bit_fifo_s
+typedef struct bit_fifo_t
 {
     /* This unsigned integer allows us to work at the bit level. This buffer
      * can contain 32 bits, and the used space can be found on the MSb's side
@@ -153,7 +153,7 @@ typedef struct bit_fifo_s
  * This type, based on a PES stream, includes all the structures needed to
  * handle the input stream like a bit stream.
  *****************************************************************************/
-struct bit_stream_s
+struct bit_stream_t
 {
     /*
      * Bit structures

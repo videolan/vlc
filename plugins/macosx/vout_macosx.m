@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.12 2002/07/16 20:41:48 jlj Exp $
+ * $Id: vout_macosx.m,v 1.13 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -43,7 +43,7 @@
 
 #define QT_MAX_DIRECTBUFFERS 10
 
-struct picture_sys_s
+struct picture_sys_t
 {
     void *p_info;
     unsigned int i_size;
@@ -377,8 +377,8 @@ static int CoSendRequest( vout_thread_t *p_vout, long i_request )
 {
     NSArray *o_array;
     NSPortMessage *o_msg;
-    struct vout_req_s req;
-    struct vout_req_s *p_req = &req;
+    struct vout_req_t req;
+    struct vout_req_t *p_req = &req;
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSPort *recvPort = [[NSPort port] retain];
 

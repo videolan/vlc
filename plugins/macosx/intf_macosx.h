@@ -2,7 +2,7 @@
  * intf_macosx.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.h,v 1.2 2002/07/16 20:41:48 jlj Exp $
+ * $Id: intf_macosx.h,v 1.3 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -44,7 +44,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     NSAutoreleasePool * o_pool;
     NSPort * o_sendport;

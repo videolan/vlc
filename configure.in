@@ -1726,6 +1726,13 @@ CPPFLAGS="${save_CPPFLAGS}"
 CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
+dnl
+dnl  Create the vlc-config script
+dnl
+libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
+for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} `eval echo '$'{${i}_LDFLAGS}`" ; done
+AC_SUBST(libvlc_LDFLAGS)
+
 dnl 
 dnl  Configuration is finished
 dnl
@@ -1830,7 +1837,8 @@ AC_SUBST(x11_LDFLAGS)
 AC_SUBST(xvideo_LDFLAGS)
 AC_SUBST(xosd_LDFLAGS)
 
-AC_OUTPUT([Makefile.config Makefile.opts po/Makefile.in])
+AC_OUTPUT([Makefile.config Makefile.opts po/Makefile.in vlc-config])
+chmod a+x vlc-config
 
 echo "
 vlc configuration

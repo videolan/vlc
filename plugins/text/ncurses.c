@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.18 2002/07/15 20:09:31 sam Exp $
+ * $Id: ncurses.c,v 1.19 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -82,7 +82,7 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * intf_sys_t: description and status of ncurses interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     /* special actions */
     vlc_mutex_t         change_lock;                      /* the change lock */

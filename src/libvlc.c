@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.16 2002/07/18 01:00:41 sam Exp $
+ * $Id: libvlc.c,v 1.17 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -91,9 +91,9 @@ static vlc_mutex_t global_lock;
 void *             p_global_data;
 
 /* A list of all the currently allocated vlc objects */
-static volatile int i_vlc = 0;
-static volatile int i_unique = 0;
-static volatile vlc_t **pp_vlc = NULL;
+static int volatile i_vlc = 0;
+static int volatile i_unique = 0;
+static vlc_t ** volatile pp_vlc = NULL;
 
 /*****************************************************************************
  * Local prototypes
@@ -120,7 +120,13 @@ static void ShowConsole   ( void );
  * This function allocates a vlc_t structure and returns NULL in case of
  * failure. Also, the thread system and the signal handlers are initialized.
  *****************************************************************************/
-vlc_t * vlc_create( void )
+vlc_error_t vlc_create( void )
+{
+    vlc_t * p_vlc = vlc_create_r();
+    return p_vlc ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+vlc_t * vlc_create_r( void )
 {
     vlc_t * p_vlc = NULL;
 
@@ -175,7 +181,12 @@ vlc_t * vlc_create( void )
  *  - message queue, module bank and playlist initialization
  *  - configuration and commandline parsing
  *****************************************************************************/
-vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
+vlc_error_t vlc_init( int i_argc, char *ppsz_argv[] )
+{
+    return vlc_init_r( ( i_vlc == 1 ) ? *pp_vlc : NULL, i_argc, ppsz_argv );
+}
+
+vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 {
     char p_capabilities[200];
     char *psz_module;
@@ -515,7 +526,12 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  * separate thread. If b_block is set to 1, vlc_add_intf will continue until
  * user requests to quit.
  *****************************************************************************/
-vlc_error_t vlc_run( vlc_t *p_vlc )
+vlc_error_t vlc_run( void )
+{
+    return vlc_run_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+}
+
+vlc_error_t vlc_run_r( vlc_t *p_vlc )
 {
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
@@ -538,8 +554,14 @@ vlc_error_t vlc_run( vlc_t *p_vlc )
  * separate thread. If b_block is set to 1, vlc_add_intf will continue until
  * user requests to quit.
  *****************************************************************************/
-vlc_error_t vlc_add_intf( vlc_t *p_vlc, const char *psz_module,
-                                        vlc_bool_t b_block )
+vlc_error_t vlc_add_intf( const char *psz_module, vlc_bool_t b_block )
+{
+    return vlc_add_intf_r( ( i_vlc == 1 ) ? *pp_vlc : NULL,
+                           psz_module, b_block );
+}
+
+vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
+                                          vlc_bool_t b_block )
 {
     vlc_error_t err;
     intf_thread_t *p_intf;
@@ -595,7 +617,12 @@ vlc_error_t vlc_add_intf( vlc_t *p_vlc, const char *psz_module,
  * This function requests the interface threads to finish, waits for their
  * termination, and destroys their structure.
  *****************************************************************************/
-vlc_error_t vlc_stop( vlc_t *p_vlc )
+vlc_error_t vlc_stop( void )
+{
+    return vlc_stop_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+}
+
+vlc_error_t vlc_stop_r( vlc_t *p_vlc )
 {
     intf_thread_t *p_intf;
     playlist_t    *p_playlist;
@@ -667,7 +694,12 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
  * This function uninitializes every vlc component that was activated in
  * vlc_init: audio and video outputs, playlist, module bank and message queue.
  *****************************************************************************/
-vlc_error_t vlc_end( vlc_t *p_vlc )
+vlc_error_t vlc_end( void )
+{
+    return vlc_end_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+}
+
+vlc_error_t vlc_end_r( vlc_t *p_vlc )
 {
     /* Check that the handle is valid */
     if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
@@ -720,7 +752,12 @@ vlc_error_t vlc_end( vlc_t *p_vlc )
  *****************************************************************************
  * This function frees the previously allocated vlc_t structure.
  *****************************************************************************/
-vlc_error_t vlc_destroy( vlc_t *p_vlc )
+vlc_error_t vlc_destroy( void )
+{
+    return vlc_destroy_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+}
+
+vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
 {
     int i_index;
 
@@ -782,7 +819,12 @@ vlc_error_t vlc_destroy( vlc_t *p_vlc )
     return VLC_SUCCESS;
 }
 
-vlc_status_t vlc_status( vlc_t *p_vlc )
+vlc_status_t vlc_status( void )
+{
+    return vlc_status_r( ( i_vlc == 1 ) ? *pp_vlc : NULL );
+}
+
+vlc_status_t vlc_status_r( vlc_t *p_vlc )
 {
     if( !p_vlc )
     {
@@ -792,8 +834,14 @@ vlc_status_t vlc_status( vlc_t *p_vlc )
     return p_vlc->i_status;
 }
 
-vlc_error_t vlc_add_target( vlc_t *p_vlc, const char *psz_target,
-                                          int i_mode, int i_pos )
+vlc_error_t vlc_add_target( const char *psz_target, int i_mode, int i_pos )
+{
+    return vlc_add_target_r( ( i_vlc == 1 ) ? *pp_vlc : NULL,
+                             psz_target, i_mode, i_pos );
+}
+
+vlc_error_t vlc_add_target_r( vlc_t *p_vlc, const char *psz_target,
+                                            int i_mode, int i_pos )
 {
     vlc_error_t err;
     playlist_t *p_playlist;
@@ -841,8 +889,8 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        vlc_add_target( p_vlc, ppsz_argv[ i_opt ],
-                        PLAYLIST_APPEND, PLAYLIST_END );
+        vlc_add_target_r( p_vlc, ppsz_argv[ i_opt ],
+                          PLAYLIST_APPEND, PLAYLIST_END );
     }
 
     return VLC_SUCCESS;

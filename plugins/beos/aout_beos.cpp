@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.24 2002/06/01 12:31:58 sam Exp $
+ * $Id: aout_beos.cpp,v 1.25 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,7 +49,7 @@ extern "C"
  * This structure is part of the audio output thread descriptor.
  * It describes some BeOS specific variables.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     BPushGameSound * p_sound;
     gs_audio_format * p_format;

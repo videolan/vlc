@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.13 2002/07/19 21:14:13 massiot Exp $
+ * $Id: ipv6.c,v 1.14 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -48,6 +48,7 @@
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
+#   include <net/if.h>
 #   ifdef HAVE_ARPA_INET_H
 #       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
 #   endif

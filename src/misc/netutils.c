@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.71 2002/06/07 23:53:44 sam Exp $
+ * $Id: netutils.c,v 1.72 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -87,7 +87,7 @@
  * as it depends on the VideoLAN channel server, which isn't frozen for
  * the time being.
  *****************************************************************************/
-struct input_channel_s
+struct input_channel_t
 {
     int         i_channel;                         /* current channel number */
     mtime_t     last_change;                             /* last change date */

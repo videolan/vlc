@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.69 2002/06/02 11:59:46 sam Exp $
+ * $Id: input_ext-intf.h,v 1.70 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,7 +43,7 @@
  * Describes an elementary stream, and includes fields required to handle and
  * demultiplex this elementary stream.
  *****************************************************************************/
-struct es_descriptor_s
+struct es_descriptor_t
 {
     u16                     i_id;            /* stream ID for PS, PID for TS */
     u8                      i_stream_id;     /* stream ID defined in the PES */
@@ -98,7 +98,7 @@ struct es_descriptor_s
  * Describes a program and list associated elementary streams. It is build by
  * the PSI decoder upon the informations carried in program map sections
  *****************************************************************************/
-struct pgrm_descriptor_s
+struct pgrm_descriptor_t
 {
     /* Program characteristics */
     u16                     i_number;                      /* program number */
@@ -136,7 +136,7 @@ struct pgrm_descriptor_s
  *****************************************************************************
  * Attributes for current area (title for DVD)
  *****************************************************************************/
-struct input_area_s
+struct input_area_t
 {
     /* selected area attributes */
     int                     i_id;        /* identificator for area */
@@ -165,7 +165,7 @@ struct input_area_s
  * Describes a stream and list its associated programs. Build upon
  * the information carried in program association sections (for instance)
  *****************************************************************************/
-struct stream_descriptor_s
+struct stream_descriptor_t
 {
     u16                     i_stream_id;                        /* stream id */
     vlc_bool_t              b_changed;    /* if stream has been changed,
@@ -227,7 +227,7 @@ struct stream_descriptor_s
  *****************************************************************************
  * Describes the current position in the stream.
  *****************************************************************************/
-struct stream_position_s
+struct stream_position_t
 {
     off_t    i_tell;     /* actual location in the area (in arbitrary units) */
     off_t    i_size;          /* total size of the area (in arbitrary units) */
@@ -243,7 +243,7 @@ struct stream_position_s
  *****************************************************************************
  * This structure includes all the local static variables of an input thread
  *****************************************************************************/
-struct input_thread_s
+struct input_thread_t
 {
     VLC_COMMON_MEMBERS
 

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_dummy.c,v 1.19 2002/06/07 16:06:09 sam Exp $
+ * $Id: input_dummy.c,v 1.20 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@ static int  DummyDemux  ( input_thread_t * );
 /*****************************************************************************
  * access_sys_t: private input data
  *****************************************************************************/
-struct demux_sys_s
+struct demux_sys_t
 {
     /* The real command */
     int i_command;
@@ -111,12 +111,12 @@ static int DummyInit( input_thread_t *p_input )
 {
     char * psz_name = p_input->psz_name;
     int i_len = strlen( psz_name );
-    struct demux_sys_s * p_method;
+    struct demux_sys_t * p_method;
     int   i_arg;
     
     p_input->stream.b_seekable = 0;
 
-    p_method = malloc( sizeof( struct demux_sys_s ) );
+    p_method = malloc( sizeof( struct demux_sys_t ) );
     if( p_method == NULL )
     {
         msg_Err( p_input, "out of memory" );
@@ -180,7 +180,7 @@ static void DummyEnd( input_thread_t *p_input )
  *****************************************************************************/
 static int DummyDemux( input_thread_t *p_input )
 {
-    struct demux_sys_s * p_method = p_input->p_demux_data;
+    struct demux_sys_t * p_method = p_input->p_demux_data;
     playlist_t *p_playlist;
 
     p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );

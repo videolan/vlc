@@ -10,7 +10,7 @@ export DH_COMPAT=3
 
 # Compilation options
 export FFMPEG_VERSION=20020707
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION)"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION) --enable-mp4"
 # Remove --without-dvdcss here in non-totalitarian countries
 export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 
@@ -76,6 +76,12 @@ install: build
 	# do the same for the mozilla plugin
 	ln -s vlc debian/mozilla-plugin-vlc/usr/share/doc/mozilla-plugin-vlc
 	mv debian/vlc/usr/lib/mozilla debian/mozilla-plugin-vlc/usr/lib
+
+	# install development files
+	mv debian/vlc/usr/bin/vlc-config debian/libvlc0-dev/usr/bin/
+	mv debian/vlc/usr/lib/*.a debian/libvlc0-dev/usr/lib/
+	mv debian/vlc/usr/include/vlc/* debian/libvlc0-dev/usr/include/vlc/
+	ln -s vlc debian/libvlc0-dev/usr/share/doc/libvlc0-dev
 
 	# do the binary aliases
 	mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/

@@ -2,7 +2,7 @@
  * ac3_imdct.h : AC3 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.h,v 1.8 2002/06/01 12:31:57 sam Exp $
+ * $Id: ac3_imdct.h,v 1.9 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,14 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct complex_s {
+struct complex_t
+{
     float real;
     float imag;
 };
 
 #define N 512
 
-struct imdct_s
+struct imdct_t
 {
     complex_t * buf;
     void *      buf_orig;                         /* pointer before memalign */

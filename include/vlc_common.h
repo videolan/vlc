@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.9 2002/07/12 21:57:25 massiot Exp $
+ * $Id: vlc_common.h,v 1.10 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -122,71 +122,71 @@ typedef s64 mtime_t;
  *****************************************************************************/
 
 /* Messages */
-VLC_DECLARE_STRUCT(msg_bank)
-VLC_DECLARE_STRUCT(msg_subscription)
+VLC_DECLARE_STRUCT(msg_bank_t)
+VLC_DECLARE_STRUCT(msg_subscription_t)
 
 /* Playlist */
-VLC_DECLARE_STRUCT(playlist)
-VLC_DECLARE_STRUCT(playlist_item)
+VLC_DECLARE_STRUCT(playlist_t)
+VLC_DECLARE_STRUCT(playlist_item_t)
 
 /* Modules */
-VLC_DECLARE_STRUCT(module_bank)
-VLC_DECLARE_STRUCT(module)
-VLC_DECLARE_STRUCT(module_config)
-VLC_DECLARE_STRUCT(module_symbols)
-VLC_DECLARE_STRUCT(module_functions)
+VLC_DECLARE_STRUCT(module_bank_t)
+VLC_DECLARE_STRUCT(module_t)
+VLC_DECLARE_STRUCT(module_config_t)
+VLC_DECLARE_STRUCT(module_symbols_t)
+VLC_DECLARE_STRUCT(module_functions_t)
 
 /* Interface */
-VLC_DECLARE_STRUCT(intf_thread)
-VLC_DECLARE_STRUCT(intf_sys)
-VLC_DECLARE_STRUCT(intf_console)
-VLC_DECLARE_STRUCT(intf_msg)
-VLC_DECLARE_STRUCT(intf_channel)
+VLC_DECLARE_STRUCT(intf_thread_t)
+VLC_DECLARE_STRUCT(intf_sys_t)
+VLC_DECLARE_STRUCT(intf_console_t)
+VLC_DECLARE_STRUCT(intf_msg_t)
+VLC_DECLARE_STRUCT(intf_channel_t)
 
 /* Input */
-VLC_DECLARE_STRUCT(input_thread)
-VLC_DECLARE_STRUCT(input_channel)
-VLC_DECLARE_STRUCT(input_cfg)
-VLC_DECLARE_STRUCT(input_area)
-VLC_DECLARE_STRUCT(input_buffers)
-VLC_DECLARE_STRUCT(input_socket)
+VLC_DECLARE_STRUCT(input_thread_t)
+VLC_DECLARE_STRUCT(input_channel_t)
+VLC_DECLARE_STRUCT(input_cfg_t)
+VLC_DECLARE_STRUCT(input_area_t)
+VLC_DECLARE_STRUCT(input_buffers_t)
+VLC_DECLARE_STRUCT(input_socket_t)
 
 /* Audio */
-VLC_DECLARE_STRUCT(aout_thread)
-VLC_DECLARE_STRUCT(aout_sys)
-VLC_DECLARE_STRUCT(aout_fifo)
+VLC_DECLARE_STRUCT(aout_thread_t)
+VLC_DECLARE_STRUCT(aout_sys_t)
+VLC_DECLARE_STRUCT(aout_fifo_t)
 
 /* Video */
-VLC_DECLARE_STRUCT(vout_thread)
-VLC_DECLARE_STRUCT(vout_font)
-VLC_DECLARE_STRUCT(vout_sys)
-VLC_DECLARE_STRUCT(chroma_sys)
-VLC_DECLARE_STRUCT(picture)
-VLC_DECLARE_STRUCT(picture_sys)
-VLC_DECLARE_STRUCT(picture_heap)
-VLC_DECLARE_STRUCT(subpicture)
-VLC_DECLARE_STRUCT(subpicture_sys)
+VLC_DECLARE_STRUCT(vout_thread_t)
+VLC_DECLARE_STRUCT(vout_font_t)
+VLC_DECLARE_STRUCT(vout_sys_t)
+VLC_DECLARE_STRUCT(chroma_sys_t)
+VLC_DECLARE_STRUCT(picture_t)
+VLC_DECLARE_STRUCT(picture_sys_t)
+VLC_DECLARE_STRUCT(picture_heap_t)
+VLC_DECLARE_STRUCT(subpicture_t)
+VLC_DECLARE_STRUCT(subpicture_sys_t)
 
 /* Decoders */
-VLC_DECLARE_STRUCT(decoder_fifo)
+VLC_DECLARE_STRUCT(decoder_fifo_t)
 
 /* Misc */
-VLC_DECLARE_STRUCT(macroblock)
-VLC_DECLARE_STRUCT(data_packet)
-VLC_DECLARE_STRUCT(data_buffer)
-VLC_DECLARE_STRUCT(downmix)
-VLC_DECLARE_STRUCT(imdct)
-VLC_DECLARE_STRUCT(complex)
-VLC_DECLARE_STRUCT(dm_par)
-VLC_DECLARE_STRUCT(es_descriptor)
-VLC_DECLARE_STRUCT(pgrm_descriptor)
-VLC_DECLARE_STRUCT(stream_descriptor)
-VLC_DECLARE_STRUCT(stream_position)
-VLC_DECLARE_STRUCT(stream_ctrl)
-VLC_DECLARE_STRUCT(pes_packet)
-VLC_DECLARE_STRUCT(bit_stream)
-VLC_DECLARE_STRUCT(network_socket)
-VLC_DECLARE_STRUCT(iso639_lang)
+VLC_DECLARE_STRUCT(macroblock_t)
+VLC_DECLARE_STRUCT(data_packet_t)
+VLC_DECLARE_STRUCT(data_buffer_t)
+VLC_DECLARE_STRUCT(downmix_t)
+VLC_DECLARE_STRUCT(imdct_t)
+VLC_DECLARE_STRUCT(complex_t)
+VLC_DECLARE_STRUCT(dm_par_t)
+VLC_DECLARE_STRUCT(es_descriptor_t)
+VLC_DECLARE_STRUCT(pgrm_descriptor_t)
+VLC_DECLARE_STRUCT(stream_descriptor_t)
+VLC_DECLARE_STRUCT(stream_position_t)
+VLC_DECLARE_STRUCT(stream_ctrl_t)
+VLC_DECLARE_STRUCT(pes_packet_t)
+VLC_DECLARE_STRUCT(bit_stream_t)
+VLC_DECLARE_STRUCT(network_socket_t)
+VLC_DECLARE_STRUCT(iso639_lang_t)
 
 /*****************************************************************************
  * Plug-in stuff
@@ -243,7 +243,7 @@ VLC_DECLARE_STRUCT(iso639_lang)
     int be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                        \
 
 /* The real vlc_object_t type. Yes, it's that simple :-) */
-struct vlc_object_s
+struct vlc_object_t
 {
     VLC_COMMON_MEMBERS
 };

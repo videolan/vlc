@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.39 2002/06/27 19:05:17 sam Exp $
+ * $Id: main.h,v 1.40 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
  * it when you can access the members you need in an other way. In fact, it
  * should only be used by interface thread.
  *****************************************************************************/
-struct vlc_s
+struct vlc_t
 {
     VLC_COMMON_MEMBERS
 

@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.29 2002/06/01 12:32:00 sam Exp $
+ * $Id: aout_sdl.c,v 1.30 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,7 +47,7 @@
 /* the overflow limit is used to prevent the fifo from growing too big */
 #define OVERFLOWLIMIT 100000
 
-struct aout_sys_s
+struct aout_sys_t
 {
     byte_t  * audio_buf;
     int i_audio_end;

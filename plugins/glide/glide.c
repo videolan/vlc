@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.15 2002/06/01 12:31:59 sam Exp $
+ * $Id: glide.c,v 1.16 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -84,7 +84,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Glide specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     GrLfbInfo_t                 p_buffer_info;           /* back buffer info */
 

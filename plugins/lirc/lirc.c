@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.13 2002/07/15 20:09:31 sam Exp $
+ * $Id: lirc.c,v 1.14 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -38,7 +38,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     struct lirc_config *config;
     vlc_mutex_t         change_lock;

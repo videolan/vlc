@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.20 2002/07/15 20:09:31 sam Exp $
+ * $Id: intf_dummy.c,v 1.21 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,7 +33,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     /* Prevent malloc(0) */
     int i_dummy;

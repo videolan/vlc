@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.14 2002/06/11 09:44:21 gbazin Exp $
+ * $Id: invert.c,v 1.15 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -65,7 +65,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Invert specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     vout_thread_t *p_vout;
 };

@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.8 2002/06/01 18:04:48 sam Exp $
+ * $Id: scope.c,v 1.9 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,7 +42,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes some scope specific variables.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     aout_thread_t aout;
     aout_fifo_t *p_aout_fifo;

@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.17 2002/06/04 00:11:12 sam Exp $
+ * $Id: xmga.c,v 1.18 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -126,7 +126,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the X11 and XVideo specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     /* Internal settings and properties */
     Display *           p_display;                        /* display pointer */
@@ -194,7 +194,7 @@ struct vout_sys_s
  *****************************************************************************/
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct mwmhints_s
+typedef struct mwmhints_t
 {
     u32 flags;
     u32 functions;

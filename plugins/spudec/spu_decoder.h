@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.5 2002/06/01 12:32:00 sam Exp $
+ * $Id: spu_decoder.h,v 1.6 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct subpicture_sys_s
+struct subpicture_sys_t
 {
     mtime_t i_pts;                                 /* presentation timestamp */
 
@@ -37,7 +37,7 @@ struct subpicture_sys_s
 /*****************************************************************************
  * spudec_thread_t : sub picture unit decoder thread descriptor
  *****************************************************************************/
-typedef struct spudec_thread_s
+typedef struct spudec_thread_t
 {
     /*
      * Thread properties and locks

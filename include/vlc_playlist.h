@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.2 2002/07/03 19:40:49 sam Exp $
+ * $Id: vlc_playlist.h,v 1.3 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,7 @@
 /*****************************************************************************
  * playlist_item_t: playlist item
  *****************************************************************************/
-struct playlist_item_s
+struct playlist_item_t
 {
     char *  psz_name;
     int     i_type;   /* unused yet */
@@ -38,7 +38,7 @@ struct playlist_item_s
  * the playlist, a change lock, a dynamic array of playlist items, and a
  * current item which is an exact copy of one of the array members.
  *****************************************************************************/
-struct playlist_s
+struct playlist_t
 {
     VLC_COMMON_MEMBERS
 

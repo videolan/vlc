@@ -29,7 +29,7 @@
 #include "playlist.h"
 #include "preferences.h"
 
-typedef struct es_descriptor_s es_descriptor_t;
+VLC_DECLARE_STRUCT(es_descriptor_t)
 
 /*****************************************************************************
  * The TrackBar is graduated from 0 to SLIDER_MAX_VALUE.
@@ -41,7 +41,7 @@ typedef struct es_descriptor_s es_descriptor_t;
 /*****************************************************************************
  * intf_sys_t: description and status of Win32 interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     /* special actions */
     vlc_bool_t          b_playing;

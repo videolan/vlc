@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.5 2002/07/18 01:00:41 sam Exp $
+ * $Id: vlc.c,v 1.6 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -33,7 +33,6 @@
  *****************************************************************************/
 int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
 {
-    vlc_t *p_vlc;
     vlc_error_t err;
 
 #ifdef SYS_LINUX
@@ -47,45 +46,43 @@ int main(int i_argc, char *ppsz_argv[], char *ppsz_env[])
 #endif
 
     /* Create the vlc structure */
-    p_vlc = vlc_create();
-    if( p_vlc == NULL )
-    {
-        return -1;
-    }
-
-    /* Initialize vlc */
-    err = vlc_init( p_vlc, i_argc, ppsz_argv );
+    err = vlc_create();
     if( err != VLC_SUCCESS )
     {
-        vlc_destroy( p_vlc );
         return err;
     }
 
-    //vlc_add( p_vlc, "/home/sam/videolan/streams/mpeg/axe.mpeg" );
+    /* Initialize vlc */
+    err = vlc_init( i_argc, ppsz_argv );
+    if( err != VLC_SUCCESS )
+    {
+        vlc_destroy();
+        return err;
+    }
 
     /* Run vlc, in non-blocking mode */
-    err = vlc_run( p_vlc );
+    err = vlc_run();
 
     /* Add background interfaces */
-    //{ int i; for( i=10; i--; ) vlc_add_intf( p_vlc, "dummy", 0 ); }
-    //vlc_add_intf( p_vlc, "dummy", VLC_FALSE );
-    //vlc_add_intf( p_vlc, "logger", VLC_FALSE );
-    //vlc_add_intf( p_vlc, "xosd", VLC_FALSE );
-    //vlc_add_intf( p_vlc, "gtk", VLC_FALSE );
-    //vlc_add_intf( p_vlc, "kde", VLC_FALSE );
-    vlc_add_intf( p_vlc, "rc", VLC_FALSE );
+    //{ int i; for( i=10; i--; ) vlc_add_intf( NULL, "dummy", 0 ); }
+    //vlc_add_intf( NULL, "dummy", VLC_FALSE );
+    //vlc_add_intf( NULL, "logger", VLC_FALSE );
+    //vlc_add_intf( NULL, "xosd", VLC_FALSE );
+    //vlc_add_intf( NULL, "gtk", VLC_FALSE );
+    //vlc_add_intf( NULL, "kde", VLC_FALSE );
+    vlc_add_intf( "rc", VLC_FALSE );
 
     /* Add a blocking interface and keep the return value */
-    err = vlc_add_intf( p_vlc, NULL, VLC_TRUE );
+    err = vlc_add_intf( NULL, VLC_TRUE );
 
     /* Finish the interface */
-    vlc_stop( p_vlc );
+    vlc_stop();
 
     /* Finish all threads */
-    vlc_end( p_vlc );
+    vlc_end();
 
     /* Destroy the vlc structure */
-    vlc_destroy( p_vlc );
+    vlc_destroy();
 
     return err;
 }

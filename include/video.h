@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.54 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: video.h,v 1.55 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -26,7 +26,7 @@
 /*****************************************************************************
  * plane_t: description of a planar graphic field
  *****************************************************************************/
-typedef struct plane_s
+typedef struct plane_t
 {
     u8 *p_pixels;                               /* Start of the plane's data */
 
@@ -54,7 +54,7 @@ typedef struct plane_s
  * Picture type and flags should only be modified by the output thread. Note
  * that an empty picture MUST have its flags set to 0.
  *****************************************************************************/
-struct picture_s
+struct picture_t
 {
     /* Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
@@ -93,7 +93,7 @@ struct picture_s
  * picture_heap_t: video picture heap, either render (to store pictures used
  * by the decoder) or output (to store pictures displayed by the vout plugin)
  *****************************************************************************/
-struct picture_heap_s
+struct picture_heap_t
 {
     int i_pictures;                                     /* current heap size */
 
@@ -311,7 +311,7 @@ struct picture_heap_s
  * Subtitle type and flags should only be modified by the output thread. Note
  * that an empty subtitle MUST have its flags set to 0.
  *****************************************************************************/
-struct subpicture_s
+struct subpicture_t
 {
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_type;                                          /* type */

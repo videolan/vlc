@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.24 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout_dummy.c,v 1.25 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the dummy specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     /* Nothing needed here. Maybe stats ? */
 

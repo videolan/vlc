@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.21 2002/07/15 20:09:31 sam Exp $
+ * $Id: rc.c,v 1.22 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -51,7 +51,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     input_thread_t * p_input;
 };

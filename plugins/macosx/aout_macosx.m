@@ -2,7 +2,7 @@
  * aout_macosx.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.7 2002/06/08 18:52:34 sam Exp $
+ * $Id: aout_macosx.m,v 1.8 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,7 +41,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-struct aout_sys_s
+struct aout_sys_t
 {
     AudioDeviceID       device;         // the audio device
     AudioConverterRef   s_converter;    // the AudioConverter

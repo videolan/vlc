@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.12 2002/07/15 20:09:31 sam Exp $
+ * $Id: logger.c,v 1.13 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,7 +59,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     int i_mode;
 

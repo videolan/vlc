@@ -2,7 +2,7 @@
  * iso_lang.h: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: iso_lang.h,v 1.6 2002/06/01 12:31:57 sam Exp $
+ * $Id: iso_lang.h,v 1.7 2002/07/20 18:01:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct iso639_lang_s
+struct iso639_lang_t
 {
     char * psz_eng_name;        /* Description in English */
     char * psz_native_name;     /* Description in native language */

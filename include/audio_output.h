@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.48 2002/06/01 18:04:48 sam Exp $
+ * $Id: audio_output.h,v 1.49 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -29,7 +29,7 @@
  * order to avoid rounding problems and heavy computations, as the function
  * that handles this structure only uses additions.
  *****************************************************************************/
-typedef struct aout_increment_s
+typedef struct aout_increment_t
 {
     /* The remainder is used to keep track of the fractional part of the
      * index. */
@@ -51,7 +51,7 @@ typedef struct aout_increment_s
 /*****************************************************************************
  * aout_fifo_t
  *****************************************************************************/
-struct aout_fifo_s
+struct aout_fifo_t
 {
     /* See the fifo formats below */
     int                 i_format;
@@ -111,7 +111,7 @@ struct aout_fifo_s
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
-struct aout_thread_s
+struct aout_thread_t
 {
     VLC_COMMON_MEMBERS
 

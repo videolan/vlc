@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.31 2002/07/17 21:54:37 stef Exp $
+ * $Id: interface.h,v 1.32 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -29,7 +29,7 @@
  * This structe describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
-struct intf_thread_s
+struct intf_thread_t
 {
     VLC_COMMON_MEMBERS
 

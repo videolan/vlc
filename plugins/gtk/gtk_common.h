@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.11 2002/07/11 19:28:13 sam Exp $
+ * $Id: gtk_common.h,v 1.12 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,7 +33,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     /* special actions */
     vlc_bool_t          b_playing;

@@ -2,6 +2,7 @@ tmp
 vlc
 vlc-plugin-*
 mozilla-plugin-vlc
+libvlc0-dev
 gvlc*
 gnome-vlc*
 qvlc*

@@ -16,6 +16,15 @@ Description: a free MPEG, DVD and DivX player
  This is vlc, the VideoLAN Client. It plays MPEG and MPEG2 files,
  DVDs, or MPEG streams from a network source.
 
+Package: libvlc0-dev
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: development files for the VideoLAN Client
+ VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+ .
+ This package contains headers and a static library required to build plugins
+ for the Videolan Client, or standalone applications using VideoLAN Client.
+
 Package: gnome-vlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}

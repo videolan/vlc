@@ -2,7 +2,7 @@
  * ac3_downmix.h : AC3 downmix types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.h,v 1.4 2002/06/01 12:31:57 sam Exp $
+ * $Id: ac3_downmix.h,v 1.5 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,13 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct dm_par_s {
+struct dm_par_t
+{
     float unit;
     float clev;
     float slev;
 };
 
-struct downmix_s {
+struct downmix_t
+{
     /* Module used and shortcuts */
     module_t * p_module;
     void (*pf_downmix_3f_2r_to_2ch)(float *, dm_par_t * dm_par);

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.15 2002/07/15 22:45:12 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.16 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -741,14 +741,14 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                      p_vdec->i_framesize);
 
     __NextFrame( p_vdec );
-                                         
+
     if( i_status < 0 )
     {
         msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
                                   p_vdec->i_framesize );
         return;
     }
-    if( !b_gotpicture )
+    if( !b_gotpicture || avpicture.linesize[0] == 0 )
     {
         return;
     }

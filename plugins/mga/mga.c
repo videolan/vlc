@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.18 2002/06/01 12:32:00 sam Exp $
+ * $Id: mga.c,v 1.19 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -99,7 +99,7 @@ MODULE_DEACTIVATE_STOP
 
 #   define MGA_NUM_FRAMES      1
 
-typedef struct mga_vid_config_s
+typedef struct mga_vid_config_t
 {
     u16 version;
     u16 card_type;
@@ -120,14 +120,14 @@ typedef struct mga_vid_config_s
 } mga_vid_config_t;
 #endif
 
-struct vout_sys_s
+struct vout_sys_t
 {
     mga_vid_config_t    mga;
     int                 i_fd;
     byte_t *            p_video;
 };
 
-struct picture_sys_s
+struct picture_sys_t
 {
     int     i_frame;
 };

@@ -33,7 +33,7 @@
 
 #include <sys/asoundlib.h>
 
-struct aout_sys_s
+struct aout_sys_t
 {
     snd_pcm_t  * p_pcm_handle;
     int          i_card;

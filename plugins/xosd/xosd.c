@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.3 2002/06/08 02:50:26 lool Exp $
+ * $Id: xosd.c,v 1.4 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -38,7 +38,7 @@
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     input_thread_t * p_input;   /* associated input thread */
     xosd * p_osd;               /* libxosd handle */

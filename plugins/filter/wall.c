@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.23 2002/06/11 09:44:21 gbazin Exp $
+ * $Id: wall.c,v 1.24 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,12 +81,12 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Wall specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     int    i_col;
     int    i_row;
     int    i_vout;
-    struct vout_list_s
+    struct vout_list_t
     {
         vlc_bool_t b_active;
         int i_width;
@@ -153,7 +153,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
-                                     sizeof(struct vout_list_s) );
+                                     sizeof(struct vout_list_t) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
         msg_Err( p_vout, "out of memory" );

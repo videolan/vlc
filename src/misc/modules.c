@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.71 2002/07/04 18:11:57 sam Exp $
+ * $Id: modules.c,v 1.72 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -263,9 +263,9 @@ void __module_ManageBank( vlc_object_t *p_this )
 module_t * __module_Need( vlc_object_t *p_this, int i_capability,
                           const char *psz_name, void *p_data )
 {
-    typedef struct module_list_s module_list_t;
+    typedef struct module_list_t module_list_t;
 
-    struct module_list_s
+    struct module_list_t
     {
         module_t *p_module;
         int i_score;

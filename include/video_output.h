@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.80 2002/07/12 21:57:25 massiot Exp $
+ * $Id: video_output.h,v 1.81 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -37,7 +37,7 @@
 typedef void (vout_chroma_convert_t)( vout_thread_t *,
                                       picture_t *, picture_t * );
 
-typedef struct vout_chroma_s
+typedef struct vout_chroma_t
 {
     /* conversion functions */
     vout_chroma_convert_t *pf_convert;
@@ -55,7 +55,7 @@ typedef struct vout_chroma_s
 /*****************************************************************************
  * vout_fifo_t
  *****************************************************************************/
-typedef struct vout_fifo_s
+typedef struct vout_fifo_t
 {
     /* See the fifo types below */
     int                 i_type;
@@ -78,7 +78,7 @@ typedef struct vout_fifo_s
  * is represented by a video output thread, and described using the following
  * structure.
  *****************************************************************************/
-struct vout_thread_s
+struct vout_thread_t
 {
     VLC_COMMON_MEMBERS
 

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.35 2002/06/01 12:32:02 sam Exp $
+ * $Id: video_text.c,v 1.36 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,7 @@
  * Therefore the border masks can't be complete if the font has pixels on the
  * border.
  *****************************************************************************/
-struct vout_font_s
+struct vout_font_t
 {
     int                 i_type;                                 /* font type */
     int                 i_width;                /* character width in pixels */

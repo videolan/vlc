@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.43 2002/07/17 21:34:57 stef Exp $
+ * $Id: xcommon.c,v 1.44 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -86,8 +86,7 @@
 #   define IMAGE_FREE     XDestroyImage
 #endif
 
-struct x11_window_s;
-typedef struct x11_window_s x11_window_t;
+VLC_DECLARE_STRUCT(x11_window_t)
 
 /*****************************************************************************
  * Local prototypes
@@ -138,7 +137,7 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
  *****************************************************************************
  * This structure contains all the data necessary to describe an X11 window.
  *****************************************************************************/
-struct x11_window_s
+struct x11_window_t
 {
     Window              base_window;                          /* base window */
     Window              video_window;     /* sub-window for displaying video */
@@ -155,7 +154,7 @@ struct x11_window_s
  * This structure is part of the video output thread descriptor.
  * It describes the X11 and XVideo specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     /* Internal settings and properties */
     Display *           p_display;                        /* display pointer */
@@ -210,7 +209,7 @@ struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * XVideo specific properties of a direct buffer.
  *****************************************************************************/
-struct picture_sys_s
+struct picture_sys_t
 {
     IMAGE_TYPE *        p_image;
 
@@ -227,7 +226,7 @@ struct picture_sys_s
  *****************************************************************************/
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct mwmhints_s
+typedef struct mwmhints_t
 {
     u32 flags;
     u32 functions;

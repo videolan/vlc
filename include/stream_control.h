@@ -4,7 +4,7 @@
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.8 2002/06/01 12:31:58 sam Exp $
+ * $Id: stream_control.h,v 1.9 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -33,7 +33,7 @@
  *****************************************************************************
  * Describe the state of a program stream.
  *****************************************************************************/
-struct stream_ctrl_s
+struct stream_ctrl_t
 {
     vlc_mutex_t             control_lock;
 

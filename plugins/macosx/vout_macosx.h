@@ -2,7 +2,7 @@
  * vout_macosx.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.h,v 1.1 2002/07/15 01:54:04 jlj Exp $
+ * $Id: vout_macosx.h,v 1.2 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -53,7 +53,7 @@
 /*****************************************************************************
  * vout_sys_t: MacOS X video output method descriptor
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     intf_thread_t * p_intf;
     VLCWindow * o_window;
@@ -81,7 +81,7 @@ struct vout_sys_s
 #define VOUT_REQ_CREATE_WINDOW  0x00000001
 #define VOUT_REQ_DESTROY_WINDOW 0x00000002
 
-typedef struct vout_req_s
+typedef struct vout_req_t
 {
     int i_type;
     int i_result;

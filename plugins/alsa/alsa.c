@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.19 2002/07/17 06:40:49 sam Exp $
+ * $Id: alsa.c,v 1.20 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -69,19 +69,19 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-typedef struct alsa_device_s
+typedef struct alsa_device_t
 {
     int i_num;
 } alsa_device_t;
 
-typedef struct alsa_card_s
+typedef struct alsa_card_t
 {
     int i_num;
 } alsa_card_t;
 
 /* here we store plugin dependant informations */
 
-struct aout_sys_s
+struct aout_sys_t
 {
     snd_pcm_t   * p_alsa_handle;
     unsigned long buffer_time;

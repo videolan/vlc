@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.9 2002/07/16 21:29:10 sam Exp $
+ * $Id: threads.c,v 1.10 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,7 @@ struct itimerval
 int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
 #   endif /* WIN32 */
 
-typedef struct wrapper_s
+typedef struct wrapper_t
 {
     /* Data lock access */
     vlc_mutex_t lock;

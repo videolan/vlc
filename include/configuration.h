@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.15 2002/07/03 19:40:49 sam Exp $
+ * $Id: configuration.h,v 1.16 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -46,7 +46,7 @@
 
 #define CONFIG_ITEM                         0x00F0
 
-struct module_config_s
+struct module_config_t
 {
     int          i_type;                               /* Configuration type */
     char        *psz_name;                                    /* Option name */

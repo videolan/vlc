@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.13 2002/06/01 13:52:24 sam Exp $
+ * $Id: vdec_ext-plugins.h,v 1.14 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,7 +25,7 @@
  * macroblock_t : information on a macroblock passed to the video_decoder
  *                thread
  *****************************************************************************/
-typedef struct idct_inner_s
+typedef struct idct_inner_t
 {
     /* Should be kept aligned ! */
     dctelem_t *             pi_block;                               /* block */
@@ -37,7 +37,7 @@ typedef struct idct_inner_s
                                                             * non-NULL coeff */
 } idct_inner_t;
 
-typedef struct motion_inner_s
+typedef struct motion_inner_t
 {
     vlc_bool_t              b_average;                          /* 0 == copy */
     int                     i_x_pred, i_y_pred;            /* motion vectors */
@@ -47,7 +47,7 @@ typedef struct motion_inner_s
     vlc_bool_t              b_second_half;
 } motion_inner_t;
 
-struct macroblock_s
+struct macroblock_t
 {
     int                     i_mb_modes;
 

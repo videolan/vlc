@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.16 2002/07/11 18:41:54 sam Exp $
+ * $Id: intf_qt.cpp,v 1.17 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,7 +125,7 @@ private:
 /*****************************************************************************
  * intf_sys_t: description and status of Qt interface
  *****************************************************************************/
-struct intf_sys_s
+struct intf_sys_t
 {
     QApplication *p_app;
     IntfWindow   *p_window;

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.56 2002/07/03 19:40:49 sam Exp $
+ * $Id: modules.h,v 1.57 2002/07/20 18:01:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -88,7 +88,7 @@ typedef void *  module_handle_t;
  *****************************************************************************
  * This variable is accessed by any function using modules.
  *****************************************************************************/
-struct module_bank_s
+struct module_bank_t
 {
     module_t *   first;                          /* First module in the bank */
     int          i_count;                     /* Number of allocated modules */
@@ -100,7 +100,7 @@ struct module_bank_s
 /*****************************************************************************
  * Module description structure
  *****************************************************************************/
-struct module_s
+struct module_t
 {
     VLC_COMMON_MEMBERS
 
@@ -166,7 +166,7 @@ struct module_s
 /*****************************************************************************
  * Module functions description structure
  *****************************************************************************/
-typedef struct function_list_s
+typedef struct function_list_t
 {
     union
     {
@@ -298,7 +298,7 @@ typedef struct function_list_s
 
 } function_list_t;
 
-struct module_functions_s
+struct module_functions_t
 {
     /* XXX: The order here has to be the same as above for the #defines */
     function_list_t intf;

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.24 2002/06/02 09:03:54 sam Exp $
+ * $Id: aout_directx.c,v 1.25 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -47,7 +47,7 @@ DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0, 0xaf, 0x8, 0x0, 
 /*****************************************************************************
  * notification_thread_t: DirectX event thread
  *****************************************************************************/
-typedef struct notification_thread_s
+typedef struct notification_thread_t
 {
     VLC_COMMON_MEMBERS
 
@@ -63,7 +63,7 @@ typedef struct notification_thread_s
  * It describes the direct sound specific properties of an audio device.
  *****************************************************************************/
 
-struct aout_sys_s
+struct aout_sys_t
 {
     LPDIRECTSOUND       p_dsobject;              /* main Direct Sound object */
 

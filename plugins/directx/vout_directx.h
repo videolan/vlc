@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.8 2002/06/01 16:45:34 sam Exp $
+ * $Id: vout_directx.h,v 1.9 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,7 +24,7 @@
 /*****************************************************************************
  * event_thread_t: DirectX event thread
  *****************************************************************************/
-typedef struct event_thread_s
+typedef struct event_thread_t
 {
     VLC_COMMON_MEMBERS
 
@@ -38,7 +38,7 @@ typedef struct event_thread_s
  * This structure is part of the video output thread descriptor.
  * It describes the DirectX specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
     LPDIRECTDRAWSURFACE3 p_display;                        /* Display device */
@@ -92,7 +92,7 @@ struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * DirectX specific properties of a direct buffer.
  *****************************************************************************/
-struct picture_sys_s
+struct picture_sys_t
 {
     LPDIRECTDRAWSURFACE3 p_surface;
     DDSURFACEDESC        ddsd;

@@ -52,7 +52,7 @@
 #define MODE_VIDEO_MEM      2
 #define MODE_VIDEO_OVERLAY  3
 
-struct vout_sys_s
+struct vout_sys_t
 {
     /* video mode */
     int                     i_mode;
@@ -93,7 +93,7 @@ struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * XVideo specific properties of a direct buffer.
  *****************************************************************************/
-struct picture_sys_s
+struct picture_sys_t
 {
     /* [shared] memory blit */
     PhImage_t *             p_image;

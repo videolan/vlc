@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.13 2002/06/27 19:05:17 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.14 2002/07/20 18:01:43 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,7 +91,7 @@
 /*****************************************************************************
  * data_buffer_t: shared data type
  *****************************************************************************/
-struct data_buffer_s
+struct data_buffer_t
 {
     data_buffer_t * p_next;
 
@@ -113,7 +113,7 @@ struct                                                                      \
     unsigned int i_depth;                                                   \
 } NAME;
 
-struct input_buffers_s
+struct input_buffers_t
 {
     vlc_mutex_t lock;
     PACKETS_LIFO( pes_packet_t, pes )

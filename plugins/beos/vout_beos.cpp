@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.60 2002/06/01 12:31:58 sam Exp $
+ * $Id: vout_beos.cpp,v 1.61 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,7 +49,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the BeOS specific properties of an output thread.
  *****************************************************************************/
-struct vout_sys_s
+struct vout_sys_t
 {
     VideoWindow *  p_window;
 

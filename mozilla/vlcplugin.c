@@ -2,7 +2,7 @@
  * vlcplugin.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.c,v 1.2 2002/07/12 17:08:52 sam Exp $
+ * $Id: vlcplugin.c,v 1.3 2002/07/20 18:01:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,7 +99,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         //"--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins",
         "--vout", "xvideo,x11,dummy",
         "--intf", "dummy",
-        //"--noaudio",
+        "--noaudio",
         //"-v"
     };
 
@@ -123,25 +123,25 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         This->window = 0;
     }
 
-    This->p_vlc = vlc_create();
+    This->p_vlc = vlc_create_r();
     if( This->p_vlc == NULL )
     {
         return NPERR_GENERIC_ERROR;
     }
 
-    i_ret = vlc_init( This->p_vlc, sizeof(ppsz_foo)/sizeof(char*), ppsz_foo );
+    i_ret = vlc_init_r( This->p_vlc, sizeof(ppsz_foo)/sizeof(char*), ppsz_foo );
     if( i_ret )
     {
-        vlc_destroy( This->p_vlc );
+        vlc_destroy_r( This->p_vlc );
         This->p_vlc = NULL;
         return NPERR_GENERIC_ERROR;
     }
 
-    i_ret = vlc_run( This->p_vlc );
+    i_ret = vlc_run_r( This->p_vlc );
     if( i_ret )
     {
-        vlc_end( This->p_vlc );
-        vlc_destroy( This->p_vlc );
+        vlc_end_r( This->p_vlc );
+        vlc_destroy_r( This->p_vlc );
         This->p_vlc = NULL;
         return NPERR_GENERIC_ERROR;
     }
@@ -179,9 +179,9 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
     if( This->p_vlc != NULL )
     {
-        vlc_stop( This->p_vlc );
-        vlc_end( This->p_vlc );
-        vlc_destroy( This->p_vlc );
+        vlc_stop_r( This->p_vlc );
+        vlc_end_r( This->p_vlc );
+        vlc_destroy_r( This->p_vlc );
         This->p_vlc = NULL;
     }
 
@@ -244,9 +244,9 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         This->b_stream = 1;
         if( This->psz_target )
         {
-            vlc_add_target( This->p_vlc, This->psz_target, PLAYLIST_APPEND, PLAYLIST_END );
+            vlc_add_target_r( This->p_vlc, This->psz_target, PLAYLIST_APPEND, PLAYLIST_END );
                     /* We loop, dude */
-            vlc_add_target( This->p_vlc, "vlc:loop", PLAYLIST_APPEND, PLAYLIST_END );
+            vlc_add_target_r( This->p_vlc, "vlc:loop", PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
 #endif
@@ -353,9 +353,9 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
     if (instance != NULL)
     {
         This = (PluginInstance*) instance->pdata;
-        vlc_add_target( This->p_vlc, fname, PLAYLIST_APPEND, PLAYLIST_END );
+        vlc_add_target_r( This->p_vlc, fname, PLAYLIST_APPEND, PLAYLIST_END );
                 /* We loop, dude */
-        vlc_add_target( This->p_vlc, "vlc:loop", PLAYLIST_APPEND, PLAYLIST_END );
+        vlc_add_target_r( This->p_vlc, "vlc:loop", PLAYLIST_APPEND, PLAYLIST_END );
     }
 }
 

@@ -313,9 +313,9 @@ distclean: clean
 #
 # Install/uninstall rules
 #
-install: vlc-install plugins-install po-install mozilla-install
+install: vlc-install plugins-install libvlc-install po-install mozilla-install
 
-uninstall: vlc-uninstall plugins-uninstall po-uninstall mozilla-uninstall
+uninstall: vlc-uninstall plugins-uninstall libvlc-install po-uninstall mozilla-uninstall
 
 vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -340,11 +340,24 @@ endif
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(PLUGINS))
-	$(INSTALL) -m 644 $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/vlc
+	$(INSTALL) $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/vlc
 endif
 
 plugins-uninstall:
 	rm -f $(DESTDIR)$(libdir)/vlc/*.so
+
+libvlc-install:
+	mkdir -p $(DESTDIR)$(bindir)
+	$(INSTALL) vlc-config $(DESTDIR)$(bindir)
+	mkdir -p $(DESTDIR)$(includedir)/vlc
+	$(INSTALL) -m 644 include/vlc/*.h $(DESTDIR)$(includedir)/vlc
+	mkdir -p $(DESTDIR)$(libdir)
+	$(INSTALL) -m 644 lib/libvlc.a $(DESTDIR)$(libdir)
+
+libvlc-uninstall:
+	rm -f $(DESTDIR)$(bindir)/vlc-config
+	rm -Rf $(DESTDIR)$(includedir)/vlc
+	rm -f $(DESTDIR)$(libdir)/libvlc.a
 
 mozilla-install:
 ifeq ($(MOZILLA),1)
@@ -585,7 +598,7 @@ endif
 # Main application target
 #
 vlc: Makefile.config Makefile.opts Makefile.dep Makefile $(VLC_OBJ) lib/libvlc.a $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) lib/libvlc.a $(BUILTIN_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) lib/libvlc.a $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
@@ -598,9 +611,15 @@ endif
 #
 # Main library target
 #
-lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
+lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ) $(BUILTIN_OBJ)
 	rm -f $@
 	ar rc $@ $(LIBVLC_OBJ)
+ifneq (,$(BUILTINS))
+	rm -Rf lib/tmp && mkdir -p lib/tmp
+	cd lib/tmp && for i in $(BUILTINS) ; do ar x ../../plugins/$$i.a ; done
+	ar rcs $@ lib/tmp/*
+	rm -Rf lib/tmp
+endif
 	$(RANLIB) $@
 
 #lib/libvlc.so: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
