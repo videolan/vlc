@@ -38,6 +38,7 @@
 #include "video_fifo.h"
 #include "vpar_synchro.h"
 #include "video_parser.h"
+#include "vpar_motion.h"
 
 /*
  * Local prototypes
@@ -435,9 +436,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     
     DumpBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
     
-    p_vpar->picture.b_full_pel_forward_vector = GetBits( &p_vpar->bit_stream, 1 );
+    p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
     p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
-    p_vpar->picture.b_full_pel_backward_vector = GetBits( &p_vpar->bit_stream, 1 );
+    p_vpar->picture.pb_full_pel_vector[1] = GetBits( &p_vpar->bit_stream, 1 );
     p_vpar->picture.i_backward_f_code = GetBits( &p_vpar->bit_stream, 3 );
 
     /* extra_information_picture */
@@ -928,6 +929,8 @@ static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar )
     /* That's scalable, so we trash it */
     DumpBits32( &p_vpar->bit_stream );
     DumpBits( &p_vpar->bit_stream, 14 );
+    p_vpar->picture.i_spatial_temporal_weight_code_table_index = GetBits( &p_vpar->bit_stream, 2 );
+    DumpBits( &p_vpar->bit_stream, 2 );
 }
 
 

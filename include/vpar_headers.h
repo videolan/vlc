@@ -76,7 +76,7 @@ typedef struct sequence_s
  *****************************************************************************/
 typedef struct picture_parsing_s
 {
-    boolean_t           b_full_pel_forward_vector, b_full_pel_backward_vector;
+    boolean_t           pb_full_pel_vector[2];
     int                 i_forward_f_code, i_backward_f_code;
 
     int                 ppi_f_code[2][2];
@@ -99,6 +99,9 @@ typedef struct picture_parsing_s
     boolean_t           b_frame_structure;
     f_macroblock_type_t pf_macroblock_type;
 
+    /* Scalability variables */
+    int                 i_spatial_temporal_weight_code_table_index;
+    
     boolean_t           b_error;
 } picture_parsing_t;
 

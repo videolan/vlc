@@ -571,6 +571,8 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
             }
         }
     }
+
+    p_vpar->mb.b_dmv = p_vpar->mb.i_motion_type == MOTION_DMV;
 }
 
 /*****************************************************************************

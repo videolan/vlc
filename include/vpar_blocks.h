@@ -41,13 +41,10 @@ typedef struct macroblock_s
     picture_t *             p_backw_bot;
     picture_t *             p_forw_top;
     picture_t *             p_forw_bot;
-    int                     i_field_select_backw_top, i_field_select_backw_bot;
-    int                     i_field_select_forw_top, i_field_select_forw_bot;
-    int                     pi_motion_vectors_backw_top[2];
-    int                     pi_motion_vectors_backw_bot[2];
-    int                     pi_motion_vectors_forw_top[2];
-    int                     pi_motion_vectors_forw_bot[2];
-
+    int                     ppi_field_select[2][2];
+    int                     pppi_motion_vectors[2][2][2];
+    int                     pi_dm_vector[2];
+   
     /* AddBlock information */
     f_addb_t                pf_addb[12];      /* pointer to the Add function */
     data_t *                p_data[12];              /* pointer to the position
@@ -61,6 +58,7 @@ typedef struct macroblock_s
 typedef struct
 {
     int                     i_mb_type, i_motion_type, i_mv_count, i_mv_format;
+    boolean_t               b_dmv;
     /* AddressIncrement information */
     int                     i_addr_inc;
     int                     i_coded_block_pattern;
