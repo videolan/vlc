@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.4 2002/10/14 21:59:44 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.5 2002/10/20 17:28:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -144,6 +144,10 @@ typedef struct videodec_thread_s
 /* Sorenson v1 */
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
 
+/* wmv */
+#define FOURCC_WMV1         VLC_FOURCC('W','M','V','1')
+#define FOURCC_WMV2         VLC_FOURCC('W','M','V','2')
+
 static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
                                   int *pi_ffmpeg_codec,
                                   char **ppsz_name )
@@ -230,6 +234,15 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_H263I;
             psz_name = "I263.I";
             break;
+        case FOURCC_WMV1:
+            i_codec = CODEC_ID_WMV1;
+            psz_name ="Windows Media Video 1";
+            break;
+        case FOURCC_WMV2:
+            i_codec = CODEC_ID_WMV2;
+            psz_name ="Windows Media Video 2";
+            break;
+
     }
 
     if( i_codec )

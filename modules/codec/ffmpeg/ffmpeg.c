@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.7 2002/10/14 21:59:44 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.8 2002/10/20 17:28:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -288,7 +288,7 @@ static void __PES_NEXT( decoder_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
-static inline void __GetFrame( videodec_thread_t *p_vdec )
+static void __GetFrame( videodec_thread_t *p_vdec )
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
@@ -334,7 +334,7 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
     } while( p_data );
 }
 
-static inline void __NextFrame( videodec_thread_t *p_vdec )
+static void __NextFrame( videodec_thread_t *p_vdec )
 {
     __PES_NEXT( p_vdec->p_fifo );
 }
@@ -666,13 +666,13 @@ static int InitThread( videodec_thread_t *p_vdec )
     }
 
     /* ***** Fill p_context with init values ***** */
-#if LIBAVCODEC_BUILD >= 4624
-    p_vdec->p_context = avcodec_alloc_context();
-#else
+//#if LIBAVCODEC_BUILD >= 4624
+//    p_vdec->p_context = avcodec_alloc_context();
+//#else
     p_vdec->p_context = malloc( sizeof( AVCodecContext ) );
     memset( p_vdec->p_context, 0, sizeof( AVCodecContext ) );
-#endif
 
+//#endif
     p_vdec->p_context->width  = p_vdec->format.i_width;
     p_vdec->p_context->height = p_vdec->format.i_height;
     
