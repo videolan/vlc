@@ -1,53 +1,19 @@
 <html>
 <head>
-    <title>VLC Media Player</title>
-    <vlc id="if" param1="url_param"/>
-        <meta http-equiv="refresh" content="0;URL=/" />
-    <vlc id="end" />
-
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play" />
-    <vlc id="set" param1="sout" param2="string" />
+    <title>VLC Media Player - Informations</title>
 </head>
 <body>
-    <h2><center><a href="http://www.videolan.org">VLC Media Player <vlc id="value" param1="version" /></a> (http interface)</center></h2>
+    <h2><center><a href="http://www.videolan.org">VLC Media Player <vlc id="display" param1="version" /></a></center></h2>
     <hr/>
-    <td>
-        <form method="get" action="">
-            <input type="submit" name="control" value="stop" />
-            <input type="submit" name="control" value="pause" />
-            <input type="submit" name="control" value="previous" />
-            <input type="submit" name="control" value="next" />
-            <a href="info.html">infos</a>
-        </form>
-    </td>
-    <br />
-    <td>
-        <form method="get" action="" enctype="text/plain" >
-            <input type="text" name="mrl" size="40" />
-            <input type="submit" name="control" value="add" />
-        </form>
-    </td>
-    <td>
-        <form method="get" action="" enctype="text/plain" >
-            <input type="text"   name="sout"    size="30" value="<vlc id="get" param1="sout" param2="string" />" />
-            <input type="submit" name="control" value="sout" />
-        </form>
-    </td>
-    <hr/>
-    <p>
-        <vlc id="foreach" param1="pl" param2="playlist" />
-            <vlc id="if" param1="pl.current" />
-                <b>
-            <vlc id="end" />
-            <a href=?control=play&item=<vlc id="value" param1="pl.index" />><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a> <br />
-            <vlc id="if" param1="pl.current" />
-                </b>
-            <vlc id="end" />
-
+    <vlc id="foreach" param1="cat" param2="informations" />
+        <p> <vlc id="value" param1="cat.name" />
+        <ul>
+        <vlc id="foreach" param1="info" param2="cat.info" />
+            <li> <vlc id="value" param1="info.name" /> : <vlc id="value" param1="info.value" /> </li>
         <vlc id="end" />
-    </p>
+        </ul>
+    <vlc id="end" />
     <hr/>
-    <p> <vlc id="value" param1="copyright" /> </p>
+    <p><vlc id="display" param1="copyright" /> </p>
 </body>
 </html>
-
