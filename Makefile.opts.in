@@ -129,6 +129,7 @@ endif
 
 # PROGRAM_VERSION is the current vlc version
 PROGRAM_VERSION=@VLC_VERSION@
+LIBDVDCSS_VERSION=@LIBDVDCSS_VERSION@
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.

@@ -160,7 +160,7 @@ show:
 
 
 # ugliest of all, but I have no time to do it -- sam
-snapshot: Makefile.opts
+snapshot: clean Makefile.opts
 	rm -Rf /tmp/vlc-${PROGRAM_VERSION}* /tmp/vlc-${PROGRAM_VERSION}nocss*
 	# copy archive in /tmp
 	find -type d | grep -v CVS | grep -v '\.dep' | while read i ; \
@@ -183,7 +183,8 @@ snapshot: Makefile.opts
 			do rm -Rf $$i ; \
 		done
 	# copy misc files
-	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL README TODO todo.pl \
+	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL INSTALL.libdvdcss \
+		README TODO todo.pl \
 		Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
 			/tmp/vlc-${PROGRAM_VERSION}/
@@ -198,9 +199,6 @@ snapshot: Makefile.opts
 		cp share/$$icon.xpm share/$$icon.png \
 			/tmp/vlc-${PROGRAM_VERSION}/share/ ; done
 
-	# make distclean
-	(cd /tmp/vlc-${PROGRAM_VERSION} ; ./configure ; make distclean )
-
 	# build css-enabled archives
 	(cd /tmp ; tar cf vlc-${PROGRAM_VERSION}.tar vlc-${PROGRAM_VERSION} ; \
 		bzip2 -f -9 < vlc-${PROGRAM_VERSION}.tar \
@@ -211,6 +209,50 @@ snapshot: Makefile.opts
 
 	# clean up
 	rm -Rf /tmp/vlc-${PROGRAM_VERSION}*
+
+libdvdcss-snapshot: clean Makefile.opts
+	rm -Rf /tmp/libdvdcss-${LIBDVDCSS_VERSION}* \
+		/tmp/libdvdcss-${LIBDVDCSS_VERSION}nocss*
+	# copy archive in /tmp
+	find include extras doc lib -type d | grep -v CVS | grep -v '\.dep' | \
+		while read i ; do \
+			mkdir -p /tmp/libdvdcss-${LIBDVDCSS_VERSION}/$$i ; \
+		done
+	# .c .h .in .cpp .glade
+	find include extras -type f -name '*.[chig]*' | while read i ; \
+		do cp $$i /tmp/libdvdcss-${LIBDVDCSS_VERSION}/$$i ; done
+	# Makefiles
+	sed -e 's#^install:#install-unused:#' \
+		-e 's#^clean:#clean-unused:#' \
+		-e 's#^all:.*#all: libdvdcss#' \
+		-e 's#^libdvdcss-install:#install:#' \
+		-e 's#^libdvdcss-clean:#clean:#' \
+		< Makefile > /tmp/libdvdcss-${LIBDVDCSS_VERSION}/Makefile
+	# extra files
+	cp -a extras/* /tmp/libdvdcss-${LIBDVDCSS_VERSION}/extras
+	cp -a doc/* /tmp/libdvdcss-${LIBDVDCSS_VERSION}/doc
+	find /tmp/libdvdcss-${LIBDVDCSS_VERSION}/extras \
+		/tmp/libdvdcss-${LIBDVDCSS_VERSION}/doc \
+		-type d -name CVS | while read i ; \
+			do rm -Rf $$i ; \
+		done
+	# copy misc files
+	cp AUTHORS COPYING ChangeLog INSTALL INSTALL.libdvdcss README \
+		TODO todo.pl Makefile.opts.in Makefile.dep Makefile.modules \
+		configure configure.in install-sh config.sub config.guess \
+			/tmp/libdvdcss-${LIBDVDCSS_VERSION}/
+
+	# build css-enabled archives
+	(cd /tmp ; tar cf libdvdcss-${LIBDVDCSS_VERSION}.tar \
+		libdvdcss-${LIBDVDCSS_VERSION} ; \
+		bzip2 -f -9 < libdvdcss-${LIBDVDCSS_VERSION}.tar \
+			> libdvdcss-${LIBDVDCSS_VERSION}.tar.bz2 ; \
+		gzip -f -9 libdvdcss-${LIBDVDCSS_VERSION}.tar )
+	mv /tmp/libdvdcss-${LIBDVDCSS_VERSION}.tar.gz \
+		/tmp/libdvdcss-${LIBDVDCSS_VERSION}.tar.bz2 ..
+
+	# clean up
+	rm -Rf /tmp/libdvdcss-${LIBDVDCSS_VERSION}*
 
 .PHONY: vlc.app
 vlc.app:

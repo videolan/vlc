@@ -1,11 +1,13 @@
 dnl Autoconf settings for vlc
-AC_INIT(src/interface/main.c)
+AC_INIT(include/main.h)
 AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_HOST
 
 VLC_VERSION=0.2.80
 AC_SUBST(VLC_VERSION)
+LIBDVDCSS_VERSION=0.0.1
+AC_SUBST(LIBDVDCSS_VERSION)
 VLC_CODENAME=Ourumov
 AC_SUBST(VLC_CODENAME)
 
