@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.7 2004/01/25 20:05:29 hartman Exp $
+ * $Id: id3.c,v 1.8 2004/03/03 11:38:14 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -53,17 +53,24 @@ vlc_module_end();
  ****************************************************************************/
 static int SkipID3Tag( vlc_object_t *p_this )
 {
-    input_thread_t *p_input;
+    input_thread_t *p_input = NULL;
     uint8_t *p_peek;
     int i_size;
     uint8_t version, revision;
     int b_footer;
 
-    if ( p_this->i_object_type != VLC_OBJECT_INPUT )
+    if ( p_this->i_object_type == VLC_OBJECT_INPUT )
     {
-        return( VLC_EGENERIC );
+        p_input = (input_thread_t *)p_this;
     }
-    p_input = (input_thread_t *)p_this;
+    if( p_input == NULL )
+    {
+        p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        if( p_input == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+    }
 
     msg_Dbg( p_input, "checking for ID3 tag" );
 
@@ -71,11 +78,13 @@ static int SkipID3Tag( vlc_object_t *p_this )
     if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_input, "cannot peek()" );
+        vlc_object_release( p_input );
         return VLC_EGENERIC;
     }
 
     if( p_peek[0] != 'I' || p_peek[1] != 'D' || p_peek[2] != '3' )
     {
+        vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
 
@@ -98,5 +107,6 @@ static int SkipID3Tag( vlc_object_t *p_this )
     msg_Dbg( p_input, "ID3v2.%d revision %d tag found, skiping %d bytes",
              version, revision, i_size );
 
+    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
