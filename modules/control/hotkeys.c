@@ -415,7 +415,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
             }
-            else if( i_action == ACTIONID_POSITION )
+            else if( i_action == ACTIONID_POSITION && b_seekable )
             {
                 DisplayPosition( p_vout, p_input );
             }
