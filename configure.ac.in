@@ -128,6 +128,7 @@ case "x${target_os}" in
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
         LDFLAGS_access_http="${LDFLAGS_http} -lws2_32"
+        LDFLAGS_access_mms="${LDFLAGS_mms} -lws2_32"
         LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
     fi
     ;;

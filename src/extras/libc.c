@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.1 2002/11/10 23:41:53 sam Exp $
+ * $Id: libc.c,v 1.2 2002/11/12 10:44:04 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -50,7 +50,7 @@ char *strdup( const char *string )
  * strndup: returns a malloc'd copy of at most n bytes of string 
  * Does anyone know whether or not it will be present in Jaguar?
  *****************************************************************************/
-#ifndef HAVE_STRDUP
+#ifndef HAVE_STRNDUP
 char *strndup( const char *string, size_t n )
 {
     char *psz;
