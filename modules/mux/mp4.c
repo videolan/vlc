@@ -50,12 +50,13 @@
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-mp4-"
+
 vlc_module_begin();
     set_description( _("MP4/MOV muxer") );
 
-    add_bool( "mp4-faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT,
               VLC_TRUE );
-
     set_capability( "sout mux", 5 );
     add_shortcut( "mp4" );
     add_shortcut( "mov" );
@@ -65,6 +66,10 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "faststart", NULL
+};
+
 static int Capability(sout_mux_t *, int, void *, void * );
 static int AddStream( sout_mux_t *, sout_input_t * );
 static int DelStream( sout_mux_t *, sout_input_t * );
@@ -164,7 +169,14 @@ static int Open( vlc_object_t *p_this )
     sout_mux_sys_t  *p_sys;
     bo_t            *box;
 
-    p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    msg_Dbg( p_mux, "Mp4 muxer opend" );
+    sout_ParseCfg( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+
+    p_mux->pf_capacity  = Capability;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = Mux;
+    p_mux->p_sys        = p_sys = malloc( sizeof( sout_mux_sys_t ) );
     p_sys->i_pos        = 0;
     p_sys->i_nb_streams = 0;
     p_sys->pp_streams   = NULL;
@@ -172,13 +184,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_mov        = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mov" );
     p_sys->i_dts_start  = 0;
 
-    msg_Dbg( p_mux, "Open" );
-
-    p_mux->pf_capacity  = Capability;
-    p_mux->pf_addstream = AddStream;
-    p_mux->pf_delstream = DelStream;
-    p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys;
 
     if( !p_sys->b_mov )
     {
@@ -253,8 +258,7 @@ static void Close( vlc_object_t * p_this )
     moov = GetMoovBox( p_mux );
 
     /* Check we need to create "fast start" files */
-    var_Create( p_this, "mp4-faststart", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "mp4-faststart", &val );
+    var_Get( p_this, SOUT_CFG_PREFIX "faststart", &val );
     p_sys->b_fast_start = val.b_bool;
     while( p_sys->b_fast_start )
     {
