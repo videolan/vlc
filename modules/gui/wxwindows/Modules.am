@@ -2,10 +2,10 @@ SOURCES_wxwindows = \
 	wxwindows.cpp \
 	wxwindows.h \
 	interface.cpp \
+	extrapanel.cpp \
 	dialogs.cpp \
 	open.cpp \
 	streamout.cpp \
-	streamwizard.cpp \
 	wizard.cpp \
 	messages.cpp \
 	playlist.cpp \

@@ -897,7 +897,6 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
 
         /* Get the key combination and send it to the hotkey handler */
         var_Set( p_intf->p_vlc, "key-pressed", val );
-	msg_Err( p_intf, "received key event: %i", event.GetId() );
         return;
     }
 

@@ -137,6 +137,9 @@ struct intf_sys_t
     /* Embedded vout */
     VideoWindow         *p_video_window;
     wxBoxSizer          *p_video_sizer;
+
+    /* Aout */
+    aout_instance_t     *p_aout;
 };
 
 /*****************************************************************************
@@ -183,6 +186,104 @@ private:
     vlc_bool_t b_old_seekable;
 };
 
+
+/* Extended panel */
+class ExtraPanel: public wxPanel
+{
+public:
+    /* Constructor */
+    ExtraPanel( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~ExtraPanel();
+
+    wxStaticBox *adjust_box;
+    wxButton *restoredefaults_button;
+    wxSlider *brightness_slider;
+    wxSlider *contrast_slider;
+    wxSlider *saturation_slider;
+    wxSlider *hue_slider;
+    wxSlider *gamma_slider;
+
+    wxStaticBox *other_box;
+    wxComboBox *ratio_combo;
+
+    char *psz_bands;
+    float f_preamp;
+    vlc_bool_t b_update;
+
+private:
+
+    wxPanel *VideoPanel( wxWindow * );
+    wxPanel *EqzPanel( wxWindow * );
+    wxPanel *AudioPanel( wxWindow * );
+
+    wxNotebook *notebook;
+
+    wxCheckBox *eq_chkbox;
+
+    wxCheckBox *eq_2p_chkbox;
+
+    wxSlider *smooth_slider;
+
+    wxSlider *preamp_slider;
+    wxStaticText * preamp_text;
+
+    int i_smooth;
+    wxWindow *p_parent;
+
+    wxSlider *band_sliders[10];
+    wxStaticText *band_texts[10];
+
+    int i_values[10];
+
+    void CheckAout();
+
+    /* Event handlers (these functions should _not_ be virtual) */
+
+    void OnEnableAdjust( wxCommandEvent& );
+    void OnEnableEqualizer( wxCommandEvent& );
+    void OnRestoreDefaults( wxCommandEvent& );
+    void OnChangeEqualizer( wxScrollEvent& );
+    void OnAdjustUpdate( wxScrollEvent& );
+    void OnRatio( wxCommandEvent& );
+    void OnFiltersInfo( wxCommandEvent& );
+    void OnSelectFilter( wxCommandEvent& );
+
+    void OnEqSmooth( wxScrollEvent& );
+    void OnPreamp( wxScrollEvent& );
+    void OnEq2Pass( wxCommandEvent& );
+    void OnEqRestore( wxCommandEvent& );
+
+    void OnHeadphone( wxCommandEvent& );
+    void OnNormvol( wxCommandEvent& );
+    void OnNormvolSlider( wxScrollEvent& );
+
+    void OnIdle( wxIdleEvent& );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    vlc_bool_t b_my_update;
+};
+
+#if 0
+/* Extended Window  */
+class ExtraWindow: public wxFrame
+{
+public:
+    /* Constructor */
+    ExtraWindow( intf_thread_t *p_intf, wxWindow *p_parent, wxPanel *panel );
+    virtual ~ExtraWindow();
+
+private:
+
+    wxPanel *panel;
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+};
+#endif
+
 /* Main Interface */
 class Interface: public wxFrame
 {
@@ -198,20 +299,13 @@ public:
 
     wxSlider    *slider;
     wxWindow    *slider_frame;
-    wxWindow    *extra_frame;
+    wxPanel     *extra_frame;
+
+    wxFrame    *extra_window;
 
     vlc_bool_t b_extra;
+    vlc_bool_t b_undock;
 
-    wxStaticBox *adjust_box;
-    wxButton *restoredefaults_button;
-    wxSlider *brightness_slider;
-    wxSlider *contrast_slider;
-    wxSlider *saturation_slider;
-    wxSlider *hue_slider;
-    wxSlider *gamma_slider;
-
-    wxStaticBox *other_box;
-    wxComboBox *ratio_combo;
 
     wxGauge     *volctrl;
 
@@ -232,7 +326,10 @@ private:
     void OnOpenDisc( wxCommandEvent& event );
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
+
     void OnExtended( wxCommandEvent& event );
+    //void OnUndock( wxCommandEvent& event );
+
     void OnBookmarks( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
@@ -242,13 +339,6 @@ private:
     void OnNextStream( wxCommandEvent& event );
     void OnSlowStream( wxCommandEvent& event );
     void OnFastStream( wxCommandEvent& event );
-
-    void OnEnableAdjust( wxCommandEvent& event );
-    void OnRestoreDefaults( wxCommandEvent& event);
-    void OnAdjustUpdate( wxScrollEvent& event );
-
-    void OnRatio( wxCommandEvent& event );
-    void OnEnableVisual( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
 

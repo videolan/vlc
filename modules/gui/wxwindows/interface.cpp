@@ -118,7 +118,6 @@ enum
     OpenOther_Event,
     EjectDisc_Event,
 
-    StreamWizard_Event,
     Wizard_Event,
 
     Playlist_Event,
@@ -127,6 +126,7 @@ enum
 
     Prefs_Event,
     Extended_Event,
+//    Undock_Event,
     Bookmarks_Event,
     Skins_Event,
 
@@ -137,17 +137,6 @@ enum
     NextStream_Event,
     SlowStream_Event,
     FastStream_Event,
-
-    Adjust_Event,
-    RestoreDefaults_Event,
-    Hue_Event,
-    Contrast_Event,
-    Brightness_Event,
-    Saturation_Event,
-    Gamma_Event,
-
-    Ratio_Event,
-    Visual_Event,
 
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
@@ -167,13 +156,10 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     EVT_MENU_OPEN(Interface::OnMenuOpen)
 
-    EVT_MENU( Extended_Event, Interface::OnExtended)
-    EVT_MENU( Bookmarks_Event, Interface::OnShowDialog)
+    EVT_MENU( Extended_Event, Interface::OnExtended )
+//    EVT_MENU( Undock_Event, Interface::OnUndock )
 
-    EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
-    EVT_BUTTON( RestoreDefaults_Event, Interface::OnRestoreDefaults)
-    EVT_TEXT( Ratio_Event, Interface::OnRatio)
-    EVT_CHECKBOX( Visual_Event, Interface::OnEnableVisual)
+    EVT_MENU( Bookmarks_Event, Interface::OnShowDialog)
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
     EVT_CONTEXT_MENU(Interface::OnContextMenu2)
@@ -188,7 +174,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
     EVT_MENU(OpenCapture_Event, Interface::OnShowDialog)
     EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
-    EVT_MENU(StreamWizard_Event, Interface::OnShowDialog)
     EVT_MENU(Wizard_Event, Interface::OnShowDialog)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
@@ -199,12 +184,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
-    
-    EVT_COMMAND_SCROLL(Hue_Event, Interface::OnAdjustUpdate)
-    EVT_COMMAND_SCROLL(Contrast_Event, Interface::OnAdjustUpdate)
-    EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnAdjustUpdate)
-    EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnAdjustUpdate)
-    EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnAdjustUpdate)
 
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
@@ -223,6 +202,9 @@ Interface::Interface( intf_thread_t *_p_intf ):
     p_intf = _p_intf;
     i_old_playing_status = PAUSE_S;
     b_extra = VLC_FALSE;
+//    b_undock = VLC_FALSE;
+
+    extra_window = NULL;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
@@ -244,7 +226,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     CreateOurToolBar();
 
     /* Create the extra panel */
-    CreateOurExtendedPanel();
+    extra_frame = new ExtraPanel( p_intf, this );
     frame_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
     frame_sizer->Hide( extra_frame );
 
@@ -341,8 +323,6 @@ void Interface::CreateOurMenuBar()
 
     file_menu->AppendSeparator();
     file_menu->Append( Wizard_Event, wxU(_("&Wizard...\tCtrl-W")) );
-    file_menu->Append( StreamWizard_Event,
-                       wxU(_("Old streaming Wizard...")) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")) );
 
@@ -523,201 +503,6 @@ void Interface::CreateOurSlider()
 }
 
 
-void Interface::CreateOurExtendedPanel()
-{
-    char *psz_filters;
-
-    extra_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
-    extra_frame->SetAutoLayout( TRUE );
-    wxBoxSizer *extra_sizer = new wxBoxSizer( wxHORIZONTAL );
-
-    /* Create static box to surround the adjust controls */
-    wxStaticBox *adjust_box =
-           new wxStaticBox( extra_frame, -1, wxU(_("Adjust Image")) );
-
-    /* Create the size for the frame */
-    wxStaticBoxSizer *adjust_sizer =
-        new wxStaticBoxSizer( adjust_box, wxVERTICAL );
-    adjust_sizer->SetMinSize( -1, 50 );
-    
-    /* Create flex grid */
-    wxFlexGridSizer *adjust_gridsizer =
-        new wxFlexGridSizer( 6, 2, 0, 0);
-    adjust_gridsizer->AddGrowableCol(1);
-
-    /* Create every controls */
-
-    /* Create the adjust button */
-    wxCheckBox * adjust_check = new wxCheckBox( extra_frame, Adjust_Event,
-                                                 wxU(_("Enable")));
-
-    /* Create the restore to defaults button */
-    restoredefaults_button = 
-        new wxButton( extra_frame, RestoreDefaults_Event,
-        wxU(_("Restore Defaults")), wxDefaultPosition);
-
-    wxStaticText *hue_text = new wxStaticText( extra_frame, -1,
-                                       wxU(_("Hue")) );
-    hue_slider = new wxSlider ( extra_frame, Hue_Event, 0, 0,
-                                360, wxDefaultPosition, wxDefaultSize );
-
-
-    wxStaticText *contrast_text = new wxStaticText( extra_frame, -1,
-                                       wxU(_("Contrast")) );
-    contrast_slider = new wxSlider ( extra_frame, Contrast_Event, 0, 0,
-                                200, wxDefaultPosition, wxDefaultSize);
-
-    wxStaticText *brightness_text = new wxStaticText( extra_frame, -1,
-                                       wxU(_("Brightness")) );
-    brightness_slider = new wxSlider ( extra_frame, Brightness_Event, 0, 0,
-                           200, wxDefaultPosition, wxDefaultSize) ;
-
-    wxStaticText *saturation_text = new wxStaticText( extra_frame, -1,
-                                          wxU(_("Saturation")) );
-    saturation_slider = new wxSlider ( extra_frame, Saturation_Event, 0, 0,
-                           300, wxDefaultPosition, wxDefaultSize );
-
-    wxStaticText *gamma_text = new wxStaticText( extra_frame, -1,
-                                          wxU(_("Gamma")) );
-    gamma_slider = new wxSlider ( extra_frame, Gamma_Event, 0, 0,
-                           100, wxDefaultPosition, wxDefaultSize );
-
-    adjust_gridsizer->Add(adjust_check, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(restoredefaults_button, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(hue_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(hue_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(contrast_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(contrast_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(brightness_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(brightness_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(saturation_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(saturation_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(gamma_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(gamma_slider, 1, wxEXPAND, 0);
-    
-    adjust_sizer->Add(adjust_gridsizer,1,wxEXPAND, 0);
-    
-    extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
-
-    /* Create sizer to surround the other controls */
-    wxBoxSizer *other_sizer = new wxBoxSizer( wxVERTICAL );
-
-
-    wxStaticBox *video_box =
-            new wxStaticBox( extra_frame, -1, wxU(_("Video Options")) );
-    /* Create the sizer for the frame */
-    wxStaticBoxSizer *video_sizer =
-       new wxStaticBoxSizer( video_box, wxVERTICAL );
-    video_sizer->SetMinSize( -1, 50 );
-
-    static const wxString ratio_array[] =
-    {
-        wxT("4:3"),
-        wxT("16:9"),
-    };
-
-    wxBoxSizer *ratio_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxStaticText *ratio_text = new wxStaticText( extra_frame, -1,
-                                          wxU(_("Aspect Ratio")) );
-
-    ratio_combo = new wxComboBox( extra_frame, Ratio_Event, wxT(""),
-                                  wxDefaultPosition, wxSize(120,-1),
-                                  WXSIZEOF(ratio_array), ratio_array,
-                                  0 );
-
-    ratio_sizer->Add( ratio_text, 0, wxALL, 2 );
-    ratio_sizer->Add( ratio_combo, 0, wxALL, 2 );
-    ratio_sizer->Layout();
-
-    video_sizer->Add( ratio_sizer  , 0 , wxALL , 0 );
-    video_sizer->Layout();
-
-#if 0
-    wxBoxSizer *visual_sizer = new wxBoxSizer( wxHORIZONTAL );
-
-    wxCheckBox *visual_checkbox = new wxCheckBox( extra_frame, Visual_Event,
-                                            wxU(_("Visualizations")) );
-
-    visual_sizer->Add( visual_checkbox, 0, wxEXPAND, 0);
-    visual_sizer->Layout();
-
-    wxStaticBox *audio_box =
-              new wxStaticBox( extra_frame, -1, wxU(_("Audio Options")) );
-    /* Create the sizer for the frame */
-    wxStaticBoxSizer *audio_sizer =
-        new wxStaticBoxSizer( audio_box, wxVERTICAL );
-    audio_sizer->SetMinSize( -1, 50 );
-
-    audio_sizer->Add( visual_sizer, 0, wxALL, 0);
-    audio_sizer->Layout();
-
-    other_sizer->Add( audio_sizer , 0 , wxALL | wxEXPAND , 0 );
-#endif
-    other_sizer->Add( video_sizer, 0, wxALL | wxEXPAND , 0);
-    other_sizer->Layout();
-
-    extra_sizer->Add(other_sizer,0,wxBOTTOM,5);
-
-    extra_frame->SetSizer( extra_sizer );
-
-    /* Layout the whole panel */
-    extra_sizer->Layout();
-
-    extra_sizer->SetSizeHints(extra_frame);
-
-    /* Write down initial values */
-#if 0
-    psz_filters = config_GetPsz( p_intf, "audio-filter" );
-    if( psz_filters && strstr( psz_filters, "visual" ) )
-    {
-        visual_checkbox->SetValue(1);
-    }
-    if( psz_filters ) free( psz_filters );
-#endif
-    psz_filters = config_GetPsz( p_intf, "filter" );
-    if( psz_filters && strstr( psz_filters, "adjust" ) )
-    {
-        adjust_check->SetValue( 1 );
-        restoredefaults_button->Enable();
-        saturation_slider->Enable();
-        contrast_slider->Enable();
-        brightness_slider->Enable();
-        hue_slider->Enable();
-        gamma_slider->Enable();
-    }
-    else
-    {
-        adjust_check->SetValue( 0 );
-        restoredefaults_button->Disable();
-        saturation_slider->Disable();
-        contrast_slider->Disable();
-        brightness_slider->Disable();
-        hue_slider->Disable();
-        gamma_slider->Disable();
-    }
-    if( psz_filters ) free( psz_filters );
-
-    int i_value = config_GetInt( p_intf, "hue" );
-    if( i_value > 0 && i_value < 360 )
-        hue_slider->SetValue( i_value );
-
-    float f_value;
-    f_value = config_GetFloat( p_intf, "saturation" );
-    if( f_value > 0 && f_value < 5 )
-        saturation_slider->SetValue( (int)(100 * f_value) );
-    f_value = config_GetFloat( p_intf, "contrast" );
-    if( f_value > 0 && f_value < 4 )
-        contrast_slider->SetValue( (int)(100 * f_value) );
-    f_value = config_GetFloat( p_intf, "brightness" );
-    if( f_value > 0 && f_value < 2 )
-        brightness_slider->SetValue( (int)(100 * f_value) );
-    f_value = config_GetFloat( p_intf, "gamma" );
-    if( f_value > 0 && f_value < 10 )
-        gamma_slider->SetValue( (int)(10 * f_value) );
-
-    extra_frame->Hide();
-}
-
 static int ConvertHotkeyModifiers( int i_hotkey )
 {
     int i_accel_flags = 0;
@@ -819,6 +604,11 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         p_settings_menu->AppendCheckItem( Extended_Event,
             wxU(_("&Extended GUI") ) );
         if( b_extra ) p_settings_menu->Check( Extended_Event, TRUE );
+#if 0
+        p_settings_menu->AppendCheckItem( Undock_Event,
+            wxU(_("&Undock Ext. GUI") ) );
+        if( b_undock ) p_settings_menu->Check( Undock_Event, TRUE );
+#endif
         p_settings_menu->AppendCheckItem( Bookmarks_Event,
             wxU(_("&Bookmarks...") ) );
         p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")) );
@@ -924,9 +714,6 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case Prefs_Event:
             i_id = INTF_DIALOG_PREFS;
             break;
-        case StreamWizard_Event:
-            i_id = INTF_DIALOG_STREAMWIZARD;
-            break;
         case Wizard_Event:
             i_id = INTF_DIALOG_WIZARD;
             break;
@@ -944,205 +731,99 @@ void Interface::OnShowDialog( wxCommandEvent& event )
 
 void Interface::OnExtended(wxCommandEvent& event)
 {
-    if( b_extra == VLC_FALSE)
-    {
-        extra_frame->Show();
-        frame_sizer->Show( extra_frame );
-        b_extra = VLC_TRUE;
-    }
-    else
+    b_extra = (b_extra == VLC_TRUE ? VLC_FALSE : VLC_TRUE );
+
+    if( b_extra == VLC_FALSE )
     {
         extra_frame->Hide();
         frame_sizer->Hide( extra_frame );
-        b_extra = VLC_FALSE;
+    }
+    else
+    {
+        extra_frame->Show();
+        frame_sizer->Show( extra_frame );
     }
     frame_sizer->Layout();
     frame_sizer->Fit(this);
 }
 
-void Interface::OnEnableAdjust(wxCommandEvent& event)
-{
-    char *psz_filters=config_GetPsz( p_intf, "filter");
-    char *psz_new = NULL;
-    if( event.IsChecked() )
-    {
-        if(psz_filters == NULL)
+#if 0
+        if( b_undock == VLC_TRUE )
         {
-            psz_new = strdup( "adjust" );
+                fprintf(stderr,"Deleting window\n");
+            if( extra_window )
+            {
+                delete extra_window;
+                extra_window = NULL;
+            }
         }
         else
         {
-            psz_new= (char *) malloc(strlen(psz_filters) + 8 );
-            sprintf( psz_new, "%s:adjust", psz_filters);
+            extra_frame->Hide();
+            frame_sizer->Hide( extra_frame );
+            frame_sizer->Layout();
+            frame_sizer->Fit(this);
         }
-        config_PutPsz( p_intf, "filter", psz_new );
-        vlc_value_t val;
-        vout_thread_t *p_vout =
-           (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                       FIND_ANYWHERE );
-        if( p_vout != NULL )
-        {
-            val.psz_string = strdup( psz_new );
-            var_Set( p_vout, "filter", val);
-            vlc_object_release( p_vout );
-        }
-        if( val.psz_string ) free( val.psz_string );
-        restoredefaults_button->Enable();
-        brightness_slider->Enable();
-        saturation_slider->Enable();
-        contrast_slider->Enable();
-        hue_slider->Enable();
-        gamma_slider->Enable();
     }
     else
     {
-        if( psz_filters != NULL )
+        if( b_undock == VLC_TRUE )
         {
-
-            char *psz_current;
-            unsigned int i=0;
-            for( i = 0; i< strlen(psz_filters ); i++)
+                fprintf(stderr,"Creating window\n");
+            extra_frame->Hide();
+            frame_sizer->Hide( extra_frame );
+            frame_sizer->Detach( extra_frame );
+            frame_sizer->Layout();
+            frame_sizer->Fit(this);
+            extra_window = new ExtraWindow( p_intf, this, extra_frame );
+        }
+        else
+        {
+                fprintf(stderr,"Deleting window\n");
+            if( extra_window )
             {
-                if ( !strncasecmp( &psz_filters[i],"adjust",6 ))
-                {
-                    if(i > 0)
-                        if( psz_filters[i-1] == ':' ) i--;
-                    psz_current = strchr( &psz_filters[i+1] , ':' );
-                    if( !psz_current )
-                        psz_filters[i] = '\0';
-                    else
-                    {
-                       memmove( &psz_filters[i] , psz_current,
-                                &psz_filters[strlen(psz_filters)]-psz_current
-                                +1);
-                    }
-                }
+                delete extra_window;
             }
-            config_PutPsz( p_intf, "filter", psz_filters);
-            vlc_value_t val;
-            val.psz_string = strdup( psz_filters );
-            vout_thread_t *p_vout =
-               (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                       FIND_ANYWHERE );
-            if( p_vout != NULL )
+            extra_frame->Show();
+            frame_sizer->Show( extra_frame );
+            frame_sizer->Layout();
+            frame_sizer->Fit(this);
+        }
+    }
+}
+
+void Interface::OnUndock(wxCommandEvent& event)
+{
+    b_undock = (b_undock == VLC_TRUE ? VLC_FALSE : VLC_TRUE );
+
+    if( b_extra == VLC_TRUE )
+    {
+        if( b_undock == VLC_FALSE )
+        {
+                fprintf(stderr,"Deleting window\n");
+            if( extra_window )
             {
-                var_Set( p_vout, "filter", val);
-                vlc_object_release( p_vout );
+                delete extra_window;
+                extra_window = NULL;
             }
-            if( val.psz_string ) free( val.psz_string );
+            extra_frame->Show();
+            frame_sizer->Show( extra_frame );
+            frame_sizer->Layout();
+            frame_sizer->Fit(this);
         }
-        restoredefaults_button->Disable();
-        brightness_slider->Disable();
-        saturation_slider->Disable();
-        contrast_slider->Disable();
-        hue_slider->Disable();
-        gamma_slider->Disable();
-    }
-    if(psz_filters) free(psz_filters);
-    if(psz_new) free(psz_new);
-}
-
-void Interface::OnRestoreDefaults( wxCommandEvent &event)
-{
-    hue_slider->SetValue(0);
-    saturation_slider->SetValue(100);
-    brightness_slider->SetValue(100);
-    contrast_slider->SetValue(100),
-    gamma_slider->SetValue(10);
-
-    wxScrollEvent *hscroll_event = new wxScrollEvent(0, Hue_Event, 0);
-    OnAdjustUpdate(*hscroll_event);
-    
-    wxScrollEvent *sscroll_event = new wxScrollEvent(0, Saturation_Event, 100);
-    OnAdjustUpdate(*sscroll_event);
-    
-    wxScrollEvent *bscroll_event = new wxScrollEvent(0, Brightness_Event, 100);
-    OnAdjustUpdate(*bscroll_event);
-    
-    wxScrollEvent *cscroll_event = new wxScrollEvent(0, Contrast_Event, 100);
-    OnAdjustUpdate(*cscroll_event);
-    
-    wxScrollEvent *gscroll_event = new wxScrollEvent(0, Gamma_Event, 10);
-    OnAdjustUpdate(*gscroll_event);
-
-}
-
-void Interface::OnAdjustUpdate( wxScrollEvent &event)
-{
-    vout_thread_t *p_vout = (vout_thread_t *)vlc_object_find(p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE);
-    if(p_vout == NULL)
-        switch(event.GetId())
+        else
         {
-            case Hue_Event: 
-                config_PutInt( p_intf , "hue" , event.GetPosition() );
-                break;
-            
-            case Saturation_Event: 
-                config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
-                break;
-            
-            case Brightness_Event: 
-                config_PutFloat( p_intf , "brightness" , (float)event.GetPosition()/100 );
-                break;
-            
-            case Contrast_Event: 
-                config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
-                break;
-            
-            case Gamma_Event: 
-                config_PutFloat( p_intf , "gamma" , (float)event.GetPosition()/10 );
-                break;
+                fprintf(stderr,"Creating window\n");
+            extra_frame->Hide();
+            frame_sizer->Hide( extra_frame );
+            frame_sizer->Detach( extra_frame );
+            frame_sizer->Layout();
+            frame_sizer->Fit(this);
+            extra_window = new ExtraWindow( p_intf, this, extra_frame );
         }
-    else
-    {
-        vlc_value_t val;
-        switch(event.GetId())
-        {
-            case Hue_Event: 
-                val.i_int = event.GetPosition();
-                var_Set(p_vout, "hue", val);
-                break;
-            
-            case Saturation_Event:
-                val.f_float = (float)event.GetPosition()/100;
-                var_Set(p_vout, "saturation", val);
-                break;
-            
-            case Brightness_Event: 
-                val.f_float = (float)event.GetPosition()/100;
-                var_Set(p_vout, "brightness", val);
-                break;
-            
-            case Contrast_Event: 
-                val.f_float = (float)event.GetPosition()/100;
-                var_Set(p_vout, "contrast", val);
-                break;
-            
-            case Gamma_Event: 
-                val.f_float = (float)event.GetPosition()/10;
-                var_Set(p_vout, "gamma", val);
-                break;
-        }
-        vlc_object_release(p_vout);
     }
 }
-
-void Interface::OnRatio( wxCommandEvent& event )
-{
-   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue().mb_str() );
-}
-
-void Interface::OnEnableVisual(wxCommandEvent& event)
-{
-    if( event.IsChecked() )
-    {
-        config_PutPsz( p_intf, "audio-filter", "visual" );
-    }
-    else
-    {
-        config_PutPsz( p_intf, "audio-filter", "" );
-    }
-}
+#endif
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 {
