@@ -15,7 +15,7 @@ build-stamp:
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-ppro --enable-mmx --enable-gnome
+		--enable-mmx --enable-gnome --enable-fb
 	$(MAKE)
 
 	touch build-stamp

@@ -1,3 +1,16 @@
+vlc (0.1.99f) unstable; urgency=low
+
+  * plugin detection now works
+  * "gvlc", "fbvlc", "ggivlc" aliases now work
+  * fixed functions that weren't properly inlined
+  * removed bloat from the MMX YUV plugin
+  * vlc.init becomes ~/.vlcrc
+  * removed float operations in the video decoder, and all emms asm functions
+  * borrowed linuxvideo's MMX motion compensation
+  * fixed an undefined symbol in the MMX YUV plugin
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue,  8 Aug 2000 11:24:01 +0200
+
 vlc (0.1.99e) unstable; urgency=low
 
   * new bitstream syntax and slight performance increase

@@ -1991,9 +1991,9 @@ void ParseMacroblockGENERIC( vpar_thread_t * p_vpar, int * pi_mb_address,
                              int i_chroma_format, int i_structure,
                              boolean_t b_second_field )
 {
-/*    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
+    ParseMacroblock( p_vpar, pi_mb_address, i_mb_previous, i_mb_base,
                      b_mpeg2, i_coding_type, i_chroma_format,
-                     i_structure, b_second_field );*/
+                     i_structure, b_second_field );
 }
 
 #if (VPAR_OPTIM_LEVEL > 0)

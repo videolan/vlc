@@ -352,11 +352,11 @@ distclean: clean
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
-	rm -rf .dep
+	rm -rf .dep debian/tmp
 
 install:
 	mkdir -p $(prefix)/bin
-	$(INSTALL) vlc $(prefix)/bin
+	$(INSTALL) vlc @ALIASES@ $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
 	mkdir -p $(prefix)/share/videolan
@@ -378,6 +378,7 @@ snapshot:
 		make distclean ; \
 		find . -type d -name CVS | xargs rm -rf ; \
 		find . -type f -name '.*.swp' | xargs rm -f ; \
+		find . -type f -name '.cvsignore' | xargs rm -f ; \
 		cd .. ; \
 		tar czvf ${SNAPSHOTDIR}.tar.gz ${SNAPSHOTDIR} ; \
 		tar cIvf ${SNAPSHOTDIR}.tar.bz2 ${SNAPSHOTDIR} )

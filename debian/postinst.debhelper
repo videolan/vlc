@@ -6,5 +6,5 @@ if [ "$1" = "configure" ]; then
 fi
 # End automatically added section
 # Automatically added by dh_installmenu
-if test -x /usr/bin/update-menus ; then update-menus ; fi
+if [ "$1" = "configure" -a -x /usr/bin/update-menus ]; then update-menus ; fi
 # End automatically added section
