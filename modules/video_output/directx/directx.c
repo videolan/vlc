@@ -556,6 +556,20 @@ static int Manage( vout_thread_t *p_vout )
             int i_style = WS_CLIPCHILDREN | WS_VISIBLE;
             SetWindowLong( hwnd, GWL_STYLE, i_style );
 
+            if( p_vout->p_sys->hparent )
+            {
+                /* Retrieve current window position so fullscreen will happen
+                 * on the right screen */
+                POINT point = {0,0};
+                RECT rect;
+                ClientToScreen( p_vout->p_sys->hwnd, &point );
+                GetClientRect( p_vout->p_sys->hwnd, &rect );
+                SetWindowPos( hwnd, 0, point.x, point.y,
+                              rect.right, rect.bottom,
+                              SWP_NOZORDER|SWP_FRAMECHANGED );
+                GetWindowPlacement( hwnd, &window_placement );
+            }
+
             /* Maximize window */
             window_placement.showCmd = SW_SHOWMAXIMIZED;
             SetWindowPlacement( hwnd, &window_placement );
