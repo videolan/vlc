@@ -46,7 +46,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.5.1
+export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.5.2
 
 config:
 	./configure --mandir=$${prefix}/share/man \

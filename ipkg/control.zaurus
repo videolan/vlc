@@ -1,8 +1,8 @@
 Package: zaurus-vlc
 Section: graphics
 Priority: optional
-Version: 0.5.1
-Release: test2
+Version: 0.5.2
+Release: 1 
 Conflicts: gpe-apps, gpe-vlc, vlc, libsdl
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>
