@@ -86,6 +86,7 @@ HEADERS_include = \
 	include/mtime.h \
 	include/network.h \
 	include/os_specific.h \
+	include/snapshot.h \
 	include/stream_control.h \
 	include/stream_output.h \
 	include/variables.h \
