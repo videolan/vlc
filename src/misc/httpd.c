@@ -2196,7 +2196,8 @@ static int BuildAddr( struct sockaddr_in * p_socket,
         if( !inet_aton( psz_address, &p_socket->sin_addr ) )
 #else
         p_socket->sin_addr.s_addr = inet_addr( psz_address );
-        if( p_socket->sin_addr.s_addr == INADDR_NONE )
+/*        if( p_socket->sin_addr.s_addr == INADDR_NONE )*/
+        if( p_socket->sin_addr.s_addr == INADDR_BROADCAST )
 #endif
         {
             /* We have a fqdn, try to find its address */
