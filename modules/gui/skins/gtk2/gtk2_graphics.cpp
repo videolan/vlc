@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.5 2003/04/13 20:07:34 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.6 2003/04/14 20:07:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -33,6 +33,8 @@
 #include "os_window.h"
 #include "gtk2_graphics.h"
 
+#include <stdio.h>
+
 //---------------------------------------------------------------------------
 // GTK2 GRAPHICS
 //---------------------------------------------------------------------------
@@ -53,8 +55,18 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
     SelectObject( Image, HImage );
     DeleteObject( HImage );*/
     
-    Image = ( GdkDrawable* )( (GTK2Window *)from )->GetHandle();
-    Gc = gdk_gc_new( Image );
+    if( from != NULL )
+    {
+        GdkWindow *fromWnd = ( (GTK2Window *)from )->GetHandle();
+        Image = (GdkDrawable*) gdk_pixmap_new( fromWnd, w, h, -1 );
+        Gc = gdk_gc_new( ( GdkDrawable* )fromWnd );
+    }
+    else
+    {
+        Image = (GdkDrawable*) gdk_pixmap_new( NULL, w, h, 8 );
+        gdk_drawable_set_colormap( Image, gdk_colormap_get_system() );
+        Gc = gdk_gc_new( Image );
+    }
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()
@@ -67,6 +79,9 @@ void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 {
 /*    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
         sx, sy, Flag );*/
+        fprintf(stderr, "%d %d %d %d %d %d\n", sx, sy, dx, dy, dw, dh);
+    gdk_draw_drawable( Image, Gc, (( GTK2Graphics* )Src )->GetImage(),
+            sx, sy, dx, dy, dw, dh );
 }
 
 //---------------------------------------------------------------------------

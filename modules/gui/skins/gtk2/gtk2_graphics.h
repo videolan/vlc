@@ -2,7 +2,7 @@
  * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.h,v 1.2 2003/04/13 17:46:22 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.3 2003/04/14 20:07:49 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -58,7 +58,8 @@ class GTK2Graphics : public Graphics
         virtual void SetClipRegion( Region *rgn );
 
         // Specific GTK2 methods
-        GdkDrawable *GetImageHandle()    { return Image; };
+        GdkDrawable *GetImage() { return Image; };
+        GdkGC *GetGC()    { return Gc; };
 };
 //---------------------------------------------------------------------------
 class GTK2Region : public Region

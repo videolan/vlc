@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.6 2003/04/14 17:03:42 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.7 2003/04/14 20:07:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -70,6 +70,7 @@ GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
 {
     // Set handles
     gWnd           = gwnd;
+    gc = gdk_gc_new( gwnd );
 /*
     // Set position parameters
     CursorPos    = new POINT;
@@ -234,7 +235,12 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 
     // Release window device context
     ReleaseDC( hWnd, DC );
+    
 */
+    
+ fprintf(stderr, "window %d %d %d %d\n", x, y, w, h);
+    gdk_draw_drawable( gWnd, gc, (( GTK2Graphics* )Image )->GetImage(),
+            x, y, x, y, w, h );
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMove()
@@ -271,7 +277,6 @@ void GTK2Window::Move( int left, int top )
 //---------------------------------------------------------------------------
 void GTK2Window::Size( int width, int height )
 {
-fprintf(stderr, "size %d %d\n", width, height);
     Width  = width;
     Height = height;
     gdk_window_resize( gWnd, width, height );

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.6 2003/04/14 17:56:45 karibu Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.7 2003/04/14 20:07:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -163,14 +163,11 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
     // New method, not available in win95
     TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h, AlphaColor );
 */
-    GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImageHandle();
+    GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImage();
+    GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
 
-    GdkGC *gc = gdk_gc_new( destImg );
-    /*gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,  
-            GDK_RGB_DITHER_NONE, 0, 0);*/
-fprintf(stderr, "draw %d %d %d %d\n", xRef, yRef, w, h);
-    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, xRef, yRef, w, h,
-            GDK_RGB_DITHER_NONE, 0, 0);
+    gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
+            w, h, GDK_RGB_DITHER_NONE, 0, 0);
 }
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)

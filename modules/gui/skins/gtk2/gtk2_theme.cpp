@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.7 2003/04/14 18:05:35 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.8 2003/04/14 20:07:49 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -264,10 +264,10 @@ void GTK2Theme::OnLoadTheme()
     GdkWindowAttr attr;
     attr.title = "VLC Media Player";
     attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.x = 100;
-    attr.y = 100;
-    attr.width = 400;
-    attr.height = 150;
+    attr.x = 0;
+    attr.y = 0;
+    attr.width = 0;
+    attr.height = 0;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_ONLY;
     attr.override_redirect = FALSE;
@@ -277,7 +277,7 @@ void GTK2Theme::OnLoadTheme()
     // Create the parent window
     ParentWindow = gdk_window_new( NULL, &attr, mask);
 
-    gdk_window_show( ParentWindow );
+//    gdk_window_show( ParentWindow );
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::AddSystemMenu( string name, Event *event )
@@ -322,13 +322,13 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     attr.event_mask = GDK_ALL_EVENTS_MASK;
     attr.width = 0;
     attr.height = 0;
-    attr.window_type = GDK_WINDOW_CHILD;
+    attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_OUTPUT;
     
     gint mask =0;
     
     // Create the window
-    GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask );
+    GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask );
     if( !gwnd )
     {
         msg_Err( p_intf, "CreateWindow failed" );
