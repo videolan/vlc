@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.7 2003/05/26 01:25:12 hartman Exp $
+ * $Id: output.m,v 1.8 2003/06/17 14:38:39 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -394,13 +394,17 @@
         o_transcode_string = [NSMutableString stringWithString:@"transcode{"];
         if ( [o_transcode_video_chkbox state] == NSOnState )
         {
-            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\",",
+            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\"",
                 [o_transcode_video_selector titleOfSelectedItem],
                 [o_transcode_video_bitrate stringValue]];
+            if ( [o_transcode_audio_chkbox state] == NSOnState )
+            {
+                [o_transcode_string appendString: @","];
+            }
         }
         if ( [o_transcode_audio_chkbox state] == NSOnState )
         {
-            [o_transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\",",
+            [o_transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\"",
                 [o_transcode_audio_selector titleOfSelectedItem],
                 [o_transcode_audio_bitrate stringValue]];
         }
