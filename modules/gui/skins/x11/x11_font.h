@@ -2,7 +2,7 @@
  * x11_font.h: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.h,v 1.3 2003/06/06 21:47:18 asmax Exp $
+ * $Id: x11_font.h,v 1.4 2003/06/08 00:32:07 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -43,6 +43,7 @@ class X11Font : SkinFont
     private:
         Display *display;
         Font font;
+        XFontStruct *FontInfo;
         bool Underline;
 
         // Assign font to Device Context

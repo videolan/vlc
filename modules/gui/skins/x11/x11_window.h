@@ -2,7 +2,7 @@
  * x11_window.h: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.h,v 1.4 2003/06/07 12:19:23 asmax Exp $
+ * $Id: x11_window.h,v 1.5 2003/06/08 00:32:07 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -41,6 +41,12 @@ typedef struct
     intf_thread_t *p_intf;
     X11Timer *timer;
     string text;
+    Display *display;
+    Window window;
+    GC gc;
+    Font font;
+    int curX;
+    int curY;
 } tooltip_t;
 
 
@@ -62,8 +68,7 @@ class X11Window : public SkinWindow
         X11DropObject *DropObject;
 
         // Tooltip texts
-        Window ToolTipWindow;
-        tooltip_t ToolTipInfo;
+        tooltip_t ToolTip;
 
         // Double-click handling
         int ClickedX;

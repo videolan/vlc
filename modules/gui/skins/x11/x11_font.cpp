@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.7 2003/06/06 23:34:35 asmax Exp $
+ * $Id: x11_font.cpp,v 1.8 2003/06/08 00:32:07 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -59,6 +59,7 @@ X11Font::X11Font( intf_thread_t *_p_intf, string fontname, int size,
 
     XLOCK;
     font = XLoadFont( display, name );
+    FontInfo = XQueryFont( display, font );
     XUNLOCK;
 }
 //---------------------------------------------------------------------------
@@ -81,7 +82,7 @@ void X11Font::GetSize( string text, int &w, int &h )
     XUNLOCK;
 
     w = overall.rbearing - overall.lbearing;
-    h = overall.ascent + overall.descent;
+    h = FontInfo->max_bounds.ascent + FontInfo->max_bounds.descent;
 }
 //---------------------------------------------------------------------------
 void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
@@ -99,7 +100,7 @@ void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
     rect.x = x;
     rect.y = y;
     rect.width = w;
-    rect.height = h+1;
+    rect.height = h;
 
     XLOCK;
     XChangeGC( display, gc, GCForeground|GCFont, &gcVal );
@@ -107,10 +108,12 @@ void X11Font::GenericPrint( Graphics *dest, string text, int x, int y,
     XSetClipRectangles( display, gc, 0, 0, &rect, 1, Unsorted );  
     
     // Render text no the drawable
-    XDrawString( display, drawable, gc, x, y+h, text.c_str(), text.size());
+    XDrawString( display, drawable, gc, x, y+FontInfo->max_bounds.ascent, 
+                 text.c_str(), text.size());
     if( Underline )
     {
-        XDrawLine( display, drawable, gc, x, y+h, x+w, y+h );
+        XDrawLine( display, drawable, gc, x, y+FontInfo->max_bounds.ascent+1, 
+                   x+w, y+FontInfo->max_bounds.ascent+1 );
     }
     
     // Reset the clip mask

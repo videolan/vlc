@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.12 2003/06/07 12:19:23 asmax Exp $
+ * $Id: x11_window.cpp,v 1.13 2003/06/08 00:32:07 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -92,10 +92,33 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     }
 
     // Create Tool Tip window
-    ToolTipWindow = XCreateSimpleWindow( display, wnd, 0, 0, 1, 1, 0, 0, 0 );
-    X11Timer *timer = new X11Timer( p_intf, 100, ToolTipCallback, &ToolTipInfo );
-    ToolTipInfo.p_intf = p_intf;
-    ToolTipInfo.timer = timer;
+    XColor color;
+    color.red = 0xffff;
+    color.green = 0xffff;
+    color.blue = 0xa000;
+    Colormap cm = DefaultColormap( display, screen );
+    Window root = DefaultRootWindow( display );
+
+    XLOCK;
+    XAllocColor( display, cm, &color );
+    XSetWindowAttributes attr;
+    attr.background_pixel = color.pixel;
+    attr.override_redirect = True;
+    ToolTip.window = XCreateWindow( display, root, 0, 0, 1, 1, 1, 0, InputOutput,
+                                    CopyFromParent, CWBackPixel|CWOverrideRedirect, &attr );
+    XGCValues gcVal;
+    ToolTip.font = XLoadFont( display, "-*-helvetica-bold-r-*-*-*-80-*-*-*-*-*-*" );
+    gcVal.font = ToolTip.font;
+    gcVal.foreground = 0;
+    gcVal.background = color.pixel;
+    ToolTip.gc = XCreateGC( display, ToolTip.window, 
+                            GCBackground|GCForeground|GCFont, &gcVal );
+    XUNLOCK;
+
+    ToolTip.display = display;
+    X11Timer *timer = new X11Timer( p_intf, 100, ToolTipCallback, &ToolTip );
+    ToolTip.p_intf = p_intf;
+    ToolTip.timer = timer;
 
     // Double-click handling
     ClickedX = 0;
@@ -115,7 +138,7 @@ X11Window::~X11Window()
     {
         DestroyWindow( hWnd );
     }*/
-    XDestroyWindow( display, ToolTipWindow );
+    XDestroyWindow( display, ToolTip.window );
     /*
     if( DragDrop )
     {
@@ -289,6 +312,10 @@ void X11Window::RefreshFromImage( int x, int y, int w, int h )
  
     XImage *image = XGetImage( display, drawable, 0, 0, Width, Height, 
                                AllPlanes, ZPixmap );
+    if( !image )
+    {
+        msg_Err( p_intf, "X11Window::RefreshFromImage failed");
+    }
  
     // Mask for transparency
     Region region = XCreateRegion();
@@ -362,7 +389,31 @@ void X11Window::Size( int width, int height )
 
 bool ToolTipCallback( void *data )
 {
-    fprintf(stderr," TOOLTIP: %s\n", ((tooltip_t*)data)->text.c_str());
+    int direction, fontAscent, fontDescent;
+
+    Display *disp = ((tooltip_t*)data)->display;
+    Window win = ((tooltip_t*)data)->window;
+    Font font = ((tooltip_t*)data)->font;
+    GC gc = ((tooltip_t*)data)->gc;
+    string text = ((tooltip_t*)data)->text;
+    int curX = ((tooltip_t*)data)->curX;
+    int curY = ((tooltip_t*)data)->curY;
+ 
+    XLOCK;
+    XClearWindow( disp, win );
+    XCharStruct overall;
+    XQueryTextExtents( disp, font, text.c_str(), text.size(), &direction, 
+                       &fontAscent, &fontDescent, &overall );
+    int w = overall.rbearing - overall.lbearing;
+    int h = overall.ascent + overall.descent;
+    XMapRaised( disp, win );
+    XMoveWindow( disp, win, curX - w/4, curY + 20 );
+    XResizeWindow( disp, win, w+8, h+8 );
+    XDrawString( disp, win, gc, 4, overall.ascent+4, text.c_str(), 
+                 text.size() );
+    XSync( disp, 0 );
+    XUNLOCK;
+    
     return False;
 }
 
@@ -374,8 +425,14 @@ void X11Window::ChangeToolTipText( string text )
         if( ToolTipText != "none" )
         {
             ToolTipText = "none";
-//            ToolTipInfo.lpszText = NULL;
- //           SendMessage( ToolTipWindow, TTM_ACTIVATE, 0 , 0 );
+            XLOCK;
+            // Hide the tooltip window
+            X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
+            timerManager->removeTimer( ToolTip.timer );
+            XUnmapWindow( display, ToolTip.window );
+            XResizeWindow( display, ToolTip.window, 1, 1 );
+            XSync( display, 0 );
+            XUNLOCK;
         }
     }
     else
@@ -383,10 +440,10 @@ void X11Window::ChangeToolTipText( string text )
         if( text != ToolTipText )
         {
             ToolTipText = text;
-            ToolTipInfo.text = text;
+            ToolTip.text = text;
+            OSAPI_GetMousePos( ToolTip.curX, ToolTip.curY );
             X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
-            timerManager->addTimer( ToolTipInfo.timer );
-  //          ToolTipInfo.lpszText = (char *)ToolTipText.c_str();
+            timerManager->addTimer( ToolTip.timer );
         }
     }
 }

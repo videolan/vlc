@@ -2441,29 +2441,16 @@ if test "x${enable_skins}" != "xno"; then
     LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
   else
     if test "x${enable_skins}" = "xyes"; then
-
-      AC_ARG_WITH(gtk2-skins,
-      [    --with-gtk2-skins        skins using GTK2 (default disabled)])
-
-      if test "x${with_gtk2_skins}" = "xyes"; then
-        PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
-        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
-      else
-
-      	IMLIB2_PATH="${PATH}"
-        AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-        if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
-          AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
-        fi
-
-        PLUGINS="${PLUGINS} skins"
-        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
-        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
+      IMLIB2_PATH="${PATH}"
+      AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
+      if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+        AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
       fi
 
       PLUGINS="${PLUGINS} skins"
-
+      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+      LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
+      PLUGINS="${PLUGINS} skins"
     fi
   fi
 fi
@@ -2480,25 +2467,14 @@ if test "x${enable_basic_skins}" = "xyes"; then
     LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
 
   else
-    AC_ARG_WITH(gtk2-basic-skins,
-    [    --with-gtk2-basic-skins        skins using GTK2 (default disabled)])
-
-    if test "x${with_gtk2_basic_skins}" = "xyes"; then
-      PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
-      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
-    else
-
-      IMLIB2_PATH="${PATH}"
-      AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
-      if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
-      AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
-      fi
-
-      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
-      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
+    IMLIB2_PATH="${PATH}"
+    AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
+    if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+    AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
     fi
 
+    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
+    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
   fi
 
   PLUGINS="${PLUGINS} basic_skins"
