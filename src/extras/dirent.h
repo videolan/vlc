@@ -15,9 +15,9 @@
  *  DISCLAIMED. This includeds but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  * $Author: sam $
- * $Date: 2002/11/09 16:34:52 $
+ * $Date: 2002/11/10 18:04:23 $
  *
  */
 
@@ -26,7 +26,9 @@
 #ifndef _DIRENT_H_
 #define _DIRENT_H_
 
+#ifndef UNDER_CE
 #include <io.h>
+#endif
 
 #ifndef RC_INVOKED
 
@@ -51,7 +53,7 @@ struct dirent
 typedef struct
 {
 	/* disk transfer area for this dir */
-	struct _finddata_t	dd_dta;
+	WIN32_FIND_DATA		dd_dta;
 
 	/* dirent struct to return from dir (NOTE: this makes this thread
 	 * safe as long as only one thread uses a particular DIR struct at
@@ -102,7 +104,7 @@ struct _wdirent
 typedef struct
 {
 	/* disk transfer area for this dir */
-	struct _wfinddata_t	dd_dta;
+	WIN32_FIND_DATA		dd_dta;
 
 	/* dirent struct to return from dir (NOTE: this makes this thread
 	 * safe as long as only one thread uses a particular DIR struct at

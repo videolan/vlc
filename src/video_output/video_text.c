@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.37 2002/08/08 00:35:11 sam Exp $
+ * $Id: video_text.c,v 1.38 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,21 +25,23 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                  /* errno */
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
-#include <fcntl.h>                                                 /* open() */
 
 #include <vlc/vlc.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                    /* read(), close() */
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                               /* errno */
 #endif
 
-#if defined( WIN32 )
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>                                              /* open() */
+#endif
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>                                    /* read(), close() */
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 
@@ -253,7 +255,9 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
         }
 
         /* Open file */
+#ifndef UNDER_CE /* FIXME */
         i_file = open( psz_file, O_RDONLY );
+#endif
         free( psz_file );
 
         if( i_file != -1 )
@@ -264,7 +268,11 @@ vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
 
     if( i_file == -1 )
     {
+#ifdef HAVE_ERRNO_H
         msg_Err( p_vout, "cannot open '%s' (%s)", psz_name, strerror(errno) );
+#else
+        msg_Err( p_vout, "cannot open '%s'", psz_name );
+#endif
         return( NULL );
     }
 

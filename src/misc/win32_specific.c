@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.18 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: win32_specific.c,v 1.19 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -21,20 +21,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>                                                /* free() */
-#include <fcntl.h>
-
-#include <winsock2.h>
 
 #include <vlc/vlc.h>
+
+#if !defined( UNDER_CE )
+#   include <fcntl.h>
+#   include <winsock2.h>
+#endif
 
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
 void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
+#if !defined( UNDER_CE )
     WSADATA Data;
     int i_err;
 
@@ -48,6 +50,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     /* Set the default file-translation mode */
     _fmode = _O_BINARY;
+#endif
 }
 
 /*****************************************************************************
@@ -55,6 +58,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_Configure( vlc_t *p_this )
 {
+#if !defined( UNDER_CE )
     p_this->p_libvlc->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
     p_this->p_libvlc->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
 
@@ -73,6 +77,7 @@ void system_Configure( vlc_t *p_this )
     }
     else
 	msg_Dbg( p_this, "raised process priority" );
+#endif
 }
 
 /*****************************************************************************
@@ -80,5 +85,7 @@ void system_Configure( vlc_t *p_this )
  *****************************************************************************/
 void system_End( vlc_t *p_this )
 {
+#if !defined( UNDER_CE )
     WSACleanup();
+#endif
 }

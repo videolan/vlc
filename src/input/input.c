@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.213 2002/10/08 16:02:05 sam Exp $
+ * $Id: input.c,v 1.214 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,14 +27,20 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #include <vlc/vlc.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+
 #include <string.h>
-#include <errno.h>
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
@@ -161,7 +167,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     if( vlc_thread_create( p_input, "input", RunThread,
                            VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
-        msg_Err( p_input, "cannot create input thread (%s)", strerror(errno) );
+        msg_Err( p_input, "cannot create input thread" );
         free( p_input );
         return NULL;
     }

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.7 2002/10/27 17:23:17 titer Exp $
+ * $Id: vlc_threads_funcs.h,v 1.8 2002/11/10 18:04:22 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -232,6 +232,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     {
         PulseEvent( p_condvar->event );
     }
+#   ifndef UNDER_CE
     else if( p_condvar->i_win9x_cv == 1 )
     {
         /* Wait for the gate to be open */
@@ -263,6 +264,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
+#   endif
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -366,6 +368,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
             PulseEvent( p_condvar->event );
         }
     }
+#   ifndef UNDER_CE
     else if( p_condvar->i_win9x_cv == 1 )
     {
         /* Wait for the gate to be open */
@@ -399,6 +402,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
+#   endif
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )

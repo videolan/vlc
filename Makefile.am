@@ -276,73 +276,25 @@ EXTRA_DIST += \
 	msvc/vlc.dsw \
 	msvc/vlc.dsp.in \
 	msvc/vlc.dsp.out \
+	msvc/vlc.vcp \
+	msvc/vlc.vcw \
+	msvc/vlc.vcp.in \
+	msvc/vlc.vcp.out \
 	msvc/config.h \
 	msvc/modules_builtin_msvc.h \
 	$(NULL)
 
-#
-# rule to rebuild vlc.dsp - not for the faint of heart
-#
-update-vlc.dsp: FORCE
-	rm -f msvc/vlc.dsp
-#	Top of the project file
-	cat msvc/vlc.dsp.in > msvc/vlc.dsp
-#	The source files
-	echo '# Begin Group "Source Files"' >> msvc/vlc.dsp
-	echo '# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"' >> msvc/vlc.dsp
-	echo '# Begin Group "vlc"' >> msvc/vlc.dsp
-	for file in $(vlc_SOURCES) ; do \
-		echo '# Begin Source File' >> msvc/vlc.dsp ; \
-		echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
-		echo '# End Source File' >> msvc/vlc.dsp ; \
-	done ; \
-	echo '# End Group' >> msvc/vlc.dsp
-	echo '# Begin Group "libvlc"' >> msvc/vlc.dsp
-	for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep -v "/.*/"` ; do \
-		echo '# Begin Source File' >> msvc/vlc.dsp ; \
-		echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
-		echo '# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"' >> msvc/vlc.dsp ; \
-		echo '# End Source File' >> msvc/vlc.dsp ; \
-	done ; \
-	for subdir in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/.*/" | cut -f2 -d/ | sort | uniq` ; do \
-		echo '# Begin Group "'$$subdir'"' >> msvc/vlc.dsp ; \
-		for file in `for i in $(SOURCES_libvlc) $(OPT_SOURCES_libvlc_win32) $(OPT_SOURCES_libvlc_dirent) $(OPT_SOURCES_libvlc_getopt) ; do echo $$i ; done | grep "/$$subdir/"` ; do \
-			echo '# Begin Source File' >> msvc/vlc.dsp ; \
-			echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
-			echo '# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"' >> msvc/vlc.dsp ; \
-			echo '!IF "$$(CFG)" == "vlc - Win32 Release"' >> msvc/vlc.dsp ; \
-			echo '# PROP Intermediate_Dir "Release\'$$subdir'"' >> msvc/vlc.dsp ; \
-			echo '# PROP Output_Dir "Release\'$$subdir'"' >> msvc/vlc.dsp ; \
-			echo '!ELSEIF "$$(CFG)" == "vlc - Win32 Debug"' >> msvc/vlc.dsp ; \
-			echo '# PROP Intermediate_Dir "Debug\'$$subdir'"' >> msvc/vlc.dsp ; \
-			echo '# PROP Output_Dir "Debug\'$$subdir'"' >> msvc/vlc.dsp ; \
-			echo '!ENDIF' >> msvc/vlc.dsp ; \
-			echo '# End Source File' >> msvc/vlc.dsp ; \
-		done ; \
-		echo '# End Group' >> msvc/vlc.dsp ; \
-	done
-	echo '# End Group' >> msvc/vlc.dsp
-	echo '# End Group' >> msvc/vlc.dsp
-#	The modules
-	echo 'no modules yet'
-#	The headers
-	echo '# Begin Group "Header Files"' >> msvc/vlc.dsp
-	echo '# PROP Default_Filter "h;hpp;hxx;hm;inl"' >> msvc/vlc.dsp
-	for file in $(HEADERS_include) $(HEADERS_include_built) ; do \
-		echo '# Begin Source File' >> msvc/vlc.dsp ; \
-		echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
-		echo '# End Source File' >> msvc/vlc.dsp ; \
-	done
-	echo '# Begin Group "vlc"' >> msvc/vlc.dsp
-	for file in $(dist_pkginclude_HEADERS) ; do \
-		echo '# Begin Source File' >> msvc/vlc.dsp ; \
-		echo $$file | sed -e 's%/%\\%g' -e 's%.*%SOURCE="..\\&"%' >> msvc/vlc.dsp ; \
-		echo '# End Source File' >> msvc/vlc.dsp ; \
-	done
-	echo '# End Group' >> msvc/vlc.dsp
-	echo '# End Group' >> msvc/vlc.dsp
-#	Bottom of the project file - handles resource files too
-	cat msvc/vlc.dsp.out >> msvc/vlc.dsp
+show-vlc-sources: FORCE
+	@echo X: $(vlc_SOURCES)
+
+show-libvlc-sources: FORCE
+	@echo X: $(SOURCES_libvlc_common) $(SOURCES_libvlc_win32) $(SOURCES_libvlc_dirent) $(SOURCES_libvlc_getopt) $(SOURCES_libvlc_strndup)
+
+show-libvlc-headers: FORCE
+	@echo X: $(HEADERS_include) $(HEADERS_include_built)
+
+show-libvlc-pkg-headers: FORCE
+	@echo X: $(dist_pkginclude_HEADERS)
 
 ###############################################################################
 # Building libvlc
@@ -361,64 +313,64 @@ lib_libvlc_pic_a_CFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CFLAGS_pic) @CFLAGS_vlc@
 lib_libvlc_pic_a_CXXFLAGS = $(CPPFLAGS_pic) -D__VLC__ $(CXXFLAGS_pic)
 
 if HAVE_BEOS
-SOURCES_libvlc_beos = $(OPT_SOURCES_libvlc_beos)
+OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
 endif
 if HAVE_DARWIN
-SOURCES_libvlc_darwin = $(OPT_SOURCES_libvlc_darwin)
+OPT_SOURCES_libvlc_darwin = $(SOURCES_libvlc_darwin)
 endif
 if HAVE_WIN32
-SOURCES_libvlc_win32 = $(OPT_SOURCES_libvlc_win32)
+OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
 endif
 if BUILD_DIRENT
-SOURCES_libvlc_dirent = $(OPT_SOURCES_libvlc_dirent)
+OPT_SOURCES_libvlc_dirent = $(SOURCES_libvlc_dirent)
 endif
 if BUILD_GETOPT
-SOURCES_libvlc_getopt = $(OPT_SOURCES_libvlc_getopt)
+OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
 endif
 if BUILD_STRNDUP
-SOURCES_libvlc_strndup = $(OPT_SOURCES_libvlc_strndup)
+OPT_SOURCES_libvlc_strndup = $(SOURCES_libvlc_strndup)
 endif
 if BUILD_MOZILLA
 LIBRARIES_libvlc_pic = lib/libvlc_pic.a
 endif
 
 EXTRA_DIST += \
-	$(OPT_SOURCES_libvlc_beos) \
-	$(OPT_SOURCES_libvlc_darwin) \
-	$(OPT_SOURCES_libvlc_win32) \
-	$(OPT_SOURCES_libvlc_dirent) \
-	$(OPT_SOURCES_libvlc_getopt) \
-	$(OPT_SOURCES_libvlc_strndup) \
+	$(SOURCES_libvlc_beos) \
+	$(SOURCES_libvlc_darwin) \
+	$(SOURCES_libvlc_win32) \
+	$(SOURCES_libvlc_dirent) \
+	$(SOURCES_libvlc_getopt) \
+	$(SOURCES_libvlc_strndup) \
 	$(NULL)
 
-OPT_SOURCES_libvlc_beos = \
+SOURCES_libvlc_beos = \
 	src/misc/beos_specific.cpp \
 	$(NULL)
 
-OPT_SOURCES_libvlc_darwin = \
+SOURCES_libvlc_darwin = \
 	src/misc/darwin_specific.c \
 	$(NULL)
 
-OPT_SOURCES_libvlc_win32 = \
+SOURCES_libvlc_win32 = \
 	src/misc/win32_specific.c \
 	$(NULL)
 
-OPT_SOURCES_libvlc_dirent = \
+SOURCES_libvlc_dirent = \
 	src/extras/dirent.c \
 	src/extras/dirent.h \
 	$(NULL)
 
-OPT_SOURCES_libvlc_getopt = \
+SOURCES_libvlc_getopt = \
 	src/extras/getopt.c \
 	src/extras/getopt.h \
 	src/extras/getopt1.c \
 	$(NULL)
 
-OPT_SOURCES_libvlc_strndup = \
+SOURCES_libvlc_strndup = \
 	src/extras/strndup.c
 	$(NULL)
 
-SOURCES_libvlc = \
+SOURCES_libvlc_common = \
 	src/libvlc.c \
 	src/libvlc.h \
 	src/interface/interface.c \
@@ -453,17 +405,21 @@ SOURCES_libvlc = \
 	src/misc/configuration.c \
 	src/misc/netutils.c \
 	src/misc/iso_lang.c \
-	src/misc/iso-639.def \
+	src/misc/iso-639_def.h \
 	src/misc/messages.c \
 	src/misc/objects.c \
 	src/misc/variables.c \
 	src/misc/error.c \
-	$(SOURCES_libvlc_beos) \
-	$(SOURCES_libvlc_darwin) \
-	$(SOURCES_libvlc_win32) \
-	$(SOURCES_libvlc_dirent) \
-	$(SOURCES_libvlc_getopt) \
-	$(SOURCES_libvlc_strndup) \
+	$(NULL)
+
+SOURCES_libvlc = \
+	$(SOURCES_libvlc_common) \
+	$(OPT_SOURCES_libvlc_beos) \
+	$(OPT_SOURCES_libvlc_darwin) \
+	$(OPT_SOURCES_libvlc_win32) \
+	$(OPT_SOURCES_libvlc_dirent) \
+	$(OPT_SOURCES_libvlc_getopt) \
+	$(OPT_SOURCES_libvlc_strndup) \
 	$(NULL)
 
 ###############################################################################

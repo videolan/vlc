@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.7 2002/10/03 13:21:55 sam Exp $
+ * $Id: cpu.c,v 1.8 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -26,10 +26,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
-#include <setjmp.h>                                       /* longjmp, setjmp */
-
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SIGNAL_H
+#   include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
+#   include <setjmp.h>                                    /* longjmp, setjmp */
+#endif
 
 #ifdef SYS_DARWIN
 #   include <mach/mach.h>                               /* AltiVec detection */
@@ -43,15 +45,19 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+#ifdef HAVE_SIGNAL_H
 static void SigHandler   ( int );
+#endif
 
 /*****************************************************************************
  * Global variables - they're needed for signal handling
  *****************************************************************************/
+#ifdef HAVE_SIGNAL_H
 static jmp_buf env;
 static int     i_illegal;
 #if defined( __i386__ )
 static char   *psz_capability;
+#endif
 #endif
 
 /*****************************************************************************
@@ -112,7 +118,8 @@ u32 CPUCapabilities( void )
                      : "a"  ( a )          \
                      : "cc" );
 
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
     void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 #   endif
 
@@ -137,7 +144,8 @@ u32 CPUCapabilities( void )
 
     if( i_eax == i_ebx )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -150,7 +158,8 @@ u32 CPUCapabilities( void )
 
     if( !i_eax )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -168,7 +177,8 @@ u32 CPUCapabilities( void )
 
     if( ! (i_edx & 0x00800000) )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -203,7 +213,8 @@ u32 CPUCapabilities( void )
 
     if( i_eax < 0x80000001 )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -236,14 +247,15 @@ u32 CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
 
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+     && defined( HAVE_SIGNAL_H )
     signal( SIGILL, pf_sigill );
 #   endif
     return i_capabilities;
 
 #elif defined( __powerpc__ )
 
-#   ifdef CAN_COMPILE_ALTIVEC
+#   ifdef CAN_COMPILE_ALTIVEC && defined( HAVE_SIGNAL_H )
     void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 
     i_capabilities |= CPU_CAPABILITY_FPU;
@@ -286,6 +298,7 @@ u32 CPUCapabilities( void )
  * This function is called when an illegal instruction signal is received by
  * the program. We use this function to test OS and CPU capabilities
  *****************************************************************************/
+#if defined( HAVE_SIGNAL_H )
 static void SigHandler( int i_signal )
 {
     /* Acknowledge the signal received */
@@ -307,4 +320,5 @@ static void SigHandler( int i_signal )
 
     longjmp( env, 1 );
 }
+#endif
 

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.16 2002/10/31 11:16:29 sam Exp $
+ * $Id: playlist.c,v 1.17 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -23,7 +23,6 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
-#include <errno.h>                                                 /* ENOMEM */
 
 #include <vlc/vlc.h>
 

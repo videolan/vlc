@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.42 2002/11/09 17:44:09 sam Exp $
+ * $Id: configuration.c,v 1.43 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,7 +26,9 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
-#include <errno.h>                                                  /* errno */
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                               /* errno */
+#endif
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */
@@ -44,8 +46,12 @@
 #include <pwd.h>                                               /* getpwuid() */
 #endif
 
-#include <sys/stat.h>
-#include <sys/types.h>
+#if defined( HAVE_SYS_STAT_H )
+#   include <sys/stat.h>
+#endif
+#if defined( HAVE_SYS_TYPES_H )
+#   include <sys/types.h>
+#endif
 
 /*****************************************************************************
  * config_GetInt: get the value of an int variable
@@ -681,15 +687,24 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
     sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
 
-#ifndef WIN32
-    if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
-#else
+#ifdef HAVE_ERRNO_H
+#   if defined( WIN32 )
     if( mkdir( psz_filename ) && errno != EEXIST )
-#endif
+#   else
+    if( mkdir( psz_filename, 0755 ) && errno != EEXIST )
+#   endif
     {
         msg_Err( p_this, "could not create %s (%s)",
                          psz_filename, strerror(errno) );
     }
+
+#else
+    if( mkdir( psz_filename ) )
+    {
+        msg_Err( p_this, "could not create %s", psz_filename );
+    }
+
+#endif
 
     strcat( psz_filename, "/" CONFIG_FILE );
 

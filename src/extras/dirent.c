@@ -9,21 +9,36 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  * $Author: sam $
- * $Date: 2002/11/09 17:44:09 $
+ * $Date: 2002/11/10 18:04:23 $
  *
  */
 
+#include "config.h"
+
 #include <stdlib.h>
-#include <errno.h>
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
+#else
+    static int errno;
+    /* FIXME: anything clever to put here? */
+#   define EFAULT 12
+#   define ENOTDIR 12
+#   define ENOENT 12
+#   define ENOMEM 12
+#   define EINVAL 12
+#endif
 #include <string.h>
-#include <io.h>
-#include <direct.h>
-#include "dirent.h"
+#ifndef UNDER_CE
+#   include <io.h>
+#   include <direct.h>
+#endif
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> /* for GetFileAttributes */
+
+#include "dirent.h"
 
 #define SUFFIX	"*"
 #define	SLASH	"\\"
@@ -71,7 +86,19 @@ opendir (const CHAR *szPath)
     }
 
   /* Make an absolute pathname.  */
+#if defined( UNDER_CE )
+  if (szPath[0] == '\\' || szPath[0] == '/')
+    {
+      snprintf (szFullPath, MAX_PATH, "%s", szPath);
+      szFullPath[0] = '\\';
+    }
+  else
+    {
+      snprintf (szFullPath, MAX_PATH, "\\%s", szPath );
+    }
+#else
   _fullpath (szFullPath, szPath, MAX_PATH);
+#endif
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
@@ -100,7 +127,7 @@ opendir (const CHAR *szPath)
   strcat (nd->dd_name, SUFFIX);
 
   /* Initialize handle to -1 so that a premature closedir doesn't try
-   * to call _findclose on it. */
+   * to call FindClose on it. */
   nd->dd_handle = -1;
 
   /* Initialize the status. */
@@ -112,7 +139,7 @@ opendir (const CHAR *szPath)
   nd->dd_dir.d_ino = 0;
   nd->dd_dir.d_reclen = 0;
   nd->dd_dir.d_namlen = 0;
-  nd->dd_dir.d_name = nd->dd_dta.name;
+  nd->dd_dir.d_name = nd->dd_dta.cFileName;
 
   return nd;
 }
@@ -136,7 +163,7 @@ readdir (DIR * dirp)
       return (struct dirent *) 0;
     }
 
-  if (dirp->dd_dir.d_name != dirp->dd_dta.name)
+  if (dirp->dd_dir.d_name != dirp->dd_dta.cFileName)
     {
       /* The structure does not seem to be set up correctly. */
       errno = EINVAL;
@@ -153,7 +180,7 @@ readdir (DIR * dirp)
     {
       /* We haven't started the search yet. */
       /* Start the search */
-      dirp->dd_handle = _findfirst (dirp->dd_name, &(dirp->dd_dta));
+      dirp->dd_handle = FindFirstFile (dirp->dd_name, &(dirp->dd_dta));
 
   	  if (dirp->dd_handle == -1)
 	{
@@ -169,10 +196,10 @@ readdir (DIR * dirp)
   else
     {
       /* Get the next search entry. */
-      if (_findnext (dirp->dd_handle, &(dirp->dd_dta)))
+      if (FindNextFile (dirp->dd_handle, &(dirp->dd_dta)))
 	{
 	  /* We are off the end or otherwise error. */
-	  _findclose (dirp->dd_handle);
+	  FindClose (dirp->dd_handle);
 	  dirp->dd_handle = -1;
 	  dirp->dd_stat = -1;
 	}
@@ -218,7 +245,7 @@ closedir (DIR * dirp)
 
   if (dirp->dd_handle != -1)
     {
-      rc = _findclose (dirp->dd_handle);
+      rc = FindClose (dirp->dd_handle);
     }
 
   /* Delete the dir structure. */
@@ -246,7 +273,7 @@ rewinddir (DIR * dirp)
 
   if (dirp->dd_handle != -1)
     {
-      _findclose (dirp->dd_handle);
+      FindClose (dirp->dd_handle);
     }
 
   dirp->dd_handle = -1;
@@ -303,7 +330,7 @@ seekdir (DIR * dirp, long lPos)
       /* Seek past end. */
       if (dirp->dd_handle != -1)
 	{
-	  _findclose (dirp->dd_handle);
+	  FindClose (dirp->dd_handle);
 	}
       dirp->dd_handle = -1;
       dirp->dd_stat = -1;

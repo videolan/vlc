@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.101 2002/11/09 17:44:09 sam Exp $
+ * $Id: modules.c,v 1.102 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -41,8 +41,12 @@
 #   include "../extras/dirent.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
@@ -620,7 +624,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     /* Parse the directory and try to load all files it contains. */
     while( (file = readdir( dir )) )
     {
+#ifndef UNDER_CE
         struct stat statbuf;
+#endif
         unsigned int i_len;
 
         /* Skip ".", ".." and anything starting with "." */
@@ -634,7 +640,11 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
         sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
 
+#ifdef UNDER_CE
+        if( GetFileAttributes( psz_file ) & FILE_ATTRIBUTE_DIRECTORY )
+#else
         if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
+#endif
         {
             AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
         }

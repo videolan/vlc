@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.44 2002/11/09 17:44:08 sam Exp $
+ * $Id: libvlc.c,v 1.45 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -33,12 +33,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
+#include <vlc/vlc.h>
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                              /* ENOMEM */
+#endif
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */
-
-#include <vlc/vlc.h>
 
 #ifndef WIN32
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -46,7 +48,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
+#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 

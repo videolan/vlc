@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.74 2002/10/05 19:26:23 jlj Exp $
+ * $Id: netutils.c,v 1.75 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -31,14 +31,17 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
-#include <errno.h>                                                /* errno() */
 #include <string.h>                                              /* memset() */
 
 #include <vlc/vlc.h>
 
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                             /* errno() */
+#endif
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                      /* gethostname() */
-#elif defined( _MSC_VER ) && defined( _WIN32 )
+#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 
@@ -46,7 +49,9 @@
 #include <sys/time.h>                                        /* gettimeofday */
 #endif
 
-#ifdef WIN32
+#if defined( UNDER_CE )
+    /* No real network support */
+#elif defined( WIN32 )
 #   include <winsock2.h>
 #else
 #   include <netdb.h>                                         /* hostent ... */
@@ -67,10 +72,11 @@
 #include <IOKit/network/IOEthernetController.h>
 #endif
 
-#if defined( WIN32 )                    /* tools to get the MAC adress from  */
-#include <windows.h>                    /* the interface under Windows       */
-#include <stdio.h>
-#include <nb30.h>
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    /* tools to get the MAC adress from the interface under Windows */
+#   include <windows.h>
+#   include <stdio.h>
+#   include <nb30.h>
 #endif
 
 #ifdef HAVE_NET_IF_H
@@ -107,7 +113,7 @@ static int GetMacAddress   ( vlc_object_t *, int i_fd, char *psz_mac );
 #ifdef SYS_DARWIN
 static int GetNetIntfCtrl  ( const char *psz_interface, 
                              io_object_t *ctrl_service );
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
 
@@ -120,7 +126,7 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
  *****************************************************************************/
 int __network_ChannelCreate( vlc_object_t *p_this )
 {
-#if !defined( SYS_LINUX ) && !defined( WIN32 )
+#if !defined( SYS_LINUX ) && !( defined( WIN32 ) && !defined( UNDER_CE ) )
     msg_Err( p_this, "VLAN-based channels are not supported "
                      "on this architecture" );
 #endif
@@ -157,6 +163,7 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
 #define VLCS_VERSION 13
 #define MESSAGE_LENGTH 256
 
+#if defined( SYS_LINUX ) || ( defined( WIN32 ) && !defined( UNDER_CE ) )
     module_t *       p_network;
     char *           psz_network = NULL;
     network_socket_t socket_desc;
@@ -288,12 +295,13 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
     }
 
     /* Close the socket and return nicely */
-#ifndef WIN32
-    close( i_fd );
-#else
+#   if defined( WIN32 )
     closesocket( i_fd );
-#endif
+#   else
+    close( i_fd );
+#   endif
 
+#endif
     return 0;
 }
 
@@ -380,7 +388,7 @@ static int GetMacAddress( vlc_object_t *p_this, int i_fd, char *psz_mac )
 
     return( 0 );
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
     int i, i_ret = -1;
 
     /* Get adapter list - support for more than one adapter */
@@ -457,7 +465,7 @@ static int GetNetIntfCtrl( const char *psz_interface,
     return( 0 );
 }
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 /*****************************************************************************
  * GetAdapterInfo : gets some informations about the interface using NETBIOS
  *****************************************************************************/

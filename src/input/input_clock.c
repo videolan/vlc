@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.32 2002/06/01 12:32:01 sam Exp $
+ * $Id: input_clock.c,v 1.33 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,9 +25,12 @@
  * Preamble
  *****************************************************************************/
 #include <string.h>                                    /* memcpy(), memset() */
-#include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>                                           /* off_t */
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

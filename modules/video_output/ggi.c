@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.1 2002/08/13 11:59:36 sam Exp $
+ * $Id: ggi.c,v 1.2 2002/11/10 18:04:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -273,6 +273,7 @@ static int Manage( vout_thread_t *p_vout )
     struct timeval tv = { 0, 1000 };                        /* 1 millisecond */
     gii_event_mask mask;
     gii_event      event;
+    vlc_value_t    val;
 
     mask = emKeyboard | emPtrButtonPress | emPtrButtonRelease;
 
@@ -291,7 +292,6 @@ static int Manage( vout_thread_t *p_vout )
                     case 'q':
                     case 'Q':
                     case GIIUC_Escape:
-                        /* FIXME pass message ! */
                         p_vout->p_vlc->b_die = 1;
                         break;
 
@@ -304,6 +304,11 @@ static int Manage( vout_thread_t *p_vout )
 
                 switch( event.pbutton.button )
                 {
+                    case GII_PBUTTON_LEFT:
+                        val.b_bool = VLC_TRUE;
+                        var_Set( p_vout, "mouse-clicked", val );
+                        break;
+
                     case GII_PBUTTON_RIGHT:
                         {
                             intf_thread_t *p_intf;

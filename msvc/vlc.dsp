@@ -181,17 +181,6 @@ SOURCE="..\src\audio_output\intf.c"
 # End Group
 # Begin Group "extras"
 # Begin Source File
-SOURCE="..\src\extras\strndup.c"
-# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
-!IF "$(CFG)" == "vlc - Win32 Release"
-# PROP Intermediate_Dir "Release\extras"
-# PROP Output_Dir "Release\extras"
-!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
-# PROP Intermediate_Dir "Debug\extras"
-# PROP Output_Dir "Debug\extras"
-!ENDIF
-# End Source File
-# Begin Source File
 SOURCE="..\src\extras\dirent.c"
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
@@ -237,6 +226,17 @@ SOURCE="..\src\extras\getopt.h"
 # End Source File
 # Begin Source File
 SOURCE="..\src\extras\getopt1.c"
+# ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
+!IF "$(CFG)" == "vlc - Win32 Release"
+# PROP Intermediate_Dir "Release\extras"
+# PROP Output_Dir "Release\extras"
+!ELSEIF "$(CFG)" == "vlc - Win32 Debug"
+# PROP Intermediate_Dir "Debug\extras"
+# PROP Output_Dir "Debug\extras"
+!ENDIF
+# End Source File
+# Begin Source File
+SOURCE="..\src\extras\strndup.c"
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\"plugins\" /D DATA_PATH=\"share\"
 !IF "$(CFG)" == "vlc - Win32 Release"
 # PROP Intermediate_Dir "Release\extras"

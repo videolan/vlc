@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.20 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: messages.c,v 1.21 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,14 +27,20 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                  /* errno */
-#include <fcntl.h>                     /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
 #include <stdio.h>                                               /* required */
 #include <stdarg.h>                                       /* va_list for BSD */
 #include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>                  /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
+#endif
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>                                               /* errno */
+#endif
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                      /* close(), write() */
@@ -248,8 +254,12 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     if( psz_str == NULL )
     {
+#ifdef HAVE_ERRNO_H
         fprintf( stderr, "main warning: can't store message (%s): ",
                  strerror(errno) );
+#else
+        fprintf( stderr, "main warning: can't store message: " );
+#endif
         vfprintf( stderr, psz_format, args );
         fprintf( stderr, "\n" );
         return;

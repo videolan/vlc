@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.49 2002/10/14 16:46:55 sam Exp $
+ * $Id: main.h,v 1.50 2002/11/10 18:04:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -57,7 +57,7 @@ struct libvlc_t
     /* Arch-specific variables */
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
     SIGNALOBJECTANDWAIT    SignalObjectAndWait;
     vlc_bool_t             b_fast_mutex;
     int                    i_win9x_cv;
@@ -83,8 +83,13 @@ struct vlc_t
 
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;
+#if defined( WIN32 )
+    void* ( __cdecl *pf_memcpy ) ( void *, const void *, size_t );
+    void* ( __cdecl *pf_memset ) ( void *, int, size_t );
+#else
     void* ( *pf_memcpy ) ( void *, const void *, size_t );
     void* ( *pf_memset ) ( void *, int, size_t );
+#endif
 
     /* Shared data - these structures are accessed directly from p_vlc by
      * several modules */

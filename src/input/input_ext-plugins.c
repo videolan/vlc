@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.19 2002/10/26 15:24:19 gbazin Exp $
+ * $Id: input_ext-plugins.c,v 1.20 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,14 +25,21 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
+#endif
+
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
 
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
@@ -40,35 +47,19 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
+#elif defined( _MSC_VER ) && defined( _WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
 
-#ifdef WIN32
+#ifdef UNDER_CE
+    /* No network support */
+#elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
-#   include <netdb.h>                                         /* hostent ... */
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
-#   endif
+#   include <sys/types.h>
+#   include <sys/socket.h>                                         /* recv() */
 #endif
-
-#ifdef WIN32
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
-#   include <netdb.h>                                         /* hostent ... */
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
-#   endif
-#endif
-
-
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -132,13 +123,13 @@ void * __input_BuffersInit( vlc_object_t *p_this )
 
     if( p_buffers == NULL )
     {
-        return( NULL );
+        return NULL;
     }
 
     memset( p_buffers, 0, sizeof( input_buffers_t ) );
     vlc_mutex_init( p_this, &p_buffers->lock );
 
-    return( p_buffers );
+    return p_buffers;
 }
 
 /*****************************************************************************
@@ -257,7 +248,7 @@ data_buffer_t * input_NewBuffer( input_buffers_t * p_buffers, size_t i_size )
     p_buf = NewBuffer( p_buffers, i_size );
     vlc_mutex_unlock( &p_buffers->lock );
 
-    return( p_buf );
+    return p_buf;
 }
 
 /*****************************************************************************
@@ -338,7 +329,7 @@ data_packet_t * input_ShareBuffer( input_buffers_t * p_buffers,
     p_data = ShareBuffer( p_buffers, p_buf );
     vlc_mutex_unlock( &p_buffers->lock );
 
-    return( p_data );
+    return p_data;
 }
 
 /*****************************************************************************
@@ -354,7 +345,7 @@ static inline data_packet_t * NewPacket( input_buffers_t * p_buffers,
 
     if( p_buf == NULL )
     {
-        return( NULL );
+        return NULL;
     }
 
     p_data = ShareBuffer( p_buffers, p_buf );
@@ -362,7 +353,7 @@ static inline data_packet_t * NewPacket( input_buffers_t * p_buffers,
     {
         ReleaseBuffer( p_buffers, p_buf );
     }
-    return( p_data );
+    return p_data;
 }
 
 data_packet_t * input_NewPacket( input_buffers_t * p_buffers, size_t i_size )
@@ -373,7 +364,7 @@ data_packet_t * input_NewPacket( input_buffers_t * p_buffers, size_t i_size )
     p_data = NewPacket( p_buffers, i_size );
     vlc_mutex_unlock( &p_buffers->lock );
 
-    return( p_data );
+    return p_data;
 }
 
 /*****************************************************************************
@@ -442,7 +433,7 @@ static inline pes_packet_t * NewPES( input_buffers_t * p_buffers )
     p_pes->i_pes_size = 0;
     p_pes->i_nb_data = 0;
 
-    return( p_pes );
+    return p_pes;
 }
 
 pes_packet_t * input_NewPES( input_buffers_t * p_buffers )
@@ -453,7 +444,7 @@ pes_packet_t * input_NewPES( input_buffers_t * p_buffers )
     p_pes = NewPES( p_buffers );
     vlc_mutex_unlock( &p_buffers->lock );
 
-    return( p_pes );
+    return p_pes;
 }
 
 /*****************************************************************************
@@ -549,7 +540,7 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
     p_input->p_current_data = (byte_t *)p_buf + sizeof(data_buffer_t);
     p_input->p_last_data = p_input->p_current_data + i_remains + i_ret;
 
-    return( (ssize_t)i_remains + i_ret );
+    return (ssize_t)i_remains + i_ret;
 }
 
 /*****************************************************************************
@@ -566,7 +557,7 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
 
         if( i_size == -1 )
         {
-            return( -1 );
+            return -1;
         }
         else if( i_ret < i_size )
         {
@@ -574,7 +565,7 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
         }
     }
     *pp_byte = p_input->p_current_data;
-    return( i_size );
+    return i_size;
 }
 
 /*****************************************************************************
@@ -591,7 +582,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
 
         if( i_ret == -1 )
         {
-            return( -1 );
+            return -1;
         }
         else if( i_ret < i_size )
         {
@@ -618,7 +609,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
     p_input->stream.p_selected_area->i_tell += i_size;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
  
-    return( i_size );
+    return i_size;
 }
 
 /*****************************************************************************
@@ -627,11 +618,11 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
 int input_AccessInit( input_thread_t * p_input )
 {
     p_input->p_method_data = input_BuffersInit( p_input );
-    if( p_input->p_method_data == NULL ) return( -1 );
+    if( p_input->p_method_data == NULL ) return -1;
     p_input->p_data_buffer = NULL;
     p_input->p_current_data = NULL;
     p_input->p_last_data = NULL;
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -693,7 +684,7 @@ void __input_FDNetworkClose( vlc_object_t * p_this )
     msg_Info( p_input, "closing network `%s/%s://%s'", 
               p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
     closesocket( p_access_data->i_handle );
 #else
     close( p_access_data->i_handle );
@@ -713,10 +704,14 @@ ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len 
  
     if( i_ret < 0 )
     {
+#ifdef HAVE_ERRNO_H
         msg_Err( p_input, "read failed (%s)", strerror(errno) );
+#else
+        msg_Err( p_input, "read failed" );
+#endif
     }
  
-    return( i_ret );
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -724,6 +719,10 @@ ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len 
  *****************************************************************************/
 static inline int NetworkSelect( input_thread_t * p_input )
 {
+#ifdef UNDER_CE
+    return -1;
+
+#else
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     struct timeval  timeout;
     fd_set          fds;
@@ -746,7 +745,9 @@ static inline int NetworkSelect( input_thread_t * p_input )
         msg_Err( p_input, "network select error (%s)", strerror(errno) );
     }
 
-    return( i_ret );
+    return i_ret;
+
+#endif
 }
 
 /*****************************************************************************
@@ -756,6 +757,10 @@ static inline int NetworkSelect( input_thread_t * p_input )
 ssize_t input_FDNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
                              size_t i_len )
 {
+#ifdef UNDER_CE
+    return -1;
+
+#else
     if( NetworkSelect( p_input ) > 0 )
     {
         input_socket_t * p_access_data
@@ -775,10 +780,12 @@ ssize_t input_FDNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
             msg_Err( p_input, "recv failed (%s)", strerror(errno) );
         }
 
-        return( i_ret );
+        return i_ret;
     }
     
-    return( 0 );
+    return 0;
+
+#endif
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.3 2002/10/17 13:15:30 sam Exp $
+ * $Id: test4.c,v 1.4 2002/11/10 18:04:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,6 +41,8 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+static int    Foo       ( vlc_object_t *, char *, char * );
+
 static int    Callback  ( vlc_object_t *, char *, char * );
 static int    MyCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
@@ -56,6 +58,8 @@ static int    Signal    ( vlc_object_t *, char *, char * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Miscellaneous stress tests") );
+    var_Create( p_module->p_libvlc, "foo-test", VLC_VAR_COMMAND );
+    var_Set( p_module->p_libvlc, "foo-test", (vlc_value_t)(void*)Foo );
     var_Create( p_module->p_libvlc, "callback-test", VLC_VAR_COMMAND );
     var_Set( p_module->p_libvlc, "callback-test", (vlc_value_t)(void*)Callback );
     var_Create( p_module->p_libvlc, "stress-test", VLC_VAR_COMMAND );
@@ -63,6 +67,56 @@ vlc_module_begin();
     var_Create( p_module->p_libvlc, "signal", VLC_VAR_COMMAND );
     var_Set( p_module->p_libvlc, "signal", (vlc_value_t)(void*)Signal );
 vlc_module_end();
+
+/*****************************************************************************
+ * Foo: put anything here
+ *****************************************************************************/
+static int Foo( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    vlc_value_t val;
+    int i, i_vals;
+    vlc_value_t *p_vals;
+
+    var_Create( p_this, "honk", VLC_VAR_STRING | VLC_VAR_ISLIST );
+
+    val.psz_string = "foo";
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
+    val.psz_string = "bar";
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
+    val.psz_string = "baz";
+    var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
+    var_Change( p_this, "honk", VLC_VAR_SETDEFAULT, &val );
+
+    var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+
+    val.psz_string = "foo";
+    var_Set( p_this, "honk", val );
+
+    var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+
+    val.psz_string = "blork";
+    var_Set( p_this, "honk", val );
+
+    var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+
+    val.psz_string = "baz";
+    var_Change( p_this, "honk", VLC_VAR_DELCHOICE, &val );
+
+    var_Get( p_this, "honk", &val ); printf( "value: %s\n", val.psz_string );
+
+    var_Change( p_this, "honk", VLC_VAR_GETLIST, &val );
+    i_vals = ((vlc_value_t*)val.p_address)[0].i_int;
+    p_vals = &((vlc_value_t*)val.p_address)[1];
+    for( i = 0 ; i < i_vals ; i++ )
+    {
+        printf( "value %i: %s\n", i, p_vals[i].psz_string );
+    }
+    var_Change( p_this, "honk", VLC_VAR_FREELIST, &val );
+
+    var_Destroy( p_this, "honk" );
+
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * Callback: test callback functions

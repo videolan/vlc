@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.49 2002/10/29 13:22:48 sam Exp $
+ * $Id: input_dec.c,v 1.50 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,9 +26,12 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
-#include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>                                           /* off_t */
+#endif
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.41 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: input_ext-intf.c,v 1.42 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,9 +25,12 @@
  * Preamble
  *****************************************************************************/
 #include <string.h>                                    /* memcpy(), memset() */
-#include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>                                           /* off_t */
+#endif
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.96 2002/11/05 18:25:43 gbazin Exp $
+ * $Id: input_programs.c,v 1.97 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,9 +26,12 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
-#include <sys/types.h>                                              /* off_t */
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>                                           /* off_t */
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

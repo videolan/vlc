@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.23 2002/10/16 10:31:58 sam Exp $
+ * $Id: threads.c,v 1.24 2002/11/10 18:04:24 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -98,6 +98,9 @@ int __vlc_threads_init( vlc_object_t *p_this )
 
 #elif defined( ST_INIT_IN_ST_H )
         i_ret = st_init();
+
+#elif defined( UNDER_CE )
+        /* Nothing to initialize */
 
 #elif defined( WIN32 )
         /* Dynamically get the address of SignalObjectAndWait */
@@ -258,6 +261,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
+#   if !defined( UNDER_CE )
     if( p_this->p_libvlc->SignalObjectAndWait &&
         !p_this->p_libvlc->b_fast_mutex )
     {
@@ -266,6 +270,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
         return ( p_mutex->mutex != NULL ? 0 : 1 );
     }
     else
+#   endif
     {
         p_mutex->mutex = NULL;
         InitializeCriticalSection( &p_mutex->csection );
@@ -391,6 +396,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
+#   if !defined( UNDER_CE )
     /* Misc init */
     p_condvar->i_win9x_cv = p_this->p_libvlc->i_win9x_cv;
     p_condvar->SignalObjectAndWait = p_this->p_libvlc->SignalObjectAndWait;
@@ -398,6 +404,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     if( (p_condvar->SignalObjectAndWait && !p_this->p_libvlc->b_fast_mutex)
         || p_condvar->i_win9x_cv == 0 )
     {
+#   endif
         /* Create an auto-reset event. */
         p_condvar->event = CreateEvent( NULL,   /* no security */
                                         FALSE,  /* auto-reset event */
@@ -406,6 +413,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 
         p_condvar->semaphore = NULL;
         return !p_condvar->event;
+#   if !defined( UNDER_CE )
     }
     else
     {
@@ -425,6 +433,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 
         return !p_condvar->semaphore || !p_condvar->event;
     }
+#   endif
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_init( &p_condvar->cond, NULL );

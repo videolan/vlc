@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.15 2002/10/14 16:46:55 sam Exp $
+ * $Id: vlc.c,v 1.16 2002/11/10 18:04:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -24,11 +24,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
+#include "config.h"
+
 #include <stdio.h>                                              /* fprintf() */
 #include <stdlib.h>                                  /* putenv(), strtol(),  */
-#include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
-#include <time.h>                                                  /* time() */
+#ifdef HAVE_SIGNAL_H
+#   include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
+#endif
+#ifdef HAVE_TIME_H
+#   include <time.h>                                               /* time() */
+#endif
 
 #include <vlc/vlc.h>
 
