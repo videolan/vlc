@@ -120,7 +120,11 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
     if( val.i_int >= 1 && val.i_int <= 51 )
     {
+#if X264_BUILD >= 0x000a
+        p_sys->param.rc.i_qp_constant = val.i_int;
+#else
         p_sys->param.i_qp_constant = val.i_int;
+#endif
     }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "cabac", &val );
