@@ -1510,7 +1510,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
                     i_seekpoint = p_access->info.i_seekpoint - 1;
-                else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
+                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT ) 
                     i_seekpoint = p_access->info.i_seekpoint + 1;
                 else
                     i_seekpoint = val.i_int;
