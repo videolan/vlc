@@ -1,0 +1,132 @@
+<!DOCTYPE Theme SYSTEM "skin.dtd">
+
+<Theme version="2.0" magnet="20" alpha="255" movealpha="192" fadetime="500">
+  <ThemeInfo name="VLC OSX Interface" author="BigBen"
+             email="bigben@videolan.org" webpage="http://www.videolan.org"/>
+
+  <Bitmap id="mainbody" file="body.png" alphacolor="#FF0000"/>
+
+  <Bitmap id="add_item" file="add_item.png" alphacolor="#FF0000"/>
+  <Bitmap id="add_item_onclick" file="add_item_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="close" file="close.png" alphacolor="#00FF00"/>
+  <Bitmap id="close_onclick" file="close_onclick.png" alphacolor="#00FF00"/>
+  <Bitmap id="close_mouseover" file="close_mouseover.png" alphacolor="#00FF00"/>
+  <Bitmap id="delete_item" file="delete_item.png" alphacolor="#FF0000"/>
+  <Bitmap id="delete_item_onclick" file="delete_item_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="fast" file="fast.png" alphacolor="#FF0000"/>
+  <Bitmap id="fast_click" file="fast_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="fast_disabled" file="fast_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="rev" file="rev.png" alphacolor="#FF0000"/>
+  <Bitmap id="rev_click" file="rev_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="next" file="next.png" alphacolor="#FF0000"/>
+  <Bitmap id="next_disabled" file="next_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="next_onclick" file="next_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="pause" file="pause.png" alphacolor="#FF0000"/>
+  <Bitmap id="pause_onclick" file="pause_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="play" file="play.png" alphacolor="#FF0000"/>
+  <Bitmap id="play_onclick" file="play_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="disabled" file="disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist1" file="playlist_body1.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist2" file="playlist_body2.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist3" file="playlist_body3.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist4" file="playlist_body4.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist6" file="playlist_body6.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist7" file="playlist_body7.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist8" file="playlist_body8.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist9" file="playlist_body9.png" alphacolor="#FF0000"/>
+  <Bitmap id="resize" file="resize.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist_button" file="playlist_button.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist_button_onclick" file="playlist_button_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist_button2" file="playlist_button2.png" alphacolor="#FF0000"/>
+  <Bitmap id="playlist_button_onclick2" file="playlist_button_onclick2.png" alphacolor="#FF0000"/>
+  <Bitmap id="sort_button" file="sort.png" alphacolor="#FF0000"/>
+  <Bitmap id="sort_button_onclick" file="sort_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="preferences" file="preferences.png" alphacolor="#FF0000"/>
+  <Bitmap id="preferences_onclick" file="preferences_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="previous" file="previous.png" alphacolor="#FF0000"/>
+  <Bitmap id="previous_disabled" file="previous_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="previous_onclick" file="previous_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="reduce" file="reduce.png" alphacolor="#FF0000"/>
+  <Bitmap id="reduce_onclick" file="reduce_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="reduce_disabled" file="reduce_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="slider" file="slider.png" alphacolor="#FF0000"/>
+  <Bitmap id="slider_onclick" file="slider_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="slider_playlist" file="slider_playlist.png" alphacolor="#FF0000"/>
+  <Bitmap id="slider_volume" file="slider_volume.png" alphacolor="#FF0000"/>
+  <Bitmap id="slider_volume_onclick" file="slider_volume_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="slow" file="slow.png" alphacolor="#FF0000"/>
+  <Bitmap id="slow_disabled" file="slow_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="slow_onclick" file="slow_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="stop" file="stop.png" alphacolor="#FF0000"/>
+  <Bitmap id="stop_disabled" file="stop_disabled.png" alphacolor="#FF0000"/>
+  <Bitmap id="stop_onclick" file="stop_onclick.png" alphacolor="#FF0000"/>
+  <Bitmap id="volume_radial" file="volume.png" alphacolor="#FF0000"/>
+  <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
+  <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 
+
+<!--
+  <Event id="mouseoverclose" event="CTRL_ID_VISIBLE(mouseimg,TRUE)"/>
+  <Event id="mouseoutclose" event="CTRL_ID_VISIBLE(mouseimg,FALSE)"/>
+  <Event id="move" event="WINDOW_MOVE(mainwindow)"/>
+  <Event id="move_playlist" event="WINDOW_MOVE(playlist_window)"/>
+  <Event id="hide_playlist" event="WINDOW_CLOSE(playlist_window)"/>
+  <Event id="show_playlist" event="WINDOW_OPEN(playlist_window)"/>
+
+
+  <Event id="item_add" event="VLC_PLAYLIST_ADD_FILE"/>
+  <Event id="item_del" event="PLAYLIST_ID_DEL(playlist)"/>
+-->
+  <Window id="mainwindow" x="230" y="250" dragdrop="true">
+
+   <Layout id="testlayout" width="424" height="152">
+    <Group x="0" y="0">
+      <Image x="0" y="0" image="mainbody" onclick="move"/>
+      <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC"/>
+    </Group>
+   </Layout>
+
+   <Layout id="mainlayout" width="424" height="152">
+    <Group x="0" y="0">
+      <Anchor x="7" y="151" priority="100"/>
+      <Image x="0" y="0" image="mainbody" onclick="move"/>
+      <Text font="default_font" width="70" x="287" y="79" text="$T"/>
+      <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
+      <Button x="17" y="64" up="stop" down="stop_onclick" over="stop" action="vlc.stop()" tooltiptext="Stop"/>
+      <CheckBox x="42" y="87" up1="playlist_button" down1="playlist_button_onclick" up2="playlist_button2" down2="playlist_button_onclick2" state="playlist_window.isVisible" tooltiptext1="Show Playlist" tooltiptext2="Hide Playlist"/>
+      <CheckBox x="83" y="44" up1="play" up2="pause" down1="play_onclick" down2="pause_onclick" state="vlc.isPlaying" tooltiptext1="Play" tooltiptext2="Pause"/>
+      <Button x="159" y="37" up="rev" down="rev_click" over="rev" action="vlc.slower()" tooltiptext="Slower"/>
+      <Button x="159" y="89" up="fast" down="fast_click" over="fast" action="vlc.faster()" tooltiptext="Faster"/>
+      <Button x="196" y="46" up="previous" down="previous_onclick" over="previous" action="playlist.previous()" tooltiptext="Previous Item"/>
+      <Button x="196" y="79" up="next" down="next_onclick" over="next" action="playlist.next()" tooltiptext="Next Item"/>
+      <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC" help="quit"/>
+      <Image x="29" y="5" image="reduce_disabled"/>
+      <Slider id="time_slider" x="24" y="130" up="slider" down="slider_onclick" points="(0,0),(366,0)" value="time" visible="vlc.isSeekablePlaying" tooltiptext="Time: $T"/>
+      <Slider id="volume_slider" x="391" y="53" up="slider_volume" down="slider_volume_onclick" points="(0,47),(0,0)" value="volume" tooltiptext="Volume: $V%"/>
+    </Group>
+   </Layout>
+  </Window>
+  <Window id="playlist_window" x="237" y="401" visible="false">
+   <Layout id="playlistLayout" width="410" height="250" minwidth="200" minheight="150" maxwidth="1000" maxheight="800">
+    <Group x="0" y="0">
+      <Anchor x="0" y="0" priority="50"/>
+      <Image image="playlist1" x="0" y="0" lefttop="lefttop" rightbottom="lefttop" onclick="move"/>
+      <Image image="playlist2" x="17" y="0" lefttop="lefttop" rightbottom="righttop" onclick="move"/>
+      <Image image="playlist3" x="350" y="0" lefttop="righttop" rightbottom="righttop" onclick="move"/>
+      <Image image="playlist4" x="0" y="70" lefttop="lefttop" rightbottom="leftbottom" onclick="move"/>
+      <Image image="playlist6" x="350" y="70" lefttop="righttop" rightbottom="rightbottom" onclick="move"/>
+      <Image image="playlist7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" onclick="move"/>
+      <Image image="playlist8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" onclick="move"/>
+      <Image image="playlist9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" onclick="move"/> 
+      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" onclick="resize"/>
+
+      <Button x="374" y="12" lefttop="righttop" rightbottom="righttop" up="add_item" down="add_item_onclick" over="add_item" action="playlist.add()" tooltiptext="Add item"/>
+      <Button x="374" y="40" up="delete_item" lefttop="righttop" rightbottom="righttop" down="delete_item_onclick" over="delete_item" action="playlist.del()" tooltiptext="Del item"/>
+      <Button x="374" y="68" up="sort_button" lefttop="righttop" rightbottom="righttop" down="sort_button_onclick" over="sort_button" action="playlist.sort()" tooltiptext="Sort the playlist"/>
+      <Playlist id="playlist" x="17" y="15" width="333" height="204" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#000000" playcolor="#ff0000" bgcolor1="#ffffff" bgcolor2="#e0e0ff" selcolor="#4e8bc7">
+        <Slider id="playlist_slider" x="358" y="25" lefttop="righttop" rightbottom="rightbottom" up="slider_volume" down="slider_volume_onclick" points="(0,185),(0,0)"/>
+      </Playlist>
+    </Group>
+   </Layout>
+  </Window>
+</Theme>
+
