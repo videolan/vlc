@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.7 2002/06/10 16:48:59 sam Exp $
+$Id: FAQ,v 1.8 2002/07/09 23:40:34 lool Exp $
 
 1. Using VLC
 
@@ -41,7 +41,7 @@ more information.
 -----------------------------------------------------
 If you don't know what is a raw device, don't even read this answer :-).
 There is an experimental support for raw devices in libdvdcss. It needs
-that you set up a raw device pointing to your DVD device (under Linux, 
+that you set up a raw device pointing to your DVD device (under Linux,
 use the "raw" utility). Then pass the raw device as second argument, for
 instance :
     vlc dvd:/dev/dvd@/dev/raw0
@@ -54,6 +54,25 @@ documentation of these programs. Then start VLC :
 You shouldn't need any option. If you're paranoid and want to control
 everything, here is the exact syntax :
     vlc udp:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
+
+1.8 How do I uninstall / reinstall VLC ?
+--------------------------------------
+Why would you want to ?  ;)
+
+If you're using a source distribution of VLC, for example a tarball or
+the CVS, then you have probably used "make install" to install the
+compiled VLC.  To remove it just "make uninstall".  If you want to
+install a newer version than the currently installed one, you should
+first uninstall the first one.  If you deleted the original source tree,
+a "make uninstall" in the newer tree should still work.
+
+For binary packages, remove old packages first and install the new ones
+(normally this should be handled automagically by your sytem).
+
+1.9 Debian: what should I put in my sources.list for videolan ?
+-------------------------------------------------------------
+deb     ftp://ftp.videolan.org/pub/videolan/ debian/
+deb-src ftp://ftp.videolan.org/pub/videolan/ debian/
 
 
 2. Troubleshooting
@@ -118,7 +137,28 @@ is being investigated.
 
 2.9 Sound volume is too low
 ----------------------------
-You can raise it with --volume commandline switch.
+You can raise it with --volume commandline switch or in the preferences
+window of your graphical interface.
+
+2.10 I have no image under DirectX
+----------------------------------
+Check that your video card drivers are in their latest version and that
+your DirectX is up-to-date.
+
+2.11 VLC crashes
+----------------
+Increase the verbosity level (either in the preferences or with a
+"-vvvv" command-line option) and look at the debug messages (on the
+terminal or in the Messages window).
+
+2.12 I can only play a DVD as root
+----------------------------------
+Check that as user you have write access to your DVD drive / device.
+
+2.13 I'm stuck with option xxx, how do I reset options ?
+------------------------------------------------------
+Under unices, remove your ~/.videolan/vlcrc; for Windows, remove vlcrc
+in the videolan subfolder of your "Application Data" directory.
 
 
 3. Ports and features
@@ -144,3 +184,16 @@ working properly !
 ---------------------------------------------------------------------------
 This is a known problem with Win 95-class systems. Upgrade to an NT-class
 system.
+
+3.3 Planned ports
+
+3.3.1 Do you have plans for a MacOS 9 / OS/2 / &{#!@}~ port ?
+--------------------------------------------------------
+No, nobody reported to be actually working on a MacOS 9 port.  If you
+feel like you could write it, we would of course welcome it.  Currently,
+the developers are more interested in supporting the latest Operating
+Systems and completing the functionalities.
+
+3.3.2 Does VLC have dxr2 / dxr3 cards support ?
+---------------------------------------------
+This support is currently being developed.
