@@ -61,7 +61,10 @@ const UString VarText::get() const
     // $V for volume)
     UString temp( m_text );
 
-    while( (pos = temp.find( "$H" )) != UString::npos )
+    // $H is processed first, in case the help string contains other variables
+    // to replace. And it is replaced only once, in case one of these other
+    // variables is $H...
+    if( (pos = temp.find( "$H" )) != UString::npos )
     {
         VarManager *pVarManager = VarManager::instance( getIntf() );
         // We use .getRaw() to avoid replacing the $H recursively!
