@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.6 2003/08/23 12:59:31 hartman Exp $
+ * $Id: subsdec.c,v 1.7 2003/08/23 19:20:29 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,22 +48,25 @@ static vout_thread_t *FindVout( subsdec_thread_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static char *ppsz_encodings[] = { N_("System Default"), 
-    "ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3",
-    "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", 
-    "ISO-8859-9", "ISO-8859-10", "ISO-8859-13", "ISO-8859-14", "ISO-8859-15",
-    "ISO-8859-16", "ISO-2022-JP", "ISO-2022-JP-1", "ISO-2022-JP-2", "ISO-2022-CN",
-    "ISO-2022-CN-EXT", "ISO-2022-KR",
-    "CP850", "CP862", "CP866", "CP874", "CP932", "CP949", "CP950", "CP1133",
-    "CP1250", "CP1251", "CP1252", "CP1253", "CP1254", "CP1255", "CP1256", "CP1257", "CP1258",
-    "MacRoman", "MacCentralEurope", "MacIceland", "MacCroatian", "MacRomania",
-    "MacCyrillic", "MacUkraine", "MacGreek", "MacTurkish", "MacHebrew", "MacArabic",
-    "MacThai", "Macintosh",
-    "UTF-7", "UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "UTF-32BE", "UTF-32LE",
-    "C99", "JAVA", "UCS-2", "UCS-2BE", "UCS-2LE", "UCS-4", "UCS-4BE", "UCS-4LE",
-    "KOI8-R", "KOI8-U", "KOI8-RU", "KOI8-T",
-    "EUC-JP", "EUC-CN", "EUC-KR", "EUC-TW",
-    "SHIFT_JIS", "HZ", "GBK", "GB18030", "BIG5", "BIG5-HKSCS", "JOHAB", "ARMSCII-8",
+static char *ppsz_encodings[] = { N_("System Default"), "ASCII", "UTF-8", "",
+    "ISO-8859-1", "CP1252", "MacRoman", "MacIceland","ISO-8859-15", "",
+    "ISO-8859-2", "CP1250", "MacCentralEurope", "MacCroatian", "MacRomania", "",
+    "ISO-8859-5", "CP1251", "MacCyrillic", "MacUkraine", "KOI8-R", "KOI8-U", "KOI8-RU", "",
+    "ISO-8859-6", "CP1256", "MacArabic", "",
+    "ISO-8859-7", "CP1253", "MacGreek", "",
+    "ISO-8859-8", "CP1255", "MacHebrew", "",
+    "ISO-8859-9", "CP1254", "MacTurkish", "",
+    "ISO-8859-13", "CP1257", "",
+    "ISO-2022-JP", "ISO-2022-JP-1", "ISO-2022-JP-2", "EUC-JP", "SHIFT_JIS", "",
+    "ISO-2022-CN", "ISO-2022-CN-EXT", "EUC-CN", "EUC-TW", "BIG5", "BIG5-HKSCS", "",
+    "ISO-2022-KR", "EUC-KR", "",
+    "MacThai", "KOI8-T", "",
+    "ISO-8859-3", "ISO-8859-4", "ISO-8859-10", "ISO-8859-14", "ISO-8859-16", "",
+    "CP850", "CP862", "CP866", "CP874", "CP932", "CP949", "CP950", "CP1133", "CP1258", "",
+    "Macintosh", "",
+    "UTF-7", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "UTF-32BE", "UTF-32LE",
+    "C99", "JAVA", "UCS-2", "UCS-2BE", "UCS-2LE", "UCS-4", "UCS-4BE", "UCS-4LE", "",
+    "HZ", "GBK", "GB18030", "JOHAB", "ARMSCII-8",
     "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
     "HPROMAN8", "NEXTSTEP", NULL };
 
