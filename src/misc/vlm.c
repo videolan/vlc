@@ -224,25 +224,30 @@ int vlm_Load( vlm_t *p_vlm, char *psz_file )
     file = fopen( psz_file, "r" );
     if( file == NULL ) return 1;
 
-    if( fseek( file, 0, SEEK_END) != 0 ) return 2;
+    if( fseek( file, 0, SEEK_END) != 0 )
+    {
+        fclose( file );
+        return 2;
+    }
 
     i_size = ftell( file );
-    fseek( file, 0, SEEK_SET);
+    fseek( file, 0, SEEK_SET );
     psz_buffer = malloc( i_size + 1 );
     if( !psz_buffer )
     {
         fclose( file );
         return 2;
     }
-    fread( psz_buffer, 1, i_size, file);
+    fread( psz_buffer, 1, i_size, file );
     psz_buffer[ i_size ] = '\0';
     if( Load( p_vlm, psz_buffer ) )
     {
+        fclose( file );
         free( psz_buffer );
         return 3;
     }
-    free( psz_buffer );
 
+    free( psz_buffer );
     fclose( file );
 
     return 0;
@@ -1932,32 +1937,28 @@ static int Load( vlm_t *vlm, char *file )
     while( *pf != '\0' )
     {
         vlm_message_t *message = NULL;
-        int i_temp = 0;
-        int i_next;
+        int i_end = 0;
 
-        while( pf[i_temp] != '\n' && pf[i_temp] != '\0' && pf[i_temp] != '\r' )
+        while( pf[i_end] != '\n' && pf[i_end] != '\0' && pf[i_end] != '\r' )
         {
-            i_temp++;
+            i_end++;
         }
 
-        if( pf[i_temp] == '\r' || pf[i_temp] == '\n' )
+        if( pf[i_end] == '\r' || pf[i_end] == '\n' )
         {
-            pf[i_temp] = '\0';
-            i_next = i_temp + 1;
-        }
-        else
-        {
-            i_next = i_temp;
+            pf[i_end] = '\0';
+            i_end++;
+            if( pf[i_end] == '\n' ) i_end++;
         }
 
-        if( ExecuteCommand( vlm, pf, &message ) )
+        if( *pf && ExecuteCommand( vlm, pf, &message ) )
         {
-            free( message );
+            if( message ) free( message );
             return 1;
         }
-        free( message );
+        if( message ) free( message );
 
-        pf += i_next;
+        pf += i_end;
     }
 
     return 0;
