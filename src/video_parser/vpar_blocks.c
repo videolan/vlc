@@ -657,7 +657,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
         {
-            b_dc = !((i_parse + 62)/63);
+            b_dc = (i_parse == 0);
             i_run =     ppl_dct_tab2[b_dc][(i_code>>12)-4].i_run;
             i_level =   ppl_dct_tab2[b_dc][(i_code>>12)-4].i_level;
             i_length =  ppl_dct_tab2[b_dc][(i_code>>12)-4].i_length;
@@ -683,7 +683,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
                 else if (i_level > 128)
                     i_level -= 256;
 
-                if (i_level<0)
+                if( (b_sign = i_level < 0) )
                     i_level = -i_level;
                 
                 break;
@@ -720,6 +720,14 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale
                     * p_vpar->sequence.nonintra_quant.pi_matrix[i_pos] ) >> 4;
+
+        /* Mismatch control */
+        if( i_level ) /* Should always be true */
+        {
+            /* Equivalent to : if( (val & 1) == 0 ) val = val - 1; */
+            i_level = (i_level - 1) | 1;
+        }
+
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
 
@@ -783,7 +791,7 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
     /* Read the actual code with the good length */
     p_vpar->mb.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
 
-    p_mb->ppi_blocks[i_b][0] = p_vpar->mb.pi_dc_dct_pred[i_cc];
+    p_mb->ppi_blocks[i_b][0] = p_vpar->mb.pi_dc_dct_pred[i_cc] << 3;
 
     i_nc = ( p_vpar->mb.pi_dc_dct_pred[i_cc] != 0 );
 
@@ -800,7 +808,6 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
     
     /* Decoding of the AC coefficients */
     i_coef = 0;
-    i_nc = 0;
     b_sign = 0;
 
     for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
@@ -833,6 +840,8 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
                     i_level = GetBits( &p_vpar->bit_stream, 8 ) - 256;
                 else if (i_level > 128)
                     i_level -= 256;
+                if( (b_sign = i_level < 0) )
+                    i_level = -i_level;
                 break;
             case DCT_EOB:
                 if( i_nc <= 1 )
@@ -867,6 +876,14 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
         i_level = ( i_level *
                     p_vpar->mb.i_quantizer_scale *
                     p_vpar->sequence.intra_quant.pi_matrix[i_pos] ) >> 3;
+
+        /* Mismatch control */
+        if( i_level ) /* Should always be true */
+        {
+            /* Equivalent to : if( (val & 1) == 0 ) val = val - 1; */
+            i_level = (i_level - 1) | 1;
+        }
+
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
 
@@ -1214,17 +1231,16 @@ static __inline__ void DecodeMotionVector( int * pi_prediction, int i_r_size,
  ****************************************************************************/
 static __inline__ void MotionVector( vpar_thread_t * p_vpar,
                                      macroblock_t * p_mb, int i_r,
-                                     int i_s, int i_full_pel, int i_structure )
+                                     int i_s, int i_full_pel, int i_structure,
+                                     int i_h_r_size, int i_v_r_size )
 {
     int i_motion_code, i_motion_residual;
-    int i_r_size;
     int pi_dm_vector[2];
 
-    i_r_size = p_vpar->picture.ppi_f_code[i_s][0] - 1;
     i_motion_code = MotionCode( p_vpar );
-    i_motion_residual = (i_r_size != 0 && i_motion_code != 0) ?
-                        GetBits( &p_vpar->bit_stream, i_r_size) : 0;
-    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][0], i_r_size,
+    i_motion_residual = (i_h_r_size != 0 && i_motion_code != 0) ?
+                        GetBits( &p_vpar->bit_stream, i_h_r_size) : 0;
+    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][0], i_h_r_size,
                         i_motion_code, i_motion_residual, i_full_pel );
     p_mb->pppi_motion_vectors[i_r][i_s][0] = p_vpar->mb.pppi_pmv[i_r][i_s][0];
 
@@ -1240,10 +1256,9 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
         }
     }
 
-    i_r_size = p_vpar->picture.ppi_f_code[i_s][1]-1;
     i_motion_code = MotionCode( p_vpar );
-    i_motion_residual = (i_r_size != 0 && i_motion_code != 0) ?
-                        GetBits( &p_vpar->bit_stream, i_r_size) : 0;
+    i_motion_residual = (i_v_r_size != 0 && i_motion_code != 0) ?
+                        GetBits( &p_vpar->bit_stream, i_v_r_size) : 0;
 
 
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
@@ -1252,7 +1267,7 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
          p_vpar->mb.pppi_pmv[i_r][i_s][1] >>= 1;
     }
 
-    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][1], i_r_size,
+    DecodeMotionVector( &p_vpar->mb.pppi_pmv[i_r][i_s][1], i_v_r_size,
                         i_motion_code, i_motion_residual, i_full_pel );
 
     if( (p_vpar->mb.i_mv_format == MOTION_FIELD)
@@ -1324,8 +1339,11 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
 static void DecodeMVMPEG1( vpar_thread_t * p_vpar,
                            macroblock_t * p_mb, int i_s, int i_structure )
 {
+    int i_r_size = i_s ? p_vpar->picture.i_backward_f_code - 1 :
+                         p_vpar->picture.i_forward_f_code - 1;
     MotionVector( p_vpar, p_mb, 0, i_s,
-                  p_vpar->picture.pb_full_pel_vector[i_s], i_structure );
+                  p_vpar->picture.pb_full_pel_vector[i_s], FRAME_STRUCTURE,
+                  i_r_size, i_r_size );
 }
 
 /*****************************************************************************
@@ -1341,7 +1359,9 @@ static void DecodeMVMPEG2( vpar_thread_t * p_vpar,
             p_mb->ppi_field_select[0][i_s] = p_mb->ppi_field_select[1][i_s]
                                             = GetBits( &p_vpar->bit_stream, 1 );
         }
-        MotionVector( p_vpar, p_mb, 0, i_s, 0, i_structure );
+        MotionVector( p_vpar, p_mb, 0, i_s, 0, i_structure,
+                      p_vpar->picture.ppi_f_code[i_s][0] - 1,
+                      p_vpar->picture.ppi_f_code[i_s][1] - 1 );
         p_vpar->mb.pppi_pmv[1][i_s][0] = p_vpar->mb.pppi_pmv[0][i_s][0];
         p_vpar->mb.pppi_pmv[1][i_s][1] = p_vpar->mb.pppi_pmv[0][i_s][1];
         p_mb->pppi_motion_vectors[1][i_s][0] = p_vpar->mb.pppi_pmv[0][i_s][0];
@@ -1350,9 +1370,13 @@ static void DecodeMVMPEG2( vpar_thread_t * p_vpar,
     else
     {
         p_mb->ppi_field_select[0][i_s] = GetBits( &p_vpar->bit_stream, 1 );
-        MotionVector( p_vpar, p_mb, 0, i_s, 0, i_structure );
+        MotionVector( p_vpar, p_mb, 0, i_s, 0, i_structure,
+                      p_vpar->picture.ppi_f_code[i_s][0] - 1,
+                      p_vpar->picture.ppi_f_code[i_s][1] - 1 );
         p_mb->ppi_field_select[1][i_s] = GetBits( &p_vpar->bit_stream, 1 );
-        MotionVector( p_vpar, p_mb, 1, i_s, 0, i_structure );
+        MotionVector( p_vpar, p_mb, 1, i_s, 0, i_structure,
+                      p_vpar->picture.ppi_f_code[i_s][0] - 1,
+                      p_vpar->picture.ppi_f_code[i_s][1] - 1 );
     }
 }
 

@@ -300,7 +300,7 @@ Difficulty: Guru
 Urgency: Wishlist
 Description: Debug MPEG1 video
  The MPEG1 support has been done, but it still crashes.
-Status: Todo
+Status: Done 23 Oct 2000 (Meuuh)
 
 Task: 0x13
 Difficulty: Hard
