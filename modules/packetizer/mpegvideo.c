@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.22 2003/11/22 16:53:02 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.23 2003/11/27 22:44:50 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -434,10 +434,12 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 p_sys->b_seq_progressive = VLC_TRUE;
                 p_sys->b_low_delay = VLC_TRUE;
 
+#if 0
                 msg_Dbg( p_dec, "Size %dx%d fps=%.3f",
                          p_dec->fmt_out.video.i_width,
                          p_dec->fmt_out.video.i_height,
                          (float)p_sys->i_frame_rate / (float)p_sys->i_frame_rate_base );
+#endif
             }
             else if( p_frag->p_buffer[3] == 0xb5 )
             {

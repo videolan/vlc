@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.40 2003/11/27 19:39:53 fenrir Exp $
+ * $Id: ts.c,v 1.41 2003/11/27 22:44:50 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -405,8 +405,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
 
-    msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_codec );
-
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ts_stream_t ) );
 
     /* Init this new stream */
@@ -414,6 +412,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->i_continuity_counter    = 0;
     p_stream->i_decoder_specific_info = 0;
     p_stream->p_decoder_specific_info = NULL;
+
+    msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d", (char*)&p_input->p_fmt->i_codec, p_stream->i_pid );
 
     /* All others fields depand on codec */
     switch( p_input->p_fmt->i_cat )
@@ -537,6 +537,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         }
         p_sys->i_pcr_pid   = p_stream->i_pid;
         p_sys->p_pcr_input = p_input;
+
+        msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
     }
 
     return VLC_SUCCESS;
@@ -551,8 +553,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     ts_stream_t     *p_stream;
     char            *val;
 
-    msg_Dbg( p_mux, "removing input" );
     p_stream = (ts_stream_t*)p_input->p_sys;
+    msg_Dbg( p_mux, "removing input pid=%d", p_stream->i_pid );
 
     if( p_sys->i_pcr_pid == p_stream->i_pid )
     {
@@ -588,6 +590,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
             /* Empty TS buffer */
             /* FIXME */
         }
+        msg_Dbg( p_mux, "new PCR PID is %d", p_sys->i_pcr_pid );
     }
 
     /* Empty all data in chain_pes */
@@ -607,6 +610,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         if ( i_pid_video == p_stream->i_pid )
         {
             p_sys->i_pid_video = i_pid_video;
+            msg_Dbg( p_mux, "freeing video PID %d", i_pid_video );
         }
     }
     if( ( val = sout_cfg_find_value( p_mux->p_cfg, "pid-audio" ) ) )
@@ -615,6 +619,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         if ( i_pid_audio == p_stream->i_pid )
         {
             p_sys->i_pid_audio = i_pid_audio;
+            msg_Dbg( p_mux, "freeing audio PID %d", i_pid_audio );
         }
     }
     free( p_stream );

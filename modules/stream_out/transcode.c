@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.54 2003/11/27 10:34:51 gbazin Exp $
+ * $Id: transcode.c,v 1.55 2003/11/27 22:44:51 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -102,6 +102,9 @@ struct sout_stream_sys_t
     int             i_qmax;
     vlc_bool_t      i_hq;
     vlc_bool_t      b_deinterlace;
+    vlc_bool_t      b_strict_rc;
+    vlc_bool_t      b_pre_me;
+    vlc_bool_t      b_hurry_up;
 
     int             i_crop_top;
     int             i_crop_bottom;
@@ -213,6 +216,18 @@ static int Open( vlc_object_t *p_this )
         if( sout_cfg_find( p_stream->p_cfg, "deinterlace" ) )
         {
             p_sys->b_deinterlace = VLC_TRUE;
+        }
+        if( sout_cfg_find( p_stream->p_cfg, "strict_rc" ) )
+        {
+            p_sys->b_strict_rc = VLC_TRUE;
+        }
+        if( sout_cfg_find( p_stream->p_cfg, "pre_me" ) )
+        {
+            p_sys->b_pre_me = VLC_TRUE;
+        }
+        if( sout_cfg_find( p_stream->p_cfg, "hurry_up" ) )
+        {
+            p_sys->b_hurry_up = VLC_TRUE;
         }
         /* crop */
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "croptop" ) ) )
@@ -1058,6 +1073,9 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->i_qmin = p_sys->i_qmin;
     id->p_encoder->i_qmax = p_sys->i_qmax;
     id->p_encoder->i_hq = p_sys->i_hq;
+    id->p_encoder->b_strict_rc = p_sys->b_strict_rc;
+    id->p_encoder->b_pre_me = p_sys->b_pre_me;
+    id->p_encoder->b_hurry_up = p_sys->b_hurry_up;
 
     id->p_ff_pic         = avcodec_alloc_frame();
     id->p_ff_pic_tmp0    = NULL;
@@ -1362,6 +1380,10 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         /* Set the pts of the frame being encoded */
         pic.date = p_sys->i_output_pts;
+
+        pic.b_progressive = 1; /* ffmpeg doesn't support interlaced encoding */
+        pic.i_nb_fields = frame->repeat_pict;
+        pic.b_top_field_first = frame->top_field_first;
 
         /* Interpolate the next PTS
          * (needed by the mpeg video packetizer which can send pts <= 0 ) */

@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.6 2003/11/24 23:22:01 gbazin Exp $
+ * $Id: vlc_codec.h,v 1.7 2003/11/27 22:44:50 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -115,7 +115,9 @@ struct encoder_t
     int i_qmin;
     int i_qmax;
     int i_hq;
-
+    vlc_bool_t          b_strict_rc;
+    vlc_bool_t          b_pre_me;
+    vlc_bool_t          b_hurry_up;
 };
 
 /**
