@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.18 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: esd.c,v 1.19 2003/06/25 21:17:21 asmax Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,6 +33,8 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include "aout_internal.h"
+
+#include <sys/socket.h>
 
 #include <esd.h>
 
@@ -75,6 +77,7 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     int i_nb_channels;
+    int fl;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( aout_sys_t ) );
@@ -113,6 +116,9 @@ static int Open( vlc_object_t *p_this )
         break;
     }
 
+    /* Force the rate, otherwise the sound is very noisy */
+    p_aout->output.output.i_rate = ESD_DEFAULT_RATE;
+    
     /* open a socket for playing a stream
      * and try to open /dev/dsp if there's no EsounD */
     p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
@@ -154,13 +160,18 @@ static void Play( aout_instance_t *p_aout )
 
     if ( p_buffer != NULL )
     {
-        i_tmp = write( p_sys->i_fd, p_buffer->p_buffer, p_buffer->i_nb_bytes );
+        int pos;
+        char *data = p_buffer->p_buffer;
 
-        if( i_tmp < 0 )
+        for( pos = 0; pos + ESD_BUF_SIZE <= p_buffer->i_nb_bytes; 
+             pos += ESD_BUF_SIZE )
         {
-            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+            i_tmp = write( p_sys->i_fd, data + pos, ESD_BUF_SIZE );
+            if( i_tmp < 0 )
+            {
+                msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+            }
         }
-
         aout_BufferFree( p_buffer );
     }
 }
