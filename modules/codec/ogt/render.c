@@ -1,8 +1,10 @@
 /*****************************************************************************
- * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
+ * render.c : Philips OGT and CVD (VCD Subtitle) blending routines.
+ *            stuff from here might be pulled out, abstracted or used
+ *            by DVD subtitles.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.27 2004/01/31 05:53:35 rocky Exp $
+ * $Id: render.c,v 1.28 2004/02/01 05:15:22 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from: 
@@ -38,15 +40,16 @@
 #include "subtitle.h"
 #include "render.h"
 
-/* We use 4 bits for an alpha value: 0..15, 15 is completely transparent and
-   0 completely opaque. Note that although SVCD allow 8-bits, pixels 
-   previously should be scaled down to 4 bits to use these routines.
+/* We use 4 bits for an transparency value: 0..15, 15 is completely
+   transparent and 0 completely opaque. Note that although SVCD allow
+   8-bits, for these routines pixels should previously have been be
+   scaled down to 4 bits (the range used by DVDs).
 */
-#define ALPHA_BITS (4)
-#define MAX_ALPHA  ((1<<ALPHA_BITS) - 1) 
-#define ALPHA_SCALEDOWN (8-ALPHA_BITS)
+#define TRANS_BITS (4)
+#define MAX_TRANS  ((1<<TRANS_BITS) - 1) 
+#define TRANS_SCALEDOWN (8-TRANS_BITS)
 
-/* We use a fixed-point arithmetic to scaling ratios so that we
+/* We use a fixed-point arithmetic in scaling ratios so that we
    can use integer arithmetic and still get fairly precise
    results. ASCALE is a left shift amount. 
 */
@@ -54,6 +57,30 @@
 
 /* Horrible hack to get dbg_print to do the right thing */
 #define p_dec p_vout
+
+/**
+   Take two 8-bit RGB values and a transparency and do a weighted
+   average of them. The "weight" comes from i_trans which is in the
+   range 0..MAX_TRANS. To have greater precision using integer
+   arithmetic, the RGB values are scaled. The uint16_t cast below is
+   to make sure we don't overflow the product in the multiplication
+
+   (MAX_TRANS - i_trans) is the additive "inverse" of i_trans, i.e.
+   i_trans + (MAX_TRANS - i_trans) = MAX_TRANS. So the resulting sum
+   of rgb1*i_trans + rgb2*(MAX_TRANS-i_trans) will be scaled by
+   MAX_TRANS. To reduce the value back down to 8 bits, we shift by
+   TRANS_BITS, noting that 1 << TRANS_BITS is roughly
+   MAX_TRANS. (Actually it is MAX_TRANS - 1).
+*/
+#define avg_8bit_rgb(rgb_vout, rgb_sub, i_trans)                   \
+{                                                                  \
+   int i;                                                          \
+   for (i=0; i < RGB_SIZE; i++) {                                  \
+   rgb_vout[i] = ( (uint16_t) rgb_vout[i]*(MAX_TRANS-i_trans) +    \
+                   (uint16_t) rgb_sub [i]*i_trans ) >> TRANS_BITS; \
+   }                                                               \
+}
+
 
 /*****************************************************************************
  * Local prototypes
@@ -236,7 +263,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
           }
 
 #ifdef TESTING_TRANSPARENCY
-          if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 1;
+          if (p_source->s.t == MAX_TRANS) p_source->s.t >>= 1;
 #endif
 
 	  switch( p_source->s.t )
@@ -245,7 +272,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 	      /* Completely transparent. Don't change pixel. */
 	      break;
 	      
-	    case MAX_ALPHA:
+	    case MAX_TRANS:
 	      {
 		/* Completely opaque. Completely overwrite underlying
 		   pixel with subtitle pixel. */
@@ -289,7 +316,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 		*/
 		uint16_t i_pixel_color_Y = 
 		  (uint16_t) ( *p_pixel_Y * 
-			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+			       (uint16_t) (MAX_TRANS - p_source->s.t) ) ;
 		
 		/* Scale the 12-bit result back down to 8 bits. A
 		   precise scaling after adding the two components,
@@ -299,7 +326,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 		   transparent and all opaque) aren't handled properly.
 		   But we deal with them in special cases above. */
 
-		*p_pixel_Y = ( i_sub_color_Y + i_pixel_color_Y ) >> ALPHA_BITS;
+		*p_pixel_Y = ( i_sub_color_Y + i_pixel_color_Y ) >> TRANS_BITS;
 
 		if ( even_scanline && i_x % 2 == 0 ) {
 		  uint8_t *p_pixel_U = p_pixel_base_U_y + i_x/2
@@ -315,12 +342,12 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 				 (uint16_t) (p_source->s.t) );
 		  uint16_t i_pixel_color_U = 
 		    (uint16_t) ( *p_pixel_U * 
-				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+				 (uint16_t) (MAX_TRANS - p_source->s.t) ) ;
 		  uint16_t i_pixel_color_V = 
 		    (uint16_t) ( *p_pixel_V * 
-				 (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
-		  *p_pixel_U = ( i_sub_color_U + i_pixel_color_U )>>ALPHA_BITS;
-		  *p_pixel_V = ( i_sub_color_V + i_pixel_color_V )>>ALPHA_BITS;
+				 (uint16_t) (MAX_TRANS - p_source->s.t) ) ;
+		  *p_pixel_U = ( i_sub_color_U + i_pixel_color_U )>>TRANS_BITS;
+		  *p_pixel_V = ( i_sub_color_V + i_pixel_color_V )>>TRANS_BITS;
 		}
 		break;
 	      }
@@ -427,15 +454,15 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   
 	  
           /* Favor opaque subtitle pixels. */
-	  if ( (p_source->s.t == 0) && (p_source+1)->s.t == MAX_ALPHA )
+	  if ( (p_source->s.t == 0) && (p_source+1)->s.t == MAX_TRANS )
             i_avg_tr = (p_source+1)->s.t;
-          else if ( (p_source->s.t == MAX_ALPHA) && (p_source+1)->s.t == 0 )
+          else if ( (p_source->s.t == MAX_TRANS) && (p_source+1)->s.t == 0 )
             i_avg_tr = p_source->s.t;
           else 
             i_avg_tr = ( p_source->s.t + (p_source+1)->s.t ) / 2;
           
 #ifdef TESTING_TRANSPARENCY 
-          if (i_avg_tr == MAX_ALPHA) i_avg_tr >>= 1;
+          if (i_avg_tr == MAX_TRANS) i_avg_tr >>= 1;
 #endif
 
 	  switch( i_avg_tr )
@@ -444,7 +471,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 	      /* Completely transparent. Don't change pixel. */
 	      break;
 	      
-	    case MAX_ALPHA:
+	    case MAX_TRANS:
 	      {
 		/* Completely opaque. Completely overwrite underlying
 		   pixel with subtitle pixel. */
@@ -455,10 +482,10 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		uint8_t i_avg_v;
 
                 /* Favor opaque subtitle pixel. */
-                if (p_source->s.t == MAX_ALPHA ) {
+                if (p_source->s.t == MAX_TRANS ) {
                   i_avg_u = p_source->plane[U_PLANE] ;
                   i_avg_v = p_source->plane[V_PLANE] ;
-                } else if ( (p_source+1)->s.t == MAX_ALPHA ) {
+                } else if ( (p_source+1)->s.t == MAX_TRANS ) {
                   i_avg_u = (p_source+1)->plane[U_PLANE] ;
                   i_avg_v = (p_source+1)->plane[V_PLANE] ;
                 } else {
@@ -514,16 +541,16 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 
 		uint16_t i_pixel_color_Y1 = 
 		  (uint16_t) ( *(p_pixel) * 
-			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
+			       (uint16_t) (MAX_TRANS - i_avg_tr) ) ;
 		uint16_t i_pixel_color_Y2 = 
 		  (uint16_t) ( *(p_pixel+2) * 
-			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
+			       (uint16_t) (MAX_TRANS - i_avg_tr) ) ;
 		uint16_t i_pixel_color_U = 
 		  (uint16_t) ( *(p_pixel+1) * 
-			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
+			       (uint16_t) (MAX_TRANS - i_avg_tr) ) ;
 		uint16_t i_pixel_color_V = 
 		  (uint16_t) ( *(p_pixel+3) * 
-			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
+			       (uint16_t) (MAX_TRANS - i_avg_tr) ) ;
 
 		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
 
@@ -535,10 +562,10 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   transparent and all opaque) aren't handled properly.
 		   But we deal with them in special cases above. */
 
-		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 )>>ALPHA_BITS;
-		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U )  >>ALPHA_BITS;
-		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 )>>ALPHA_BITS;
-		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V )  >>ALPHA_BITS;
+		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 )>>TRANS_BITS;
+		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U )  >>TRANS_BITS;
+		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 )>>TRANS_BITS;
+		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V )  >>TRANS_BITS;
 		break;
 	      }
 	    }
@@ -623,68 +650,62 @@ yuv2rgb565(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
 
 static inline void
 rv16_pack_blend(uint8_t *p_pixel, ogt_yuvt_t *p_source,  uint8_t *p_rgb1,
-                uint8_t *p_rgb2, vlc_bool_t b_15bpp, uint8_t i_alpha, 
+                uint8_t *p_rgb2, vlc_bool_t b_15bpp, uint8_t i_trans, 
                 int a_scale_down )
 {
-  uint8_t rgb_source[3];
-  uint8_t rgb[RGB_SIZE];
+  uint8_t rgb_sub[3];
+  uint8_t rgb_vout[RGB_SIZE];
   int i;
-#ifdef FIXED_RV16_TRANSPARENCY
-  uint8_t i_dest_alpha = MAX_ALPHA - i_alpha;
-#endif
 
-  yuv2rgb(p_source, rgb_source);
+  yuv2rgb(p_source, rgb_sub);
 
   /* Scale RGB from 8 bits down to 6 or 5. */
-  rgb_source[GREEN_PIXEL] >>= (8-5);
-  rgb_source[BLUE_PIXEL]  >>= (8-5);
+  rgb_sub[GREEN_PIXEL] >>= (8-5);
+  rgb_sub[BLUE_PIXEL]  >>= (8-5);
 
-  rgb[GREEN_PIXEL] = *(p_pixel+1)    & 0x1f;
+  rgb_vout[GREEN_PIXEL] = *(p_pixel+1)    & 0x1f;
   if (b_15bpp) {
-    rgb_source[RED_PIXEL]   >>= (8-5);
-    rgb[BLUE_PIXEL]  = ((*p_pixel)>>2) & 0x1f;
-    rgb[RED_PIXEL]   = ((*p_pixel & 0x03) << 3) | ((*(p_pixel+1)&0xe0)>>5);
+    rgb_sub[RED_PIXEL]   >>= (8-5);
+    rgb_vout[BLUE_PIXEL]  = ((*p_pixel)>>2) & 0x1f;
+    rgb_vout[RED_PIXEL]   = ((*p_pixel & 0x03) << 3) | ((*(p_pixel+1)&0xe0)>>5);
   } else {
-    rgb_source[RED_PIXEL]   >>= (8-6);
-    rgb[BLUE_PIXEL]  = ((*p_pixel)>>3) & 0x1f;
-    rgb[RED_PIXEL]   = ((*p_pixel & 0x07) << 3) | ((*(p_pixel+1)&0xe0)>>5);
+    rgb_sub[RED_PIXEL]   >>= (8-6);
+    rgb_vout[BLUE_PIXEL]  = ((*p_pixel)>>3) & 0x1f;
+    rgb_vout[RED_PIXEL]   = ((*p_pixel & 0x07) << 3) | ((*(p_pixel+1)&0xe0)>>5);
   }
   
 
 #if 0
-  printf("r,g,b=(%d,%d,%d), source r,g,b=(%d,%d,%d), alpha %d, dest_alpha %d\n",
-         rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL],
-         rgb_source[RED_PIXEL], rgb_source[GREEN_PIXEL], 
-         rgb_source[BLUE_PIXEL], i_alpha, i_dest_alpha);
+  printf("r,g,b=(%d,%d,%d), sub r,g,b=(%d,%d,%d), trans %d, inv_trans %d\n",
+         rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL],
+         rgb_sub[RED_PIXEL], rgb_sub[GREEN_PIXEL], 
+         rgb_sub[BLUE_PIXEL], i_trans, i_inv_trans);
 #endif
 
-  for (i=0; i < RGB_SIZE; i++) {
-    /* Average the two pixels.  */
-
 #ifdef FIXED_RV16_TRANSPARENCY
-    rgb[i] = ( (uint16_t) rgb_source[i]*i_alpha + rgb[i]*i_dest_alpha) >>
-      ALPHA_BITS;
+  avg_8bit_rgb(rgb_vout, rgb_sub, i_trans);
 #else 
+  for (i=0; i < RGB_SIZE; i++) {
     /* For now the Best we can do is fade the color. Picking up 
        video underneath doesn't work. */
-    /* rgb[i] = ( (uint16_t) rgb[i]*i_dest_alpha ) >> ALPHA_BITS; */
-    rgb[i] = ( (uint16_t) rgb_source[i]*i_alpha ) >> ALPHA_BITS;
+    /* rgb_vout[i] = ( (uint16_t) rgb_vout[i]*i_inv_trans ) >> TRANS_BITS; */
+    rgb_vout[i] = ( (uint16_t) rgb_sub[i]*i_trans ) >> TRANS_BITS;
 #endif 
   }
   
 
 #if 0
   printf("avg r,g,b=(%d,%d,%d)\n",
-         rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL] );
+         rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL] );
 #endif
 
 #if 0
   if (b_15bpp) {
-    *p_rgb1 = ( (rgb[BLUE_PIXEL] << 2)&0x7c )|( (rgb[RED_PIXEL]>>3)&0x03 );
+    *p_rgb1 = ( (rgb_vout[BLUE_PIXEL] << 2)&0x7c )|( (rgb_vout[RED_PIXEL]>>3)&0x03 );
   } else {
-    *p_rgb1 = ( (rgb[BLUE_PIXEL] << 3)&0xF8 )|( (rgb[RED_PIXEL]>>3)&0x07 );
+    *p_rgb1 = ( (rgb_vout[BLUE_PIXEL] << 3)&0xF8 )|( (rgb_vout[RED_PIXEL]>>3)&0x07 );
   }
-  *p_rgb2 = ( (rgb[RED_PIXEL]  << 5)&0xe0 ) | ( rgb[GREEN_PIXEL]&0x1f );
+  *p_rgb2 = ( (rgb_vout[RED_PIXEL]  << 5)&0xe0 ) | ( rgb_vout[GREEN_PIXEL]&0x1f );
 #else 
   *p_rgb1 = (*p_rgb1)+1;
   *p_rgb2 = (*p_rgb2)+1;
@@ -802,7 +823,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 	      }
 	      
 #ifdef TESTING_TRANSPARENCY
-              if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 1;
+              if (p_source->s.t == MAX_TRANS) p_source->s.t >>= 1;
 #endif
 
 	      switch( p_source->s.t )
@@ -811,7 +832,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		  /* Completely transparent. Don't change pixel. */
 		  break;
 		  
-                case MAX_ALPHA:
+                case MAX_TRANS:
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -857,7 +878,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 
                     for ( len = i_xlast - i_xdest; len ; len--) {
                       rv16_pack_blend(p_dest, p_source, &i_rgb1, &i_rgb2, 
-                                      b_15bpp, p_source->s.t, ALPHA_SCALEDOWN);
+                                      b_15bpp, p_source->s.t, TRANS_SCALEDOWN);
                       *p_dest++ = i_rgb1;
                       *p_dest++ = i_rgb2;
                     }
@@ -900,7 +921,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		    /* Completely transparent. Don't change pixel. */
                     break;
 
-                case MAX_ALPHA: 
+                case MAX_TRANS: 
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -944,7 +965,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		      uint8_t *p_dest = p_pixel_base + i_ytmp;
                       for ( len = i_xlast - i_xdest; len ; len--) {
                         rv16_pack_blend(p_dest, p_source, &i_rgb1, &i_rgb2,
-                                      b_15bpp, p_source->s.t, ALPHA_SCALEDOWN);
+                                      b_15bpp, p_source->s.t, TRANS_SCALEDOWN);
                         *p_dest++ = i_rgb1;
                         *p_dest++ = i_rgb2;
                       }
@@ -961,33 +982,26 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 #define BYTES_PER_PIXEL 4
 
 static inline void
-rv24_pack_blend(uint8_t *p_pixel, uint8_t *rgb_source,  uint8_t i_alpha,  
+rv24_pack_blend(uint8_t *rgb_vout, const uint8_t *rgb_sub,  uint8_t i_trans,  
                 int a_scale_down )
 {
-  int i;
-  uint8_t i_dest_alpha = MAX_ALPHA - i_alpha;
 
 #if 0
-  printf("r,g,b=(%d,%d,%d), source r,g,b=(%d,%d,%d), alpha %d, dest_alpha %d\n",
-         p_pixel[RED_PIXEL], p_pixel[GREEN_PIXEL], p_pixel[BLUE_PIXEL],
-         rgb_source[RED_PIXEL], rgb_source[GREEN_PIXEL], 
-         rgb_source[BLUE_PIXEL], i_alpha, i_dest_alpha);
+  printf("r,g,b=(%d,%d,%d), source r,g,b=(%d,%d,%d), trans %d\n",
+         rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL],
+         rgb_sub[RED_PIXEL], rgb_sub[GREEN_PIXEL], 
+         rgb_sub[BLUE_PIXEL], i_trans);
 #endif
 
 #ifdef WORDS_BIGENDIAN
-  *p_pixel++;
+  *rgb_vout++;
 #endif
 
-  for (i=0; i < RGB_SIZE; i++) {
-    /* Average the two pixels.  */
-
-    p_pixel[i] = ( (uint16_t) rgb_source[i]*i_alpha + p_pixel[i]*i_dest_alpha) 
-              >> ALPHA_BITS;
-  }
+  avg_8bit_rgb(rgb_vout, rgb_sub, i_trans);
   
 #if 0
   printf("avg r,g,b=(%d,%d,%d)\n",
-         rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL] );
+         rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL] );
 #endif
 
 }
@@ -1111,7 +1125,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 	      }
 	      
 #ifdef TESTING_TRANSPARENCY
-              if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 2;
+              if (p_source->s.t == MAX_TRANS) p_source->s.t >>= 2;
 #endif
 
 	      switch( p_source->s.t )
@@ -1120,7 +1134,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 		  /* Completely transparent. Don't change pixel. */
 		  break;
 		  
-                case MAX_ALPHA:
+                case MAX_TRANS:
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -1153,10 +1167,12 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                                            * BYTES_PER_PIXEL );
                       uint32_t len     = i_xlast - i_xdest * BYTES_PER_PIXEL;
                       
-                      /* To be able to scale correctly for full opaqueness, we
-                         add 1 to the alpha.  This means alpha value 0 won't
-                         be completely transparent and is not correct, but
-                         that's handled in a special case above anyway. */
+                      /* To be able to scale correctly for full
+                         opaqueness, we add 1 to the transparency.
+                         This means transparency value 0 won't be
+                         completely transparent which is not correct.
+                         But that's handled in a special case above
+                         anyway. */
                       
                       /* This is the location that's going to get changed. */
                       uint8_t *p_dest = p_pixel_base_y + i_xdest;
@@ -1166,7 +1182,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 
                       for ( len = i_xlast - i_xdest; len ; len--) {
                         rv24_pack_blend(p_dest, rgb, p_source->s.t,
-                                        ALPHA_SCALEDOWN);
+                                        TRANS_SCALEDOWN);
                         p_dest += BYTES_PER_PIXEL;
                       }
                       break;
@@ -1209,7 +1225,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 		    /* Completely transparent. Don't change pixel. */
                     break;
 
-                case MAX_ALPHA: 
+                case MAX_TRANS: 
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -1267,7 +1283,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 
                       for ( len = i_xlast - i_xdest; len ; len--) {
                         rv24_pack_blend(p_dest, rgb, p_source->s.t,
-                                        ALPHA_SCALEDOWN);
+                                        TRANS_SCALEDOWN);
                         p_dest += BYTES_PER_PIXEL;
                       }
                     }
@@ -1407,7 +1423,7 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		  break;
 		  
                 default:
-                case MAX_ALPHA:
+                case MAX_TRANS:
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -1448,7 +1464,7 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
                          be completely transparent and is not correct, but
                          that's handled in a special case above anyway. */
                       
-                      uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
+                      uint8_t i_destalpha = MAX_TRANS - p_source->s.t;
                       uint8_t rgb[RGB_SIZE];
 
                       /* This is the location that's going to get changed. */
@@ -1456,7 +1472,7 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
                       
                       yuv2rgb(p_source, rgb);
                       rv32_pack_blend(p_dest, rgb, dest_alpha, 
-                                      ALPHA_SCALEDOWN);
+                                      TRANS_SCALEDOWN);
 
                       for ( len = i_xlast - i_xdest; len ; len--) {
                         *p_dest++ = rgb[BLUE_PIXEL];
@@ -1506,7 +1522,7 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
                     break;
 
                 default:
-                case MAX_ALPHA: 
+                case MAX_TRANS: 
 		  {
 		    /* Completely opaque. Completely overwrite underlying
 		       pixel with subtitle pixel. */
@@ -1562,9 +1578,9 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
 			 be completely transparent and is not correct, but
 			 that's handled in a special case above anyway. */
 
-                      uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
+                      uint8_t i_destalpha = MAX_TRANS - p_source->s.t;
                       rv32_pack_blend(p_dest, rgb, dest_alpha,
-                                      ALPHA_SCALEDOWN);
+                                      TRANS_SCALEDOWN);
                     }
                     break;
 #endif /*TRANSPARENCY_FINISHED*/
@@ -1574,60 +1590,68 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/* 4-entry array of colormap indices */
+static  uint8_t cmap[NUM_SUBTITLE_COLORS];
+
+/* Actual RGB values for above; this is used in blending.*/
+static uint8_t cmap_rgb[NUM_SUBTITLE_COLORS][RGB_SIZE];
+
 /*
-  Return the colormap index for the average of p_pixel and a subtitle
-  pixel in RGB form.
+  Return the colormap index for the average of i_pixel and a subtitle
+  pixel whose subtitle palette entry is i_cmap. 
  */
 static inline cmap_t
-avg_rgb2(const vout_thread_t *p_vout, uint8_t i_pixel, cmap_t i_cmap_sub,
-         const uint8_t rgb_sub[] )
+avg_rgb2(const vout_thread_t *p_vout, uint8_t i_pixel, uint8_t i_trans, 
+         int i_cmap, mtime_t i_pts)
 {
   uint8_t rgb_vout[RGB_SIZE];
-  static cmap_t avg_cache[CMAP_RGB2_SIZE][NUM_SUBTITLE_COLORS];
-  static vlc_bool_t b_first_time = VLC_TRUE;
-  int i;
 
-  /* FIXME: really we need to save subtitle number since in theory
-     the palette can change each on each distinct subtitle. In practice
-     this doesn't happen that much.
+  /* Cache the average of a vout colormap entry and a subtitle palette
+     entry. There are not too many of these 256*4 = 1024.
    */
-  if (b_first_time) 
+  static cmap_t avg_cache[CMAP_RGB2_SIZE][NUM_SUBTITLE_COLORS];
+
+  /* subtitle palettes might change between two subtitles. i_last_pts
+     will be used to figure out if the subtitle has changed, and
+     we have to invalidate the cache. */
+  static mtime_t i_last_pts = -1;
+
+  if (i_pts != i_last_pts) 
     {
-      int i, j;
-      for (i=0; i<CMAP_RGB2_SIZE; i++) 
-        for (j=0; j<NUM_SUBTITLE_COLORS; j++) 
-          avg_cache[i][j] = INVALID_CMAP_ENTRY;
+      /* Hack: We rely on the fact that INVALID_CMAP_ENTRY is repeated
+         0xFF.
+       */
+      memset(avg_cache, 0xFF, sizeof(avg_cache));
+      i_last_pts = i_pts;
     }
 
-  if ( avg_cache[i_pixel][i_cmap_sub] != INVALID_CMAP_ENTRY ) 
-    return avg_cache[i_pixel][i_cmap_sub];
+  if ( avg_cache[i_pixel][i_cmap] != INVALID_CMAP_ENTRY ) 
+    return avg_cache[i_pixel][i_cmap];
 
   if ( !query_color(p_vout, i_pixel, rgb_vout) ) return INVALID_CMAP_ENTRY;
 
-  for (i = 0; i < RGB_SIZE; i++) 
-    {
-      rgb_vout[i] = (rgb_vout[i] + rgb_sub[i]) / 2;
-    }
+  avg_8bit_rgb(rgb_vout, cmap_rgb[i_cmap], i_trans);
 
 #if 0
  {
   uint8_t rgb_approx[RGB_SIZE];
 
-  avg_cache[i_pixel][i_cmap_sub] = 
+  avg_cache[i_pixel][i_cmap] = 
     find_cmap_rgb8_nearest(p_vout, rgb_vout, rgb_approx);
   printf(
-         "cmap old %0x new 0%x sub=(%0x, %0x, %0x) "
-         "avg=(%0x, %0x, %0x) vout=(%0x, %0x, %0x)\n", 
-         i_pixel, i_cmap,
-         rgb_sub[RED_PIXEL], rgb_sub[GREEN_PIXEL], rgb_sub[BLUE_PIXEL],
+         "cmap old %0x avg approx 0%x sub: %d sub=(%0x, %0x, %0x) "
+         "approx=(%0x, %0x, %0x) avg vout=(%0x, %0x, %0x)\n", 
+         i_pixel, avg_cache[i_pixel][i_cmap], i_cmap,
+         cmap_rgb[i_cmap][RED_PIXEL], cmap_rgb[i_cmap][GREEN_PIXEL], 
+         cmap_rgb[i_cmap][BLUE_PIXEL],
          rgb_approx[RED_PIXEL], rgb_approx[GREEN_PIXEL], rgb_approx[BLUE_PIXEL],
          rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL]);
  }  
 #else 
-  avg_cache[i_pixel][i_cmap_sub] = 
+  avg_cache[i_pixel][i_cmap] = 
     find_cmap_rgb8_nearest(p_vout, rgb_vout, NULL);
 #endif
-  return avg_cache[i_pixel][i_cmap_sub];
+  return avg_cache[i_pixel][i_cmap];
 }
 
 #undef  BYTES_PER_PIXEL
@@ -1642,6 +1666,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
     uint8_t *p_src_start = (uint8_t *)p_spu->p_sys->p_data;
     uint8_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
     uint8_t *p_source; /* This is the where the subtitle pixels come from */
+    int i;
 
     int i_x, i_y;
     int i_y_src;
@@ -1656,13 +1681,6 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
 
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;
-
-    /* 4-entry array of colormap indices */
-    uint8_t cmap[NUM_SUBTITLE_COLORS];
-    int i;
-
-    /* Actual RGB values for above; this is used in blending.*/
-    uint8_t cmap_rgb[NUM_SUBTITLE_COLORS][RGB_SIZE];
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
     unsigned int i_aspect_x, i_aspect_y;
@@ -1694,10 +1712,9 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
 
       if ( p_sys->p_palette[i].s.t != 0 ) {
         uint8_t rgb[RGB_SIZE]; 
-        uint8_t approx_rgb[RGB_SIZE]; 
         yuv2rgb(&(p_sys->p_palette[i]), rgb);
         cmap[i] = 
-          find_cmap_rgb8_nearest(p_vout, rgb, approx_rgb);
+          find_cmap_rgb8_nearest(p_vout, rgb, cmap_rgb[i]);
         dbg_print( (DECODE_DBG_RENDER), 
                    "palette %d RGB=(%0x, %0x, %0x)\n", i,
                    rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL]);
@@ -1768,7 +1785,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               p_yuvt = p_sys->p_palette[*p_source & 0x3];
 
 #ifdef TESTING_TRANSPARENCY
-              if (p_yuvt.s.t == MAX_ALPHA) p_yuvt.s.t >>= 1;
+              if (p_yuvt.s.t == MAX_TRANS) p_yuvt.s.t >>= 1;
 #endif
 
               switch ( p_yuvt.s.t ) 
@@ -1779,7 +1796,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                   printf(" "); /*++++*/
 #endif
                   break;
-                case MAX_ALPHA: 
+                case MAX_TRANS: 
                   {
                     uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
                                          * BYTES_PER_PIXEL );
@@ -1803,15 +1820,25 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                     uint8_t *p_pixel = p_pixel_base_y + i_xdest;
                     uint32_t len     = i_xlast - i_xdest;
 
+#if FULL_TRANSPARENCY
+                    /* This is what should be done, but it may be too
+		       slow.  */
                     for ( len = i_xlast - i_xdest -1; len >= 0; len-- ) 
                       {
-                        cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, 
-                                                  cmap[*p_source],
-                                                  cmap_rgb[*p_source]);
+                        cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, p_yuvt.s.t,
+                                                  *p_source, p_sys->i_pts);
+                                                  
                         if (i_cmap != INVALID_CMAP_ENTRY) 
                           *p_pixel= (uint8_t) i_cmap;
                         p_pixel++;
                       }
+#else
+                    cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, p_yuvt.s.t,
+                                              *p_source, p_sys->i_pts);
+                    if (i_cmap != INVALID_CMAP_ENTRY) 
+                      memset(p_pixel, i_cmap, len);
+#endif 
+
 #if 0
                     printf("%1d", *p_source); /*++++*/
 #endif
@@ -1851,7 +1878,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               }
               
 #ifdef TESTING_TRANSPARENCY
-              if (p_yuvt.s.t == MAX_ALPHA) p_yuvt.s.t >>= 1;
+              if (p_yuvt.s.t == MAX_TRANS) p_yuvt.s.t >>= 1;
 #endif
               switch ( p_yuvt.s.t ) 
                 {
@@ -1861,7 +1888,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                   printf(" "); /*++++*/
 #endif
                   break;
-                case MAX_ALPHA: 
+                case MAX_TRANS: 
                   {
                     uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
                                          * BYTES_PER_PIXEL );
@@ -1884,7 +1911,7 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                                          * BYTES_PER_PIXEL );
                     uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
                                          * BYTES_PER_PIXEL );
-                    int32_t len;
+                    int32_t len = i_xlast - i_xdest;
 #if 0
                     printf("%1d", *p_source); /*++++*/
 #endif
@@ -1893,15 +1920,26 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                          i_ytmp += p_pic->p->i_pitch ) {
                       /* This is the pixel that's going to change;*/
                       uint8_t *p_pixel = p_pixel_base + i_ytmp + i_xdest;
+
+#if FULL_TRANSPARENCY
+                    /* This is what should be done, but it may be too
+		       slow.  */
                       for ( len = i_xlast - i_xdest -1; len >= 0; len-- ) 
                         {
                           cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, 
-                                                    cmap[*p_source],
-                                                    cmap_rgb[*p_source]);
+                                                    p_yuvt.s.t, *p_source, 
+                                                    p_sys->i_pts);
                           if (i_cmap != INVALID_CMAP_ENTRY) 
                             *p_pixel= (uint8_t) i_cmap;
                           p_pixel++;
                         }
+#else
+                    cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, p_yuvt.s.t, 
+                                              *p_source, p_sys->i_pts);
+                    if (i_cmap != INVALID_CMAP_ENTRY) 
+                      memset(p_pixel, i_cmap, len);
+#endif 
+
                     }
                   }
                 }
