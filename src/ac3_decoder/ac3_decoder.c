@@ -214,6 +214,26 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	}
 
 	parse_syncinfo( p_ac3dec );
+/*
+        switch ( p_ac3dec->syncinfo.fscod )
+        {
+            case 0:
+                p_ac3dec->p_aout_fifo->l_rate = 48000;
+                break;
+
+            case 1:
+                p_ac3dec->p_aout_fifo->l_rate = 44100;
+                break;
+
+            case 2:
+                p_ac3dec->p_aout_fifo->l_rate = 32000;
+                break;
+
+            default:
+                fprintf( stderr, "ac3dec debug: fscod == `11' (reserved)\n" );
+                break;
+        }
+*/
 	parse_bsi( p_ac3dec );
 
 	/* frame 1 */
