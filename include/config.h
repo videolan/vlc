@@ -194,6 +194,10 @@
  * server */
 #define INPUT_VLAN_CHANGE_DELAY         5000000
 
+/* Duration between the time we receive the TS packet, and the time we will
+ * mark it to be presented */
+#define INPUT_PTS_DELAY                 2000000
+
 /*******************************************************************************
  * Audio configuration
  *******************************************************************************/
@@ -288,7 +292,7 @@
 #define VPAR_IDLE_SLEEP                 100000
 
 /* Time to sleep when waiting for a buffer (from vout or the video fifo). */
-#define VPAR_OUTMEM_SLEEP               10000
+#define VPAR_OUTMEM_SLEEP               100000
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */

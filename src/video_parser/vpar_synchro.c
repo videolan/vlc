@@ -71,7 +71,9 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
     decoder_fifo_t * decoder_fifo = p_vpar->bit_stream.p_decoder_fifo;
 
     /* interpolate the current _decode_ PTS */
-    i_current_pts = decoder_fifo->buffer[decoder_fifo->i_start]->i_pts;
+    i_current_pts = decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts ?
+                    decoder_fifo->buffer[decoder_fifo->i_start]->i_pts :
+                    0;
     if( !i_current_pts )
     {
         i_current_pts = p_vpar->synchro.i_last_decode_pts
@@ -84,8 +86,10 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 	    = i_current_pts;
 
     /* update display time */
-    i_displaydate = decoder_fifo->buffer[decoder_fifo->i_start]->i_pts;
-    if( !i_displaydate || i_coding_type != I_CODING_TYPE )
+    i_displaydate = decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts ?
+                    decoder_fifo->buffer[decoder_fifo->i_start]->i_pts :
+                    0;
+    if( !i_displaydate /* || i_coding_type != I_CODING_TYPE */ )
     {
         if (!p_vpar->synchro.i_images_since_pts )
             p_vpar->synchro.i_images_since_pts = 10;

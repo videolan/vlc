@@ -1000,7 +1000,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 
                             case SYNCHRO_START:
                                 p_pes->i_pts += p_pcr->delta_pcr;
-                                p_pcr->delta_absolute = mdate() - p_pes->i_pts + 500000;
+                                p_pcr->delta_absolute = mdate() - p_pes->i_pts + INPUT_PTS_DELAY;
                                 p_pes->i_pts += p_pcr->delta_absolute;
                                 p_pcr->i_synchro_state = 0;
                                 break;

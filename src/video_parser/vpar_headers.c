@@ -164,11 +164,17 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );
     }
+    else if( p_newref != NULL )
+    {
+        /* Put date immediately. */
+        vout_DatePicture( p_vpar->p_vout, p_newref,
+                          vpar_SynchroDate( p_vpar ) );
+    }
 }
 
 /*****************************************************************************
  * ReferenceReplace : Replace the last reference pointer when we destroy
- * a picture
+ *                    a picture
  *****************************************************************************/
 static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
                                          int i_coding_type,
@@ -669,12 +675,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         /* Initialize values. */
         vpar_SynchroDecode( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
-        {
-            /* Put date immediately. */
-            vout_DatePicture( p_vpar->p_vout, P_picture,
-                              vpar_SynchroDate( p_vpar ) );
-        }
         P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
         P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_l_stride = ( p_vpar->sequence.i_width
