@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.29 2003/01/22 01:48:06 hartman Exp $
+ * $Id: intf.m,v 1.30 2003/01/22 02:39:33 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1056,6 +1056,11 @@ static void Run( intf_thread_t *p_intf )
 {
     switch( [[NSApp currentEvent] type] )
     {
+        case NSLeftMouseDown:
+            f_slider = [sender floatValue];
+            [self displayTime];
+            break;
+            
         case NSLeftMouseDragged:
             f_slider = [sender floatValue];
             [self displayTime];
@@ -1067,7 +1072,6 @@ static void Run( intf_thread_t *p_intf )
             intf_thread_t * p_intf = [NSApp getIntf];
             input_thread_t * p_input = p_intf->p_sys->p_input;
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            vlc_object_release( p_input );
             break;
 
         default:
