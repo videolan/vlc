@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.66 2003/09/20 02:47:41 hartman Exp $
+$Id: NEWS,v 1.67 2003/10/12 23:28:36 hartman Exp $
 
 Changes between 0.6.2 and 0.6.3:
 ---------------------------------
@@ -6,33 +6,45 @@ Changes between 0.6.2 and 0.6.3:
 Core support:
  * Video outputs are recycled if possible. This removes any 'flicker' between two similiar video files.
  * Fixed the video filters. Video should no longer go black when these are used.
+ * New input core. Advantages are: better seeking, more responsive, support for subtitle files at the core, and much much more.
+ * Added a repeat mode to repeat a single file over and over.
 
 Stream output:
  * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
 
-Input demux:
+Input:
  * MPEG TS demuxer also handles A52 audio in DVB streams.
  * Fixed seeking support in FLAC files.
+ * cddax and vcdx
+ * Reworked DVB tuning
 
 Codecs:
  * Support for AAC + SBR.
  * MPEG 2.5 support.
+ * removed old a52, mpeg_video and mpeg_audio codecs, since we are using others now.
 
 Mac OS X port:
  * Mozilla plugin for Mac OS X (experimental).
+ * Save playlist.
+ * Works on 10.1.x again. Apologies for that problem.
 
 Win32 port:
  * New DirectShow input module (for video acquisition cards, webcams...).
  * VLC can be installed as a Windows NT service.
  * Support for 3F2R in audio output.
+ * Mozilla plugin for Windows (experimental).
+
+Subtitles:
+ * Text subtitles now have a black outline.
+ * Text subtitles autodetection.
+ * Text subtitles charset autodetection.
+ * Text subtitles for videofiles. Result may vary.
+ * Automatic fontsize selection for text subtitles.
 
 Miscellaneous:
- * Text subtitles now have a black outline.
- * Text subtitles filename and charset autodetection.
- * Text subtitles for mpeg files.
- * Automatic fontsize selection for text subtitles.
  * Audio visual effects filters (spectrum, scope and random).
  * Audio visual effects filter using goom.
+ * Spanish and Portugese Brazilian translations.
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------

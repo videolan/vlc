@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.95 2003/10/11 22:40:05 hartman Exp $
+ * $Id: libvlc.h,v 1.96 2003/10/12 23:28:36 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -26,7 +26,7 @@
 #define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
 
-static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
+static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", "ja",
                                 "nl", "no", "pl", "pt_BR", "ru", "sv", NULL };
 
 /*****************************************************************************
