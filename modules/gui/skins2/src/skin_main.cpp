@@ -350,7 +350,7 @@ vlc_module_begin();
     add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
 #endif
-    set_shorname( _("Skins"));
+    set_shortname( _("Skins"));
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
