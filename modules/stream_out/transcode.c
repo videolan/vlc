@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.80 2004/02/24 17:42:07 gbazin Exp $
+ * $Id: transcode.c,v 1.81 2004/03/03 11:29:26 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -39,6 +39,10 @@
 #   include <ffmpeg/avcodec.h>
 #else
 #   include <avcodec.h>
+#endif
+
+#if LIBAVCODEC_BUILD < 4704
+#   define AV_NOPTS_VALUE 0
 #endif
 
 /*****************************************************************************
@@ -1306,7 +1310,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             b_gotpicture = 1;
 
             /* Set PTS */
-            frame->pts = p_sys->i_input_pts;
+            frame->pts = p_sys->i_input_pts ? p_sys->i_input_pts :
+                         AV_NOPTS_VALUE;
         }
 
         if( i_used < 0 )
@@ -1324,7 +1329,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         /* Get the pts of the decoded frame if any, otherwise keep the
          * interpolated one */
-        if( frame->pts > 0 )
+        if( frame->pts != AV_NOPTS_VALUE )
         {
             p_sys->i_output_pts = frame->pts;
         }
@@ -1594,6 +1599,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 p_out->i_dts = p_block->i_dts;
                 p_out->i_pts = p_block->i_pts;
                 p_out->i_length = p_block->i_length;
+                p_out->i_flags =
+                        (p_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
+                          & SOUT_BUFFER_FLAGS_BLOCK_MASK;
                 sout_BufferChain( out, p_out );
 
                 p_block = p_block->p_next;
@@ -1652,6 +1660,9 @@ static int EncoderThread( sout_stream_sys_t * p_sys )
             p_out->i_dts = p_block->i_dts;
             p_out->i_pts = p_block->i_pts;
             p_out->i_length = p_block->i_length;
+            p_out->i_flags =
+                (p_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
+                  & SOUT_BUFFER_FLAGS_BLOCK_MASK;
             sout_BufferChain( &p_sys->p_buffers, p_out );
 
             p_block = p_block->p_next;
@@ -1701,7 +1712,7 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_context->opaque;
 
     /* Set PTS */
-    p_frame->pts = p_sys->i_input_pts;
+    p_frame->pts = p_sys->i_input_pts ? p_sys->i_input_pts : AV_NOPTS_VALUE;
 
     return avcodec_default_get_buffer( p_context, p_frame );
 }

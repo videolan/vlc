@@ -1,11 +1,12 @@
 /*****************************************************************************
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.23 2004/02/21 22:41:49 gbazin Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: encoder.c,v 1.24 2004/03/03 11:29:26 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,12 +39,16 @@
 #   include <avcodec.h>
 #endif
 
+#if LIBAVCODEC_BUILD < 4704
+#   define AV_NOPTS_VALUE 0
+#endif
+
 #include "ffmpeg.h"
 
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
-#define HURRY_UP_GUARD1 (1000000)
-#define HURRY_UP_GUARD2 (1000000)
-#define HURRY_UP_GUARD3 (200000)
+#define HURRY_UP_GUARD1 (450000)
+#define HURRY_UP_GUARD2 (300000)
+#define HURRY_UP_GUARD3 (100000)
 
 /*****************************************************************************
  * Local prototypes
@@ -101,6 +106,7 @@ struct encoder_sys_t
      */
     mtime_t i_last_ref_pts;
     mtime_t i_buggy_pts_detect;
+    mtime_t i_last_pts;
     vlc_bool_t b_inited;
 
     /*
@@ -368,6 +374,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->i_buggy_pts_detect = 0;
     p_sys->i_samples_delay = 0;
     p_sys->i_pts = 0;
+    p_sys->i_last_pts = 0;
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
 
@@ -496,57 +503,43 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame.linesize[i_plane] = p_pict->p[i_plane].i_pitch;
     }
 
+    /* Let ffmpeg select the frame type */
+    frame.pict_type = 0;
+
+    frame.repeat_pict = p_pict->i_nb_fields;
+
+#if LIBAVCODEC_BUILD >= 4685
+    frame.interlaced_frame = !p_pict->b_progressive;
+    frame.top_field_first = p_pict->b_top_field_first;
+#endif
+
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
     if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
     {
-        frame.pts = p_pict->date;
+        frame.pts = p_pict->date ? p_pict->date : AV_NOPTS_VALUE;
 
-        if ( p_enc->b_hurry_up )
+        if ( p_enc->b_hurry_up && frame.pts != AV_NOPTS_VALUE )
         {
             mtime_t current_date = mdate();
-#if LIBAVCODEC_BUILD >= 4702
-            struct thread_context_t ** pp_contexts =
-                (struct thread_context_t **)p_sys->p_context->thread_opaque;
-#endif
 
-            if ( frame.pts && current_date + HURRY_UP_GUARD3 > frame.pts )
+            if ( current_date + HURRY_UP_GUARD3 > frame.pts )
             {
                 p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
                 p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
-#if LIBAVCODEC_BUILD >= 4702
-                if ( p_enc->i_threads >= 2 )
-                {
-                    int i;
-
-                    for ( i = 0; i < p_enc->i_threads; i++ )
-                    {
-                        vlc_thread_set_priority( pp_contexts[i],
-                                            VLC_THREAD_PRIORITY_VIDEO + 4 );
-                    }
-                }
-#endif
                 msg_Dbg( p_enc, "hurry up mode 3" );
             }
             else
             {
                 p_sys->p_context->mb_decision = p_enc->i_hq;
 
-                if ( frame.pts && current_date + HURRY_UP_GUARD2 > frame.pts )
+                if ( current_date + HURRY_UP_GUARD2 > frame.pts )
                 {
                     p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
-#if LIBAVCODEC_BUILD >= 4702
-                    if ( p_enc->i_threads >= 2 )
-                    {
-                        int i;
-
-                        for ( i = 0; i < p_enc->i_threads; i++ )
-                        {
-                            vlc_thread_set_priority( pp_contexts[i],
-                                             VLC_THREAD_PRIORITY_VIDEO + 2 );
-                        }
-                    }
+#if LIBAVCODEC_BUILD >= 4690
+                    p_sys->p_context->noise_reduction = p_enc->i_noise_reduction
+                         + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
 #endif
                     msg_Dbg( p_enc, "hurry up mode 2" );
                 }
@@ -554,48 +547,39 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 {
                     if ( p_enc->b_trellis )
                         p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-
-#if LIBAVCODEC_BUILD >= 4702
-                    if ( p_enc->i_threads >= 2 )
-                    {
-                        int i;
-
-                        for ( i = 0; i < p_enc->i_threads; i++ )
-                        {
-                            vlc_thread_set_priority( pp_contexts[i],
-                                                   VLC_THREAD_PRIORITY_VIDEO );
-                        }
-                    }
+#if LIBAVCODEC_BUILD >= 4690
+                    p_sys->p_context->noise_reduction =
+                                    p_enc->i_noise_reduction;
 #endif
                 }
             }
 
-#if LIBAVCODEC_BUILD >= 4690
-            if ( frame.pts && current_date + HURRY_UP_GUARD1 > frame.pts )
+            if ( current_date + HURRY_UP_GUARD1 > frame.pts )
             {
-                p_sys->p_context->noise_reduction = p_enc->i_noise_reduction
-                         + (HURRY_UP_GUARD1 + current_date - frame.pts) / 1500;
+                frame.pict_type = FF_P_TYPE;
+                /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
             }
-            else
-            {
-                p_sys->p_context->noise_reduction = p_enc->i_noise_reduction;
-            }
-#endif
         }
     }
     else
     {
-        frame.pts = 0;
+        frame.pts = AV_NOPTS_VALUE;
     }
 
-    /* Let ffmpeg select the frame type */
-    frame.pict_type = 0;
-
-    frame.repeat_pict = p_pict->i_nb_fields;
-#if LIBAVCODEC_BUILD >= 4685
-    frame.interlaced_frame = !p_pict->b_progressive;
-    frame.top_field_first = p_pict->b_top_field_first;
-#endif
+    if ( frame.pts != AV_NOPTS_VALUE )
+    {
+        if ( p_sys->i_last_pts == frame.pts )
+        {
+            msg_Warn( p_enc,
+                      "almost fed libavcodec with two frames with the same PTS (" I64Fd ")",
+                      frame.pts );
+            return NULL;
+        }
+        else
+        {
+            p_sys->i_last_pts = frame.pts;
+        }
+    }
 
     i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
                                   AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
@@ -605,7 +589,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         block_t *p_block = block_New( p_enc, i_out );
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
-        if( p_sys->p_context->coded_frame->pts != 0 &&
+        if( p_sys->p_context->coded_frame->pts != AV_NOPTS_VALUE &&
             p_sys->i_buggy_pts_detect != p_sys->p_context->coded_frame->pts )
         {
             p_sys->i_buggy_pts_detect = p_sys->p_context->coded_frame->pts;
@@ -645,6 +629,19 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 p_enc->fmt_in.video.i_frame_rate_base /
                 p_enc->fmt_in.video.i_frame_rate;
             p_block->i_dts = p_block->i_pts = p_pict->date;
+        }
+
+        switch ( p_sys->p_context->coded_frame->pict_type )
+        {
+        case FF_I_TYPE:
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+            break;
+        case FF_P_TYPE:
+            p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+            break;
+        case FF_B_TYPE:
+            p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+            break;
         }
 
         return p_block;
