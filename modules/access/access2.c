@@ -43,6 +43,7 @@ vlc_module_begin();
     add_shortcut( "http" );
     add_shortcut( "ftp" );
     add_shortcut( "tcp" );
+    add_shortcut( "pvr" );
 
     /* Hack */
     //add_shortcut( "file" );
