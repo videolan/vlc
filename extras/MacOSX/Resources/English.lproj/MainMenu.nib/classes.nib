@@ -4,31 +4,34 @@
         {
             ACTIONS = {
                 fullscreen_toggle = id; 
+                nextPlaylist = id; 
                 openFile = id; 
                 pause = id; 
                 play = id; 
+                prevPlaylist = id; 
                 speedslider_update = id; 
+                stop = id; 
                 timeslider_update = id; 
             }; 
             CLASS = Intf_Controller; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                o_currenttime = id; 
-                o_menu_fullscreen = id; 
-                o_pause = id; 
-                o_play = id; 
-                o_playlistds = id; 
-                o_stepf = id; 
-                o_stepr = id; 
-                o_stop = id; 
-                o_timeslider = id; 
+                o_currenttime = NSTextField; 
+                o_menu_fullscreen = NSMenuItem; 
+                o_pause = NSButton; 
+                o_play = NSButton; 
+                o_playlistds = Intf_PlaylistDS; 
+                o_stepf = NSButton; 
+                o_stepr = NSButton; 
+                o_stop = NSButton; 
+                o_timeslider = NSSlider; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
         {
             CLASS = Intf_PlaylistDS; 
             LANGUAGE = ObjC; 
-            OUTLETS = {o_table = id; }; 
+            OUTLETS = {o_table = NSTableView; }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VlcQuickDrawView; LANGUAGE = ObjC; SUPERCLASS = NSQuickDrawView; }

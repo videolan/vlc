@@ -68,5 +68,6 @@ typedef enum intf_speed_e {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST} intf_speed_t 
 - (void) playlistPlayItem:(int)i_item ;
 - (void) playlistAdd:(NSString*)o_filename ;
 - (void) clearPlaylist ;
+- (bool) playlistPlaying ;
 @end
 

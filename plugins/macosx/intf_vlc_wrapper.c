@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.5 2001/12/07 18:33:07 sam Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.5.2.1 2002/01/24 21:54:37 fgp Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -276,7 +276,9 @@
         vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;        
     }
     
-
+    - (bool) playlistPlaying {
+        return p_main->p_playlist->b_stopped ;
+    }
 
 
 // Private Functions. This are just some utilities for other functions

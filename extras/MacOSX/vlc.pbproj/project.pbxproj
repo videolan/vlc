@@ -132,10 +132,12 @@
 			refType = 4;
 		};
 		F51212320170635601A80A1F = {
+			indentWidth = 4;
 			isa = PBXFileReference;
 			name = vout_macosx.c;
 			path = plugins/macosx/vout_macosx.c;
 			refType = 4;
+			usesTabs = 0;
 		};
 		F51352740170655D01A80A1F = {
 			isa = PBXFileReference;
@@ -217,7 +219,7 @@
 	<key>CFBundleExecutable</key>
 	<string>vlc</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VideoLan Client</string>
+	<string>VideoLan Client 0.2.92</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -229,9 +231,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>vlc 0.2.90</string>
+	<string>vlc 0.2.92</string>
 	<key>CFBundleVersion</key>
-	<string>0.2.90</string>
+	<string>0.2.92</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

@@ -150,7 +150,6 @@ static int vout_Init( vout_thread_t *p_vout )
 {
     p_vout->b_need_render = 0 ;
     p_vout->i_bytes_per_line = p_vout->i_width ;
-    p_vout->p_sys->c_codec = 'NONE' ;
     p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_REQUEST_QDPORT ;
     
     return 0 ;
@@ -292,18 +291,16 @@ static void fillout_ImageDescription(ImageDescriptionHandle h_descr, unsigned in
 
 static void fillout_ScalingMatrix( vout_thread_t *p_vout)
 {
-	Rect s_rect ;
-	Fixed factor_x ;
-	Fixed factor_y ;
+    Rect s_rect ;
+    Fixed factor_x ;
+    Fixed factor_y ;
         	
-	GetPortBounds( p_vout->p_sys->osx_communication.p_qdport, &s_rect ) ;
-//	if (((s_rect.right - s_rect.left) / ((float) p_vout->i_width)) < ((s_rect.bottom - s_rect.top) / ((float) p_vout->i_height)))
-		factor_x = FixDiv(Long2Fix(s_rect.right - s_rect.left), Long2Fix(p_vout->i_width)) ;
-//	else
-		factor_y = FixDiv(Long2Fix(s_rect.bottom - s_rect.top), Long2Fix(p_vout->i_height)) ;
+    GetPortBounds( p_vout->p_sys->osx_communication.p_qdport, &s_rect ) ;
+    factor_x = FixDiv(Long2Fix(s_rect.right - s_rect.left), Long2Fix(p_vout->i_width)) ;
+    factor_y = FixDiv(Long2Fix(s_rect.bottom - s_rect.top), Long2Fix(p_vout->i_height)) ;
 	
-	SetIdentityMatrix(p_vout->p_sys->p_matrix) ;
-	ScaleMatrix( p_vout->p_sys->p_matrix, factor_x, factor_y, Long2Fix(0), Long2Fix(0) ) ;
+    SetIdentityMatrix(p_vout->p_sys->p_matrix) ;
+    ScaleMatrix( p_vout->p_sys->p_matrix, factor_x, factor_y, Long2Fix(0), Long2Fix(0) ) ;
 }
 
 static OSErr new_QTSequence( ImageSequence *i_seq, CGrafPtr p_qdport, ImageDescriptionHandle h_descr, MatrixRecordPtr p_matrix )
@@ -349,6 +346,12 @@ static int create_QTSequenceBestCodec( vout_thread_t *p_vout )
         ) )
     {
         p_vout->p_sys->c_codec = 'y420' ;
+	intf_WarnMsg( 1, "vout_macosx: Created QTSequence with codec '%c%c%c%c'", 
+            p_vout->p_sys->c_codec >> 24,
+            p_vout->p_sys->c_codec >> 16,
+            p_vout->p_sys->c_codec >> 8,
+            p_vout->p_sys->c_codec
+        ) ;
         return 0 ;
     }
    
@@ -360,7 +363,14 @@ static void dispose_QTSequence( vout_thread_t *p_vout )
 {
     if (p_vout->p_sys->c_codec == 'NONE')
     	return ;
-    	
+
+    intf_WarnMsg( 1, "vout_macosx: About to delete QTSequence using codec: '%c%c%c%c'", 
+        p_vout->p_sys->c_codec >> 24,
+        p_vout->p_sys->c_codec >> 16,
+        p_vout->p_sys->c_codec >> 8,
+        p_vout->p_sys->c_codec
+    ) ;    	
+    
     CDSequenceEnd( p_vout->p_sys->i_seq ) ;
     switch (p_vout->p_sys->c_codec)
     {

@@ -30,6 +30,7 @@
 
 #include <QuickTime/QuickTime.h>
 #include <ApplicationServices/ApplicationServices.h>
+#include <CoreServices/CoreServices.h>
 #import "intf_controller.h"
 #import "intf_vlc_wrapper.h"
 
@@ -53,6 +54,8 @@
         
         [o_currenttime setStringValue: [o_vlc getTimeAsString]] ;
         [o_timeslider setFloatValue: [o_vlc getTimeAsFloat]] ;
+        if ([o_vlc playlistPlaying])
+            UpdateSystemActivity(UsrActivity) ;
    }
     
     - (void)applicationDidBecomeActive:(NSNotification*)aNotification {
@@ -96,6 +99,18 @@
         [o_vlc playlistPlayCurrent] ;
     }
     
+    - (IBAction) stop:(id)sender {
+        [o_vlc playlistStop] ;
+    }
+    
+    - (IBAction) prevPlaylist:(id)sender {
+        [o_vlc playlistPlayPrev] ;
+    }
+    
+    - (IBAction) nextPlaylist:(id)sender {
+        [o_vlc playlistPlayNext] ;
+    }
+    
     - (IBAction) timeslider_update:(id)slider {
         [o_vlc setTimeAsFloat: [o_timeslider floatValue]] ;
     }
@@ -128,6 +143,8 @@
                 defer:NO screen:[NSScreen mainScreen]
             ] ;
             [o_window setLevel:CGShieldingWindowLevel()] ;
+            CGDisplayHideCursor(kCGDirectMainDisplay) ;
+            [o_menu_fullscreen setState:NSOffState] ;
             b_window_is_fullscreen = TRUE ;
         }
         else {
@@ -154,7 +171,6 @@
         [o_window setContentView:o_qdview] ;
         [o_window orderFront:self] ;
         [o_vlc setQDPort:[o_qdview qdPort]] ;
-        [o_menu_fullscreen setState:(b_window_is_fullscreen ? NSOnState : NSOffState)] ;
     }
     
     - (void) releaseQDPort {
@@ -167,6 +183,11 @@
         if (o_window) {
             [o_window close] ;
             o_window = nil ;
+        }
+        if (b_window_is_fullscreen)
+        {
+            [o_menu_fullscreen setState:NSOnState] ;
+            CGDisplayShowCursor(kCGDirectMainDisplay) ;
         }
     }
     
