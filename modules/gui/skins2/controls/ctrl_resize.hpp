@@ -64,6 +64,9 @@ class CtrlResize: public CtrlFlat
         static void transResizeStill( SkinObject *pCtrl );
         static void transResizeResize( SkinObject *pCtrl );
 
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return m_rCtrl.getType(); }
+
     private:
         FSM m_fsm;
         /// Decorated CtrlFlat

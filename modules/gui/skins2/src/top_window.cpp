@@ -32,6 +32,7 @@
 #include "../commands/cmd_on_top.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../controls/ctrl_generic.hpp"
+#include "../events/evt_refresh.hpp"
 #include "../events/evt_enter.hpp"
 #include "../events/evt_focus.hpp"
 #include "../events/evt_leave.hpp"
@@ -64,6 +65,24 @@ TopWindow::~TopWindow()
 {
     // Unregister from the window manager
     m_rWindowManager.unregisterWindow( *this );
+}
+
+
+void TopWindow::processEvent( EvtRefresh &rEvtRefresh )
+{
+    // We override the behaviour defined in GenericWindow, because we don't
+    // want to draw on a video control!
+    if( m_pActiveLayout == NULL )
+    {
+        GenericWindow::processEvent( rEvtRefresh );
+    }
+    else
+    {
+        m_pActiveLayout->refreshRect( rEvtRefresh.getXStart(),
+                                      rEvtRefresh.getYStart(),
+                                      rEvtRefresh.getWidth(),
+                                      rEvtRefresh.getHeight() );
+    }
 }
 
 

@@ -129,12 +129,7 @@ void Win32Loop::run()
                                 Infos.rcPaint.right - Infos.rcPaint.left + 1,
                                 Infos.rcPaint.bottom - Infos.rcPaint.top + 1 );
                 EndPaint( msg.hwnd, &Infos );
-                // Ignore all the painting events for the vout window,
-                // otherwise we are going to screw up the colorkey
-                if( win.getType() != "Vout" )
-                {
-                    win.processEvent( evt );
-                }
+                win.processEvent( evt );
                 break;
             }
             case WM_MOUSEMOVE:

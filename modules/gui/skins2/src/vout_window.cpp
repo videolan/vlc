@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "vout_window.hpp"
+#include "vlcproc.hpp"
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
 #include "os_window.hpp"
@@ -69,7 +70,14 @@ void VoutWindow::refresh( int left, int top, int width, int height )
 {
     if( m_pImage )
     {
-        m_pImage->copyToWindow( *getOSWindow(), left, top, width, height, left,
-                                top );
+        // Get the VlcProc
+        VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
+
+        // Refresh only when there is no video!
+        if( pVlcProc && !pVlcProc->isVoutUsed() )
+        {
+            m_pImage->copyToWindow( *getOSWindow(), left, top,
+                                    width, height, left, top );
+        }
     }
 }

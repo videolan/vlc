@@ -75,6 +75,9 @@ class GenericLayout: public SkinObject, public Box
         /// Refresh the window
         virtual void refreshAll();
 
+        /// Refresh a rectangular portion of the window
+        virtual void refreshRect( int x, int y, int width, int height );
+
         /// Get the image of the layout
         virtual OSGraphics *getImage() const { return m_pImage; }
 
@@ -119,9 +122,6 @@ class GenericLayout: public SkinObject, public Box
         virtual void addAnchor( Anchor *pAnchor );
 
     private:
-        /// Refresh a rectangular portion of the window
-        void GenericLayout::refreshRect( int x, int y, int width, int height );
-
         /// Parent window of the layout
         TopWindow *m_pWindow;
         /// Layout size

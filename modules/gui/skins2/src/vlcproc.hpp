@@ -65,6 +65,9 @@ class VlcProc: public SkinObject
         /// Set the vout window handle
         void setVoutWindow( void *pVoutWindow );
 
+        /// Indicate whether the embedded video output is currently used
+        bool isVoutUsed() const { return m_pVout; }
+
     protected:
         // Protected because it is a singleton
         VlcProc( intf_thread_t *pIntf );
@@ -92,7 +95,7 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
-        /// Vout window hanlde
+        /// Vout window handle
         void *m_pVoutWindow;
         /// Vout thread
         vout_thread_t *m_pVout;

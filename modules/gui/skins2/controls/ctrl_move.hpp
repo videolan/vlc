@@ -62,6 +62,9 @@ class CtrlMove: public CtrlFlat
         static void transStillMoving( SkinObject *pCtrl );
         static void transMovingStill( SkinObject *pCtrl );
 
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return m_rCtrl.getType(); }
+
     private:
         FSM m_fsm;
         /// Window manager

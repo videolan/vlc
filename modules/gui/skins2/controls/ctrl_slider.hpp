@@ -2,7 +2,7 @@
  * ctrl_slider.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.hpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -62,6 +62,9 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
 
         /// Get the text of the tooltip
         virtual UString getTooltipText() const { return m_tooltip; }
+
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return "slider_cursor"; }
 
     private:
         /// Finite state machine of the control
@@ -124,6 +127,9 @@ class CtrlSliderBg: public CtrlGeneric
 
         /// Handle an event
         virtual void handleEvent( EvtGeneric &rEvent );
+
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return "slider_bg"; }
 
     private:
         /// Cursor of the slider

@@ -58,6 +58,9 @@ class CtrlButton: public CtrlGeneric
         /// Get the text of the tooltip
         virtual UString getTooltipText() const { return m_tooltip; }
 
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return "button"; }
+
     private:
         /// Finite state machine of the control
         FSM m_fsm;

@@ -2,7 +2,7 @@
  * ctrl_text.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_text.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -59,6 +59,9 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         /// Set the text of the control, with an optional color
         /// This takes effect immediatly
         void setText( const UString &rText, uint32_t color = 0xFFFFFFFF );
+
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return "text"; }
 
     private:
         /// Finite state machine of the control

@@ -48,6 +48,9 @@ class CtrlVideo: public CtrlGeneric
         /// Draw the control on the given graphics
         virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
+        /// Get the type of control (custom RTTI)
+        virtual string getType() const { return "video"; }
+
     private:
         /// Vout window
         VoutWindow *m_pVout;

@@ -200,6 +200,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
 {
     // Draw all the controls of the layout
     list<LayeredControl>::const_iterator iter;
+    list<LayeredControl>::const_iterator iterVideo = m_controlList.end();
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
@@ -207,6 +208,10 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         if( pCtrl->isVisible() && pPos )
         {
             pCtrl->draw( *m_pImage, pPos->getLeft(), pPos->getTop() );
+            // Remember the video control (we assume there is at most one video
+            // control per layout)
+            if( pCtrl->getType() == "video" && pCtrl->getPosition() )
+                iterVideo = iter;
         }
     }
 
@@ -224,7 +229,40 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         if( y + height > m_height )
             height = m_height - y;
 
-        pWindow->refresh( x, y, width, height );
+        // Refresh the window... but do not paint on a video control!
+        if( iterVideo == m_controlList.end() )
+        {
+            // No video control, we can safely repain the rectangle
+            pWindow->refresh( x, y, width, height );
+        }
+        else
+        {
+            // Bad luck, there is a video control somewhere (not necessarily
+            // in the repainting zone, btw).
+            // We will divide the repainting into 4 regions (top, left, bottom
+            // and right). The overlapping parts (i.e. the corners) of these
+            // regions will be painted twice, because otherwise the algorithm
+            // becomes a real mess :)
+
+            // Use short variable names for convenience
+            int xx = iterVideo->m_pControl->getPosition()->getLeft();
+            int yy = iterVideo->m_pControl->getPosition()->getTop();
+            int ww = iterVideo->m_pControl->getPosition()->getWidth();
+            int hh = iterVideo->m_pControl->getPosition()->getHeight();
+
+            // Top part:
+            if( y < yy )
+                pWindow->refresh( x, y, width, yy - y );
+            // Left part:
+            if( x < xx )
+                pWindow->refresh( x, y, xx - x, height );
+            // Bottom part
+            if( y + height > yy + hh )
+                pWindow->refresh( x, yy + hh, width, y + height - (yy + hh) );
+            // Right part
+            if( x + width > xx + ww )
+                pWindow->refresh( xx + ww, y, x + width - (xx + ww), height );
+        }
     }
 }
 
