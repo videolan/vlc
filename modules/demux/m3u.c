@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.10 2002/12/14 01:05:53 babal Exp $
+ * $Id: m3u.c,v 1.11 2003/01/16 21:14:23 babal Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -255,27 +255,54 @@ static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
 
     }
 
+    /* empty line */
+    if ( !*psz_bol ) return;
+
     /*
      * From now on, we know we've got a meaningful line
      */
 
-    /* Check if the line has an absolute or relative path */
+    /* check for a protocol name */
+    /* for URL, we should look for "://"
+     * for MRL (Media Resource Locator) ([[<access>][/<demux>]:][<source>]),
+     * we should look for ":"
+     * so we end up looking simply for ":"*/
+    /* PB: on some file systems, ':' are valid characters though*/
     psz_name = psz_bol;
-    while( *psz_name && strncmp( psz_name, "://", sizeof("://") - 1 ) )
+    while( *psz_name && *psz_name!=':' )
     {
         psz_name++;
     }
+#ifdef WIN32
+    if ( *psz_name && ( psz_name == psz_bol + 1 ) )
+    {
+        /* if it is not an URL,
+         * as it is unlikely to be an MRL (PB: if it is ?)
+         * it should be an absolute file name with the drive letter */
+        if ( *(psz_name+1) == '/' )/* "*:/" */
+        {
+            if ( *(psz_name+2) != '/' )/* not "*://" */
+                while ( *psz_name ) *psz_name++;/* so now (*psz_name==0) */
+        }
+        else while ( *psz_name ) *psz_name++;/* "*:*"*/
+    }
+#endif
+
+    /* if the line doesn't specify a protocol name,
+     * check if the line has an absolute or relative path */
 #ifndef WIN32
     if( !*psz_name && *psz_bol != '/' )
+         /* If this line doesn't begin with a '/' */
 #else
-    if( !*psz_name && (strlen(psz_bol) < 2 ||
-                ( *(psz_bol+1) != ':' &&
-                  strncmp( psz_bol, "\\\\", 2 ) ) ) )
+    if( !*psz_name
+            && *psz_bol!='/'
+            && *psz_bol!='\\'
+            && *(psz_bol+1)!=':' )
+         /* if this line doesn't begin with
+          *  "/" or "\" or "*:" or "*:\" or "*:/" or "\\" */
 #endif
     {
-        /* the line doesn't specify a protocol name.
-         * If this line doesn't begin with a '/' then assume the path
-         * is relative to the path of the m3u file. */
+        /* assume the path is relative to the path of the m3u file. */
         char *psz_path = strdup( p_input->psz_name );
 
 #ifndef WIN32

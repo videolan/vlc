@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.29 2002/12/25 02:23:37 massiot Exp $
+ * $Id: input.c,v 1.30 2003/01/16 21:14:23 babal Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,6 +43,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
     audio_sample_format_t intermediate_format, headphone_intermediate_format;
     aout_filter_t * p_headphone_filter;
+    vlc_bool_t b_use_headphone_filter = VLC_FALSE;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
 
@@ -50,13 +51,30 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
     p_input->p_first_byte_to_mix = NULL;
 
-    /* Create filters. */
+    /* Prepare format structure */
     memcpy( &intermediate_format, &p_aout->mixer.mixer,
             sizeof(audio_sample_format_t) );
+    intermediate_format.i_rate = p_input->input.i_rate;
+
+    /* Headphone filter add-ons. */
     memcpy( &headphone_intermediate_format, &p_aout->mixer.mixer,
             sizeof(audio_sample_format_t) );
+    headphone_intermediate_format.i_rate = p_input->input.i_rate;
     if ( config_GetInt( p_aout , "headphone" ) )
     {
+        /* Do we use heaphone filter ? */
+        if ( intermediate_format.i_physical_channels
+                == ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT )
+            && ( intermediate_format.i_format != VLC_FOURCC('f','l','3','2')
+                || intermediate_format.i_format != VLC_FOURCC('f','i','3','2')
+                ) )
+        {
+            b_use_headphone_filter = VLC_TRUE;
+        }
+    }
+    if ( b_use_headphone_filter == VLC_TRUE )
+    {
+        /* Split the filter pipeline. */
         headphone_intermediate_format.i_physical_channels = p_input->input.i_physical_channels;
         headphone_intermediate_format.i_original_channels = p_input->input.i_original_channels;
         headphone_intermediate_format.i_bytes_per_frame =
@@ -65,8 +83,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 / aout_FormatNbChannels( &intermediate_format );
     }
 
-    intermediate_format.i_rate = p_input->input.i_rate;
-    headphone_intermediate_format.i_rate = p_input->input.i_rate;
+    /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                      &p_input->i_nb_filters, &p_input->input,
                                      &headphone_intermediate_format ) < 0 )
@@ -79,7 +96,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         return -1;
     }
 
-    if ( config_GetInt( p_aout , "headphone" ) )
+    /* Headphone filter add-ons. */
+    if ( b_use_headphone_filter == VLC_TRUE )
     {
         /* create a vlc object */
         p_headphone_filter = vlc_object_create( p_aout

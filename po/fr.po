@@ -216,7 +216,7 @@ msgstr ""
 
 #: src/libvlc.h:93
 msgid "headphone virtual spatialization effect"
-msgstr ""
+msgstr "effet de spatialisation virtuelle pour casque stéréo"
 
 #: src/libvlc.h:95
 msgid ""
@@ -226,16 +226,24 @@ msgid ""
 "tiring when listening to music for long periods of time.\n"
 "It works with any source format from mono to 5.1."
 msgstr ""
+"Cet effet donne l'impression d'être dans une pièce réelle avec un "
+"ensemble de haut-parleurs en 5.1 en utilisant simplement un casque "
+"stéréo, et procure ainsi une ambiance sonore plus réaliste. Ecouter de "
+"la musique de façon prolongée devrait également être plus confortable "
+"et moins fatiguant.\nCela marche avec n'importe quelle format audio, "
+"depuis une source mono jusqu'à une source 5.1."
 
 #: src/libvlc.h:102
 msgid "characteristic dimension"
-msgstr ""
+msgstr "dimension caractéristique"
 
 #: src/libvlc.h:104
 msgid ""
 "Headphone virtual spatialization effect parameter: distance between front "
 "left speaker and listener in meters."
 msgstr ""
+"Parmètre pour l'effet de spatialisation virtuelle pour casque stéréo: "
+"distance entre le haut parleur avant gauche et l'auditeur en mètres."
 
 #: src/libvlc.h:107
 msgid "video output module"

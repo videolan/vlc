@@ -117,7 +117,7 @@ case "x${target_os}" in
 
     if test "x$SYS" = "xmingw32"; then
         # add ws2_32 for closesocket, select, recv
-        CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
+        CPPFLAGS_save="${CPPFLAGS_save}"
         CPPFLAGS="${CPPFLAGS_save}"
         LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
