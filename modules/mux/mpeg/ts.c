@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.44 2004/02/17 13:13:31 gbazin Exp $
+ * $Id: ts.c,v 1.45 2004/02/22 15:57:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -396,7 +396,7 @@ static int Open( vlc_object_t *p_this )
 
             ck[0] = val[8];
             val[8] = 0;
-            i_ck = strtol( val, NULL, 16 ) << 32;
+            i_ck = ((int64_t)strtol( val, NULL, 16 )) << 32;
             val[8] = ck[0];
             i_ck += strtol( &val[8], NULL, 16 );
             for( i = 0; i < 8; i++ )

@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vorbis.c,v 1.31 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: vorbis.c,v 1.32 2004/02/22 15:57:41 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 #include "vlc_playlist.h"
 
 #include <ogg/ogg.h>

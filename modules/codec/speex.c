@@ -2,7 +2,7 @@
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: speex.c,v 1.12 2004/01/29 19:38:17 gbazin Exp $
+ * $Id: speex.c,v 1.13 2004/02/22 15:57:41 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>
 #include "vlc_playlist.h"
 
 #include <ogg/ogg.h>

@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.14 2004/01/25 03:29:02 hartman Exp $
+ * $Id: ncurses.c,v 1.15 2004/02/22 15:57:41 fenrir Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -497,7 +497,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 val.b_bool = VLC_TRUE;
                 var_Set( p_sys->p_input, "prev-title", val );
             }
-            break;
+            return 1;
 
         case ']':
             if( p_sys->p_input )
@@ -505,7 +505,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 val.b_bool = VLC_TRUE;
                 var_Set( p_sys->p_input, "next-title", val );
             }
-            break;
+            return 1;
 
         case '<':
             if( p_sys->p_input )
@@ -513,7 +513,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 val.b_bool = VLC_TRUE;
                 var_Set( p_sys->p_input, "prev-chapter", val );
             }
-            break;
+            return 1;
 
         case '>':
             if( p_sys->p_input )
@@ -521,7 +521,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 val.b_bool = VLC_TRUE;
                 var_Set( p_sys->p_input, "next-chapter", val );
             }
-            break;
+            return 1;
 
         case 'p':
             if( p_intf->p_sys->p_playlist )
