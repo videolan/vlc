@@ -34,7 +34,7 @@
 
 #ifndef _MSC_VER
     /* Work-around a bug in w32api-2.5 */
-#   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE
+#   define QACONTAINERFLAGS QACONTAINERFLAGS_ANOTHERSOMETHINGELSE
 #endif
 
 #include "common.h"
