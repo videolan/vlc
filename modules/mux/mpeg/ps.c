@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.5 2003/01/13 02:33:13 fenrir Exp $
+ * $Id: ps.c,v 1.6 2003/02/16 14:10:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -148,7 +148,7 @@ static void Close( vlc_object_t * p_this )
     p_end = sout_BufferNew( p_sout, 4 );
     SetDWBE( p_end->p_buffer, 0x01b9 );
 
-    p_sout->pf_write( p_sout, p_end );
+    sout_AccessWrite( p_sout->p_access, p_end );
 
     free( p_mux );
 
@@ -247,7 +247,7 @@ static int MuxWritePackHeader( sout_instance_t *p_sout,
     bits_write( &bits, 5,  0x1f );  // FIXME reserved
     bits_write( &bits, 3,  0 );     // stuffing bytes
     p_hdr->i_size = 14;
-    p_sout->pf_write( p_sout, p_hdr );
+    sout_AccessWrite( p_sout->p_access, p_hdr );
 
     return( 0 );
 }
@@ -281,7 +281,7 @@ static int MuxWriteSystemHeader( sout_instance_t *p_sout )
 
     /* FIXME missing stream_id ... */
 
-    p_sout->pf_write( p_sout, p_hdr );
+    sout_AccessWrite( p_sout->p_access, p_hdr );
 
     return( 0 );
 }
@@ -365,7 +365,7 @@ static int Mux      ( sout_instance_t *p_sout )
 
         p_data = sout_FifoGet( p_fifo );
         E_( EStoPES )( p_sout, &p_data, p_data, p_stream->i_stream_id, 1);
-        p_sout->pf_write( p_sout, p_data );
+        sout_AccessWrite( p_sout->p_access, p_data );
 
         p_mux->i_pes_count++;
 

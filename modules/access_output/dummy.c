@@ -2,7 +2,7 @@
  * dummy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: dummy.c,v 1.2 2003/02/16 14:10:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,8 +48,8 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int     Write( sout_instance_t *, sout_buffer_t * );
-static int     Seek( sout_instance_t *, off_t  );
+static int     Write( sout_access_out_t *, sout_buffer_t * );
+static int     Seek ( sout_access_out_t *, off_t  );
 
 /*****************************************************************************
  * Module descriptor
@@ -67,14 +67,13 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
+    sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
 
-    p_sout->i_method        = SOUT_METHOD_NONE;
-    p_sout->p_access_data   = NULL;
-    p_sout->pf_write        = Write;
-    p_sout->pf_seek         = Seek;
+    p_access->p_sys    = NULL;
+    p_access->pf_write = Write;
+    p_access->pf_seek  = Seek;
 
-    msg_Info( p_sout, "dummy stream output access launched" );
+    msg_Info( p_access, "dummy stream output access launched" );
     return VLC_SUCCESS;
 }
 
@@ -83,14 +82,14 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    msg_Info( p_sout, "Close" );
+    sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
+    msg_Info( p_access, "Close" );
 }
 
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
     size_t i_write = 0;
 
@@ -99,11 +98,11 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
         sout_buffer_t *p_next;
         i_write += p_buffer->i_size;
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_sout, p_buffer );
+        sout_BufferDelete( p_access->p_sout, p_buffer );
         p_buffer = p_next;
     } while( p_buffer );
 
-    msg_Dbg( p_sout, "Dummy Skipped: len:%d", (uint32_t)i_write );
+    msg_Dbg( p_access, "Dummy Skipped: len:"I64Fd, (int64_t)i_write );
 
     return( i_write );
 }
@@ -111,11 +110,10 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( sout_instance_t *p_sout, off_t i_pos )
+static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    msg_Dbg( p_sout, "Seek: pos:%lld", (int64_t)i_pos );
+    msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
     return( 0 );
 }
-
 
 

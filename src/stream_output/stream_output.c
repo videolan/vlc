@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.12 2003/01/17 15:26:24 fenrir Exp $
+ * $Id: stream_output.c,v 1.13 2003/02/16 14:10:44 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -82,7 +82,6 @@ static int InitInstance( sout_instance_t * p_sout )
     p_sout->psz_name = "";
     p_sout->p_access = NULL;
     p_sout->p_mux = NULL;
-    p_sout->i_access_preheader = 0;
     p_sout->i_mux_preheader = 0;
     p_sout->i_nb_inputs = 0;
     p_sout->pp_inputs = NULL;
@@ -165,14 +164,14 @@ static int InitInstance( sout_instance_t * p_sout )
 
     /* Find and open appropriate access module */
     p_sout->p_access =
-        module_Need( p_sout, "sout access", p_sout->psz_access );
-
+        sout_AccessOutNew( p_sout, p_sout->psz_access, p_sout->psz_name );
     if( p_sout->p_access == NULL )
     {
         msg_Err( p_sout, "no suitable sout access module for `%s/%s://%s'",
                  p_sout->psz_access, p_sout->psz_mux, p_sout->psz_name );
         return -1;
     }
+
 
     /* Find and open appropriate mux module */
     p_sout->p_mux =
@@ -182,7 +181,8 @@ static int InitInstance( sout_instance_t * p_sout )
     {
         msg_Err( p_sout, "no suitable mux module for `%s/%s://%s'",
                  p_sout->psz_access, p_sout->psz_mux, p_sout->psz_name );
-        module_Unneed( p_sout, p_sout->p_access );
+
+        sout_AccessDelete( p_sout->p_access );
         return -1;
     }
 
@@ -206,7 +206,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     }
     if( p_sout->p_access )
     {
-        module_Unneed( p_sout, p_sout->p_access );
+        sout_AccessDelete( p_sout->p_access );
     }
 
     vlc_mutex_destroy( &p_sout->lock );
@@ -214,6 +214,71 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     /* Free structure */
     vlc_object_destroy( p_sout );
 }
+
+/*****************************************************************************
+ * sout_AccessOutNew: allocate a new access out
+ *****************************************************************************/
+sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
+                                      char *psz_access, char *psz_name )
+{
+    sout_access_out_t *p_access;
+
+    if( !( p_access = vlc_object_create( p_sout,
+                                         sizeof( sout_access_out_t ) ) ) )
+    {
+        msg_Err( p_sout, "out of memory" );
+        return NULL;
+    }
+    p_access->psz_access = strdup( psz_access ? psz_access : "" );
+    p_access->psz_name   = strdup( psz_name ? psz_name : "" );
+    p_access->p_sout     = p_sout;
+    p_access->p_sys = NULL;
+    p_access->pf_seek    = NULL;
+    p_access->pf_write   = NULL;
+
+    p_access->p_module   = module_Need( p_access,
+                                        "sout access",
+                                        p_access->psz_access );;
+
+    if( !p_access->p_module )
+    {
+        vlc_object_destroy( p_access );
+        p_access = NULL;
+    }
+
+    return p_access;
+}
+/*****************************************************************************
+ * sout_AccessDelete: delete an access out
+ *****************************************************************************/
+void sout_AccessDelete( sout_access_out_t *p_access )
+{
+    if( p_access->p_module )
+    {
+        module_Unneed( p_access, p_access->p_module );
+    }
+    free( p_access->psz_access );
+    free( p_access->psz_name );
+
+    vlc_object_destroy( p_access );
+}
+
+/*****************************************************************************
+ * sout_AccessSeek:
+ *****************************************************************************/
+int  sout_AccessSeek( sout_access_out_t *p_access, off_t i_pos )
+{
+    return( p_access->pf_seek( p_access, i_pos ) );
+}
+
+/*****************************************************************************
+ * sout_AccessWrite:
+ *****************************************************************************/
+int  sout_AccessWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+{
+    return( p_access->pf_write( p_access, p_buffer ) );
+}
+
 
 
 /*****************************************************************************
@@ -494,7 +559,7 @@ sout_buffer_t *sout_BufferNew( sout_instance_t *p_sout, size_t i_size )
 #endif
 
     p_buffer = malloc( sizeof( sout_buffer_t ) );
-    i_prehader = p_sout->i_access_preheader + p_sout->i_mux_preheader;
+    i_prehader = p_sout->i_mux_preheader;
 
     if( i_size > 0 )
     {

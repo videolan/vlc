@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.2 2003/01/08 10:40:10 fenrir Exp $
+ * $Id: file.c,v 1.3 2003/02/16 14:10:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -48,8 +48,8 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int     Write( sout_instance_t *, sout_buffer_t * );
-static int     Seek( sout_instance_t *, off_t  );
+static int     Write( sout_access_out_t *, sout_buffer_t * );
+static int     Seek ( sout_access_out_t *, off_t  );
 
 /*****************************************************************************
  * Module descriptor
@@ -61,36 +61,36 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-typedef struct sout_access_data_s
+struct sout_access_out_sys_t
 {
     FILE *p_file;
 
-} sout_access_data_t;
+};
 
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_access_data_t  *p_access;
-    char *              psz_name = p_sout->psz_name;
+    sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
 
-    p_access = malloc( sizeof( sout_access_data_t ) );
-
-    if( !( p_access->p_file = fopen( psz_name, "wb" ) ) )
+    if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
-        msg_Err( p_sout, "cannot open `%s'", psz_name );
-        free( p_access );
-        return( -1 );
+        msg_Err( p_access, "out of memory" );
+        return( VLC_EGENERIC );
     }
 
-    p_sout->i_method        = SOUT_METHOD_FILE;
-    p_sout->p_access_data   = p_access;
-    p_sout->pf_write        = Write;
-    p_sout->pf_seek         = Seek;
+    if( !( p_access->p_sys->p_file = fopen( p_access->psz_name, "wb" ) ) )
+    {
+        msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
+        free( p_access->p_sys );
+        return( VLC_EGENERIC );
+    }
 
-    msg_Info( p_sout, "Open: name:`%s'", psz_name );
+    p_access->pf_write        = Write;
+    p_access->pf_seek         = Seek;
+
+    msg_Info( p_access, "Open: name:`%s'", p_access->psz_name );
     return VLC_SUCCESS;
 }
 
@@ -99,23 +99,22 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
+    sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
 
-    if( p_access->p_file )
+    if( p_access->p_sys->p_file )
     {
-        fclose( p_access->p_file );
+        fclose( p_access->p_sys->p_file );
     }
+    free( p_access->p_sys );
 
-    msg_Info( p_sout, "Close" );
+    msg_Info( p_access, "Close" );
 }
 
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
+static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
-    sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
     size_t i_write = 0;
 
     do
@@ -123,14 +122,12 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
         sout_buffer_t *p_next;
 
         i_write += fwrite( p_buffer->p_buffer, 1, p_buffer->i_size,
-                           p_access->p_file );
+                           p_access->p_sys->p_file );
         p_next = p_buffer->p_next;
-        sout_BufferDelete( p_sout, p_buffer );
+        sout_BufferDelete( p_access->p_sout, p_buffer );
         p_buffer = p_next;
 
     } while( p_buffer );
-
-//    msg_Dbg( p_sout, "Write: len:%d", (uint32_t)i_write );
 
     return( i_write );
 }
@@ -138,13 +135,11 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( sout_instance_t *p_sout, off_t i_pos )
+static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
 
-    sout_access_data_t  *p_access = (sout_access_data_t*)p_sout->p_access_data;
-
-    msg_Dbg( p_sout, "Seek: pos:%lld", (int64_t)i_pos );
-    return( fseek( p_access->p_file, i_pos, SEEK_SET ) );
+    msg_Dbg( p_access, "Seek: pos:"I64Fd, (int64_t)i_pos );
+    return( fseek( p_access->p_sys->p_file, i_pos, SEEK_SET ) );
 }
 
 

@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.7 2003/01/13 02:33:13 fenrir Exp $
+ * $Id: ts.c,v 1.8 2003/02/16 14:10:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -574,7 +574,7 @@ static int Mux( sout_instance_t *p_sout )
         p_mux->i_ts_packet++;
         SetTSDate( p_ts, i_dts, i_length );
 
-        p_sout->pf_write( p_sout, p_ts );
+        sout_AccessWrite( p_sout->p_access, p_ts );
     }
 
     return( 0 );
