@@ -99,6 +99,7 @@ struct vout_thread_t
     int       ( *pf_manage )     ( vout_thread_t * );
     void      ( *pf_render )     ( vout_thread_t *, picture_t * );
     void      ( *pf_display )    ( vout_thread_t *, picture_t * );
+    int       ( *pf_control )    ( vout_thread_t *, int, va_list );
     /**@}*/
 
     /** \name Statistics
@@ -217,6 +218,32 @@ picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
 VLC_EXPORT( void *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
 VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
+
+static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
+                                  va_list args )
+{
+    if( p_vout->pf_control )
+        return p_vout->pf_control( p_vout, i_query, args );
+    else
+        return VLC_EGENERIC;
+}
+
+static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
+{
+    va_list args;
+    int i_result;
+
+    va_start( args, i_query );
+    i_result = vout_vaControl( p_vout, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
+enum output_query_e
+{
+    VOUT_SET_ZOOM,         /* arg1= double *       res=    */
+    VOUT_REPARENT
+};
 
 /**
  * \addtogroup subpicture

@@ -139,6 +139,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 
         ppsz_varnames[i] = "fullscreen";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "zoom";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "aspect-ratio";
@@ -296,6 +298,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         vlc_object_t *p_dec_obj;
 
         ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "zoom";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
         pi_objects[i++] = p_object->i_object_id;
@@ -523,6 +527,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     case VLC_VAR_VARIABLE:
     case VLC_VAR_STRING:
     case VLC_VAR_INTEGER:
+    case VLC_VAR_FLOAT:
         break;
     default:
         /* Variable doesn't exist or isn't handled */
@@ -594,6 +599,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
     case VLC_VAR_VARIABLE:
     case VLC_VAR_STRING:
     case VLC_VAR_INTEGER:
+    case VLC_VAR_FLOAT:
         break;
     default:
         /* Variable doesn't exist or isn't handled */
@@ -669,6 +675,29 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
 
           if( !(i_type & VLC_VAR_ISCOMMAND) &&
               val_list.p_list->p_values[i].i_int == val.i_int )
+              menu->Check( i_item_id, TRUE );
+          break;
+
+        case VLC_VAR_FLOAT:
+          var_Get( p_object, psz_var, &val );
+
+          menuitem =
+              new wxMenuItemExt( menu, ++i_item_id,
+                                 text_list.p_list->p_values[i].psz_string ?
+                                 (wxString)wxU(
+                                   text_list.p_list->p_values[i].psz_string) :
+                                 wxString::Format(wxT("%.2f"),
+                                 val_list.p_list->p_values[i].f_float),wxT(""),
+                                 i_type & VLC_VAR_ISCOMMAND ?
+                                   wxITEM_NORMAL : wxITEM_RADIO,
+                                 strdup(psz_var),
+                                 p_object->i_object_id,
+                                 val_list.p_list->p_values[i], i_type );
+
+          menu->Append( menuitem );
+
+          if( !(i_type & VLC_VAR_ISCOMMAND) &&
+              val_list.p_list->p_values[i].f_float == val.f_float )
               menu->Check( i_item_id, TRUE );
           break;
 

@@ -83,6 +83,7 @@ static int  InitVideo      ( vout_thread_t * );
 static void EndVideo       ( vout_thread_t * );
 static void DisplayVideo   ( vout_thread_t *, picture_t * );
 static int  ManageVideo    ( vout_thread_t * );
+static int  Control        ( vout_thread_t *, int, va_list );
 
 static int  InitDisplay    ( vout_thread_t * );
 
@@ -149,6 +150,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     p_vout->pf_manage = ManageVideo;
     p_vout->pf_render = NULL;
     p_vout->pf_display = DisplayVideo;
+    p_vout->pf_control = Control;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -2112,6 +2114,32 @@ static void SetPalette( vout_thread_t *p_vout,
                   p_vout->p_sys->colormap, p_colors, 255 );
 }
 #endif
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    double f_arg;
+
+    switch( i_query )
+    {
+        case VOUT_SET_ZOOM:
+            f_arg = va_arg( args, double );
+
+            /* Update dimensions */
+            XResizeWindow( p_vout->p_sys->p_display,
+                           p_vout->p_sys->p_win->base_window,
+                           p_vout->render.i_width * f_arg,
+                           p_vout->render.i_height * f_arg );
+
+            return VLC_SUCCESS;
+
+        default:
+            msg_Dbg( p_vout, "control query not supported" );
+            return VLC_EGENERIC;
+    }
+}
 
 /*****************************************************************************
  * TestNetWMSupport: tests for Extended Window Manager Hints support

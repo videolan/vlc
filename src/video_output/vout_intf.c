@@ -36,6 +36,10 @@
  * Local prototypes
  *****************************************************************************/
 
+/* Object variables callbacks */
+static int ZoomCallback( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
  *****************************************************************************
@@ -99,4 +103,59 @@ void vout_ReleaseWindow( vout_thread_t *p_vout, void *p_window )
 
     p_intf->pf_release_window( p_intf, p_window );
     vlc_object_release( p_intf );
+}
+
+/*****************************************************************************
+ * vout_IntfInit: called during the vout creation to initialise misc things.
+ *****************************************************************************/
+void vout_IntfInit( vout_thread_t *p_vout )
+{
+    vlc_value_t val, text, old_val;
+
+    /* Create a few object variables we'll need later on */
+    var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
+                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+
+    text.psz_string = _("Zoom");
+    var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
+
+    var_Get( p_vout, "zoom", &old_val );
+    if( old_val.f_float == 0.25 ||
+        old_val.f_float == 0.5 ||
+        old_val.f_float == 1 ||
+        old_val.f_float == 2 )
+    {
+        var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
+    }
+
+    val.f_float = 0.25; text.psz_string = _("1:4 Quater");
+    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+    val.f_float = 0.5; text.psz_string = _("1:2 Half");
+    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+    val.f_float = 1; text.psz_string = _("1:1 Original");
+    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+    val.f_float = 2; text.psz_string = _("2:1 Double");
+    var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+
+    var_Set( p_vout, "zoom", old_val );
+
+    var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
+}
+
+/*****************************************************************************
+ * Object variables callbacks
+ *****************************************************************************/
+static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_Control( p_vout, VOUT_SET_ZOOM, newval.f_float );
+    return VLC_SUCCESS;
 }

@@ -57,6 +57,8 @@ static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
+void vout_IntfInit( vout_thread_t * );
+
 /* Object variables callbacks */
 static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
@@ -290,6 +292,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     p_vout->render_time  = 10;
     p_vout->c_fps_samples = 0;
     p_vout->b_filter_change = 0;
+    p_vout->pf_control = 0;
 
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
@@ -310,14 +313,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
 
-    /* Create a few object variables we'll need later on */
-    var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    /* Take care of some "interface/control" related initialisations */
+    vout_IntfInit( p_vout );
 
     p_vout->b_override_aspect = VLC_FALSE;
 
