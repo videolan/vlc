@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.22 2003/07/11 23:14:03 gbazin Exp $
+ * $Id: directx.c,v 1.23 2003/08/14 11:47:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -307,6 +307,12 @@ static int OpenAudio( vlc_object_t *p_this )
                    | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                    | AOUT_CHAN_LFE;
         }
+        else if( val.i_int == AOUT_VAR_3F2R )
+        {
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        }
         else if( val.i_int == AOUT_VAR_2F2R )
         {
             p_aout->output.output.i_physical_channels
@@ -395,6 +401,24 @@ static void Probe( aout_instance_t * p_aout )
         }
     }
 
+    /* Test for 3 Front 2 Rear support */
+    i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                          AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
+                          AOUT_CHAN_REARRIGHT;
+    if( p_aout->output.output.i_physical_channels == i_physical_channels )
+    {
+        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 5,
+                               p_aout->output.output.i_rate, VLC_TRUE )
+            == VLC_SUCCESS )
+        {
+            val.i_int = AOUT_VAR_3F2R;
+            text.psz_string = N_("3 Front 2 Rear");
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
+            msg_Dbg( p_aout, "device supports 5 channels" );
+        }
+    }
+
     /* Test for 2 Front 2 Rear support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
@@ -422,6 +446,7 @@ static void Probe( aout_instance_t * p_aout )
         val.i_int = AOUT_VAR_STEREO;
         text.psz_string = N_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
         msg_Dbg( p_aout, "device supports 2 channels" );
     }
 

@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.8 2003/05/27 01:48:50 hartman Exp $
+ * $Id: libc.c,v 1.9 2003/08/14 11:47:31 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -143,6 +143,29 @@ double vlc_atof( const char *nptr )
     free( psz_tmp );
 
     return f_result;
+}
+#endif
+
+/*****************************************************************************
+ * atoll: convert a string to a 64 bits int.
+ *****************************************************************************/
+#if !defined( HAVE_ATOLL )
+int64_t vlc_atoll( const char *str )
+{
+    int64_t i_value = 0;
+    int sign = 1;
+
+    if( *str == '-' )
+    {
+        sign = -1;
+    }
+
+    while( *str >= '0' && *str <= '9' )
+    {
+        i_value = i_value * 10 + ( *str - '0' );
+    }
+
+    return i_value * sign;
 }
 #endif
 

@@ -2,7 +2,7 @@
  * ntservice.c: Windows NT/2K/XP service interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ntservice.c,v 1.1 2003/08/13 23:26:55 gbazin Exp $
+ * $Id: ntservice.c,v 1.2 2003/08/14 11:47:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,6 +45,12 @@ static void Close   ( vlc_object_t * );
 #define NAME_TEXT N_( "Display name of the service" )
 #define NAME_LONGTEXT N_( \
     "This allows you to change the display name of the service." )
+#define EXTRAINTF_TEXT N_("Extra interface modules")
+#define EXTRAINTF_LONGTEXT N_( \
+    "This option allows you to select additional interfaces spawned by the " \
+    "service. It should be specified at install time so the service is " \
+    "properly configured. Use a comma separated list of interface modules. " \
+    "(common values are: logger,sap,rc,http)")
 
 vlc_module_begin();
     set_description( _("Windows NT/2K/XP service interface") );
@@ -52,6 +58,7 @@ vlc_module_begin();
     add_bool( "ntservice-install", 0, NULL, INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
     add_bool( "ntservice-uninstall", 0, NULL, INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
     add_string ( "ntservice-name", VLCSERVICENAME, NULL, NAME_TEXT, NAME_LONGTEXT, VLC_TRUE );
+    add_string ( "ntservice-extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", 0 );
     set_callbacks( Activate, Close );
@@ -143,7 +150,7 @@ static void Run( intf_thread_t *p_intf )
 static int NTServiceInstall( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys  = p_intf->p_sys;
-    char psz_path[MAX_PATH], psz_pathtmp[MAX_PATH];
+    char psz_path[MAX_PATH], psz_pathtmp[MAX_PATH], *psz_extraintf;
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
     if( handle == NULL )
     {
@@ -156,6 +163,14 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
     sprintf( psz_path, "\"%s\" -I "MODULE_STRING, psz_pathtmp );
 
+    psz_extraintf = config_GetPsz( p_intf, "ntservice-extraintf" );
+    if( psz_extraintf && *psz_extraintf )
+    {
+        strcat( psz_path, " --ntservice-extraintf " );
+        strcat( psz_path, psz_extraintf );
+    }
+    if( psz_extraintf ) free( psz_extraintf );
+
     SC_HANDLE service =
         CreateService( handle, p_sys->psz_service, p_sys->psz_service,
                        GENERIC_READ | GENERIC_EXECUTE,
@@ -166,13 +181,15 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     {
         if( GetLastError() != ERROR_SERVICE_EXISTS )
         {
-            msg_Err( p_intf, "Could not create new service" );
+            msg_Err( p_intf, "Could not create new service: \"%s\" (%s)",
+                     p_sys->psz_service ,psz_path );
             CloseServiceHandle( handle );
             return VLC_EGENERIC;
         }
         else
         {
-            msg_Warn( p_intf, "Service already exists" );
+            msg_Warn( p_intf, "Service \"%s\" already exists",
+                      p_sys->psz_service );
         }
     }
     else
@@ -209,7 +226,8 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     /* Remove the service */
     if( !DeleteService( service ) )
     {
-        msg_Err( p_intf, "Could not delete service" );
+        msg_Err( p_intf, "Could not delete service \"%s\"",
+                 p_sys->psz_service );
     }
     else
     {
@@ -226,6 +244,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_global_intf;
     intf_sys_t    *p_sys  = p_intf->p_sys;
+    char *psz_modules, *psz_parser;
 
     /* We have to initialize the service-specific stuff */
     memset( &p_sys->status, 0, sizeof(SERVICE_STATUS) );
@@ -239,6 +258,54 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
     {
         msg_Err( p_intf, "Failed to register service control handler" );
         return;
+    }
+
+    /*
+     * Load background interfaces
+     */
+    psz_modules = config_GetPsz( p_intf, "ntservice-extraintf" );
+    psz_parser = psz_modules;
+    while( psz_parser && *psz_parser )
+    {
+        char *psz_module, *psz_temp;
+        psz_module = psz_parser;
+        psz_parser = strchr( psz_module, ',' );
+        if( psz_parser )
+        {
+            *psz_parser = '\0';
+            psz_parser++;
+        }
+        psz_temp = (char *)malloc( strlen(psz_module) + sizeof(",none") );
+        if( psz_temp )
+        {
+            intf_thread_t *p_new_intf;
+            sprintf( psz_temp, "%s,none", psz_module );
+
+            /* Try to create the interface */
+            p_new_intf = intf_Create( p_intf, psz_temp );
+            if( p_new_intf == NULL )
+            {
+                msg_Err( p_intf, "interface \"%s\" initialization failed",
+                         psz_temp );
+                free( psz_temp );
+                continue;
+            }
+
+            /* Try to run the interface */
+            p_new_intf->b_block = VLC_FALSE;
+            if( intf_RunThread( p_new_intf ) )
+            {
+                vlc_object_detach( p_new_intf );
+                intf_Destroy( p_new_intf );
+                msg_Err( p_intf, "interface \"%s\" cannot run", psz_temp );
+            }
+
+            free( psz_temp );
+        }
+    }
+    if( psz_modules )
+    {
+        free( psz_modules );
     }
 
     /* Initialization complete - report running status */

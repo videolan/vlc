@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.71 2003/08/13 14:17:26 zorglub Exp $
+ * $Id: vlc_common.h,v 1.72 2003/08/14 11:47:32 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -541,6 +541,13 @@ static inline uint64_t U64_AT( void * _p )
     VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
 #elif !defined(__PLUGIN__)
 #   define vlc_atof NULL
+#endif
+
+#ifndef HAVE_ATOLL
+#   define atoll vlc_atoll
+    VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_atoll NULL
 #endif
 
 #ifndef HAVE_GETENV

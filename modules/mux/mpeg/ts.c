@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.26 2003/08/10 14:23:15 gbazin Exp $
+ * $Id: ts.c,v 1.27 2003/08/14 11:47:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -217,28 +217,6 @@ static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, sout_buffer_t *
 static void TSSetDate( sout_buffer_chain_t *, mtime_t, mtime_t );
 static void TSSetConstraints( sout_mux_t*, sout_buffer_chain_t *,
                               mtime_t i_length, int i_bitrate_min, int i_bitrate_max );
-
-#if !defined( HAVE_ATOLL )
-/* Et oui y'a des systemes de MERDE (ex: OS X, Solaris) qui ne l'ont pas :((( */
-static long long atoll(const char *str)
-{
-    long long i_value = 0;
-    int sign = 1;
-
-    if( *str == '-' )
-    {
-        sign = -1;
-    }
-
-    while( *str >= '0' && *str <= '9' )
-    {
-        i_value = i_value * 10 + ( *str - '0' );
-    }
-
-    return i_value * sign;
-}
-#endif
-
 
 /*****************************************************************************
  * Open:
