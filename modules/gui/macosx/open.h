@@ -82,12 +82,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_sub_fps;
     IBOutlet id o_file_sub_fps_lbl;
     IBOutlet id o_file_sub_fps_stp;
+    IBOutlet id o_file_sub_encoding_pop;
+    IBOutlet id o_file_sub_encoding_lbl;
+    IBOutlet id o_file_sub_size_pop;
+    IBOutlet id o_file_sub_size_lbl;
+    IBOutlet id o_file_sub_align_pop;
+    IBOutlet id o_file_sub_align_lbl;
     IBOutlet id o_file_sub_ok_btn;
-    
+
     IBOutlet id o_output_ckbox;
     IBOutlet id o_sout_options;
 }
 
+- (void)setSubPanel;
 - (void)openTarget:(int)i_type;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 

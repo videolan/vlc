@@ -7,6 +7,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Benjamin Pracht <bigben at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -168,16 +169,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
 
-    [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
-    [o_file_sub_btn_settings setTitle: _NS("Settings...")];
-    [o_file_sub_btn_browse setTitle: _NS("Browse...")];
-    [o_file_sub_override setTitle: _NS("Override")];
-    [o_file_sub_delay_lbl setStringValue: _NS("delay")];
-    [o_file_sub_delay_stp setEnabled: NO];
-    [o_file_sub_fps_lbl setStringValue: _NS("fps")];
-    [o_file_sub_fps_stp setEnabled: NO];
-    [o_file_sub_ok_btn setStringValue: _NS("OK")];
-    
+    [self setSubPanel];
+
+
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
         name: NSControlTextDidChangeNotification
@@ -218,6 +212,74 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         object: o_net_http_url];
 }
 
+- (void)setSubPanel
+{
+    intf_thread_t * p_intf = VLCIntf;
+    int i_index;
+    module_config_t * p_item;
+
+    [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
+    [o_file_sub_btn_settings setTitle: _NS("Settings...")];
+    [o_file_sub_btn_browse setTitle: _NS("Browse...")];
+    [o_file_sub_override setTitle: _NS("Override")];
+    [o_file_sub_delay_lbl setStringValue: _NS("delay")];
+    [o_file_sub_delay_stp setEnabled: NO];
+    [o_file_sub_fps_lbl setStringValue: _NS("fps")];
+    [o_file_sub_fps_stp setEnabled: NO];
+    [o_file_sub_encoding_lbl setStringValue: _NS("Subtitles text encoding")];
+    [o_file_sub_encoding_pop removeAllItems];
+    [o_file_sub_size_lbl setStringValue: _NS("Font size")];
+    [o_file_sub_size_pop removeAllItems];
+    [o_file_sub_align_lbl setStringValue: _NS("Subtitles justification")];
+    [o_file_sub_align_pop removeAllItems];
+    [o_file_sub_ok_btn setStringValue: _NS("OK")];
+
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-encoding" );
+
+    if( p_item )
+    {
+        for( i_index = 0; p_item->ppsz_list && p_item->ppsz_list[i_index];
+             i_index++ )
+        {
+            [o_file_sub_encoding_pop addItemWithTitle:
+                [NSString stringWithCString:
+                p_item->ppsz_list[i_index]]];
+        }
+        [o_file_sub_encoding_pop selectItemWithTitle:
+                [NSString stringWithCString:
+                p_item->psz_value]];
+    }
+
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-align" );
+
+    if ( p_item )
+    {
+        for ( i_index = 0; i_index < p_item->i_list; i_index++ )
+        {
+            [o_file_sub_align_pop addItemWithTitle:
+                [NSString stringWithUTF8String:
+                p_item->ppsz_list_text[i_index]]];
+        }
+        [o_file_sub_align_pop selectItemAtIndex: p_item->i_value];
+    }
+
+    p_item = config_FindConfig( VLC_OBJECT(p_intf), "freetype-rel-fontsize" );
+
+    if ( p_item )
+    {
+        for ( i_index = 0; i_index < p_item->i_list; i_index++ )
+        {
+            [o_file_sub_size_pop addItemWithTitle:
+                [NSString stringWithUTF8String:
+                p_item->ppsz_list_text[i_index]]];
+            if ( p_item->i_value == p_item->pi_list[i_index] )
+            {
+                [o_file_sub_size_pop selectItemAtIndex: i_index];
+            }
+        }
+    }
+}
+
 - (void)openTarget:(int)i_type
 {
     int i_result;
@@ -237,11 +299,30 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
         if( [o_file_sub_ckbox state] == NSOnState )
         {
+            intf_thread_t * p_intf = VLCIntf;
+            module_config_t * p_item;
+
             [o_options addObject: [NSString stringWithFormat: @"sub-file=%s", [[o_file_sub_path stringValue] fileSystemRepresentation]]];
             if( [o_file_sub_override state] == NSOnState )
             {
                 [o_options addObject: [NSString stringWithFormat: @"sub-delay=%i", (int)( [o_file_sub_delay intValue] * 10 )]];
                 [o_options addObject: [NSString stringWithFormat: @"sub-fps=%f", [o_file_sub_fps floatValue]]];
+            }
+            [o_options addObject: [NSString stringWithFormat:
+                    @"subsdec-encoding=%@",
+                    [o_file_sub_encoding_pop titleOfSelectedItem]]];
+            [o_options addObject: [NSString stringWithFormat:
+                    @"subsdec-align=%i",
+                    [o_file_sub_align_pop indexOfSelectedItem]]];
+
+            p_item = config_FindConfig( VLC_OBJECT(p_intf),
+                                            "freetype-rel-fontsize" );
+
+            if ( p_item )
+            {
+                [o_options addObject: [NSString stringWithFormat:
+                    @"freetype-rel-fontsize=%i",
+                    p_item->pi_list[[o_file_sub_size_pop indexOfSelectedItem]]]];
             }
         }
         if( [o_output_ckbox state] == NSOnState )

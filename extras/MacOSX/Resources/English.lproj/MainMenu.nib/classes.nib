@@ -293,12 +293,16 @@
                 "o_file_btn_browse" = id; 
                 "o_file_path" = id; 
                 "o_file_stream" = id; 
+                "o_file_sub_align_lbl" = id; 
+                "o_file_sub_align_pop" = id; 
                 "o_file_sub_btn_browse" = id; 
                 "o_file_sub_btn_settings" = id; 
                 "o_file_sub_ckbox" = id; 
                 "o_file_sub_delay" = id; 
                 "o_file_sub_delay_lbl" = id; 
                 "o_file_sub_delay_stp" = id; 
+                "o_file_sub_encoding_lbl" = id; 
+                "o_file_sub_encoding_pop" = id; 
                 "o_file_sub_fps" = id; 
                 "o_file_sub_fps_lbl" = id; 
                 "o_file_sub_fps_stp" = id; 
@@ -306,6 +310,8 @@
                 "o_file_sub_override" = id; 
                 "o_file_sub_path" = id; 
                 "o_file_sub_sheet" = id; 
+                "o_file_sub_size_lbl" = id; 
+                "o_file_sub_size_pop" = id; 
                 "o_mrl" = id; 
                 "o_mrl_lbl" = id; 
                 "o_net_http_url" = id; 
