@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.19 2004/01/19 18:15:29 fenrir Exp $
+ * $Id: es_out.c,v 1.20 2004/01/22 00:00:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -140,6 +140,38 @@ void input_EsOutDelete( es_out_t *out )
     free( p_sys );
     free( out );
 }
+/*****************************************************************************
+ * EsOutAddProgram:
+ *****************************************************************************/
+static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
+{
+    input_thread_t    *p_input = out->p_sys->p_input;
+    pgrm_descriptor_t *p_prgm;
+    es_descriptor_t   *p_pmt;
+
+    /* FIXME we should use a object variable but a lot of place in src/input
+     * have to be changed */
+    int               i_select = config_GetInt( p_input, "program" );
+
+    /* create it */
+    p_prgm = input_AddProgram( p_input, i_group, 0 );
+
+    /* XXX welcome to kludge, add a dummy es, if you want to understand
+     * why have a look at input_SetProgram. Basicaly, it assume the first
+     * es to be the PMT, how that is stupide, nevertheless it is needed for
+     * the old ts demuxer */
+    p_pmt = input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
+    p_pmt->i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
+
+    /* Select i_select or the first by default */
+    if( p_input->stream.p_selected_program == NULL &&
+        ( i_select <= 0 || i_select == i_group ) )
+    {
+        p_input->stream.p_selected_program = p_prgm;
+    }
+
+    return p_prgm;
+}
 
 /*****************************************************************************
  * EsOutSelect: Select an ES given the current mode
@@ -256,22 +288,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
         if( p_prgm == NULL )
         {
-            es_descriptor_t *p_pmt;
-            /* create it */
-            p_prgm = input_AddProgram( p_input, fmt->i_group, 0 );
-
-            /* XXX welcome to kludge, add a dummy es, if you want to understand
-             * why have a look at input_SetProgram. Basicaly, it assume the first
-             * es to be the PMT, how that is stupide, nevertheless it is needed for
-             * the old ts demuxer */
-            p_pmt = input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
-            p_pmt->i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
-
-            /* Select the first by default */
-            if( p_input->stream.p_selected_program == NULL )
-            {
-                p_input->stream.p_selected_program = p_prgm;
-            }
+            /* Create it */
+            p_prgm = EsOutAddProgram( out, fmt->i_group );
         }
     }
     if( fmt->i_id < 0 )
@@ -736,6 +754,11 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             {
                 int i_group = (int)va_arg( args, int );
                 p_prgm = input_FindProgram( p_sys->p_input, i_group );
+                if( p_prgm == NULL )
+                {
+                    /* we create the requested program */
+                    p_prgm = EsOutAddProgram( out, i_group );
+                }
             }
             i_pcr   = (int64_t)va_arg( args, int64_t );
 

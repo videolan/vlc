@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.6 2004/01/21 10:22:31 fenrir Exp $
+ * $Id: net.c,v 1.7 2004/01/22 00:00:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -291,7 +291,9 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
 
         if( ( i_send = send( fd, p_data, i_data, 0 ) ) < 0 )
         {
-            msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+            /* XXX With udp for example, it will issue a message if the host
+             * isn't listening */
+            /* msg_Err( p_this, "send failed (%s)", strerror(errno) ); */
             return i_total > 0 ? i_total : -1;
         }
 
