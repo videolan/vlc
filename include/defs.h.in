@@ -172,6 +172,9 @@
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH
 
+/* css decryption with player keys */
+#undef HAVE_CSSKEYS
+
 /* long getopt support */
 #undef HAVE_GETOPT_LONG
 

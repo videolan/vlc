@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.37 2001/08/09 20:16:17 jlj Exp $
+ * $Id: dvd_ifo.c,v 1.38 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -1047,7 +1047,8 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
     if( p_title->i_chapter_map_start_byte )
     {
         p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle,
-               OFF2LB( i_start + p_title->i_chapter_map_start_byte ) );
+               OFF2LB( i_start + p_title->i_chapter_map_start_byte ),
+               DVDCSS_NOFLAGS );
         
         p_title->chapter_map.pi_start_cell =
                     malloc( p_title->i_chapter_nb * sizeof(chapter_map_t) );
@@ -2098,7 +2099,7 @@ void CommandPrint( ifo_t ifo )
  *****************************************************************************/
 static u8* FillBuffer( ifo_t* p_ifo, u8* p_buf, int i_pos )
 {
-    p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle, i_pos );
+    p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle, i_pos, DVDCSS_NOFLAGS );
     dvdcss_read( p_ifo->dvdhandle, p_buf, 1, DVDCSS_NOFLAGS );
 
     return p_buf;

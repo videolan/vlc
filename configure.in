@@ -18,6 +18,9 @@ if test -r extras/libdvdcss/libdvdcss.c; then
   HAVE_LIBDVDCSS=1
   LIBDVDCSS_VERSION=0.0.3
   AC_SUBST(LIBDVDCSS_VERSION)
+  if test -r extras/libdvdcss/csskeys.h; then
+    AC_DEFINE(HAVE_CSSKEYS,1,css decryption with player keys)
+  fi
 fi
 
 dnl Save CFLAGS and LDFLAGS

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.117 2001/10/03 15:10:55 sam Exp $
+ * $Id: main.c,v 1.118 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -129,6 +129,7 @@
 #define OPT_YUV                 183
 #define OPT_DOWNMIX             184
 #define OPT_IMDCT               185
+#define OPT_DVDCSS              186
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -199,6 +200,7 @@ static const struct option longopts[] =
     {   "dvdaudio",         1,          0,      'a' },
     {   "dvdchannel",       1,          0,      'c' },
     {   "dvdsubtitle",      1,          0,      's' },
+    {   "dvdcss_method",    1,          0,      OPT_DVDCSS },
     
     /* Input options */
     {   "input",            1,          0,      OPT_INPUT },
@@ -738,16 +740,16 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* DVD options */
-        case 't':
+        case 't':                                              /* --dvdtitle */
             main_PutIntVariable( INPUT_TITLE_VAR, atoi(optarg) );
             break;
-        case 'T':
+        case 'T':                                            /* --dvdchapter */
             main_PutIntVariable( INPUT_CHAPTER_VAR, atoi(optarg) );
             break;
-        case 'u':
+        case 'u':                                              /* --dvdangle */
             main_PutIntVariable( INPUT_ANGLE_VAR, atoi(optarg) );
             break;
-        case 'a':
+        case 'a':                                              /* --dvdaudio */
             if ( ! strcmp(optarg, "ac3") )
                 main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_AC3 );
             else if ( ! strcmp(optarg, "lpcm") )
@@ -757,11 +759,14 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             else
                 main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_NOAUDIO );
             break;
-        case 'c':
+        case 'c':                                            /* --dvdchannel */
             main_PutIntVariable( INPUT_CHANNEL_VAR, atoi(optarg) );
             break;
-        case 's':
+        case 's':                                           /* --dvdsubtitle */
             main_PutIntVariable( INPUT_SUBTITLE_VAR, atoi(optarg) );
+            break;
+        case OPT_DVDCSS:                                         /* --dvdcss */
+                main_PutPszVariable( INPUT_DVDCSS_VAR, optarg );
             break;
 
         /* Input options */
@@ -888,6 +893,7 @@ static void Usage( int i_fashion )
           "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
           "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
           "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
+          "\n    , --dvdcss <method>          \tselect DVDCSS decryption method"
           "\n"
           "\n      --input                    \tinput method"
           "\n      --channels                 \tenable channels"
@@ -917,7 +923,7 @@ static void Usage( int i_fashion )
         "\n  " AOUT_SPDIF_VAR "={1|0}                 \tAC3 pass-through mode"
         "\n  " DOWNMIX_METHOD_VAR "=<method name>     \tAC3 downmix method"
         "\n  " IMDCT_METHOD_VAR "=<method name>       \tAC3 IMDCT method"
-        "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
+        "\n  " AOUT_RATE_VAR "=<rate>                 \toutput rate" );
 
     /* Video parameters */
     intf_MsgImm( "\nVideo parameters:"
@@ -938,22 +944,23 @@ static void Usage( int i_fashion )
 
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"
-        "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
-        "\n  " INPUT_TITLE_VAR "=<title>             \ttitle number"
-        "\n  " INPUT_CHAPTER_VAR "=<chapter>         \tchapter number"
-        "\n  " INPUT_ANGLE_VAR "=<angle>             \tangle number"
-        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
-        "\n  " INPUT_CHANNEL_VAR "=[0-15]            \taudio channel"
-        "\n  " INPUT_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
+        "\n  " INPUT_DVD_DEVICE_VAR "=<device>        \tDVD device"
+        "\n  " INPUT_TITLE_VAR "=<title>              \ttitle number"
+        "\n  " INPUT_CHAPTER_VAR "=<chapter>          \tchapter number"
+        "\n  " INPUT_ANGLE_VAR "=<angle>              \tangle number"
+        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off}  \taudio type"
+        "\n  " INPUT_CHANNEL_VAR "=[0-15]             \taudio channel"
+        "\n  " INPUT_SUBTITLE_VAR "=[0-31]            \tsubtitle channel"
+        "\n  " INPUT_DVDCSS_VAR "={csskey|disc|title} \tdvdcss method" );
 
     /* Input parameters */
     intf_MsgImm( "\nInput parameters:"
-        "\n  " INPUT_SERVER_VAR "=<hostname>         \tvideo server"
-        "\n  " INPUT_PORT_VAR "=<port>               \tvideo server port"
-        "\n  " INPUT_IFACE_VAR "=<interface>         \tnetwork interface"
-        "\n  " INPUT_BCAST_ADDR_VAR "=<addr>         \tbroadcast mode"
-        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname> \tchannel server"
-        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>       \tchannel server port" );
+        "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
+        "\n  " INPUT_PORT_VAR "=<port>                \tvideo server port"
+        "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
+        "\n  " INPUT_BCAST_ADDR_VAR "=<addr>          \tbroadcast mode"
+        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>  \tchannel server"
+        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>        \tchannel server port" );
 
 }
 

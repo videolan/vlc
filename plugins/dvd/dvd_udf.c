@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.13 2001/08/06 13:28:00 sam Exp $
+ * $Id: dvd_udf.c,v 1.14 2001/10/13 15:34:21 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -109,7 +109,7 @@ typedef struct ad_s
 static int UDFReadLB( dvdcss_handle dvdhandle, off_t i_lba,
                       size_t i_block_count, u8 *pi_data )
 {
-    if( dvdcss_seek( dvdhandle, i_lba ) < 0 )
+    if( dvdcss_seek( dvdhandle, i_lba, DVDCSS_NOFLAGS ) < 0 )
     {
         intf_ErrMsg( "UDF: Postion not found" );
         return 0;

@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.6 2001/08/08 02:48:44 sam Exp $
+ * $Id: ioctl.h,v 1.7 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,8 +22,8 @@
  *****************************************************************************/
 
 int ioctl_ReadCopyright     ( int, int, int * );
-int ioctl_ReadKey           ( int, int *, u8 * );
-
+int ioctl_ReadDiscKey       ( int, int *, u8 * );
+int ioctl_ReadTitleKey      ( int, int *, int, u8 * );
 int ioctl_ReportAgid        ( int, int * );
 int ioctl_ReportChallenge   ( int, int *, u8 * );
 int ioctl_ReportKey1        ( int, int *, u8 * );

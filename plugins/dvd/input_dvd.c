@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.87 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input_dvd.c,v 1.88 2001/10/13 15:34:21 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -199,7 +199,7 @@ static void DVDInit( input_thread_t * p_input )
 
     p_dvd->dvdhandle = (dvdcss_handle) p_input->i_handle;
 
-    dvdcss_seek( p_dvd->dvdhandle, 0 );
+    dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS );
 
     /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
      * DVD_DATA_READ_ONCE at most */
@@ -306,6 +306,8 @@ static void DVDInit( input_thread_t * p_input )
 static void DVDOpen( struct input_thread_s *p_input )
 {
     dvdcss_handle dvdhandle;
+    char *        psz_method;
+    int           i_method;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -320,14 +322,33 @@ static void DVDOpen( struct input_thread_s *p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* XXX: put this shit in an access plugin */
-    if( strlen( p_input->p_source ) > 4
-         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    psz_method = main_GetPszVariable( INPUT_DVDCSS_VAR,
+                                      INPUT_DVDCSS_DEFAULT );
+    if( !strncmp( psz_method, "key", 3 ) )
     {
-        dvdhandle = dvdcss_open( p_input->p_source + 4, DVDCSS_INIT_QUIET );
+        i_method = DVDCSS_KEY;
+    }
+    else if( !strncmp( psz_method, "disc", 4 ) )
+    {
+        i_method = DVDCSS_DISC;
     }
     else
     {
-        dvdhandle = dvdcss_open( p_input->p_source, DVDCSS_INIT_QUIET );
+        i_method = DVDCSS_TITLE;
+    }
+    
+    if( strlen( p_input->p_source ) > 4
+         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        dvdhandle = dvdcss_open( p_input->p_source + 4,
+                                 i_method,
+                                 DVDCSS_INIT_QUIET );
+    }
+    else
+    {
+        dvdhandle = dvdcss_open( p_input->p_source,
+                                 i_method,
+                                 DVDCSS_INIT_QUIET );
     }
 
     if( dvdhandle == NULL )
@@ -429,11 +450,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         intf_WarnMsgImm( 3, "dvd: title %d vts_title %d pgc %d",
                          p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
 
-        /*
-         * Tell libdvdcss we changed title
-         */
-        dvdcss_title( p_dvd->dvdhandle,
-                      vts.i_pos + vts.manager_inf.i_title_vob_start_sector );
 
         /*
          * Angle management
@@ -745,6 +761,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         }
     }
 
+    /*
+     * Force libdvdcss to check its title key.
+     * It is only useful for title cracking method. Methods using the decrypted
+     * disc key are fast enough to check the key at each seek
+     */
+    dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI );
+
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
     if( p_area->i_angle != p_dvd->i_angle )
@@ -809,6 +832,7 @@ static int DVDRead( input_thread_t * p_input,
     i_sector = p_dvd->i_title_start + p_dvd->i_sector;
     i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
 
+
     /* Get the position of the next cell if we're at cell end */
     if( i_block_once <= 0 )
     {
@@ -827,7 +851,8 @@ static int DVDRead( input_thread_t * p_input,
 
         /* Position the fd pointer on the right address */
         i_sector = dvdcss_seek( p_dvd->dvdhandle,
-                                p_dvd->i_title_start + p_dvd->i_sector );
+                                p_dvd->i_title_start + p_dvd->i_sector,
+                                DVDCSS_SEEK_MPEG );
 
         /* update chapter : it will be easier when we have navigation
          * ES support */
@@ -1079,8 +1104,9 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
     p_input->stream.p_selected_area->i_tell =
-        LB2OFF ( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_title_start
-                                                 + p_dvd->i_sector ) )
+        LB2OFF ( dvdcss_seek( p_dvd->dvdhandle,
+                              p_dvd->i_title_start + p_dvd->i_sector,
+                              DVDCSS_SEEK_MPEG ) )
          - p_input->stream.p_selected_area->i_start;
 
     intf_WarnMsg( 7, "Program Cell: %d Cell: %d Chapter: %d",
@@ -1211,7 +1237,9 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
     p_dvd->i_start = p_dvd->i_title_start + p_dvd->i_sector;
 
     /* Position the fd pointer on the right address */
-    p_dvd->i_start = dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start );
+    p_dvd->i_start = dvdcss_seek( p_dvd->dvdhandle,
+                                  p_dvd->i_start,
+                                  DVDCSS_SEEK_MPEG );
 
     p_dvd->i_chapter = i_chapter;
     return 0;

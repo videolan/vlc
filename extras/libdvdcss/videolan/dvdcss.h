@@ -2,7 +2,7 @@
  * libdvdcss.h: DVD reading library, exported functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvdcss.h,v 1.5 2001/07/27 14:43:30 sam Exp $
+ * $Id: dvdcss.h,v 1.6 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,18 +37,30 @@ typedef struct dvdcss_s* dvdcss_handle;
 
 #define DVDCSS_READ_DECRYPT    (1 << 0)
 
+#define DVDCSS_SEEK_INI        (1 << 0)
+#define DVDCSS_SEEK_MPEG       (2 << 0)
+
 #define DVDCSS_BLOCK_SIZE      2048
+
+/*****************************************************************************
+ * libdvdcss method: used like init flags
+ *****************************************************************************/
+#define DVDCSS_KEY        0
+#define DVDCSS_DISC       1
+#define DVDCSS_TITLE      2
 
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
 extern dvdcss_handle dvdcss_open  ( char *psz_target,
+                                    int i_method,
                                     int i_flags );
 extern int           dvdcss_close ( dvdcss_handle );
 extern int           dvdcss_title ( dvdcss_handle,
                                     int i_block );
 extern int           dvdcss_seek  ( dvdcss_handle,
-                                    int i_blocks );
+                                    int i_blocks,
+                                    int i_flags );
 extern int           dvdcss_read  ( dvdcss_handle,
                                     void *p_buffer,
                                     int i_blocks,

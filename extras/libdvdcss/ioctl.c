@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.12 2001/09/28 15:24:11 massiot Exp $
+ * $Id: ioctl.c,v 1.13 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,6 +29,8 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#include <stdio.h>
 
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
@@ -76,6 +78,7 @@
 #endif
 
 #include "ioctl.h"
+
 
 /*****************************************************************************
  * Local prototypes, BeOS specific
@@ -234,9 +237,9 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 }
 
 /*****************************************************************************
- * ioctl_ReadKey: get the disc key
+ * ioctl_ReadDiscKey: get the disc key
  *****************************************************************************/
-int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
+int ioctl_ReadDiscKey( int i_fd, int *pi_agid, u8 *p_key )
 {
     int i_ret;
 
@@ -316,7 +319,6 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
     dvd.grantID = *pi_agid;
     
     i_ret = ioctl( i_fd, DKIOCDVDREADSTRUCTURE, &dvd );
-
     memcpy( p_key, dvddki.discKeyStructures, 2048 );
 
 #elif defined( WIN32 )
@@ -367,6 +369,57 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 #endif
     return i_ret;
 }
+
+/*****************************************************************************
+ * ioctl_ReadTitleKey: get the title key
+ *****************************************************************************/
+int ioctl_ReadTitleKey( int i_fd, int *pi_agid, int i_pos, u8 *p_key )
+{
+    int i_ret;
+
+#if defined( HAVE_LINUX_DVD_STRUCT )
+    dvd_authinfo dvd_ai;
+
+    memset( &dvd_ai, 0, sizeof(dvd_ai) );
+    dvd_ai.type = DVD_LU_SEND_TITLE_KEY;
+    dvd_ai.lstk.agid = *pi_agid;
+    dvd_ai.lstk.lba = i_pos;
+
+    i_ret = ioctl( i_fd, DVD_AUTH, &dvd_ai );
+
+    if( i_ret < 0 )
+    {
+        return i_ret;
+    }
+
+    memcpy( p_key, dvd_ai.lstk.title_key, 5 );
+
+#elif defined( HAVE_BSD_DVD_STRUCT )
+    i_ret = -1;
+
+#elif defined( SYS_BEOS )
+    i_ret = -1;
+
+#elif defined( SOLARIS_USCSI )
+    i_ret = -1;
+
+#elif defined( SYS_DARWIN )
+    i_ret = 0;
+
+    memset( p_key, 0x00, KEY_SIZE );
+
+#elif defined( WIN32 )
+    i_ret = -1;
+
+#else
+
+    i_ret = -1;
+
+#endif
+
+    return i_ret;
+}
+
 
 /*****************************************************************************
  * ioctl_ReportAgid: get AGID from the drive
@@ -745,14 +798,12 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
     
     memset(&dvd, 0, sizeof(dvd));
     memset(&dvdk1i, 0, sizeof(dvdk1i));
-
     dvd.buffer = &dvdk1i;
     dvd.bufferLength = sizeof(dvdk1i);
     dvd.format = kDVDKeyFormatKey1;
     dvd.grantID = *pi_agid;
     
     i_ret = ioctl( i_fd, DKIOCDVDREPORTKEY, &dvd );
-
     memcpy( p_key, dvdk1i.key1Value, 5 );
 
 #elif defined( WIN32 )

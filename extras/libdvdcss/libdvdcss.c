@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.15 2001/09/09 13:43:25 sam Exp $
+ * $Id: libdvdcss.c,v 1.16 2001/10/13 15:34:21 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -80,7 +80,7 @@ static int _win32_dvdcss_aread  ( int i_fd, void *p_data, int i_blocks );
 /*****************************************************************************
  * dvdcss_open: initialize library, open a DVD device, crack CSS key
  *****************************************************************************/
-extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
+extern dvdcss_handle dvdcss_open ( char *psz_target, int i_method, int i_flags )
 {
     int i_ret;
 
@@ -102,6 +102,7 @@ extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
     dvdcss->p_titles = NULL;
     dvdcss->b_debug = i_flags & DVDCSS_INIT_DEBUG;
     dvdcss->b_errors = !(i_flags & DVDCSS_INIT_QUIET);
+    dvdcss->i_method = i_method;
     dvdcss->psz_error = "no error";
 
     i_ret = _dvdcss_open( dvdcss, psz_target );
@@ -128,7 +129,7 @@ extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
     /* If disc is CSS protected and the ioctls work, authenticate the drive */
     if( dvdcss->b_encrypted && dvdcss->b_ioctls )
     {
-        i_ret = CSSInit( dvdcss );
+        i_ret = CSSGetDiscKey( dvdcss );
 
         if( i_ret < 0 )
         {
@@ -152,26 +153,35 @@ extern char * dvdcss_error ( dvdcss_handle dvdcss )
 /*****************************************************************************
  * dvdcss_seek: seek into the device
  *****************************************************************************/
-extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
+extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks, int i_flags )
 {
+    /* title cracking method is too slow to be used at each seek */
+    if( ( ( i_flags & DVDCSS_SEEK_MPEG ) && ( dvdcss->i_method != DVDCSS_TITLE ) )
+       || ( i_flags & DVDCSS_SEEK_INI ) )
+    {
+        /* check the title key */
+        dvdcss_title( dvdcss, i_blocks );
+    }
+
     return _dvdcss_seek( dvdcss, i_blocks );
 }
 
 /*****************************************************************************
- * dvdcss_title: crack the current title key if needed
+ * dvdcss_title: crack or decrypt the current title key if needed
+ *****************************************************************************
+ * This function should only be called by dvdcss_seek and should eventually
+ * not be external if possible.
  *****************************************************************************/
 extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
 {
     dvd_title_t *p_title;
-    dvd_key_t p_key;
-    int i_ret;
+    dvd_title_t *p_newtitle;
+    int          i_ret;
 
     if( ! dvdcss->b_encrypted )
     {
         return 0;
     }
-
-    //fprintf( stderr, "looking for a key for offset %i\n", i_block );
 
     /* Check if we've already cracked this key */
     p_title = dvdcss->p_titles;
@@ -186,11 +196,12 @@ extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
          && p_title->i_startlb == i_block )
     {
         /* We've already cracked this key, nothing to do */
+        memcpy( dvdcss->css.p_title_key, p_title->p_key, sizeof(dvd_key_t) );
         return 0;
     }
 
-    /* Crack CSS title key for current VTS */
-    i_ret = CSSGetKey( dvdcss, i_block, p_key );
+    /* Crack or decrypt CSS title key for current VTS */
+    i_ret = CSSGetTitleKey( dvdcss, i_block );
 
     if( i_ret < 0 )
     {
@@ -203,49 +214,39 @@ extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
         return -1;
     }
 
-    //fprintf( stderr, "cracked key is %.2x %.2x %.2x %.2x %.2x\n",
-    //         p_key[0], p_key[1], p_key[2], p_key[3], p_key[4] );
-
-    /* Add key to keytable if it isn't empty */
-    /* We need to cache the fact that a title is unencrypted
-       if( p_key[0] | p_key[1] | p_key[2] | p_key[3] | p_key[4] ) */
+    /* Find our spot in the list */
+    p_newtitle = NULL;
+    p_title = dvdcss->p_titles;
+    while( ( p_title != NULL ) && ( p_title->i_startlb < i_block ) )
     {
-        dvd_title_t *p_newtitle;
+        p_newtitle = p_title;
+        p_title = p_title->p_next;
+    }
 
-        /* Find our spot in the list */
-        p_newtitle = NULL;
-        p_title = dvdcss->p_titles;
-        while( p_title != NULL
-                && p_title->i_startlb < i_block )
-        {
-            p_newtitle = p_title;
-            p_title = p_title->p_next;
-        }
+    /* Save the found title */
+    p_title = p_newtitle;
 
-        /* Save the found title */
-        p_title = p_newtitle;
+    /* Write in the new title and its key */
+    p_newtitle = malloc( sizeof( dvd_title_t ) );
+    p_newtitle->i_startlb = i_block;
+    memcpy( p_newtitle->p_key, dvdcss->css.p_title_key, KEY_SIZE );
 
-        /* Write in the new title and its key */
-        p_newtitle = malloc( sizeof( dvd_title_t ) );
-        p_newtitle->i_startlb = i_block;
-        memcpy( p_newtitle->p_key, p_key, KEY_SIZE );
-
-        /* Link the new title, either at the beginning or inside the list */
-        if( p_title == NULL )
-        {
-            dvdcss->p_titles = p_newtitle;
-            p_newtitle->p_next = NULL;
-        }
-        else
-        {
-            p_newtitle->p_next = p_title->p_next;
-            p_title->p_next = p_newtitle;
-        }
+    /* Link the new title, either at the beginning or inside the list */
+    if( p_title == NULL )
+    {
+        dvdcss->p_titles = p_newtitle;
+        p_newtitle->p_next = NULL;
+    }
+    else
+    {
+        p_newtitle->p_next = p_title->p_next;
+        p_title->p_next = p_newtitle;
     }
 
     return 0;
 }
 
+#define Pkey dvdcss->css.p_title_key
 /*****************************************************************************
  * dvdcss_read: read data from the device, decrypt if requested
  *****************************************************************************/
@@ -253,7 +254,6 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
                                                int i_blocks,
                                                int i_flags )
 {
-    dvd_title_t *p_title;
     int i_ret, i_index;
 
     i_ret = _dvdcss_read( dvdcss, p_buffer, i_blocks );
@@ -265,25 +265,9 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
         return i_ret;
     }
 
-    /* find our key */
-    p_title = dvdcss->p_titles;
-    while( p_title != NULL
-            && p_title->p_next
-            && p_title->p_next->i_startlb <= dvdcss->i_seekpos )
-    {
-        p_title = p_title->p_next;
-    }
-
-    if( p_title == NULL )
-    {
-        /* no css key found to use, so no decryption to do */
-        return 0;
-    }
-
     /* For what we believe is an unencrypted title, 
        check that there are no encrypted blocks */
-    if( !( p_title->p_key[0] | p_title->p_key[1] | p_title->p_key[2] |
-           p_title->p_key[3] | p_title->p_key[4] ) ) 
+    if( !( Pkey[0] | Pkey[1] | Pkey[2] | Pkey[3] | Pkey[4] ) ) 
     {
         for( i_index = i_ret; i_index; i_index-- )
         {
@@ -301,7 +285,7 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
     /* Decrypt the blocks we managed to read */
     for( i_index = i_ret; i_index; i_index-- )
     {
-        CSSDescrambleSector( p_title->p_key, p_buffer );
+        CSSDescrambleSector( dvdcss->css.p_title_key, p_buffer );
         ((u8*)p_buffer)[0x14] &= 0x8f;
         (u8*)p_buffer += DVDCSS_BLOCK_SIZE;
     }
@@ -310,14 +294,13 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
 }
 
 /*****************************************************************************
- * dvdcss_readv: read data to an iovec structure, decrypt if reaquested
+ * dvdcss_readv: read data to an iovec structure, decrypt if requested
  *****************************************************************************/
 extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
                                                 int i_blocks,
                                                 int i_flags )
 {
 #define P_IOVEC ((struct iovec*)p_iovec)
-    dvd_title_t *p_title;
     int i_ret, i_index;
     void *iov_base;
     size_t iov_len;
@@ -331,20 +314,6 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
         return i_ret;
     }
 
-    /* Find our key */
-    p_title = dvdcss->p_titles;
-    while( p_title != NULL
-            && p_title->p_next != NULL
-            && p_title->p_next->i_startlb <= dvdcss->i_seekpos )
-    {
-        p_title = p_title->p_next;
-    }
-
-    if( p_title == NULL )
-    {
-        /* no css key found to use, so no decryption to do */
-        return 0;
-    }
 
     /* Initialize loop for decryption */
     iov_base = P_IOVEC->iov_base;
@@ -366,7 +335,7 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
             iov_len = P_IOVEC->iov_len;
         }
 
-        CSSDescrambleSector( p_title->p_key, iov_base );
+        CSSDescrambleSector( dvdcss->css.p_title_key, iov_base );
         ((u8*)iov_base)[0x14] &= 0x8f;
 
         (u8*)iov_base += DVDCSS_BLOCK_SIZE;
@@ -376,6 +345,7 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
     return i_ret;
 #undef P_IOVEC
 }
+#undef Pkey
 
 /*****************************************************************************
  * dvdcss_close: close the DVD device and clean up the library
