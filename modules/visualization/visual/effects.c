@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.4 2003/09/02 22:06:51 sigmunau Exp $
+ * $Id: effects.c,v 1.5 2003/09/03 10:00:23 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -94,7 +94,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
     
     p_buffs = p_s16_buff;
-    i_nb_bands = config_GetInt ( p_aout, "visual-nb" );
+    i_nb_bands = config_GetInt ( p_aout, "visual-nbbands" );
     i_separ    = config_GetInt( p_aout, "visual-separ" );
     i_amp     = config_GetInt ( p_aout, "visual-amp" );
     i_peak     = config_GetInt ( p_aout, "visual-peaks" );
@@ -386,7 +386,7 @@ int random_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     if( p_effect->psz_args )
     {
         psz_parse = strdup( p_effect->psz_args );
-        i_nb_plots = config_GetInt ( p_aout, "visual-nb" );
+        i_nb_plots = config_GetInt ( p_aout, "visual-stars" );
     }
     else
     {

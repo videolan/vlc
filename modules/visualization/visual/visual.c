@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.3 2003/09/02 22:06:51 sigmunau Exp $
+ * $Id: visual.c,v 1.4 2003/09/03 10:00:23 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -42,9 +42,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  *****************************************************************************/
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
-      "A list of visual effect, separated by semi-commas." \
-      "Arguments may be passed to effects using syntax " \
-      " effect={arg=val,arg=val};effect={arg=val,arg=val},..." )
+      "A list of visual effect, separated by commas." )
 
 #define WIDTH_TEXT N_( "Video width" )
 #define HEIGHT_LONGTEXT N_( \
@@ -54,28 +52,47 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 #define WIDTH_LONGTEXT N_( \
       "The width of the effects video window, in pixels." )
 
-#define NB_TEXT N_( "Number of bands" )
-#define NB_LONGTEXT N_( \
+#define NBBANDS_TEXT N_( "Number of bands" )
+#define NBBANDS_LONGTEXT N_( \
       "Number of bands used by spectrum analizer, should be 20 or 80" )
-static char *effect_list[] = { "dummy", "random", "scope", "spectrum", NULL };
+
+#define SEPAR_TEXT N_( "Band separator" )
+#define SEPAR_LONGTEXT N_( \
+        "Number of blank pixels between bands")
+      
+#define AMP_TEXT N_( "Amplification" )
+#define AMP_LONGTEXT N_( \
+        "This is a coefficient that modifies the height of the bands")
+      
+#define PEAKS_TEXT N_( "Enable peaks" )
+#define PEAKS_LONGTEXT N_( \
+        "Defines whether to draw peaks" )
+
+#define STARS_TEXT N_( "Number of stars" )
+#define STARS_LONGTEXT N_( \
+        "Defines the number of stars to draw with random effect" )
+
+//static char *effect_list[] = { "dummy", "random", "scope", "spectrum", NULL };
 
 vlc_module_begin();
     add_category_hint( N_("visualizer") , NULL , VLC_FALSE);
     set_description( _("visualizer filter") ); 
-    add_string_from_list("effect-list", "dummy", effect_list, NULL,
+    add_string("effect-list", "dummy", NULL,
             ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
     add_integer("effect-width",VOUT_WIDTH,NULL,
              WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
     add_integer("effect-height" , VOUT_HEIGHT , NULL,
              HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
-    add_integer("visual-nb", 80, NULL,
-             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+    add_integer("visual-nbbands", 80, NULL,
+             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_FALSE );
     add_integer("visual-separ", 1, NULL,
-             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_FALSE );
     add_integer("visual-amp", 3, NULL,
-             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+             AMP_TEXT, AMP_LONGTEXT, VLC_FALSE );
     add_bool("visual-peaks", VLC_TRUE, NULL,
-             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_FALSE );
+    add_integer("visual-stars", 200, NULL,
+             STARS_TEXT, STARS_LONGTEXT, VLC_FALSE );
     set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");
@@ -139,7 +156,7 @@ static int Open( vlc_object_t *p_this )
     p_current_effect->p_next = NULL;
     while(1)
     {
-        psz_eof = strchr( psz_effects , ';'  );
+        psz_eof = strchr( psz_effects , ','  );
         if( !psz_eof )
         {
             b_end = VLC_TRUE;
