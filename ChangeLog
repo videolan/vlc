@@ -4,7 +4,67 @@
 
 HEAD
 
-  * Nothing yet.
+  * ./plugins/beos/InterfaceWindow.h: stopped more than one playlist being
+    opened.
+  * ./plugins/beos/InterfaceWindow.cpp: fixed segfault on exit with playlist
+    open.
+  * ./plugins/beos/vout_beos.cpp: corrected size of output window.
+  * ./plugins/a52/a52.c, ./plugins/satellite/satellite_tools.c: compilation
+    fixes for Solaris.
+  * ./plugins/sdl/aout_sdl.c: fixed an endianness issue created by a
+    brain-dead developer :p
+  * ./plugins/win32/mainframe.cpp: the "Eject" button is enabled only after we
+    played a dvd or vcd.
+  * ./plugins/win32/mainframe.cpp: the toolbar is now flat and less cubist.
+  * ./plugins/win32/mainframe.cpp: got rid of the ugly slider with some winXP
+    skins. 
+  * ./plugins/win32/messages.cpp: added a config option to limit the number of
+    messages in the log window (default is set to 500).
+  * ./plugins/mpeg_vdec/vpar_headers.c: don't try to deference a null
+    pointer.
+  * ./plugins/gtk/gnome.c: compilation fix.
+  * ./src/misc/netutils.c: removed the obsolete artificial delay when switching
+    channels.
+  * ./src/interface/intf_eject.c: added ejection code for Win32.
+  * ./plugins/win32/*: enabled the "Eject" button (thanks Ipkiss).
+  * ./include/configuration.h: changed ADD_BOOL and ADD_BOOL_WITH_SHORT config
+    macros to accept a default value as an argument.
+  * ./src/misc/configuration.c: modified the command line parsing to accept
+    --foo and --no-foo when a "foo" boolean config option is defined.
+  * ./src/interface/main.c: modified the help menu to indicate whether the
+    option is enabled or disabled by default.
+  * ./src/video_output/video_output.c: when the video output hasn't received
+    a new picture for a while, it redisplays the last displayed one. This will
+    be useful for DVD menus, but also solves the "picture becomes black when
+    vlc is paused" issue.
+  * ./plugins/dummy/dummy.c: added a CATEGORY_HINT to the config.
+  * ./plugins/x11/xcommon.c: small change to the ToggleFullscreen routine
+    to avoid a flickering during the switch.
+  * ./plugins/filters/*: fixed inconsistencies.
+  * ./plugins/win32/mainframe.dfm: new icons for the toolbar buttons.
+  * ./plugins/win32/network.cpp: URL can now start with "http://" in the
+    Network dialog box.
+  * ./plugins/win32/about.dfm: updated the About dialog box.
+  * ./include/video.h: added a b_force flag to picture_t so that we can force
+    the display of an image even if it is late.
+  * ./plugins/filter/*: filters are now configurable through the configuration
+    system. Patch from Sigmund Augdal <sigmunau@stud.ntnu.no>.
+  * ./po/vlc.pot: updated potfile.
+  * ./po/pl.po: polish translation, courtesy of Arkadiusz Lipiec
+    <A.Lipiec@elka.pw.edu.pl>.
+  * ./debian/control: updated Debian package descriptions.      
+  * ./plugins/aa/aa.c: removed all palette code as it was unused.
+  * ./plugins/aa/aa.c: moved the aa_fastrender call from vout_Display to
+    vout_Render.
+  * ./plugins/aa/aa.c: added support for resizing and right-click menu.
+  * ./src/input/mpeg_system.c: in order to make ac3 working in avi file, moved
+    some code from ac3 decoder to mpeg_system.c. (skip 3 bytes is now done in
+    mpeg_system.c and no longer in ac3 audio decoder).
+  * src/misc/netutils.c: tests if message from vlcs begins with 'E:' or 'I:'
+    instead of testing 'E: ' and 'I: ' (to simplify miniVLCS).
+  * ./plugins/avi/avi.c, ./plugins/avi/libioRIFF.c: added more safety tests.
+  * ./include/inpu_ext-dec.h: added a check to fifo->b_die after the call
+    to BitstreamNextDataPacket() in GetChunk().
 
 0.4.0
 Thu, 23 May 2002 01:27:05 +0200
