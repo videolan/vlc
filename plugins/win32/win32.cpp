@@ -2,9 +2,8 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: win32.cpp,v 1.1 2002/01/21 00:52:07 sam Exp $
  *
- * Authors: 
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr> 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,14 +26,14 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-extern "C"
-{
 #include <videolan/vlc.h>
+
+#include "win32.h"                                       /* Borland specific */
 
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( intf_getfunctions )( function_list_t * p_function_list );
+void _M( intf_getfunctions ) ( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -43,7 +42,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "Win32 interface" )
+    SET_DESCRIPTION( "Win32 interface module" )
     ADD_CAPABILITY( INTF, 100 )
     ADD_SHORTCUT( "win32" )
 MODULE_INIT_STOP
@@ -55,4 +54,3 @@ MODULE_ACTIVATE_STOP
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
-} /* extern "C" */

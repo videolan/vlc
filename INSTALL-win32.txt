@@ -11,14 +11,12 @@ to use the command line arguments. You can obtain a list of these command
 line arguments by typing 'vlc --help'.
 It is also sometimes useful to display vlc's debug console. You can do so
 by running 'vlc -v'.
-This feature is at the moment broken. To display vlc's debug messages,
-open the menu 'view', select 'messages'.
 To store a debug log of the current vlc session, you can use
 'vlc -vvv --stdout=debug.txt'.
 
 If you want to play a DVD, run vlc and click on the Disc option in the
 interface. You then have to type your drive letter in the 'Device name'
-box including the final '\' (eg. 'D:\' if your dvdrom drive is assigned the letter 'D').
+box (eg. 'D:' if your dvdrom drive is assigned the letter 'D').
 ( !Warning: you have to be in administrator mode (for now) on Win2k )
 
 
@@ -60,8 +58,7 @@ See `./configure --help' for more information.
 For example if you are cross-compiling from Debian, you can use something
 along those lines:
 
- make distclean ; CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
-   RANLIB=i586-mingw32msvc-ranlib WINDRES=i586-mingw32msvc-windres \
+ make distclean ; CC=i586-mingw32msvc-gcc \
    ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
     --build=i386-linux --with-gtk-config-path=/usr/i586-mingw32msvc/bin \
     --with-sdl-config-path=/usr/i586-mingw32msvc/bin
@@ -94,6 +91,32 @@ If you are using the tools from http://www.libsdl.org/Xmingw32/ you can type som
 
  PATH=/usr/local/cross-tools/bin:/usr/local/cross-tools/i386-mingw32msvc/bin:$PATH \
    make
+
+Building Win32 interface with bcc32 (Borland's compiler)
+========================================================
+
+[Steps 2 and 3 are temporary]
+
+1) Compile vlc as usual.
+include\defs.h should be generated.
+
+2) Edit include\defs.h, and add the following lines if necessary:
+#define WIN32
+#define MODULE_NAME win32
+#define MODULE_NAME_IS win32
+#define PLUGIN
+#define HAVE_DYNAMIC_PLUGINS
+
+3) Still in defs.h, comment the following line to avoid compilation warnings:
+#define PACKAGE "vlc"
+
+4) From the plugin\win32 directory, use Borland C++ command-line tools
+as follows:
+bpr2mak intfwin.bpr 	// Create a makefile from intfwin.bpr
+make -fintfwin 		// It's Borland's make utility !
+
+5) This should create a intfwin.so
+You can remove any other generated file.
 
 
 Well done, now you're ready to use vlc!
