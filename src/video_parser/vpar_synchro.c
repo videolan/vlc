@@ -380,9 +380,9 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
     mtime_t i_displaydate = p_vpar->synchro.i_last_display_pts;
     
-#if 0
-    static mtime_t i_delta = 0;
 
+    static mtime_t i_delta = 0;
+#if 0
     fprintf( stderr,
         "displaying type %i with delay %lli and delta %lli\n",
         p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type,

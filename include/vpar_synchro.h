@@ -88,7 +88,7 @@ typedef struct video_synchro_s
 } video_synchro_t;
 
 #define SYNC_TOLERATE   10000 /* 10 ms */
-#define SYNC_DELAY      100000
+#define SYNC_DELAY      500000
 #endif
 
 /*****************************************************************************

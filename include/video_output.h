@@ -17,16 +17,13 @@
  *      p_pic                           picture address 
  *      p_y, p_u, p_v                   Y,U,V samples addresses
  *      i_width, i_height               Y samples extension
- *      i_skip                          Y pixels to skip at the end of a line
  *      i_pic_width, i_pic_height       picture extension
- *      i_pic_skip                      pixels to skip at the end of a line
+ *      i_pic_line_width                picture total line width
  *      i_matrix_coefficients           matrix coefficients
- * Conditions:
- *      i_width % 16 == 0
  *******************************************************************************/
 typedef void (vout_yuv_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                    yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                   int i_width, int i_height, int i_skip,
+                                   int i_width, int i_height,
                                    int i_pic_width, int i_pic_height, int i_pic_skip,
                                    int i_matrix_coefficients );
 

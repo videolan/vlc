@@ -264,7 +264,110 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type, 
                                      int i_size )
 {
-    //??
+    int                 i_subpic;                          /* subpicture index */
+    subpicture_t *      p_free_subpic = NULL;         /* first free subpicture */    
+    subpicture_t *      p_destroyed_subpic = NULL;   /* first destroyed subpic */
+
+    /* Get lock */
+    vlc_mutex_lock( &p_vout->subpicture_lock );
+
+    /* 
+     * Look for an empty place 
+     */
+    for( i_subpic = 0; i_subpic < VOUT_MAX_PICTURES; i_subpic++ )
+    {
+	if( p_vout->p_subpicture[i_subpic].i_status == DESTROYED_SUBPICTURE )
+	{
+	    /* Subpicture is marked for destruction, but is still allocated */
+	    if( (p_vout->p_subpicture[i_subpic].i_type  == i_type)   &&
+		(p_vout->p_subpicture[i_subpic].i_size  >= i_size) )
+	    {
+		/* Memory size do match or is smaller : memory will not be reallocated, 
+                 * and function can end immediately - this is the best possible case, 
+                 * since no memory allocation needs to be done */
+		p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
+#ifdef DEBUG_VIDEO
+                intf_DbgMsg("subpicture %p (in destroyed subpicture slot)\n", 
+                            &p_vout->p_subpicture[i_subpic] );                
+#endif
+		vlc_mutex_unlock( &p_vout->subpicture_lock );
+		return( &p_vout->p_subpicture[i_subpic] );
+	    }
+	    else if( p_destroyed_subpic == NULL )
+	    {
+		/* Memory size do not match, but subpicture index will be kept in
+		 * case no other place are left */
+		p_destroyed_subpic = &p_vout->p_subpicture[i_subpic];                
+	    }	    
+	}
+        else if( (p_free_subpic == NULL) && 
+                 (p_vout->p_subpicture[i_subpic].i_status == FREE_SUBPICTURE ))
+        {
+	    /* Subpicture is empty and ready for allocation */
+            p_free_subpic = &p_vout->p_subpicture[i_subpic];
+        }
+    }
+
+    /* If no free subpicture is available, use a destroyed subpicture */
+    if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
+    { 
+	/* No free subpicture or matching destroyed subpicture has been found, but
+	 * a destroyed subpicture is still avalaible */
+        free( p_destroyed_subpic->p_data );        
+        p_free_subpic = p_destroyed_subpic;
+    }
+
+    /*
+     * Prepare subpicture
+     */
+    if( p_free_subpic != NULL )
+    {
+        /* Allocate memory */
+        switch( i_type )
+        {
+        case TEXT_SUBPICTURE:                               /* text subpicture */
+            p_free_subpic->p_data = malloc( i_size + 1 );             
+            break;
+#ifdef DEBUG
+        default:
+            intf_DbgMsg("error: unknown subpicture type %d\n", i_type );
+            p_free_subpic->p_data   =  NULL;            
+            break;            
+#endif    
+        }
+
+        if( p_free_subpic->p_data != NULL )
+        {                    /* Copy subpicture informations, set some default values */
+            p_free_subpic->i_type                      = i_type;
+            p_free_subpic->i_status                    = RESERVED_SUBPICTURE;
+            p_free_subpic->i_size                      = i_size;            
+            p_free_subpic->i_x                         = 0;
+            p_free_subpic->i_y                         = 0;             
+            p_free_subpic->i_width                     = 0;
+            p_free_subpic->i_height                    = 0;
+            p_free_subpic->i_horizontal_align          = CENTER_RALIGN;             
+            p_free_subpic->i_vertical_align            = CENTER_RALIGN;             
+        }
+        else
+        {
+            /* Memory allocation failed : set subpicture as empty */
+            p_free_subpic->i_type   =  EMPTY_SUBPICTURE;            
+            p_free_subpic->i_status =  FREE_SUBPICTURE;            
+            p_free_subpic =            NULL;            
+            intf_ErrMsg("warning: %s\n", strerror( ENOMEM ) );            
+        }
+        
+#ifdef DEBUG_VIDEO
+        intf_DbgMsg("subpicture %p (in free subpicture slot)\n", p_free_subpic );        
+#endif
+        vlc_mutex_unlock( &p_vout->subpicture_lock );
+        return( p_free_subpic );
+    }
+    
+    /* No free or destroyed subpicture could be found */
+    intf_DbgMsg( "warning: heap is full\n" );
+    vlc_mutex_unlock( &p_vout->subpicture_lock );
+    return( NULL );
 }
 
 /******************************************************************************
@@ -380,9 +483,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     /* 
      * Look for an empty place 
      */
-    for( i_picture = 0; 
-         i_picture < VOUT_MAX_PICTURES; 
-         i_picture++ )
+    for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
     {
 	if( p_vout->p_picture[i_picture].i_status == DESTROYED_PICTURE )
 	{
@@ -497,7 +598,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         return( p_free_picture );
     }
     
-    // No free or destroyed picture could be found
+    /* No free or destroyed picture could be found */
     intf_DbgMsg( "warning: heap is full\n" );
     vlc_mutex_unlock( &p_vout->picture_lock );
     return( NULL );
@@ -1167,7 +1268,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Try horizontal scaling first */
         i_pic_width = ( p_vout->b_scale || (p_pic->i_width > i_vout_width)) ? 
             i_vout_width : p_pic->i_width;
-        i_pic_width = i_pic_width / 16 * 16; //?? currently, width must be multiple of 16        
+        i_pic_width = i_pic_width;
         switch( p_pic->i_aspect_ratio )
         {
         case AR_3_4_PICTURE:
@@ -1207,7 +1308,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 i_pic_width = p_pic->i_width * i_pic_height / p_pic->i_height;
                 break;
             }        
-            i_pic_width = i_pic_width / 16 * 16; //?? currently, width must be multiple of 16        
+            i_pic_width = i_pic_width;
         }        
 
         /* Set picture position */
@@ -1311,25 +1412,25 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case YUV_420_PICTURE:
         p_vout->yuv.p_Convert420( p_vout, p_pic_data, 
                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_pic->i_width, p_pic->i_height,
                                   p_buffer->i_pic_width, p_buffer->i_pic_height, 
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
                                   p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
         p_vout->yuv.p_Convert422( p_vout, p_pic_data, 
                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_pic->i_width, p_pic->i_height,
                                   p_buffer->i_pic_width, p_buffer->i_pic_height, 
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
                                   p_pic->i_matrix_coefficients );
         break;        
     case YUV_444_PICTURE:
         p_vout->yuv.p_Convert444( p_vout, p_pic_data, 
                                   p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_pic->i_width, p_pic->i_height,
                                   p_buffer->i_pic_width, p_buffer->i_pic_height, 
-                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel,
                                   p_pic->i_matrix_coefficients );
         break;        
 #ifdef DEBUG
@@ -1481,7 +1582,40 @@ static void RenderInfo( vout_thread_t *p_vout )
  *******************************************************************************/
 static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
-    //??
+    p_vout_font_t       p_font;                                   /* text font */    
+    int                 i_width, i_height;            /* subpicture dimensions */    
+    
+    switch( p_subpic->i_type )
+    {
+    case TEXT_SUBPICTURE:                                  /* single line text */
+        /* Select default font if not specified */
+        p_font = p_subpic->type.text.p_font;
+        if( p_font == NULL )
+        {
+            p_font = p_vout->p_default_font;            
+        }
+
+        /* Computes text size (width and height fields are ignored) and print it */
+        vout_TextSize( p_font, p_subpic->type.text.i_style, p_subpic->p_data, &i_width, &i_height );        
+        if( !Align( p_vout, &p_subpic->i_x, &p_subpic->i_y, i_width, i_height,
+                    p_subpic->i_horizontal_align, p_subpic->i_vertical_align ) )
+        {
+            vout_Print( p_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                        p_subpic->i_x * p_vout->i_bytes_per_pixel +
+                        p_subpic->i_y * p_vout->i_bytes_per_line, 
+                        p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                        p_subpic->type.text.i_char_color, p_subpic->type.text.i_border_color,
+                        p_subpic->type.text.i_bg_color, p_subpic->type.text.i_style,
+                        p_subpic->p_data );            
+            SetBufferArea( p_vout, p_subpic->i_x, p_subpic->i_y, i_width, i_height );            
+        }        
+        break;        
+        
+#ifdef DEBUG
+    default:
+        intf_DbgMsg("error: unknown subpicture %p type %d\n", p_subpic, p_subpic->i_type );        
+#endif
+    }
 }
 
 /*******************************************************************************

@@ -97,15 +97,17 @@ typedef struct picture_s
 typedef struct subpicture_s
 {
     /* Type and flags - should NOT be modified except by the vout thread */
-    int             i_type;                                        /* spu type */
-    int             i_status;                                     /* spu flags */
-
+    int             i_type;                                            /* type */
+    int             i_status;                                         /* flags */
+    int             i_size;                                       /* data size */
+    
     /* Other properties */
     mtime_t         begin_date;                   /* beginning of display date */
     mtime_t         end_date;                           /* end of display date */
 
     /* Display properties - these properties are only indicative and may be
-     * changed by the video output thread */
+     * changed by the video output thread, or simply ignored depending of the
+     * subpicture type. */
     int             i_x;                     /* offset from alignment position */
     int             i_y;                     /* offset from alignment position */
     int             i_width;                                  /* picture width */
@@ -113,15 +115,30 @@ typedef struct subpicture_s
     int             i_horizontal_align;                /* horizontal alignment */
     int             i_vertical_align;                    /* vertical alignment */
 
-    /* Sub picture unit data - data can always be freely modified. p_data itself 
-     * (the pointer) should NEVER be modified. */
-    void *          p_data;                                        /* spu data */    
+    /* Additionnal properties depending of the subpicture type */
+    union 
+    {
+        /* Text subpictures properties - text is stored in data area, in ASCIIZ
+         * format */
+        struct          
+        {
+            p_vout_font_t       p_font;              /* font, NULL for default */    
+            int                 i_style;                         /* text style */
+            u32                 i_char_color;               /* character color */
+            u32                 i_border_color;                /* border color */
+            u32                 i_bg_color;                /* background color */
+        } text;                
+    } type;        
+
+    /* Subpicture data, format depends of type - data can always be freely 
+     * modified. p_data itself (the pointer) should NEVER be modified. */
+    void *          p_data;                                 /* subpicture data */    
 } subpicture_t;
 
 /* Subpicture type */
 #define EMPTY_SUBPICTURE        0      /* subtitle slot is empty and available */
 #define RLE_SUBPICTURE          100                    /* RLE encoded subtitle */
-#define TEXT_SUBPICTURE         200                 /* iso8859-1 text subtitle */
+#define TEXT_SUBPICTURE         200                        /* single line text */
 
 /* Subpicture status */
 #define FREE_SUBPICTURE         0      /* subpicture is free and not allocated */
