@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.49 2003/06/15 01:23:31 massiot Exp $
+$Id: NEWS,v 1.50 2003/06/15 22:32:06 hartman Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -41,7 +41,7 @@ Miscellaneous:
  * You can set your language in the prefences
  * New video chroma conversion module using ffmpeg
  * Added a Gentoo ebuild file to the distribution
- * Added a new smaller subtitles font + scripts to generate your own
+ * Added a new smaller subtitles font (now the default) + scripts to generate your own
 
 UNIX ports:
  * Basic support for the X11 Xinerama extension.
@@ -51,7 +51,7 @@ Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
  * New about panel and revamped preferences panel.
  * Fixed the deinterlace menu.
- * Float on top and a Transparency option for video out.
+ * Float on top, Fit to Screen and a Transparency option for video out.
  * New output dialog for transcode and display while stream capabilities.
  * New icons by Davor Orel.
  * New audio resampler. Should make VLC much faster.

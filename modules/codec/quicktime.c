@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.6 2003/05/26 14:59:37 hartman Exp $
+ * $Id: quicktime.c,v 1.7 2003/06/15 22:32:06 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -289,9 +289,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('f','l','6','4'): /* 64-bit Floating Point */
         case VLC_FOURCC('i','n','2','4'): /* 24-bit Interger */
         case VLC_FOURCC('i','n','3','2'): /* 32-bit Integer */
-	case 0x31:				/* MS GSM */
-	case 0x32:				/* MSN Audio */
-	case 0x0011:				/* DVI IMA */
+        case 0x0011:				/* DVI IMA */
 	case 0x6D730002:			/* Microsoft ADPCM-ACM */
 	case 0x6D730011:			/* DVI Intel IMAADPCM-ACM */
 
@@ -455,7 +453,7 @@ static int InitThreadAudio( adec_thread_t *p_dec )
                                          &p_dec->myConverter );
     if( i_error )
     {
-        msg_Dbg( p_dec->p_fifo, "error while SoundConverterOpen = %d", i_error );
+        msg_Err( p_dec->p_fifo, "error while SoundConverterOpen = %d", i_error );
         goto exit_error;
     }
 

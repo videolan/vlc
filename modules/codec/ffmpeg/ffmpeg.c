@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.42 2003/06/14 15:43:39 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.43 2003/06/15 22:32:06 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -627,8 +627,8 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Audio 2";
             break;
 
-#if( ( LIBAVCODEC_BUILD >= 4663 ) && ( defined( WORDS_BIGENDIAN ) ) )
-        /* Quality of this decoder on ppc is not gooed */
+#if( ( LIBAVCODEC_BUILD >= 4663 ) && ( !defined( WORDS_BIGENDIAN ) ) )
+        /* Quality of this decoder on ppc is not good */
 	case FOURCC_IV31:
         case FOURCC_iv31:
         case FOURCC_IV32:
@@ -653,7 +653,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_cat    = VIDEO_ES;
             i_codec  = CODEC_ID_ASV1;
             psz_name = "Asus V1";
-            break;*/
+            break; */
 #endif
 
         default:
