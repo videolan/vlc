@@ -59,22 +59,36 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 
+typedef struct media_es_t media_es_t;
+
+typedef struct
+{
+    media_es_t *p_media_es;
+    char *psz_ip;
+    int i_port;
+
+} rtsp_client_es_t;
+
 typedef struct
 {
     char *psz_session;
     int64_t i_last; /* for timeout */
 
     vlc_bool_t b_playing; /* is it in "play" state */
+    vlc_bool_t b_paused; /* is it in "pause" state */
+
+    int i_es;
+    rtsp_client_es_t **es;
 
 } rtsp_client_t;
 
-typedef struct
+struct media_es_t
 {
     /* VoD server */
     vod_t *p_vod;
 
     /* RTSP server */
-    httpd_url_t  *p_rtsp_url;
+    httpd_url_t *p_rtsp_url;
 
     vod_media_t *p_media;
 
@@ -84,7 +98,7 @@ typedef struct
     char        *psz_rtpmap;
     char        *psz_fmtp;
 
-} media_es_t;
+};
 
 struct vod_media_t
 {
@@ -105,6 +119,8 @@ struct vod_media_t
 
     int64_t i_sdp_id;
     int     i_sdp_version;
+
+    vlc_bool_t b_multicast;
 
     vlc_mutex_t lock;
 
@@ -430,11 +446,18 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 
     httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_SETUP,
                     RtspCallbackES, (void*)p_es );
+    httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_TEARDOWN,
+                    RtspCallbackES, (void*)p_es );
+    httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_PLAY,
+                    RtspCallbackES, (void*)p_es );
+    httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_PAUSE,
+                    RtspCallbackES, (void*)p_es );
 
     es_format_Copy( &p_es->fmt, p_fmt );
     p_es->p_vod = p_vod;
     p_es->p_media = p_media;
 
+#if 0
     /* Choose the port */
     if( p_fmt->i_cat == AUDIO_ES && p_media->i_port_audio > 0 )
     {
@@ -457,6 +480,10 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
         }
         p_media->i_port += 2;
     }
+#else
+
+    p_es->i_port = 0;
+#endif
 
     vlc_mutex_lock( &p_media->lock );
     TAB_APPEND( p_media->i_es, p_media->es, p_es );
@@ -504,11 +531,10 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
 static rtsp_client_t *RtspClientNew( vod_media_t *p_media, char *psz_session )
 {
     rtsp_client_t *p_rtsp = malloc( sizeof(rtsp_client_t) );
+    memset( p_rtsp, 0, sizeof(rtsp_client_t) );
+    p_rtsp->es = 0;
 
     p_rtsp->psz_session = psz_session;
-    p_rtsp->i_last = 0;
-    p_rtsp->b_playing = VLC_FALSE;
-
     TAB_APPEND( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
     msg_Dbg( p_media->p_vod, "new session: %s", psz_session );
@@ -533,7 +559,16 @@ static rtsp_client_t *RtspClientGet( vod_media_t *p_media, char *psz_session )
 
 static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 {
+    int i;
+
     msg_Dbg( p_media->p_vod, "closing session: %s", p_rtsp->psz_session );
+
+    while( p_rtsp->i_es-- )
+    {
+        rtsp_client_es_t *p_es = p_rtsp->es[p_rtsp->i_es];
+        TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_es );
+        if( p_es[i].psz_ip ) free( p_es[i].psz_ip );
+    }
 
     TAB_REMOVE( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
@@ -548,6 +583,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     vod_t *p_vod = p_media->p_vod;
     char *psz_destination = p_media->psz_destination;
     char *psz_session = NULL;
+    rtsp_client_t *p_rtsp;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
@@ -576,7 +612,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_PLAY:
         {
-            rtsp_client_t *rtsp;
             char *psz_output, *ip;
             int i, i_port_audio = 0, i_port_video = 0;
 
@@ -589,19 +624,29 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
-            rtsp = RtspClientGet( p_media, psz_session );
-            if( !rtsp || rtsp->b_playing ) break;
+            p_rtsp = RtspClientGet( p_media, psz_session );
+            if( !p_rtsp ) break;
+
+            if( p_rtsp->b_playing && p_rtsp->b_paused )
+            {
+                vod_MediaControl( p_vod, p_media, psz_session,
+                                  VOD_MEDIA_PAUSE );
+                p_rtsp->b_paused = VLC_FALSE;
+                break;
+            }
+            else if( p_rtsp->b_playing ) break;
+
             if( !(ip = httpd_ClientIP( cl )) ) break;
 
-            rtsp->b_playing = VLC_TRUE;
+            p_rtsp->b_playing = VLC_TRUE;
 
             /* FIXME for != 1 video and 1 audio */
-            for( i = 0; i < p_media->i_es; i++ )
+            for( i = 0; i < p_rtsp->i_es; i++ )
             {
-                if( p_media->es[i]->fmt.i_cat == AUDIO_ES )
-                    i_port_audio = p_media->es[i]->i_port;
-                if( p_media->es[i]->fmt.i_cat == VIDEO_ES )
-                    i_port_video = p_media->es[i]->i_port;
+                if( p_rtsp->es[i]->p_media_es->fmt.i_cat == AUDIO_ES )
+                    i_port_audio = p_rtsp->es[i]->i_port;
+                if( p_rtsp->es[i]->p_media_es->fmt.i_cat == VIDEO_ES )
+                    i_port_video = p_rtsp->es[i]->i_port;
             }
 
             asprintf( &psz_output, "rtp{dst=%s,port-video=%i,port-audio=%i}",
@@ -617,14 +662,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PAUSE for session: %s", psz_session );
 
+            p_rtsp = RtspClientGet( p_media, psz_session );
+            if( !p_rtsp ) break;
+
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PAUSE );
-            /* TODO: do something useful */
+            p_rtsp->b_paused = VLC_TRUE;
             return VLC_EGENERIC;
 
         case HTTPD_MSG_TEARDOWN:
-        {
-            rtsp_client_t *rtsp;
-
             /* for now only multicast so easy again */
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -634,13 +679,12 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_TEARDOWN for session: %s", psz_session);
 
-            rtsp = RtspClientGet( p_media, psz_session );
-            if( !rtsp ) break;
+            p_rtsp = RtspClientGet( p_media, psz_session );
+            if( !p_rtsp ) break;
 
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_STOP );
-            RtspClientDel( p_media, rtsp );
+            RtspClientDel( p_media, p_rtsp );
             break;
-        }
 
         default:
             return VLC_EGENERIC;
@@ -668,6 +712,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     vod_t *p_vod = p_media->p_vod;
     char *psz_session = NULL;
     char *psz_transport = NULL;
+    int i;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
@@ -705,7 +750,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         else if( strstr( psz_transport, "unicast" ) &&
                  strstr( psz_transport, "client_port=" ) )
         {
-            rtsp_client_t *rtsp = NULL;
+            rtsp_client_t *p_rtsp;
+            rtsp_client_es_t *p_rtsp_es;
             char *ip = httpd_ClientIP( cl );
             int i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                strlen("client_port=") );
@@ -726,12 +772,12 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( !psz_session || !*psz_session )
             {
                 asprintf( &psz_session, "%d", rand() );
-                rtsp = RtspClientNew( p_media, psz_session );
+                p_rtsp = RtspClientNew( p_media, psz_session );
             }
             else
             {
-                rtsp = RtspClientGet( p_media, psz_session );
-                if( !rtsp )
+                p_rtsp = RtspClientGet( p_media, psz_session );
+                if( !p_rtsp )
                 {
                     /* FIXME right error code */
                     answer->i_status = 400;
@@ -743,7 +789,11 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
             }
 
-            /* TODO: do something useful */
+            p_rtsp_es = malloc( sizeof(rtsp_client_es_t) );
+            p_rtsp_es->i_port = i_port;
+            p_rtsp_es->psz_ip = strdup( ip );
+            p_rtsp_es->p_media_es = p_es;
+            TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
 
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -761,6 +811,48 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             answer->p_body = NULL;
         }
         break;
+
+        case HTTPD_MSG_TEARDOWN:
+        {
+            rtsp_client_t *p_rtsp;
+
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
+
+            psz_session = httpd_MsgGet( query, "Session" );
+            msg_Dbg( p_vod, "HTTPD_MSG_TEARDOWN for session: %s", psz_session);
+
+            p_rtsp = RtspClientGet( p_media, psz_session );
+            if( !p_rtsp ) break;
+
+            for( i = 0; i < p_rtsp->i_es; i++ )
+            {
+                if( p_rtsp->es[i]->p_media_es == p_es )
+                {
+                    if( p_rtsp->es[i]->psz_ip ) free( p_rtsp->es[i]->psz_ip );
+                    TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_rtsp->es[i] );
+                    break;
+                }
+            }
+
+            if( !p_rtsp->i_es )
+            {
+                vod_MediaControl( p_vod, p_media, psz_session,
+                                  VOD_MEDIA_STOP );
+                RtspClientDel( p_media, p_rtsp );
+            }
+            break;
+        }
+
+        case HTTPD_MSG_PLAY:
+        case HTTPD_MSG_PAUSE:
+            answer->i_status = 460;
+            answer->psz_status = strdup( "Only Aggregate Operation Allowed" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
+            break;
 
         default:
             return VLC_EGENERIC;
@@ -787,10 +879,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
  *****************************************************************************/
 static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
 {
-#if 0
-    return strdup( "" );
-
-#else
     int i, i_size;
     char *p, *psz_sdp;
 
@@ -881,5 +969,4 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
 
     fprintf( stderr, psz_sdp );
     return psz_sdp;
-#endif
 }
