@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.60 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: interface.cpp,v 1.61 2003/10/06 16:23:30 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -125,6 +125,7 @@ enum
     FileInfo_Event,
 
     Prefs_Event,
+    Extra_Event,
 
     SliderScroll_Event,
     StopStream_Event,
@@ -134,6 +135,13 @@ enum
     SlowStream_Event,
     FastStream_Event,
 
+    Adjust_Event,
+    Hue_Event,
+    Contrast_Event,
+    Brightness_Event,
+    Saturation_Event,
+
+    Ratio_Event,
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
@@ -151,6 +159,11 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Prefs_Event, Interface::OnShowDialog)
 
     EVT_MENU_OPEN(Interface::OnMenuOpen)
+
+    EVT_MENU( Extra_Event, Interface::OnExtra)
+    EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
+
+    EVT_COMBOBOX( Ratio_Event, Interface::OnRatio)
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
     EVT_CONTEXT_MENU(Interface::OnContextMenu2)
@@ -173,6 +186,11 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
 
+    EVT_COMMAND_SCROLL(Hue_Event, Interface::OnHueUpdate)
+    EVT_COMMAND_SCROLL(Contrast_Event, Interface::OnContrastUpdate)
+    EVT_COMMAND_SCROLL(Brightness_Event, Interface::OnBrightnessUpdate)
+    EVT_COMMAND_SCROLL(Saturation_Event, Interface::OnSaturationUpdate)
+
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -185,12 +203,14 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Initializations */
     p_intf = _p_intf;
     i_old_playing_status = PAUSE_S;
+    b_extra = VLC_FALSE;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
 
     /* Create a sizer for the main frame */
-    frame_sizer = new wxBoxSizer( wxHORIZONTAL );
+    //frame_sizer= new wxFlexGridSizer( 1, 0, 0);
+    frame_sizer = new wxBoxSizer( wxVERTICAL );
     SetSizer( frame_sizer );
 
     /* Create a dummy widget that can get the keyboard focus */
@@ -198,7 +218,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
                                       wxSize(0,0) );
     p_dummy->SetFocus();
     frame_sizer->Add( p_dummy );
-                
+
     /* Creation of the menu bar */
     CreateOurMenuBar();
 
@@ -207,8 +227,13 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
     /* Creation of the slider sub-window */
     CreateOurSlider();
-    frame_sizer->Add( slider_frame, 1, wxGROW, 0 );
+    frame_sizer->Add( slider_frame, 0, wxEXPAND , 0 );
     frame_sizer->Hide( slider_frame );
+
+    /* Create the extra panel */
+    CreateOurExtraPanel();
+    frame_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
+    frame_sizer->Hide( extra_frame );
 
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
@@ -260,6 +285,7 @@ void Interface::CreateOurMenuBar()
 #define HELP_FILEINFO       N_("Show information about the file being played")
 
 #define HELP_PREFS N_("Go to the preferences menu")
+#define EXTRA_PREFS N_("Open the extended GUI")
 
 #define HELP_ABOUT N_("About this program")
 
@@ -297,6 +323,9 @@ void Interface::CreateOurMenuBar()
     wxMenu *settings_menu = new wxMenu;
     settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
                            wxU(_(HELP_PREFS)) );
+    settings_menu->Append( Extra_Event, wxU(_("&Extra GUI") ),
+                           wxU(_(EXTRA_PREFS)) );
+
 
     /* Create the "Audio" menu */
     p_audio_menu = new wxMenu;
@@ -388,6 +417,7 @@ void Interface::CreateOurToolBar()
      * toolbar and set this as the minimum for the main frame size. */
     wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxHORIZONTAL );
     toolbar_sizer->Add( toolbar, 0, 0, 0 );
+
     toolbar_sizer->Layout();
 
 #ifndef WIN32
@@ -438,6 +468,142 @@ void Interface::CreateOurSlider()
     slider_frame->Hide();
 }
 
+
+void Interface::CreateOurExtraPanel()
+{
+    char *psz_filters;
+
+    extra_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
+    extra_frame->SetAutoLayout( TRUE );
+    wxBoxSizer *extra_sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    /* Create static box to surround the adjust controls */
+    adjust_box = new wxStaticBox( extra_frame, -1,
+                  wxT(_("Image adjust")) );
+
+    /* Create the size for the frame */
+    wxStaticBoxSizer *adjust_sizer =
+        new wxStaticBoxSizer( adjust_box, wxVERTICAL );
+    adjust_sizer->SetMinSize( -1, 50 );
+
+    /* Create every controls */
+
+    /* Create the adjust button */
+    wxCheckBox * adjust_check = new wxCheckBox( extra_frame, Adjust_Event,
+                                                 wxU(_("Enable")));
+
+
+    wxBoxSizer *hue_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *hue_text = new wxStaticText( extra_frame, -1,
+                                       wxU(_("Hue")) );
+    hue_slider = new wxSlider ( extra_frame, Hue_Event, 0, 0,
+                                360, wxDefaultPosition, wxDefaultSize );
+
+   hue_sizer->Add(hue_text,1, 0 ,0);
+   hue_sizer->Add(hue_slider,1, 0 ,0);
+   hue_sizer->Layout();
+
+    wxBoxSizer *contrast_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *contrast_text = new wxStaticText( extra_frame, -1,
+                                       wxU(_("Contrast")) );
+    contrast_slider = new wxSlider ( extra_frame, Contrast_Event, 0, 0,
+                                200, wxDefaultPosition, wxDefaultSize);
+    contrast_sizer->Add(contrast_text,1, 0 ,0);
+    contrast_sizer->Add(contrast_slider,1, 0 ,0);
+    contrast_sizer->Layout();
+
+    wxBoxSizer *brightness_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *brightness_text = new wxStaticText( extra_frame, -1,
+                                       wxU(_("Brightness")) );
+    brightness_slider = new wxSlider ( extra_frame, Brightness_Event, 0, 0,
+                           200, wxDefaultPosition, wxDefaultSize) ;
+    brightness_sizer->Add(brightness_text,1,0,0);
+    brightness_sizer->Add(brightness_slider,1,0,0);
+    brightness_sizer->Layout();
+
+    wxBoxSizer *saturation_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *saturation_text = new wxStaticText( extra_frame, -1,
+                                          wxU(_("Saturation")) );
+    saturation_slider = new wxSlider ( extra_frame, Saturation_Event, 0, 0,
+                           300, wxDefaultPosition, wxDefaultSize );
+    saturation_sizer->Add(saturation_text,1,0,0);
+    saturation_sizer->Add(saturation_slider,1,0,0);
+    saturation_sizer->Layout();
+
+    adjust_sizer->Add(adjust_check, 1, wxEXPAND, 0);
+    adjust_sizer->Add(hue_sizer, 1, wxEXPAND, 0);
+    adjust_sizer->Add(contrast_sizer, 1, wxEXPAND, 0);
+    adjust_sizer->Add(brightness_sizer, 1, wxEXPAND, 0);
+    adjust_sizer->Add(saturation_sizer, 1, wxEXPAND, 0);
+
+    extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
+
+
+    /* Create static box to surround the other controls */
+    other_box = new wxStaticBox( extra_frame, -1,
+                  wxT(_("Video Options")) );
+
+    /* Create the sizer for the frame */
+    wxStaticBoxSizer *other_sizer =
+        new wxStaticBoxSizer( other_box, wxVERTICAL );
+    other_sizer->SetMinSize( -1, 50 );
+
+    static const wxString ratio_array[] =
+    {
+        wxT("4:3"),
+        wxT("16:9"),
+    };
+
+    wxBoxSizer *ratio_sizer = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText *ratio_text = new wxStaticText( extra_frame, -1,
+                                          wxU(_("Ratio")) );
+
+    ratio_combo = new wxComboBox( extra_frame, Ratio_Event, wxT(""),
+                                  wxDefaultPosition, wxSize(120,-1),
+                                  WXSIZEOF(ratio_array), ratio_array,
+                                  0 );
+
+    ratio_sizer->Add( ratio_text, 0, wxALL, 2 );
+    ratio_sizer->Add( ratio_combo, 0, wxALL, 2 );
+    ratio_sizer->Layout();
+
+    other_sizer->Add(ratio_sizer,0,wxALL,0 );
+
+    extra_sizer->Add(other_sizer,0,wxBOTTOM,5);
+
+    extra_frame->SetSizer( extra_sizer );
+
+    /* Layout the whole panel */
+    extra_sizer->Layout();
+
+    extra_sizer->SetSizeHints(extra_frame);
+
+    /* Write down initial values */
+    psz_filters = config_GetPsz( p_intf, "filter" );
+
+    if(psz_filters == NULL) psz_filters=strdup("");
+
+    if( strstr(psz_filters,"adjust") )
+    {
+        adjust_check->SetValue( 1 );
+        saturation_slider->Enable();
+        contrast_slider->Enable();
+        brightness_slider->Enable();
+        hue_slider->Enable();
+    }
+    else
+    {
+        adjust_check->SetValue( 0 );
+        saturation_slider->Disable();
+        contrast_slider->Disable();
+        brightness_slider->Disable();
+        hue_slider->Disable();
+    }
+
+    extra_frame->Hide();
+    free(psz_filters);
+}
+
 void Interface::UpdateAcceleratorTable()
 {
     /* Set some hotkeys */
@@ -469,11 +635,13 @@ void Interface::UpdateAcceleratorTable()
 
     if( !accel.Ok() )
         msg_Err( p_intf, "invalid accelerator table" );
-    
+
     SetAcceleratorTable( accel );
     msg_Dbg( p_intf, "accelerator table loaded" );
-    
+
 }
+
+
 
 /*****************************************************************************
  * Event Handlers.
@@ -659,6 +827,108 @@ void Interface::OnShowDialog( wxCommandEvent& event )
     }
 }
 
+void Interface::OnExtra(wxCommandEvent& event)
+{
+    if( b_extra == VLC_FALSE)
+    {
+        extra_frame->Show();
+        frame_sizer->Show( extra_frame );
+        b_extra = VLC_TRUE;
+    }
+    else
+    {
+        extra_frame->Hide();
+        frame_sizer->Hide( extra_frame );
+        b_extra = VLC_FALSE;
+    }
+    frame_sizer->Layout();
+    frame_sizer->Fit(this);
+}
+
+void Interface::OnEnableAdjust(wxCommandEvent& event)
+{
+    char *psz_filters=config_GetPsz( p_intf, "filter");
+    char *psz_new = NULL;
+    if( event.IsChecked() )
+    {
+        if(psz_filters == NULL)
+        {
+            psz_new = strdup( "adjust" );
+        }
+        else
+        {
+            psz_new= (char *) malloc(strlen(psz_filters) + 8 );
+            sprintf( psz_new, "%s:adjust", psz_filters);
+        }
+        config_PutPsz( p_intf, "filter", psz_new );
+
+        brightness_slider->Enable();
+        saturation_slider->Enable();
+        contrast_slider->Enable();
+        hue_slider->Enable();
+    }
+    else
+    {
+        if( psz_filters != NULL )
+        {
+
+            char *psz_current;
+            unsigned int i=0;
+            for( i = 0; i< strlen(psz_filters ); i++)
+            {
+                if ( !strncasecmp( &psz_filters[i],"adjust",6 ))
+                {
+                    if(i > 0)
+                        if( psz_filters[i-1] == ':' ) i--;
+                    psz_current = strchr( &psz_filters[i+1] , ':' );
+                    if( !psz_current )
+                        psz_filters[i] = '\0';
+                    else
+                    {
+                       memmove( &psz_filters[i] , psz_current,
+                                &psz_filters[strlen(psz_filters)]-psz_current
+                                +1);
+                    }
+                }
+            }
+            config_PutPsz( p_intf, "filter", psz_filters);
+        }
+        brightness_slider->Disable();
+        saturation_slider->Disable();
+        contrast_slider->Disable();
+        hue_slider->Disable();
+    }
+    if(psz_filters) free(psz_filters);
+    if(psz_new) free(psz_new);
+}
+
+void Interface::OnHueUpdate( wxScrollEvent& event)
+{
+   config_PutInt( p_intf , "hue" , event.GetPosition() );
+}
+
+void Interface::OnSaturationUpdate( wxScrollEvent& event)
+{
+   config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/300 );
+}
+
+void Interface::OnBrightnessUpdate( wxScrollEvent& event)
+{
+   config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/200 );
+}
+
+void Interface::OnContrastUpdate(wxScrollEvent& event)
+{
+   config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/200 );
+
+}
+
+void Interface::OnRatio( wxCommandEvent& event )
+{
+   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue() );
+}
+
+
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 {
     wxCommandEvent dummy;
@@ -667,7 +937,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
                                        FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
-    if( p_playlist->i_size )
+    if( p_playlist->i_size && p_playlist->i_enabled )
     {
         vlc_value_t state;
 

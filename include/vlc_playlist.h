@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.13 2003/09/08 12:02:16 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.14 2003/10/06 16:23:30 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,10 +48,15 @@ struct playlist_item_t
                                 * ppsz_options array */
     int        i_type;         /**< unused yet */
     int        i_status;       /**< unused yet */
-    vlc_bool_t b_autodeletion; /**< Indicates wether this item is to
+    vlc_bool_t b_autodeletion; /**< Indicates whther this item is to
                                 * be deleted after playback. True mean
                                 * that this item is to be deleted
                                 * after playback, false otherwise */
+    vlc_bool_t b_enabled;      /**< Indicates whether this item is to be
+                                * played or skipped */
+
+    int        i_group;         /**< unused yet */
+    char *     psz_author;     /**< Author */
 };
 
 /**
@@ -73,7 +78,7 @@ struct playlist_t
     int                   i_index;  /**< current index into the playlist */
     playlist_status_t     i_status; /**< current status of playlist */
     int                   i_size;   /**< total size of the list */
-
+    int                   i_enabled; /**< How many items are enabled ? */
     playlist_item_t **    pp_items; /**< array of pointers to the
                                      * playlist items */
 
@@ -84,6 +89,9 @@ struct playlist_t
 
 #define SORT_NORMAL 0
 #define SORT_REVERSE 1
+
+#define PLAYLIST_TYPE_MANUAL 0
+#define PLAYLIST_TYPE_SAP 1
 
 /*****************************************************************************
  * Prototypes
@@ -105,6 +113,10 @@ VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char **, 
 VLC_EXPORT( int,  playlist_AddExt,    ( playlist_t *, const char *, const char *, mtime_t, const char **, int, int, int ) );
 VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_DisableGroup, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_EnableGroup, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );

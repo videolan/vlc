@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.21 2003/09/22 14:40:10 zorglub Exp $
+ * $Id: playlist.cpp,v 1.22 2003/10/06 16:23:30 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -55,12 +55,19 @@ enum
     Open_Event,
     Save_Event,
 
+    EnableSelection_Event,
+    DisableSelection_Event,
+
     InvertSelection_Event,
     DeleteSelection_Event,
     Random_Event,
     Loop_Event,
     Repeat_Event,
     SelectAll_Event,
+
+    En_Dis_Event,
+
+    Infos_Event,
 
     SearchText_Event,
     Search_Event,
@@ -78,9 +85,12 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU(Close_Event, Playlist::OnClose)
     EVT_MENU(Open_Event, Playlist::OnOpen)
     EVT_MENU(Save_Event, Playlist::OnSave)
+    EVT_MENU(EnableSelection_Event, Playlist::OnEnableSelection)
+    EVT_MENU(DisableSelection_Event, Playlist::OnDisableSelection)
     EVT_MENU(InvertSelection_Event, Playlist::OnInvertSelection)
     EVT_MENU(DeleteSelection_Event, Playlist::OnDeleteSelection)
     EVT_MENU(SelectAll_Event, Playlist::OnSelectAll)
+    EVT_MENU(Infos_Event, Playlist::OnInfos)
     EVT_CHECKBOX(Random_Event, Playlist::OnRandom)
     EVT_CHECKBOX(Repeat_Event, Playlist::OnRepeat)
     EVT_CHECKBOX(Loop_Event, Playlist::OnLoop)
@@ -91,7 +101,9 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Button events */
     EVT_BUTTON( Search_Event, Playlist::OnSearch)
+    EVT_BUTTON( En_Dis_Event, Playlist::OnEnDis)
     EVT_BUTTON( Save_Event, Playlist::OnSave)
+    EVT_BUTTON( Infos_Event, Playlist::OnInfos)
 
     EVT_TEXT(SearchText_Event, Playlist::OnSearchTextChange)
 
@@ -108,6 +120,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
+    iteminfo_dialog = NULL;
     p_intf = _p_intf;
     vlc_value_t  val;
     i_update_counter = 0;
@@ -135,6 +148,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
+    selection_menu->Append( EnableSelection_Event, wxU(_("&Enable")) );
+    selection_menu->Append( DisableSelection_Event, wxU(_("&Disable")) );
+    selection_menu->AppendSeparator();
     selection_menu->Append( InvertSelection_Event, wxU(_("&Invert")) );
     selection_menu->Append( DeleteSelection_Event, wxU(_("&Delete")) );
     selection_menu->Append( SelectAll_Event, wxU(_("&Select All")) );
@@ -161,76 +177,87 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
                                wxLC_REPORT | wxSUNKEN_BORDER );
     listview->InsertColumn( 0, wxU(_("Url")) );
     #if 0
-	listview->InsertColumn( 1, wxU(_("Duration")) );
+        listview->InsertColumn( 1, wxU(_("Duration")) );
     #endif
     listview->SetColumnWidth( 0, 300 );
     #if 0
-	listview->SetColumnWidth( 1, 100 );
+        listview->SetColumnWidth( 1, 100 );
     #endif
 
     /* Create the Random checkbox */
-    wxCheckBox *random_checkbox = 
+    wxCheckBox *random_checkbox =
         new wxCheckBox( playlist_panel, Random_Event, wxU(_("Random")) );
-	
+
     var_Get( p_intf, "random", &val);
     vlc_bool_t b_random = val.b_bool;
     random_checkbox->SetValue( b_random == VLC_FALSE ? 0 : 1);
 
     /* Create the Loop Checkbox */
-    wxCheckBox *loop_checkbox = 
+    wxCheckBox *loop_checkbox =
         new wxCheckBox( playlist_panel, Loop_Event, wxU(_("Loop")) );
 
     var_Get( p_intf, "loop", &val );
-    int b_loop = val.b_bool ; 
+    int b_loop = val.b_bool ;
     loop_checkbox->SetValue( b_loop );
 
     /* Create the Repeat one checkbox */
-    wxCheckBox *repeat_checkbox = 
-	new wxCheckBox( playlist_panel, Repeat_Event, wxU(_("Repeat one")) );
+    wxCheckBox *repeat_checkbox =
+        new wxCheckBox( playlist_panel, Repeat_Event, wxU(_("Repeat one")) );
 
     var_Get( p_intf, "repeat", &val );
-    int b_repeat = val.b_bool ; 
+    int b_repeat = val.b_bool ;
     repeat_checkbox->SetValue( b_repeat );
 
     /* Create the Search Textbox */
     search_text =
-	new wxTextCtrl( playlist_panel, SearchText_Event, wxT(""), 
-			wxDefaultPosition, wxSize( 140, -1), 
-			wxTE_PROCESS_ENTER);    
+        new wxTextCtrl( playlist_panel, SearchText_Event, wxT(""),
+                        wxDefaultPosition, wxSize( 140, -1),
+                        wxTE_PROCESS_ENTER);
 
     /* Create the search button */
-    search_button = 
-	new wxButton( playlist_panel, Search_Event, wxU(_("Search")) );
+    search_button =
+        new wxButton( playlist_panel, Search_Event, wxU(_("Search")) );
 
- 
+    wxButton *en_dis_button =
+        new wxButton( playlist_panel, En_Dis_Event, wxU(_("Enable/Disable Group") ) );
+
+    wxButton *iteminfo_button =
+        new wxButton( playlist_panel, Infos_Event, wxU(_("Item Infos") ) );
     /* Place everything in sizers */
-    wxBoxSizer *button_sizer = new wxBoxSizer( wxVERTICAL );
-    button_sizer->Add( random_checkbox, 0, 
-			     wxEXPAND|wxALIGN_RIGHT, 5);
-    button_sizer->Add( loop_checkbox, 0, 
-		              wxEXPAND|wxALIGN_RIGHT, 5);
-    button_sizer->Add( repeat_checkbox, 0, 
-		              wxEXPAND|wxALIGN_RIGHT, 5);
-
+    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+    button_sizer->Add( en_dis_button, 0, wxALIGN_CENTER|wxRIGHT, 5);
+    button_sizer->Add( iteminfo_button, 0, wxALIGN_CENTER|wxLEFT , 5);
     button_sizer->Layout();
 
-    wxBoxSizer *search_sizer = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *checkbox_sizer = new wxBoxSizer( wxHORIZONTAL );
+    checkbox_sizer->Add( random_checkbox, 0,
+                       wxEXPAND|wxALIGN_RIGHT, 5);
+    checkbox_sizer->Add( loop_checkbox, 0,
+                       wxEXPAND|wxALIGN_RIGHT, 5);
+    checkbox_sizer->Add( repeat_checkbox, 0,
+                       wxEXPAND|wxALIGN_RIGHT, 5);
+
+    checkbox_sizer->Layout();
+
+    wxBoxSizer *search_sizer = new wxBoxSizer( wxHORIZONTAL );
     search_sizer->Add( search_text, 0, wxALL|wxALIGN_CENTER, 5);
     search_sizer->Add( search_button, 0, wxALL|wxALIGN_CENTER, 5);
 
     search_sizer->Layout();
 
-    wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
-    bottom_sizer->Add( search_sizer , 0, wxALL|wxALIGN_CENTER, 5 );
+    wxBoxSizer *bottom_sizer = new wxBoxSizer( wxVERTICAL );
+    bottom_sizer->Add( checkbox_sizer, 0, wxALL|wxALIGN_CENTER, 5 );
     bottom_sizer->Add( button_sizer , 0, wxALL|wxALIGN_CENTER, 5 );
-    
+
     bottom_sizer->Layout();
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
-    
+
+    panel_sizer->Add( search_sizer, 0, wxALIGN_CENTRE );
     panel_sizer->Add( bottom_sizer, 0 , wxALIGN_CENTRE);
     panel_sizer->Layout();
 
@@ -270,6 +297,8 @@ Playlist::~Playlist()
         return;
     }
 
+    delete iteminfo_dialog;
+
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     vlc_object_release( p_playlist );
 }
@@ -293,11 +322,18 @@ void Playlist::Rebuild()
     {
         wxString filename = wxU(p_playlist->pp_items[i]->psz_name);
         listview->InsertItem( i, filename );
+        if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
+        {
+            wxListItem listitem;
+            listitem.m_itemId = i;
+            listitem.SetTextColour( *wxLIGHT_GREY);
+            listview->SetItem(listitem);
+        }
         /* FIXME: we should try to find the actual duration... */
-	/* While we don't use it, hide it, it's ugly */
-	#if 0
-		listview->SetItem( i, 1, wxU(_("no info")) );
-	#endif
+        /* While we don't use it, hide it, it's ugly */
+        #if 0
+            listview->SetItem( i, 1, wxU(_("no info")) );
+        #endif
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -307,7 +343,6 @@ void Playlist::Rebuild()
     listitem.SetTextColour( *wxRED );
     listview->SetItem( listitem );
 
-//    listview->Select( p_playlist->i_index, TRUE );
     listview->Focus( p_playlist->i_index );
 
     vlc_object_release( p_playlist );
@@ -465,7 +500,7 @@ void Playlist::OnSort( wxCommandEvent& WXUNUSED(event) )
     }
 
     playlist_Sort( p_playlist , 0  );
-   
+
     vlc_object_release( p_playlist );
 
     Rebuild();
@@ -484,7 +519,7 @@ void Playlist::OnRSort( wxCommandEvent& WXUNUSED(event) )
     }
 
     playlist_Sort( p_playlist , 1 );
-   
+
     vlc_object_release( p_playlist );
 
     Rebuild();
@@ -494,7 +529,7 @@ void Playlist::OnRSort( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
 {
-   search_button->SetDefault(); 
+   search_button->SetDefault();
 }
 
 void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
@@ -502,30 +537,30 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
     wxString search_string= search_text->GetValue();
 
     int i_current;
-    int i_first = 0 ; 
+    int i_first = 0 ;
     int i_item = -1;
 
     for( i_current = 0 ; i_current <= listview->GetItemCount() ; i_current++ ) 
     {
-	if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED)
-		== wxLIST_STATE_SELECTED )
-	{
-	    i_first = i_current;
-	    break;
-	}
+        if( listview->GetItemState( i_current, wxLIST_STATE_SELECTED)
+                   == wxLIST_STATE_SELECTED )
+        {
+            i_first = i_current;
+            break;
+        }
     }
 
-    for ( i_current = i_first + 1; i_current <= listview->GetItemCount()
-		 ; i_current++ )
+    for ( i_current = i_first + 1; i_current <= listview->GetItemCount() ; 
+          i_current++ )
     {
-	wxListItem listitem;
- 	listitem.SetId( i_current );
-	listview->GetItem( listitem );
-	if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
-	{
-	   i_item = i_current;
-	   break;
-	}
+        wxListItem listitem;
+        listitem.SetId( i_current );
+        listview->GetItem( listitem );
+        if( listitem.m_text.Lower().Contains( search_string.Lower() ) )
+        {
+            i_item = i_current;
+            break;
+        }
     }
     for( long item = 0; item < listview->GetItemCount(); item++ )
     {
@@ -562,11 +597,52 @@ void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
     Rebuild();
 }
 
+void Playlist::OnEnableSelection( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    for( long item = listview->GetItemCount() - 1; item >= 0; item-- )
+    {
+        if( listview->IsSelected( item ) )
+        {
+            playlist_Enable( p_playlist, item );
+        }
+    }
+    vlc_object_release( p_playlist);
+    Rebuild();
+}
+
+void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    for( long item = listview->GetItemCount() - 1; item >= 0; item-- )
+    {
+        if( listview->IsSelected( item ) )
+        {
+            playlist_Disable( p_playlist, item );
+        }
+    }
+    vlc_object_release( p_playlist);
+    Rebuild();
+}
+
 void Playlist::OnRandom( wxCommandEvent& event )
 {
     vlc_value_t val;
     val.b_bool = event.IsChecked();
-// ? VLC_TRUE : VLC_FALSE ;
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -581,7 +657,6 @@ void Playlist::OnLoop ( wxCommandEvent& event )
 {
     vlc_value_t val;
     val.b_bool = event.IsChecked();
-// ? VLC_TRUE : VLC_FALSE ;
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -597,7 +672,6 @@ void Playlist::OnRepeat ( wxCommandEvent& event )
 {
     vlc_value_t val;
     val.b_bool = event.IsChecked();
-// ? VLC_TRUE : VLC_FALSE ;
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
@@ -626,7 +700,6 @@ void Playlist::OnActivateItem( wxListEvent& event )
     {
         return;
     }
-
     playlist_Goto( p_playlist, event.GetIndex() );
 
     vlc_object_release( p_playlist );
@@ -642,6 +715,65 @@ void Playlist::OnKeyDown( wxListEvent& event )
     }
 }
 
+void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if( iteminfo_dialog == NULL )
+    {
+        /* We use the first selected item, so find it */
+        long i_item = -1;
+        i_item = listview->GetNextItem(i_item,
+                         wxLIST_NEXT_ALL,
+                         wxLIST_STATE_SELECTED);
+        if( i_item >= 0 && i_item < p_playlist->i_size )
+        {
+            iteminfo_dialog = new ItemInfoDialog(
+                              p_intf, p_playlist->pp_items[i_item], this );
+            if( iteminfo_dialog->ShowModal()  == wxID_OK )
+                Rebuild();
+            delete iteminfo_dialog;
+            iteminfo_dialog = NULL;
+        }
+    }
+    vlc_object_release( p_playlist );
+}
+
+
+void Playlist::OnEnDis( wxCommandEvent& WXUNUSED(event) )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    long i_item = -1;
+    i_item = listview->GetNextItem(i_item,
+                       wxLIST_NEXT_ALL,
+                       wxLIST_STATE_SELECTED);
+
+    if( i_item >= 0 && i_item < p_playlist->i_size )
+    {
+       if( p_playlist->pp_items[i_item]->b_enabled == VLC_TRUE)
+           playlist_DisableGroup( p_playlist ,
+                                  p_playlist->pp_items[i_item]->i_group );
+       else
+           playlist_EnableGroup( p_playlist ,
+                                  p_playlist->pp_items[i_item]->i_group );
+       Rebuild();
+    }
+
+    vlc_object_release( p_playlist );
+}
 /*****************************************************************************
  * PlaylistChanged: callback triggered by the intf-change playlist variable
  *  We don't rebuild the playlist directly here because we don't want the

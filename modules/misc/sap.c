@@ -2,12 +2,12 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.23 2003/09/15 08:33:29 zorglub Exp $
+ * $Id: sap.c,v 1.24 2003/10/06 16:23:30 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
  *          Damien Lucas <nitrox@videolan.org>
- *          
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -160,12 +160,15 @@ struct attr_descr_t
 #define SAP_IPV6_LONGTEXT N_("Set this if you want SAP to listen for IPv6 announces")
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
 #define SAP_SCOPE_LONGTEXT N_("Sets the scope for IPv6 announces (default is 8)")
+#define SAP_GROUP_ID_TEXT N_("SAP Playlist group ID")
+#define SAP_GROUP_ID_LONGTEXT N_("Sets the default group ID in which" \
+                      "SAP items are put" )
 
 vlc_module_begin();
     add_category_hint( N_("SAP"), NULL, VLC_TRUE );
         add_string( "sap-addr", NULL, NULL,
                      SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
-    
+
         add_bool( "no-sap-ipv4", 0 , NULL,
                      SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
 
@@ -174,6 +177,9 @@ vlc_module_begin();
 
         add_string( "sap-ipv6-scope", "8" , NULL,
                     SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
+
+        add_integer( "sap-group-id", 42, NULL,
+                     SAP_GROUP_ID_TEXT, SAP_GROUP_ID_LONGTEXT, VLC_TRUE);
 
     set_description( _("SAP interface") );
     set_capability( "interface", 0 );
@@ -412,8 +418,8 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                 
             }
         }
-        
-        
+
+
         /* Filling p_item->psz_uri */
         if( b_http == VLC_FALSE )
         {
@@ -421,7 +427,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
             p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
                         strlen( psz_port ) + 5 +i_multicast );
-    
+
             if( p_item->psz_uri == NULL )
             {
                 msg_Err( p_intf, "Not enough memory");
@@ -442,27 +448,30 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         }
         else
         {
-            if( psz_http_path == NULL ) 
+            if( psz_http_path == NULL )
                 psz_http_path = strdup("/");
-            
+
             p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
                         strlen( psz_port ) + 3 + strlen(psz_http_path) );
-    
+
             if( p_item->psz_uri == NULL )
             {
                 msg_Err( p_intf, "Not enough memory");
                 free( p_item );
                 return 0;
             }
-            
+
             sprintf( p_item->psz_uri, "%s://%s:%s%s", psz_proto,
                             psz_uri, psz_port,psz_http_path );
-            
+
         }
             /* Enqueueing p_item in the playlist */
 
         if( p_item )
         {
+            p_item->i_group = config_GetInt( p_intf, "sap-group-id" );
+            p_item->b_enabled = VLC_TRUE;
+            p_item->psz_author = NULL;
             p_playlist = vlc_object_find( p_intf,
             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -470,8 +479,8 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             PLAYLIST_CHECK_INSERT, PLAYLIST_END);
             vlc_object_release( p_playlist );
         }
-  
-        if( psz_http_path ) 
+
+        if( psz_http_path )
             free(psz_http_path);
     }
 

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.62 2003/09/22 14:40:10 zorglub Exp $
+ * $Id: wxwindows.h,v 1.63 2003/10/06 16:23:30 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,12 +141,25 @@ public:
     virtual ~Interface();
     void TogglePlayButton( int i_playing_status );
 
+//    wxFlexGridSizer *frame_sizer;
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
 
     wxSlider    *slider;
     wxWindow    *slider_frame;
+    wxWindow    *extra_frame;
     wxStaticBox *slider_box;
+
+    vlc_bool_t b_extra;
+
+    wxStaticBox *adjust_box;
+    wxSlider *brightness_slider;
+    wxSlider *contrast_slider;
+    wxSlider *saturation_slider;
+    wxSlider *hue_slider;
+
+    wxStaticBox *other_box;
+    wxComboBox *ratio_combo;
 
     wxGauge     *volctrl;
 
@@ -154,6 +167,7 @@ private:
     void UpdateAcceleratorTable();
     void CreateOurMenuBar();
     void CreateOurToolBar();
+    void CreateOurExtraPanel();
     void CreateOurSlider();
     void Open( int i_access_method );
 
@@ -167,6 +181,7 @@ private:
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
     void OnOpenV4L( wxCommandEvent& event );
+    void OnExtra( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
@@ -175,6 +190,14 @@ private:
     void OnNextStream( wxCommandEvent& event );
     void OnSlowStream( wxCommandEvent& event );
     void OnFastStream( wxCommandEvent& event );
+
+    void OnEnableAdjust( wxCommandEvent& event );
+    void OnHueUpdate( wxScrollEvent& event );
+    void OnContrastUpdate( wxScrollEvent& event );
+    void OnBrightnessUpdate( wxScrollEvent& event );
+    void OnSaturationUpdate( wxScrollEvent& event );
+
+    void OnRatio( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
 
@@ -638,6 +661,7 @@ private:
 };
 
 /* Playlist */
+class ItemInfoDialog;
 class Playlist: public wxFrame
 {
 public:
@@ -661,9 +685,13 @@ private:
     void OnRSort( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnSearch( wxCommandEvent& event );
+    void OnEnDis( wxCommandEvent& event );
+    void OnInfos( wxCommandEvent& event );
     void OnSearchTextChange( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
+    void OnEnableSelection( wxCommandEvent& event );
+    void OnDisableSelection( wxCommandEvent& event );
     void OnInvertSelection( wxCommandEvent& event );
     void OnDeleteSelection( wxCommandEvent& event );
     void OnSelectAll( wxCommandEvent& event );
@@ -675,13 +703,58 @@ private:
     void Rebuild();
 
     wxTextCtrl *search_text;
-    wxButton *search_button; 
+    wxButton *search_button;
     DECLARE_EVENT_TABLE();
+
+
+    ItemInfoDialog *iteminfo_dialog;
 
     intf_thread_t *p_intf;
     wxListView *listview;
     int i_update_counter;
 };
+
+
+/* ItemInfo Dialog */
+class ItemInfoDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    ItemInfoDialog( intf_thread_t *p_intf, playlist_item_t *_p_item,
+                    wxWindow *p_parent );
+    virtual ~ItemInfoDialog();
+
+    wxArrayString GetOptions();
+
+private:
+    wxPanel *InfoPanel( wxWindow* parent );
+    wxPanel *GroupPanel( wxWindow* parent );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    playlist_item_t *p_item;
+    wxWindow *p_parent;
+
+    /* Controls for the iteminfo dialog box */
+    wxPanel *info_subpanel;
+    wxPanel *info_panel;
+
+    wxPanel *group_subpanel;
+    wxPanel *group_panel;
+
+    wxTextCtrl *uri_text;
+    wxTextCtrl *name_text;
+    wxTextCtrl *author_text;
+
+    wxCheckBox *enabled_checkbox;
+    wxSpinCtrl *group_spin;
+};
+
 
 /* File Info */
 class FileInfo: public wxFrame
