@@ -55,9 +55,8 @@ static int Control    ( vout_thread_t *, int, va_list );
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 
-static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval,
-                            void *p_data );
+static int LogoCallback( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -107,13 +106,13 @@ vlc_module_end();
 /*****************************************************************************
  * LoadPNG: loads the PNG logo into memory
  *****************************************************************************/
-static picture_t *LoadPNG( vlc_object_t *p_this, char *psz_filename, int i_trans )
+static picture_t *LoadPNG( vlc_object_t *p_this, char *psz_filename,
+                           int i_trans )
 {
     picture_t *p_pic;
     FILE *file;
     int i, j;
     vlc_bool_t b_alpha = VLC_TRUE;
-
 
     png_uint_32 i_width, i_height;
     int i_color_type, i_interlace_type, i_compression_type, i_filter_type;
@@ -538,13 +537,13 @@ struct filter_sys_t
     char *psz_filename;
     int i_trans;
     
-    time_t last_time;
     vlc_bool_t b_absolute;
 
     mtime_t i_last_date;
-    /*  On the fly control variable: */
+
+    /* On the fly control variable */
     vlc_bool_t b_need_update;
-    vlc_bool_t b_newPNG;
+    vlc_bool_t b_new_png;
 };
 
 static subpicture_t *Filter( filter_t *, mtime_t );
@@ -557,7 +556,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     vlc_object_t *p_input;
-    
+
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
@@ -565,10 +564,12 @@ static int CreateFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+
     /* Hook used for callback variables */
-    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_input )
     {
+        free( p_sys );
         return VLC_ENOOBJ;
     }
 
@@ -576,6 +577,8 @@ static int CreateFilter( vlc_object_t *p_this )
     if( !p_sys->psz_filename || !*p_sys->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
+        vlc_object_release( p_input );
+        free( p_sys );
         return 0;
     }
 
@@ -584,8 +587,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->pos = var_CreateGetInteger( p_input , "logo-position" );
     p_sys->i_trans = var_CreateGetInteger( p_input, "logo-transparency");
     p_sys->i_trans = __MAX( __MIN( p_sys->i_trans, 255 ), 0 );
-
-    p_sys->p_pic = LoadPNG( p_this, p_sys->psz_filename, p_sys->i_trans );
 
     var_AddCallback( p_input, "logo-file", LogoCallback, p_sys );
     var_AddCallback( p_input, "logo-x", LogoCallback, p_sys );
@@ -608,14 +609,13 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
-    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
-    p_sys->i_last_date = 0;
-
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
+    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
     p_sys->b_need_update = VLC_TRUE;
-    p_sys->last_time = ((time_t)-1);
+    p_sys->b_new_png = VLC_FALSE;
+    p_sys->i_last_date = 0;
 
     return VLC_SUCCESS;
 }
@@ -636,78 +636,66 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
     
     /* Delete the logo variables from INPUT */
-    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-    if( !p_input )
-    {
-        return;
-    }
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( !p_input ) return;
+
     var_Destroy( p_input , "logo-file" );
     var_Destroy( p_input , "logo-x" );
     var_Destroy( p_input , "logo-y" );
     var_Destroy( p_input , "logo-position" );
     var_Destroy( p_input , "logo-transparency" );
     vlc_object_release( p_input );
-
 }
 
-/****************************************************************************
+/*****************************************************************************
  * Filter: the whole thing
- ****************************************************************************
+ *****************************************************************************
  * This function outputs subpictures at regular time intervals.
- ****************************************************************************/
+ *****************************************************************************/
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
     video_format_t fmt;
-    filter_sys_t *p_dummy;
-    time_t t;
-    FILE *file;
 
-    if( p_sys->last_time == time( NULL ) )
+    if( !p_sys->b_need_update && p_sys->i_last_date +5000000 > date ) return 0;
+
+    if( p_sys->b_new_png )
     {
-        return NULL;
+        if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
+            free( p_sys->p_pic->p_data_orig );
+        if( p_sys->p_pic ) free( p_sys->p_pic );
+
+	p_sys->p_pic = LoadPNG( VLC_OBJECT(p_filter), p_sys->psz_filename,
+				p_sys->i_trans );
+	if( p_sys->p_pic )
+	{
+	    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+	    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
+	}
+
+        p_sys->b_new_png = VLC_FALSE;
     }
 
-    if( p_sys->b_need_update == VLC_FALSE )
-    {
-        return NULL;
-    }
-    
-    if (p_sys->b_newPNG == VLC_TRUE)
-    {
-    /* Trap invalid filenames, else get new graphic, swap for old */
-       if( !(file = fopen( p_sys->psz_filename , "rb" )) )
-       {
-          msg_Err( p_filter, "logo file (%s) not found", p_sys->psz_filename );
-          p_sys->b_newPNG = VLC_FALSE;
-       }
-       else
-       {
-          fclose( file );	       
-          p_dummy = malloc( sizeof( filter_sys_t ) );
-          p_dummy->p_pic = malloc( sizeof(picture_t) );
-          p_dummy->p_pic = LoadPNG( p_filter, p_sys->psz_filename, p_sys->i_trans );
+    p_sys->b_need_update = VLC_FALSE;
 
-          if( !p_sys->p_pic )
-          {
-             p_dummy->p_pic = p_sys->p_pic;
-          }
-   /*    if( p_sys->p_pic ) free( p_sys->p_pic );  */
-          p_sys->p_pic = p_dummy->p_pic;
-          free( p_dummy->p_pic );
-          free( p_dummy );
-      
-          p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
-          p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
-          p_sys->i_last_date = 0; 
-          p_sys->b_newPNG = VLC_FALSE;
-       }
-    }
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
+
+    p_spu->b_absolute = p_sys->b_absolute;
+    p_spu->i_start = p_sys->i_last_date = date;
+    p_spu->i_stop = 0;
+    p_spu->b_ephemer = VLC_TRUE;
+
+    p_sys->b_need_update = VLC_FALSE;
+
+    if( !p_sys->p_pic || !p_sys->i_trans )
+    {
+        /* Send an empty subpicture to clear the display */
+        return p_spu;
+    }
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -724,39 +712,31 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
     }
-    
-    t = p_sys->last_time = time( NULL );
+
     vout_CopyPicture( p_filter, &p_region->picture, p_sys->p_pic );
     p_region->i_x = 0;
     p_region->i_y = 0;
     p_spu->i_x = p_sys->posx;
     p_spu->i_y = p_sys->posy;
     p_spu->i_flags = p_sys->pos;
-    p_spu->b_absolute = p_sys->b_absolute;
-
     p_spu->p_region = p_region;
-
-    p_spu->i_start = p_sys->i_last_date = date;
-    p_spu->i_stop = 0;
-    p_spu->b_ephemer = VLC_TRUE;
-    p_sys->b_need_update = VLC_FALSE;
 
     return p_spu;
 }
-/**********************************************************************
+
+/*****************************************************************************
  * Callback to update params on the fly
- **********************************************************************/
+ *****************************************************************************/
 static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
-                            vlc_value_t oldval, vlc_value_t newval,
-                            void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
     if( !strncmp( psz_var, "logo-file", 6 ) )
     {
         if( p_sys->psz_filename ) free( p_sys->psz_filename );
         p_sys->psz_filename = strdup( newval.psz_string ); 
-        p_sys->b_newPNG = VLC_TRUE;
+        p_sys->b_new_png = VLC_TRUE;
     }
     else if ( !strncmp( psz_var, "logo-x", 6 ) )
     {
@@ -773,7 +753,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     else if ( !strncmp( psz_var, "logo-transparency", 9 ) )
     {
         p_sys->i_trans = __MAX( __MIN( newval.i_int, 255 ), 0 );
-        p_sys->b_newPNG = VLC_TRUE;
+        p_sys->b_new_png = VLC_TRUE;
     }
     p_sys->b_need_update = VLC_TRUE;
     return VLC_SUCCESS;
