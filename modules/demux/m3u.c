@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.21 2003/06/28 19:19:55 fenrir Exp $
+ * $Id: m3u.c,v 1.22 2003/06/29 19:15:04 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -375,7 +375,6 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
 
         if( strstr ( psz_bol, "<Name>" ) )
         {
-            msg_Dbg( p_input, "###########<Name>");
             /* We have a name */
             while ( *psz_bol &&
                     strncasecmp( psz_bol,"Name",sizeof("Name") -1 ) )
@@ -401,7 +400,6 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
         }
         else if( strstr( psz_bol, "</entry>" ) || strstr( psz_bol, "</Entry>" ))
         {
-            msg_Dbg( p_input, "###########<Entry>");
             *pb_next = VLC_TRUE;
             return 0;
         }
@@ -437,7 +435,6 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
     /* empty line */
     if ( !*psz_bol ) return 0;
 
-    msg_Dbg( p_input, "############Line=%s", psz_bol );
     /*
      * From now on, we know we've got a meaningful line
      */
@@ -525,12 +522,11 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
 
 static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
                           char *psz_line,
-                          char **ppsz_uri, char **ppsz_name )
+                          char **ppsz_uri, char **ppsz_name,
+                          int *pi_position )
 {
     char          psz_data[MAX_LINE];
     vlc_bool_t    b_next;
-
-    msg_Dbg( p_input, "ProcessLine(0): name=%s uri=%s ", *ppsz_name, *ppsz_uri );
 
     switch( ParseLine( p_input, psz_line, psz_data, &b_next ) )
     {
@@ -552,13 +548,14 @@ static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
         default:
             break;
     }
-    msg_Dbg( p_input, "name=%s uri=%s next=%d", *ppsz_name, *ppsz_uri, b_next );
+
     if( b_next && *ppsz_uri )
     {
         playlist_AddName( p_playlist,
                           *ppsz_name ? *ppsz_name : *ppsz_uri,
                           *ppsz_uri,
-                          PLAYLIST_INSERT, PLAYLIST_END );
+                          PLAYLIST_INSERT, *pi_position );
+        (*pi_position)++;
         if( *ppsz_name )
         {
             free( *ppsz_name );
@@ -567,7 +564,6 @@ static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
         *ppsz_name = NULL;
         *ppsz_uri  = NULL;
     }
-    msg_Dbg( p_input, "ProcessLine(1:: name=%s uri=%s ", *ppsz_name, *ppsz_uri );
 }
 
 /*****************************************************************************
@@ -590,6 +586,8 @@ static int Demux ( input_thread_t *p_input )
     char          *psz_name = NULL;
     char          *psz_uri  = NULL;
 
+    int           i_position;
+
     p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                                  FIND_ANYWHERE );
     if( !p_playlist )
@@ -599,6 +597,7 @@ static int Demux ( input_thread_t *p_input )
     }
 
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+    i_position = p_playlist->i_index + 1;
 
     /* Depending on wether we are dealing with an m3u/asf file, the end of
      * line token will be different */
@@ -646,7 +645,7 @@ static int Demux ( input_thread_t *p_input )
             psz_line[i_linepos] = '\0';
             i_linepos = 0;
 
-            ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name );
+            ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name, &i_position );
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
@@ -656,11 +655,11 @@ static int Demux ( input_thread_t *p_input )
     {
         psz_line[i_linepos] = '\0';
 
-        ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name );
+        ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name, &i_position );
         /* is there a pendding uri without b_next */
         if( psz_uri )
         {
-            playlist_Add( p_playlist, psz_uri, PLAYLIST_INSERT, PLAYLIST_END );
+            playlist_Add( p_playlist, psz_uri, PLAYLIST_INSERT, i_position );
         }
     }
 
