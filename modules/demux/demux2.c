@@ -69,6 +69,7 @@ vlc_module_begin();
     add_shortcut( "avi" );
     add_shortcut( "mjpeg" );
     add_shortcut( "directory" );
+    add_shortcut( "wav" );
 vlc_module_end();
 
 /*****************************************************************************
