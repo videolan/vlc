@@ -373,14 +373,13 @@ public:
         :segment(NULL)
         ,i_timescale(MKVD_TIMECODESCALE)
         ,f_duration(-1.0)
-        ,i_cues_position(0)
-        ,i_chapters_position(0)
-        ,i_tags_position(0)
+        ,i_cues_position(-1)
+        ,i_chapters_position(-1)
+        ,i_tags_position(-1)
         ,cluster(NULL)
-        ,b_cues(false)
+        ,b_cues(VLC_FALSE)
         ,i_index(0)
-        ,i_index_max(0)
-        ,index(NULL)
+        ,i_index_max(1024)
         ,psz_muxing_application(NULL)
         ,psz_writing_application(NULL)
         ,psz_segment_filename(NULL)
@@ -391,7 +390,9 @@ public:
         ,p_sys(p_demuxer)
         ,ep(NULL)
         ,b_preloaded(false)
-    {}
+    {
+        index = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
+    }
 
     ~matroska_segment_t()
     {
@@ -434,7 +435,9 @@ public:
         {
             free( psz_date_utc );
         }
-    
+        if ( index )
+            free( index );
+
         delete ep;
     }
 
@@ -600,7 +603,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t        *p_sys;
     matroska_stream_t  *p_stream;
     matroska_segment_t *p_segment;
-    mkv_track_t        *p_track;
     uint8_t            *p_peek;
     std::string        s_path, s_filename;
     size_t             i_track;
@@ -630,21 +632,6 @@ static int Open( vlc_object_t * p_this )
 
     p_stream->in = new vlc_stream_io_callback( p_demux->s );
     p_stream->es = new EbmlStream( *p_stream->in );
-    p_track = new mkv_track_t(); 
-    p_segment->tracks.push_back( p_track );
-    p_sys->i_pts   = 0;
-    p_segment->i_cues_position = -1;
-    p_segment->i_chapters_position = -1;
-    p_segment->i_tags_position = -1;
-
-    p_segment->b_cues       = VLC_FALSE;
-    p_segment->i_index      = 0;
-    p_segment->i_index_max  = 1024;
-    p_segment->index        = (mkv_index_t*)malloc( sizeof( mkv_index_t ) *
-                                                p_segment->i_index_max );
-
-    p_sys->meta = NULL;
-    p_sys->title = NULL;
 
     if( p_stream->es == NULL )
     {
