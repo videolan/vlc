@@ -1017,6 +1017,14 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
             }
         }
     }
+    else if( !strcmp( psz_cmd, "inputdeln" ) )
+    {
+        int index = atoi( psz_value );
+        if( index > 0 && index <= media->i_input )
+        {
+            TAB_REMOVE( media->i_input, media->input, media->input[index-1] );
+        }
+    }
     else if( !strcmp( psz_cmd, "output" ) )
     {
         if( media->psz_output != NULL )
