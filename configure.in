@@ -691,22 +691,22 @@ then
     CPPFLAGS="$CPPFLAGS $CFLAGS_SDL"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
-      [ echo "The development package for SDL is not installed. Please install it"
-        echo "and try again. Alternatively you can also configure with --disable-sdl."
-        exit 1 ])
+      [ AC_MSG_ERROR([The development package for SDL is not installed. 
+Please install it and try again. Alternatively you can also configure with 
+--disable-sdl.])
+      ])
     CPPFLAGS=$save_CPPFLAGS
     if expr 1.1.5 \> `$SDL_CONFIG --version` >/dev/null
     then
-      echo "You need SDL version 1.1.5 or later. Install it and try again."
-      echo "Alternatively, you can also configure with --disable-sdl."
-      exit 1
+      AC_MSG_ERROR([The development package for SDL is not installed.
+Please install it and try again. Alternatively you can also configure with
+--disable-sdl.])
     fi
   elif test "x$enable_sdl" =  "xyes"
   then
-    echo "I couldn't find the SDL package. You can download libSDL from"
-    echo "http://www.libsdl.org/, or configure with --disable-sdl. Have a"
-    echo "nice day."
-    exit 1
+    AC_MSG_ERROR([I couldn't find the SDL package. You can download libSDL
+from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
+    ])
   fi
 fi
 
@@ -723,7 +723,9 @@ AC_ARG_WITH(directx,
         LIB_DIRECTX="${LIB_DIRECTX} -L"$withval"/lib -lgdi32 -ldxguid"
         INCLUDE="${INCLUDE} -I"$withval"/include"
       else
-        AC_CHECK_HEADERS(directx.h, , [echo "Cannot find DirectX headers !"; exit])
+        AC_CHECK_HEADERS(directx.h, , 
+	  AC_MSG_ERROR([Cannot find DirectX headers !])
+	)
         LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lgdi32 -ldxguid"
       fi
     fi ])
@@ -800,10 +802,26 @@ dnl
 AC_ARG_ENABLE(gnome,
   [  --enable-gnome          Gnome interface support (default disabled)],
   [if test x$enable_gnome = xyes; then
-     PLUGINS="${PLUGINS} gnome"
-     ALIASES="${ALIASES} gnome-vlc"
-     LIB_GNOME="`gnome-config --libs gnomeui | sed 's,-rdynamic,,'`"
-   fi])
+    # look for gnome-config
+    AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
+    if test -x ${GNOME_CONFIG}
+    then
+       CFLAGS_GNOME="`${GNOME_CONFIG} --cflags gnomeui`"
+       LIB_GNOME="`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
+    fi
+    # now look for the gnome.h header
+    saved_CPPFLAGS=$CPPFLAGS
+    CPPFLAGS="$CPPFLAGS $CFLAGS_GNOME"
+    AC_CHECK_HEADERS(gnome.h, [
+      PLUGINS="${PLUGINS} gnome"
+      ALIASES="${ALIASES} gnome-vlc"
+     ],[
+      AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
+developement librairie or remove the --enable-gnome option])
+     ])
+  
+    CPPFLAGS=$saved_CPPFLAGS
+  fi])
 
 dnl
 dnl  Gtk+ module

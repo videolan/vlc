@@ -4,6 +4,7 @@
 
 HEAD
 
+  * Added gnome.h check and cleaned the error messages in the configure script
   * Tiny small optim in LPCM decoder.
 
 0.2.83
