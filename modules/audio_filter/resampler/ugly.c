@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.8 2002/12/06 16:34:04 sam Exp $
+ * $Id: ugly.c,v 1.9 2003/03/04 03:27:40 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -68,7 +68,10 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_FALSE;
+
+    /* We don't want a new buffer to be created because we're not sure we'll
+     * actually need to resample anything. */
+    p_filter->b_in_place = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -79,8 +82,7 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int32_t* p_in = (int32_t*)p_in_buf->p_buffer;
-    int32_t* p_out = (int32_t*)p_out_buf->p_buffer;
+    int32_t *p_in, *p_out = (int32_t*)p_out_buf->p_buffer;
 
     unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     unsigned int i_in_nb = p_in_buf->i_nb_samples;
@@ -88,6 +90,24 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                     / p_filter->input.i_rate;
     unsigned int i_sample_bytes = i_nb_channels * sizeof(int32_t);
     unsigned int i_out, i_chan, i_remainder = 0;
+
+    /* Check if we really need to run the resampler */
+    if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
+    {
+        return;
+    }
+
+#ifdef HAVE_ALLOCA
+    p_in = (int32_t *)alloca( p_in_buf->i_nb_bytes );
+#else
+    p_in = (int32_t *)malloc( p_in_buf->i_nb_bytes );
+#endif
+    if( p_in == NULL )
+    {
+        return;
+    }
+
+    p_aout->p_vlc->pf_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
 
     for( i_out = i_out_nb ; i_out-- ; )
     {

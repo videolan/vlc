@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.38 2003/02/09 01:13:43 massiot Exp $
+ * $Id: aout_internal.h,v 1.39 2003/03/04 03:27:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,7 +112,7 @@ typedef struct aout_filter_t
                                          struct aout_buffer_t *,
                                          struct aout_buffer_t * );
     vlc_bool_t              b_in_place;
-    vlc_bool_t              b_reinit;
+    vlc_bool_t              b_continuity;
 } aout_filter_t;
 
 /*****************************************************************************

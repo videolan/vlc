@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.9 2003/02/17 09:47:16 gbazin Exp $
+ * $Id: linear.c,v 1.10 2003/03/04 03:27:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -94,7 +94,10 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = VLC_FALSE;
+
+    /* We don't want a new buffer to be created because we're not sure we'll
+     * actually need to resample anything. */
+    p_filter->b_in_place = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
@@ -115,18 +118,46 @@ static void Close( vlc_object_t * p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    float* p_in = (float*)p_in_buf->p_buffer;
-    float* p_out = (float*)p_out_buf->p_buffer;
-    float* p_prev_sample = (float*)p_filter->p_sys->p_prev_sample;
+    float *p_in, *p_out = (float *)p_out_buf->p_buffer;
+    float *p_prev_sample = (float *)p_filter->p_sys->p_prev_sample;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_chan, i_in, i_out = 0;
 
-    /* Take care of the previous input sample (if any) */
-    if( p_filter->b_reinit )
+    /* Check if we really need to run the resampler */
+    if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
     {
-        p_filter->b_reinit = VLC_FALSE;
+        if( p_filter->b_continuity &&
+	    p_in_buf->i_size >=
+	      p_in_buf->i_nb_bytes + sizeof(float) * i_nb_channels )
+	{
+	    /* output the whole thing with the last sample from last time */
+	    memmove( ((float *)(p_in_buf->p_buffer)) + i_nb_channels,
+		     p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+	    memcpy( p_in_buf->p_buffer, p_prev_sample,
+		    i_nb_channels * sizeof(float) );
+	}
+        p_filter->b_continuity = VLC_FALSE;
+        return;
+    }
+
+#ifdef HAVE_ALLOCA
+    p_in = (float *)alloca( p_in_buf->i_nb_bytes );
+#else
+    p_in = (float *)malloc( p_in_buf->i_nb_bytes );
+#endif
+    if( p_in == NULL )
+    {
+        return;
+    }
+
+    p_aout->p_vlc->pf_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+
+    /* Take care of the previous input sample (if any) */
+    if( !p_filter->b_continuity )
+    {
+        p_filter->b_continuity = VLC_TRUE;
 	p_filter->p_sys->i_remainder = 0;
         aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
     }

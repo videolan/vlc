@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.32 2003/02/21 22:59:38 gbazin Exp $
+ * $Id: input.c,v 1.33 2003/03/04 03:27:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -130,7 +130,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         }
 
         /* success */
-        p_headphone_filter->b_reinit = VLC_TRUE;
+        p_headphone_filter->b_continuity = VLC_FALSE;
         p_input->pp_filters[p_input->i_nb_filters++] = p_headphone_filter;
     }
 
@@ -248,7 +248,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         if ( p_input->i_nb_resamplers != 0 )
         {
             p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-            p_input->pp_resamplers[0]->b_reinit = VLC_TRUE;
+            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
         }
         start_date = 0;
     }
@@ -260,7 +260,12 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
                   mdate() - p_buffer->start_date );
         aout_BufferFree( p_buffer );
-
+        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+        if ( p_input->i_nb_resamplers != 0 )
+        {
+            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
+        }
         return 0;
     }
 
@@ -353,8 +358,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->start_date = start_date;
 
     /* Actually run the resampler now. */
-    if ( p_input->i_nb_resamplers > 0 && p_aout->mixer.mixer.i_rate !=
-         p_input->pp_resamplers[0]->input.i_rate )
+    if ( p_input->i_nb_resamplers > 0 )
     {
         aout_FiltersPlay( p_aout, p_input->pp_resamplers,
                           p_input->i_nb_resamplers,

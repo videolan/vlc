@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.17 2003/01/21 10:29:12 massiot Exp $
+ * $Id: filters.c,v 1.18 2003/03/04 03:27:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,7 +60,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
         return NULL;
     }
 
-    p_filter->b_reinit = VLC_TRUE;
+    p_filter->b_continuity = VLC_FALSE;
 
     return p_filter;
 }
