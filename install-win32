@@ -74,8 +74,6 @@ Section "Install"
                        "$INSTDIR\vlc.exe" "--intf wxwin"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (skins).lnk" \
                        "$INSTDIR\vlc.exe" "--intf skins"
-	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (custom).lnk" \
-                       "$INSTDIR\vlc.exe" 
 
         WriteRegStr HKLM \
             SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \

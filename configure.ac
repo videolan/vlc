@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.47 2003/07/29 22:20:53 gbazin Exp $
+dnl $Id: configure.ac,v 1.48 2003/07/29 23:50:39 gbazin Exp $
 
 AC_INIT(vlc,0.6.1)
 
@@ -2440,6 +2440,7 @@ if test "${enable_skins}" != "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
 
     AX_ADD_PLUGINS([skins])
+    ALIASES="${ALIASES} svlc"
     AX_ADD_CPPFLAGS([skins],[-U_OFF_T_ -U_off_t -Imodules/gui/skins])
     AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
@@ -2452,6 +2453,7 @@ if test "${enable_skins}" != "no"; then
     fi
 
     AX_ADD_PLUGINS([skins])
+    ALIASES="${ALIASES} svlc"
     AX_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins],[-L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`])
