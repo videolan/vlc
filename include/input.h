@@ -57,22 +57,26 @@ typedef struct ts_packet_s
 typedef struct pes_packet_s
 {
     /* PES properties */
-    boolean_t               b_data_loss;   /* The previous (at least) PES packet
-            * has been lost. The decoders will have to find a way to recover. */
-    boolean_t               b_data_alignment; /* used to find the beginning of a
-                                               * video or audio unit          */
+    boolean_t               b_data_loss;  /* The previous (at least) PES packet
+           * has been lost. The decoders will have to find a way to recover. */
+    boolean_t               b_data_alignment;  /* used to find the beginning of
+                                                * a video or audio unit      */
     boolean_t               b_has_pts;       /* is the following field set ? */
     mtime_t                 i_pts; /* the PTS for this packet (if set above) */
     boolean_t               b_random_access;
-             /* if TRUE, in the payload of this packet, there is the first byte
-              * of a video sequence header, or the first byte of an audio frame.
-              */
+            /* if TRUE, in the payload of this packet, there is the first byte
+             * of a video sequence header, or the first byte of an audio frame.
+             */
     u8                      i_stream_id;              /* payload type and id */
     int                     i_pes_size;    /* size of the current PES packet */
+    int                     i_pes_real_size;      /* real size of the current
+                                                   * PES packet, ie. the one
+                                                   * announced in the header */
     int                     i_ts_packets;/* number of TS packets in this PES */
 
     /* Demultiplexer environment */
     boolean_t               b_discard_payload;  /* is the packet messed up ? */
+    boolean_t               b_already_parsed;     /* was it already parsed ? */
     byte_t *                p_pes_header;       /* pointer to the PES header */
     byte_t *                p_pes_header_save;           /* temporary buffer */
 

@@ -166,6 +166,7 @@ static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input )
     p_pes_packet->b_random_access = 0;
     p_pes_packet->b_discard_payload = 0;
     p_pes_packet->i_pes_size = 0;
+    p_pes_packet->i_pes_real_size = 0;
     p_pes_packet->i_ts_packets = 0;
     p_pes_packet->p_first_ts = NULL;
     p_pes_packet->p_last_ts = NULL;

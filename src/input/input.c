@@ -91,6 +91,8 @@ static __inline__ void  input_DemuxPES( input_thread_t *p_input,
                                         ts_packet_t *ts_packet,
                                         es_descriptor_t *p_es_descriptor,
                                         boolean_t b_unit_start, boolean_t b_packet_lost );
+static __inline__ void  input_ParsePES( input_thread_t *p_input,
+                                        es_descriptor_t *p_es_descriptor );
 static __inline__ void  input_DemuxPSI( input_thread_t *p_input,
                                         ts_packet_t *ts_packet,
                                         es_descriptor_t *p_es_descriptor,
@@ -722,7 +724,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
     if( !b_adaption )
     {
         /* We don't have any adaptation_field, so payload start immediately
-         after the 4 byte TS header */
+           after the 4 byte TS header */
         p_ts_packet->i_payload_start = 4;
     }
     else
@@ -736,7 +738,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
         {
             /* If the packet has both adaptation_field and payload, adaptation_field
                cannot be more than 182 bytes long; if there is only an
-           adaptation_field, it must fill the next 183 bytes. */
+               adaptation_field, it must fill the next 183 bytes. */
             if( b_payload ? (p[4] > 182) : (p[4] != 183) )
             {
                 intf_DbgMsg("input debug: invalid TS adaptation field (%p)\n",
@@ -797,7 +799,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
         if( !b_payload && i_dummy == 0 )
         {
             /* This is a packet without payload, this is allowed by the draft
-               As there is nothing interessant in this packet (except PCR that
+               As there is nothing interesting in this packet (except PCR that
                have already been handled), we can trash the packet. */
             intf_DbgMsg("Packet without payload received by TS demux\n");
             b_trash = 1;
@@ -865,7 +867,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
 /*****************************************************************************
  * input_DemuxPES:
  *****************************************************************************
- * Gather a PES packet and analyzes its header.
+ * Gather a PES packet.
  *****************************************************************************/
 static __inline__ void input_DemuxPES( input_thread_t *p_input,
                                        ts_packet_t *p_ts_packet,
@@ -873,8 +875,6 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                                        boolean_t b_unit_start,
                                        boolean_t b_packet_lost )
 {
-    decoder_fifo_t *            p_fifo;
-    u8                          i_pes_header_size;
     int                         i_dummy;
     pes_packet_t*               p_last_pes;
     ts_packet_t *               p_ts;
@@ -904,33 +904,27 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
        so parse its header and give it to the decoders */
     if( b_unit_start && p_pes != NULL )
     {
-        //intf_DbgMsg("End of PES packet %p\n", p_pes);
-
         /* Parse the header. The header has a variable length, but in order
            to improve the algorithm, we will read the 14 bytes we may be
            interested in */
+
+        /* If this part of the header did not fit in the current TS packet,
+           copy the part of the header we are interested in to the
+           p_pes_header_save buffer. The buffer is dynamicly allocated if
+           needed so it's time expensive but this situation almost never
+           occurs. */
         p_ts = p_pes->p_first_ts;
         i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
-        i_dummy = 0;
 
-        if(i_ts_payload_size >= PES_HEADER_SIZE)
+        if(i_ts_payload_size < PES_HEADER_SIZE)
         {
-            /* This part of the header entirely fits in the payload of
-               the first TS packet */
-            p_pes->p_pes_header = &(p_ts->buffer[p_ts->i_payload_start]);
-        }
-        else
-        {
-            /* This part of the header does not fit in the current TS packet:
-               copy the part of the header we are interested in to the
-               p_pes_header_save buffer. The buffer is dynamicly allocated if
-               needed so it's time expensive but this situation almost never occur. */
             intf_DbgMsg("Code never tested encountered, WARNING ! (benny)\n");
             if( !p_pes->p_pes_header_save )
             {
                 p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE);
             }
 
+            i_dummy = 0;
             do
             {
                 memcpy(p_pes->p_pes_header_save + i_dummy,
@@ -963,197 +957,19 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                    PES_HEADER_SIZE - i_dummy);
 
             /* The header must be read in the buffer not in any TS packet */
-           p_pes->p_pes_header = p_pes->p_pes_header_save;
+            p_pes->p_pes_header = p_pes->p_pes_header_save;
+
+            /* Get the PES size if defined */
+            if( (i_dummy = U16_AT(p_pes->p_pes_header + 4)) )
+            {
+                p_pes->i_pes_real_size = i_dummy + 6;
+            }
         }
 
         /* Now we have the part of the PES header we were interested in:
-           parse it */
-
-        /* First read the 6 header bytes common to all PES packets:
-           use them to test the PES validity */
-        if( (p_pes->p_pes_header[0] || p_pes->p_pes_header[1] ||
-            (p_pes->p_pes_header[2] != 1)) ||
-                                     /* packet_start_code_prefix != 0x000001 */
-            ((i_dummy = U16_AT(p_pes->p_pes_header + 4)) &&
-             (i_dummy + 6 != p_pes->i_pes_size)) )
-                   /* PES_packet_length is set and != total received payload */
-        {
-          /* Trash the packet and set p_pes to NULL to be sure the next PES
-             packet will have its b_data_lost flag set */
-          intf_DbgMsg("Corrupted PES packet received: trashed\n");
-          input_NetlistFreePES( p_input, p_pes );
-          p_pes = NULL;
-          /* Stats XXX?? */
-        }
-        else
-        {
-            /* The PES packet is valid. Check its type to test if it may
-               carry additional informations in a header extension */
-            p_pes->i_stream_id =  p_pes->p_pes_header[3];
-
-            switch( p_pes->i_stream_id )
-            {
-            case 0xBE:  /* Padding */
-            case 0xBC:  /* Program stream map */
-            case 0xBF:  /* Private stream 2 */
-            case 0xB0:  /* ECM */
-            case 0xB1:  /* EMM */
-            case 0xFF:  /* Program stream directory */
-            case 0xF2:  /* DSMCC stream */
-            case 0xF8:  /* ITU-T H.222.1 type E stream */
-                /* The payload begins immediatly after the 6 bytes header, so
-                   we have finished with the parsing */
-                i_pes_header_size = 6;
-                break;
-
-            default:
-                /* The PES header contains at least 3 more bytes: parse them */
-                p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
-                p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
-                i_pes_header_size = p_pes->p_pes_header[8] + 9;
-
-                /* Now parse the optional header extensions (in the limit of
-                   the 14 bytes */
-                if( p_pes->b_has_pts )
-                {
-                    pcr_descriptor_t * p_pcr;
-
-                    p_pcr = p_input->p_pcr;
-
-                    p_pes->i_pts =
-                        ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
-                          (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
-                          ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) ) * 300;
-                    p_pes->i_pts /= 27;
-
-                    if( p_pcr->i_synchro_state )
-                    {
-                        switch( p_pcr->i_synchro_state )
-                        {
-                            case SYNCHRO_NOT_STARTED:
-                                p_pes->b_has_pts = 0;
-                                break;
-
-                            case SYNCHRO_START:
-                                p_pes->i_pts += p_pcr->delta_pcr;
-                                p_pcr->delta_absolute = mdate() - p_pes->i_pts + INPUT_PTS_DELAY;
-                                p_pes->i_pts += p_pcr->delta_absolute;
-                                p_pcr->i_synchro_state = 0;
-                                break;
-
-                            case SYNCHRO_REINIT: /* We skip a PES */
-                                p_pes->b_has_pts = 0;
-                                p_pcr->i_synchro_state = SYNCHRO_START;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        p_pes->i_pts += p_pcr->delta_pcr + p_pcr->delta_absolute;
-                    }
-                }
-                break;
-            }
-
-            /* Now we've parsed the header, we just have to indicate in some
-               specific TS packets where the PES payload begins (renumber
-               i_payload_start), so that the decoders can find the beginning
-               of their data right out of the box. */
-            p_ts = p_pes->p_first_ts;
-            i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
-            while( i_pes_header_size > i_ts_payload_size )
-            {
-                /* These packets are entirely filled by the PES header. */
-                i_pes_header_size -= i_ts_payload_size;
-                p_ts->i_payload_start = p_ts->i_payload_end;
-                /* Go to the next TS packet: here we won't have to test it is
-                   not NULL because we trash the PES packets when packet lost
-                   occurs */
-                p_ts = p_ts->p_next_ts;
-                i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
-            }
-            /* This last packet is partly header, partly payload. */
-            p_ts->i_payload_start += i_pes_header_size;
-
-
-            /* Now we can eventually put the PES packet in the decoder's
-               PES fifo */
-            switch( p_es_descriptor->i_type )
-            {
-                case MPEG1_VIDEO_ES:
-                case MPEG2_VIDEO_ES:
-#ifdef OLD_DECODER
-                    p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
-#else
-                    p_fifo = &(((vpar_thread_t*)(p_es_descriptor->p_dec))->fifo);
-#endif
-                    break;
-
-                case MPEG1_AUDIO_ES:
-                case MPEG2_AUDIO_ES:
-                    p_fifo = &(((adec_thread_t*)(p_es_descriptor->p_dec))->fifo);
-                    break;
-
-                case AC3_AUDIO_ES:
-#if 0
-                    /* we skip 4 bytes at the beginning of the AC3 payload */
-                    p_ts->i_payload_start += 4;
-#endif
-                    p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
-                    break;
-
-                case DVD_SPU_ES:
-                    /* we skip 4 bytes at the beginning of the subpicture payload */
-                    p_ts->i_payload_start += 4;
-                    p_fifo = &(((spudec_thread_t *)(p_es_descriptor->p_dec))->fifo);
-                    break;
-
-                default:
-                    /* This should never happen */
-                    intf_DbgMsg("Unknown stream type (%d, %d): PES trashed\n",
-                        p_es_descriptor->i_id, p_es_descriptor->i_type);
-                    p_fifo = NULL;
-                    break;
-            }
-
-            if( p_fifo != NULL )
-            {
-                vlc_mutex_lock( &p_fifo->data_lock );
-                if( DECODER_FIFO_ISFULL( *p_fifo ) )
-                {
-                    /* The FIFO is full !!! This should not happen. */
-#ifdef STATS
-                    p_input->c_packets_trashed += p_pes->i_ts_packets;
-                    p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
-#endif
-                    input_NetlistFreePES( p_input, p_pes );
-                    intf_DbgMsg("PES trashed - fifo full ! (%d, %d)\n",
-                               p_es_descriptor->i_id, p_es_descriptor->i_type);
-                }
-        else
-                {
-                    //intf_DbgMsg("Putting %p into fifo %p/%d\n",
-                    //            p_pes, p_fifo, p_fifo->i_end);
-                    p_fifo->buffer[p_fifo->i_end] = p_pes;
-                    DECODER_FIFO_INCEND( *p_fifo );
-
-                    /* Warn the decoder that it's got work to do. */
-                    vlc_cond_signal( &p_fifo->data_wait );
-                }
-                vlc_mutex_unlock( &p_fifo->data_lock );
-            }
-            else
-            {
-                intf_DbgMsg("No fifo to receive PES %p: trash\n", p_pes);
-#ifdef STATS
-                p_input->c_packets_trashed += p_pes->i_ts_packets;
-                p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
-#endif
-                input_NetlistFreePES( p_input, p_pes );
-            }
-        }
+           p_pes_header and i_pes_real_size ; we can parse it */
+        input_ParsePES( p_input, p_es_descriptor );
     }
-
 
     /* If we are at the beginning of a new PES packet, we must fetch a new
        PES buffer to begin with the reassembly of this PES packet. This is
@@ -1173,25 +989,41 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
         {
             //intf_DbgMsg("New PES packet %p (first TS: %p)\n", p_pes, p_ts_packet);
 
-            /* Init the PES fields so that the first TS packet could be correctly
-               added to the PES packet (see below) */
+            /* Init the PES fields so that the first TS packet could be
+             * correctly added to the PES packet (see below) */
             p_pes->p_first_ts = p_ts_packet;
             p_pes->p_last_ts = NULL;
 
-            /* If the last pes packet was null, this means that the synchronisation
-               was lost and so warn the decoder that he will have to find a way to
-               recover */
+            /* If the last pes packet was null, this means that the
+             * synchronization was lost and so warn the decoder that he
+             * will have to find a way to recover */
             if( !p_last_pes )
                 p_pes->b_data_loss = 1;
+
+            /* Tell the Demux we haven't yet parsed this PES */
+            p_pes->b_already_parsed = 0;
 
             /* Read the b_random_access flag status and then reinit it */
             p_pes->b_random_access = p_es_descriptor->b_random;
             p_es_descriptor->b_random = 0;
         }
+
+        /* If the PES header fits in the first TS packet, we can
+         * already set p_pes->p_pes_header, and in all cases we
+	 * set p_pes->i_pes_real_size */
+        if( p_ts_packet->i_payload_end - p_ts_packet->i_payload_start
+                >= PES_HEADER_SIZE )
+        {
+            p_pes->p_pes_header = &(p_ts_packet->buffer[p_ts_packet->i_payload_start]);
+            if( (i_dummy = U16_AT(p_pes->p_pes_header + 4)) )
+            {
+                p_pes->i_pes_real_size = i_dummy + 6;
+            }
+        }
     }
 
 
-    /* If we are synchronised with the stream, and so if we are ready to
+    /* If we are synchronized with the stream, and so if we are ready to
        receive correctly the data, add the TS packet to the current PES
        packet */
     if( p_pes != NULL )
@@ -1207,9 +1039,9 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
         p_ts_packet->p_next_ts = NULL;
         if( p_pes->i_ts_packets != 0 )
         {
-            /* Regarder si il serait pas plus efficace de ne creer que les liens
-               precedent->suivant pour le moment, et les liens suivant->precedent
-               quand le paquet est termine */
+            /* Regarder si il serait pas plus efficace de ne creer que
+             * les liens precedent->suivant pour le moment, et les
+             * liens suivant->precedent quand le paquet est termine */
             /* Otherwise it is the first TS packet. */
             p_pes->p_last_ts->p_next_ts = p_ts_packet;
         }
@@ -1223,6 +1055,16 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
         i_dummy = p_ts_packet->i_payload_end - p_ts_packet->i_payload_start;
         p_es_descriptor->c_payload_bytes += i_dummy;
 #endif
+
+        /* We can check if the packet is finished */
+        if( p_pes->i_pes_size == p_pes->i_pes_real_size )
+        {
+            /* The packet is finished, parse it */
+            input_ParsePES( p_input, p_es_descriptor );
+
+            /* Tell the Demux we have parsed this PES, no need to redo it */
+            p_pes = NULL;
+        }
     }
     else
     {
@@ -1235,6 +1077,209 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 #undef p_pes
 }
 
+
+
+/*****************************************************************************
+ * input_ParsePES
+ *****************************************************************************
+ * Parse a finished PES packet and analyze its header.
+ *****************************************************************************/
+static __inline__ void input_ParsePES( input_thread_t *p_input,
+                                       es_descriptor_t *p_es_descriptor )
+{
+    decoder_fifo_t *            p_fifo;
+    u8                          i_pes_header_size;
+    ts_packet_t *               p_ts;
+    int                         i_ts_payload_size;
+
+
+#define p_pes (p_es_descriptor->p_pes_packet)
+
+    //intf_DbgMsg("End of PES packet %p\n", p_pes);
+
+    /* First read the 6 header bytes common to all PES packets:
+       use them to test the PES validity */
+    if( (p_pes->p_pes_header[0] || p_pes->p_pes_header[1] ||
+        (p_pes->p_pes_header[2] != 1)) ||
+                                 /* packet_start_code_prefix != 0x000001 */
+        ((p_pes->i_pes_real_size) &&
+         (p_pes->i_pes_real_size != p_pes->i_pes_size)) )
+               /* PES_packet_length is set and != total received payload */
+    {
+      /* Trash the packet and set p_pes to NULL to be sure the next PES
+         packet will have its b_data_lost flag set */
+      intf_DbgMsg("Corrupted PES packet received: trashed\n");
+      input_NetlistFreePES( p_input, p_pes );
+      p_pes = NULL;
+      /* Stats XXX?? */
+    }
+    else
+    {
+        /* The PES packet is valid. Check its type to test if it may
+           carry additional informations in a header extension */
+        p_pes->i_stream_id =  p_pes->p_pes_header[3];
+
+        switch( p_pes->i_stream_id )
+        {
+        case 0xBE:  /* Padding */
+        case 0xBC:  /* Program stream map */
+        case 0xBF:  /* Private stream 2 */
+        case 0xB0:  /* ECM */
+        case 0xB1:  /* EMM */
+        case 0xFF:  /* Program stream directory */
+        case 0xF2:  /* DSMCC stream */
+        case 0xF8:  /* ITU-T H.222.1 type E stream */
+            /* The payload begins immediatly after the 6 bytes header, so
+               we have finished with the parsing */
+            i_pes_header_size = 6;
+            break;
+
+        default:
+            /* The PES header contains at least 3 more bytes: parse them */
+            p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
+            p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
+            i_pes_header_size = p_pes->p_pes_header[8] + 9;
+
+            /* Now parse the optional header extensions (in the limit of
+               the 14 bytes */
+            if( p_pes->b_has_pts )
+            {
+                pcr_descriptor_t * p_pcr;
+
+                p_pcr = p_input->p_pcr;
+
+                p_pes->i_pts =
+                    ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
+                      (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
+                      ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) ) * 300;
+                p_pes->i_pts /= 27;
+
+                if( p_pcr->i_synchro_state )
+                {
+                    switch( p_pcr->i_synchro_state )
+                    {
+                        case SYNCHRO_NOT_STARTED:
+                            p_pes->b_has_pts = 0;
+                            break;
+
+                        case SYNCHRO_START:
+                            p_pes->i_pts += p_pcr->delta_pcr;
+                            p_pcr->delta_absolute = mdate() - p_pes->i_pts + INPUT_PTS_DELAY;
+                            p_pes->i_pts += p_pcr->delta_absolute;
+                            p_pcr->i_synchro_state = 0;
+                            break;
+
+                        case SYNCHRO_REINIT: /* We skip a PES */
+                            p_pes->b_has_pts = 0;
+                            p_pcr->i_synchro_state = SYNCHRO_START;
+                            break;
+                    }
+                }
+                else
+                {
+                    p_pes->i_pts += p_pcr->delta_pcr + p_pcr->delta_absolute;
+                }
+            }
+            break;
+        }
+
+        /* Now we've parsed the header, we just have to indicate in some
+           specific TS packets where the PES payload begins (renumber
+           i_payload_start), so that the decoders can find the beginning
+           of their data right out of the box. */
+        p_ts = p_pes->p_first_ts;
+        i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+        while( i_pes_header_size > i_ts_payload_size )
+        {
+            /* These packets are entirely filled by the PES header. */
+            i_pes_header_size -= i_ts_payload_size;
+            p_ts->i_payload_start = p_ts->i_payload_end;
+            /* Go to the next TS packet: here we won't have to test it is
+               not NULL because we trash the PES packets when packet lost
+               occurs */
+            p_ts = p_ts->p_next_ts;
+            i_ts_payload_size = p_ts->i_payload_end - p_ts->i_payload_start;
+        }
+        /* This last packet is partly header, partly payload. */
+        p_ts->i_payload_start += i_pes_header_size;
+
+
+        /* Now we can eventually put the PES packet in the decoder's
+           PES fifo */
+        switch( p_es_descriptor->i_type )
+        {
+            case MPEG1_VIDEO_ES:
+            case MPEG2_VIDEO_ES:
+#ifdef OLD_DECODER
+                p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+#else
+                p_fifo = &(((vpar_thread_t*)(p_es_descriptor->p_dec))->fifo);
+#endif
+                break;
+
+            case MPEG1_AUDIO_ES:
+            case MPEG2_AUDIO_ES:
+                p_fifo = &(((adec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+                break;
+
+            case AC3_AUDIO_ES:
+                /* we skip 4 bytes at the beginning of the AC3 payload */
+                //p_ts->i_payload_start += 4;
+                p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
+                break;
+
+            case DVD_SPU_ES:
+                /* we skip 4 bytes at the beginning of the subpicture payload */
+                //p_ts->i_payload_start += 4;
+                p_fifo = &(((spudec_thread_t *)(p_es_descriptor->p_dec))->fifo);
+                break;
+
+            default:
+                /* This should never happen */
+                intf_DbgMsg("Unknown stream type (%d, %d): PES trashed\n",
+                    p_es_descriptor->i_id, p_es_descriptor->i_type);
+                p_fifo = NULL;
+                break;
+        }
+
+        if( p_fifo != NULL )
+        {
+            vlc_mutex_lock( &p_fifo->data_lock );
+            if( DECODER_FIFO_ISFULL( *p_fifo ) )
+            {
+                /* The FIFO is full !!! This should not happen. */
+#ifdef STATS
+                p_input->c_packets_trashed += p_pes->i_ts_packets;
+                p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
+#endif
+                input_NetlistFreePES( p_input, p_pes );
+                intf_DbgMsg("PES trashed - fifo full ! (%d, %d)\n",
+                           p_es_descriptor->i_id, p_es_descriptor->i_type);
+            }
+        else
+            {
+                //intf_DbgMsg("Putting %p into fifo %p/%d\n",
+                //            p_pes, p_fifo, p_fifo->i_end);
+                p_fifo->buffer[p_fifo->i_end] = p_pes;
+                DECODER_FIFO_INCEND( *p_fifo );
+
+                /* Warn the decoder that it's got work to do. */
+                vlc_cond_signal( &p_fifo->data_wait );
+            }
+            vlc_mutex_unlock( &p_fifo->data_lock );
+        }
+        else
+        {
+            intf_DbgMsg("No fifo to receive PES %p: trash\n", p_pes);
+#ifdef STATS
+            p_input->c_packets_trashed += p_pes->i_ts_packets;
+            p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
+#endif
+            input_NetlistFreePES( p_input, p_pes );
+        }
+    }
+#undef p_pes
+}
 
 
 
