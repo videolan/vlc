@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.8 2004/01/22 18:49:38 fenrir Exp $
+ * $Id: mmstu.c,v 1.9 2004/02/12 20:09:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -192,6 +192,10 @@ int  E_(MMSTUOpen)( input_thread_t *p_input )
      *  broadcast    yy=0x02, xx= 0x00
      *  pre-recorded yy=0x01, xx= 0x80 if video, 0x00 no video
      */
+    if( p_sys->i_packet_count <= 0 && p_sys->asfh.i_data_packets_count > 0 )
+    {
+        p_sys->i_packet_count = p_sys->asfh.i_data_packets_count;
+    }
     if( p_sys->i_packet_count <= 0 || ( p_sys->i_flags_broadcast >> 24 ) == 0x02 )
     {
         p_input->stream.b_seekable = 0;
