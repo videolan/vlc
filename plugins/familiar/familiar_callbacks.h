@@ -34,3 +34,7 @@ gboolean
 on_xpm_forward_button_press_event      (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
+
+void
+on_familiar_destroy                    (GtkObject       *object,
+                                        gpointer         user_data);

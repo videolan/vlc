@@ -33,11 +33,38 @@ create_familiar (void)
   GtkWidget *xpm_forward;
   GtkWidget *progress;
   GtkWidget *notebook;
-  GtkWidget *empty_notebook_page;
+  GtkWidget *fixedMedia;
+  GtkWidget *labelUrl;
+  GtkWidget *listMedia;
+  GtkWidget *comboURL;
+  GList *comboURL_items = NULL;
+  GtkWidget *combo_entry1;
   GtkWidget *media;
-  GtkWidget *preference;
-  GtkWidget *help;
+  GtkWidget *fixedPreferences;
+  GtkWidget *buttonSave;
+  GtkWidget *buttonApply;
+  GtkWidget *buttonCancel;
+  GtkWidget *frameDefaultURL;
+  GtkWidget *fixed3;
+  GtkWidget *comboDefaultURL;
+  GList *comboDefaultURL_items = NULL;
+  GtkWidget *combo_entry2;
+  GtkWidget *frameIP;
+  GtkWidget *fixed2;
+  GSList *IPversion_group = NULL;
+  GtkWidget *rbIPv6;
+  GtkWidget *rbIPv4;
+  GtkWidget *preferences;
+  GtkWidget *fixedAbout;
+  GtkWidget *logo;
+  GtkWidget *labelVlc;
+  GtkWidget *labelCopyright;
+  GtkWidget *labelAuthors;
+  GtkWidget *labelAbout;
   GtkWidget *about;
+  GtkTooltips *tooltips;
+
+  tooltips = gtk_tooltips_new ();
 
   familiar = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (familiar), "familiar", familiar);
@@ -133,9 +160,54 @@ create_familiar (void)
   gtk_widget_show (notebook);
   gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 0);
 
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (empty_notebook_page);
-  gtk_container_add (GTK_CONTAINER (notebook), empty_notebook_page);
+  fixedMedia = gtk_fixed_new ();
+  gtk_widget_ref (fixedMedia);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedMedia", fixedMedia,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (fixedMedia);
+  gtk_container_add (GTK_CONTAINER (notebook), fixedMedia);
+
+  labelUrl = gtk_label_new (_("URL:"));
+  gtk_widget_ref (labelUrl);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelUrl", labelUrl,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelUrl);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), labelUrl, 4, 8);
+  gtk_widget_set_uposition (labelUrl, 4, 8);
+  gtk_widget_set_usize (labelUrl, 38, 18);
+
+  listMedia = gtk_list_new ();
+  gtk_widget_ref (listMedia);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "listMedia", listMedia,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (listMedia);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), listMedia, 8, 40);
+  gtk_widget_set_uposition (listMedia, 8, 40);
+  gtk_widget_set_usize (listMedia, 220, 200);
+  gtk_tooltips_set_tip (tooltips, listMedia, _("Select multimedia file."), NULL);
+  gtk_list_set_selection_mode (GTK_LIST (listMedia), GTK_SELECTION_MULTIPLE);
+
+  comboURL = gtk_combo_new ();
+  gtk_widget_ref (comboURL);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL", comboURL,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (comboURL);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), comboURL, 46, 6);
+  gtk_widget_set_uposition (comboURL, 46, 6);
+  gtk_widget_set_usize (comboURL, 185, 24);
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("file://"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://localhost"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://localhost"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp://localhost:1234/"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
+  g_list_free (comboURL_items);
+
+  combo_entry1 = GTK_COMBO (comboURL)->entry;
+  gtk_widget_ref (combo_entry1);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry1", combo_entry1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo_entry1);
+  gtk_entry_set_text (GTK_ENTRY (combo_entry1), _("file://"));
 
   media = gtk_label_new (_("Media"));
   gtk_widget_ref (media);
@@ -144,39 +216,188 @@ create_familiar (void)
   gtk_widget_show (media);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0), media);
 
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (empty_notebook_page);
-  gtk_container_add (GTK_CONTAINER (notebook), empty_notebook_page);
-
-  preference = gtk_label_new (_("Preference"));
-  gtk_widget_ref (preference);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "preference", preference,
+  fixedPreferences = gtk_fixed_new ();
+  gtk_widget_ref (fixedPreferences);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedPreferences", fixedPreferences,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (preference);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), preference);
+  gtk_widget_show (fixedPreferences);
+  gtk_container_add (GTK_CONTAINER (notebook), fixedPreferences);
 
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (empty_notebook_page);
-  gtk_container_add (GTK_CONTAINER (notebook), empty_notebook_page);
-
-  help = gtk_label_new (_("Help"));
-  gtk_widget_ref (help);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "help", help,
+  buttonSave = gtk_button_new_with_label (_("Save"));
+  gtk_widget_ref (buttonSave);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonSave", buttonSave,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (help);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), help);
+  gtk_widget_show (buttonSave);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), buttonSave, 8, 216);
+  gtk_widget_set_uposition (buttonSave, 8, 216);
+  gtk_widget_set_usize (buttonSave, 54, 24);
 
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (empty_notebook_page);
-  gtk_container_add (GTK_CONTAINER (notebook), empty_notebook_page);
+  buttonApply = gtk_button_new_with_label (_("Apply"));
+  gtk_widget_ref (buttonApply);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonApply", buttonApply,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (buttonApply);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), buttonApply, 64, 216);
+  gtk_widget_set_uposition (buttonApply, 64, 216);
+  gtk_widget_set_usize (buttonApply, 54, 24);
+
+  buttonCancel = gtk_button_new_with_label (_("Cancel"));
+  gtk_widget_ref (buttonCancel);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonCancel", buttonCancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (buttonCancel);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), buttonCancel, 176, 216);
+  gtk_widget_set_uposition (buttonCancel, 176, 216);
+  gtk_widget_set_usize (buttonCancel, 54, 24);
+
+  frameDefaultURL = gtk_frame_new (_("Default URL:"));
+  gtk_widget_ref (frameDefaultURL);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "frameDefaultURL", frameDefaultURL,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frameDefaultURL);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), frameDefaultURL, 8, 8);
+  gtk_widget_set_uposition (frameDefaultURL, 8, 8);
+  gtk_widget_set_usize (frameDefaultURL, 220, 60);
+
+  fixed3 = gtk_fixed_new ();
+  gtk_widget_ref (fixed3);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed3", fixed3,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (fixed3);
+  gtk_container_add (GTK_CONTAINER (frameDefaultURL), fixed3);
+
+  comboDefaultURL = gtk_combo_new ();
+  gtk_widget_ref (comboDefaultURL);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboDefaultURL", comboDefaultURL,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (comboDefaultURL);
+  gtk_fixed_put (GTK_FIXED (fixed3), comboDefaultURL, 8, 4);
+  gtk_widget_set_uposition (comboDefaultURL, 8, 4);
+  gtk_widget_set_usize (comboDefaultURL, 200, 24);
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("file://"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://localhost"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("http://localhost"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udp://localhost:1234/"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboDefaultURL), comboDefaultURL_items);
+  g_list_free (comboDefaultURL_items);
+
+  combo_entry2 = GTK_COMBO (comboDefaultURL)->entry;
+  gtk_widget_ref (combo_entry2);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry2", combo_entry2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo_entry2);
+  gtk_entry_set_text (GTK_ENTRY (combo_entry2), _("file://"));
+
+  frameIP = gtk_frame_new (_("IP version:"));
+  gtk_widget_ref (frameIP);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "frameIP", frameIP,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frameIP);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), frameIP, 8, 72);
+  gtk_widget_set_uposition (frameIP, 8, 72);
+  gtk_widget_set_usize (frameIP, 220, 60);
+
+  fixed2 = gtk_fixed_new ();
+  gtk_widget_ref (fixed2);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed2", fixed2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (fixed2);
+  gtk_container_add (GTK_CONTAINER (frameIP), fixed2);
+
+  rbIPv6 = gtk_radio_button_new_with_label (IPversion_group, _("IPv6"));
+  IPversion_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv6));
+  gtk_widget_ref (rbIPv6);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv6", rbIPv6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (rbIPv6);
+  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv6, 112, 8);
+  gtk_widget_set_uposition (rbIPv6, 112, 8);
+  gtk_widget_set_usize (rbIPv6, 104, 26);
+
+  rbIPv4 = gtk_radio_button_new_with_label (IPversion_group, _("IPv4"));
+  IPversion_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv4));
+  gtk_widget_ref (rbIPv4);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv4", rbIPv4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (rbIPv4);
+  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv4, 8, 8);
+  gtk_widget_set_uposition (rbIPv4, 8, 8);
+  gtk_widget_set_usize (rbIPv4, 104, 26);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (rbIPv4), TRUE);
+
+  preferences = gtk_label_new (_("Preference"));
+  gtk_widget_ref (preferences);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "preferences", preferences,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (preferences);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), preferences);
+
+  fixedAbout = gtk_fixed_new ();
+  gtk_widget_ref (fixedAbout);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedAbout", fixedAbout,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (fixedAbout);
+  gtk_container_add (GTK_CONTAINER (notebook), fixedAbout);
+
+  logo = create_pixmap (familiar, "vlc32x32.xpm");
+  gtk_widget_ref (logo);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "logo", logo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (logo);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), logo, 8, 0);
+  gtk_widget_set_uposition (logo, 8, 0);
+  gtk_widget_set_usize (logo, 50, 50);
+
+  labelVlc = gtk_label_new (_("VideoLAN Client\n for familiar Linux"));
+  gtk_widget_ref (labelVlc);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelVlc", labelVlc,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelVlc);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), labelVlc, 64, 8);
+  gtk_widget_set_uposition (labelVlc, 64, 8);
+  gtk_widget_set_usize (labelVlc, 120, 40);
+  gtk_label_set_line_wrap (GTK_LABEL (labelVlc), TRUE);
+
+  labelCopyright = gtk_label_new (_("(c) 2002, the VideoLAN Team"));
+  gtk_widget_ref (labelCopyright);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelCopyright", labelCopyright,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelCopyright);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), labelCopyright, 16, 56);
+  gtk_widget_set_uposition (labelCopyright, 16, 56);
+  gtk_widget_set_usize (labelCopyright, 200, 18);
+
+  labelAuthors = gtk_label_new (_("Authors: The VideoLAN Team, http://www.videolan.org"));
+  gtk_widget_ref (labelAuthors);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelAuthors", labelAuthors,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelAuthors);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), labelAuthors, 16, 80);
+  gtk_widget_set_uposition (labelAuthors, 16, 80);
+  gtk_widget_set_usize (labelAuthors, 200, 40);
+  gtk_label_set_line_wrap (GTK_LABEL (labelAuthors), TRUE);
+
+  labelAbout = gtk_label_new (_("The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources."));
+  gtk_widget_ref (labelAbout);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelAbout", labelAbout,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelAbout);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), labelAbout, 16, 128);
+  gtk_widget_set_uposition (labelAbout, 16, 128);
+  gtk_widget_set_usize (labelAbout, 200, 70);
+  gtk_label_set_justify (GTK_LABEL (labelAbout), GTK_JUSTIFY_LEFT);
+  gtk_label_set_line_wrap (GTK_LABEL (labelAbout), TRUE);
 
   about = gtk_label_new (_("About"));
   gtk_widget_ref (about);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "about", about,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (about);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 3), about);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), about);
 
+  gtk_signal_connect (GTK_OBJECT (familiar), "destroy",
+                      GTK_SIGNAL_FUNC (on_familiar_destroy),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (xpm_open), "button_press_event",
                       GTK_SIGNAL_FUNC (on_xpm_open_button_press_event),
                       NULL);
@@ -198,6 +419,8 @@ create_familiar (void)
   gtk_signal_connect (GTK_OBJECT (xpm_forward), "button_press_event",
                       GTK_SIGNAL_FUNC (on_xpm_forward_button_press_event),
                       NULL);
+
+  gtk_object_set_data (GTK_OBJECT (familiar), "tooltips", tooltips);
 
   return familiar;
 }

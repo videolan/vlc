@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.2 2002/07/22 19:49:40 jpsaman Exp $
+ * $Id: familiar.c,v 1.3 2002/07/22 20:52:42 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -61,7 +61,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("Familiar Linux Gtk+ interface module") )
-    ADD_CAPABILITY( INTF, 590 )
+    ADD_CAPABILITY( INTF, 70 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

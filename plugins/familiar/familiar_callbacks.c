@@ -77,3 +77,11 @@ on_xpm_forward_button_press_event      (GtkWidget       *widget,
   return FALSE;
 }
 
+
+void
+on_familiar_destroy                    (GtkObject       *object,
+                                        gpointer         user_data)
+{
+  gtk_main_quit();
+}
+
