@@ -406,6 +406,10 @@ static int Open( vlc_object_t * p_this )
                 else
                 {
                     es_format_Init( &fmt, VIDEO_ES, p_vids->p_bih->biCompression );
+                    if( tk->i_codec == FOURCC_mp4v && !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
+                    {
+                        fmt.i_codec = VLC_FOURCC( 'X', 'V', 'I', 'D' );
+                    }
                 }
                 tk->i_samplesize = 0;
                 fmt.video.i_width  = p_vids->p_bih->biWidth;
