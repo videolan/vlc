@@ -706,6 +706,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     };
 
     wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 6, 1, 20 );
+    wxFlexGridSizer *video_sub_sizer = new wxFlexGridSizer( 2, 5, 20 );
     video_transc_checkbox =
         new wxCheckBox( panel, VideoTranscEnable_Event, wxU(_("Video codec")));
     video_codec_combo =
@@ -730,14 +731,16 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     video_sizer->Add( video_codec_combo, 1,
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    video_sizer->Add( bitrate_label, 0,
+    video_sub_sizer->Add( bitrate_label, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    video_sizer->Add( video_bitrate_combo, 1,
+    video_sub_sizer->Add( video_bitrate_combo, 1,
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    video_sizer->Add( scale_label, 0,
+    video_sub_sizer->Add( scale_label, 0,
                       wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    video_sizer->Add( video_scale_combo, 1,
+    video_sub_sizer->Add( video_scale_combo, 1,
                       wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    video_sizer->Add( video_sub_sizer, 1, wxEXPAND |
+                         wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
     /* Create audio transcoding checkox */
     static const wxString wxacodecs_array[] =
