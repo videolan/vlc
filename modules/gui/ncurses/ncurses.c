@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.9 2004/01/10 23:31:33 sigmunau Exp $
+ * $Id: ncurses.c,v 1.10 2004/01/11 00:01:35 fenrir Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -100,6 +100,9 @@ struct intf_sys_t
     int             i_box_lines_total;
     int             i_box_start;
 
+    int             i_box_plidx;    /* Playlist index */
+    int             b_box_plidx_follow;
+
     int             b_box_cleared;
 
     msg_subscription_t* p_sub;                  /* message bank subscription */
@@ -116,6 +119,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys;
+    vlc_value_t    val;
 
     /* Allocate instance and initialize some members */
     p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -127,7 +131,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_box_lines = 0;
     p_sys->i_box_start= 0;
     p_sys->i_box_lines_total = 0;
+    p_sys->b_box_plidx_follow = VLC_TRUE;
     p_sys->b_box_cleared = VLC_FALSE;
+    p_sys->i_box_plidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf );
 
     /* Initialize the curses library */
@@ -147,6 +153,10 @@ static int Open( vlc_object_t *p_this )
 
     /* exported function */
     p_intf->pf_run = Run;
+
+    /* Set quiet mode */
+    val.i_int = -1;
+    var_Set( p_intf->p_vlc, "verbose", val );
 
     return VLC_SUCCESS;
 }
@@ -201,27 +211,35 @@ static void Run( intf_thread_t *p_intf )
         {
             p_sys->p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         }
-        if( p_sys->p_input == NULL )
+        if( p_sys->p_playlist )
         {
-            if( p_sys->p_playlist )
+            vlc_mutex_lock( &p_sys->p_playlist->object_lock );
+            if( p_sys->p_input == NULL )
             {
-                p_sys->p_input = vlc_object_find( p_sys->p_playlist,
-                                                  VLC_OBJECT_INPUT,FIND_CHILD );
+                p_sys->p_input = p_sys->p_playlist->p_input;
+                if( p_sys->p_input )
+                {
+                    if( !p_sys->p_input->b_dead )
+                    {
+                        vlc_object_yield( p_sys->p_input );
+                    }
+                }
             }
-            else
+            else if( p_sys->p_input->b_dead )
             {
-                p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                   FIND_ANYWHERE );
+                vlc_object_release( p_sys->p_input );
+                p_sys->p_input = NULL;
+                p_sys->f_slider = p_sys->f_slider_old = 0.0;
+                p_sys->b_box_cleared = VLC_FALSE;
             }
-            p_sys->b_box_cleared = VLC_FALSE;
+            vlc_mutex_unlock( &p_sys->p_playlist->object_lock );
         }
-        else if( p_sys->p_input->b_dead )
+
+        if( p_sys->b_box_plidx_follow )
         {
-            vlc_object_release( p_sys->p_input );
-            p_sys->p_input = NULL;
-            p_sys->f_slider = p_sys->f_slider_old = 0.0;
-            p_sys->b_box_cleared = VLC_FALSE;
+            p_sys->i_box_plidx = p_sys->p_playlist->i_index;
         }
+
 
         while( ( i_key = getch()) != -1 )
         {
@@ -261,6 +279,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
     if( p_sys->i_box_type == BOX_PLAYLIST && p_sys->p_playlist )
     {
+        int b_ret = VLC_TRUE;
+
         switch( i_key )
         {
             /* Playlist sort */
@@ -276,51 +296,54 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
             /* Playlist navigation */
             case KEY_HOME:
-                playlist_Goto( p_sys->p_playlist, 0 );
-                return 1;
+                p_sys->i_box_plidx = 0;
+                break;
             case KEY_END:
-                playlist_Goto( p_sys->p_playlist, p_sys->p_playlist->i_size - 1 );
-                return 1;
+                p_sys->i_box_plidx = p_sys->p_playlist->i_size - 1;
+                break;
             case KEY_UP:
-                playlist_Prev( p_sys->p_playlist );
-                return 1;
+                p_sys->i_box_plidx--;
+                break;
             case KEY_DOWN:
-                playlist_Next( p_sys->p_playlist );
-                return 1;
+                p_sys->i_box_plidx++;
+                break;
             case KEY_PPAGE:
-            {
-                int i_item = p_sys->p_playlist->i_index - p_sys->i_box_lines;
-                if( i_item < 0 ) i_item = 0;
-                playlist_Goto( p_sys->p_playlist, i_item );
-                return 1;
-            }
+                p_sys->i_box_plidx -= p_sys->i_box_lines;
+                break;
             case KEY_NPAGE:
-            {
-                int i_item = p_sys->p_playlist->i_index + p_sys->i_box_lines;
-                if( i_item >= p_sys->p_playlist->i_size ) i_item = p_sys->p_playlist->i_size - 1;
-                if( i_item > 0 )
-                {
-                    playlist_Goto( p_sys->p_playlist, i_item );
-                }
-                return 1;
-            }
+                p_sys->i_box_plidx += p_sys->i_box_lines;
+                break;
             case KEY_BACKSPACE:
-                playlist_Delete( p_sys->p_playlist, p_sys->p_playlist->i_index );
-                return 1;
-
             case KEY_DC:
             {
                 int i_item = p_sys->p_playlist->i_index;
-                playlist_Delete( p_sys->p_playlist, p_sys->p_playlist->i_index );
-                if( i_item < p_sys->p_playlist->i_size )
+
+                playlist_Delete( p_sys->p_playlist, p_sys->i_box_plidx );
+                if( i_item < p_sys->p_playlist->i_size && i_item != p_sys->p_playlist->i_index )
                 {
                     playlist_Goto( p_sys->p_playlist, i_item );
                 }
-                return 1;
+                break;
             }
 
-            default:
+            case KEY_ENTER:
+            case 0x0d:
+                playlist_Goto( p_sys->p_playlist, p_sys->i_box_plidx );
                 break;
+            default:
+                b_ret = VLC_FALSE;
+                break;
+        }
+
+        if( b_ret )
+        {
+            if( p_sys->i_box_plidx >= p_sys->p_playlist->i_size ) p_sys->i_box_plidx = p_sys->p_playlist->i_size - 1;
+            if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+            if( p_sys->i_box_plidx == p_sys->p_playlist->i_index )
+                p_sys->b_box_plidx_follow = VLC_TRUE;
+            else
+                p_sys->b_box_plidx_follow = VLC_FALSE;
+            return 1;
         }
     }
     else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO )
@@ -873,14 +896,17 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         int        i_item;
         DrawBox( p_sys->w, y++, 0, h, COLS, " Playlist " );
 
-        if( p_playlist->i_index < (h - 2)/2 )
+        if( p_sys->i_box_plidx >= p_playlist->i_size ) p_sys->i_box_plidx = p_playlist->i_size - 1;
+        if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+
+        if( p_sys->i_box_plidx < (h - 2)/2 )
         {
             i_start = 0;
             i_stop = h - 2;
         }
-        else if( p_playlist->i_size - p_playlist->i_index > (h - 2)/2 )
+        else if( p_playlist->i_size - p_sys->i_box_plidx > (h - 2)/2 )
         {
-            i_start = p_playlist->i_index - (h - 2)/2;
+            i_start = p_sys->i_box_plidx - (h - 2)/2;
             i_stop = i_start + h - 2;
         }
         else
@@ -899,7 +925,9 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
 
         for( i_item = i_start; i_item < i_stop; i_item++ )
         {
-            vlc_bool_t b_selected = ( p_playlist->i_index == i_item );
+            vlc_bool_t b_selected = ( p_sys->i_box_plidx == i_item );
+            int c = p_playlist->i_index == i_item ? '>' : ' ';
+
             if( y >= y_end ) break;
             if( b_selected )
             {
@@ -907,13 +935,15 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
             }
             if( !strcmp( p_playlist->pp_items[i_item]->psz_name, p_playlist->pp_items[i_item]->psz_uri ) )
             {
-                mvnprintw( y++, 1, COLS - 2, "  %d - '%s'",
+                mvnprintw( y++, 1, COLS - 2, "%c %d - '%s'",
+                           c,
                            i_item,
                            p_playlist->pp_items[i_item]->psz_uri );
             }
             else
             {
-                mvnprintw( y++, 1, COLS - 2, "  %d - '%s' (%s)",
+                mvnprintw( y++, 1, COLS - 2, "%c %d - '%s' (%s)",
+                          c,
                           i_item,
                           p_playlist->pp_items[i_item]->psz_uri,
                           p_playlist->pp_items[i_item]->psz_name );
