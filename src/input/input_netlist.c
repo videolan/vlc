@@ -6,7 +6,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: input_netlist.c,v 1.43 2001/11/11 01:32:03 stef Exp $
+ * $Id: input_netlist.c,v 1.44 2001/11/27 10:18:33 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -363,6 +363,14 @@ void input_NetlistMviovec( void * p_method_data, int i_nb_iovec,
         pp_data[i_loop]->p_buffer =
                     p_netlist->p_free_iovec[p_netlist->i_iovec_start].iov_base;
         
+        pp_data[i_loop]->p_payload_start = pp_data[i_loop]->p_buffer;
+
+        pp_data[i_loop]->p_payload_end =
+                  pp_data[i_loop]->p_buffer + p_netlist->i_buffer_size;
+
+        pp_data[i_loop]->p_next = NULL;
+        pp_data[i_loop]->b_discard_payload = 0;
+
         pp_data[i_loop]->pi_refcount = p_netlist->pi_refcount +
                                        p_netlist->i_iovec_start;
         (*pp_data[i_loop]->pi_refcount)++;
@@ -407,6 +415,14 @@ struct data_packet_s * input_NetlistNewPtr( void * p_method_data )
 
     p_netlist->i_data_start++;
     p_netlist->i_data_start &= p_netlist->i_nb_data;
+
+    p_return->p_payload_start = p_return->p_buffer;
+
+    p_return->p_payload_end =
+              p_return->p_buffer + p_netlist->i_buffer_size;
+
+    p_return->p_next = NULL;
+    p_return->b_discard_payload = 0;
 
     /* unlock */
     vlc_mutex_unlock (&p_netlist->lock);

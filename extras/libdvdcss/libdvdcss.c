@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.23 2001/11/26 15:56:36 massiot Exp $
+ * $Id: libdvdcss.c,v 1.24 2001/11/27 10:18:33 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -490,11 +490,14 @@ static int _dvdcss_raw_open ( dvdcss_handle dvdcss, char *psz_target )
     if( dvdcss->i_raw_fd == -1 )
     {
         _dvdcss_error( dvdcss, "failed opening raw device, continuing" );
+        return -1;
     }
     else
     {
         dvdcss->i_read_fd = dvdcss->i_raw_fd;
     }
+
+    return 0;
 }
 #endif
 
