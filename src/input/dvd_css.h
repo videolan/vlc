@@ -58,4 +58,5 @@ typedef struct css_s
  *****************************************************************************/
 struct css_s    CSSInit     ( int );
 int             CSSGetKeys  ( struct css_s* );
+int             CSSDescrambleSector( DVD_key_t , u8* );
 #endif

@@ -59,7 +59,7 @@ static int IfoFindVMG( ifo_t* p_ifo )
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
+//fprintf( stderr, "VMG Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -84,7 +84,7 @@ static int IfoFindVTS( ifo_t* p_ifo )
     }
     p_ifo->i_off = p_ifo->i_pos;
 
-fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
+//fprintf( stderr, "VTS Off : %lld\n", (long long)(p_ifo->i_off) );
 
     return 0;
 }
@@ -159,9 +159,9 @@ void IfoEnd( ifo_t* p_ifo )
     free( p_ifo->vmg.pgc.p_cell_pos_inf );
     free( p_ifo->vmg.pgc.p_cell_play_inf );
     free( p_ifo->vmg.pgc.prg_map.pi_entry_cell );
-    free( p_ifo->vmg.pgc.com_tab.ps_cell_com );
-    free( p_ifo->vmg.pgc.com_tab.ps_post_com );
-    free( p_ifo->vmg.pgc.com_tab.ps_pre_com );
+    free( p_ifo->vmg.pgc.com_tab.p_cell_com );
+    free( p_ifo->vmg.pgc.com_tab.p_post_com );
+    free( p_ifo->vmg.pgc.com_tab.p_pre_com );
 
     return;
 }
@@ -173,9 +173,9 @@ void IfoEnd( ifo_t* p_ifo )
 #define GET( p_field , i_len )                                              \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , (i_len) );                          \
-fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
+/*fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                (long long)*(p_field) );                    \
+                                (long long)*(p_field) );    */                \
         p_ifo->i_pos =                                                      \
                    lseek64( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );\
     }
@@ -183,9 +183,9 @@ fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
 #define GETC( p_field )                                                     \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 1 );                                \
-fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+/*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );                     \
+                                          *(p_field) );*/                     \
         p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );\
     }
 
@@ -193,9 +193,9 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 2 );                                \
         *(p_field) = ntohs( *(p_field) );                                   \
-fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+/*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );                     \
+                                          *(p_field) );*/                     \
         p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );\
     }
 
@@ -203,9 +203,9 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 4 );                                \
         *(p_field) = ntohl( *(p_field) );                                   \
-fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
+/*fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                          *(p_field) );                     \
+                                          *(p_field) );*/                     \
         p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );\
     }
 
@@ -213,15 +213,15 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
     {                                                                       \
         read( p_ifo->i_fd , (p_field) , 8 );                                \
         *(p_field) = ntoh64( *(p_field) );                                  \
-fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
+/*fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
                                 (long long)(p_ifo->i_pos - i_start),        \
-                                            *(p_field) );                   \
+                                            *(p_field) );*/                   \
         p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );\
     }
 
 #define FLUSH( i_len )                                                      \
     {                                                                       \
-fprintf(stderr, "Pos : %lld\n", (long long)(p_ifo->i_pos - i_start));       \
+/*fprintf(stderr, "Pos : %lld\n", (long long)(p_ifo->i_pos - i_start));*/       \
         p_ifo->i_pos = lseek64( p_ifo->i_fd ,                               \
                               p_ifo->i_pos + (i_len), SEEK_SET );           \
     }
@@ -233,13 +233,31 @@ fprintf(stderr, "Pos : %lld\n", (long long)(p_ifo->i_pos - i_start));       \
 /*****************************************************************************
  * ReadPGC : Fills the Program Chain structure.
  *****************************************************************************/
+#define GETCOMMAND( p_com )                                                 \
+    {                                                                       \
+        read( p_ifo->i_fd , (p_com) , 8 );                                  \
+/*fprintf(stderr, "Pos : %lld Type : %d direct : %d cmd : %d dircmp : %d cmp : %d subcmd : %d v0 : %d v2 : %d v4 : %d\n",                                  \
+                                (long long)(p_ifo->i_pos - i_start),        \
+                                (int)((p_com)->i_type),                     \
+                                (int)((p_com)->i_direct),                   \
+                                (int)((p_com)->i_cmd),                      \
+                                (int)((p_com)->i_dir_cmp),                  \
+                                (int)((p_com)->i_cmp),                      \
+                                (int)((p_com)->i_sub_cmd),                  \
+                                (int)((p_com)->i_v0),                       \
+                                (int)((p_com)->i_v2),                       \
+                                (int)((p_com)->i_v4) );*/                     \
+        p_ifo->i_pos =                                                      \
+                   lseek64( p_ifo->i_fd, p_ifo->i_pos + 8, SEEK_SET );      \
+    }
+
 static pgc_t ReadPGC( ifo_t* p_ifo )
 {
     pgc_t   pgc;
     int     i;
     off64_t   i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PGC\n" );
+//fprintf( stderr, "PGC\n" );
 
     FLUSH(2);
     GETC( &pgc.i_prg_nb );
@@ -280,42 +298,48 @@ fprintf( stderr, "PGC\n" );
         FLUSH( 2 );
         if( pgc.com_tab.i_pre_com_nb )
         {
-            pgc.com_tab.ps_pre_com =
-                            malloc(pgc.com_tab.i_pre_com_nb *COMMAND_SIZE);
-            if( pgc.com_tab.ps_pre_com == NULL )
+            pgc.com_tab.p_pre_com =
+                      malloc(pgc.com_tab.i_pre_com_nb *sizeof(ifo_command_t));
+            if( pgc.com_tab.p_pre_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.ps_pre_com,
-                 pgc.com_tab.i_pre_com_nb *COMMAND_SIZE );
+            for( i=0 ; i<pgc.com_tab.i_pre_com_nb ; i++ )
+            {
+                GETCOMMAND( &pgc.com_tab.p_pre_com[i] );
+            }
         }
         if( pgc.com_tab.i_post_com_nb )
         {
-            pgc.com_tab.ps_post_com =
-                            malloc(pgc.com_tab.i_post_com_nb *COMMAND_SIZE);
-            if( pgc.com_tab.ps_post_com == NULL )
+            pgc.com_tab.p_post_com =
+                      malloc(pgc.com_tab.i_post_com_nb *sizeof(ifo_command_t));
+            if( pgc.com_tab.p_post_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.ps_post_com,
-                 pgc.com_tab.i_post_com_nb *COMMAND_SIZE );
+            for( i=0 ; i<pgc.com_tab.i_post_com_nb ; i++ )
+            {
+                GETCOMMAND( &pgc.com_tab.p_post_com[i] );
+            }
         }
         if( pgc.com_tab.i_cell_com_nb )
         {
-            pgc.com_tab.ps_cell_com =
-                            malloc(pgc.com_tab.i_cell_com_nb *COMMAND_SIZE);
-            if( pgc.com_tab.ps_cell_com == NULL )
+            pgc.com_tab.p_cell_com =
+                      malloc(pgc.com_tab.i_cell_com_nb *sizeof(ifo_command_t));
+            if( pgc.com_tab.p_cell_com == NULL )
             {
                 intf_ErrMsg( "Out of memory" );
                 p_ifo->b_error = 1;
                 return pgc;
             }
-            GET( pgc.com_tab.ps_cell_com,
-                 pgc.com_tab.i_cell_com_nb *COMMAND_SIZE );
+            for( i=0 ; i<pgc.com_tab.i_cell_com_nb ; i++ )
+            {
+                GETCOMMAND( &pgc.com_tab.p_cell_com[i] );
+            }
         }
     }
     /* Parsing of pgc_prg_map_t */
@@ -389,7 +413,7 @@ static pgci_inf_t ReadUnit( ifo_t* p_ifo )
     int             i;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "Unit\n" );
+//fprintf( stderr, "Unit\n" );
 
     GETS( &inf.i_srp_nb );
     FLUSH( 2 );
@@ -428,7 +452,7 @@ static pgci_ut_t ReadUnitTable( ifo_t* p_ifo )
     int             i;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "Unit Table\n" );
+//fprintf( stderr, "Unit Table\n" );
 
     GETS( &pgci.i_lu_nb );
     FLUSH( 2 );
@@ -474,7 +498,7 @@ static c_adt_t ReadCellInf( ifo_t* p_ifo )
     int             i, i_max;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "CELL ADD\n" );
+//fprintf( stderr, "CELL ADD\n" );
 
     GETS( &c_adt.i_vob_nb );
     FLUSH( 2 );
@@ -508,7 +532,7 @@ static vobu_admap_t ReadMap( ifo_t* p_ifo )
     int                 i, i_max;
     off64_t             i_start = p_ifo->i_pos;
     
-fprintf( stderr, "VOBU ADMAP\n" );
+//fprintf( stderr, "VOBU ADMAP\n" );
 
     GETL( &map.i_ebyte );
     i_max = ( i_start + map.i_ebyte + 1 - p_ifo->i_pos ) / sizeof(u32);
@@ -533,9 +557,9 @@ static vmgi_mat_t ReadVMGInfMat( ifo_t* p_ifo )
 {
     vmgi_mat_t  mat;
     int         i;
-    off64_t     i_start = p_ifo->i_pos;
+//    off64_t     i_start = p_ifo->i_pos;
 
-fprintf( stderr, "VMGI\n" );
+//fprintf( stderr, "VMGI\n" );
 
     GET( mat.psz_id , 12 );
     mat.psz_id[12] = '\0';
@@ -590,9 +614,9 @@ static vmg_ptt_srpt_t ReadVMGTitlePointer( ifo_t* p_ifo )
 {
     vmg_ptt_srpt_t  ptr;
     int             i;
-    off64_t         i_start = p_ifo->i_pos;
+//    off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PTR\n" );
+//fprintf( stderr, "PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
     FLUSH( 2 );
@@ -628,7 +652,7 @@ static vmg_ptl_mait_t ReadParentalInf( ifo_t* p_ifo )
     int             i, j, k;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PTL\n" );
+//fprintf( stderr, "PTL\n" );
 
     GETS( &par.i_country_nb );
     GETS( &par.i_vts_nb );
@@ -687,7 +711,7 @@ static vmg_vts_atrt_t ReadVTSAttr( ifo_t* p_ifo )
     int             i, j;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "VTS ATTR\n" );
+//fprintf( stderr, "VTS ATTR\n" );
 
     GETS( &atrt.i_vts_nb );
     FLUSH( 2 );
@@ -820,9 +844,9 @@ static vtsi_mat_t ReadVTSInfMat( ifo_t* p_ifo )
 {
     vtsi_mat_t  mat;
     int         i;
-    off64_t     i_start = p_ifo->i_pos;
+//    off64_t     i_start = p_ifo->i_pos;
 
-fprintf( stderr, "VTSI\n" );
+//fprintf( stderr, "VTSI\n" );
 
     GET( mat.psz_id , 12 );
     mat.psz_id[12] = '\0';
@@ -888,7 +912,7 @@ static vts_ptt_srpt_t ReadVTSTitlePointer( ifo_t* p_ifo )
     int             i;
     off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "PTR\n" );
+//fprintf( stderr, "PTR\n" );
 
     GETS( &ptr.i_ttu_nb );
     FLUSH( 2 );
@@ -930,9 +954,9 @@ static vts_tmap_ti_t ReadVTSTimeMap( ifo_t* p_ifo )
 {
     vts_tmap_ti_t   tmap;
     int             i,j;
-    off64_t         i_start = p_ifo->i_pos;
+//    off64_t         i_start = p_ifo->i_pos;
 
-fprintf( stderr, "TMAP\n" );
+//fprintf( stderr, "TMAP\n" );
 
     GETS( &tmap.i_nb );
     FLUSH( 2 );
@@ -1069,10 +1093,10 @@ void IfoRead( ifo_t* p_ifo )
         p_ifo->b_error = 1;
         return;
     }
-    for( i=0 ; i<1 /*p_ifo->vmg.mat.i_tts_nb*/ ; i++ )
+    for( i=0 ; i<1/*p_ifo->vmg.mat.i_tts_nb*/ ; i++ )
     {
 
-fprintf( stderr, "######### VTS %d #############\n", i+1 );
+        intf_WarnMsg( 3, "######### VTS %d #############\n", i+1 );
 
         i_off = p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector *DVD_LB_SIZE;
         p_ifo->i_pos = lseek64( p_ifo->i_fd, i_off, SEEK_SET );
@@ -1082,3 +1106,23 @@ fprintf( stderr, "######### VTS %d #############\n", i+1 );
     }
     return; 
 }
+
+/*
+ * IFO virtual machine : a set of commands that give the behaviour of the dvd
+ */
+
+/*****************************************************************************
+ * CommandRead : translates the command strings in ifo into command
+ * structures.
+ *****************************************************************************/
+ifo_command_t CommandRead( ifo_t* p_ifo )
+{
+    ifo_command_t   com;
+
+    return com;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+

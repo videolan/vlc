@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.6 2001/01/22 05:20:44 stef Exp $
+ * $Id: input_dvd.c,v 1.7 2001/01/29 06:10:10 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -43,7 +43,7 @@
 # include <sys/dvdio.h>
 #endif
 #ifdef LINUX_DVD
-#include <linux/cdrom.h>
+# include <linux/cdrom.h>
 #endif
 
 #include "config.h"
@@ -67,6 +67,7 @@
 #include "mpeg_system.h"
 
 #include "debug.h"
+
 
 /*****************************************************************************
  * Local prototypes
@@ -134,6 +135,7 @@ static void DVDInit( input_thread_t * p_input )
     lseek64( p_input->i_handle, 0, SEEK_SET );
 
     /* Ifo initialisation */
+    intf_Msg( 3, "Ifo: Initialization" );
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
 
@@ -143,9 +145,8 @@ static void DVDInit( input_thread_t * p_input )
     {
         int   i;
 
-fprintf(stderr, " CSS Init start\n" );
+        intf_Msg( 3, "CSS: Initialization" );
         p_method->css = CSSInit( p_input->i_handle );
-fprintf(stderr, " CSS Init end\n" );
         p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
         if( (p_method->css.p_title_key =
              malloc( p_method->css.i_title_nb *
@@ -158,12 +159,10 @@ fprintf(stderr, " CSS Init end\n" );
         for( i=0 ; i<p_method->css.i_title_nb ; i++ )
         {
             p_method->css.p_title_key[i].i =
-                      p_method->ifo.p_vts[i].i_pos +
-                      p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
+                    p_method->ifo.p_vts[i].i_pos +
+                    p_method->ifo.p_vts[i].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
         }
-fprintf(stderr, " CSS Get start\n" );
         CSSGetKeys( &(p_method->css) );
-fprintf(stderr, " CSS Get end\n" );
     }
 #endif
 
@@ -171,7 +170,7 @@ fprintf(stderr, " CSS Get end\n" );
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
 
     i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
-    fprintf(stderr, "Begin at : %lld\n", (long long)i_start );
+    intf_Msg( "VOB start at : %lld", (long long)i_start );
 
 #if 1
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
@@ -315,19 +314,26 @@ static void DVDEnd( input_thread_t * p_input )
 static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
                                 size_t i_len )
 {
+    // FIXME : aie aie ugly kludge for testing purposes :)
+    static byte_t       p_tmp[2048];
+
+
     thread_dvd_data_t * p_method;
     int                 i_nb;
+    off64_t             i_pos;
 
     p_method = (thread_dvd_data_t *)p_input->p_plugin_data;
-//    if( !p_method->b_encrypted )
-//    {
+    i_pos = lseek64( p_input->i_handle, 0, SEEK_CUR );
+    if( !p_method->b_encrypted )
+    {
         i_nb = read( p_input->i_handle, p_buffer, i_len );
-#if 0
     }
     else
     {
-        i_nb = read( p_input->i_handle, p_buffer, 4096 );
-        CSSDescrambleSector( p_method->css.p_title_key.key, p_buffer );
+        lseek64( p_input->i_handle, i_pos & ~0x7FF, SEEK_SET );
+        i_nb = read( p_input->i_handle, p_tmp, 0x800 );
+        CSSDescrambleSector( p_method->css.p_title_key[0].key, p_tmp );
+        memcpy( p_buffer, p_tmp + (i_pos & 0x7FF ), i_len );
     }
     switch( i_nb )
     {
@@ -335,15 +341,14 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
             /* End of File */
             return( 1 );
         case -1:
-            intf_ErrMsg( "Read failed (%s)", strerror(errno) );
+            intf_ErrMsg( "DVD: Read failed (%s)", strerror(errno) );
             return( -1 );
         default:
             break;
     }
-#endif
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.i_tell += i_nb; //lseek64( p_input->i_handle,
-                             //         p_input->stream.i_tell+i_len, SEEK_SET );
+    p_input->stream.i_tell = 
+                lseek64( p_input->i_handle, i_pos+i_len, SEEK_SET );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     return( 0 );
 }
@@ -379,7 +384,8 @@ static int DVDRead( input_thread_t * p_input,
             /* This is not the startcode of a packet. Read the stream
              * until we find one. */
             u32         i_startcode = U32_AT(p_header);
-            int         i_dummy,i_nb;
+            int         i_nb;
+            byte_t      i_dummy;
 
             if( i_startcode )
             {
@@ -392,7 +398,8 @@ static int DVDRead( input_thread_t * p_input,
             while( (i_startcode & 0xFFFFFF00) != 0x100L )
             {
                 i_startcode <<= 8;
-                if( (i_nb = read( p_input->i_handle, &i_dummy, 1 )) != 0 )
+fprintf( stderr, "sprotch\n" );
+                if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
                 {
                     i_startcode |= i_dummy;
                 }

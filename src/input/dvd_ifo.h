@@ -33,6 +33,20 @@
  * Program Chain structures
  */
 
+/* Ifo vitual machine Commands */
+typedef struct ifo_command_s
+{
+    u8              i_type      :3;
+    u8              i_direct    :1;
+    u8              i_cmd       :4;
+    u8              i_dir_cmp   :1;
+    u8              i_cmp       :3;
+    u8              i_sub_cmd   :4;
+    u16             i_v0        :16;
+    u16             i_v2        :16;
+    u16             i_v4        :16;
+} ifo_command_t;
+
 /* Program Chain Command Table
   - start at i_pgc_com_tab_sbyte */
 typedef struct pgc_com_tab_s
@@ -41,11 +55,10 @@ typedef struct pgc_com_tab_s
     u16             i_post_com_nb;              // 2 bytes
     u16             i_cell_com_nb;              // 2 bytes
 //    char[2]         ???
-    char*           ps_pre_com;                 // i_pre_com_nb * 8 bytes
-    char*           ps_post_com;                // i_post_com_nb * 8 bytes
-    char*           ps_cell_com;                // i_cell_com_nb * 8 bytes
+    ifo_command_t*  p_pre_com;                  // i_pre_com_nb * 8 bytes
+    ifo_command_t*  p_post_com;                 // i_post_com_nb * 8 bytes
+    ifo_command_t*  p_cell_com;                 // i_cell_com_nb * 8 bytes
 } pgc_com_tab_t;
-#define COMMAND_SIZE    8
 
 /* Program Chain Map Table
  * - start at "i_pgc_prg_map_sbyte" */

@@ -275,11 +275,11 @@ int CSSGetASF( int i_fd )
     {
         if( !( ioctl( i_fd, DVD_AUTH, &ai ) ) )
         {
-            fprintf( stderr, "%sAuthenticated\n", (ai.lsasf.asf) ? "" : "not");
+            intf_Msg("CSS: %sAuthenticated\n", (ai.lsasf.asf) ? "" : "not");
             return 0;
         }
     }
-    intf_ErrMsg( "CSS Error : GetASF" );
+    intf_ErrMsg( "CSS Error: GetASF" );
     return -1;
 }
 
@@ -376,12 +376,11 @@ static void CSSCryptKey( int i_key_type, int i_varient,
         pi_bits[--i_index] = i_val & 0xFF;
         i_val >>= 8;
 
-        fprintf(stderr, "lfsr0=%08x lfsr1=%08x\n", i_lfsr0, i_lfsr1);
     } while( i_index > 0 );
 
     i_css_varient = pi_css_varients[i_css_varient];
 
-fprintf( stderr, "CSE : %d\n", i_css_varient );
+    intf_WarnMsg( 3, "CSS varient: %d\n", i_css_varient );
 
     /* 
      * Mangling
@@ -442,13 +441,11 @@ static int CSSAuthHost( dvd_authinfo *ai, disc_t *disc )
     {
         /* Host data receive (host changes state) */
         case DVD_LU_SEND_AGID:
-//        	_CSSPrintDebug ("AGID %d\n", ai->lsa.agid);
 
     	    ai->type = DVD_HOST_SEND_CHALLENGE;
         	break;
 
         case DVD_LU_SEND_KEY1:
-//    	    _CSSPrintDebugBytes ("LU sent key1", ai->lsk.key, LEN_KEY);
 
             for( i=0; i<KEY_SIZE; i++ )
             {
@@ -463,7 +460,7 @@ static int CSSAuthHost( dvd_authinfo *ai, disc_t *disc )
         	    if( memcmp( disc->pi_key_check,
                             disc->pi_key1, KEY_SIZE ) == 0 )
                 {
-                    fprintf( stderr, "Drive Authentic - using varient %d\n", i);
+                    intf_WarnMsg( 3, "CSS: Drive Authentic - using varient %d\n", i);
                     disc->i_varient = i;
                     ai->type = DVD_LU_SEND_CHALLENGE;
                     break;
@@ -479,7 +476,6 @@ static int CSSAuthHost( dvd_authinfo *ai, disc_t *disc )
             {
     	        disc->pi_challenge[i] = ai->hsc.chal[9-i];
             }
-//      	_CSSPrintDebugBytes ("LU sent challenge", ai->hsc.chal, 10);
     	    CSSCryptKey( 1, disc->i_varient, disc->pi_challenge,
                                              disc->pi_key2 );
         	ai->type = DVD_HOST_SEND_KEY2;
@@ -491,7 +487,6 @@ static int CSSAuthHost( dvd_authinfo *ai, disc_t *disc )
             {
     		    ai->hsc.chal[9-i] = disc->pi_challenge[i];
             }
-//    	    _CSSPrintDebugBytes ("Host sending challenge", ai->hsc.chal, 10);
     	    /* Returning data, let LU change state */
     	    break;
 
@@ -500,12 +495,11 @@ static int CSSAuthHost( dvd_authinfo *ai, disc_t *disc )
             {
     		    ai->hsk.key[4-i] = disc->pi_key2[i];
             }
-//          _CSSPrintDebugBytes ("Host sending key 2", &disc->Key2[0], LEN_KEY);
             /* Returning data, let LU change state */
             break;
 
         default:
-    	    intf_ErrMsg( "Got invalid state %d", ai->type );
+    	    intf_ErrMsg( "CSS: Got invalid state %d", ai->type );
             return -22;
     }
 
@@ -552,7 +546,7 @@ static int CSScracker( int StartVal,
     {
         if (invtab4[ i ] != 1)
         {
-            printf( "Permutation error\n" );
+            intf_ErrMsg( "CSS: Permutation error" );
             exit( -1 );
         }
     }
@@ -591,7 +585,6 @@ static int CSScracker( int StartVal,
             t6 -= t4;
             t5 += t6 + t4;
             t6 = invtab4[ t6 ];
-            /* printf( "%02x/%02x ", t4, t6 ); */
             /* feed / advance t3 / t5 */
             t3 = (t3 << 8) | t6;
             t5 >>= 8;
@@ -677,6 +670,8 @@ css_t CSSInit( int i_fd )
     int             rv = -1;
     int             i;
 
+    css.i_fd = i_fd;
+
     memset( &ai, 0, sizeof(ai) );
 
 //    if (CSSGetASF (i_fd))
@@ -686,14 +681,13 @@ css_t CSSInit( int i_fd )
     /* Init sequence, request AGID */
     for( i=1; (i<4)&&(rv== -1) ; ++i )
     {
-        fprintf( stderr, "Request AGID [%d]...", i );
+        intf_WarnMsg( 3, "CSS: Request AGID [%d]...", i );
         ai.type = DVD_LU_SEND_AGID;
         ai.lsa.agid = 0;
         rv =  ioctl (i_fd, DVD_AUTH, &ai);
-        fprintf( stderr, "%d %d\n" , rv, ai.lsa.agid );
         if (rv == -1)
         {
-            fprintf( stderr, "N/A, invalidating" );
+            intf_ErrMsg( "CSS: N/A, invalidating" );
             ai.type = DVD_INVALIDATE_AGID;
             ai.lsa.agid = 0;
             ioctl( i_fd, DVD_AUTH, &ai );
@@ -701,26 +695,25 @@ css_t CSSInit( int i_fd )
     }
     if( rv==-1 )
     {
-        fprintf( stderr, "Cannot get AGID\n" );
+        intf_ErrMsg( "CSS: Cannot get AGID\n" );
     }
 
     for( i=0 ; i<10; ++i )
     {
-//        disc->Challenge[i] = i;
         css.disc.pi_challenge[i] = i;
     }
 
     /* Send AGID to host */
     if( CSSAuthHost(&ai, &(css.disc) )<0 )
     {
-        intf_ErrMsg( "CSS Error :Send AGID to host failed" );
+        intf_ErrMsg( "CSS Error: Send AGID to host failed" );
         return css;
     }
 
     /* Get challenge from host */
     if( CSSAuthHost( &ai, &(css.disc) )<0)
     {
-        intf_ErrMsg( "CSS Error :Get challenge from host failed" );
+        intf_ErrMsg( "CSS Error: Get challenge from host failed" );
         return css;
     }
     css.i_agid = ai.lsa.agid;
@@ -728,14 +721,14 @@ css_t CSSInit( int i_fd )
     /* Send challenge to LU */
     if( ioctl( i_fd, DVD_AUTH, &ai )<0 )
     {
-        intf_ErrMsg( "CSS Error :Send challenge to LU failed ");
+        intf_ErrMsg( "CSS Error: Send challenge to LU failed ");
         return css;
     }
 
     /* Get key1 from LU */
     if( ioctl( i_fd, DVD_AUTH, &ai )<0)
     {
-        intf_ErrMsg( "CSS Error :Get key1 from LU failed ");
+        intf_ErrMsg( "CSS Error: Get key1 from LU failed ");
         return css;
     }
 
@@ -743,45 +736,45 @@ css_t CSSInit( int i_fd )
 //    if (_CSSAuthHost(&ai, disc) < 0) {
     if( CSSAuthHost( &ai, &(css.disc) )<0)
     {
-        intf_ErrMsg( "CSS Error :Send key1 to host failed" );
+        intf_ErrMsg( "CSS Error: Send key1 to host failed" );
         return css;
     }
 
     /* Get challenge from LU */
     if( ioctl( i_fd, DVD_AUTH, &ai)<0 )
     {
-        intf_ErrMsg( "CSS Error :Get challenge from LU failed ");
+        intf_ErrMsg( "CSS Error: Get challenge from LU failed ");
         return css;
     }
 
     /* Send challenge to host */
     if( CSSAuthHost( &ai, &(css.disc) )<0 )
     {
-        intf_ErrMsg( "CSS Error :Send challenge to host failed");
+        intf_ErrMsg( "CSS Error: Send challenge to host failed");
         return css;
     }
 
     /* Get key2 from host */
     if( CSSAuthHost( &ai, &(css.disc) )<0 )
     {
-        intf_ErrMsg( "CSS Error :Get key2 from host failed" );
+        intf_ErrMsg( "CSS Error: Get key2 from host failed" );
         return css;
     }
 
     /* Send key2 to LU */
     if( ioctl( i_fd, DVD_AUTH, &ai )<0 )
     {
-        intf_ErrMsg( "CSS Error :Send key2 to LU failed (expected)" );
+        intf_ErrMsg( "CSS Error: Send key2 to LU failed (expected)" );
         return css;
     }
 
     if( ai.type == DVD_AUTH_ESTABLISHED )
     {
-        intf_ErrMsg("CSS Error :DVD is authenticated");
+        intf_WarnMsg( 3, "DVD is authenticated");
     }
     else if( ai.type == DVD_AUTH_FAILURE )
     {
-        intf_ErrMsg("CSS Error :DVD authentication failed");
+        intf_ErrMsg("CSS Error: DVD authentication failed");
     }
 
     memcpy( css.disc.pi_challenge, css.disc.pi_key1, KEY_SIZE );
@@ -790,12 +783,7 @@ css_t CSSInit( int i_fd )
                     css.disc.pi_challenge,
                     css.disc.pi_key_check );
 
-        intf_Msg( "Received Session Key\n" );
-    for( i=0 ; i<KEY_SIZE ; i++ )
-    {
-        intf_Msg( "%02x", &(css.disc.pi_key_check[i]) );
-    }
-    intf_Msg( "\n" );
+        intf_WarnMsg( 3, "CSS: Received Session Key\n" );
 
     if( css.i_agid < 0 )
     {
@@ -811,7 +799,7 @@ css_t CSSInit( int i_fd )
 
     if( ioctl( i_fd, DVD_READ_STRUCT, &dvd )<0 )
     {
-        fprintf( stderr, "Error : Could not read Disc Key" );
+        intf_ErrMsg( "CSS Error: Could not read Disc Key" );
         css.b_error = 1;
         return css;
     }
@@ -820,7 +808,6 @@ css_t CSSInit( int i_fd )
     {
         dvd.disckey.value[i] ^= css.disc.pi_key_check[4 - (i % KEY_SIZE)];
     }
-//    _CSSPrintDebugBytes ("Received Disc Key", s.disckey.value, 10);
     memcpy( css.disc.pi_key_check, dvd.disckey.value, 2048 );
 //    
 //    if (CSSGetASF (i_fd) < 0)
@@ -838,21 +825,7 @@ css_t CSSInit( int i_fd )
  * The DVD should have been opened before.
  *****************************************************************************/
 #define MaxKeys 1000
-#define REPEAT  20
-struct
-{
-  int verbosity ; /* 0-9 */
-	int repetitions ;
-	int scanall ;
-	char *infile ;
-} params ;
-
-typedef struct
-{
-	int				occ;
-	DVD_key_t		key;
-} KeyOcc;
-
+#define REPEAT  2
 
 int CSSGetKeys( css_t * p_css )
 {
@@ -935,7 +908,7 @@ int CSSGetKeys( css_t * p_css )
     DVD_key_t   my_key;
     title_key_t title_key[MaxKeys] ;
     int         i_title;
-    int    		i_pos = 0;
+    off64_t		i_pos = 0;
     int         i_bytes_read;
     int         i_best_plen;
     int         i_best_p;
@@ -951,12 +924,6 @@ int CSSGetKeys( css_t * p_css )
     for( i_title=0 ; i_title<1/*p_css->i_title_nb*/ ; i_title++ )
     {
         i_pos = p_css->p_title_key[i_title].i;
-// FIXME : Ugly Kludge
-#if 1
-i_fd = open( "/dvd/video_ts/vts_01_1.vob", O_RDONLY|O_NONBLOCK);
-fprintf( stderr, "CSS:File opened\n" );
-i_pos = 0;
-#endif
         do
         {
             i_pos = lseek64( i_fd, i_pos, SEEK_SET );
@@ -1003,11 +970,6 @@ i_pos = 0;
                             title_key[i_registered_keys++].i = 1;
                             i_total_keys_found++;
                         }
-    
-    fprintf(stderr, "\nOfs:%08X - Key: %02X %02X %02X %02X %02X\n",
-                                        i_pos, my_key[0], my_key[1], my_key[2],
-                                               my_key[3], my_key[4] );
-    
                         i = CSScracker( i, &pi_buf[0x80],
                             &pi_buf[0x80 -( i_best_plen / i_best_p) *i_best_p],
                             (DVD_key_t*)&pi_buf[0x54], &my_key);
@@ -1023,17 +985,17 @@ i_pos = 0;
     
         if( b_stop_scanning)
         {
-            fprintf( stderr, 
-                "Found enough occurancies of the same key. Scan stopped.\n" );
+            intf_WarnMsg( 3,
+                "CSS: Found enough occurancies of the same key." );
         }
         if( !b_encrypted )
         {
-            fprintf(stderr, "This file was _NOT_ encrypted!\n");
+            intf_WarnMsg( 3, "CSS: This file was _NOT_ encrypted!");
             return(0);
         }
         if( b_encrypted && i_registered_keys == 0 )
         {
-            fprintf(stderr, "Sorry... Unable to determine keys from file.\n");
+            intf_WarnMsg( 3 , "CSS: Unable to determine keys from file.");
             return(1);
         }
         for( i=0 ; i<i_registered_keys-1 ; i++ )
@@ -1052,8 +1014,9 @@ i_pos = 0;
                 }
             }
         }
-        fprintf(stderr, " Key(s) & key probability\n---------------------\n");
         i_highest = 0;
+#if 0
+        fprintf(stderr, " Key(s) & key probability\n---------------------\n");
         for( i=0 ; i<i_registered_keys ; i++ )
         {
             fprintf(stderr, "%d) %02X %02X %02X %02X %02X - %3.2f%%\n", i,
@@ -1068,12 +1031,14 @@ i_pos = 0;
             }
         }
         fprintf(stderr, "\n");
+#endif
     
         /* The "find the key with the highest probability" code
          * is untested, as I haven't been able to find a VOB that
          * produces multiple keys (RT)
          */
-        printf( "%02X %02X %02X %02X %02X\n", 
+        intf_WarnMsg( 3, "CSS: Title %d key: %02X %02X %02X %02X %02X\n",
+                    i_title+1,
                     title_key[i_highest].key[0],
                     title_key[i_highest].key[1],
                     title_key[i_highest].key[2],
@@ -1093,17 +1058,17 @@ i_pos = 0;
  * sec : sector to descramble
  * key : title key for this sector
  *****************************************************************************/
-int CSSDescrambleSector( DVD_key_t* key, u8* pi_sec )
+int CSSDescrambleSector( DVD_key_t key, u8* pi_sec )
 {
     unsigned int    i_t1, i_t2, i_t3, i_t4, i_t5, i_t6;
     u8*             pi_end = pi_sec + 0x800;
 
     if( pi_sec[0x14] & 0x30) // PES_scrambling_control
     {
-        i_t1 = ((*key)[0] ^ pi_sec[0x54]) | 0x100;
-        i_t2 = (*key)[1] ^ pi_sec[0x55];
-        i_t3 = (((*key)[2]) | ((*key)[3] << 8) |
-               ((*key)[4] << 16)) ^ ((pi_sec[0x56]) |
+        i_t1 = ((key)[0] ^ pi_sec[0x54]) | 0x100;
+        i_t2 = (key)[1] ^ pi_sec[0x55];
+        i_t3 = (((key)[2]) | ((key)[3] << 8) |
+               ((key)[4] << 16)) ^ ((pi_sec[0x56]) |
                (pi_sec[0x57] << 8) | (pi_sec[0x58] << 16));
         i_t4 = i_t3 & 7;
         i_t3 = i_t3 * 2 + 8 - i_t4;
