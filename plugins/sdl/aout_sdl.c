@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.20 2001/12/07 18:33:08 sam Exp $
+ * $Id: aout_sdl.c,v 1.21 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -107,7 +107,14 @@ static int aout_Probe( probedata_t *p_data )
 {
 #if 0
     SDL_AudioSpec desired, obtained;
+#endif
 
+    if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
+    {
+        return( 0 );
+    }
+
+#if 0
     /* Start AudioSDL */
     if( SDL_Init(SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) != 0 )
     {
@@ -154,12 +161,30 @@ static int aout_Open( aout_thread_t *p_aout )
     SDL_AudioSpec desired;
     int i_channels = p_aout->b_stereo ? 2 : 1;
 
-   /* Allocate structure */
+    /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
 
     if( p_aout->p_sys == NULL )
     {
         intf_ErrMsg( "aout error: %s", strerror(ENOMEM) );
+        return( 1 );
+    }
+
+    /* Initialize library */
+    if( SDL_Init( SDL_INIT_AUDIO
+#ifndef WIN32
+    /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
+                | SDL_INIT_EVENTTHREAD
+#endif
+#ifdef DEBUG
+    /* In debug mode you may want vlc to dump a core instead of staying
+     * stuck */
+                | SDL_INIT_NOPARACHUTE
+#endif
+                ) < 0 )
+    {
+        intf_ErrMsg( "aout error: can't initialize SDL (%s)", SDL_GetError() );
+        free( p_aout->p_sys );
         return( 1 );
     }
 
@@ -192,6 +217,8 @@ static int aout_Open( aout_thread_t *p_aout )
     if( SDL_OpenAudio( &desired, NULL ) < 0 )
     {
         intf_ErrMsg( "aout error: SDL_OpenAudio failed (%s)", SDL_GetError() );
+        SDL_QuitSubSystem( SDL_INIT_AUDIO );
+        free( p_aout->p_sys );
         return( -1 );
     }
 
@@ -294,6 +321,8 @@ static void aout_Close( aout_thread_t *p_aout )
     }
 
     SDL_CloseAudio();
+
+    SDL_QuitSubSystem( SDL_INIT_AUDIO );
 
     free( p_aout->p_sys );                              /* Close the Output. */
 }

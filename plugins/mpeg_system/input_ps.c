@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.4 2001/12/12 13:48:09 massiot Exp $
+ * $Id: input_ps.c,v 1.5 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -214,6 +214,7 @@ static void PSInit( input_thread_t * p_input )
             data_packet_t *     pp_packets[INPUT_READ_ONCE];
 
             i_result = PSRead( p_input, pp_packets );
+
             if( i_result == 1 )
             {
                 /* EOF */
@@ -222,7 +223,7 @@ static void PSInit( input_thread_t * p_input )
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
                 break;
             }
-            if( i_result == -1 )
+            else if( i_result == -1 )
             {
                 p_input->b_error = 1;
                 break;

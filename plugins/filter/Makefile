@@ -8,17 +8,19 @@
 #
 
 PLUGIN_BOB = bob.o
-PLUGIN_BOB422 = bob422.o
+PLUGIN_TRANSFORM = transform.o
 PLUGIN_INVERT = invert.o
+PLUGIN_DISTORT = distort.o
 PLUGIN_WALL = wall.o
 
 BUILTIN_BOB = $(PLUGIN_BOB:%.o=BUILTIN_%.o)
-BUILTIN_BOB422 = $(PLUGIN_BOB422:%.o=BUILTIN_%.o)
+BUILTIN_TRANSFORM = $(PLUGIN_TRANSFORM:%.o=BUILTIN_%.o)
 BUILTIN_INVERT = $(PLUGIN_INVERT:%.o=BUILTIN_%.o)
+BUILTIN_DISTORT = $(PLUGIN_DISTORT:%.o=BUILTIN_%.o)
 BUILTIN_WALL = $(PLUGIN_WALL:%.o=BUILTIN_%.o)
 
-PLUGIN_C = $(PLUGIN_BOB) $(PLUGIN_BOB422) $(PLUGIN_INVERT) $(PLUGIN_WALL)
-BUILTIN_C = $(BUILTIN_BOB) $(BUILTIN_BOB422) $(BUILTIN_INVERT) $(BUILTIN_WALL)
+PLUGIN_C = $(PLUGIN_BOB) $(PLUGIN_TRANSFORM) $(PLUGIN_INVERT) $(PLUGIN_DISTORT) $(PLUGIN_WALL)
+BUILTIN_C = $(BUILTIN_BOB) $(BUILTIN_TRANSFORM) $(BUILTIN_INVERT) $(BUILTIN_DISTORT) $(BUILTIN_WALL)
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
@@ -38,10 +40,10 @@ include ../../Makefile.modules
 	ar r $@ $^
 	$(RANLIB) $@
 
-../filter_bob422.so: $(PLUGIN_BOB422)
+../filter_transform.so: $(PLUGIN_TRANSFORM)
 	$(CC) -o $@ $^ $(PLCFLAGS) 
 
-../filter_bob422.a: $(BUILTIN_BOB422)
+../filter_transform.a: $(BUILTIN_TRANSFORM)
 	ar r $@ $^
 	$(RANLIB) $@
 
@@ -49,6 +51,13 @@ include ../../Makefile.modules
 	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../filter_invert.a: $(BUILTIN_INVERT)
+	ar r $@ $^
+	$(RANLIB) $@
+
+../filter_distort.so: $(PLUGIN_DISTORT)
+	$(CC) -o $@ $^ $(PLCFLAGS) $(LIB_FILTER_DISTORT)
+
+../filter_distort.a: $(BUILTIN_DISTORT)
 	ar r $@ $^
 	$(RANLIB) $@
 

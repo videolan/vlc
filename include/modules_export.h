@@ -92,6 +92,7 @@
     (p_symbols)->vout_DestroySubPicture = vout_DestroySubPicture; \
     (p_symbols)->vout_DisplaySubPicture = vout_DisplaySubPicture; \
     (p_symbols)->vout_CreatePicture = vout_CreatePicture; \
+    (p_symbols)->vout_AllocatePicture = vout_AllocatePicture; \
     (p_symbols)->vout_DisplayPicture = vout_DisplayPicture; \
     (p_symbols)->vout_DestroyPicture = vout_DestroyPicture; \
     (p_symbols)->vout_DatePicture = vout_DatePicture; \
@@ -203,6 +204,7 @@
 #   define vout_DestroySubPicture p_symbols->vout_DestroySubPicture
 #   define vout_DisplaySubPicture p_symbols->vout_DisplaySubPicture
 #   define vout_CreatePicture p_symbols->vout_CreatePicture
+#   define vout_AllocatePicture p_symbols->vout_AllocatePicture
 #   define vout_DisplayPicture p_symbols->vout_DisplayPicture
 #   define vout_DestroyPicture p_symbols->vout_DestroyPicture
 #   define vout_DatePicture p_symbols->vout_DatePicture

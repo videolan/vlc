@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * $Id: invert.c,v 1.2 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,10 +42,10 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "filter_common.h"
+
 #include "modules.h"
 #include "modules_export.h"
-
-#define INVERT_MAX_DIRECTBUFFERS 8
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -95,8 +95,6 @@ static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
-
-static int  InvertNewPicture( struct vout_thread_s *, struct picture_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -157,6 +155,21 @@ static int vout_Init( vout_thread_t *p_vout )
     
     I_OUTPUTPICTURES = 0;
 
+    /* Initialize the output structure */
+    switch( p_vout->render.i_chroma )
+    {
+        case YUV_420_PICTURE:
+            p_vout->output.i_chroma = p_vout->render.i_chroma;
+            p_vout->output.i_width  = p_vout->render.i_width;
+            p_vout->output.i_height = p_vout->render.i_height;
+            p_vout->output.i_aspect = p_vout->render.i_aspect;
+            break;
+
+        default:
+            return( 0 ); /* unknown chroma */
+            break;
+    }
+
     /* Try to open the real video output */
     psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
     main_PutPszVariable( VOUT_FILTER_VAR, "" );
@@ -178,54 +191,7 @@ static int vout_Init( vout_thread_t *p_vout )
  
     main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
-    /* Initialize the output structure */
-    switch( p_vout->render.i_chroma )
-    {
-        case YUV_420_PICTURE:
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            break;
-
-        default:
-            p_vout->output.i_chroma = EMPTY_PICTURE; /* unknown chroma */
-            break;
-    }
-
-    /* Try to initialize INVERT_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < INVERT_MAX_DIRECTBUFFERS )
-    {
-        p_pic = NULL;
-
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-        {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( InvertNewPicture( p_vout, p_pic ) )
-        {
-            break;
-        }
-
-        p_pic->i_status        = DESTROYED_PICTURE;
-        p_pic->i_type          = DIRECT_PICTURE;
-
-        p_pic->i_left_margin   =
-        p_pic->i_right_margin  =
-        p_pic->i_top_margin    =
-        p_pic->i_bottom_margin = 0;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
-    }
+    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     return( 0 );
 }
@@ -296,13 +262,31 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-        pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
-        pixel_data_t *p_end = p_in + p_pic->planes[ i_index ].i_bytes;
+        pixel_data_t *p_in, *p_in_end, *p_out;
 
-        pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+        p_in = p_pic->planes[ i_index ].p_data;
+        p_in_end = p_in + p_pic->planes[ i_index ].i_bytes - 64;
 
-        for( ; p_in < p_end ; )
+        p_out = p_outpic->planes[ i_index ].p_data;
+
+        for( ; p_in < p_in_end ; )
         {
+            /* Do 64 pixels at a time */
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+            *((u64*)p_out)++ = ~( *((u64*)p_in)++ );
+        }
+
+        p_in_end += 64;
+
+        for( ; p_in < p_in_end ; )
+        {
+            /* Do 1 pixel at a time */
             *p_out++ = ~( *p_in++ );
         }
     }
@@ -310,62 +294,5 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-}
-
-
-/*****************************************************************************
- * InvertNewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int InvertNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int i_luma_bytes, i_chroma_bytes;
-
-    int i_width  = p_vout->output.i_width;
-    int i_height = p_vout->output.i_height;
-
-    switch( p_vout->output.i_chroma )
-    {
-    /* We know this chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    case YUV_420_PICTURE:
-
-        /* Precalculate some values */
-        p_pic->i_size         = i_width * i_height;
-        p_pic->i_chroma_width = i_width / 2;
-        p_pic->i_chroma_size  = i_height * ( i_width / 2 );
-
-        /* Allocate the memory buffer */
-        i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
-        i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
-
-        /* Y buffer */
-        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
-        p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
-        p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof(pixel_data_t);
-
-        /* U buffer */
-        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + i_height * i_width;
-        p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
-
-        /* V buffer */
-        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * p_pic->i_chroma_width;
-        p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
-
-        /* We allocated 3 planes */
-        p_pic->i_planes = 3;
-
-        return( 0 );
-        break;
-
-    /* Unknown chroma, do nothing */
-    default:
-
-        return( 0 );
-        break;
-    }
 }
 

@@ -3,7 +3,7 @@
  * Functions are prototyped in tests.h.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: tests.c,v 1.9 2001/12/07 18:33:08 sam Exp $
+ * $Id: tests.c,v 1.10 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *
@@ -46,7 +46,21 @@ int TestProgram( char * psz_program )
  *****************************************************************************/
 int TestMethod( char * psz_var, char * psz_method )
 {
-    return( !strcmp( psz_method, main_GetPszVariable( psz_var, "" ) ) );
+    int   i_len = strlen( psz_method );
+    int   i_index = 0;
+    char *psz_requested = main_GetPszVariable( psz_var, "" );
+
+    while( psz_requested[i_index] && psz_requested[i_index] != ':' )
+    {
+        i_index++;
+    }
+
+    if( i_index != i_len )
+    {
+        return 0;
+    }
+
+    return !strncmp( psz_method, psz_requested, i_len );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * bob.c : BOB deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: bob.c,v 1.2 2001/12/16 18:00:18 sam Exp $
+ * $Id: bob.c,v 1.3 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,10 +42,10 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "filter_common.h"
+
 #include "modules.h"
 #include "modules_export.h"
-
-#define BOB_MAX_DIRECTBUFFERS 8
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -95,8 +95,6 @@ static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
-
-static int  BobNewPicture( struct vout_thread_s *, struct picture_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -162,6 +160,7 @@ static int vout_Init( vout_thread_t *p_vout )
     switch( p_vout->render.i_chroma )
     {
         case YUV_420_PICTURE:
+        case YUV_422_PICTURE:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -178,11 +177,26 @@ static int vout_Init( vout_thread_t *p_vout )
     main_PutPszVariable( VOUT_FILTER_VAR, "" );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
-        
-    p_vout->p_sys->p_vout =
-        vout_CreateThread( NULL,
+
+    switch( p_vout->render.i_chroma )
+    {
+        case YUV_420_PICTURE:
+            p_vout->p_sys->p_vout =
+                vout_CreateThread( NULL,
                            p_vout->output.i_width, p_vout->output.i_height / 2,
                            p_vout->output.i_chroma, p_vout->output.i_aspect );
+            break;
+
+        case YUV_422_PICTURE:
+            p_vout->p_sys->p_vout =
+                vout_CreateThread( NULL,
+                           p_vout->output.i_width, p_vout->output.i_height,
+                           YUV_420_PICTURE, p_vout->output.i_aspect );
+            break;
+
+        default:
+            break;
+    }
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
@@ -194,39 +208,7 @@ static int vout_Init( vout_thread_t *p_vout )
  
     main_PutPszVariable( VOUT_FILTER_VAR, psz_filter );
 
-    /* Try to initialize BOB_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < BOB_MAX_DIRECTBUFFERS )
-    {
-        p_pic = NULL;
-
-        /* Find an empty picture slot */
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-        {
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-            {
-                p_pic = p_vout->p_picture + i_index;
-                break;
-            }
-        }
-
-        /* Allocate the picture */
-        if( BobNewPicture( p_vout, p_pic ) )
-        {
-            break;
-        }
-
-        p_pic->i_status        = DESTROYED_PICTURE;
-        p_pic->i_type          = DIRECT_PICTURE;
-
-        p_pic->i_left_margin   =
-        p_pic->i_right_margin  =
-        p_pic->i_top_margin    =
-        p_pic->i_bottom_margin = 0;
-
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-        I_OUTPUTPICTURES++;
-    }
+    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     return( 0 );
 }
@@ -275,7 +257,7 @@ static int vout_Manage( vout_thread_t *p_vout )
  * This function send the currently rendered image to BOB image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_inpic )
+static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i_index, i_field;
@@ -299,89 +281,66 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_inpic )
                           mdate() + (mtime_t)(50000 + i_field * 20000) );
 
         /* Copy image and skip lines */
-        for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
+        for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
         {
-            pixel_data_t *p_in, *p_end, *p_out;
+            pixel_data_t *p_in, *p_out_end, *p_out;
+            int i_increment;
 
-            p_in = p_inpic->planes[ i_index ].p_data
-                       + i_field * p_inpic->planes[ i_index ].i_line_bytes;
+            p_in = p_pic->planes[ i_index ].p_data
+                       + i_field * p_pic->planes[ i_index ].i_line_bytes;
 
             p_out = p_outpic->planes[ i_index ].p_data;
-            p_end = p_out + p_outpic->planes[ i_index ].i_bytes;
+            p_out_end = p_out + p_outpic->planes[ i_index ].i_bytes;
 
-            for( ; p_out < p_end ; )
+            switch( p_vout->render.i_chroma )
             {
-                p_main->fast_memcpy( p_out, p_in,
-                                     p_inpic->planes[ i_index ].i_line_bytes );
+                case YUV_420_PICTURE:
 
-                p_out += p_inpic->planes[ i_index ].i_line_bytes;
-                p_in += 2 * p_inpic->planes[ i_index ].i_line_bytes;
+                    for( ; p_out < p_out_end ; )
+                    {
+                        p_main->fast_memcpy( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+
+                        p_out += p_pic->planes[ i_index ].i_line_bytes;
+                        p_in += 2 * p_pic->planes[ i_index ].i_line_bytes;
+                    }
+                    break;
+
+                case YUV_422_PICTURE:
+
+                    i_increment = 2 * p_pic->planes[ i_index ].i_line_bytes;
+
+                    if( i_index == Y_PLANE )
+                    {
+                        for( ; p_out < p_out_end ; )
+                        {
+                            p_main->fast_memcpy( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+                            p_main->fast_memcpy( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+                            p_in += i_increment;
+                        }
+                    }
+                    else
+                    {
+                        for( ; p_out < p_out_end ; )
+                        {
+                            p_main->fast_memcpy( p_out, p_in,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+                            p_out += p_pic->planes[ i_index ].i_line_bytes;
+                            p_in += i_increment;
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
             }
         }
 
         vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
-    }
-}
-
-
-/*****************************************************************************
- * BobNewPicture: allocate a picture
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int BobNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int i_luma_bytes, i_chroma_bytes;
-
-    int i_width  = p_vout->output.i_width;
-    int i_height = p_vout->output.i_height;
-
-    switch( p_vout->output.i_chroma )
-    {
-    /* We know this chroma, allocate a buffer which will be used
-     * directly by the decoder */
-    case YUV_420_PICTURE:
-
-        /* Precalculate some values */
-        p_pic->i_size         = i_width * i_height;
-        p_pic->i_chroma_width = i_width / 2;
-        p_pic->i_chroma_size  = i_height * ( i_width / 2 );
-
-        /* Allocate the memory buffer */
-        i_luma_bytes = p_pic->i_size * sizeof(pixel_data_t);
-        i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
-
-        /* Y buffer */
-        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes
-                                                   + 2 * i_chroma_bytes );
-        p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
-        p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof(pixel_data_t);
-
-        /* U buffer */
-        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data
-                                           + i_height * i_width;
-        p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width
-                                                 * sizeof(pixel_data_t);
-
-        /* V buffer */
-        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data
-                                           + i_height * p_pic->i_chroma_width;
-        p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width
-                                                 * sizeof(pixel_data_t);
-
-        /* We allocated 3 planes */
-        p_pic->i_planes = 3;
-
-        return( 0 );
-        break;
-
-    /* Unknown chroma, do nothing */
-    default:
-
-        return( 0 );
-        break;
     }
 }
 

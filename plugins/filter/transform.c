@@ -1,8 +1,8 @@
 /*****************************************************************************
- * wall.c : Wall video plugin for vlc
+ * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.2 2001/12/19 03:50:22 sam Exp $
+ * $Id: transform.c,v 1.1 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME filter_wall
+#define MODULE_NAME filter_transform
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -47,6 +47,12 @@
 #include "modules.h"
 #include "modules_export.h"
 
+#define TRANSFORM_MODE_HFLIP   1
+#define TRANSFORM_MODE_VFLIP   2
+#define TRANSFORM_MODE_90      3
+#define TRANSFORM_MODE_180     4
+#define TRANSFORM_MODE_270     5
+
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
@@ -56,14 +62,14 @@ static void vout_getfunctions( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for Wall module" )
+ADD_WINDOW( "Configuration for transform module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_VOUT;
-    p_module->psz_longname = "image wall video module";
+    p_module->psz_longname = "image transformation module";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -74,15 +80,16 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * vout_sys_t: Wall video output method descriptor
+ * vout_sys_t: Transform video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the Wall specific properties of an output thread.
+ * It describes the Transform specific properties of an output thread.
  *****************************************************************************/
 typedef struct vout_sys_s
 {
-    struct vout_thread_s *p_vout_top;
-    struct vout_thread_s *p_vout_bottom;
+    int i_mode;
+    boolean_t b_rotation;
+    struct vout_thread_s *p_vout;
 
 } vout_sys_t;
 
@@ -118,7 +125,7 @@ static void vout_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_FILTER_VAR, "wall" ) )
+    if( TestMethod( VOUT_FILTER_VAR, "transform" ) )
     {
         return( 999 );
     }
@@ -128,25 +135,68 @@ static int vout_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * vout_Create: allocates Wall video thread output method
+ * vout_Create: allocates Transform video thread output method
  *****************************************************************************
- * This function allocates and initializes a Wall vout method.
+ * This function allocates and initializes a Transform vout method.
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
+    char *psz_method;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
         return( 1 );
+    }
+
+    /* Look what method was requested */
+    psz_method = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+
+    while( *psz_method && *psz_method != ':' )
+    {
+        psz_method++;
+    }
+
+    if( !strcmp( psz_method, ":hflip" ) )
+    {
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_HFLIP;
+        p_vout->p_sys->b_rotation = 0;
+    }
+    else if( !strcmp( psz_method, ":vflip" ) )
+    {
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_VFLIP;
+        p_vout->p_sys->b_rotation = 0;
+    }
+    else if( !strcmp( psz_method, ":90" ) )
+    {
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
+        p_vout->p_sys->b_rotation = 1;
+    }
+    else if( !strcmp( psz_method, ":180" ) )
+    {
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_180;
+        p_vout->p_sys->b_rotation = 0;
+    }
+    else if( !strcmp( psz_method, ":270" ) )
+    {
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_270;
+        p_vout->p_sys->b_rotation = 1;
+    }
+    else
+    {
+        intf_ErrMsg( "filter error: no valid transform mode provided, "
+                     "using transform:90" );
+        p_vout->p_sys->i_mode = TRANSFORM_MODE_90;
+        p_vout->p_sys->b_rotation = 1;
     }
 
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_Init: initialize Wall video thread output method
+ * vout_Init: initialize Transform video thread output method
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
@@ -175,32 +225,29 @@ static int vout_Init( vout_thread_t *p_vout )
     psz_filter = main_GetPszVariable( VOUT_FILTER_VAR, "" );
     main_PutPszVariable( VOUT_FILTER_VAR, "" );
 
-    intf_WarnMsg( 1, "filter: spawning the real video outputs" );
+    intf_WarnMsg( 1, "filter: spawning the real video output" );
 
-    p_vout->p_sys->p_vout_top =
-        vout_CreateThread( NULL,
-                           p_vout->render.i_width, p_vout->render.i_height / 2,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect * 2);
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout_top == NULL )
+    if( p_vout->p_sys->b_rotation )
     {
-        intf_ErrMsg( "filter error: can't open top vout, aborting" );
-
-        return( 0 );
+        p_vout->p_sys->p_vout =
+            vout_CreateThread( NULL,
+                           p_vout->render.i_height, p_vout->render.i_width,
+                           p_vout->render.i_chroma,
+                           (u64)VOUT_ASPECT_FACTOR * (u64)VOUT_ASPECT_FACTOR
+                               / (u64)p_vout->render.i_aspect );
+    }
+    else
+    {
+        p_vout->p_sys->p_vout =
+            vout_CreateThread( NULL,
+                           p_vout->render.i_width, p_vout->render.i_height,
+                           p_vout->render.i_chroma, p_vout->render.i_aspect );
     }
 
-    p_vout->p_sys->p_vout_bottom =
-        vout_CreateThread( NULL,
-                           p_vout->render.i_width, p_vout->render.i_height / 2,
-                           p_vout->render.i_chroma, p_vout->render.i_aspect * 2 );
-
     /* Everything failed */
-    if( p_vout->p_sys->p_vout_bottom == NULL )
+    if( p_vout->p_sys->p_vout == NULL )
     {
-        intf_ErrMsg( "filter error: can't open bottom vout, aborting" );
-        vout_DestroyThread( p_vout->p_sys->p_vout_top, NULL );
-
+        intf_ErrMsg( "filter error: can't open vout, aborting" );
         return( 0 );
     }
  
@@ -212,7 +259,7 @@ static int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate Wall video thread output method
+ * vout_End: terminate Transform video thread output method
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
@@ -227,20 +274,19 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy Wall video thread output method
+ * vout_Destroy: destroy Transform video thread output method
  *****************************************************************************
- * Terminate an output method created by WallCreateOutputMethod
+ * Terminate an output method created by TransformCreateOutputMethod
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    vout_DestroyThread( p_vout->p_sys->p_vout_top, NULL );
-    vout_DestroyThread( p_vout->p_sys->p_vout_bottom, NULL );
+    vout_DestroyThread( p_vout->p_sys->p_vout, NULL );
 
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_Manage: handle Wall events
+ * vout_Manage: handle Transform events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
@@ -253,19 +299,18 @@ static int vout_Manage( vout_thread_t *p_vout )
 /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
- * This function send the currently rendered image to Wall image, waits
+ * This function send the currently rendered image to Transform image, waits
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    picture_t *p_outpic_top, *p_outpic_bottom;
+    picture_t *p_outpic;
     int i_index;
-    mtime_t i_date = mdate() + 50000;
 
-    while( ( p_outpic_top
-              = vout_CreatePicture( p_vout->p_sys->p_vout_top, 0, 0, 0 ) )
-            == NULL )
+    /* This is a new frame. Get a structure from the video_output. */
+    while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
+              == NULL )
     {
         if( p_vout->b_die || p_vout->b_error )
         {
@@ -274,40 +319,129 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }   
 
-    while( ( p_outpic_bottom
-              = vout_CreatePicture( p_vout->p_sys->p_vout_bottom, 0, 0, 0 ) )
-            == NULL )
+    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, mdate() + 50000 );
+    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
+
+    switch( p_vout->p_sys->i_mode )
     {
-        if( p_vout->b_die || p_vout->b_error )
-        {
-            vout_DestroyPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }   
+        case TRANSFORM_MODE_90:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_line_bytes = p_pic->planes[ i_index ].i_line_bytes;
 
-    vout_DatePicture( p_vout->p_sys->p_vout_top, p_outpic_top, i_date );
-    vout_DatePicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom, i_date );
+                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
 
-    vout_LinkPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_LinkPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
+                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+                pixel_data_t *p_out_end = p_out
+                                       + p_outpic->planes[ i_index ].i_bytes;
 
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
-    {
-        p_main->fast_memcpy( p_outpic_top->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].i_bytes / 2 );
+                for( ; p_out < p_out_end ; )
+                {
+                    pixel_data_t *p_line_end;
 
-        p_main->fast_memcpy( p_outpic_bottom->planes[ i_index ].p_data,
-                             p_pic->planes[ i_index ].p_data
-                              + p_pic->planes[ i_index ].i_bytes / 2,
-                             p_pic->planes[ i_index ].i_bytes / 2 );
+                    p_line_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+                    for( ; p_in < p_line_end ; )
+                    {
+                        p_line_end -= i_line_bytes;
+                        *(--p_out_end) = *p_line_end;
+                    }
+
+                    p_in++;
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_180:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    *p_out++ = *(--p_in_end);
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_270:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                int i_line_bytes = p_pic->planes[ i_index ].i_line_bytes;
+
+                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+
+                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+                pixel_data_t *p_out_end = p_out
+                                       + p_outpic->planes[ i_index ].i_bytes;
+
+                for( ; p_out < p_out_end ; )
+                {
+                    pixel_data_t *p_in_end;
+
+                    p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+                    for( ; p_in < p_in_end ; )
+                    {
+                        p_in_end -= i_line_bytes;
+                        *p_out++ = *p_in_end;
+                    }
+
+                    p_in++;
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_VFLIP:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    p_in_end -= p_pic->planes[ i_index ].i_line_bytes;
+                    p_main->fast_memcpy( p_out, p_in_end,
+                                     p_pic->planes[ i_index ].i_line_bytes );
+                    p_out += p_pic->planes[ i_index ].i_line_bytes;
+                }
+            }
+            break;
+
+        case TRANSFORM_MODE_HFLIP:
+            for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+            {
+                pixel_data_t *p_in = p_pic->planes[ i_index ].p_data;
+                pixel_data_t *p_in_end = p_in + p_pic->planes[ i_index ].i_bytes;
+
+                pixel_data_t *p_out = p_outpic->planes[ i_index ].p_data;
+
+                for( ; p_in < p_in_end ; )
+                {
+                    pixel_data_t *p_line_end = p_in
+                            + p_pic->planes[ i_index ].i_line_bytes;
+
+                    for( ; p_in < p_line_end ; )
+                    {
+                        *p_out++ = *(--p_line_end);
+                    }
+
+                    p_in += p_pic->planes[ i_index ].i_line_bytes;
+                }
+            }
+            break;
+
+        default:
+            break;
     }
 
-    vout_UnlinkPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_UnlinkPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
+    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
-    vout_DisplayPicture( p_vout->p_sys->p_vout_top, p_outpic_top );
-    vout_DisplayPicture( p_vout->p_sys->p_vout_bottom, p_outpic_bottom );
+    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.70 2001/12/16 16:18:36 sam Exp $
+ * $Id: vout_sdl.c,v 1.71 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -68,6 +68,7 @@
 typedef struct vout_sys_s
 {
     SDL_Surface *   p_display;                             /* display device */
+    SDL_Overlay *   p_overlay; /* An overlay we keep to grab the XVideo port */
 
     int i_width;
     int i_height;
@@ -129,6 +130,11 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
+    if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
+    {
+        return( 0 );
+    }
+
     if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
     {
         return( 999 );
@@ -190,15 +196,21 @@ static int vout_Create( vout_thread_t *p_vout )
             * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
-    if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 300 )
+    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 200 )
     {
-        p_vout->p_sys->i_width *= 2;
-        p_vout->p_sys->i_height *= 2;
+        p_vout->p_sys->i_width <<= 1;
+        p_vout->p_sys->i_height <<= 1;
+    }
+    else if( p_vout->p_sys->i_width <= 400 && p_vout->p_sys->i_height <= 300 )
+    {
+        p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
+        p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
     }
 
     if( SDLOpenDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
+        SDL_QuitSubSystem( SDL_INIT_VIDEO );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -247,8 +259,8 @@ static int vout_Init( vout_thread_t *p_vout )
             }
         }
 
-        /* Allocate the picture */
-        if( SDLNewPicture( p_vout, p_pic ) )
+        /* Allocate the picture if we found one */
+        if( p_pic == NULL || SDLNewPicture( p_vout, p_pic ) )
         {
             break;
         }
@@ -506,8 +518,29 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     SDL_LockSurface( p_vout->p_sys->p_display );
 
-    SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
-                       VOUT_TITLE " (SDL output)" );
+    p_vout->p_sys->p_overlay =
+        SDL_CreateYUVOverlay( 32, 32, SDL_YV12_OVERLAY,
+                              p_vout->p_sys->p_display );
+
+    if( p_vout->p_sys->p_overlay == NULL )
+    {
+        intf_ErrMsg( "vout error: cannot set overlay" );
+        SDL_UnlockSurface( p_vout->p_sys->p_display );
+        SDL_FreeSurface( p_vout->p_sys->p_display );
+        return( 1 );
+    }
+
+    if( p_vout->p_sys->p_overlay->hw_overlay )
+    {
+        SDL_WM_SetCaption( VOUT_TITLE " (hardware SDL output)",
+                           VOUT_TITLE " (hardware SDL output)" );
+    }
+    else
+    {
+        SDL_WM_SetCaption( VOUT_TITLE " (software SDL output)",
+                           VOUT_TITLE " (software SDL output)" );
+    }
+
     SDL_EventState( SDL_KEYUP, SDL_IGNORE );               /* ignore keys up */
 
     return( 0 );
@@ -521,6 +554,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
+    SDL_FreeYUVOverlay( p_vout->p_sys->p_overlay );
     SDL_UnlockSurface ( p_vout->p_sys->p_display );
     SDL_FreeSurface( p_vout->p_sys->p_display );
 }

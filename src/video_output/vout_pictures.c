@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.4 2001/12/16 16:18:36 sam Exp $
+ * $Id: vout_pictures.c,v 1.5 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,11 +39,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void     NewPicture        ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
@@ -185,12 +180,16 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      */
     if( p_free_picture != NULL )
     {
-        NewPicture( p_vout, p_free_picture );
+        vout_AllocatePicture( p_free_picture,
+                              p_vout->render.i_width, p_vout->render.i_height,
+                              p_vout->render.i_chroma );
 
         if( p_free_picture->i_planes )
         {
             /* Copy picture information, set some default values */
             p_free_picture->i_status = RESERVED_PICTURE;
+            p_free_picture->i_type = MEMORY_PICTURE;
+
             p_free_picture->i_refcount = 0;
 
             p_free_picture->b_progressive = b_progressive;
@@ -447,51 +446,46 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
     *pi_y = ( i_height - *pi_height ) / 2;
 }
 
-/* Following functions are local */
-
 /*****************************************************************************
- * NewPicture: allocate a new picture in the heap.
+ * vout_AllocatePicture: allocate a new picture in the heap.
  *****************************************************************************
  * This function allocates a fake direct buffer in memory, which can be
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  *****************************************************************************/
-static void NewPicture( vout_thread_t *p_vout, picture_t *p_picture )
+void vout_AllocatePicture( picture_t *p_picture,
+                           int i_width, int i_height, int i_chroma )
 {
     int i_data_size = 0;
 
-    p_picture->i_size = p_vout->render.i_width
-                         * p_vout->render.i_height;
+    p_picture->i_size = i_width * i_height;
 
     /* Calculate coordinates */
-    switch( p_vout->render.i_chroma )
+    switch( i_chroma )
     {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size / 4;
-            p_picture->i_chroma_width = p_vout->render.i_width / 2;
+            p_picture->i_chroma_width = i_width / 2;
             break;
 
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size / 2;
-            p_picture->i_chroma_width = p_vout->render.i_width / 2;
+            p_picture->i_chroma_width = i_width / 2;
             break;
 
         case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
             p_picture->i_chroma_size = p_picture->i_size;
-            p_picture->i_chroma_width = p_vout->render.i_width;
+            p_picture->i_chroma_width = i_width;
             break;
 
         default:
-            intf_ErrMsg( "vout error: unknown chroma type %d",
-                         p_vout->render.i_chroma );
+            intf_ErrMsg( "vout error: unknown chroma type %d", i_chroma );
             p_picture->i_planes = 0;
             return;
     }
 
-    p_picture->i_type = MEMORY_PICTURE;
-
     /* Allocate memory */
-    switch( p_vout->render.i_chroma )
+    switch( i_chroma )
     {
         case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
         case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
@@ -503,7 +497,7 @@ static void NewPicture( vout_thread_t *p_vout, picture_t *p_picture )
             p_picture->planes[ Y_PLANE ].i_bytes =
                  p_picture->i_size * sizeof(pixel_data_t);
             p_picture->planes[ Y_PLANE ].i_line_bytes =
-                 p_vout->render.i_width * sizeof(pixel_data_t);
+                 i_width * sizeof(pixel_data_t);
             p_picture->planes[ Y_PLANE ].p_data =
                  memalign( 16, i_data_size * sizeof(pixel_data_t) * 4 );
             /* The U plane */

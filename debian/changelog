@@ -1,6 +1,6 @@
-vlc (0.2.92-1) unstable; urgency=low
+vlc (0.2.92-UNSTABLE) unstable; urgency=low
 
-  * New upstream release.
+  * Development branch.
 
  -- Christophe Massiot <massiot@via.ecp.fr>  Fri,  7 Dec 2001 20:18:56 +0100
 

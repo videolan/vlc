@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.59 2001/12/16 16:18:36 sam Exp $
+ * $Id: common.h,v 1.60 2001/12/19 03:50:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -547,6 +547,7 @@ typedef struct module_symbols_s
     struct picture_s * ( * vout_CreatePicture )
                                     ( struct vout_thread_s *,
                                       boolean_t, boolean_t, boolean_t ); 
+    void  ( * vout_AllocatePicture )( struct picture_s *, int, int, int );
     void  ( * vout_DisplayPicture ) ( struct vout_thread_s *, 
                                       struct picture_s * );
     void  ( * vout_DestroyPicture ) ( struct vout_thread_s *,

@@ -144,7 +144,9 @@ AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
-AC_CHECK_LIB(m,cos,LIB_IMDCT="${LIB_IMDCT} -lm")
+AC_CHECK_LIB(m,cos,
+  LIB_IMDCT="${LIB_IMDCT} -lm"
+  LIB_FILTER_DISTORT="${LIB_FILTER_DISTORT} -lm")
 AC_CHECK_LIB(m,pow,
   LIB_IMDCT="${LIB_IMDCT} -lm"
   LIB_IMDCT3DN="${LIB_IMDCT3DN} -lm"
@@ -310,7 +312,7 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb8 filter_bob filter_invert filter_wall filter_bob422"
+PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb8 filter_bob filter_invert filter_wall filter_transform filter_distort"
 
 dnl
 dnl  Accelerated modules
@@ -411,7 +413,7 @@ dnl
 case ${target_os} in
   linux*)
     SYS=linux
-	;;
+    ;;
   bsdi*)
     SYS=bsdi
     ;;
@@ -1269,6 +1271,7 @@ AC_SUBST(LIB_DVD_PLUGIN)
 AC_SUBST(LIB_DVDREAD)
 AC_SUBST(LIB_DVDREAD_PLUGIN)
 AC_SUBST(LIB_ESD)
+AC_SUBST(LIB_FILTER_DISTORT)
 AC_SUBST(LIB_GGI)
 AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GNOME)
