@@ -721,6 +721,11 @@ then
     PLUGINS="${PLUGINS} vcd"
   ])
 
+  if test "x${SYS}" = "xfreebsd4.5"
+  then
+    PLUGINS="${PLUGINS} vcd"
+  fi
+  
   if test "x${SYS}" = "xbsdi"
   then
     PLUGINS="${PLUGINS} vcd"

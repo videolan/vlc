@@ -2,7 +2,7 @@
  * cdrom_tools.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_tools.c,v 1.2 2002/04/04 05:08:05 sam Exp $
+ * $Id: cdrom_tools.c,v 1.3 2002/04/26 23:32:23 jobi Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,7 +41,7 @@
 
 #include <sys/ioctl.h>
 
-#if defined(SYS_BSDI)
+#if defined( SYS_BSDI )
 #   include <dvd.h>
 #elif defined ( SYS_DARWIN )
 #   include <CoreFoundation/CFBase.h>
@@ -49,6 +49,9 @@
 #   include <IOKit/storage/IOCDTypes.h>
 #   include <IOKit/storage/IOCDMedia.h>
 #   include <IOKit/storage/IOCDMediaBSDClient.h>
+#elif defined( SYS_FREEBSD4_5 )
+#   include <sys/cdio.h>
+#   include <sys/cdrio.h>
 #else
 #   include <linux/cdrom.h>
 #endif
@@ -89,6 +92,17 @@ int ioctl_GetTrackCount( int i_fd, const char *psz_dev )
 
     freeTOC( pTOC );
 
+#elif defined( SYS_FREEBSD4_5 )
+    struct ioc_toc_header tochdr;
+    
+    if( ioctl( i_fd, CDIOREADTOCHEADER, &tochdr ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: could not read TOCHDR" );
+        return -1;
+    }
+
+    i_count = tochdr.ending_track - tochdr.starting_track + 1;
+    
 #else
     struct cdrom_tochdr   tochdr;
 
@@ -167,6 +181,42 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
 
     freeTOC( pTOC );
 
+#elif defined( SYS_FREEBSD4_5 )
+    struct ioc_read_toc_entry toc_entries;
+
+    i_tracks = ioctl_GetTrackCount( i_fd, psz_dev );
+    p_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+    if( p_sectors == NULL )
+    {
+        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
+        return NULL;
+    }
+
+    toc_entries.address_format = CD_LBA_FORMAT;
+    toc_entries.starting_track = 0;
+    toc_entries.data_len = ( i_tracks + 1 ) * sizeof( struct cd_toc_entry ); 
+    toc_entries.data = (struct cd_toc_entry *) malloc( toc_entries.data_len );
+    if( toc_entries.data == NULL )
+    {
+        intf_ErrMsg( "vcd error: not enoug memory" );
+        free( p_sectors );
+        return NULL;
+    }
+ 
+    /* Read the TOC */
+    if( ioctl( i_fd, CDIOREADTOCENTRYS, &toc_entries ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: could not read the TOC" );
+        free( p_sectors );
+        free( toc_entries.data );
+        return NULL;
+    }
+    
+    /* Fill the p_sectors structure with the track/sector matches */
+    for( i = 0 ; i <= i_tracks ; i++ )
+    {
+        p_sectors[ i ] = ntohl( toc_entries.data[i].addr.lba );
+    }
 #else
     struct cdrom_tochdr   tochdr;
     struct cdrom_tocentry tocent;
@@ -232,6 +282,28 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
     if( ioctl( i_fd, DKIOCCDREAD, &cd_read ) == -1 )
     {
         intf_ErrMsg( "vcd error: could not read block %d", i_sector );
+        return( -1 );
+    }
+
+#elif defined( SYS_FREEBSD4_5 )
+    
+    int i_size = VCD_SECTOR_SIZE;
+
+    if( ioctl( i_fd, CDRIOCSETBLOCKSIZE, &i_size ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: Could not set block size" );
+        return( -1 );
+    }
+
+    if( lseek( i_fd, i_sector * VCD_SECTOR_SIZE, SEEK_SET ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: Could not lseek to sector %d", i_sector );
+        return( -1 );
+    }
+
+    if( read( i_fd, p_block, VCD_SECTOR_SIZE ) == -1 )
+    {
+        intf_ErrMsg( "vcd error: Could not read sector %d", i_sector );
         return( -1 );
     }
 
