@@ -2,7 +2,7 @@
  * httpd.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.h,v 1.2 2003/02/25 17:17:43 fenrir Exp $
+ * $Id: httpd.h,v 1.3 2003/03/06 11:09:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -76,6 +76,7 @@ static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
     p_httpd = vlc_object_find( p_this, VLC_OBJECT_HTTPD, FIND_ANYWHERE );
     if( !p_httpd )
     {
+        msg_Info(p_this, "creating new http daemon" );
         if( !b_create )
         {
             return( NULL );
@@ -98,6 +99,7 @@ static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
         }
 
         vlc_object_yield( p_httpd );
+        vlc_object_attach( p_httpd, p_this->p_vlc );
     }
 
     return( p_httpd );
@@ -106,6 +108,10 @@ static inline httpd_t* httpd_Find( vlc_object_t *p_this, vlc_bool_t b_create )
 static inline void  httpd_Release( httpd_t *p_httpd )
 {
     vlc_object_release( p_httpd );
+    if( p_httpd->i_refcount <= 0 )
+    {
+        vlc_object_detach( p_httpd );
+    }
 }
 
 

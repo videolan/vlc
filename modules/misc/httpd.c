@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.6 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: httpd.c,v 1.7 2003/03/06 11:09:56 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -438,7 +438,7 @@ static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, i
         /* yes, increment ref count and succed */
         p_httpt->host[i]->i_ref++;
         vlc_mutex_unlock( &p_httpt->host_lock );
-        return NULL;
+        return( p_httpt->host[i] );
     }
 
     /* need to add a new listening socket */
