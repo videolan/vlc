@@ -269,13 +269,10 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
     fNextTitleMI = new BMenuItem( _("Next Title"), new BMessage( NEXT_TITLE ) );
     fPrevChapterMI = new BMenuItem( _("Previous chapter"), new BMessage( PREV_CHAPTER ) );
     fNextChapterMI = new BMenuItem( _("Next chapter"), new BMessage( NEXT_CHAPTER ) );
-    fGotoMenuMI = new BMenuItem( _("Goto Menu"), new BMessage( NAVIGATE_MENU ) );
 
     /* Add the Navigation menu */
     fNavigationMenu = new BMenu( _("Navigation") );
     fMenuBar->AddItem( fNavigationMenu );
-    fNavigationMenu->AddItem( fGotoMenuMI );
-    fNavigationMenu->AddSeparatorItem();
     fNavigationMenu->AddItem( fPrevTitleMI );
     fNavigationMenu->AddItem( fNextTitleMI );
     fNavigationMenu->AddItem( fTitleMenu = new TitleMenu( _("Go to Title"), p_intf ) );
@@ -555,13 +552,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             break;
 
-        case NAVIGATE_MENU:
-            if( p_input )
-            {
-                var_SetInteger( p_input, "title", 0 );
-            }
-            break;
-
         case TOGGLE_TITLE:
         {
             int32 index;
@@ -833,8 +823,8 @@ void InterfaceWindow::UpdateInterface()
     {
         vlc_value_t val;
         p_mediaControl->SetEnabled( true );
-        bool hasTitles   = var_Get( p_input, "title", &val );
-        bool hasChapters = var_Get( p_input, "chapter", &val );
+        bool hasTitles   = !var_Get( p_input, "title", &val );
+        bool hasChapters = !var_Get( p_input, "chapter", &val );
         p_mediaControl->SetStatus( var_GetInteger( p_input, "state" ), 
                                    var_GetInteger( p_input, "rate" ) );
         var_Get( p_input, "position", &val );
@@ -948,7 +938,6 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
              fSubtitlesMenu->SetEnabled( hasFile );
         if ( fSpeedMenu->IsEnabled() != hasFile )
              fSpeedMenu->SetEnabled( hasFile );
-        fGotoMenuMI->SetEnabled( true );
         Unlock();
     }
 }
@@ -1296,6 +1285,7 @@ void TitleMenu::AttachedToWindow()
     }
 
     vlc_value_t val;
+    BMessage * message;
     if( !var_Get( p_input, "title", &val ) )
     {
         vlc_value_t val_list, text_list;
@@ -1304,8 +1294,10 @@ void TitleMenu::AttachedToWindow()
         
         for( int i = 0; i < val_list.p_list->i_count; i++ )
         {
+            message = new BMessage( TOGGLE_TITLE );
+            message->AddInt32( "index", val_list.p_list->p_values[i].i_int );
             item = new BMenuItem( text_list.p_list->p_values[i].psz_string,
-                                  NULL );
+                                  message );
             if( val_list.p_list->p_values[i].i_int == val.i_int )
             {
                 item->SetMarked( true );
@@ -1356,6 +1348,7 @@ void ChapterMenu::AttachedToWindow()
     }
 
     vlc_value_t val;
+    BMessage * message;
     if( !var_Get( p_input, "chapter", &val ) )
     {
         vlc_value_t val_list, text_list;
@@ -1364,8 +1357,10 @@ void ChapterMenu::AttachedToWindow()
         
         for( int i = 0; i < val_list.p_list->i_count; i++ )
         {
+            message = new BMessage( TOGGLE_CHAPTER );
+            message->AddInt32( "index", val_list.p_list->p_values[i].i_int );
             item = new BMenuItem( text_list.p_list->p_values[i].psz_string,
-                                  NULL );
+                                  message );
             if( val_list.p_list->p_values[i].i_int == val.i_int )
             {
                 item->SetMarked( true );
