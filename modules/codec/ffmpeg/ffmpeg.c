@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.9 2002/10/24 09:37:47 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.10 2002/10/24 10:33:09 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -85,13 +85,23 @@ static int      b_ffmpeginit = 0;
     "but no more than requested quality\n" \
     "Not yet implemented !"
 
+#define WORAROUND_BUG_LONGTEXT \
+    "Try to fix some bugs\n" \
+    "1  autodetect\n" \
+    "2  old msmpeg4\n" \
+    "4  xvid interlaced\n" \
+    "8  ump4 \n" \
+    "16 no padding\n" \
+    "32 ac vlc" \
+    "64 Qpel chroma"
+
 vlc_module_begin();
     add_category_hint( N_("Ffmpeg"), NULL );
 #if LIBAVCODEC_BUILD >= 4611
     add_integer ( "ffmpeg-error-resilience", -1, NULL, 
                   "error resilience", ERROR_RESILIENCE_LONGTEXT );
     add_integer ( "ffmpeg-workaround-bugs", 0, NULL, 
-                  "workaround bugs", "0-99, seems to be for msmpeg v3\n"  );
+                  "workaround bugs", WORAROUND_BUG_LONGTEXT );
 #endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
     
@@ -238,56 +248,38 @@ static void ffmpeg_ParseBitMapInfoHeader( bitmapinfoheader_t *p_bh,
 
 }
 
-static void __GetFrame( videodec_thread_t *p_vdec )
-{
-    pes_packet_t  *p_pes;
-    data_packet_t *p_data;
-    byte_t        *p_buffer;
+static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+{   
+    int i_copy; 
+    int i_count;
 
-    p_pes = GetPES( p_vdec->p_fifo );
-    p_vdec->i_pts = p_pes->i_pts;
+    data_packet_t   *p_data;
 
-    while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
-    {
-        p_pes = NextPES( p_vdec->p_fifo );
-    }
-    p_vdec->i_framesize = p_pes->i_pes_size;
-    if( p_pes->i_nb_data == 1 )
-    {
-        p_vdec->p_framedata = p_pes->p_first->p_payload_start;
-        return;    
-    }
-    /* get a buffer and gather all data packet */
-    if( p_vdec->i_buffer_size < p_pes->i_pes_size )
-    {
-        if( p_vdec->p_buffer )
-        {
-            p_vdec->p_buffer = realloc( p_vdec->p_buffer,
-                                        p_pes->i_pes_size );
-        }
-        else
-        {
-            p_vdec->p_buffer = malloc( p_pes->i_pes_size );
-        }
-        p_vdec->i_buffer_size = p_pes->i_pes_size;
-    }
-    
-    p_buffer = p_vdec->p_framedata = p_vdec->p_buffer;
+    i_count = 0;
     p_data = p_pes->p_first;
-    do
+    while( p_data != NULL && i_count < i_max )
     {
-        p_vdec->p_fifo->p_vlc->pf_memcpy( p_buffer, p_data->p_payload_start, 
-                     p_data->p_payload_end - p_data->p_payload_start );
-        p_buffer += p_data->p_payload_end - p_data->p_payload_start;
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+                        i_max - i_count );
+
+        if( i_copy > 0 )
+        {
+            memcpy( p_buf,
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+
         p_data = p_data->p_next;
-    } while( p_data );
-}
+        i_count += i_copy;
+        p_buf   += i_copy;
+    }
 
-static void __NextFrame( videodec_thread_t *p_vdec )
-{
-    NextPES( p_vdec->p_fifo );
+    if( i_count < i_max )
+    {
+        memset( p_buf, 0, i_max - i_count );
+    }
 }
-
 
 /* Check if we have a Vout with good parameters */
 static int ffmpeg_CheckVout( vout_thread_t *p_vout,
@@ -615,13 +607,13 @@ static int InitThread( videodec_thread_t *p_vdec )
     }
 
     /* ***** Fill p_context with init values ***** */
-//#if LIBAVCODEC_BUILD >= 4624
-//    p_vdec->p_context = avcodec_alloc_context();
-//#else
+#if LIBAVCODEC_BUILD >= 4624
+    p_vdec->p_context = avcodec_alloc_context();
+#else
     p_vdec->p_context = malloc( sizeof( AVCodecContext ) );
     memset( p_vdec->p_context, 0, sizeof( AVCodecContext ) );
+#endif
 
-//#endif
     p_vdec->p_context->width  = p_vdec->format.i_width;
     p_vdec->p_context->height = p_vdec->format.i_height;
     
@@ -655,7 +647,7 @@ static int InitThread( videodec_thread_t *p_vdec )
                                  p_vdec->psz_namecodec );
     }
 
-    /* ***** init this codec with special data(up to now MPEG4 only) ***** */
+    /* ***** init this codec with special data ***** */
     if( p_vdec->format.i_data )
     {
         AVPicture avpicture;
@@ -670,6 +662,18 @@ static int InitThread( videodec_thread_t *p_vdec )
                                       p_vdec->format.i_data );
                 break;
             default:
+                if( p_vdec->p_fifo->i_fourcc == FOURCC_MP4S ||
+                    p_vdec->p_fifo->i_fourcc == FOURCC_mp4s ||
+                    p_vdec->p_fifo->i_fourcc == FOURCC_M4S2 ||
+                    p_vdec->p_fifo->i_fourcc == FOURCC_m4s2 )
+                {
+                    p_vdec->p_context->extradata_size = p_vdec->format.i_data;
+                    p_vdec->p_context->extradata = malloc( p_vdec->format.i_data );
+                    memcpy( p_vdec->p_context->extradata,
+                            p_vdec->format.p_data,
+                            p_vdec->format.i_data );
+                }
+
                 break;
         }
     }
@@ -764,6 +768,8 @@ static int InitThread( videodec_thread_t *p_vdec )
  *****************************************************************************/
 static void  DecodeThread( videodec_thread_t *p_vdec )
 {
+    pes_packet_t    *p_pes;
+    int     i_frame_size;
     int     i_status;
     int     b_drawpicture;
     int     b_gotpicture;
@@ -815,20 +821,42 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
 #endif
     }
 
-    __GetFrame( p_vdec );
+    do
+    {
+        if( !( p_pes = GetPES( p_vdec->p_fifo ) ) )
+        {
+            p_vdec->p_fifo->b_error = 1;
+            return;
+        }
+        p_vdec->i_pts = p_pes->i_pts;
+        i_frame_size = p_pes->i_pes_size;
+
+        if( i_frame_size > 0 )
+        {
+            if( p_vdec->i_buffer < i_frame_size + 16 )
+            {
+                FREE( p_vdec->p_buffer );
+                p_vdec->p_buffer = malloc( i_frame_size + 16 );
+                p_vdec->i_buffer = i_frame_size + 16;
+            }
+            
+            GetPESData( p_vdec->p_buffer, p_vdec->i_buffer, p_pes );
+        }
+        NextPES( p_vdec->p_fifo );
+    } while( i_frame_size <= 0 );
+
 
     i_status = avcodec_decode_video( p_vdec->p_context,
                                      &avpicture,
                                      &b_gotpicture,
-                                     p_vdec->p_framedata,
-                                     p_vdec->i_framesize);
+                                     p_vdec->p_buffer,
+                                     i_frame_size );
 
-    __NextFrame( p_vdec );
 
     if( i_status < 0 )
     {
         msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
-                                  p_vdec->i_framesize );
+                                  i_frame_size );
         p_vdec->i_frame_error++;
         return;
     }
@@ -916,6 +944,7 @@ static void EndThread( videodec_thread_t *p_vdec )
     if( p_vdec->p_context != NULL)
     {
         FREE( p_vdec->p_context->quant_store );
+        FREE( p_vdec->p_context->extradata );
         avcodec_close( p_vdec->p_context );
         msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
                                  p_vdec->psz_namecodec );

@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.37 2002/10/24 09:37:47 gbazin Exp $
+ * $Id: input_ext-dec.c,v 1.38 2002/10/24 10:33:09 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -157,6 +157,14 @@ pes_packet_t * GetPES( decoder_fifo_t * p_fifo )
 static inline pes_packet_t * _NextPES( decoder_fifo_t * p_fifo )
 {
     pes_packet_t * p_next;
+
+    if( p_fifo->p_first == NULL )
+    {
+        if( GetPES( p_fifo ) == NULL )
+        {
+            return( NULL );
+        }
+    }
 
     vlc_mutex_lock( &p_fifo->data_lock );
 
