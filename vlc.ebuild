@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.20 2004/01/08 19:07:42 hartman Exp $
+# $Id: vlc.ebuild,v 1.21 2004/01/08 21:19:03 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -20,28 +20,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 ###############################################################################
-# Instructions: http://wiki.videolan.org/index.php/Linux%20Gentoo
 # Some of the ideas in this ebuild are derived from the official Gentoo ebuild
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
+
+inherit libtool
 
 # Missing support for...
 #	tarkin - package not in portage yet - experimental
 #	theora - package not in portage yet - experimental
 #	tremor - package not in portage yet - experimental
 
-IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi
-      oggvorbis gnome xv oss sdl aalib slp truetype v4l xvid lirc 
+inherit gcc
+
+IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi speex
+      oggvorbis gnome xv oss sdl aalib slp truetype v4l lirc 
 	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec png"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
-PFFMPEG=ffmpeg-20040103
-PLIVEDOTCOM=live
+PFFM=ffmpeg-20040103
+PLIVE=live
 
 S=${WORKDIR}/${P}
-SFFMPEG=${WORKDIR}/${PFFMPEG}
-SLIVEDOTCOM=${WORKDIR}/${PLIVEDOTCOM}
+SFFM=${WORKDIR}/${PFFM}
+SLIVE=${WORKDIR}/${PLIVE}
 
 DESCRIPTION="VLC media player - Video player and streamer"
 SRC_URI="http://download.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
@@ -52,10 +55,11 @@ HOMEPAGE="http://www.videolan.org/vlc"
 
 SLOT="0"
 LICENSE="GPL-2"
-KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64"
+KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64 ~ia64 ~ppc64"
 
 DEPEND="X? ( virtual/x11 )
-	aalib? ( >=media-libs/aalib-1.4_rc4-r2 )
+	aalib? ( >=media-libs/aalib-1.4_rc4-r2 
+			>=media-libs/libcaca-0.6 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
@@ -79,68 +83,77 @@ DEPEND="X? ( virtual/x11 )
 		>=media-libs/libogg-1.0 )
 	sdl? ( >=media-libs/libsdl-1.2.5 )
 	slp? ( >=net-libs/openslp-1.0.10 )
-	truetype? ( >=dev-libs/fribidi-0.10.4
-				>=media-libs/freetype-2.1.4 )
+	bidi? ( >=dev-libs/fribidi-0.10.4 )
+	truetype? ( >=media-libs/freetype-2.1.4 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
 	xosd? ( >=x11-libs/xosd-2.0 )
-	xvid? ( >=media-libs/xvid-0.9.1 )
 	3dfx? ( media-libs/glide-v3 )
 	png? ( >=media-libs/libpng-1.2.5 )
+	speex? ( >=media-libs/speex-1.0.3 )
 	>=media-sound/lame-3.93.1
 	>=media-libs/libdvbpsi-0.1.3
 	>=media-libs/a52dec-0.7.4
-	>=media-libs/mpeg2dec-0.4.0
+	>=media-libs/libmpeg2-0.4.0
 	>=media-libs/flac-1.1.0"
 
-inherit gcc
+# mplayer is a required depandancy until the libpostproc code becomes
+# a seperate package or until ffmpeg gets support for installing 
+# the library
+
+# liveMedia (live.com) is not a true library but needs to be 'imported'
+# into your own sourcetree. This is against VLC coding policy.
 
 src_unpack() {
 	
 	unpack ${A}
-	cd ${S}
+
+	# Mozilla plugin related fix
+	epatch ${FILESDIR}/${PV}-mozilla-fix.patch
 
 	# Change the location of the glide headers
 	cd ${S}
-	sed -i -e "s:/usr/include/glide:/usr/include/glide3:" configure
-	sed -i -e "s:glide2x:glide3:" configure
+	sed -i \
+		-e "s:/usr/include/glide:/usr/include/glide3:" \
+		-e "s:glide2x:glide3:" \
+		configure
+
 	cd ${S}/modules/video_output
 	epatch ${FILESDIR}/glide.patch
 	cd ${S}
-}
 
-src_compile(){
-	# configure and building of livedotcom
-	cd ${SLIVEDOTCOM}
-	./genMakefiles linux
-	make
-	
-	# configure and building of ffmpeg
-	cd ${SFFMPEG}
-	local myconf
-	use mmx || myconf="--disable-mmx"
-
-	./configure ${myconf} \
-		--enable-mp3lame \
-		--enable-pp \
-		--disable-vorbis || die "./configure of ffmpeg failed"
-	
-	cd libpostproc
-	make || die "make of libpostproc failed"
-	cd libavcodec
-	make || die "make of libavcodec failed"
-
-	# Configure and build VLC
-	cd ${S}
-	
 	# Avoid timestamp skews with autotools
 	touch configure.ac
 	touch aclocal.m4
 	touch configure
 	touch config.h.in
 	touch `find . -name Makefile.in`
+}
+
+src_compile(){
+	# configure and building of livedotcom
+	cd ${SLIVE}
+	./genMakefiles linux || die "Creating liveMedia Makefiles failed."
+	make || die "liveMedia code failed to compile."
 	
+	# configure and building of ffmpeg
+	cd ${SFFM}
+	./configure \
+		--enable-mp3lame \
+		--enable-pp \
+		--disable-vorbis 
+		`use_enable mmx` || die "ffmpeg failed to configure"
+	
+	cd libavcodec
+	make || die "ffmpeg->libavcodec failed to compile"
+	cd libpostproc
+	make || die "ffmpeg->libpostproc failed to compile"
+
+	# Configure and build VLC
+	cd ${S}
 	local myconf
-	myconf="--disable-mga --enable-flac --with-gnu-ld"
+	myconf="--disable-mga --enable-flac --with-gnu-ld \
+			--enable-a52 --enable-dvbpsi --enable-libmpeg2 \
+			--disable-qt --disable-kde"
 
     #--enable-pth				GNU Pth support (default disabled)
 	#--enable-st				State Threads (default disabled)
@@ -149,83 +162,17 @@ src_compile(){
 	#--enable-mostly-builtin	most modules will be built-in (default enabled)
 	#--disable-optimizations	disable compiler optimizations (default disabled)
 	#--enable-testsuite			build test modules (default disabled)
-	#--disable-plugins			make all plugins built-in (default disabled)
+	#--disable-plugins			make all plugins built-in (default plugins enabled)
 
-	use nls || myconf="${myconf} --disable-nls"
-	
 	use debug && myconf="${myconf} --enable-debug" \
 		|| myconf="${myconf} --enable-release"
 	
-	use dvd \
-		&& myconf="${myconf} --enable-dvdread" \
-		|| myconf="${myconf} \
-			--disable-dvd \
-			--disable-dvdread \
-			--disable-dvdplay \
-			--disable-vcd"
-
-	use v4l && myconf="${myconf} --enable-v4l"
-
-	use dvb && myconf="${myconf} --enable-satellite --enable-pvr --enable-dvb"
-
-	use oggvorbis || myconf="${myconf} --disable-vorbis --disable-ogg"
-
-	use matroska || myconf="${myconf} --disable-mkv"
-
-	use mad || myconf="${myconf} --disable-mad"
-
-	use faad && myconf="${myconf} --enable-faad"
-
-	use xvid && myconf="${myconf} --enable-xvid"
-
-	use X || myconf="${myconf} --disable-x11"
-
-	use xv || myconf="${myconf} --disable-xvideo"
-
-	use sdl || myconf="${myconf} --disable-sdl"
-
-	use truetype || myconf="${myconf} --disable-freetype"
-
-	use fbcon || myconf="${myconf} --disable-fb"
-
-	use svga && myconf="${myconf} --enable-svgalib"
-
-	use ggi && myconf="${myconf} --enable-ggi"
-
-	use 3dfx && myconf="${myconf} --enable-glide"
-
-	use aalib && myconf="${myconf} --enable-aa"
-
-	use oss || myconf="${myconf} --disable-oss"
-
-	use esd && myconf="${myconf} --enable-esd"
-
-	use arts && myconf="${myconf} --enable-arts"
-
-	use alsa && myconf="${myconf} --enable-alsa"
-
 	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
 
-	use gtk || myconf="${myconf} --disable-gtk"
-
-	use gnome && myconf="${myconf} --enable-gnome"
-
-	use ncurses && myconf="${myconf} --enable-ncurses"
-
-	use xosd && myconf="${myconf} --enable-xosd"
-
-	use slp || myconf="${myconf} --disable-slp"
-
-	use lirc && myconf="${myconf} --enable-lirc"
-
-	use joystick && myconf="${myconf} --enable-joystick"
-
-	use mozilla && \
-		myconf="${myconf} --enable-mozilla \
-	    MOZILLA_CONFIG=/usr/lib/mozilla/mozilla-config \
-	    XPIDL=/usr/bin/xpidl"
-
-	use altivec || myconf="${myconf} --disable-altivec"
+	use mozilla \
+		&& myconf="${myconf} --enable-mozilla \
+		MOZILLA_CONFIG=/usr/lib/mozilla/mozilla-config \
+		XPIDL=/usr/bin/xpidl"
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -234,15 +181,44 @@ src_compile(){
 	export WANT_AUTOCONF_2_5=1
 	export WANT_AUTOMAKE_1_6=1
 
-	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
+	myconf="${myconf} --enable-ffmpeg \
+		--with-ffmpeg-tree=${SFFM} \
 		--with-ffmpeg-mp3lame \
-		--enable-libmpeg2 \
-		--enable-livedotcom --with-livedotcom-tree=${SLIVEDOTCOM} \
-		--enable-flac \
-		--disable-kde \
-		--disable-qt"
+		--enable-livedotcom \
+		--with-livedotcom-tree=${SLIVE}"
 
-	econf ${myconf} || die "configure of VLC failed"
+	econf \
+		`use_enable nls` \
+		`use_enable slp` \
+		`use_enable xosd` \
+		`use_enable ncurses` \
+		`use_enable alsa` \
+		`use_enable esd` \
+		`use_enable oss` \
+		`use_enable ggi` \
+		`use_enable sdl` \
+		`use_enable mad` \
+		`use_enable faad` \
+		`use_enable v4l` \
+		`use_enable dvd` \
+		`use_enable dvd vcd` `use_enable dvdread` `use_enable dvd dvdplay` \
+		`use_enable dvb satellite` `use_enable dvb pvr`
+		`use_enable joystick` `use_enable lirc` \
+		`use_enable arts` \
+		`use_enable gtk` `use_enable gnome` \
+		`use_enable oggvorbis ogg` `use_enable oggvorbis vorbis` \
+		`use_enable speex` \
+		`use_enable matroska mkv` \
+		`use_enable truetype freetype` \
+		`use_enable bidi fribidi` \
+		`use_enable svga svgalib` \
+		`use_enable fbcon fb` \
+		`use_enable aalib aa` `use_enable aalib caca` \
+		`use_enable xv xvideo` \
+		`use_enable X x11 ` \
+		`use_enable 3dfx glide` \
+		`use_enable altivec` \
+		${myconf} || die "configure of VLC failed"
 
 	if [ `gcc-major-version` -eq 2 ]; then
 		sed -i s:"-fomit-frame-pointer":: vlc-config
