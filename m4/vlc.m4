@@ -1,5 +1,5 @@
 dnl  Macros needed for VLC
-dnl  $Id: vlc.m4,v 1.3 2003/06/28 14:31:40 sam Exp $
+dnl  $Id: vlc.m4,v 1.4 2003/06/29 14:57:49 sam Exp $
 
 dnl  Add plugins or builtins
 AC_DEFUN([AX_ADD_BUILTINS], [
@@ -58,7 +58,7 @@ AC_DEFUN([AX_ADD_OBJCFLAGS], [
 
 AC_DEFUN([AX_ADD_LDFLAGS], [
   for element in [$1]; do
-    eval "LDFLAGS_${element}="'"$'"{LDFLAGS_${element}} $2"'"'
+    eval "LDFLAGS_${element}="'"'"$2 "'$'"{LDFLAGS_${element}} "'"'
     am_plugins_with_ldflags="${am_plugins_with_ldflags} ${element}"
   done
 ])
