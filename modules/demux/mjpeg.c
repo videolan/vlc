@@ -63,6 +63,9 @@ struct demux_sys_t
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
+    vlc_bool_t      b_still;
+    mtime_t         i_still_end;
+
     mtime_t         i_time;
     mtime_t         i_frame_length;
     char            *psz_separator;
@@ -271,6 +274,12 @@ static int SendBlock( demux_t *p_demux, int i )
     /* set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
+
+    if( p_sys->b_still )
+    {
+        p_sys->i_still_end = mdate() + I64C(5000000);
+    }
+
     return 1;
 }
 
@@ -284,19 +293,12 @@ static int Open( vlc_object_t * p_this )
     int         i_size;
     int         b_matched = VLC_FALSE;
     vlc_value_t val;
+    char *psz_ext;
 
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
     p_sys->i_time       = 0;
-
-    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "mjpeg-fps", &val );
-    p_sys->i_frame_length = 0;
-    if( val.f_float )
-    {
-        p_sys->i_frame_length = 1000000.0 / val.f_float;
-    }
 
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
@@ -325,6 +327,24 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    /* Check for jpeg file extension */
+    p_sys->b_still = VLC_FALSE;
+    p_sys->i_still_end = 0;
+    psz_ext = strrchr( p_demux->psz_path, '.' );
+    if( psz_ext && ( !strcasecmp( psz_ext, ".jpeg" ) ||
+                     !strcasecmp( psz_ext, ".jpg" ) ) )
+    {
+        p_sys->b_still = VLC_TRUE;
+    }
+
+    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "mjpeg-fps", &val );
+    p_sys->i_frame_length = 0;
+    if( val.f_float )
+    {
+        p_sys->i_frame_length = 1000000.0 / val.f_float;
+    }
+
     es_format_Init( &p_sys->fmt, VIDEO_ES, 0 );
     p_sys->fmt.i_codec = VLC_FOURCC('m','j','p','g');
 
@@ -332,7 +352,6 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    msg_Warn( p_demux, "JPEG camera module discarded" );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -345,7 +364,18 @@ error:
 static int MjpgDemux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int         i;
+    int i;
+
+    if( p_sys->b_still && p_sys->i_still_end && p_sys->i_still_end < mdate() )
+    {
+        /* Still frame, wait until the pause delay is gone */
+        p_sys->i_still_end = 0;
+    }
+    else if( p_sys->b_still && p_sys->i_still_end )
+    {
+        msleep( 40000 );
+        return 1;
+    }
 
     if( !Peek( p_demux, VLC_TRUE ) )
     {
@@ -373,6 +403,7 @@ static int MjpgDemux( demux_t *p_demux )
         }
     }
     i++;
+
     msg_Dbg( p_demux, "JPEG EOI detected at %d", i );
     return SendBlock( p_demux, i );
 }
