@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.12 2003/05/15 22:27:37 massiot Exp $
+ * $Id: deinterlace.c,v 1.13 2003/05/24 23:40:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -136,20 +136,19 @@ static int Create( vlc_object_t *p_this )
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
 
     /* Look what method was requested */
-    val.psz_string = config_GetPsz( p_vout, "deinterlace-mode" );
-
     var_Create( p_vout, "deinterlace-mode", VLC_VAR_STRING );
+    var_Change( p_vout, "deinterlace-mode", VLC_VAR_INHERITVALUE, NULL, NULL );
+    var_Get( p_vout, "deinterlace-mode", &val );
 
     if( val.psz_string == NULL )
     {
-        msg_Err( p_vout, "configuration variable %s empty",
-                         "deinterlace-mode" );
+        msg_Err( p_vout, "configuration variable deinterlace-mode empty" );
         msg_Err( p_vout, "no deinterlace mode provided, using \"discard\"" );
 
         val.psz_string = strdup( "discard" );
     }
 
-    var_Set( p_vout, "deinterlace-mode", val );
+    msg_Dbg( p_vout, "using %s deinterlace mode", val.psz_string );
 
     SetFilterMethod( p_vout, val.psz_string );
 
@@ -727,6 +726,8 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     int i_old_mode = p_vout->p_sys->i_mode;
+
+    msg_Dbg( p_vout, "using %s deinterlace mode", newval.psz_string );
 
     vlc_mutex_lock( &p_vout->p_sys->filter_lock );
 

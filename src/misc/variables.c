@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.24 2003/05/11 18:43:19 gbazin Exp $
+ * $Id: variables.c,v 1.25 2003/05/24 23:40:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -131,6 +131,9 @@ static int      Lookup      ( variable_t *, int, const char * );
 static int      LookupInner ( variable_t *, int, uint32_t );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
+
+static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
+                              int );
 
 /*****************************************************************************
  * var_Create: initialize a vlc variable
@@ -544,6 +547,26 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             if( p_var->psz_text )
             {
                 p_val->psz_string = strdup( p_var->psz_text );
+            }
+            break;
+        case VLC_VAR_INHERITVALUE:
+            {
+                vlc_value_t val;
+
+                if( InheritValue( p_this, psz_name, &val, p_var->i_type )
+                    == VLC_SUCCESS );
+                {
+                    /* Duplicate already done */
+
+                    /* Backup needed stuff */
+                    oldval = p_var->val;
+                    /* Check boundaries and list */
+                    CheckValue( p_var, &val );
+                    /* Set the variable */
+                    p_var->val = val;
+                    /* Free data if needed */
+                    p_var->pf_free( &oldval );
+                }
             }
             break;
 
@@ -1051,4 +1074,72 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
             /* FIXME: TODO */
             break;
     }
+}
+
+/*****************************************************************************
+ * InheritValue: try to inherit the value of this variable from the same one
+ *               in our closest parent.
+ *****************************************************************************/
+static int InheritValue( vlc_object_t *p_this, const char *psz_name,
+                         vlc_value_t *p_val, int i_type )
+{
+    int i_var;
+    variable_t *p_var;
+
+    /* No need to take the structure lock,
+     * we are only looking for our parents */
+
+    if( !p_this->p_parent )
+    {
+        switch( i_type & VLC_VAR_TYPE )
+        {
+        case VLC_VAR_STRING:
+            p_val->psz_string = config_GetPsz( p_this, psz_name );
+            if( !p_val->psz_string ) p_val->psz_string = strdup("");
+            break;
+        case VLC_VAR_FLOAT:
+            p_val->f_float = config_GetFloat( p_this, psz_name );
+            break;
+        case VLC_VAR_INTEGER:
+            p_val->i_int = config_GetInt( p_this, psz_name );
+            break;
+        case VLC_VAR_BOOL:
+            p_val->b_bool = config_GetInt( p_this, psz_name );
+            break;
+        default:
+            return VLC_ENOOBJ;
+            break;
+        }
+
+        return VLC_SUCCESS;
+    }
+
+    /* Look for the variable */
+    vlc_mutex_lock( &p_this->p_parent->var_lock );
+
+    i_var = Lookup( p_this->p_parent->p_vars, p_this->p_parent->i_vars,
+                    psz_name );
+
+    if( i_var >= 0 )
+    {
+        /* We found it! */
+
+        p_var = &p_this->p_parent->p_vars[i_var];
+
+        /* Really get the variable */
+        *p_val = p_var->val;
+
+        /* Duplicate value if needed */
+        p_var->pf_dup( p_val );
+
+        vlc_mutex_unlock( &p_this->p_parent->var_lock );
+
+        return VLC_SUCCESS;
+    }
+
+    vlc_mutex_unlock( &p_this->p_parent->var_lock );
+
+    /* We're still not there */
+
+    return InheritValue( p_this->p_parent, psz_name, p_val, i_type );
 }

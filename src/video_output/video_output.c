@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.223 2003/05/24 20:54:27 gbazin Exp $
+ * $Id: video_output.c,v 1.224 2003/05/24 23:40:11 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -364,6 +364,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
 
+    /* Create thread and set locks */
+    vlc_mutex_init( p_vout, &p_vout->picture_lock );
+    vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
+    vlc_mutex_init( p_vout, &p_vout->change_lock );
+
+    vlc_object_attach( p_vout, p_parent );
 
     p_vout->p_module = module_Need( p_vout,
                            ( p_vout->psz_filter_chain &&
@@ -390,7 +396,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Change( p_vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL );
     val.psz_string = ""; text.psz_string = _("Disable");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    var_Set( p_vout, "deinterlace", val );
     val.psz_string = "discard"; text.psz_string = _("Discard");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "blend"; text.psz_string = _("Blend");
@@ -401,7 +406,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "linear"; text.psz_string = _("Linear");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
-    //var_Change( p_vout, "deinterlace", VLC_VAR_INHERITVALUE, NULL, NULL );
+    if( var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )
+    {
+        var_Set( p_vout, "deinterlace", val );
+    }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
     /* Calculate delay created by internal caching */
@@ -416,13 +424,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     {
         p_vout->i_pts_delay = DEFAULT_PTS_DELAY;
     }
-
-    /* Create thread and set locks */
-    vlc_mutex_init( p_vout, &p_vout->picture_lock );
-    vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
-    vlc_mutex_init( p_vout, &p_vout->change_lock );
-
-    vlc_object_attach( p_vout, p_parent );
 
     if( vlc_thread_create( p_vout, "video output", RunThread,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE ) )
@@ -1233,37 +1234,39 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( psz_filter ) free( psz_filter );
 
-    /* now restart all video streams */
+
     p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
                                                  FIND_PARENT );
-    if( p_input )
-    {
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        p_vout->b_filter_change = VLC_TRUE;
-
-#define ES p_input->stream.pp_es[i]
-
-        for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
-        {
-            if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
-            {
-                input_UnselectES( p_input, ES );
-                input_SelectES( p_input, ES );
-            }
-#undef ES
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        vlc_object_release( p_input );
-    }
+    if( !p_input ) return VLC_EGENERIC;
 
     if( psz_mode && *psz_mode )
     {
         val.psz_string = psz_mode;
-        if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
-            config_PutPsz( p_vout, "deinterlace-mode", psz_mode );
+        var_Set( p_vout, "deinterlace-mode", val );
+        /* Modify input as well because the vout might have to be restarted */
+        var_Create( p_input, "deinterlace-mode", VLC_VAR_STRING );
+        var_Set( p_input, "deinterlace-mode", val );
     }
+
+    /* now restart all video streams */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_vout->b_filter_change = VLC_TRUE;
+
+#define ES p_input->stream.pp_es[i]
+
+    for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+    {
+        if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
+        {
+            input_UnselectES( p_input, ES );
+            input_SelectES( p_input, ES );
+        }
+#undef ES
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
 
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );

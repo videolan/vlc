@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.13 2003/05/04 22:42:14 gbazin Exp $
+ * $Id: variables.h,v 1.14 2003/05/24 23:40:11 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -117,6 +117,8 @@ struct variable_t
 #define VLC_VAR_GETLIST       0x0026
 #define VLC_VAR_FREELIST      0x0027
 #define VLC_VAR_CHOICESCOUNT  0x0028
+
+#define VLC_VAR_INHERITVALUE  0x0030
 
 /*****************************************************************************
  * Prototypes
