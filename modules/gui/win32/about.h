@@ -37,11 +37,11 @@ __published:	// IDE-managed Components
     TLabel *Label1;
     TLabel *Label2;
     TLabel *Label4;
-    TBitBtn *BitBtnOk;
     TLabel *Label3;
     TImage *Image1;
     TLabel *Label5;
     TLabel *LabelVersion;
+    TButton *ButtonOK;
 private:	// User declarations
     intf_thread_t *p_intf;
 public:		// User declarations

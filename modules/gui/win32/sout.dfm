@@ -1,8 +1,9 @@
 object SoutDlg: TSoutDlg
-  Left = 500
-  Top = 325
+  Tag = 3
+  Left = 454
+  Top = 369
   Width = 394
-  Height = 244
+  Height = 238
   Caption = 'Stream output'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +15,7 @@ object SoutDlg: TSoutDlg
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBoxStreamOut: TGroupBox
+    Tag = 3
     Left = 8
     Top = 8
     Width = 369
@@ -22,6 +24,7 @@ object SoutDlg: TSoutDlg
     Caption = 'Stream output MRL (Media Resource Locator)'
     TabOrder = 0
     object LabelPort: TLabel
+      Tag = 3
       Left = 264
       Top = 98
       Width = 22
@@ -31,6 +34,7 @@ object SoutDlg: TSoutDlg
       Enabled = False
     end
     object LabelAddress: TLabel
+      Tag = 3
       Left = 96
       Top = 98
       Width = 41
@@ -54,6 +58,7 @@ object SoutDlg: TSoutDlg
       Height = 97
       TabOrder = 1
       object RadioButtonFile: TRadioButton
+        Tag = 3
         Left = 8
         Top = 8
         Width = 49
@@ -65,6 +70,7 @@ object SoutDlg: TSoutDlg
         OnClick = RadioButtonAccessClick
       end
       object RadioButtonUDP: TRadioButton
+        Tag = 3
         Left = 8
         Top = 40
         Width = 49
@@ -74,6 +80,7 @@ object SoutDlg: TSoutDlg
         OnClick = RadioButtonAccessClick
       end
       object RadioButtonRTP: TRadioButton
+        Tag = 3
         Left = 8
         Top = 72
         Width = 49
@@ -84,13 +91,14 @@ object SoutDlg: TSoutDlg
       end
     end
     object ButtonBrowse: TButton
+      Tag = 3
       Left = 278
       Top = 60
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Browse...'
-      TabOrder = 2
+      TabOrder = 3
       OnClick = ButtonBrowseClick
     end
     object EditFile: TEdit
@@ -99,7 +107,7 @@ object SoutDlg: TSoutDlg
       Width = 177
       Height = 21
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 3
+      TabOrder = 2
       OnChange = CustomEditChange
     end
     object SpinEditPort: TCSpinEdit
@@ -112,7 +120,7 @@ object SoutDlg: TSoutDlg
       Enabled = False
       MaxValue = 100000
       ParentColor = False
-      TabOrder = 4
+      TabOrder = 5
       Value = 1234
       OnChange = CustomEditChange
       OnClick = CustomEditChange
@@ -124,7 +132,7 @@ object SoutDlg: TSoutDlg
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
-      TabOrder = 5
+      TabOrder = 4
       Text = '239.239.0.1'
       OnChange = CustomEditChange
     end
@@ -136,6 +144,7 @@ object SoutDlg: TSoutDlg
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 6
       object RadioButtonPS: TRadioButton
+        Tag = 3
         Left = 3
         Top = 4
         Width = 41
@@ -146,6 +155,7 @@ object SoutDlg: TSoutDlg
         OnClick = RadioButtonMuxClick
       end
       object RadioButtonTS: TRadioButton
+        Tag = 3
         Left = 40
         Top = 4
         Width = 41
@@ -159,22 +169,28 @@ object SoutDlg: TSoutDlg
       end
     end
   end
-  object BitBtnOK: TBitBtn
-    Left = 31
-    Top = 184
-    Width = 138
+  object ButtonOK: TButton
+    Tag = 3
+    Left = 56
+    Top = 176
+    Width = 97
     Height = 25
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
     TabOrder = 1
-    OnClick = BitBtnOKClick
-    Kind = bkOK
+    OnClick = ButtonOKClick
   end
-  object BitBtnCancel: TBitBtn
-    Left = 216
-    Top = 184
-    Width = 136
+  object ButtonCancel: TButton
+    Tag = 3
+    Left = 232
+    Top = 176
+    Width = 97
     Height = 25
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
     TabOrder = 2
-    Kind = bkCancel
   end
   object OpenDialog1: TOpenDialog
     Left = 120

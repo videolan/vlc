@@ -1,9 +1,10 @@
 object NetworkDlg: TNetworkDlg
-  Left = 329
-  Top = 253
+  Tag = 3
+  Left = 507
+  Top = 259
   BorderStyle = bsDialog
   Caption = 'Open network'
-  ClientHeight = 206
+  ClientHeight = 198
   ClientWidth = 497
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -247,34 +248,15 @@ object NetworkDlg: TNetworkDlg
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object BitBtnOk: TBitBtn
-    Tag = 3
-    Left = 52
-    Top = 168
-    Width = 177
-    Height = 25
-    TabOrder = 0
-    OnClick = BitBtnOkClick
-    Kind = bkOK
-  end
-  object BitBtnCancel: TBitBtn
-    Tag = 3
-    Left = 268
-    Top = 168
-    Width = 177
-    Height = 25
-    TabOrder = 1
-    OnClick = BitBtnCancelClick
-    Kind = bkCancel
-  end
   object GroupBoxMode: TGroupBox
     Tag = 3
     Left = 8
     Top = 8
     Width = 481
     Height = 145
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Network mode'
-    TabOrder = 2
+    TabOrder = 0
     object LabelUDPPort: TLabel
       Tag = 3
       Left = 172
@@ -289,6 +271,7 @@ object NetworkDlg: TNetworkDlg
       Top = 54
       Width = 22
       Height = 13
+      Anchors = [akTop, akRight]
       Caption = 'Port:'
       Enabled = False
     end
@@ -298,6 +281,7 @@ object NetworkDlg: TNetworkDlg
       Top = 82
       Width = 22
       Height = 13
+      Anchors = [akTop, akRight]
       Caption = 'Port:'
       Enabled = False
     end
@@ -376,6 +360,7 @@ object NetworkDlg: TNetworkDlg
       Top = 50
       Width = 161
       Height = 21
+      Anchors = [akLeft, akTop, akRight]
       Enabled = False
       ItemHeight = 13
       TabOrder = 5
@@ -386,6 +371,7 @@ object NetworkDlg: TNetworkDlg
       Top = 78
       Width = 161
       Height = 21
+      Anchors = [akLeft, akTop, akRight]
       Enabled = False
       ItemHeight = 13
       TabOrder = 7
@@ -399,6 +385,7 @@ object NetworkDlg: TNetworkDlg
       Top = 106
       Width = 265
       Height = 21
+      Anchors = [akLeft, akTop, akRight]
       Enabled = False
       TabOrder = 9
     end
@@ -419,6 +406,7 @@ object NetworkDlg: TNetworkDlg
       Width = 57
       Height = 22
       TabStop = True
+      Anchors = [akTop, akRight]
       Enabled = False
       MaxValue = 65535
       ParentColor = False
@@ -431,11 +419,38 @@ object NetworkDlg: TNetworkDlg
       Width = 57
       Height = 22
       TabStop = True
+      Anchors = [akTop, akRight]
       Enabled = False
       MaxValue = 65535
       ParentColor = False
       TabOrder = 8
       Value = 6010
     end
+  end
+  object ButtonOK: TButton
+    Tag = 3
+    Left = 48
+    Top = 163
+    Width = 177
+    Height = 25
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+    OnClick = ButtonOkClick
+  end
+  object ButtonCancel: TButton
+    Tag = 3
+    Left = 272
+    Top = 163
+    Width = 177
+    Height = 25
+    Anchors = [akTop, akRight]
+    Cancel = True
+    Caption = 'Cancel'
+    Default = True
+    ModalResult = 2
+    TabOrder = 2
+    OnClick = ButtonCancelClick
   end
 end

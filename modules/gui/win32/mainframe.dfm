@@ -1,4 +1,5 @@
 object MainFrameDlg: TMainFrameDlg
+  Tag = 3
   Left = 356
   Top = 227
   Width = 541

@@ -79,12 +79,12 @@ void __fastcall TNetworkDlg::FormHide( TObject *Sender )
     p_intf->p_sys->p_window->NetworkStreamAction->Checked = false;
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::BitBtnCancelClick( TObject *Sender )
+void __fastcall TNetworkDlg::ButtonCancelClick( TObject *Sender )
 {
     Hide();
 }
 //---------------------------------------------------------------------------
-void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
+void __fastcall TNetworkDlg::ButtonOkClick( TObject *Sender )
 {
     AnsiString      Source, Address;
     AnsiString      Channel = ComboBoxCSAddress->Text;
@@ -222,4 +222,5 @@ void __fastcall TNetworkDlg::RadioButtonHTTPEnter( TObject *Sender )
     ChangeEnabled( OldRadioValue );
 }
 //---------------------------------------------------------------------------
+
 

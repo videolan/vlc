@@ -1,8 +1,9 @@
 object PlaylistDlg: TPlaylistDlg
-  Left = 433
-  Top = 308
+  Tag = 3
+  Left = 470
+  Top = 197
   Width = 335
-  Height = 436
+  Height = 435
   Caption = 'Playlist'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,24 +17,12 @@ object PlaylistDlg: TPlaylistDlg
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object BitBtnOk: TBitBtn
-    Tag = 3
-    Left = 76
-    Top = 356
-    Width = 176
-    Height = 25
-    Anchors = [akBottom]
-    Caption = 'OK'
-    ModalResult = 1
-    TabOrder = 0
-    OnClick = BitBtnOkClick
-  end
   object ListViewPlaylist: TListView
     Tag = 3
     Left = 11
     Top = 10
     Width = 305
-    Height = 331
+    Height = 330
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -55,6 +44,19 @@ object PlaylistDlg: TPlaylistDlg
     OnCustomDrawItem = ListViewPlaylistCustomDrawItem
     OnDblClick = PlayStreamActionExecute
     OnKeyDown = ListViewPlaylistKeyDown
+  end
+  object ButtonOK: TButton
+    Tag = 3
+    Left = 75
+    Top = 352
+    Width = 177
+    Height = 25
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+    OnClick = ButtonOkClick
   end
   object MainMenuPlaylist: TMainMenu
     Left = 8

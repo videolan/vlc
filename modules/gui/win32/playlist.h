@@ -45,7 +45,6 @@
 class TPlaylistDlg : public TForm
 {
 __published:	// IDE-managed Components
-    TBitBtn *BitBtnOk;
     TMainMenu *MainMenuPlaylist;
     TMenuItem *MenuAdd;
     TMenuItem *MenuAddFile;
@@ -75,9 +74,10 @@ __published:	// IDE-managed Components
     TAction *PlayStreamAction;
     TOpenDialog *PlaylistOpenDlg;
     TSaveDialog *PlaylistSaveDlg;
+    TButton *ButtonOK;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
-    void __fastcall BitBtnOkClick( TObject *Sender );
+    void __fastcall ButtonOkClick( TObject *Sender );
     void __fastcall ListViewPlaylistKeyDown( TObject *Sender, WORD &Key,
             TShiftState Shift );
     void __fastcall ListViewPlaylistCustomDrawItem( TCustomListView *Sender,

@@ -2,7 +2,7 @@
  * sout.cpp: the stream ouput dialog box
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.cpp,v 1.3 2003/01/23 03:33:34 ipkiss Exp $
+ * $Id: sout.cpp,v 1.4 2003/01/26 03:55:36 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -85,7 +85,7 @@ void __fastcall TSoutDlg::RadioButtonAccessClick( TObject *Sender )
     RebuildMrl();
 }
 //---------------------------------------------------------------------------
-void __fastcall TSoutDlg::BitBtnOKClick( TObject *Sender )
+void __fastcall TSoutDlg::ButtonOKClick( TObject *Sender )
 {
     config_PutPsz( p_intf, "sout", EditMrl->Text.c_str() );
 }

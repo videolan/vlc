@@ -1,4 +1,5 @@
 object AboutDlg: TAboutDlg
+  Tag = 3
   Left = 442
   Top = 281
   BorderStyle = bsDialog
@@ -263,7 +264,7 @@ object AboutDlg: TAboutDlg
     Tag = 3
     Left = 10
     Top = 64
-    Width = 267
+    Width = 172
     Height = 13
     Caption = '(C) 1996-2003 - the VideoLAN Team'
   end
@@ -308,9 +309,9 @@ object AboutDlg: TAboutDlg
     Height = 13
     Caption = 'Version x.y.z'
   end
-  object BitBtnOk: TBitBtn
+  object ButtonOK: TButton
     Tag = 3
-    Left = 64
+    Left = 70
     Top = 178
     Width = 145
     Height = 25

@@ -2,7 +2,7 @@
  * sout.h: the stream ouput dialog box
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.h,v 1.2 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: sout.h,v 1.3 2003/01/26 03:55:36 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -49,16 +49,16 @@ __published:	// IDE-managed Components
     TEdit *EditAddress;
     TLabel *LabelPort;
     TLabel *LabelAddress;
-    TBitBtn *BitBtnOK;
-    TBitBtn *BitBtnCancel;
     TPanel *PanelMux;
     TRadioButton *RadioButtonPS;
     TRadioButton *RadioButtonTS;
+    TButton *ButtonOK;
+    TButton *ButtonCancel;
     void __fastcall ButtonBrowseClick( TObject *Sender );
     void __fastcall CustomEditChange( TObject *Sender );
     void __fastcall RadioButtonMuxClick( TObject *Sender );
     void __fastcall RadioButtonAccessClick( TObject *Sender );
-    void __fastcall BitBtnOKClick( TObject *Sender );
+    void __fastcall ButtonOKClick( TObject *Sender );
 private:	// User declarations
     void __fastcall RebuildMrl();
     intf_thread_t *p_intf;

@@ -2,7 +2,7 @@
  * subtitles.h: Dialog box for divx subtitle selection
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: subtitles.h,v 1.1 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: subtitles.h,v 1.2 2003/01/26 03:55:36 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -40,12 +40,12 @@ __published:	// IDE-managed Components
     TEdit *EditFPS;
     TEdit *EditFile;
     TButton *ButtonBrowse;
-    TBitBtn *BitBtnOK;
-    TBitBtn *BitBtnCancel;
     TLabel *LabelDelay;
     TLabel *LabelFPS;
+    TButton *ButtonOK;
+    TButton *ButtonCancel;
     void __fastcall ButtonBrowseClick( TObject *Sender );
-    void __fastcall BitBtnOKClick( TObject *Sender );
+    void __fastcall ButtonOKClick( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
 public:		// User declarations

@@ -38,8 +38,6 @@
 class TNetworkDlg : public TForm
 {
 __published:	// IDE-managed Components
-    TBitBtn *BitBtnOk;
-    TBitBtn *BitBtnCancel;
     TGroupBox *GroupBoxMode;
     TRadioButton *RadioButtonUDP;
     TRadioButton *RadioButtonMulticast;
@@ -57,10 +55,12 @@ __published:	// IDE-managed Components
     TCSpinEdit *SpinEditUDPPort;
     TCSpinEdit *SpinEditMulticastPort;
     TCSpinEdit *SpinEditCSPort;
+    TButton *ButtonOK;
+    TButton *ButtonCancel;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
-    void __fastcall BitBtnCancelClick( TObject *Sender );
-    void __fastcall BitBtnOkClick( TObject *Sender );
+    void __fastcall ButtonCancelClick( TObject *Sender );
+    void __fastcall ButtonOkClick( TObject *Sender );
     void __fastcall RadioButtonUDPEnter( TObject *Sender );
     void __fastcall RadioButtonMulticastEnter( TObject *Sender );
     void __fastcall RadioButtonCSEnter( TObject *Sender );

@@ -2,7 +2,7 @@
  * subtitles.cpp: Dialog box for divx subtitle selection
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: subtitles.cpp,v 1.1 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: subtitles.cpp,v 1.2 2003/01/26 03:55:36 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -53,7 +53,7 @@ void __fastcall TSubtitlesDlg::ButtonBrowseClick( TObject *Sender )
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TSubtitlesDlg::BitBtnOKClick( TObject *Sender )
+void __fastcall TSubtitlesDlg::ButtonOKClick( TObject *Sender )
 {
     int delay = (int) (10 * atof( EditDelay->Text.c_str() ));
     float fps = atof( EditFPS->Text.c_str() );

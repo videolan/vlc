@@ -118,7 +118,7 @@ void __fastcall TPlaylistDlg::FormHide( TObject *Sender )
     p_intf->p_sys->p_window->PlaylistAction->Checked = false;
 }
 //---------------------------------------------------------------------------
-void __fastcall TPlaylistDlg::BitBtnOkClick( TObject *Sender )
+void __fastcall TPlaylistDlg::ButtonOkClick( TObject *Sender )
 {
     Hide();
 }

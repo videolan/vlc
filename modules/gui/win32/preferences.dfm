@@ -1,4 +1,5 @@
 object PreferencesDlg: TPreferencesDlg
+  Tag = 3
   Left = 310
   Top = 125
   Width = 458
@@ -257,6 +258,7 @@ object PreferencesDlg: TPreferencesDlg
     TabOrder = 0
   end
   object ButtonApply: TButton
+    Tag = 3
     Left = 266
     Top = 530
     Width = 82
@@ -267,6 +269,7 @@ object PreferencesDlg: TPreferencesDlg
     OnClick = ButtonApplyClick
   end
   object ButtonSave: TButton
+    Tag = 3
     Left = 359
     Top = 530
     Width = 82
@@ -277,6 +280,7 @@ object PreferencesDlg: TPreferencesDlg
     OnClick = ButtonSaveClick
   end
   object ButtonOK: TButton
+    Tag = 3
     Left = 81
     Top = 530
     Width = 82
@@ -284,16 +288,20 @@ object PreferencesDlg: TPreferencesDlg
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
+    ModalResult = 1
     TabOrder = 1
     OnClick = ButtonOkClick
   end
   object ButtonCancel: TButton
+    Tag = 3
     Left = 174
     Top = 530
     Width = 82
     Height = 25
     Anchors = [akRight, akBottom]
+    Cancel = True
     Caption = 'Cancel'
+    ModalResult = 2
     TabOrder = 2
     OnClick = ButtonCancelClick
   end

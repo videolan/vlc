@@ -1,4 +1,5 @@
 object MessagesDlg: TMessagesDlg
+  Tag = 3
   Left = 325
   Top = 160
   Width = 440
@@ -41,6 +42,8 @@ object MessagesDlg: TMessagesDlg
     Height = 25
     Anchors = [akBottom]
     Caption = 'OK'
+    Default = True
+    ModalResult = 1
     TabOrder = 1
     OnClick = ButtonOKClick
   end

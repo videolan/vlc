@@ -1,11 +1,12 @@
 object DiscDlg: TDiscDlg
-  Left = 390
-  Top = 320
+  Tag = 3
+  Left = 465
+  Top = 337
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Open Disc'
-  ClientHeight = 138
-  ClientWidth = 338
+  ClientHeight = 178
+  ClientWidth = 242
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -26,11 +27,11 @@ object DiscDlg: TDiscDlg
     Caption = 'Device &name:'
   end
   object Bevel1: TBevel
-    Left = 240
-    Top = 0
-    Width = 9
-    Height = 137
-    Shape = bsLeftLine
+    Left = 8
+    Top = 136
+    Width = 225
+    Height = 2
+    Anchors = [akLeft, akTop, akRight]
   end
   object GroupBoxPosition: TGroupBox
     Tag = 3
@@ -112,8 +113,8 @@ object DiscDlg: TDiscDlg
   end
   object ButtonOk: TButton
     Tag = 3
-    Left = 248
-    Top = 8
+    Left = 24
+    Top = 144
     Width = 81
     Height = 25
     Caption = 'OK'
@@ -124,8 +125,8 @@ object DiscDlg: TDiscDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 248
-    Top = 40
+    Left = 136
+    Top = 144
     Width = 81
     Height = 25
     Cancel = True
