@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.24 2003/10/23 14:30:26 jpsaman Exp $
+ * $Id: udp.c,v 1.25 2003/11/07 18:32:55 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -368,17 +368,17 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     {
 #ifdef WIN32
         /* On win32 recv() will fail if the datagram doesn't fit inside
-	 * the passed buffer, even though the buffer will be filled with
-	 * the first part of the datagram. */
+         * the passed buffer, even though the buffer will be filled with
+         * the first part of the datagram. */
         if( WSAGetLastError() == WSAEMSGSIZE )
-	{
-	    msg_Err( p_input, "recv() failed. "
-		     "Increase the mtu size (--mtu option)" );
-	    i_recv = i_len;
-	}
-	else
+        {
+            msg_Err( p_input, "recv() failed. "
+                     "Increase the mtu size (--mtu option)" );
+            i_recv = i_len;
+        }
+        else
 #endif
-	    msg_Err( p_input, "recv failed (%s)", strerror(errno) );
+        msg_Err( p_input, "recv failed (%s)", strerror(errno) );
     }
 
     return i_recv;
@@ -395,6 +395,7 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
     int         i_rtp_version;
     int         i_CSRC_count;
     int         i_payload_type;
+    int         i_skip = 0;
 
     byte_t *    p_tmp_buffer = alloca( p_input->i_mtu );
 
@@ -414,12 +415,18 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
     if ( i_rtp_version != 2 )
         msg_Dbg( p_input, "RTP version is %u, should be 2", i_rtp_version );
 
-    if ( i_payload_type != 33 && i_payload_type != 14
-          && i_payload_type != 32 )
+    if( i_payload_type == 14 )
+    {
+        i_skip = 4;
+    }
+    else if( i_payload_type !=  33 && i_payload_type != 32 )
+    {
         msg_Dbg( p_input, "unsupported RTP payload type (%u)", i_payload_type );
+    }
+    i_skip += RTP_HEADER_LEN + 4*i_CSRC_count;
 
     /* A CSRC extension field is 32 bits in size (4 bytes) */
-    if ( i_ret < (RTP_HEADER_LEN + 4*i_CSRC_count) )
+    if ( i_ret < i_skip )
     {
         /* Packet is not big enough to hold the complete RTP_HEADER with
          * CSRC extensions.
@@ -429,7 +436,7 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
     }
 
     /* Return the packet without the RTP header. */
-    i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
+    i_ret -= i_skip;
 
     if ( (size_t)i_ret > i_len )
     {
@@ -438,9 +445,7 @@ static ssize_t RTPRead( input_thread_t * p_input, byte_t * p_buffer,
         i_ret = i_len;
     }
 
-    p_input->p_vlc->pf_memcpy( p_buffer,
-                       p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
-                       i_ret );
+    p_input->p_vlc->pf_memcpy( p_buffer, &p_tmp_buffer[i_skip], i_ret );
 
     return i_ret;
 }
@@ -462,7 +467,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
     ssize_t i_ret = Read( p_input, p_tmp_buffer, p_input->i_mtu );
 
     if ( i_ret <= 0 ) return 0; /* i_ret is at least 1 */
-    
+
     /* Check that it's not TS. */
     if ( p_tmp_buffer[0] == 0x47 )
     {
@@ -495,6 +500,10 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
 
     case 14:
         msg_Dbg( p_input, "detected MPEG audio over RTP" );
+        if( !p_input->psz_demux || *p_input->psz_demux == '\0' )
+        {
+            p_input->psz_demux = "mp3";
+        }
         break;
 
     case 32:
@@ -511,7 +520,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
     p_input->pf_read = RTPRead;
 
     /* A CSRC extension field is 32 bits in size (4 bytes) */
-    if ( i_ret < (RTP_HEADER_LEN + 4*i_CSRC_count) )
+    if( i_ret < RTP_HEADER_LEN + 4*i_CSRC_count )
     {
         /* Packet is not big enough to hold the complete RTP_HEADER with
          * CSRC extensions.
@@ -521,7 +530,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
     }
 
     /* Return the packet without the RTP header. */
-    i_ret -= ( RTP_HEADER_LEN + 4 * i_CSRC_count );
+    i_ret -= RTP_HEADER_LEN + 4*i_CSRC_count;
 
     if ( (size_t)i_ret > i_len )
     {
@@ -530,9 +539,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
         i_ret = i_len;
     }
 
-    p_input->p_vlc->pf_memcpy( p_buffer,
-                       p_tmp_buffer + RTP_HEADER_LEN + 4 * i_CSRC_count,
-                       i_ret );
+    p_input->p_vlc->pf_memcpy( p_buffer, &p_tmp_buffer[RTP_HEADER_LEN + 4*i_CSRC_count], i_ret );
 
     return i_ret;
 }
