@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.12 2001/02/07 15:32:25 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.13 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors:
  *
@@ -277,13 +277,5 @@ struct input_thread_s * input_CreateThread( struct input_config_s *,
                                             int *pi_status );
 void                    input_DestroyThread( struct input_thread_s *,
                                              int *pi_status );
-void                    input_PauseProgram( struct input_thread_s *,
-                                            struct pgrm_descriptor_s * );
-void                    input_PlayProgram( struct input_thread_s *,
-                                           struct pgrm_descriptor_s * );
-void                    input_FFProgram( struct input_thread_s *,
-                                         struct pgrm_descriptor_s * );
-void                    input_SMProgram( struct input_thread_s *,
-                                           struct pgrm_descriptor_s * );
-void                    input_RewindProgram( struct input_thread_s *,
-                                             struct pgrm_descriptor_s * );
+void input_Play( struct input_thread_s * );
+void input_Forward( struct input_thread_s *, int );

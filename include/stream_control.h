@@ -18,11 +18,12 @@ typedef struct stream_ctrl_s
 } stream_ctrl_t;
 
 /* Possible status : */
-#define PLAYING_S           0
-#define PAUSE_S             1
-#define FORWARD_S           2
-#define BACKWARD_S          3
-#define REWIND_S            4                /* Not supported for the moment */
+#define UNDEF_S             0
+#define PLAYING_S           1
+#define PAUSE_S             2
+#define FORWARD_S           3
+#define BACKWARD_S          4
+#define REWIND_S            5                /* Not supported for the moment */
 #define NOT_STARTED_S       10
 #define START_S             11
 

@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.13 2001/02/07 15:32:25 massiot Exp $
+ * $Id: input.h,v 1.14 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors:
  *
@@ -104,9 +104,7 @@ void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );
  * Prototypes from input_clock.c
  *****************************************************************************/
 void input_ClockNewRef( struct input_thread_s *,
-                        struct pgrm_descriptor_s *, mtime_t );
-void input_EscapeDiscontinuity( struct input_thread_s *,
-                                struct pgrm_descriptor_s * );
+                        struct pgrm_descriptor_s *, mtime_t, mtime_t );
 void input_ClockInit( struct pgrm_descriptor_s * );
 void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );

@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.26 2001/02/06 00:56:55 nitrox Exp $
+ * $Id: intf_sdl.c,v 1.27 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors:
  *
@@ -136,12 +136,25 @@ void intf_SDLManage( intf_thread_t *p_intf )
                 vlc_mutex_unlock( &p_intf->p_vout->change_lock );
                 break;
                 
-           case SDLK_y:                                 /* switch to hard YUV */
+            case SDLK_y:                                /* switch to hard YUV */
                 vlc_mutex_lock( &p_intf->p_vout->change_lock );
                 p_intf->p_vout->i_changes |= VOUT_YUV_CHANGE;
                 vlc_mutex_unlock( &p_intf->p_vout->change_lock );
                 break; 
-                        
+
+            /* FIXME : this is temporary */
+            case SDLK_p:
+                input_Play( p_intf->p_input );
+                break;
+
+            case SDLK_a:
+                input_Forward( p_intf->p_input, DEFAULT_RATE/2 );
+                break;
+
+            case SDLK_s:
+                input_Forward( p_intf->p_input, DEFAULT_RATE*2 );
+                break;
+
             default:
                 if( intf_ProcessKey( p_intf, (char )i_key ) )
                 {

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.29 2001/02/07 15:32:26 massiot Exp $
+ * $Id: mpeg_system.c,v 1.30 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors: 
  *
@@ -838,8 +838,11 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     {
         p_es = input_ParsePS( p_input, p_data );
 
-        if( p_es != NULL && p_es->p_decoder_fifo != NULL )
+        vlc_mutex_lock( &p_input->stream.control.control_lock );
+        if( p_es != NULL && p_es->p_decoder_fifo != NULL
+             && (!p_es->b_audio || !p_input->stream.control.b_mute) )
         {
+            vlc_mutex_unlock( &p_input->stream.control.control_lock );
 #ifdef STATS
             p_es->c_packets++;
 #endif
@@ -847,6 +850,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         }
         else
         {
+            vlc_mutex_unlock( &p_input->stream.control.control_lock );
             b_trash = 1;
         }
     }
@@ -895,13 +899,16 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_es = input_FindES( p_input, i_pid );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if( p_es == NULL || p_es->p_decoder_fifo == NULL )
+    vlc_mutex_lock( &p_input->stream.control.control_lock );
+    if( p_es == NULL || p_es->p_decoder_fifo == NULL
+         || (p_es->b_audio && p_input->stream.control.b_mute) )
     {
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
     }
+    vlc_mutex_unlock( &p_input->stream.control.control_lock );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     if( (p_es->p_decoder_fifo != NULL) || (p_pgrm_demux->i_pcr_pid == i_pid) )
     {

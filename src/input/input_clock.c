@@ -1,8 +1,8 @@
 /*****************************************************************************
- * input_clock.c: Clock/System date conversions, stream management
+ * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.2 2001/02/07 15:32:26 massiot Exp $
+ * $Id: input_clock.c,v 1.3 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,31 +39,31 @@
 #include "input.h"
 
 /*
- *   DISCUSSION : SYNCHRONIZATION METHOD
+ * DISCUSSION : SYNCHRONIZATION METHOD
  *
- *   In some cases we can impose the pace of reading (when reading from a
- *   file or a pipe), and for the synchronization we simply sleep() until
- *   it is time to deliver the packet to the decoders. When reading from
- *   the network, we must be read at the same pace as the server writes,
- *   otherwise the kernel's buffer will trash packets. The risk is now to
- *   overflow the input buffers in case the server goes too fast, that is
- *   why we do these calculations :
+ * In some cases we can impose the pace of reading (when reading from a
+ * file or a pipe), and for the synchronization we simply sleep() until
+ * it is time to deliver the packet to the decoders. When reading from
+ * the network, we must be read at the same pace as the server writes,
+ * otherwise the kernel's buffer will trash packets. The risk is now to
+ * overflow the input buffers in case the server goes too fast, that is
+ * why we do these calculations :
  *
- *   We compute a mean for the pcr because we want to eliminate the
- *   network jitter and keep the low frequency variations. The mean is
- *   in fact a low pass filter and the jitter is a high frequency signal
- *   that is why it is eliminated by the filter/average.
+ * We compute a mean for the pcr because we want to eliminate the
+ * network jitter and keep the low frequency variations. The mean is
+ * in fact a low pass filter and the jitter is a high frequency signal
+ * that is why it is eliminated by the filter/average.
  *
- *   The low frequency variations enable us to synchronize the client clock
- *   with the server clock because they represent the time variation between
- *   the 2 clocks. Those variations (ie the filtered pcr) are used to compute
- *   the presentation dates for the audio and video frames. With those dates
- *   we can decode (or trash) the MPEG2 stream at "exactly" the same rate
- *   as it is sent by the server and so we keep the synchronization between
- *   the server and the client.
+ * The low frequency variations enable us to synchronize the client clock
+ * with the server clock because they represent the time variation between
+ * the 2 clocks. Those variations (ie the filtered pcr) are used to compute
+ * the presentation dates for the audio and video frames. With those dates
+ * we can decode (or trash) the MPEG2 stream at "exactly" the same rate
+ * as it is sent by the server and so we keep the synchronization between
+ * the server and the client.
  *
- *   It is a very important matter if you want to avoid underflow or overflow
- *   in all the FIFOs, but it may be not enough.
+ * It is a very important matter if you want to avoid underflow or overflow
+ * in all the FIFOs, but it may be not enough.
  */
 
 /*****************************************************************************
@@ -72,7 +72,8 @@
 
 /* Maximum number of samples used to compute the dynamic average value.
  * We use the following formula :
- * new_average = (old_average * c_average + new_sample_value) / (c_average +1) */
+ * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
+ */
 #define CR_MAX_AVERAGE_COUNTER 40
 
 /* Maximum gap allowed between two CRs. */
@@ -116,17 +117,19 @@ static mtime_t ClockCurrent( input_thread_t * p_input,
  * input_ClockNewRef: writes a new clock reference
  *****************************************************************************/
 void input_ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
-                        mtime_t i_clock )
+                        mtime_t i_clock, mtime_t i_sysdate )
 {
+    intf_WarnMsg( 1, "Old ref: %lld/%lld, New ref: %lld/%lld", p_pgrm->cr_ref,
+              p_pgrm->sysdate_ref, i_clock, i_sysdate );
     p_pgrm->cr_ref = i_clock;
-    p_pgrm->sysdate_ref = mdate();
+    p_pgrm->sysdate_ref = i_sysdate;
 }
 
 /*****************************************************************************
- * input_EscapeDiscontinuity: send a NULL packet to the decoders
+ * EscapeDiscontinuity: send a NULL packet to the decoders
  *****************************************************************************/
-void input_EscapeDiscontinuity( input_thread_t * p_input,
-                                pgrm_descriptor_t * p_pgrm )
+static void EscapeDiscontinuity( input_thread_t * p_input,
+                                 pgrm_descriptor_t * p_pgrm )
 {
     int     i_es;
 
@@ -135,6 +138,25 @@ void input_EscapeDiscontinuity( input_thread_t * p_input,
         es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
 
         if( p_es->p_decoder_fifo != NULL )
+        {
+            input_NullPacket( p_input, p_es );
+        }
+    }
+}
+
+/*****************************************************************************
+ * EscapeAudioDiscontinuity: send a NULL packet to the audio decoders
+ *****************************************************************************/
+static void EscapeAudioDiscontinuity( input_thread_t * p_input,
+                                      pgrm_descriptor_t * p_pgrm )
+{
+    int     i_es;
+
+    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+    {
+        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+
+        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
         {
             input_NullPacket( p_input, p_es );
         }
@@ -163,7 +185,7 @@ void input_ClockManageRef( input_thread_t * p_input,
     if( p_pgrm->i_synchro_state != SYNCHRO_OK )
     {
         /* Feed synchro with a new reference point. */
-        input_ClockNewRef( p_input, p_pgrm, i_clock );
+        input_ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
         p_pgrm->i_synchro_state = SYNCHRO_OK;
     }
     else
@@ -190,6 +212,39 @@ void input_ClockManageRef( input_thread_t * p_input,
              * In case of multiple programs, we arbitrarily follow the
              * clock of the first program. */
             mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+
+            /* Now take into account interface changes. */
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            if( p_input->stream.i_new_status != UNDEF_S )
+            {
+                /* For the moment, only PLAYING_S and FORWARD_S are
+                 * supported. */
+                input_ClockNewRef( p_input, p_pgrm, i_clock,
+                                   ClockToSysdate( p_input, p_pgrm, i_clock ) );
+
+                vlc_mutex_lock( &p_input->stream.control.control_lock );
+                p_input->stream.control.i_status = p_input->stream.i_new_status;
+
+                if( p_input->stream.control.i_status != PLAYING_S )
+                {
+                    p_input->stream.control.i_rate = p_input->stream.i_new_rate;
+                    p_input->stream.control.b_mute = 1;
+
+                    /* Feed the audio decoders with a NULL packet to avoid
+                     * discontinuities. */
+                    EscapeAudioDiscontinuity( p_input, p_pgrm );
+                }
+                else
+                {
+                    p_input->stream.control.i_rate = DEFAULT_RATE;
+                    p_input->stream.control.b_mute = 0;
+                }
+                vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+                p_input->stream.i_new_status = UNDEF_S;
+                p_input->stream.i_new_rate = UNDEF_S;
+            }
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         else
         {

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.73 2001/01/24 19:05:55 massiot Exp $
+ * $Id: input.c,v 1.74 2001/02/07 17:44:52 massiot Exp $
  *
  * Authors: 
  *
@@ -99,6 +99,8 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     p_input->stream.i_es_number = 0;
     p_input->stream.i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;
+    p_input->stream.i_new_status = p_input->stream.i_new_rate = 0;
+    p_input->stream.i_seek = 0;
 
     /* Initialize stream control properties. */
     p_input->stream.control.i_status = PLAYING_S;
