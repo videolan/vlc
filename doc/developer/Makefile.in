@@ -18,11 +18,11 @@ MAX_TEX_RECURSION=4
 #PRINT_SS=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl
 #JADE=openjade
 
-JADE=openjade
+JADE=@JADE@
 
-XML_DECL=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/dtds/decls/xml.dcl
-HTML_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/html/docbook.dsl
-PRINT_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/print/docbook.dsl
+XML_DECL=@XML_DECL@
+HTML_SS=@HTML_SS@
+PRINT_SS=@PRINT_SS@
 
 
 all: manual
