@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.20 2003/07/01 17:46:50 sam Exp $
+dnl $Id: configure.ac,v 1.21 2003/07/01 19:17:32 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -910,7 +910,7 @@ dnl
 AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
                           (default i686 on IA-32 and 750 on PPC)])
-if test "${with_tuning}" != ""; then
+if test -n "${with_tuning}"; then
     if test "${target_cpu}" = "powerpc"; then
         CFLAGS_TUNING="-mtune=${with_tuning}"
     else
@@ -1002,7 +1002,7 @@ then
   [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
   case "${with_dvdcss}" in
   ""|yes)
-    if test "${with_dvdcss_tree}" = ""
+    if test -z "${with_dvdcss_tree}"
     then
       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
         [ AX_ADD_PLUGINS([dvd])
@@ -1012,7 +1012,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdcss.a in ${with_dvdcss_tree})
       real_dvdcss_tree="`cd ${with_dvdcss_tree} 2>/dev/null && pwd`"
-      if test "${real_dvdcss_tree}" = ""
+      if test -z "${real_dvdcss_tree}"
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1067,15 +1067,15 @@ then
   [    --with-dvdread=PATH    libdvdread headers and libraries])
   AC_ARG_WITH(dvdread-tree,
   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
-  if test "${with_dvdread}" = ""
+  if test -z "${with_dvdread}"
   then
-    if test "${with_dvdread_tree}" = ""
+    if test -z "${with_dvdread_tree}"
     then
       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ AX_ADD_PLUGINS([dvdread])
           AX_ADD_LDFLAGS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
         ],[
-          if test "${enable_dvdread}" != ""
+          if test -n "${enable_dvdread}"
           then
             AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
             AC_MSG_ERROR([cannot find libdvdread headers])
@@ -1084,7 +1084,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
       real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
-      if test "${real_dvdread_tree}" = ""
+      if test -z "${real_dvdread_tree}"
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1131,16 +1131,16 @@ then
   [    --with-dvdplay=PATH    libdvdplay headers and libraries])
   AC_ARG_WITH(dvdplay-tree,
   [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
-  if test "${with_dvdplay}" = ""
+  if test -z "${with_dvdplay}"
   then
-    if test "${with_dvdplay_tree}" = ""
+    if test -z "${with_dvdplay_tree}"
     then
       AC_CHECK_HEADERS(dvdplay/dvdplay.h,[
           AX_ADD_PLUGINS([dvdplay])
           AX_ADD_LDFLAGS([dvdplay],[-ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
           AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread}])
         ],[
-          if test "${enable_dvdplay}" != ""
+          if test -n "${enable_dvdplay}"
           then
             AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
             AC_MSG_ERROR([cannot find libdvdplay headers])
@@ -1149,7 +1149,7 @@ then
     else
       AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
       real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
-      if test "${real_dvdplay_tree}" = ""
+      if test -z "${real_dvdplay_tree}"
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1198,7 +1198,7 @@ then
   [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
   case "${with_dvbpsi}" in
   ""|yes)
-    if test "${with_dvbpsi_tree}" = ""
+    if test -z "${with_dvbpsi_tree}"
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
         [ AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi])
@@ -1216,7 +1216,7 @@ then
     else
       AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
       real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
-      if test "${real_dvbpsi_tree}" = ""
+      if test -z "${real_dvbpsi_tree}"
       then
         dnl  The given directory can't be found
         AC_MSG_RESULT(no)
@@ -1241,7 +1241,7 @@ then
   ;;
   *)
     AC_MSG_CHECKING(for dvbpsi headers in ${with_dvbpsi})
-    if test "${with_dvbpsi}" = ""
+    if test -z "${with_dvbpsi}"
     then
       LDFLAGS_test=""
       CPPFLAGS_test=""
@@ -1256,7 +1256,7 @@ then
       AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi],[${LDFLAGS_test} -ldvbpsi])
 
     ],[
-      if test "${enable_dvbpsi}" != ""
+      if test -n "${enable_dvbpsi}"
       then
         AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
       fi
@@ -1275,7 +1275,7 @@ if test "${enable_v4l}" = "yes"
 then
   AC_ARG_WITH(v4l,
     [    --with-v4l=PATH       path to a v4l-enabled kernel tree],[],[])
-  if test "${with_v4l}" != "no" -a "${with_v4l}" != ""
+  if test "${with_v4l}" != "no" -a -n "${with_v4l}"
   then
     AX_ADD_CPPFLAGS([v4l],[-I${with_v4l}/include])
   fi
@@ -1435,7 +1435,7 @@ if test "${enable_mad}" != "no"
 then
   AC_ARG_WITH(mad,
     [    --with-mad=PATH       path to libmad],[],[])
-  if test "${with_mad}" != "no" -a "${with_mad}" != ""
+  if test "${with_mad}" != "no" -a -n "${with_mad}"
   then
     AX_ADD_CPPFLAGS([mpgatofixed32],[-I${with_mad}/include])
     AX_ADD_LDFLAGS([mpgatofixed32],[-L${with_mad}/lib])
@@ -1443,10 +1443,10 @@ then
 
   AC_ARG_WITH(mad-tree,
     [    --with-mad-tree=PATH  mad tree for static linking],[],[])
-  if test "${with_mad_tree}" != "no" -a "${with_mad_tree}" != ""
+  if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
   then
     real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
-    if test "${real_mad_tree}" = ""
+    if test -z "${real_mad_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1505,7 +1505,7 @@ then
   dnl
   dnl test for !(--with-ffmpeg-tree)
   dnl
-  if test "${with_ffmpeg_tree}" == "no" -o "${with_ffmpeg_tree}" == "";then
+  if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}";then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
@@ -1523,10 +1523,10 @@ then
   dnl
   dnl test for --with-ffmpeg-tree
   dnl
-  if test "${with_ffmpeg_tree}" != "no" -a "${with_ffmpeg_tree}" != "";then
+  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}";then
     AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
     real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-    if test "${real_ffmpeg_tree}" = ""; then
+    if test -z "${real_ffmpeg_tree}"; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
@@ -1567,11 +1567,11 @@ if test "${enable_faad}" = "yes"
 then
   AC_ARG_WITH(faad-tree,
   [    --with-faad-tree=PATH faad tree for static linking])
-  if test "${with_faad_tree}" != ""
+  if test -n "${with_faad_tree}"
   then
     AC_MSG_CHECKING(for libfaad.a in ${with_faad_tree})
     real_faad_tree="`cd ${with_faad_tree} 2>/dev/null && pwd`"
-    if test "${real_faad_tree}" = ""
+    if test -z "${real_faad_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1625,7 +1625,7 @@ if test "${enable_xvid}" = "yes"
 then
   AC_ARG_WITH(xvid,
     [    --with-xvid=PATH      path to xvid installation],[],[])
-  if test "${with_xvid}" != "no" -a "${with_xvid}" != ""
+  if test "${with_xvid}" != "no" -a -n "${with_xvid}"
   then
     AX_ADD_CPPFLAGS([xvid],[-I${with_xvid}/include])
     AX_ADD_LDFLAGS([xvid],[-L${with_xvid}/lib])
@@ -1633,11 +1633,11 @@ then
 
   AC_ARG_WITH(xvid-tree,
   [    --with-xvid-tree=PATH xvid tree for static linking])
-  if test "${with_xvid_tree}" != ""
+  if test -n "${with_xvid_tree}"
   then
     AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
     real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
-    if test "${real_xvid_tree}" = ""
+    if test -z "${real_xvid_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1715,10 +1715,10 @@ then
     [    --with-a52=PATH       a52 headers and libraries])
   AC_ARG_WITH(a52-tree,
     [    --with-a52-tree=PATH  a52dec tree for static linking ],[],[])
-  if test "${with_a52_tree}" != "no" -a "${with_a52_tree}" != ""
+  if test "${with_a52_tree}" != "no" -a -n "${with_a52_tree}"
   then
     real_a52_tree="`cd ${with_a52_tree} 2>/dev/null && pwd`"
-    if test "${real_a52_tree}" = ""
+    if test -z "${real_a52_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1750,7 +1750,7 @@ then
       AC_MSG_ERROR([the specified tree doesn't have a52.h])
     fi
   else
-    if test "${with_a52}" = ""
+    if test -z "${with_a52}"
     then
       LDFLAGS_test=""
       CPPFLAGS_test=""
@@ -1809,11 +1809,11 @@ if test "${enable_libmpeg2}" != "no"
 then
   AC_ARG_WITH(libmpeg2-tree,
   [    --with-libmpeg2-tree=PATH libmpeg2 tree for static linking])
-  if test "${with_libmpeg2_tree}" != ""
+  if test -n "${with_libmpeg2_tree}"
   then
     AC_MSG_CHECKING(for libmpeg2.a in ${with_libmpeg2_tree})
     real_libmpeg2_tree="`cd ${with_libmpeg2_tree} 2>/dev/null && pwd`"
-    if test "${real_libmpeg2_tree}" = ""
+    if test -z "${real_libmpeg2_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
@@ -1891,7 +1891,7 @@ if test "${enable_tarkin}" = "yes"
 then
   AC_ARG_WITH(tarkin-tree,
   [    --with-tarkin-tree=PATH tarkin tree for static linking])
-  if test "${with_tarkin_tree}" != ""
+  if test -n "${with_tarkin_tree}"
   then
     AC_MSG_CHECKING(for tarkin.o in ${with_tarkin_tree})
     real_tarkin_tree="`cd ${with_tarkin_tree} 2>/dev/null && pwd`"
@@ -2048,7 +2048,7 @@ then
     [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
                                e.g use as:
                                --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "${with_sdl_prefix}" != "no" -a "${with_sdl_prefix}" != ""
+  if test "${with_sdl_prefix}" != "no" -a -n "${with_sdl_prefix}"
   then
     SDL_PREFIX="--prefix=${with_sdl_prefix}"
   fi
@@ -2121,7 +2121,7 @@ if test "${enable_qte}" = "yes"
 then
   AC_ARG_WITH(qte,
   [    --with-qte=PATH       Qt Embedded headers and libraries])
-  if test "${with_qte}" != "no" -a "${with_qte}" != ""
+  if test "${with_qte}" != "no" -a -n "${with_qte}"
   then
     AX_ADD_LDFLAGS([qte],[-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte])
     AX_ADD_CXXFLAGS([qte],[-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti])
@@ -2149,7 +2149,7 @@ then
   then
     AC_ARG_WITH(directx,
     [    --with-directx=PATH   Win32 DirectX headers])
-    if test "${with_directx}" = ""
+    if test -z "${with_directx}"
     then
       AC_CHECK_HEADERS(ddraw.h,
       [ AX_ADD_PLUGINS([vout_directx aout_directx])
@@ -2214,7 +2214,7 @@ then
   AX_ADD_LDFLAGS([ggi],[-lggi])
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
-    [ if test "${with_ggi}" != "no" -a "${with_ggi}" != ""
+    [ if test "${with_ggi}" != "no" -a -n "${with_ggi}"
       then
         AX_ADD_CPPFLAGS([ggi],[-I${with_ggi}/include])
         AX_ADD_LDFLAGS([ggi],[-L${with_ggi}/lib])
@@ -2233,7 +2233,7 @@ then
   AX_ADD_CPPFLAGS([glide],[-I/usr/include/glide])
   AC_ARG_WITH(glide,
     [    --with-glide=PATH     path to libglide],
-    [ if test "${with_glide}" != "no" -a "${with_glide}" != ""
+    [ if test "${with_glide}" != "no" -a -n "${with_glide}"
       then
         AX_ADD_CPPFLAGS([glide],[-I${with_glide}/include])
         AX_ADD_LDFLAGS([glide],[-L${with_glide}/lib])
@@ -2556,7 +2556,7 @@ then
     [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
                           e.g use as:
                           --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "${with_gtk_prefix}" != "no" -a "${with_gtk_prefix}" != ""
+  if test "${with_gtk_prefix}" != "no" -a -n "${with_gtk_prefix}"
   then
     GTK_PREFIX="--prefix=${with_gtk_prefix}"
   fi
@@ -2584,7 +2584,7 @@ then
     # now look for gpe support
     AC_ARG_WITH(gpe-prefix,
     [    --with-gpe-prefix=PATH gpe installation path prefix (default search in \$PATH)],[],[])
-    if test "${with_gpe_prefix}" != "no"  -a "${with_gpe_prefix}" != ""
+    if test "${with_gpe_prefix}" != "no" -a -n "${with_gpe_prefix}"
     then
       AX_ADD_CFLAGS([gpe],[-I${with_gpe_prefix}/include])
       AX_ADD_LDFLAGS([gpe],[-lXi -lgdk_pixbuf -L${with_gpe_prefix}/lib -lgpewidget])
@@ -2769,7 +2769,7 @@ AC_ARG_ENABLE(opie,
   [if test "${enable_opie}" = "yes"; then
      AC_ARG_WITH(qte,
      [    --with-qte=PATH       Qt Embedded headers and libraries])
-     if test "${with_qte}" != "no" -a "${with_qte}" != ""
+     if test "${with_qte}" != "no" -a -n "${with_qte}"
      then
        AX_ADD_LDFLAGS([qte],[-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte])
        AX_ADD_CXXFLAGS([qte],[-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti])
@@ -2787,7 +2787,7 @@ AC_ARG_ENABLE(opie,
      NEED_QTE_MAIN=yes
      AX_ADD_LDFLAGS([opie],[-lqpe ${LDFLAGS_qte}])
      AX_ADD_CXXFLAGS([opie],[${CXXFLAGS_qte}])
-     if test "${with_qte}" != "no" -a "${with_qte}" != ""
+     if test "${with_qte}" != "no" -a -n "${with_qte}"
      then
        MOC=${with_qte}/bin/moc
      else
@@ -2864,7 +2864,7 @@ if test "${enable_slp}" != "no"
 then
   AC_ARG_WITH(slp,
   [    --with-slp=PATH       libslp headers and libraries])
-  if test "${with_slp}" = ""
+  if test -z "${with_slp}"
   then
     AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
     if test "${have_slp}" = "true"
@@ -2988,7 +2988,7 @@ then
     AX_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
     AX_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
     dnl Not necessarily in ${PATH}
-    if test "${XPIDL}" = "" -o ! -x "${XPIDL}"
+    if test -z "${XPIDL}" -o ! -x "${XPIDL}"
     then
       XPIDL="/usr/lib/mozilla/xpidl"
     fi

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.35 2003/07/01 12:01:22 sam Exp $
+##  $Id: toolbox,v 1.36 2003/07/01 19:17:32 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -407,7 +407,7 @@ then
   file="${srcdir}/src/misc/modules_builtin.h"
 
   rm -f ${file}.tmp && cp ${file}.in ${file}.tmp
-  if test "${BUILTINS}" != ""
+  if test -n "${BUILTINS}"
   then
     for i in `echo ${BUILTINS}`
     do
@@ -418,7 +418,7 @@ then
   echo "#define ALLOCATE_ALL_BUILTINS() \\" >> ${file}.tmp
   echo "    do \\" >> ${file}.tmp
   echo "    { \\" >> ${file}.tmp
-  if test "${BUILTINS}" != ""
+  if test -n "${BUILTINS}"
   then
     for i in `echo ${BUILTINS}`
     do

@@ -590,7 +590,7 @@ mozilla_libplugin_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
                              $(CPPFLAGS_mozilla_EXTRA) -Imozilla
 mozilla_libplugin_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
                                $(CPPFLAGS_mozilla_EXTRA) -Imozilla
-mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(DATA_npvlc_rc) builtins_pic
+mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(DATA_npvlc_rc)
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
 $(SOURCES_mozilla): mozilla/vlcintf.h

@@ -216,7 +216,7 @@ done
 #
 #  If a module was requested, use its name
 #
-if test "${module}" != ""; then
+if test -n "${module}"; then
   cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module}"
 fi
 
@@ -224,12 +224,12 @@ fi
 #  Output what we were asked
 #
 if test "${echo_linkage}" = yes; then
-  if test "${echo_plugin}"; then
+  if test "${echo_plugin}" = yes; then
     for module in `echo "${plugins}"`; do
       register_flags "${module}"
     done
   fi
-  if test "${echo_builtin}"; then
+  if test "${echo_builtin}" = yes; then
     for module in `echo "${builtins}"`; do
       register_flags "${module}"
     done
@@ -239,21 +239,21 @@ if test "${echo_linkage}" = yes; then
 fi
 
 if test "${echo_target}" = yes; then
-  if test "${echo_plugin}"; then
+  if test "${echo_plugin}" = yes; then
     for module in `echo "${plugins}"`; do
       register_targets "${module}"
     done
-    for target in `echo ${list}`; do printf "modules/${target}_plugin "; done
+    for target in `echo "${list}"`; do printf "modules/${target}_plugin "; done
     printf '\n'
   fi
-  if test "${echo_builtin}"; then
+  if test "${echo_builtin}" = yes; then
     for module in `echo "${builtins}"`; do
       register_targets "${module}"
     done
-    if test "${echo_pic}"; then
-      for target in `echo ${list}`; do printf "modules/${target}_pic.a "; done
+    if test "${echo_pic}" = yes; then
+      for target in `echo "${list}"`; do printf "modules/${target}_pic.a "; done
     else
-      for target in `echo ${list}`; do printf "modules/${target}.a "; done
+      for target in `echo "${list}"`; do printf "modules/${target}.a "; done
     fi
     printf '\n'
   fi
@@ -279,17 +279,16 @@ if test "${echo_objcflags}" = yes; then
   echo "${cppflags} ${objcflags}"
 fi
 if test "${echo_libs}" = yes; then
-  if test "${echo_builtin}"; then
+  if test "${echo_builtin}" = yes; then
     for module in `echo "${builtins}"`; do
       register_targets "${module}"
       register_flags "${module}"
     done
-    if test "${echo_pic}"; then
-      for target in `echo ${list}`; do printf "modules/${target}_pic.a "; done
+    if test "${echo_pic}" = yes; then
+      for target in `echo "${list}"`; do printf "modules/${target}_pic.a "; done
     else
-      for target in `echo ${list}`; do printf "modules/${target}.a "; done
+      for target in `echo "${list}"`; do printf "modules/${target}.a "; done
     fi
-    printf '\n'
   fi
   echo "${libs} ${ldflags}"
 fi

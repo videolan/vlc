@@ -473,15 +473,16 @@ the Boston strangler is to the woman home alone.
 <[MaDog]> :)
 <[MaDog]> xcuse me
 *** Signoff: [MaDog] (Client Quit)
-  -- #videolan
-%
-13:53 < Xtophe> is there any centralien alive ?
-13:54 < thedj> i hope so. haven't heard a thing about a nuke explosion in Paris
 
   -- #videolan
 %
-00:12 < thedj> i don't trust ffmpeg's make process ;)
-00:13 < gibalou> their make mess you mean ?
+13:53 <Xtophe> is there any centralien alive ?
+13:54 <thedj> i hope so. haven't heard a thing about a nuke explosion in Paris
+
+  -- #videolan
+%
+00:12 <thedj> i don't trust ffmpeg's make process ;)
+00:13 <gibalou> their make mess you mean ?
 
   -- #videolan
 %
@@ -490,9 +491,16 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-17:07 < JediMaster> sh-2.03# reboot
-17:07 < JediMaster> Segmentation fault
-17:07 < JediMaster> that's not good
+17:07 <JediMaster> sh-2.03# reboot
+17:07 <JediMaster> Segmentation fault
+17:07 <JediMaster> that's not good
+
+  -- #videolan
+%
+<sam> pour votre punition, ça sera un bootstrap chacun :P
+<titer> c'est reparti pour 20 min
+<gibalou> c'est reparti pour 3 x 20 min
+<sam> c'est reparti pour une modif de Makefile.am d'ici 20 min
 
   -- #videolan
 %
