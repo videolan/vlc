@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.9 2003/11/08 18:23:40 titer Exp $
+ * $Id: VideoWindow.h,v 1.10 2003/12/22 11:14:25 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -113,7 +113,7 @@ class VLCView : public BView
 	virtual	void			AttachedToWindow();
 	virtual	void			MouseDown(BPoint where);
 	virtual	void			MouseUp(BPoint where);
-	virtual	void			MouseMoved(BPoint where, uint32_t transit,
+	virtual	void			MouseMoved(BPoint where, uint32 transit,
 									   const BMessage* dragMessage);
 	virtual	void			Pulse();
 	virtual	void			Draw(BRect updateRect);

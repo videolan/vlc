@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.27 2003/12/22 11:08:00 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.28 2003/12/22 11:14:25 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1309,7 +1309,7 @@ VLCView::MouseUp( BPoint where )
  * VLCVIew::MouseMoved
  *****************************************************************************/
 void
-VLCView::MouseMoved(BPoint point, uint32_t transit, const BMessage* dragMessage)
+VLCView::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
 {
 	fLastMouseMovedTime = system_time();
 	fCursorHidden = false;
