@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.3 2003/01/16 23:25:55 lool Exp $
+ * $Id: slp.c,v 1.4 2003/01/17 14:51:09 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -222,7 +222,7 @@ static ssize_t Read  ( input_thread_t *p_input, byte_t *p_buffer, size_t s )
 /*****************************************************************************
  * Init: initialize demux
  *****************************************************************************/
-int Init ( vlc_object_t *p_this )
+static int Init ( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
 
