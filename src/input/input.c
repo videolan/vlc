@@ -49,6 +49,7 @@
  * Local prototypes
  ******************************************************************************/
 static void input_Thread( input_thread_t *p_input );
+static void EndThread( input_thread_t *p_input );
 static __inline__ int input_ReadPacket( input_thread_t *p_input );
 static __inline__ void input_SortPacket( input_thread_t *p_input,
                                          ts_packet_t *ts_packet );
@@ -217,50 +218,11 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
  ******************************************************************************/
 void input_DestroyThread( input_thread_t *p_input )
 {
-    int i_es_loop;
-
     intf_DbgMsg("input debug: requesting termination of input thread\n");
     p_input->b_die = 1;                          /* ask thread to kill itself */
+
+    /* Remove this as soon as the "status" flag is implemented */
     pthread_join( p_input->thread_id, NULL );         /* wait until it's done */
-
-    (*p_input->p_clean)( p_input );           /* close input method */
-
-    /* Destroy all decoder threads. */
-    for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
-    {
-        if( p_input->pp_selected_es[i_es_loop] )
-        {
-            switch( p_input->pp_selected_es[i_es_loop]->i_type )
-            {
-                case MPEG1_VIDEO_ES:
-                case MPEG2_VIDEO_ES:
-                    vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
-                    break;
-                case MPEG1_AUDIO_ES:
-                case MPEG2_AUDIO_ES:
-                    adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
-                    break;
-                default:
-#ifdef DEBUG
-                    /* This should never happen. */
-                    intf_DbgMsg("input debug: unknown stream type ! (%d, %d)\n",
-                             p_input->pp_selected_es[i_es_loop]->i_id,
-                             p_input->pp_selected_es[i_es_loop]->i_type);
-#endif
-                    break;
-            }
-        }
-        else
-        {
-            /* pp_selected_es should not contain any hole. */
-            break;
-        }
-    }
-
-    input_NetlistClean( p_input );                           /* clean netlist */
-    input_PsiClean( p_input );                       /* clean PSI information */
-    input_PcrClean( p_input );                       /* clean PCR information */
-    free( p_input );                           /* free input_thread structure */
 }
 
 #if 0
@@ -333,8 +295,59 @@ static void input_Thread( input_thread_t *p_input )
     }
 
     /* Ohoh, we have to die as soon as possible. */
+    EndThread( p_input );
+
     intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
     pthread_exit( 0 );
+}
+
+/*******************************************************************************
+ * EndThread: end the input thread
+ *******************************************************************************/
+static void EndThread( input_thread_t *p_input )
+{
+    int i_es_loop;
+
+    (*p_input->p_clean)( p_input );           /* close input method */
+
+    /* Destroy all decoder threads. */
+    for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
+    {
+        if( p_input->pp_selected_es[i_es_loop] )
+        {
+            switch( p_input->pp_selected_es[i_es_loop]->i_type )
+            {
+                case MPEG1_VIDEO_ES:
+                case MPEG2_VIDEO_ES:
+                    vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+                    break;
+                case MPEG1_AUDIO_ES:
+                case MPEG2_AUDIO_ES:
+                    adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+                    break;
+                default:
+#ifdef DEBUG
+                    /* This should never happen. */ 
+                    intf_DbgMsg("input debug: unknown stream type ! (%d, %d)\n",
+                             p_input->pp_selected_es[i_es_loop]->i_id,
+                             p_input->pp_selected_es[i_es_loop]->i_type);
+#endif
+                    break;
+            }
+        }
+        else
+        {
+            /* pp_selected_es should not contain any hole. */
+            break;
+        }
+    }
+
+    input_NetlistClean( p_input );                           /* clean netlist */
+    input_PsiClean( p_input );                       /* clean PSI information */
+    input_PcrClean( p_input );                       /* clean PCR information */
+    free( p_input );                           /* free input_thread structure */
+
+    intf_DbgMsg("input debug: EndThread(%p)\n", p_input);
 }
 
 /*******************************************************************************
@@ -392,10 +405,10 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
                            INPUT_TS_READ_ONCE );
     if( i_packet_size == (-1) )
     {
-	intf_DbgMsg("Read packet %d %p %d %d\n", i_base_index,
-			&p_input->netlist.p_ts_free[i_base_index],
-			p_input->netlist.i_ts_start,
-			p_input->netlist.i_ts_end);
+//	intf_DbgMsg("Read packet %d %p %d %d\n", i_base_index,
+//			&p_input->netlist.p_ts_free[i_base_index],
+//			p_input->netlist.i_ts_start,
+//			p_input->netlist.i_ts_end);
         intf_ErrMsg("input error: readv() failed (%s)\n", strerror(errno));
         return( -1 );
     }
