@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.2 2003/02/25 17:17:43 fenrir Exp $
+ * $Id: http.c,v 1.3 2003/03/06 11:15:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -195,7 +195,7 @@ static int Open( vlc_object_t *p_this )
 
         free( psz_name );
         free( psz_file_name );
-        free( p_access );
+        free( p_sys );
         return( VLC_EGENERIC );
     }
 
@@ -210,7 +210,7 @@ static int Open( vlc_object_t *p_this )
 
         free( psz_name );
         free( psz_file_name );
-        free( p_access );
+        free( p_sys );
         return( VLC_EGENERIC );
     }
 
@@ -228,7 +228,7 @@ static int Open( vlc_object_t *p_this )
 
         free( psz_name );
         free( psz_file_name );
-        free( p_access );
+        free( p_sys );
 
         return( VLC_EGENERIC );
     }
