@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.22 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.23 2001/05/30 23:02:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -282,7 +282,7 @@ void GtkNetworkJoin( GtkEditable * editable, gpointer user_data )
     int     i_channel;
 
     i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( editable ) );
-    intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
+//    intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
 
 //    network_ChannelJoin( i_channel );
 }
@@ -293,6 +293,8 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     GtkWidget *     spin;
     int             i_channel;
 
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+
     window = gtk_widget_get_toplevel( GTK_WIDGET (button) );
     spin = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( window ),
                        "network_channel_spinbutton" ) );
@@ -300,7 +302,29 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
     intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
 
+    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_intf->p_input != NULL )
+    {
+        /* end playing item */
+        p_intf->p_input->b_eof = 1;
+
+        /* update playlist */
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        p_main->p_playlist->i_index--;
+        p_main->p_playlist->b_stopped = 1;
+
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+
+        /* FIXME: ugly hack to close input and outputs */
+        p_intf->pf_manage( p_intf );
+        p_main->p_playlist->b_stopped = 0;
+        p_intf->pf_manage( p_intf );
+    }
+    vlc_mutex_unlock( &p_intf->change_lock );
+
     network_ChannelJoin( i_channel );
+    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 }
 
 

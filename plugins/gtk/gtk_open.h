@@ -2,7 +2,7 @@
  * gtk_open.h: prototypes for open functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_open.h,v 1.2 2001/05/15 14:49:48 stef Exp $
+ * $Id: gtk_open.h,v 1.3 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -36,6 +36,7 @@ gboolean GtkNetworkOpenShow     ( GtkWidget *, GdkEventButton *, gpointer );
 void     GtkNetworkOpenOk       ( GtkButton *, gpointer );
 void     GtkNetworkOpenCancel   ( GtkButton *, gpointer );
 void     GtkNetworkOpenBroadcast( GtkToggleButton *, gpointer );
+void     GtkNetworkOpenChannel  ( GtkToggleButton *, gpointer );
 
 void     GtkFileOpenActivate    ( GtkMenuItem *, gpointer );
 void     GtkDiscOpenActivate    ( GtkMenuItem *, gpointer );

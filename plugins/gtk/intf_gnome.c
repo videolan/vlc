@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: intf_gnome.c,v 1.3 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -323,6 +323,7 @@ static gint GnomeManage( gpointer p_data )
         if( p_intf->p_input->stream.b_changed )
         {
             GtkModeManage( p_intf );
+            GtkSetupMenus( p_intf );
         }
 
         /* Manage the slider */
@@ -358,7 +359,6 @@ static gint GnomeManage( gpointer p_data )
             }
 #undef p_area
         }
-        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
         if( p_intf->p_sys->i_part !=
             p_intf->p_input->stream.p_selected_area->i_part )
@@ -367,6 +367,7 @@ static gint GnomeManage( gpointer p_data )
             GtkSetupMenus( p_intf );
         }
 
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
     else if( !p_intf->b_die )
     {

@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.4 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_open.c,v 1.5 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -52,6 +52,7 @@
 #include "intf_gtk.h"
 
 #include "main.h"
+#include "netutils.h"
 
 #include "modules_export.h"
 
@@ -275,6 +276,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     char *          psz_source, *psz_server, *psz_protocol;
     unsigned int    i_port;
     boolean_t       b_broadcast;
+    boolean_t       b_channel;
     int             i_end = p_main->p_playlist->i_size;
 
     gtk_widget_hide( p_intf->p_sys->p_network );
@@ -308,7 +310,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 
     /* do we have a broadcast address */
     b_broadcast = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
-        lookup_widget( GTK_WIDGET(button), "broadcast_check" ) ) );
+        lookup_widget( GTK_WIDGET(button), "network_broadcast_check" ) ) );
     if( b_broadcast )
     {
         char *  psz_broadcast;
@@ -344,6 +346,32 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
        
         /* Build source name and add it to playlist */
         sprintf( psz_source, "%s://%s:%i", psz_protocol, psz_server, i_port );
+    }
+
+    /* Manage channel server */
+    b_channel = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
+        lookup_widget( GTK_WIDGET(button), "network_channel_check" ) ) );
+    main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, b_channel );
+    if( b_channel )
+    {
+        char *          psz_channel;
+        unsigned int    i_channel_port;
+
+        if( p_main->p_channel == NULL )
+        {
+            network_ChannelCreate();
+        }
+
+        psz_channel = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                             GTK_WIDGET(button), "network_channel" ) ) );
+        i_channel_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
+            lookup_widget( GTK_WIDGET(button), "network_channel_port" ) ) );
+
+        main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, psz_channel );
+        if( i_channel_port < 65536 )
+        {
+            main_PutIntVariable( INPUT_CHANNEL_PORT_VAR, i_channel_port );
+        }
     }
 
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
@@ -386,6 +414,27 @@ void GtkNetworkOpenBroadcast( GtkToggleButton * togglebutton,
             gtk_toggle_button_get_active( togglebutton ) );
 }
 
+
+void GtkNetworkOpenChannel( GtkToggleButton * togglebutton,
+                            gpointer user_data )
+{
+    GtkWidget *     p_network;
+
+    p_network = gtk_widget_get_toplevel( GTK_WIDGET (togglebutton) );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_channel_combo" ),
+            gtk_toggle_button_get_active( togglebutton ) );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_channel" ),
+            gtk_toggle_button_get_active( togglebutton ) );
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_network ),
+            "network_channel_port" ),
+            gtk_toggle_button_get_active( togglebutton ) );
+
+}
 
 
 /****************************************************************************

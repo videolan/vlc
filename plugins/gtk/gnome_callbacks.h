@@ -133,3 +133,11 @@ GtkNetworkJoin                         (GtkEditable     *editable,
 void
 GtkChannelGo                           (GtkButton       *button,
                                         gpointer         user_data);
+
+void
+GtkNetworkOpenBroadcast                (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);

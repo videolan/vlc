@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.3 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_display.c,v 1.4 2001/05/30 23:02:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -101,6 +101,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
     GtkWidget *     p_network_box;
     GtkWidget *     p_slider;
     GtkWidget *     p_label;
+    GtkWidget *     p_channel;
     boolean_t       b_control;
 
 #define GETWIDGET( ptr, name ) GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( \
@@ -152,6 +153,18 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             "network_address_label" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
                                     p_intf->p_input->p_source );
+                p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                           p_intf->p_sys->p_window ), "network_channel_box" ) );
+                if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                                         INPUT_NETWORK_CHANNEL_DEFAULT  ) )
+                {
+                    gtk_widget_show( GTK_WIDGET( p_channel ) );
+                }
+                else
+                {
+                    gtk_widget_hide( GTK_WIDGET( p_channel ) );
+                }
+
                 break;
             default:
                 intf_ErrMsg( "intf error: can't determine input method" );
@@ -206,12 +219,10 @@ gint GtkModeManage( intf_thread_t * p_intf )
 
     /* set control items */
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_back"), FALSE );
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_stop"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_pause"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_slow"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_window, "toolbar_fast"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_back"), FALSE );
-    gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_stop"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_pause"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_slow"), b_control );
     gtk_widget_set_sensitive( GETWIDGET(p_popup, "popup_fast"), b_control );

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.15 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_playlist.c,v 1.16 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -198,7 +198,7 @@ void GtkPlaylistDeleteSelected( GtkMenuItem * menuitem, gpointer user_data )
     playlist_t *p_playlist;
     
     /* catch the thread back */
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), /*(char*)user_data*/"intf_playlist" );
 
     p_playlist = p_main->p_playlist;
     

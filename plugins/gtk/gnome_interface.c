@@ -393,7 +393,6 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_stop", toolbar_stop,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_stop);
-  gtk_widget_set_sensitive (toolbar_stop, FALSE);
 
   tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_FORWARD);
   toolbar_play = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
@@ -1388,11 +1387,19 @@ create_intf_network (void)
   GtkWidget *label18;
   GtkObject *network_port_adj;
   GtkWidget *network_port;
-  GtkWidget *broadcast_check;
+  GtkWidget *network_broadcast_check;
   GtkWidget *network_broadcast_combo;
   GtkWidget *network_broadcast;
   GtkWidget *network_server_combo;
   GtkWidget *network_server;
+  GtkWidget *frame5;
+  GtkWidget *hbox4;
+  GtkWidget *network_channel_check;
+  GtkWidget *network_channel_combo;
+  GtkWidget *network_channel;
+  GtkWidget *channel_port;
+  GtkObject *network_channel_port_adj;
+  GtkWidget *network_channel_port;
   GtkWidget *hbuttonbox1;
   GtkWidget *network_ok;
   GtkWidget *network_cancel;
@@ -1493,7 +1500,7 @@ create_intf_network (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label18), 0, 0.5);
 
-  network_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
+  network_port_adj = gtk_adjustment_new (1234, 1024, 65535, 1, 10, 10);
   network_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_port_adj), 1, 0);
   gtk_widget_ref (network_port);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_port", network_port,
@@ -1504,15 +1511,14 @@ create_intf_network (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_tooltips_set_tip (tooltips, network_port, _("Port of the stream server"), NULL);
 
-  broadcast_check = gtk_check_button_new_with_label (_("Broadcast"));
-  gtk_widget_ref (broadcast_check);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "broadcast_check", broadcast_check,
+  network_broadcast_check = gtk_check_button_new_with_label (_("Broadcast"));
+  gtk_widget_ref (network_broadcast_check);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast_check", network_broadcast_check,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (broadcast_check);
-  gtk_table_attach (GTK_TABLE (table2), broadcast_check, 0, 1, 2, 3,
+  gtk_widget_show (network_broadcast_check);
+  gtk_table_attach (GTK_TABLE (table2), network_broadcast_check, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (broadcast_check), TRUE);
 
   network_broadcast_combo = gnome_entry_new (NULL);
   gtk_widget_ref (network_broadcast_combo);
@@ -1547,6 +1553,60 @@ create_intf_network (void)
   gtk_widget_show (network_server);
   gtk_entry_set_text (GTK_ENTRY (network_server), _("vlsppc-02"));
 
+  frame5 = gtk_frame_new (_("Channels"));
+  gtk_widget_ref (frame5);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "frame5", frame5,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame5);
+  gtk_box_pack_start (GTK_BOX (vbox5), frame5, TRUE, TRUE, 0);
+  gtk_frame_set_label_align (GTK_FRAME (frame5), 0.05, 0.5);
+
+  hbox4 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "hbox4", hbox4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox4);
+  gtk_container_add (GTK_CONTAINER (frame5), hbox4);
+
+  network_channel_check = gtk_check_button_new_with_label (_("Channel server:"));
+  gtk_widget_ref (network_channel_check);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_check", network_channel_check,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_check);
+  gtk_box_pack_start (GTK_BOX (hbox4), network_channel_check, FALSE, FALSE, 0);
+
+  network_channel_combo = gnome_entry_new (NULL);
+  gtk_widget_ref (network_channel_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_combo", network_channel_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_combo);
+  gtk_box_pack_start (GTK_BOX (hbox4), network_channel_combo, FALSE, FALSE, 0);
+  gtk_widget_set_sensitive (network_channel_combo, FALSE);
+
+  network_channel = gnome_entry_gtk_entry (GNOME_ENTRY (network_channel_combo));
+  gtk_widget_ref (network_channel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel", network_channel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel);
+  gtk_entry_set_text (GTK_ENTRY (network_channel), _("138.195.143.220"));
+
+  channel_port = gtk_label_new (_("port:"));
+  gtk_widget_ref (channel_port);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "channel_port", channel_port,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (channel_port);
+  gtk_box_pack_start (GTK_BOX (hbox4), channel_port, FALSE, FALSE, 5);
+
+  network_channel_port_adj = gtk_adjustment_new (6010, 1024, 65535, 1, 10, 10);
+  network_channel_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_port_adj), 1, 0);
+  gtk_widget_ref (network_channel_port);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_port", network_channel_port,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_port);
+  gtk_box_pack_start (GTK_BOX (hbox4), network_channel_port, FALSE, FALSE, 0);
+  gtk_widget_set_usize (network_channel_port, 60, -2);
+  gtk_widget_set_sensitive (network_channel_port, FALSE);
+
   hbuttonbox1 = GNOME_DIALOG (intf_network)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_network), "hbuttonbox1", hbuttonbox1);
   gtk_widget_show (hbuttonbox1);
@@ -1569,9 +1629,12 @@ create_intf_network (void)
   gtk_widget_show (network_cancel);
   GTK_WIDGET_SET_FLAGS (network_cancel, GTK_CAN_DEFAULT);
 
-  gtk_signal_connect (GTK_OBJECT (broadcast_check), "toggled",
+  gtk_signal_connect (GTK_OBJECT (network_broadcast_check), "toggled",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenBroadcast),
-                      NULL);
+                      "intf_network");
+  gtk_signal_connect (GTK_OBJECT (network_channel_check), "toggled",
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenChannel),
+                      "intf_network");
   gtk_signal_connect (GTK_OBJECT (network_ok), "clicked",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenOk),
                       "intf_network");
@@ -1806,7 +1869,7 @@ create_intf_playlist (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (playlist_delete_menu_uiinfo[1].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playmist_delete_item",
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_delete_item",
                             playlist_delete_menu_uiinfo[1].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 

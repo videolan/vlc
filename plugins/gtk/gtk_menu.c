@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.6 2001/05/30 17:03:12 sam Exp $
+ * $Id: gtk_menu.c,v 1.7 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -791,7 +791,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
     p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
     p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
 
-    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+//    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
     if( p_intf->p_sys->b_title_update )
     { 
@@ -922,6 +922,8 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
     
         p_intf->p_sys->b_spu_update = 0;
     }
+
+    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
     return TRUE;
 }

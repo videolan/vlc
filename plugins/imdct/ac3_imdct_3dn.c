@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.2 2001/05/28 02:38:48 sam Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.3 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -59,7 +59,7 @@ void _M( imdct_init ) (imdct_t * p_imdct)
 	int i;
 	float scale = 181.019;
 
-    fprintf(stderr,"imct_init\n");
+    intf_WarnMsg( 6, "imct_init" );
 	for (i=0; i < 128; i++)
 	{
 		float xcos_i = cos(2.0f * M_PI * (8*i+1)/(8*N)) * scale;
@@ -69,7 +69,7 @@ void _M( imdct_init ) (imdct_t * p_imdct)
 		p_imdct->xcos_sin_sse[i * 4 + 2] = -xsin_i;
 		p_imdct->xcos_sin_sse[i * 4 + 3] = -xcos_i;
 	}
-    fprintf(stderr,"done imct_init\n");
+    intf_WarnMsg( 6, "done imct_init" );
 }
 
 void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])

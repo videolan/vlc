@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.97 2001/05/30 05:19:03 stef Exp $
+ * $Id: main.c,v 1.98 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -176,10 +176,10 @@ static const struct option longopts[] =
     
     /* Input options */
     {   "input",            1,          0,      OPT_INPUT },
-    {   "channels",         0,          0,      OPT_CHANNELS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        1,          0,      OPT_BROADCAST },
+    {   "channels",         0,          0,      OPT_CHANNELS },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -305,12 +305,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize shared resources and libraries
      */
-    if( p_main->b_channels && network_ChannelCreate() )
+    if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                             INPUT_NETWORK_CHANNEL_DEFAULT ) &&
+        network_ChannelCreate() )
     {
         /* On error during Channels initialization, switch off channels */
         intf_Msg( "Channels initialization failed : "
                   "Channel management is deactivated" );
-        p_main->b_channels = 0;
+        main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 0 );
     }
 
     /*
@@ -341,7 +343,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /*
          * Go back into channel 0 which is the network
          */
-        if( p_main->b_channels )
+        if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                                 INPUT_NETWORK_CHANNEL_DEFAULT ) )
         {
             network_ChannelJoin( COMMON_CHANNEL );
         }
@@ -480,9 +483,10 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     p_main->b_audio     = 1;
     p_main->b_video     = 1;
-    p_main->b_channels  = 0;
 
     p_main->i_warning_level = 0;
+
+    p_main->p_channel = NULL;
 
     /* Get the executable name (similar to the basename command) */
     p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
@@ -644,7 +648,6 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( INPUT_METHOD_VAR, optarg );
             break;
         case OPT_CHANNELS:                                     /* --channels */
-            p_main->b_channels = 1;
             main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 1 );
             break;
         case OPT_SERVER:                                         /* --server */
@@ -807,12 +810,12 @@ static void Usage( int i_fashion )
 
     /* Input parameters */
     intf_MsgImm( "\nInput parameters:"
-        "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
-        "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
-        "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
-        "\n  " INPUT_BROADCAST_VAR "=<addr>            \tbroadcast mode"
-        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>     \tchannel server"
-        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>         \tchannel server port" );
+        "\n  " INPUT_SERVER_VAR "=<hostname>         \tvideo server"
+        "\n  " INPUT_PORT_VAR "=<port>               \tvideo server port"
+        "\n  " INPUT_IFACE_VAR "=<interface>         \tnetwork interface"
+        "\n  " INPUT_BCAST_ADDR_VAR "=<addr>         \tbroadcast mode"
+        "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname> \tchannel server"
+        "\n  " INPUT_CHANNEL_PORT_VAR "=<port>       \tchannel server port" );
 
 }
 

@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.7 2001/05/30 05:19:03 stef Exp $
+ * $Id: aout_spdif.c,v 1.8 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -42,6 +42,7 @@
 #include "aout_common.h"
 
 #define BLANK_FRAME_MAX 100
+#define SLEEP_TIME      16000
 
 /*****************************************************************************
  * aout_SpdifThread: audio output thread that sends raw spdif data
@@ -63,7 +64,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     mtime_t     mplay;
     mtime_t     mdelta;
     mtime_t     mlast = 0;
-    mtime_t     m_frame_time;
 
     /* get a blank frame ready */
     memset( pi_blank, 0, sizeof(pi_blank) );
@@ -76,7 +76,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     i_blank = 0;
 
     /* Compute the theorical duration of an ac3 frame */
-    m_frame_time = 1000000 * AC3_FRAME_SIZE / p_aout->fifo[0].l_rate;
 
     while( !p_aout->b_die )
     {
@@ -105,7 +104,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                                 l_start_frame];
                     mdelta = mplay - mdate();
 
-                    if( mdelta < ( 2 * m_frame_time ) )
+                    if( mdelta < ( 2 * SLEEP_TIME ) )
                     {
                         intf_WarnMsg( 12, "spdif out (%d):"
                                           "playing frame %lld (%lld)",
@@ -140,7 +139,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
         {
             /* we leave some time for aout fifo to fill and not to stress
              * the external decoder too much */
-            msleep( m_frame_time / 2 );
+            msleep( SLEEP_TIME );
         }
         else
         {

@@ -53,6 +53,7 @@ typedef struct module_symbols_s
     void    ( * msleep )         ( mtime_t );
     mtime_t ( * mdate )          ( void );
 
+    int  ( * network_ChannelCreate )( void );
     int  ( * network_ChannelJoin )  ( int );
 
     void ( * input_SetStatus )      ( struct input_thread_s *, int );
@@ -94,6 +95,7 @@ typedef struct module_symbols_s
     (p_symbols)->intf_UrlDecode = intf_UrlDecode; \
     (p_symbols)->msleep = msleep; \
     (p_symbols)->mdate = mdate; \
+    (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
     (p_symbols)->network_ChannelJoin = network_ChannelJoin; \
     (p_symbols)->input_SetStatus = input_SetStatus; \
     (p_symbols)->input_SetRate = input_SetRate; \
@@ -138,6 +140,7 @@ extern module_symbols_t* p_symbols;
 #   define msleep(a) p_symbols->msleep(a)
 #   define mdate() p_symbols->mdate()
 
+#   define network_ChannelCreate() p_symbols->network_ChannelCreate()
 #   define network_ChannelJoin(a) p_symbols->network_ChannelJoin(a)
 
 #   define input_SetStatus(a,b) p_symbols->input_SetStatus(a,b)

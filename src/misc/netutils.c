@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.34 2001/05/30 17:03:12 sam Exp $
+ * $Id: netutils.c,v 1.35 2001/05/30 23:02:04 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -256,8 +256,10 @@ int network_ChannelJoin( int i_channel )
     char                i_answer;
     fd_set              fd;
     unsigned int        i_rc;
+    char *              psz_channel_server;
 
-    if( ! p_main->b_channels )
+    if( !main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
+                              INPUT_NETWORK_CHANNEL_DEFAULT  ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the"
                      "--channels option" );
@@ -269,14 +271,14 @@ int network_ChannelJoin( int i_channel )
     /* If last change is too recent, wait a while */
     if( mdate() - p_main->p_channel->last_change < INPUT_CHANNEL_CHANGE_DELAY )
     {
-        intf_Msg( "network: waiting before changing channel" );
+        intf_WarnMsg( 2, "network: waiting before changing channel" );
         mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
     }
 
     p_main->p_channel->last_change = mdate();
     p_main->p_channel->i_channel   = i_channel;
 
-    intf_Msg( "network: joining channel %d", i_channel );
+    intf_WarnMsg( 2, "network: joining channel %d", i_channel );
 
     /*
      * Initializing the socket
@@ -286,14 +288,25 @@ int network_ChannelJoin( int i_channel )
     /*
      * Getting the server's information
      */
+    intf_WarnMsg( 6, "Channel server: %s port: %d",
+            main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
+                                 INPUT_CHANNEL_SERVER_DEFAULT ),
+            main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
+                                 INPUT_CHANNEL_PORT_DEFAULT ) );
+
     memset( &sa_server, 0x00, sizeof(struct sockaddr_in) );
     sa_server.sin_family = AF_INET;
-    sa_server.sin_port   = htons( INPUT_CHANNEL_PORT_DEFAULT );
+    sa_server.sin_port   = htons( main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
+                                  INPUT_CHANNEL_PORT_DEFAULT ) );
+
+    psz_channel_server = strdup( main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
+                                 INPUT_CHANNEL_SERVER_DEFAULT ) );
 #ifdef HAVE_ARPA_INET_H
-    inet_aton( INPUT_CHANNEL_SERVER_DEFAULT, &sa_server.sin_addr );
+    inet_aton( psz_channel_server, &sa_server.sin_addr );
 #else
-    sa_server.sin_addr.s_addr = inet_addr( INPUT_CHANNEL_SERVER_DEFAULT );
+    sa_server.sin_addr.s_addr = inet_addr( psz_channel_server );
 #endif
+    free( psz_channel_server );
 
     /*
      * Looking for the interface MAC address
