@@ -383,6 +383,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "mosaic-xoffset", Other, NULL );
     var_Create( p_intf, "mosaic-yoffset", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-yoffset", Other, NULL );
+    var_Create( p_intf, "mosaic-align", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "mosaic-align", Other, NULL );
     var_Create( p_intf, "mosaic-vborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "mosaic-vborder", Other, NULL );
     var_Create( p_intf, "mosaic-hborder", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -726,6 +728,7 @@ static void Run( intf_thread_t *p_intf )
                 msg_rc(_("| mosaic-width # . . . . . . . . . . . . . . width\n"));
                 msg_rc(_("| mosaic-xoffset # . . . .top left corner position\n"));
                 msg_rc(_("| mosaic-yoffset # . . . .top left corner position\n"));
+                msg_rc(_("| mosaic-align 0..2,4..6,8..10. . .mosaic alignment\n"));
                 msg_rc(_("| mosaic-vborder # . . . . . . . . vertical border\n"));
                 msg_rc(_("| mosaic-hborder # . . . . . . . horizontal border\n"));
                 msg_rc(_("| mosaic-position {0=auto,1=fixed} . . . .position\n"));
@@ -1100,7 +1103,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-alpha" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-alpha", val );
@@ -1108,7 +1111,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-height" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-height", val );
@@ -1116,7 +1119,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-width" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-width", val );
@@ -1124,7 +1127,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-xoffset" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-xoffset", val );
@@ -1132,15 +1135,23 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-yoffset" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-yoffset", val );
         }
     }
+    else if( !strcmp( psz_cmd, "mosaic-align" ) )
+    {
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_inp->p_libvlc, "mosaic-align", val );
+        }
+    }
     else if( !strcmp( psz_cmd, "mosaic-vborder" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-vborder", val );
@@ -1148,7 +1159,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-hborder" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-hborder", val );
@@ -1156,7 +1167,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-position" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-position", val );
@@ -1164,7 +1175,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-rows" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-rows", val );
@@ -1172,7 +1183,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-cols" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-cols", val );
@@ -1180,7 +1191,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
     {
-        if( strlen( newval.psz_string) > 0)
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_inp->p_libvlc, "mosaic-keep-aspect-ratio", val );

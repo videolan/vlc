@@ -70,6 +70,7 @@ struct filter_sys_t
     vlc_bool_t b_keep; /* do we keep the original picture format ? */
     int i_width, i_height; /* mosaic height and width */
     int i_cols, i_rows; /* mosaic rows and cols */
+    int i_align; /* mosaic alignment in background video */
     int i_xoffset, i_yoffset; /* top left corner offset */
     int i_vborder, i_hborder; /* border width/height between miniatures */
     int i_alpha; /* subfilter alpha blending */
@@ -92,6 +93,7 @@ struct filter_sys_t
 #define YOFFSET_TEXT N_("Top left corner y coordinate")
 #define VBORDER_TEXT N_("Vertical border width in pixels")
 #define HBORDER_TEXT N_("Horizontal border width in pixels")
+#define ALIGN_TEXT N_("Mosaic alignment")
 
 #define POS_TEXT N_("Positioning method")
 #define POS_LONGTEXT N_("Positioning method. auto : automatically choose " \
@@ -113,6 +115,11 @@ static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
 { N_("auto"), N_("fixed") };
 
+static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_align_descriptions[] =
+     { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+     N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
+
 
 vlc_module_begin();
     set_description( N_("Mosaic video sub filter") );
@@ -123,6 +130,8 @@ vlc_module_begin();
     add_integer( "mosaic-alpha", 255, NULL, ALPHA_TEXT, ALPHA_LONGTEXT, VLC_FALSE );
     add_integer( "mosaic-height", 100, NULL, HEIGHT_TEXT, HEIGHT_TEXT, VLC_FALSE );
     add_integer( "mosaic-width", 100, NULL, WIDTH_TEXT, WIDTH_TEXT, VLC_FALSE );
+    add_integer( "mosaic-align", 5, NULL, ALIGN_TEXT, ALIGN_TEXT, VLC_TRUE);
+        change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_integer( "mosaic-xoffset", 0, NULL, XOFFSET_TEXT, XOFFSET_TEXT, VLC_TRUE );
     add_integer( "mosaic-yoffset", 0, NULL, YOFFSET_TEXT, YOFFSET_TEXT, VLC_TRUE );
     add_integer( "mosaic-vborder", 0, NULL, VBORDER_TEXT, VBORDER_TEXT, VLC_TRUE );
@@ -178,6 +187,15 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( height, 0, INT_MAX );
     GET_VAR( xoffset, 0, INT_MAX );
     GET_VAR( yoffset, 0, INT_MAX );
+
+    p_sys->i_align = __MIN( 10, __MAX( 0,  var_CreateGetInteger( p_filter, "mosaic-align" ) ) );
+    if( p_sys->i_align == 3 || p_sys->i_align == 7 )
+        p_sys->i_align = 5;
+    var_Destroy( p_filter, "mosaic-align" );
+    var_Create( p_libvlc, "mosaic-align", VLC_VAR_INTEGER );
+    var_SetInteger( p_libvlc, "mosaic-align", p_sys->i_align );
+    var_AddCallback( p_libvlc, "mosaic-align", MosaicCallback, p_sys );
+
     GET_VAR( vborder, 0, INT_MAX );
     GET_VAR( hborder, 0, INT_MAX );
     GET_VAR( rows, 1, INT_MAX );
@@ -262,6 +280,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     var_Destroy( p_libvlc, "mosaic-alpha" );
     var_Destroy( p_libvlc, "mosaic-height" );
+    var_Destroy( p_libvlc, "mosaic-align" );
     var_Destroy( p_libvlc, "mosaic-width" );
     var_Destroy( p_libvlc, "mosaic-xoffset" );
     var_Destroy( p_libvlc, "mosaic-yoffset" );
@@ -337,6 +356,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->i_alpha = p_sys->i_alpha;
+    p_spu->i_flags = p_sys->i_align;
+    p_spu->b_absolute = VLC_FALSE;
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -609,6 +630,21 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         msg_Dbg( p_this, "Changing y offset from %dpx to %dpx",
                          p_sys->i_yoffset, newval.i_int );
         p_sys->i_yoffset = __MAX( newval.i_int, 0 );
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else if( !strcmp( psz_var, "mosaic-align" ) )
+    {
+        int i_old = 0, i_new = 0;
+        vlc_mutex_lock( &p_sys->lock );
+        newval.i_int = __MIN( __MAX( newval.i_int, 0 ), 10 );
+        if( newval.i_int == 3 || newval.i_int == 7 )
+            newval.i_int = 5;
+        while( pi_align_values[i_old] != p_sys->i_align ) i_old++;
+        while( pi_align_values[i_new] != newval.i_int ) i_new++;
+        msg_Dbg( p_this, "Changing alignment from %d (%s) to %d (%s)",
+                     p_sys->i_align, ppsz_align_descriptions[i_old],
+                     newval.i_int, ppsz_align_descriptions[i_new] );
+        p_sys->i_align = newval.i_int;
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, "mosaic-vborder" ) )
