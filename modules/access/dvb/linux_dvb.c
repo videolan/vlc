@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dvb.c : functions to control a DVB card under Linux with v4l2
+ * linux_dvb.c : functions to control a DVB card under Linux with v4l2
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
  *
@@ -42,13 +42,12 @@
 #include <linux/dvb/version.h>
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/frontend.h>
-
-#include <linux/errno.h>
+#include <linux/dvb/ca.h>
 
 #include "dvb.h"
-#include "network.h"
 
 #define DMX_BUFFER_SIZE (1024 * 1024)
+#define CA_MAX_STATE_RETRY 5
 
 /*
  * Frontends
@@ -1108,59 +1107,120 @@ void E_(DVRClose)( access_t * p_access )
 
 /*
  * CAM device
- *
- * This uses the external cam_set program from libdvb-0.5.4
  */
 
 /*****************************************************************************
  * CAMOpen :
  *****************************************************************************/
-int E_(CAMOpen)( access_t * p_access )
+int E_(CAMOpen)( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    char ca[128];
+    int i_adapter, i_device, i_slot, i_active_slots = 0;
+    ca_caps_t caps;
 
-    p_sys->i_cam_handle = net_OpenTCP( p_access, "localhost", 4711 );
-    if ( p_sys->i_cam_handle < 0 )
+    i_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    i_device = var_GetInteger( p_access, "dvb-device" );
+
+    if( snprintf( ca, sizeof(ca), CA, i_adapter, i_device ) >= (int)sizeof(ca) )
     {
-        return -VLC_EGENERIC;
+        msg_Err( p_access, "snprintf() truncated string for CA" );
+        ca[sizeof(ca) - 1] = '\0';
+    }
+
+    msg_Dbg( p_access, "Opening device %s", ca );
+    if( (p_sys->i_ca_handle = open(ca, O_RDWR | O_NONBLOCK)) < 0 )
+    {
+        msg_Err( p_access, "CAMInit: opening device failed (%s)",
+                 strerror(errno) );
+        return VLC_EGENERIC;
+    }
+
+    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0
+          || caps.slot_num == 0 || caps.slot_type != CA_CI_LINK )
+    {
+        msg_Err( p_access, "CAMInit: no compatible CAM module" );
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_nb_slots = caps.slot_num;
+    memset( p_sys->pb_active_slot, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
+
+    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    {
+        ca_slot_info_t sinfo;
+        int i;
+
+        if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
+        {
+            msg_Err( p_access, "CAMInit: couldn't reset slot %d", i_slot );
+            continue;
+        }
+
+        for ( i = 0; i < CA_MAX_STATE_RETRY; i++ )
+        {
+            msleep(100000);
+
+            sinfo.num = i_slot;
+            if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+            {
+                msg_Err( p_access, "CAMInit: couldn't get info on slot %d",
+                         i_slot );
+                continue;
+            }
+
+            if ( sinfo.flags & CA_CI_MODULE_READY )
+            {
+                p_sys->pb_active_slot[i_slot] = VLC_TRUE;
+            }
+        }
+    }
+
+    i_active_slots = E_(en50221_Init)( p_access );
+
+    msg_Dbg( p_access, "CAMInit: found a CI handler with %d slots, %d active",
+             p_sys->i_nb_slots, i_active_slots );
+
+    if ( !i_active_slots )
+    {
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * CAMSet :
+ * CAMPoll :
  *****************************************************************************/
-int E_(CAMSet)( access_t * p_access, uint16_t i_program, uint16_t i_vpid,
-                uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3,
-                uint16_t i_cad_length, uint8_t *p_cad )
+int E_(CAMPoll)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    uint8_t p_str[12];
 
-    memcpy( p_str, &i_program, 2 );
-    memcpy( p_str + 2, &i_vpid, 2 );
-    memcpy( p_str + 4, &i_apid1, 2 );
-    memcpy( p_str + 6, &i_apid2, 2 );
-    memcpy( p_str + 8, &i_apid3, 2 );
-    memcpy( p_str + 10, &i_cad_length, 2 );
-
-    if ( net_Write( p_access, p_sys->i_cam_handle, p_str, 12 ) != 12 )
+    if ( p_sys->i_ca_handle == 0 )
     {
-        msg_Err( p_access, "write 1 failed (%s)", strerror(errno) );
-        return -VLC_EGENERIC;
+        return VLC_EGENERIC;
     }
 
-    if ( i_cad_length )
+    return E_(en50221_Poll)( p_access );
+}
+
+/*****************************************************************************
+ * CAMSet :
+ *****************************************************************************/
+int E_(CAMSet)( access_t * p_access, uint8_t **pp_capmts, int i_nb_capmts )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if ( p_sys->i_ca_handle == 0 )
     {
-        if ( net_Write( p_access, p_sys->i_cam_handle, p_cad, i_cad_length )
-              != i_cad_length )
-        {
-            msg_Err( p_access, "write 2 failed (%s) %d", strerror(errno),
-                     i_cad_length );
-            return -VLC_EGENERIC;
-        }
+        return VLC_EGENERIC;
     }
+
+    E_(en50221_SetCAPMT)( p_access, pp_capmts, i_nb_capmts );
 
     return VLC_SUCCESS;
 }
@@ -1172,9 +1232,11 @@ void E_(CAMClose)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if ( p_sys->i_cam_handle )
+    E_(en50221_End)( p_access );
+
+    if ( p_sys->i_ca_handle )
     {
-        close( p_sys->i_cam_handle );
+        close( p_sys->i_ca_handle );
     }
 }
 

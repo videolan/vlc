@@ -183,8 +183,6 @@ typedef struct
 
 } iod_descriptor_t;
 
-#define MAX_CAD 10
-
 typedef struct
 {
     dvbpsi_handle   handle;
@@ -196,10 +194,9 @@ typedef struct
     /* IOD stuff (mpeg4) */
     iod_descriptor_t *iod;
 
-    /* Conditional Access descriptor */
-    int             i_nb_cad;
-    uint8_t         *cad[MAX_CAD];
-    uint8_t         i_cad_length[MAX_CAD];
+    /* Conditional Access PMT (EN 50 221) */
+    uint8_t         *p_capmt;
+    int             i_capmt_size;
 
 } ts_prg_psi_t;
 
@@ -277,6 +274,7 @@ struct demux_sys_t
 
     vlc_bool_t  b_dvb_control;
     int         i_dvb_program;
+    vlc_list_t  *p_programs_list;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -301,6 +299,8 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
+
+static void DVBCAPMTSend( demux_t *p_demux );
 
 #define TS_PACKET_SIZE_188 188
 #define TS_PACKET_SIZE_192 192
@@ -472,7 +472,7 @@ static int Open( vlc_object_t *p_this )
         {
             ts_pid_t *pmt = &p_sys->pid[i_pid];
 
-            msg_Dbg( p_demux, "extra pmt specified (pid=0x%x)", i_pid );
+            msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
             PIDInit( pmt, VLC_TRUE, NULL );
             /* FIXME we should also ask for a number */
             pmt->psi->prg[0]->handle =
@@ -512,7 +512,7 @@ static int Open( vlc_object_t *p_this )
                             {
                                 pid->es->fmt.i_id = i_pid;
                             }
-                            msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x "
+                            msg_Dbg( p_demux, "  * es pid=%d type=%d "
                                      "fcc=%4.4s", i_pid, i_stream_type,
                                      (char*)&pid->es->fmt.i_codec );
                             pid->es->id = es_out_Add( p_demux->out,
@@ -610,7 +610,7 @@ static void Close( vlc_object_t *p_this )
 
         if( pid->b_seen )
         {
-            msg_Dbg( p_demux, "  - pid[0x%x] seen", pid->i_pid );
+            msg_Dbg( p_demux, "  - pid[%d] seen", pid->i_pid );
         }
 
         if( p_sys->b_dvb_control && pid->i_pid > 0 )
@@ -632,6 +632,14 @@ static void Close( vlc_object_t *p_this )
     }
 
     if( p_sys->i_pmt ) free( p_sys->pmt );
+
+    if ( p_sys->p_programs_list )
+    {
+        vlc_value_t val;
+        val.p_list = p_sys->p_programs_list;
+        var_Change( p_demux, "programs", VLC_VAR_FREELIST, &val, NULL );
+    }
+
     free( p_sys );
 }
 
@@ -744,7 +752,7 @@ static int Demux( demux_t *p_demux )
         {
             if( !p_pid->b_seen )
             {
-                msg_Dbg( p_demux, "pid[0x%x] unknown", p_pid->i_pid );
+                msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
             }
             /* We have to handle PCR if present */
             PCRHandle( p_demux, p_pid, p_pkt );
@@ -829,9 +837,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             uint16_t i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
             ts_prg_psi_t *p_prg = NULL;
+            vlc_list_t *p_list;
 
             i_int = (int)va_arg( args, int );
-            msg_Dbg( p_demux, "DEMUX_SET_GROUP %d", i_int );
+            p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
+            msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
 
             if( p_sys->b_dvb_control && i_int > 0 && i_int != p_sys->i_dvb_program )
             {
@@ -907,6 +917,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
                                     VLC_TRUE );
+                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
+                                    VLC_TRUE );
+
                     for( i = 2; i < 8192; i++ )
                     {
                         ts_pid_t *pid = &p_sys->pid[i];
@@ -937,21 +951,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     }
 
                     /* Set CAM descrambling */
-                    for ( i = 0; i < p_prg->i_nb_cad; i++ )
-                    {
-                        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                        ACCESS_SET_PRIVATE_ID_CA, p_prg->i_number,
-                                        i_vpid, i_apid1, i_apid2, i_apid3,
-                                        p_prg->i_cad_length[i],
-                                        p_prg->cad[i] );
-                    }
-                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_PRIVATE_ID_CA, p_prg->i_number,
-                                    0, 0, 0, 0, 0, NULL );
-                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_PRIVATE_ID_CA, 0,
-                                    0, 0, 0, 0, 0, NULL );
+                    DVBCAPMTSend( p_demux );
                 }
+            }
+            else
+            {
+                p_sys->i_dvb_program = -1;
+                p_sys->p_programs_list = p_list;
             }
             return VLC_SUCCESS;
         }
@@ -996,7 +1002,8 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
             prg->i_pid_pcr  = -1;
             prg->i_pid_pmt  = -1;
             prg->iod        = NULL;
-            prg->i_nb_cad   = 0;
+            prg->p_capmt    = NULL;
+            prg->i_capmt_size = 0;
             prg->handle     = NULL;
 
             TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
@@ -1027,11 +1034,10 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
         if( pid->psi->handle ) dvbpsi_DetachPMT( pid->psi->handle );
         for( i = 0; i < pid->psi->i_prg; i++ )
         {
-            int j;
             if( pid->psi->prg[i]->iod )
                 IODFree( pid->psi->prg[i]->iod );
-            for ( j = 0; j < pid->psi->prg[i]->i_nb_cad; j++ )
-                free( pid->psi->prg[i]->cad[j] );
+            if ( pid->psi->prg[i]->i_capmt_size )
+                free( pid->psi->prg[i]->p_capmt );
             if( pid->psi->prg[i]->handle )
                 dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
             free( pid->psi->prg[i] );
@@ -1098,7 +1104,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
         if( !p_demux->p_sys->b_silent )
-            msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x] (pid: 0x%x)",
+            msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x] (pid: %d)",
                       header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
         return;
@@ -1335,7 +1341,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     int         i_diff;
 
 #if 0
-    msg_Dbg( p_demux, "pid=0x%x unit_start=%d adaptation=%d payload=%d "
+    msg_Dbg( p_demux, "pid=%d unit_start=%d adaptation=%d payload=%d "
              "cc=0x%x", pid->i_pid, b_unit_start, b_adaptation,
              b_payload, i_cc );
 #endif
@@ -1346,7 +1352,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     if( p[1]&0x80 )
     {
-        msg_Dbg( p_demux, "transport_error_indicator set (pid=0x%x)",
+        msg_Dbg( p_demux, "transport_error_indicator set (pid=%d)",
                  pid->i_pid );
     }
 
@@ -1369,7 +1375,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         {
             if( p[5]&0x80 )
             {
-                msg_Warn( p_demux, "discontinuity_indicator (pid=0x%x) "
+                msg_Warn( p_demux, "discontinuity_indicator (pid=%d) "
                           "ignored", pid->i_pid );
             }
         }
@@ -1392,7 +1398,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         if( pid->i_cc == 0xff )
         {
-            msg_Warn( p_demux, "first packet for pid=0x%x cc=0x%x",
+            msg_Warn( p_demux, "first packet for pid=%d cc=0x%x",
                       pid->i_pid, i_cc );
             pid->i_cc = i_cc;
         }
@@ -1906,6 +1912,27 @@ static void IODFree( iod_descriptor_t *p_iod )
  ** libdvbpsi callbacks
  ****************************************************************************
  ****************************************************************************/
+static vlc_bool_t DVBProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
+{
+    demux_sys_t          *p_sys = p_demux->p_sys;
+
+    if ( !p_sys->b_dvb_control ) return VLC_FALSE;
+    if ( p_sys->i_dvb_program == -1 && p_sys->p_programs_list == NULL )
+        return VLC_TRUE;
+    if ( p_sys->i_dvb_program == i_pgrm ) return VLC_TRUE;
+
+    if ( p_sys->p_programs_list != NULL )
+    {
+        int i;
+        for ( i = 0; i < p_sys->p_programs_list->i_count; i++ )
+        {
+            if ( i_pgrm == p_sys->p_programs_list->p_values[i].i_int )
+                return VLC_TRUE;
+        }
+    }
+    return VLC_FALSE;
+}
+
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
@@ -1914,11 +1941,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     ts_pid_t             *pmt = NULL;
     ts_prg_psi_t         *prg = NULL;
+
+    int                  i_cad_length = 0;
     ts_pid_t             **pp_clean = NULL;
     int                  i_clean = 0, i;
-
-    /* CA descriptor */
-    uint16_t             i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
@@ -1961,13 +1987,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         if( pid->b_valid && pid->p_owner == pmt->psi &&
             pid->i_owner_number == prg->i_number && pid->psi == NULL )
         {
-            if( p_sys->b_dvb_control && ( p_sys->i_dvb_program < 0 ||
-                p_sys->i_dvb_program == prg->i_number ) )
-            {
-                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE );
-            }
-
             TAB_APPEND( i_clean, pp_clean, pid );
         }
     }
@@ -1976,14 +1995,28 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         IODFree( prg->iod );
         prg->iod = NULL;
     }
-    for ( i = 0; i < prg->i_nb_cad; i++ )
-        free( prg->cad[i] );
-    prg->i_nb_cad = 0;
+    if ( prg->i_capmt_size )
+        free( prg->p_capmt );
+    prg->i_capmt_size = 0;
 
-    msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=0x%x",
+    msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=%d",
              p_pmt->i_program_number, p_pmt->i_version, p_pmt->i_pcr_pid );
     prg->i_pid_pcr = p_pmt->i_pcr_pid;
     prg->i_version = p_pmt->i_version;
+
+    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+    {
+        /* Set demux filter */
+        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                        ACCESS_SET_PRIVATE_ID_STATE, prg->i_pid_pcr,
+                        VLC_TRUE );
+    }
+    else if ( p_sys->b_dvb_control )
+    {
+        msg_Warn( p_demux, "skipping program (not selected)" );
+        dvbpsi_DeletePMT(p_pmt);
+        return;
+    }
 
     /* Parse descriptor */
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
@@ -1998,17 +2031,36 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         else if( p_dr->i_tag == 0x9 )
         {
             msg_Dbg( p_demux, " * descriptor : CA (0x9)" );
-
-            prg->cad[prg->i_nb_cad] = malloc( p_dr->i_length + 2 );
-            prg->cad[prg->i_nb_cad][0] = 0x9;
-            prg->cad[prg->i_nb_cad][1] = p_dr->i_length;
-            memcpy( prg->cad[prg->i_nb_cad] + 2, p_dr->p_data, p_dr->i_length );
-            prg->i_cad_length[prg->i_nb_cad] = p_dr->i_length + 2;
-            prg->i_nb_cad++;
+            i_cad_length += p_dr->i_length + 2;
         }
         else
         {
             msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
+        }
+    }
+
+    if ( i_cad_length )
+    {
+        prg->p_capmt = malloc( 6 + i_cad_length );
+        prg->i_capmt_size = 6 + i_cad_length;
+
+        prg->p_capmt[0] = p_pmt->i_program_number >> 8;
+        prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
+        prg->p_capmt[2] = (p_pmt->i_version << 1) | 0x1;
+        prg->p_capmt[3] = (i_cad_length + 1) >> 8;
+        prg->p_capmt[4] = (i_cad_length + 1) & 0xff;
+        prg->p_capmt[5] = 0x1; /* ok_descrambling */
+
+        i = 6;
+        for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
+        {
+            if( p_dr->i_tag == 0x9 )
+            {
+                prg->p_capmt[i] = 0x9;
+                prg->p_capmt[i+1] = p_dr->i_length;
+                memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
+                i += p_dr->i_length + 2;
+            }
         }
     }
 
@@ -2028,7 +2080,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
-            msg_Warn( p_demux, "pmt error: pid=0x%x already defined",
+            msg_Warn( p_demux, "pmt error: pid=%d already defined",
                       p_es->i_pid );
             continue;
         }
@@ -2038,15 +2090,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         pid->i_owner_number = prg->i_number;
         pid->i_pid          = p_es->i_pid;
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
-
-        if ( pid->es->fmt.i_cat == VIDEO_ES && !i_vpid )
-            i_vpid = p_es->i_pid;
-        if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid1 )
-            i_apid1 = p_es->i_pid;
-        else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid2 )
-            i_apid2 = p_es->i_pid;
-        else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid3 )
-            i_apid3 = p_es->i_pid;
 
         if( p_es->i_type == 0x10 || p_es->i_type == 0x11 ||
             p_es->i_type == 0x12 )
@@ -2058,7 +2101,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
             if( p_dr && p_dr->i_length == 2 )
             {
-                int i;
                 int i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
 
                 msg_Warn( p_demux, "found SL_descriptor es_id=%d", i_es_id );
@@ -2164,7 +2206,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
                  p_dr = p_dr->p_next )
             {
-                msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x dr->i_tag=0x%x",
+                msg_Dbg( p_demux, "  * es pid=%d type=%d dr->i_tag=0x%x",
                          p_es->i_pid, p_es->i_type, p_dr->i_tag );
 
                 if( p_dr->i_tag == 0x6a )
@@ -2191,6 +2233,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     msg_Dbg( p_demux, "  * Teletext descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
+                    pid->es->fmt.i_extra = p_dr->i_length;
+                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
+                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                            p_dr->i_length );
                 }
 #ifdef _DVBPSI_DR_59_H_
                 else if( p_dr->i_tag == 0x59 )
@@ -2314,14 +2360,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         pid->es->fmt.i_group = p_pmt->i_program_number;
         if( pid->es->fmt.i_cat == UNKNOWN_ES )
         {
-            msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x *unknown*",
+            msg_Dbg( p_demux, "  * es pid=%d type=%d *unknown*",
                      p_es->i_pid, p_es->i_type );
         }
         else if( !p_sys->b_udp_out )
         {
-            int i;
-
-            msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s",
+            msg_Dbg( p_demux, "  * es pid=%d type=%d fcc=%4.4s",
                      p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
 
             if( p_sys->b_es_id_pid ) pid->es->fmt.i_id = p_es->i_pid;
@@ -2365,6 +2409,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
+        i_cad_length = 0;
         /* Add ES to the list */
         if( old_pid )
         {
@@ -2379,14 +2424,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             if( p_dr->i_tag == 0x9 )
             {
                 msg_Dbg( p_demux, "   * descriptor : CA (0x9)" );
-
-                prg->cad[prg->i_nb_cad] = malloc( p_dr->i_length + 2 );
-                prg->cad[prg->i_nb_cad][0] = 0x9;
-                prg->cad[prg->i_nb_cad][1] = p_dr->i_length;
-                memcpy( prg->cad[prg->i_nb_cad] + 2, p_dr->p_data,
-                        p_dr->i_length );
-                prg->i_cad_length[prg->i_nb_cad] = p_dr->i_length + 2;
-                prg->i_nb_cad++;
+                i_cad_length += p_dr->i_length + 2;
             }
             else
             {
@@ -2395,8 +2433,64 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
-        if( p_sys->b_dvb_control && ( p_sys->i_dvb_program < 0 ||
-            p_sys->i_dvb_program == prg->i_number ) )
+        if ( i_cad_length )
+        {
+            if ( !prg->i_capmt_size )
+            {
+                prg->p_capmt = malloc( 5 + 6 + i_cad_length );
+                prg->i_capmt_size = 5 + 6 + i_cad_length;
+
+                prg->p_capmt[0] = p_pmt->i_program_number >> 8;
+                prg->p_capmt[1] = p_pmt->i_program_number & 0xff;
+                prg->p_capmt[2] = (p_pmt->i_version << 1) | 0x1;
+                prg->p_capmt[3] = 0; /* cad length */
+                prg->p_capmt[4] = 0;
+
+                i = 5;
+            }
+            else
+            {
+                prg->p_capmt = realloc( prg->p_capmt,
+                                        prg->i_capmt_size + 6 + i_cad_length );
+                i = prg->i_capmt_size;
+                prg->i_capmt_size += 6 + i_cad_length;
+            }
+
+            prg->p_capmt[i] = p_es->i_type;
+            prg->p_capmt[i+1] = p_es->i_pid >> 8;
+            prg->p_capmt[i+2] = p_es->i_pid & 0xff;
+            prg->p_capmt[i+3] = (i_cad_length + 1) >> 8;
+            prg->p_capmt[i+4] = (i_cad_length + 1) & 0xff;
+            prg->p_capmt[i+5] = 0x1; /* ok_descrambling */
+            i += 6;
+
+            for( p_dr = p_es->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
+            {
+                if( p_dr->i_tag == 0x9 )
+                {
+                    prg->p_capmt[i] = 0x9;
+                    prg->p_capmt[i+1] = p_dr->i_length;
+                    memcpy( &prg->p_capmt[i+2], p_dr->p_data, p_dr->i_length );
+                    i += p_dr->i_length + 2;
+                }
+            }
+        }
+        else if ( prg->i_capmt_size )
+        {
+            prg->p_capmt = realloc( prg->p_capmt,
+                                    prg->i_capmt_size + 5 );
+            i = prg->i_capmt_size;
+            prg->i_capmt_size += 5;
+
+            prg->p_capmt[i] = p_es->i_type;
+            prg->p_capmt[i+1] = p_es->i_pid >> 8;
+            prg->p_capmt[i+2] = p_es->i_pid & 0xff;
+            prg->p_capmt[i+3] = 0;
+            prg->p_capmt[i+4] = 0;
+            i += 5;
+        }
+
+        if( DVBProgramIsSelected( p_demux, prg->i_number ) )
         {
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -2407,26 +2501,23 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     dvbpsi_DeletePMT( p_pmt );
 
-    for( i = 0; i < i_clean; i++ ) PIDClean( p_demux->out, pp_clean[i] );
-    if( i_clean ) free( pp_clean );
-
-    if( p_sys->b_dvb_control &&
-        ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
+    for ( i = 0; i < i_clean; i++ )
     {
-        /* Set CAM descrambling */
-        for ( i = 0; i < prg->i_nb_cad; i++ )
+        if( DVBProgramIsSelected( p_demux, prg->i_number ) )
         {
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                            ACCESS_SET_PRIVATE_ID_CA, prg->i_number,
-                            i_vpid, i_apid1, i_apid2, i_apid3,
-                            prg->i_cad_length[i], prg->cad[i] );
+                            ACCESS_SET_PRIVATE_ID_STATE, pp_clean[i]->i_pid,
+                            VLC_FALSE );
         }
-        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                        ACCESS_SET_PRIVATE_ID_CA, prg->i_number,
-                        0, 0, 0, 0, 0, NULL );
-        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                        ACCESS_SET_PRIVATE_ID_CA, 0,
-                        0, 0, 0, 0, 0, NULL );
+
+        PIDClean( p_demux->out, pp_clean[i] );
+    }
+    if( i_clean ) free( pp_clean );
+
+    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+    {
+        /* Set CAM descrambling */
+        DVBCAPMTSend( p_demux );
     }
 }
 
@@ -2447,7 +2538,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         return;
     }
 
-    msg_Dbg( p_demux, "new PAT ts_id=0x%x version=%d current_next=%d",
+    msg_Dbg( p_demux, "new PAT ts_id=%d version=%d current_next=%d",
              p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
 
     /* Clean old */
@@ -2541,7 +2632,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     for( p_program = p_pat->p_first_program; p_program != NULL;
          p_program = p_program->p_next )
     {
-        msg_Dbg( p_demux, "  * number=%d pid=0x%x", p_program->i_number,
+        msg_Dbg( p_demux, "  * number=%d pid=%d", p_program->i_number,
                  p_program->i_pid );
         if( p_program->i_number != 0 )
         {
@@ -2600,4 +2691,119 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     pat->psi->i_pat_version = p_pat->i_version;
 
     dvbpsi_DeletePAT( p_pat );
+}
+
+static void DVBCAPMTSend( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_nb_capmts = 0;
+    int i;
+
+    for( i = 0; i < p_sys->i_pmt; i++ )
+    {
+        ts_pid_t *pmt = p_sys->pmt[i];
+        int i_prg;
+
+        for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+        {
+            if( DVBProgramIsSelected( p_demux, pmt->psi->prg[i_prg]->i_number )
+                 && pmt->psi->prg[i_prg]->i_capmt_size )
+            {
+                i_nb_capmts++;
+            }
+        }
+    }
+
+    if ( i_nb_capmts )
+    {
+        uint8_t **pp_capmts = malloc( i_nb_capmts * sizeof(uint8_t *) );
+        int i_current_capmt = 0;
+
+        for( i = 0; i < p_sys->i_pmt; i++ )
+        {
+            ts_pid_t *pmt = p_sys->pmt[i];
+            int i_prg;
+
+            for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+            {
+                if( DVBProgramIsSelected( p_demux, pmt->psi->prg[i_prg]->i_number )
+                     && pmt->psi->prg[i_prg]->i_capmt_size )
+                {
+                    uint8_t *p_capmt = malloc( pmt->psi->prg[i_prg]->i_capmt_size + 10 );
+                    int i_pos = 0;
+                    pp_capmts[i_current_capmt] = p_capmt;
+
+                    p_capmt[i_pos] = 0x9F;
+                    p_capmt[i_pos+1] = 0x80;
+                    p_capmt[i_pos+2] = 0x32;
+                    i_pos += 3;
+
+                    if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 128 )
+                    {
+                        p_capmt[i_pos] = (pmt->psi->prg[i_prg]->i_capmt_size + 1);
+                        i_pos++;
+                    }
+                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 256 )
+                    {
+                        p_capmt[i_pos] = 0x81;
+                        p_capmt[i_pos+1] = (pmt->psi->prg[i_prg]->i_capmt_size + 1);
+                        i_pos += 2;
+                    }
+                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 65536 )
+                    {
+                        p_capmt[i_pos] = 0x82;
+                        p_capmt[i_pos+1] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8;
+                        p_capmt[i_pos+2] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
+                        i_pos += 3;
+                    }
+                    else if ( (pmt->psi->prg[i_prg]->i_capmt_size + 1) < 16777216 )
+                    {
+                        p_capmt[i_pos] = 0x83;
+                        p_capmt[i_pos+1] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 16;
+                        p_capmt[i_pos+2] =
+                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8) & 0xff;
+                        p_capmt[i_pos+3] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
+                        i_pos += 4;
+                    }
+                    else
+                    {
+                        p_capmt[i_pos] = 0x84;
+                        p_capmt[i_pos+1] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 24;
+                        p_capmt[i_pos+2] =
+                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 16) & 0xff;
+                        p_capmt[i_pos+3] =
+                            ((pmt->psi->prg[i_prg]->i_capmt_size + 1) >> 8) & 0xff;
+                        p_capmt[i_pos+4] =
+                            (pmt->psi->prg[i_prg]->i_capmt_size + 1) & 0xff;
+                        i_pos += 5;
+                    }
+
+                    if ( i_nb_capmts > 1 )
+                    {
+                        if ( i_current_capmt == 0 )
+                            p_capmt[i_pos] = 0x1; /* first */
+                        else if ( i_current_capmt == i_nb_capmts - 1 )
+                            p_capmt[i_pos] = 0x2; /* last */
+                        else
+                            p_capmt[i_pos] = 0x0; /* more */
+                    }
+                    else
+                        p_capmt[i_pos] = 0x3; /* only */
+                    i_pos++;
+                    i_current_capmt++;
+
+                    memcpy( &p_capmt[i_pos], pmt->psi->prg[i_prg]->p_capmt,
+                            pmt->psi->prg[i_prg]->i_capmt_size );
+                }
+            }
+        }
+
+        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                        ACCESS_SET_PRIVATE_ID_CA, pp_capmts, i_nb_capmts );
+    }
 }
