@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.72 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: avi.c,v 1.73 2003/11/21 15:51:32 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -85,7 +85,7 @@ static int   AVI_GetKeyFlag    ( vlc_fourcc_t , uint8_t * );
 
 static int AVI_PacketGetHeader( input_thread_t *, avi_packet_t *p_pk );
 static int AVI_PacketNext     ( input_thread_t * );
-static int AVI_PacketRead     ( input_thread_t *, avi_packet_t *, pes_packet_t **);
+static int AVI_PacketRead     ( input_thread_t *, avi_packet_t *, block_t **);
 static int AVI_PacketSearch   ( input_thread_t * );
 
 static void AVI_IndexLoad    ( input_thread_t * );
@@ -557,7 +557,7 @@ static int Demux_Seekable( input_thread_t *p_input )
     {
         avi_track_t     *tk;
         vlc_bool_t       b_done;
-        pes_packet_t    *p_pes;
+        block_t         *p_frame;
         off_t i_pos;
         unsigned int i;
         size_t i_size;
@@ -700,7 +700,7 @@ static int Demux_Seekable( input_thread_t *p_input )
             i_size += 8; /* need to read and skip header */
         }
 
-        if( ( p_pes = stream_PesPacket( p_input->s, __EVEN( i_size ) ) )==NULL )
+        if( ( p_frame = stream_Block( p_input->s, __EVEN( i_size ) ) )==NULL )
         {
             msg_Warn( p_input, "failled reading data" );
             tk->b_activated = VLC_FALSE;
@@ -709,25 +709,15 @@ static int Demux_Seekable( input_thread_t *p_input )
         }
         if( i_size % 2 )    /* read was padded on word boundary */
         {
-            p_pes->p_last->p_payload_end--;
-            p_pes->i_pes_size--;
+            p_frame->i_buffer--;
         }
         /* skip header */
         if( tk->i_idxposb == 0 )
         {
-            p_pes->p_first->p_payload_start += 8;
-            p_pes->i_pes_size -= 8;
+            p_frame->p_buffer += 8;
+            p_frame->i_buffer -= 8;
         }
-
-        p_pes->i_pts = AVI_GetPTS( tk );
-
-#if 0
-        /* fix pts for audio: ie pts sould be for the first byte of the first frame */
-        if( tk->i_samplesize == 1 )
-        {
-            AVI_FixPTS( p_stream, p_pes );
-        }
-#endif
+        p_frame->i_pts = AVI_GetPTS( tk );
 
         /* read data */
         if( tk->i_samplesize )
@@ -768,19 +758,19 @@ static int Demux_Seekable( input_thread_t *p_input )
 
         b_stream = VLC_TRUE; /* at least one read succeed */
 
-        p_pes->i_dts =
-        p_pes->i_pts =
+        p_frame->i_dts =
+        p_frame->i_pts =
             input_ClockGetTS( p_input,
                               p_input->stream.p_selected_program,
-                              p_pes->i_pts * 9/100);
-        p_pes->i_rate = p_input->stream.control.i_rate;
+                              p_frame->i_pts * 9/100);
+        //p_pes->i_rate = p_input->stream.control.i_rate;
         if( b_play_audio || tk->i_cat != AUDIO_ES )
         {
-            es_out_SendPES( p_input->p_es_out, tk->p_es, p_pes );
+            es_out_Send( p_input->p_es_out, tk->p_es, p_frame );
         }
         else
         {
-            input_DeletePES( p_input->p_method_data, p_pes );
+            block_Release( p_frame );
         }
     }
 }
@@ -890,19 +880,19 @@ static int Demux_UnSeekable( input_thread_t *p_input )
                             AVI_GetPTS( p_stream_master ) )< 600*1000 )
                 {
                     /* load it and send to decoder */
-                    pes_packet_t    *p_pes;
-                    if( AVI_PacketRead( p_input, &avi_pk, &p_pes ) || !p_pes)
+                    block_t *p_frame;
+                    if( AVI_PacketRead( p_input, &avi_pk, &p_frame ) || p_frame == NULL )
                     {
                         return( -1 );
                     }
-                    p_pes->i_dts =
-                        p_pes->i_pts =
-                            input_ClockGetTS( p_input,
+                    p_frame->i_dts =
+                    p_frame->i_pts =
+                        input_ClockGetTS( p_input,
                                           p_input->stream.p_selected_program,
                                           AVI_GetPTS( p_stream ) * 9/100);
 
-                    p_pes->i_rate = p_input->stream.control.i_rate;
-                    es_out_SendPES( p_input->p_es_out, p_stream->p_es, p_pes );
+                    //p_pes->i_rate = p_input->stream.control.i_rate;
+                    es_out_Send( p_input->p_es_out, p_stream->p_es, p_frame );
                 }
                 else
                 {
@@ -1221,59 +1211,6 @@ static mtime_t AVI_GetPTS( avi_track_t *tk )
         return AVI_GetDPTS( tk, tk->i_idxposc );
     }
 }
-
-#if 0
-static void AVI_FixPTS( avi_track_t *p_stream, pes_packet_t *p_pes )
-{
-    data_packet_t *p_data;
-    uint8_t       *p;
-    int           i_pos = 0;
-
-    switch( p_stream->i_fourcc )
-    {
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-            p_data = p_pes->p_first;
-            while( p_data )
-            {
-                p = p_data->p_payload_start;
-                while( p < p_data->p_payload_end - 2 )
-                {
-                    if( p[0] == 0xff && ( p[1]&0xe0) == 0xe0 )
-                    {
-                        mtime_t i_diff = AVI_GetDPTS( p_stream, i_pos );
-                        p_pes->i_dts += i_diff;
-                        p_pes->i_pts += i_diff;
-                        return;
-                    }
-                    p++; i_pos++;
-                }
-                p_data = p_data->p_next;
-            }
-            return;
-        case VLC_FOURCC( 'a', '5', '2', ' ' ):
-            p_data = p_pes->p_first;
-            while( p_data )
-            {
-                p = p_data->p_payload_start;
-                while( p < p_data->p_payload_end - 2 )
-                {
-                    if( p[0] == 0x0b && p[1] == 0x77 )
-                    {
-                        mtime_t i_diff = AVI_GetDPTS( p_stream, i_pos );
-                        p_pes->i_dts += i_diff;
-                        p_pes->i_pts += i_diff;
-                    }
-                    p++; i_pos++;
-                }
-                p_data = p_data->p_next;
-            }
-            return;
-        default:
-            /* we can't fix :( */
-            return;
-    }
-}
-#endif
 
 static int AVI_StreamChunkFind( input_thread_t *p_input,
                                 unsigned int i_stream )
@@ -1714,23 +1651,22 @@ static int AVI_PacketNext( input_thread_t *p_input )
 }
 static int AVI_PacketRead( input_thread_t   *p_input,
                            avi_packet_t     *p_pk,
-                           pes_packet_t     **pp_pes )
+                           block_t          **pp_frame )
 {
     size_t i_size;
 
     i_size = __EVEN( p_pk->i_size + 8 );
 
-    if( ( *pp_pes = stream_PesPacket( p_input->s, i_size ) ) == NULL )
+    if( ( *pp_frame = stream_Block( p_input->s, i_size ) ) == NULL )
     {
         return VLC_EGENERIC;
     }
-    (*pp_pes)->p_first->p_payload_start += 8;
-    (*pp_pes)->i_pes_size -= 8;
+    (*pp_frame)->p_buffer += 8;
+    (*pp_frame)->i_buffer -= 8;
 
     if( i_size != p_pk->i_size + 8 )
     {
-        (*pp_pes)->p_last->p_payload_end--;
-        (*pp_pes)->i_pes_size--;
+        (*pp_frame)->i_buffer--;
     }
 
     return VLC_SUCCESS;
