@@ -113,11 +113,13 @@ static int Open ( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    int i_max;
+    int i_len;
+    char *psz_vobname;
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_length = 0;
     p_sys->p_vobsub_file = NULL;
     p_sys->i_tracks = 0;
     p_sys->track = (vobsub_track_t*)malloc( sizeof( vobsub_track_t ) );
@@ -156,8 +158,22 @@ static int Open ( vlc_object_t *p_this )
     /* Unload */
     TextUnload( &p_sys->txt );
 
-    int i_len = strlen( p_demux->psz_path );
-    char *psz_vobname = strdup( p_demux->psz_path );
+    /* Find the total length of the vobsubs */
+    if( p_sys->i_tracks > 0 )
+    {
+        int i;
+        for( i = 0; i < p_sys->i_tracks )
+        {
+            if( p_sys->track[i]->i_subtitles > 1 )
+            {
+                if( p_sys->track[i]->p_subtitles[p_sys->track[i]->i_subtitles-1]->i_start > p_sys->i_length )
+                    p_sys->i_length = (mtime_t) p_sys->track[i]->p_subtitles[p_sys->track[i]->i_subtitles-1]->i_start + 1 * 1000 * 1000;
+            }
+        }
+    }
+
+    i_len = strlen( p_demux->psz_path );
+    psz_vobname = strdup( p_demux->psz_path );
 
     strcpy( psz_vobname + i_len - 4, ".sub" );
 
@@ -203,7 +219,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            //*pi64 = p_sys->i_length;
+            *pi64 = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
