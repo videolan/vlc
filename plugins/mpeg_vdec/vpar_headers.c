@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.10 2002/01/08 23:06:12 massiot Exp $
+ * $Id: vpar_headers.c,v 1.11 2002/01/14 22:26:05 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -258,36 +258,33 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_ParseHeader( vpar_thread_t * p_vpar )
 {
-    while( !p_vpar->p_fifo->b_die )
+    NextStartCode( &p_vpar->bit_stream );
+    switch( GetBits32( &p_vpar->bit_stream ) )
     {
-        NextStartCode( &p_vpar->bit_stream );
-        switch( GetBits32( &p_vpar->bit_stream ) )
-        {
-        case SEQUENCE_HEADER_CODE:
-            p_vpar->c_sequences++;
+    case SEQUENCE_HEADER_CODE:
+        p_vpar->c_sequences++;
 
-            SequenceHeader( p_vpar );
-            return 0;
-            break;
+        SequenceHeader( p_vpar );
+        return 0;
+        break;
 
-        case GROUP_START_CODE:
-            GroupHeader( p_vpar );
-            return 0;
-            break;
+    case GROUP_START_CODE:
+        GroupHeader( p_vpar );
+        return 0;
+        break;
 
-        case PICTURE_START_CODE:
-            PictureHeader( p_vpar );
-            return 0;
-            break;
+    case PICTURE_START_CODE:
+        PictureHeader( p_vpar );
+        return 0;
+        break;
 
-        case SEQUENCE_END_CODE:
-            intf_DbgMsg("vpar debug: sequence end code received");
-            return 1;
-            break;
+    case SEQUENCE_END_CODE:
+        intf_WarnMsg(3, "vpar warning: sequence end code received");
+        return 1;
+        break;
 
-        default:
-            break;
-        }
+    default:
+        break;
     }
 
     return 0;
