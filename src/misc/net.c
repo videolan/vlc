@@ -451,7 +451,8 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
 /*****************************************************************************
  * __net_Select:
  *****************************************************************************
- * Read from several sockets (with timeout)
+ * Read from several sockets (with timeout). Takes data from the first socket
+ * that has some.
  *****************************************************************************/
 int __net_Select( vlc_object_t *p_this, int *pi_fd, int i_fd, uint8_t *p_data,
                       int i_data, mtime_t i_wait )
