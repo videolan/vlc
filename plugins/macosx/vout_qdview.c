@@ -2,7 +2,7 @@
  * vout_qdview.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_qdview.c,v 1.3 2002/04/25 23:07:23 massiot Exp $
+ * $Id: vout_qdview.c,v 1.4 2002/05/07 20:17:07 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -48,7 +48,6 @@
 - (void)drawRect:(NSRect)rect
 {
     [super drawRect: rect];
-    [o_wrapper voutDidResize: p_vout];
     [[NSColor blackColor] set];
     NSRectFill(rect);
 }

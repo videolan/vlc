@@ -2,7 +2,7 @@
  * vout_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_vlc_wrapper.c,v 1.1 2002/03/19 03:33:52 jlj Exp $
+ * $Id: vout_vlc_wrapper.c,v 1.2 2002/05/07 20:17:07 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -69,14 +69,6 @@ static Vout_VLCWrapper *o_vout = nil;
 + (NSPort *)sendPort
 {
     return( p_main->p_intf->p_sys->o_port );
-}
-
-- (void)voutDidResize:(void *)_p_vout
-{
-    struct vout_thread_s *p_vout =
-        (struct vout_thread_s *)_p_vout;
-
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
 }
 
 - (void)mouseEvent:(unsigned int)ui_status forVout:(void *)_p_vout
