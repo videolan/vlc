@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.72 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: intf.m,v 1.73 2003/05/05 22:04:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1186,7 +1186,6 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
             var_Set( (vlc_object_t *)p_aout, "intf-change", val );
 
-#error fixme! look at rc.c line 823
             [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
 
@@ -1309,11 +1308,12 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                      var:(const char *)psz_variable
                      selector:(SEL)pf_callback
 {
-    int i, i_nb_items;
+    int i, i_nb_items, i_value;
     NSMenu * o_menu = [o_mi submenu];
-    vlc_value_t val;
-    char * psz_value;
-
+    vlc_value_t val, text;
+    
+    [o_mi setTag: (int)psz_variable];
+    
     /* remove previous items */
     i_nb_items = [o_menu numberOfItems];
     for( i = 0; i < i_nb_items; i++ )
@@ -1325,12 +1325,11 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     {
         return;
     }
-    psz_value = val.psz_string;
+    i_value = val.i_int;
 
     if ( var_Change( p_object, psz_variable,
-                     VLC_VAR_GETLIST, &val, NULL ) < 0 )
+                     VLC_VAR_GETLIST, &val, &text ) < 0 )
     {
-        free( psz_value );
         return;
     }
 
@@ -1342,23 +1341,24 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         NSMenuItem * o_lmi;
         NSString * o_title;
 
-        o_title = [NSApp localizedString: val.p_list->p_values[i].psz_string];
-        o_lmi = [o_menu addItemWithTitle: o_title
+        o_title = [NSApp localizedString: text.p_list->p_values[i].psz_string];
+
+        o_lmi = [o_menu addItemWithTitle: [o_title copy]
                  action: pf_callback keyEquivalent: @""];
+        
         /* FIXME: this isn't 64-bit clean ! */
-        [o_lmi setTag: (int)psz_variable];
+        [o_lmi setTag: val.p_list->p_values[i].i_int];
         [o_lmi setRepresentedObject:
             [NSValue valueWithPointer: p_object]];
         [o_lmi setTarget: o_controls];
 
-        if ( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
+        if ( i_value == val.p_list->p_values[i].i_int )
             [o_lmi setState: NSOnState];
     }
 
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST,
-                &val, NULL );
+                &val, &text );
 
-    free( psz_value );
 }
 
 - (IBAction)clearRecentItems:(id)sender

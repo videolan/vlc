@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.46 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: vout.m,v 1.47 2003/05/05 22:04:11 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -181,14 +181,16 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
     {
         int i = 1;
-        vlc_value_t val;
+        vlc_value_t val, text;
         NSScreen * o_screen;
 
         int i_option = config_GetInt( p_vout, "macosx-vdev" );
 
-        var_Create( p_vout, "video-device", VLC_VAR_STRING |
+        var_Create( p_vout, "video-device", VLC_VAR_INTEGER |
                                             VLC_VAR_HASCHOICE ); 
-
+        text.psz_string = _("Video device");
+        var_Change( p_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
+        
         NSEnumerator * o_enumerator = [o_screens objectEnumerator];
 
         while( (o_screen = [o_enumerator nextObject]) != NULL )
@@ -200,15 +202,15 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
                       "%s %d (%dx%d)", _("Screen"), i,
                       (int)s_rect.size.width, (int)s_rect.size.height ); 
 
-            val.psz_string = psz_temp;
+            text.psz_string = psz_temp;
+            val.i_int = i;
             var_Change( p_vout, "video-device",
-                        VLC_VAR_ADDCHOICE, &val, NULL );
+                        VLC_VAR_ADDCHOICE, &val, &text );
 
             if( ( i - 1 ) == i_option )
             {
                 var_Set( p_vout, "video-device", val );
             }
-
             i++;
         }
 
@@ -1215,11 +1217,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        unsigned int i_index = 0;
         NSArray *o_screens = [NSScreen screens];
-
-        if( !sscanf( val.psz_string, _("Screen %d"), &i_index ) ||
-            [o_screens count] < i_index )
+        unsigned int i_index = val.i_int;
+        
+        if( [o_screens count] < i_index )
         {
             o_screen = [NSScreen mainScreen];
             b_main_screen = 1;
@@ -1230,9 +1231,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             o_screen = [o_screens objectAtIndex: i_index];
             config_PutInt( p_vout, "macosx-vdev", i_index );
             b_main_screen = (i_index == 0);
-        } 
-
-        free( val.psz_string );
+        }
     } 
 
     if( p_vout->b_fullscreen )

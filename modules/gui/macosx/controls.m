@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.34 2003/05/01 01:11:17 hartman Exp $
+ * $Id: controls.m,v 1.35 2003/05/05 22:04:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -611,24 +611,23 @@
 
 - (IBAction)toggleVar:(id)sender
 {
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
+    NSMenuItem *o_mi = (NSMenuItem *)sender;
+    NSMenu *o_mu = [o_mi menu];
     
     if( [o_mi state] == NSOffState )
     {
-        const char * psz_variable = (const char *)[o_mi tag];
-        char * psz_value = [NSApp delocalizeString: [o_mi title]];
+        const char * psz_variable = (const char *)
+            [[[o_mu supermenu] itemWithTitle: [o_mu title]] tag];
         vlc_object_t * p_object = (vlc_object_t *)
             [[o_mi representedObject] pointerValue];
         vlc_value_t val;
-        /* psz_string sucks */
-        val.psz_string = (char *)psz_value;
+        val.i_int = (int)[o_mi tag];
 
         if ( var_Set( p_object, psz_variable, val ) < 0 )
         {
-            msg_Warn( p_object, "cannot set variable (%s)", psz_value );
+            msg_Warn( p_object, "cannot set variable %s: with %d", psz_variable, val.i_int );
         }
-
-        free( psz_value );
+        if (psz_variable) free(psz_variable);
     }
 }
 
