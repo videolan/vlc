@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.34 2003/04/22 16:36:16 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.35 2003/05/03 13:37:21 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,7 +53,6 @@
 
 #define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
 #define INTERFACE_LOCKING_TIMEOUT 5000
-#define USE_VLC_CONFIG_FILE 0
 
 // make_sure_frame_is_on_screen
 bool
@@ -202,7 +201,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
                      ( screen_rect.bottom - PREFS_WINDOW_HEIGHT ) / 2,
                      ( screen_rect.right + PREFS_WINDOW_WIDTH ) / 2,
                      ( screen_rect.bottom + PREFS_WINDOW_HEIGHT ) / 2 );
-    fPreferencesWindow = new PreferencesWindow( p_intf, window_rect, _("Settings") );
+    fPreferencesWindow = new PreferencesWindow( p_intf, window_rect, _("Preferences") );
     window_rect.Set( screen_rect.right - 500,
                      screen_rect.top + 50,
                      screen_rect.right - 150,
@@ -241,7 +240,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     // Add the file Menu
     BMenu* fileMenu = new BMenu( _("File") );
     fMenuBar->AddItem( fileMenu );
-    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open Subtitles")),
+    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open File")),
                                       new BMessage( OPEN_FILE ), 'O') );
     
     fileMenu->AddItem( new CDMenu( _("Open Disc") ) );
@@ -301,7 +300,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
                                        new BMessage( OPEN_PLAYLIST ), 'P') );
     fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Messages")),
                                        new BMessage( OPEN_MESSAGES ), 'M' ) );
-    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Settings")),
+    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Preferences")),
                                        new BMessage( OPEN_PREFERENCES ), 'S' ) );
     fMenuBar->AddItem( fShowMenu );                            
 
@@ -957,82 +956,29 @@ launch_window( BWindow* window, bool showing )
 void
 InterfaceWindow::_RestoreSettings()
 {
-	if ( USE_VLC_CONFIG_FILE )
+	if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
 	{
-		// main window size and position
-	    int i_width = config_GetInt( p_intf, "beos-intf-width" ),
-	        i_height = config_GetInt( p_intf, "beos-intf-height" ),
-	        i_xpos = config_GetInt( p_intf, "beos-intf-xpos" ),
-	        i_ypos = config_GetInt( p_intf, "beos-intf-ypos" );
-	    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
-	    {
-	    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
-	    	set_window_pos( this, r );
-	    }
-		// playlist window size and position
-	    i_width = config_GetInt( p_intf, "beos-playlist-width" ),
-	    i_height = config_GetInt( p_intf, "beos-playlist-height" ),
-	    i_xpos = config_GetInt( p_intf, "beos-playlist-xpos" ),
-	    i_ypos = config_GetInt( p_intf, "beos-playlist-ypos" );
-	    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
-	    {
-	    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
-	    	set_window_pos( fPlaylistWindow, r );
-	    }
-	    // playlist showing
-	    launch_window( fPlaylistWindow, config_GetInt( p_intf, "beos-playlist-show" ) );
-	    // messages window size and position
-	    i_width = config_GetInt( p_intf, "beos-messages-width" ),
-	    i_height = config_GetInt( p_intf, "beos-messages-height" ),
-	    i_xpos = config_GetInt( p_intf, "beos-messages-xpos" ),
-	    i_ypos = config_GetInt( p_intf, "beos-messages-ypos" );
-	    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
-	    {
-	    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
-	    	set_window_pos( fMessagesWindow, r );
-	    }
-	    // messages showing
-	    launch_window( fMessagesWindow, config_GetInt( p_intf, "beos-messages-show" ) );
+		BRect frame;
+		if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
+			set_window_pos( this, frame );
+		if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
+			set_window_pos( fPlaylistWindow, frame );
+		if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
+			set_window_pos( fMessagesWindow, frame );
+		if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
+			set_window_pos( fPreferencesWindow, frame );
+		
+		bool showing;
+		if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
+			launch_window( fPlaylistWindow, showing );
+		if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
+			launch_window( fMessagesWindow, showing );
+		if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
+			launch_window( fPreferencesWindow, showing );
 
-		// messages window size and position
-	    i_width = config_GetInt( p_intf, "beos-settings-width" ),
-	    i_height = config_GetInt( p_intf, "beos-settings-height" ),
-	    i_xpos = config_GetInt( p_intf, "beos-settings-xpos" ),
-	    i_ypos = config_GetInt( p_intf, "beos-settings-ypos" );
-	    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
-	    {
-	    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
-	    	set_window_pos( fPreferencesWindow, r );
-	    }
-	    // settings showing
-	    launch_window( fPreferencesWindow, config_GetInt( p_intf, "beos-settings-show" ) );
-	}
-	else
-	{
-		if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
-		{
-			BRect frame;
-			if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
-				set_window_pos( this, frame );
-			if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
-				set_window_pos( fPlaylistWindow, frame );
-			if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
-				set_window_pos( fMessagesWindow, frame );
-			if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
-				set_window_pos( fPreferencesWindow, frame );
-			
-			bool showing;
-			if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
-				launch_window( fPlaylistWindow, showing );
-			if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
-				launch_window( fMessagesWindow, showing );
-			if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
-				launch_window( fPreferencesWindow, showing );
-	
-			uint32 displayMode;
-			if ( fSettings->FindInt32( "playlist display mode", (int32*)&displayMode ) == B_OK )
-				fPlaylistWindow->SetDisplayMode( displayMode );
-		}
+		uint32 displayMode;
+		if ( fSettings->FindInt32( "playlist display mode", (int32*)&displayMode ) == B_OK )
+			fPlaylistWindow->SetDisplayMode( displayMode );
 	}
 }
 
@@ -1042,90 +988,38 @@ InterfaceWindow::_RestoreSettings()
 void
 InterfaceWindow::_StoreSettings()
 {
-	if ( USE_VLC_CONFIG_FILE )
+	if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
+		fSettings->AddRect( "main frame", Frame() );
+	if ( fPlaylistWindow->Lock() )
 	{
-	    // save interface settings in vlc config file
-	    BRect frame = Frame();
-	    config_PutInt( p_intf, "beos-intf-width", (int)frame.Width() );
-	    config_PutInt( p_intf, "beos-intf-height", (int)frame.Height() );
-	    config_PutInt( p_intf, "beos-intf-xpos", (int)frame.left );
-	    config_PutInt( p_intf, "beos-intf-ypos", (int)frame.top );
-	    if( fPlaylistWindow->Lock() )
-	    {
-	        frame = fPlaylistWindow->Frame();
-	        config_PutInt( p_intf, "beos-playlist-width", (int)frame.Width() );
-	        config_PutInt( p_intf, "beos-playlist-height", (int)frame.Height() );
-	        config_PutInt( p_intf, "beos-playlist-xpos", (int)frame.left );
-	        config_PutInt( p_intf, "beos-playlist-ypos", (int)frame.top );
-	        config_PutInt( p_intf, "beos-playlist-show", !fPlaylistWindow->IsHidden() );
-	        fPlaylistWindow->Unlock();
-	    }
-	    if( fMessagesWindow->Lock() )
-	    {
-	        frame = fMessagesWindow->Frame();
-	        config_PutInt( p_intf, "beos-messages-width", (int)frame.Width() );
-	        config_PutInt( p_intf, "beos-messages-height", (int)frame.Height() );
-	        config_PutInt( p_intf, "beos-messages-xpos", (int)frame.left );
-	        config_PutInt( p_intf, "beos-messages-ypos", (int)frame.top );
-	        config_PutInt( p_intf, "beos-messages-show", !fMessagesWindow->IsHidden() );
-	        fMessagesWindow->Unlock();
-	    }
-	    if( fPreferencesWindow->Lock() )
-	    {
-	        frame = fPreferencesWindow->Frame();
-	        config_PutInt( p_intf, "beos-messages-width", (int)frame.Width() );
-	        config_PutInt( p_intf, "beos-messages-height", (int)frame.Height() );
-	        config_PutInt( p_intf, "beos-messages-xpos", (int)frame.left );
-	        config_PutInt( p_intf, "beos-messages-ypos", (int)frame.top );
-	        config_PutInt( p_intf, "beos-messages-show", !fPreferencesWindow->IsHidden() );
-	        fPreferencesWindow->Unlock();
-	    }
+		if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
+		if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
+		fPlaylistWindow->Unlock();
 	}
-    else
-    {
-		if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
-			fSettings->AddRect( "main frame", Frame() );
-		if ( fPlaylistWindow->Lock() )
-		{
-			if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
-				fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
-			if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
-				fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
-			fPlaylistWindow->Unlock();
-		}
-		if ( fMessagesWindow->Lock() )
-		{
-			if (fSettings->ReplaceRect( "messages frame", fMessagesWindow->Frame() ) != B_OK)
-				fSettings->AddRect( "messages frame", fMessagesWindow->Frame() );
-			if (fSettings->ReplaceBool( "messages showing", !fMessagesWindow->IsHidden() ) != B_OK)
-				fSettings->AddBool( "messages showing", !fMessagesWindow->IsHidden() );
-			fMessagesWindow->Unlock();
-		}
-		if ( fPreferencesWindow->Lock() )
-		{
-			if (fSettings->ReplaceRect( "settings frame", fPreferencesWindow->Frame() ) != B_OK)
-				fSettings->AddRect( "settings frame", fPreferencesWindow->Frame() );
-			if (fSettings->ReplaceBool( "settings showing", !fPreferencesWindow->IsHidden() ) != B_OK)
-				fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
-			fPreferencesWindow->Unlock();
-		}
-		uint32 displayMode = fPlaylistWindow->DisplayMode();
-		if (fSettings->ReplaceInt32( "playlist display mode", displayMode ) != B_OK )
-			fSettings->AddInt32( "playlist display mode", displayMode );
-	
-		save_settings( fSettings, "interface_settings", "VideoLAN Client" );
-    }
+	if ( fMessagesWindow->Lock() )
+	{
+		if (fSettings->ReplaceRect( "messages frame", fMessagesWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "messages frame", fMessagesWindow->Frame() );
+		if (fSettings->ReplaceBool( "messages showing", !fMessagesWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "messages showing", !fMessagesWindow->IsHidden() );
+		fMessagesWindow->Unlock();
+	}
+	if ( fPreferencesWindow->Lock() )
+	{
+		if (fSettings->ReplaceRect( "settings frame", fPreferencesWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "settings frame", fPreferencesWindow->Frame() );
+		if (fSettings->ReplaceBool( "settings showing", !fPreferencesWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
+		fPreferencesWindow->Unlock();
+	}
+	uint32 displayMode = fPlaylistWindow->DisplayMode();
+	if (fSettings->ReplaceInt32( "playlist display mode", displayMode ) != B_OK )
+		fSettings->AddInt32( "playlist display mode", displayMode );
 
-	// save VLC internal settings
-	config_SaveConfigFile( p_intf, "beos" );
-	config_SaveConfigFile( p_intf, "main" );
-	config_SaveConfigFile( p_intf, "adjust" );
-	config_SaveConfigFile( p_intf, "ffmpeg" );
+	save_settings( fSettings, "interface_settings", "VideoLAN Client" );
 }
-
-
-
-
 
 
 /*****************************************************************************

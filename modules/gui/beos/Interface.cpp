@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.11 2003/03/12 23:15:03 titer Exp $
+ * $Id: Interface.cpp,v 1.12 2003/05/03 13:37:21 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -85,7 +85,10 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         free( p_intf->p_sys );
         msg_Err( p_intf, "cannot allocate InterfaceWindow" );
         return( 1 );
-    } else {
+    }
+    else
+    {
+        /* Make the be_app aware the interface has been created */
         BMessage message(INTERFACE_CREATED);
         message.AddPointer("window", p_intf->p_sys->p_window);
         be_app->PostMessage(&message);

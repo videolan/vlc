@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.9 2003/02/09 17:10:52 stippi Exp $
+ * $Id: PreferencesWindow.h,v 1.10 2003/05/03 13:37:21 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -25,106 +25,61 @@
 #define BEOS_PREFERENCES_WINDOW_H
 
 #include <Window.h>
-#include <String.h>
 
-#define PREFS_WINDOW_WIDTH   400
-#define PREFS_WINDOW_HEIGHT  280
+#define PREFS_WINDOW_WIDTH   600
+#define PREFS_WINDOW_HEIGHT  300
+#define PREFS_ITEM_SELECTED  'pris'
+#define PREFS_OK             'prok'
+#define PREFS_REVERT         'prre'
+#define PREFS_APPLY          'prap'
+#define TEXT_HEIGHT 16
 
-#define PREFS_OK       'prok'
-#define PREFS_CANCEL   'prcb'
-#define PREFS_DEFAULTS 'prde'
-#define PREFS_REVERT   'prrv'
-#define FFMPEG_UPDATE  'ffup'
-#define ADJUST_UPDATE  'ajst'
-#define DVDMENUS_CHECK 'dvme'
-#define SET_TRANSLATOR 'sttr'
-#define SET_FOLDER 'stdr'
+class ConfigView : public BView
+{
+  public:
+                            ConfigView( BRect frame, const char * name,
+                                        uint32 resizingMode, uint32 flags );
 
-class BTabView;
-class BCheckBox;
-class BSlider;
-class BStringView;
-class BMenuField;
-class BTextControl;
+    /* When we create the view, we have to give it an arbitrary size because
+       it will be the size of the BScrollView. That's why we keep the real size
+       in fRealBounds so we can have a correct BScrollBar later */
+    BRect                   fRealBounds;
+};
+
+class StringItemWithView : public BStringItem
+{
+  public:
+                            StringItemWithView( const char * text );
+
+    /* Here we store the ConfigView associated to this module */
+    ConfigView *            fConfigView;
+};
 
 class PreferencesWindow : public BWindow
 {
- public:
-								PreferencesWindow( intf_thread_t* p_intf,
-												   BRect frame,
-												   const char* name );
-	virtual						~PreferencesWindow();
+  public:
+                            PreferencesWindow( intf_thread_t * p_intf,
+                                               BRect frame,
+                                               const char * name );
+    virtual                 ~PreferencesWindow();
 
-	virtual	bool				QuitRequested();
-	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				Show();
+    virtual bool            QuitRequested();
+    virtual void            MessageReceived(BMessage* message);
+    virtual void            FrameResized( float, float );
 
-			void				ReallyQuit();
+            void            Update();
+            void            UpdateScrollBar();
+            void            ApplyChanges( bool doIt );
 
- private:
-			void				_SetGUI( bool dvdMenus,
-										 int32 postProcessing,
-										 float brightness,
-										 float contrast,
-										 int32 hue,
-										 float saturation,
-										 const char* screenShotPath,
-										 uint32 screenShotTranslator );
-			void				_SetDefaults();
-			void				_SetToSettings();
-			void				_RevertChanges();
+            void            ReallyQuit();
 
-			void				_ApplyChanges();
+  private:
+    BView *                 fPrefsView;
+    BOutlineListView *      fOutline;
+    BView *                 fDummyView;
+    BScrollView *           fConfigScroll;
 
-			void				_ApplyScreenShotSettings();
-			void				_ApplyPictureSettings();
-			void				_ApplyFFmpegSettings();
-			void				_ApplyDVDSettings();
-
-	BView*						fPrefsView;
-	BTabView*					fTabView;
-	BView*						fGeneralView;
-	BView*						fAdjustView;
-	BTab*						fGeneralTab;
-	BTab*						fAdjustTab;
-	BCheckBox*					fDvdMenusCheck;
-	BSlider*					fPpSlider;
-	BSlider*					fContrastSlider;
-	BSlider*					fBrightnessSlider;
-	BSlider*					fHueSlider;
-	BSlider*					fSaturationSlider;
-	BStringView*				fRestartString;
-	BMenuField*					fScreenShotFormatMF;
-	BTextControl*				fScreenShotPathTC;
-
-	bool						fDVDMenusBackup;
-	int32						fPostProcessingBackup;
-	float						fBrightnessBackup;
-	float						fContrastBackup;
-	int32						fHueBackup;
-	float						fSaturationBackup;
-	BString						fScreenShotPathBackup;
-	uint32						fScreenShotFormatBackup;
-
-	intf_thread_t*				p_intf;
+    intf_thread_t *         p_intf;
 };
 
-// some global support functions
-int32
-get_config_int( intf_thread_t* intf,
-				const char* field,
-				int32 defaultValue );
-
-float
-get_config_float( intf_thread_t* intf,
-				  const char* field,
-				  float defaultValue );
-
-// don't leak the return value! (use free())
-char*
-get_config_string( intf_thread_t* intf,
-				   const char* field,
-				   const char* defaultString );
-
 #endif    // BEOS_PREFERENCES_WINDOW_H
-
