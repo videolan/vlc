@@ -27,6 +27,7 @@ Christof Baumgaertner - dbox web intf
 Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
+Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
 David Kennedy <dkennedy@tinytoad.com> - X11 fullscreen patch
 David Weber <david_weber@gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons

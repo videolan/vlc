@@ -45,15 +45,15 @@ static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
                                        list<string> *, vlc_bool_t );
 static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                                      int, int, int, int, int, int );
-static bool ConnectFilters( vlc_object_t *, IFilterGraph *,
-                            IBaseFilter *, IPin * );
+static bool ConnectFilters( vlc_object_t *, IBaseFilter *, CaptureFilter * );
 
 static int FindDevicesCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int ConfigDevicesCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 
-static void PropertiesPage( vlc_object_t *, IBaseFilter * );
+static void PropertiesPage( vlc_object_t *, IBaseFilter *,
+                            ICaptureGraphBuilder2 *, vlc_bool_t );
 
 #if 0
     /* Debug only, use this to find out GUIDs */
@@ -130,7 +130,8 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
     "(eg. I420 (default), RV24, etc.)")
 #define CONFIG_TEXT N_("Device properties")
 #define CONFIG_LONGTEXT N_( \
-    "Show the properties dialog of the selected device.")
+    "Show the properties dialog of the selected device before starting the " \
+    "stream.")
 
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
@@ -159,7 +160,7 @@ vlc_module_begin();
                 VLC_TRUE );
 
     add_bool( "dshow-config", VLC_FALSE, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
-              VLC_TRUE );
+              VLC_FALSE );
 
     add_shortcut( "dshow" );
     set_capability( "access", 0 );
@@ -199,13 +200,27 @@ typedef struct dshow_stream_t
 /****************************************************************************
  * Access descriptor declaration
  ****************************************************************************/
+#define MAX_CROSSBAR_DEPTH 10
+
+typedef struct CrossbarRouteRec {
+    IAMCrossbar *pXbar;
+    LONG        VideoInputIndex;
+    LONG        VideoOutputIndex;
+    LONG        AudioInputIndex;
+    LONG        AudioOutputIndex;
+} CrossbarRoute;
+
 struct access_sys_t
 {
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
-    IFilterGraph  *p_graph;
-    IMediaControl *p_control;
+    IFilterGraph           *p_graph;
+    ICaptureGraphBuilder2  *p_capture_graph_builder2;
+    IMediaControl          *p_control;
+
+    int                     i_crossbar_route_depth;
+    CrossbarRoute           crossbar_routes[MAX_CROSSBAR_DEPTH];
 
     /* header */
     int     i_header_size;
@@ -224,6 +239,96 @@ struct access_sys_t
     int            b_audio;
 };
 
+/****************************************************************************
+ * DirectShow utility functions
+ ****************************************************************************/
+static void CreateDirectShowGraph( access_sys_t *p_sys )
+{
+    p_sys->i_crossbar_route_depth = 0;
+
+    /* Create directshow filter graph */
+    if( SUCCEEDED( CoCreateInstance( CLSID_FilterGraph, 0, CLSCTX_INPROC,
+                       (REFIID)IID_IFilterGraph, (void **)&p_sys->p_graph) ) )
+    {
+        /* Create directshow capture graph builder if available */
+        if( SUCCEEDED( CoCreateInstance( CLSID_CaptureGraphBuilder2, 0,
+                         CLSCTX_INPROC, (REFIID)IID_ICaptureGraphBuilder2,
+                         (void **)&p_sys->p_capture_graph_builder2 ) ) )
+        {
+            p_sys->p_capture_graph_builder2->
+                SetFiltergraph((IGraphBuilder *)p_sys->p_graph);
+        }
+
+        p_sys->p_graph->QueryInterface( IID_IMediaControl,
+                                        (void **)&p_sys->p_control );
+    }
+}
+
+static void DeleteCrossbarRoutes( access_sys_t *p_sys )
+{
+    /* Remove crossbar filters from graph */
+    for( int i = 0; i < p_sys->i_crossbar_route_depth; i++ )
+    {
+        p_sys->crossbar_routes[i].pXbar->Release();
+    }
+    p_sys->i_crossbar_route_depth = 0;
+}
+
+static void DeleteDirectShowGraph( access_sys_t *p_sys )
+{
+    DeleteCrossbarRoutes( p_sys );
+
+    /* Remove filters from graph */
+    for( int i = 0; i < p_sys->i_streams; i++ )
+    {
+        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter );
+        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
+        p_sys->pp_streams[i]->p_capture_filter->Release();
+        p_sys->pp_streams[i]->p_device_filter->Release();
+    }
+
+    /* Release directshow objects */
+    if( p_sys->p_control )
+    {
+        p_sys->p_control->Release();
+        p_sys->p_control = NULL;
+    }
+    if( p_sys->p_capture_graph_builder2 )
+    {
+        p_sys->p_capture_graph_builder2->Release();
+        p_sys->p_capture_graph_builder2 = NULL;
+    }
+
+    if( p_sys->p_graph )
+    {
+        p_sys->p_graph->Release();
+        p_sys->p_graph = NULL;
+    }
+}
+
+static void ReleaseDirectShow( input_thread_t *p_input )
+{
+    msg_Dbg( p_input, "Releasing DirectShow");
+
+    access_sys_t *p_sys = p_input->p_access_data;
+
+    DeleteDirectShowGraph( p_sys );
+
+    /* Uninitialize OLE/COM */
+    CoUninitialize();
+
+    free( p_sys->p_header );
+    /* Remove filters from graph */
+    for( int i = 0; i < p_sys->i_streams; i++ )
+    {
+        delete p_sys->pp_streams[i];
+    }
+    free( p_sys->pp_streams );
+    free( p_sys );
+
+    p_input->p_access_data = NULL;
+}
+
 /*****************************************************************************
  * Open: open direct show device
  *****************************************************************************/
@@ -236,6 +341,8 @@ static int AccessOpen( vlc_object_t *p_this )
     /* Get/parse options and open device(s) */
     string vdevname, adevname;
     int i_width = 0, i_height = 0, i_chroma = 0;
+
+    var_Create( p_input, "dshow-config", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Get( p_input, "dshow-vdev", &val );
@@ -337,12 +444,12 @@ static int AccessOpen( vlc_object_t *p_this )
     SetDWBE( &p_sys->p_header[4], 1 );
     p_sys->i_header_pos = p_sys->i_header_size;
 
-    /* Build directshow graph */
-    CoCreateInstance( CLSID_FilterGraph, 0, CLSCTX_INPROC,
-                      (REFIID)IID_IFilterGraph, (void **)&p_sys->p_graph );
+    p_sys->p_graph = NULL;
+    p_sys->p_capture_graph_builder2 = NULL;
+    p_sys->p_control = NULL;
 
-    p_sys->p_graph->QueryInterface( IID_IMediaControl,
-                                    (void **)&p_sys->p_control );
+    /* Build directshow graph */
+    CreateDirectShowGraph( p_sys );
 
     if( OpenDevice( p_input, vdevname, 0 ) != VLC_SUCCESS )
     {
@@ -353,19 +460,36 @@ static int AccessOpen( vlc_object_t *p_this )
     {
         msg_Err( p_input, "can't open audio");
     }
+    
+    for( int i = 0; i < p_sys->i_crossbar_route_depth; i++ )
+    {
+        IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
+        LONG VideoInputIndex = p_sys->crossbar_routes[i].VideoInputIndex;
+        LONG VideoOutputIndex = p_sys->crossbar_routes[i].VideoOutputIndex;
+        LONG AudioInputIndex = p_sys->crossbar_routes[i].AudioInputIndex;
+        LONG AudioOutputIndex = p_sys->crossbar_routes[i].AudioOutputIndex;
+
+        if( SUCCEEDED(pXbar->Route(VideoOutputIndex, VideoInputIndex)) )
+        {
+            msg_Dbg( p_input, "Crossbar at depth %d, Routed video ouput %d to "
+                     "video input %d", i, VideoOutputIndex, VideoInputIndex );
+
+            if( AudioOutputIndex != -1 && AudioInputIndex != -1 )
+            {
+                if( SUCCEEDED( pXbar->Route(AudioOutputIndex,
+                                            AudioInputIndex)) )
+                {
+                    msg_Dbg(p_input, "Crossbar at depth %d, Routed audio "
+                            "ouput %d to audio input %d", i,
+                            AudioOutputIndex, AudioInputIndex );
+                }
+            }
+        }
+    }
 
     if( !p_sys->i_streams )
     {
-        /* Release directshow objects */
-        if( p_sys->p_control ) p_sys->p_control->Release();
-        p_sys->p_graph->Release();
-
-        /* Uninitialize OLE/COM */
-        CoUninitialize();
-
-        free( p_sys->p_header );
-        free( p_sys->pp_streams );
-        free( p_sys );
+        ReleaseDirectShow( p_input );
         return VLC_EGENERIC;
     }
 
@@ -375,6 +499,8 @@ static int AccessOpen( vlc_object_t *p_this )
 
     vlc_mutex_init( p_input, &p_sys->lock );
     vlc_cond_init( p_input, &p_sys->wait );
+
+    msg_Dbg( p_input, "Playing...");
 
     /* Everything is ready. Let's rock baby */
     p_sys->p_control->Run();
@@ -388,65 +514,317 @@ static int AccessOpen( vlc_object_t *p_this )
 static void AccessClose( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    access_sys_t    *p_sys  = p_input->p_access_data;
+    access_sys_t   *p_sys   = p_input->p_access_data;
 
     /* Stop capturing stuff */
-    //p_sys->p_control->Stop(); /* FIXME?: we get stuck here sometimes */
-    p_sys->p_control->Release();
+    p_sys->p_control->Stop();
 
-    /* Remove filters from graph */
-    for( int i = 0; i < p_sys->i_streams; i++ )
+    ReleaseDirectShow(p_input);
+}
+
+/****************************************************************************
+ * RouteCrossbars (Does not AddRef the returned *Pin)
+ ****************************************************************************/
+static HRESULT GetCrossbarIPinAtIndex( IAMCrossbar *pXbar, LONG PinIndex,
+                                       BOOL IsInputPin, IPin ** ppPin )
+{
+    LONG         cntInPins, cntOutPins;
+    IPin        *pP = 0;
+    IBaseFilter *pFilter = NULL;
+    IEnumPins   *pins=0;
+    ULONG        n;
+
+    if( !pXbar || !ppPin ) return E_POINTER;
+
+    *ppPin = 0;
+
+    if( S_OK != pXbar->get_PinCounts(&cntOutPins, &cntInPins) ) return E_FAIL;
+
+    LONG TrueIndex = IsInputPin ? PinIndex : PinIndex + cntInPins;
+
+    if( pXbar->QueryInterface(IID_IBaseFilter, (void **)&pFilter) == S_OK )
     {
-        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter );
-        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
-        p_sys->pp_streams[i]->p_capture_filter->Release();
-        p_sys->pp_streams[i]->p_device_filter->Release();
+        if( SUCCEEDED(pFilter->EnumPins(&pins)) ) 
+        {
+            LONG i = 0;
+            while( pins->Next(1, &pP, &n) == S_OK ) 
+            {
+                pP->Release();
+                if( i == TrueIndex ) 
+                {
+                    *ppPin = pP;
+                    break;
+                }
+                i++;
+            }
+            pins->Release();
+        }
+        pFilter->Release();
     }
-    p_sys->p_graph->Release();
 
-    /* Uninitialize OLE/COM */
-    CoUninitialize();
+    return *ppPin ? S_OK : E_FAIL; 
+}
 
-    free( p_sys->p_header );
-    for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
-    free( p_sys->pp_streams );
-    free( p_sys );
+/****************************************************************************
+ * GetCrossbarIndexFromIPin: Find corresponding index of an IPin on a crossbar
+ ****************************************************************************/
+static HRESULT GetCrossbarIndexFromIPin( IAMCrossbar * pXbar, LONG * PinIndex,
+                                         BOOL IsInputPin, IPin * pPin )
+{
+    LONG         cntInPins, cntOutPins;
+    IPin        *pP = 0;
+    IBaseFilter *pFilter = NULL;
+    IEnumPins   *pins = 0;
+    ULONG        n;
+    BOOL         fOK = FALSE;
+
+    if(!pXbar || !PinIndex || !pPin )
+        return E_POINTER;
+
+    if( S_OK != pXbar->get_PinCounts(&cntOutPins, &cntInPins) )
+        return E_FAIL;
+
+    if( pXbar->QueryInterface(IID_IBaseFilter, (void **)&pFilter) == S_OK )
+    {
+        if( SUCCEEDED(pFilter->EnumPins(&pins)) )
+        {
+            LONG i=0;
+
+            while( pins->Next(1, &pP, &n) == S_OK )
+            {
+                pP->Release();
+                if( pPin == pP )
+                {
+                    *PinIndex = IsInputPin ? i : i - cntInPins;
+                    fOK = TRUE;
+                    break;
+                }
+                i++;
+            }
+            pins->Release();
+        }
+        pFilter->Release();
+    }
+
+    return fOK ? S_OK : E_FAIL; 
+}
+
+/****************************************************************************
+ * FindCrossbarRoutes
+ ****************************************************************************/
+static HRESULT FindCrossbarRoutes( vlc_object_t *p_this, IPin *p_input_pin,
+                                   LONG physicalType, int depth = 0 )
+{
+    access_sys_t *p_sys = ((input_thread_t *)p_this)->p_access_data;
+    HRESULT result = S_FALSE;
+
+    IPin *p_output_pin;
+    if( FAILED(p_input_pin->ConnectedTo(&p_output_pin)) ) return S_FALSE;
+
+    // It is connected, so now find out if the filter supports IAMCrossbar
+    PIN_INFO pinInfo;
+    if( FAILED(p_output_pin->QueryPinInfo(&pinInfo)) ||
+        PINDIR_OUTPUT != pinInfo.dir )
+    {
+        p_output_pin->Release ();
+        return S_FALSE;
+    }
+
+    IAMCrossbar *pXbar=0;
+    if( FAILED(pinInfo.pFilter->QueryInterface(IID_IAMCrossbar,
+                                               (void **)&pXbar)) )
+    {
+        pinInfo.pFilter->Release();
+        p_output_pin->Release ();
+        return S_FALSE;
+    }
+
+    LONG inputPinCount, outputPinCount;
+    if( FAILED(pXbar->get_PinCounts(&outputPinCount, &inputPinCount)) )
+    {
+        pXbar->Release();
+        pinInfo.pFilter->Release();
+        p_output_pin->Release ();
+        return S_FALSE;
+    }
+
+    LONG inputPinIndexRelated, outputPinIndexRelated;
+    LONG inputPinPhysicalType, outputPinPhysicalType;
+    LONG inputPinIndex, outputPinIndex;
+    if( FAILED(GetCrossbarIndexFromIPin( pXbar, &outputPinIndex,
+                                         FALSE, p_output_pin )) ||
+        FAILED(pXbar->get_CrossbarPinInfo( FALSE, outputPinIndex,
+                                           &outputPinIndexRelated,
+                                           &outputPinPhysicalType )) )
+    {
+        pXbar->Release();
+        pinInfo.pFilter->Release();
+        p_output_pin->Release ();
+        return S_FALSE;
+    }
+
+    //
+    // for all input pins
+    //
+    for( inputPinIndex = 0; S_OK != result && inputPinIndex < inputPinCount;
+         inputPinIndex++ ) 
+    {
+        if( FAILED(pXbar->get_CrossbarPinInfo( TRUE,  inputPinIndex,
+                &inputPinIndexRelated, &inputPinPhysicalType )) ) continue;
+   
+        // Is the pin a video pin?
+        if( inputPinPhysicalType != physicalType ) continue;
+
+        // Can we route it?
+        if( FAILED(pXbar->CanRoute(outputPinIndex, inputPinIndex)) ) continue;
+
+        IPin *pPin;
+        if( FAILED(GetCrossbarIPinAtIndex( pXbar, inputPinIndex,
+                                           TRUE, &pPin)) ) continue;
+
+        result = FindCrossbarRoutes( p_this, pPin, physicalType, depth+1 );
+        if( S_OK == result || (S_FALSE == result &&
+              physicalType == inputPinPhysicalType &&
+              (p_sys->i_crossbar_route_depth = depth+1) < MAX_CROSSBAR_DEPTH) )
+        {
+            // hold on crossbar
+            pXbar->AddRef();
+
+            // remember crossbar route
+            p_sys->crossbar_routes[depth].pXbar = pXbar;
+            p_sys->crossbar_routes[depth].VideoInputIndex = inputPinIndex;
+            p_sys->crossbar_routes[depth].VideoOutputIndex = outputPinIndex;
+            p_sys->crossbar_routes[depth].AudioInputIndex = inputPinIndexRelated;
+            p_sys->crossbar_routes[depth].AudioOutputIndex = outputPinIndexRelated;
+
+            msg_Dbg( p_this, "Crossbar at depth %d, Found Route For ouput %ld "
+                     "(type %ld) to input %d (type %ld)", depth,
+                     outputPinIndex, outputPinPhysicalType, inputPinIndex,
+                     inputPinPhysicalType );
+
+            result = S_OK;
+        }
+    }
+
+    pXbar->Release();
+    pinInfo.pFilter->Release();
+    p_output_pin->Release ();
+
+    return result;
 }
 
 /****************************************************************************
  * ConnectFilters
  ****************************************************************************/
-static bool ConnectFilters( vlc_object_t *p_this, IFilterGraph *p_graph,
-                            IBaseFilter *p_filter, IPin *p_input_pin )
+static bool ConnectFilters( vlc_object_t *p_this, IBaseFilter *p_filter,
+                            CaptureFilter *p_capture_filter )
 {
-    IEnumPins *p_enumpins;
-    IPin *p_pin;
+    access_sys_t *p_sys = ((input_thread_t *)p_this)->p_access_data;
+    CapturePin *p_input_pin = p_capture_filter->CustomGetPin();
 
-    if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return false;
+    AM_MEDIA_TYPE mediaType = p_input_pin->CustomGetMediaType();
 
-    while( S_OK == p_enumpins->Next( 1, &p_pin, NULL ) )
+    if( p_sys->p_capture_graph_builder2 )
     {
-        PIN_DIRECTION pin_dir;
-        p_pin->QueryDirection( &pin_dir );
-
-        if( pin_dir == PINDIR_OUTPUT &&
-            S_OK == p_graph->ConnectDirect( p_pin, p_input_pin, 0 ) )
+        if( FAILED(p_sys->p_capture_graph_builder2->
+                     RenderStream( &PIN_CATEGORY_CAPTURE, &mediaType.majortype,
+                                   p_filter, NULL,
+                                   (IBaseFilter *)p_capture_filter )) )
         {
-            p_pin->Release();
-            p_enumpins->Release();
-            return true;
+            return false;
         }
-        p_pin->Release();
-    }
 
-    p_enumpins->Release();
-    return false;
+        // Sort out all the possible video inputs
+        // The class needs to be given the capture filters ANALOGVIDEO input pin
+        IEnumPins *pins = 0;
+        if( mediaType.majortype == MEDIATYPE_Video &&
+            SUCCEEDED(p_filter->EnumPins(&pins)) )
+        {
+            IPin        *pP = 0;
+            ULONG        n;
+            PIN_INFO     pinInfo;
+            BOOL         Found = FALSE;
+            IKsPropertySet *pKs=0;
+            GUID guid;
+            DWORD dw;
+
+            while( !Found && (S_OK == pins->Next(1, &pP, &n)) )
+            {
+                if(S_OK == pP->QueryPinInfo(&pinInfo))
+                {
+                    if(pinInfo.dir == PINDIR_INPUT)
+                    {
+                        // is this pin an ANALOGVIDEOIN input pin?
+                        if( pP->QueryInterface(IID_IKsPropertySet,
+                                               (void **)&pKs) == S_OK )
+                        {
+                            if( pKs->Get(AMPROPSETID_Pin,
+                                         AMPROPERTY_PIN_CATEGORY, NULL, 0,
+                                         &guid, sizeof(GUID), &dw) == S_OK )
+                            {
+                                if( guid == PIN_CATEGORY_ANALOGVIDEOIN )
+                                {
+                                    // recursively search crossbar routes
+                                    FindCrossbarRoutes( p_this, pP,
+                                                        PhysConn_Video_Tuner );
+                                    // found it
+                                    Found = TRUE;
+                                }
+                            }
+                            pKs->Release();
+                        }
+                    }
+                    pinInfo.pFilter->Release();
+                }
+                pP->Release();
+            }
+            pins->Release();
+        }
+        return true;
+    }
+    else
+    {
+        IEnumPins *p_enumpins;
+        IPin *p_pin;
+
+        if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return false;
+
+        while( S_OK == p_enumpins->Next( 1, &p_pin, NULL ) )
+        {
+            PIN_DIRECTION pin_dir;
+            p_pin->QueryDirection( &pin_dir );
+
+            if( pin_dir == PINDIR_OUTPUT &&
+                p_sys->p_graph->ConnectDirect( p_pin, (IPin *)p_input_pin,
+                                               0 ) == S_OK )
+            {
+                p_pin->Release();
+                p_enumpins->Release();
+                return true;
+            }
+            p_pin->Release();
+        }
+
+        p_enumpins->Release();
+        return false;
+    }
 }
 
 static int OpenDevice( input_thread_t *p_input, string devicename,
                        vlc_bool_t b_audio )
 {
     access_sys_t *p_sys = p_input->p_access_data;
+
+    /* See if device is already opened */
+    for( int i = 0; i < p_sys->i_streams; i++ )
+    {
+        if( p_sys->pp_streams[i]->devicename == devicename )
+        {
+            /* Already opened */
+            return VLC_SUCCESS;
+        }
+    }
+
     list<string> list_devices;
 
     /* Enumerate devices and display their names */
@@ -493,13 +871,30 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
 
     /* Attempt to connect one of this device's capture output pins */
     msg_Dbg( p_input, "connecting filters" );
-    if( ConnectFilters( VLC_OBJECT(p_input), p_sys->p_graph, p_device_filter,
-                        p_capture_filter->CustomGetPin() ) )
+    if( ConnectFilters( VLC_OBJECT(p_input), p_device_filter,
+                        p_capture_filter ) )
     {
         /* Success */
+        msg_Dbg( p_input, "filters connected successfully !" );
+
         dshow_stream_t dshow_stream;
         dshow_stream.b_invert = VLC_FALSE;
         dshow_stream.b_pts = VLC_FALSE;
+        dshow_stream.mt =
+            p_capture_filter->CustomGetPin()->CustomGetMediaType();
+
+        /* Show properties. Done here so the VLC stream is setup with the
+         * proper parameters. */
+        vlc_value_t val;
+        var_Get( p_input, "dshow-config", &val );
+        if( val.i_int )
+        {
+            PropertiesPage( VLC_OBJECT(p_input), p_device_filter,
+                            p_sys->p_capture_graph_builder2,
+                            dshow_stream.mt.majortype == MEDIATYPE_Audio ||
+                            dshow_stream.mt.formattype == FORMAT_WaveFormatEx);
+        }
+
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
@@ -707,14 +1102,6 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             goto fail;
         }
 
-        /* Show properties */
-        vlc_value_t val;
-        var_Create( p_input, "dshow-config",
-                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-        var_Get( p_input, "dshow-config", &val );
-
-        if(val.i_int) PropertiesPage( VLC_OBJECT(p_input), p_device_filter );
-
         /* Add directshow elementary stream to our list */
         dshow_stream.p_device_filter = p_device_filter;
         dshow_stream.p_capture_filter = p_capture_filter;
@@ -921,6 +1308,19 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
                         i_current_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
                     else if( p_mt->subtype == MEDIASUBTYPE_ARGB32 )
                         i_current_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+
+                    /* Packed YUV formats */
+                    else if(  p_mt->subtype == MEDIASUBTYPE_YVYU )
+                        i_current_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
+                    else if(  p_mt->subtype == MEDIASUBTYPE_YUYV )
+                        i_current_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', 'V' );
+                    else if(  p_mt->subtype == MEDIASUBTYPE_Y411 )
+                        i_current_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
+                    else if(  p_mt->subtype == MEDIASUBTYPE_Y211 )
+                        i_current_fourcc = VLC_FOURCC( 'Y', '2', '1', '1' );
+                    else if(  p_mt->subtype == MEDIASUBTYPE_YUY2 ||
+                              p_mt->subtype == MEDIASUBTYPE_UYVY )
+                        i_current_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
 
                     /* MPEG2 video elementary stream */
                     else if( p_mt->subtype == MEDIASUBTYPE_MPEG2_VIDEO )
@@ -1477,7 +1877,13 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     /* Find list of devices */
     list<string> list_devices;
 
+    /* Initialize OLE/COM */
+    CoInitialize( 0 );
+
     FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
+
+    /* Uninitialize OLE/COM */
+    CoUninitialize();
 
     if( !list_devices.size() ) return VLC_SUCCESS;
 
@@ -1511,6 +1917,9 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     module_config_t *p_item;
     vlc_bool_t b_audio = VLC_FALSE;
 
+    /* Initialize OLE/COM */
+    CoInitialize( 0 );
+
     p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
 
@@ -1536,37 +1945,247 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     IBaseFilter *p_device_filter =
         FindCaptureDevice( p_this, &devicename, NULL, b_audio );
     if( p_device_filter )
-        PropertiesPage( p_this, p_device_filter );
+    {
+        PropertiesPage( p_this, p_device_filter, NULL, b_audio );
+    }
     else
     {
+        /* Uninitialize OLE/COM */
+        CoUninitialize();
+
         msg_Err( p_this, "didn't find device: %s", devicename.c_str() );
         return VLC_EGENERIC;
     }
 
+    /* Uninitialize OLE/COM */
+    CoUninitialize();
+
     return VLC_SUCCESS;
 }
 
-static void PropertiesPage( vlc_object_t *p_this,
-                            IBaseFilter *p_device_filter )
+static void ShowPropertyPage( IUnknown *obj, CAUUID *cauuid )
 {
-    ISpecifyPropertyPages *p_spec;
+    if( cauuid->cElems > 0 )
+    {
+        HWND hwnd_desktop = ::GetDesktopWindow();
+
+        OleCreatePropertyFrame( hwnd_desktop, 30, 30, NULL, 1, &obj,
+                                cauuid->cElems, cauuid->pElems, 0, 0, NULL );
+
+        CoTaskMemFree( cauuid->pElems );
+    }
+}
+
+static void PropertiesPage( vlc_object_t *p_this, IBaseFilter *p_device_filter,
+                            ICaptureGraphBuilder2 *p_capture_graph,
+                            vlc_bool_t b_audio )
+{
     CAUUID cauuid;
- 
+
+    msg_Dbg( p_this, "Configuring Device Properties" );
+
+    /*
+     * Video or audio capture filter page
+     */
+    ISpecifyPropertyPages *p_spec;
+
     HRESULT hr = p_device_filter->QueryInterface( IID_ISpecifyPropertyPages,
                                                   (void **)&p_spec );
-    if( hr == S_OK )
+    if( SUCCEEDED(hr) )
     {
-        hr = p_spec->GetPages( &cauuid );
-        if( hr == S_OK )
+        if( SUCCEEDED(p_spec->GetPages( &cauuid )) )
         {
-            HWND hwnd_desktop = ::GetDesktopWindow();
-
-            hr = OleCreatePropertyFrame( hwnd_desktop, 30, 30, NULL, 1,
-                                         (IUnknown **)&p_device_filter,
-                                         cauuid.cElems,
-                                         (GUID *)cauuid.pElems, 0, 0, NULL );
-            CoTaskMemFree( cauuid.pElems );
+            ShowPropertyPage( p_device_filter, &cauuid );
         }
         p_spec->Release();
+    }
+
+    msg_Dbg( p_this, "looking for WDM Configuration Pages" );
+
+    if( p_capture_graph )
+        msg_Dbg( p_this, "got capture graph for WDM Configuration Pages" );
+
+    /*
+     * Audio capture pin
+     */
+    if( p_capture_graph && b_audio )
+    {
+        IAMStreamConfig *p_SC;
+
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                             &MEDIATYPE_Audio, p_device_filter,
+                                             IID_IAMStreamConfig,
+                                             (void **)&p_SC );
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_SC->QueryInterface( IID_ISpecifyPropertyPages,
+                                       (void **)&p_spec );
+            if( SUCCEEDED(hr) )
+            {
+                hr = p_spec->GetPages( &cauuid );
+                if( SUCCEEDED(hr) )
+                {
+                    for( unsigned int c = 0; c < cauuid.cElems; c++ )
+                    {
+                        ShowPropertyPage( p_SC, &cauuid );
+                    }
+                    CoTaskMemFree( cauuid.pElems );
+                }
+                p_spec->Release();
+            }
+            p_SC->Release();
+        }
+
+        /*
+         * TV Audio filter
+         */
+        IAMTVAudio *p_TVA;
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE, 
+                                             &MEDIATYPE_Audio, p_device_filter,
+                                             IID_IAMTVAudio, (void **)&p_TVA );
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_TVA->QueryInterface( IID_ISpecifyPropertyPages,
+                                        (void **)&p_spec );
+            if( SUCCEEDED(hr) )
+            {
+                if( SUCCEEDED( p_spec->GetPages( &cauuid ) ) )
+                    ShowPropertyPage(p_TVA, &cauuid);
+
+                p_spec->Release();
+            }
+            p_TVA->Release();
+        }
+    }
+
+    /*
+     * Video capture pin
+     */
+    if( p_capture_graph && !b_audio )
+    {
+        IAMStreamConfig *p_SC;
+
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                             &MEDIATYPE_Interleaved,
+                                             p_device_filter,
+                                             IID_IAMStreamConfig,
+                                             (void **)&p_SC );
+        if( FAILED(hr) )
+        {
+            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                                 &MEDIATYPE_Video,
+                                                 p_device_filter,
+                                                 IID_IAMStreamConfig,
+                                                 (void **)&p_SC );
+        }
+
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_SC->QueryInterface( IID_ISpecifyPropertyPages,
+                                       (void **)&p_spec );
+            if( SUCCEEDED(hr) )
+            {
+                if( SUCCEEDED( p_spec->GetPages(&cauuid) ) )
+                {
+                    ShowPropertyPage(p_SC, &cauuid);
+                }
+                p_spec->Release();
+            }
+            p_SC->Release();
+        }
+
+        /*
+         * Video crossbar, and a possible second crossbar
+         */
+        IAMCrossbar *p_X, *p_X2;
+        IBaseFilter *p_XF;
+
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                             &MEDIATYPE_Interleaved,
+                                             p_device_filter,
+                                             IID_IAMCrossbar, (void **)&p_X );
+        if( FAILED(hr) )
+        {
+            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                                 &MEDIATYPE_Video,
+                                                 p_device_filter,
+                                                 IID_IAMCrossbar,
+                                                 (void **)&p_X );
+        }
+
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_X->QueryInterface( IID_IBaseFilter, (void **)&p_XF );
+            if( SUCCEEDED(hr) )
+            {
+                hr = p_X->QueryInterface( IID_ISpecifyPropertyPages,
+                                          (void **)&p_spec );
+                if( SUCCEEDED(hr) )
+                {
+                    hr = p_spec->GetPages(&cauuid);
+                    if( hr == S_OK && cauuid.cElems > 0 )
+                    {
+                        ShowPropertyPage( p_X, &cauuid );
+                    }
+                    p_spec->Release();
+                }
+
+                hr = p_capture_graph->FindInterface( &LOOK_UPSTREAM_ONLY, NULL,
+                                                     p_XF, IID_IAMCrossbar,
+                                                     (void **)&p_X2 );
+                if( SUCCEEDED(hr) )
+                {
+                    hr = p_X2->QueryInterface( IID_ISpecifyPropertyPages,
+                                               (void **)&p_spec );
+                    if( SUCCEEDED(hr) )
+                    {
+                        hr = p_spec->GetPages( &cauuid );
+                        if( SUCCEEDED(hr) )
+                        {
+                            ShowPropertyPage( p_X2, &cauuid );
+                        }
+                        p_spec->Release();
+                    }
+                    p_X2->Release();
+                }
+
+                p_XF->Release();
+            }
+
+            p_X->Release();
+        }
+
+        /*
+         * TV Tuner
+         */
+        IAMTVTuner *p_TV;
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                             &MEDIATYPE_Interleaved,
+                                             p_device_filter,
+                                             IID_IAMTVTuner, (void **)&p_TV );
+        if( FAILED(hr) )
+        {
+            hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                                 &MEDIATYPE_Video,
+                                                 p_device_filter,
+                                                 IID_IAMTVTuner,
+                                                 (void **)&p_TV );
+        }
+
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_TV->QueryInterface( IID_ISpecifyPropertyPages,
+                                       (void **)&p_spec );
+            if( SUCCEEDED(hr) )
+            {
+                hr = p_spec->GetPages(&cauuid);
+                if( SUCCEEDED(hr) )
+                {
+                    ShowPropertyPage(p_TV, &cauuid);
+                }
+                p_spec->Release();
+            }
+            p_TV->Release();
+        }
     }
 }
