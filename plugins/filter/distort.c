@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.1 2001/12/19 03:50:22 sam Exp $
+ * $Id: distort.c,v 1.2 2001/12/19 19:26:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -49,7 +49,8 @@
 #include "modules.h"
 #include "modules_export.h"
 
-#define DISTORT_MODE_WAVE   1
+#define DISTORT_MODE_WAVE    1
+#define DISTORT_MODE_RIPPLE  2
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -104,6 +105,11 @@ static void vout_End       ( struct vout_thread_s * );
 static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+
+static void DistortWave    ( struct vout_thread_s *, struct picture_s *,
+                                                     struct picture_s * );
+static void DistortRipple  ( struct vout_thread_s *, struct picture_s *,
+                                                     struct picture_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -164,6 +170,10 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
     }
+    else if( !strcmp( psz_method, ":ripple" ) )
+    {
+        p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
+    }
     else
     {
         intf_ErrMsg( "filter error: no valid distort mode provided, "
@@ -182,7 +192,7 @@ static int vout_Init( vout_thread_t *p_vout )
     int i_index;
     char *psz_filter;
     picture_t *p_pic;
-    
+
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -205,7 +215,7 @@ static int vout_Init( vout_thread_t *p_vout )
     main_PutPszVariable( VOUT_FILTER_VAR, "" );
 
     intf_WarnMsg( 1, "filter: spawning the real video output" );
-        
+
     p_vout->p_sys->p_vout =
         vout_CreateThread( NULL,
                            p_vout->render.i_width, p_vout->render.i_height,
@@ -277,10 +287,7 @@ static int vout_Manage( vout_thread_t *p_vout )
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i_index;
-    double  f_angle;
-    mtime_t new_date = mdate();
-    
+
     /* This is a new frame. Get a structure from the video_output. */
     while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
               == NULL )
@@ -290,28 +297,53 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
         msleep( VOUT_OUTMEM_SLEEP );
-    }   
+    }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, new_date + 50000 );
-    vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
+    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, mdate() + 50000 );
 
-    /* XXX: we should check for p_vout->p_sys->i_mode, but only WAVE is
-     * implemented for the moment, so we don't care. Keep it in mind though. */
+    switch( p_vout->p_sys->i_mode )
+    {
+        case DISTORT_MODE_WAVE:
+            DistortWave( p_vout, p_pic, p_outpic );
+            break;
+
+        case DISTORT_MODE_RIPPLE:
+            DistortRipple( p_vout, p_pic, p_outpic );
+            break;
+
+        default:
+            break;
+    }
+
+    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+}
+
+
+/*****************************************************************************
+ * DistortWave: draw a wave effect on the picture
+ *****************************************************************************/
+static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
+                                                picture_t *p_outpic )
+{
+    int i_index;
+    double f_angle;
+    mtime_t new_date = mdate();
+
     p_vout->p_sys->f_angle += (new_date - p_vout->p_sys->last_date) / 200000.0;
     p_vout->p_sys->last_date = new_date;
     f_angle = p_vout->p_sys->f_angle;
 
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
     {
         int i_line, i_num_lines, i_offset;
         u8 black_pixel;
         pixel_data_t *p_in, *p_out;
 
-        p_in = p_pic->planes[ i_index ].p_data;
+        p_in = p_inpic->planes[ i_index ].p_data;
         p_out = p_outpic->planes[ i_index ].p_data;
 
-        i_num_lines = p_pic->planes[ i_index ].i_bytes
-                          / p_pic->planes[ i_index ].i_line_bytes;
+        i_num_lines = p_inpic->planes[ i_index ].i_bytes
+                          / p_inpic->planes[ i_index ].i_line_bytes;
 
         black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
 
@@ -319,7 +351,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
-            i_offset = (double)(p_pic->planes[ i_index ].i_line_bytes)
+            i_offset = (double)(p_inpic->planes[ i_index ].i_line_bytes)
                          * sin( f_angle + 10.0 * (double)i_line
                                                / (double)i_num_lines )
                          / 20.0;
@@ -329,33 +361,107 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                 if( i_offset < 0 )
                 {
                     p_main->fast_memcpy( p_out, p_in - i_offset,
-                         p_pic->planes[ i_index ].i_line_bytes + i_offset );
-                    p_in += p_pic->planes[ i_index ].i_line_bytes;
+                         p_inpic->planes[ i_index ].i_line_bytes + i_offset );
+                    p_in += p_inpic->planes[ i_index ].i_line_bytes;
                     p_out += p_outpic->planes[ i_index ].i_line_bytes;
                     memset( p_out + i_offset, black_pixel, -i_offset );
                 }
                 else
                 {
                     p_main->fast_memcpy( p_out + i_offset, p_in,
-                         p_pic->planes[ i_index ].i_line_bytes - i_offset );
+                         p_inpic->planes[ i_index ].i_line_bytes - i_offset );
                     memset( p_out, black_pixel, i_offset );
-                    p_in += p_pic->planes[ i_index ].i_line_bytes;
+                    p_in += p_inpic->planes[ i_index ].i_line_bytes;
                     p_out += p_outpic->planes[ i_index ].i_line_bytes;
                 }
             }
             else
             {
                 p_main->fast_memcpy( p_out, p_in,
-                                     p_pic->planes[ i_index ].i_line_bytes );
-                p_in += p_pic->planes[ i_index ].i_line_bytes;
+                                     p_inpic->planes[ i_index ].i_line_bytes );
+                p_in += p_inpic->planes[ i_index ].i_line_bytes;
                 p_out += p_outpic->planes[ i_index ].i_line_bytes;
             }
 
         }
     }
+}
 
-    vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
+/*****************************************************************************
+ * DistortRipple: draw a ripple effect at the bottom of the picture
+ *****************************************************************************/
+static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
+                                                  picture_t *p_outpic )
+{
+    int i_index;
+    double f_angle;
+    mtime_t new_date = mdate();
 
-    vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
+    p_vout->p_sys->f_angle -= (new_date - p_vout->p_sys->last_date) / 50000.0;
+    p_vout->p_sys->last_date = new_date;
+    f_angle = p_vout->p_sys->f_angle;
+
+    for( i_index = 0 ; i_index < p_inpic->i_planes ; i_index++ )
+    {
+        int i_line, i_first_line, i_num_lines, i_offset;
+        u8 black_pixel;
+        pixel_data_t *p_in, *p_out;
+
+        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
+
+        i_num_lines = p_inpic->planes[ i_index ].i_bytes
+                          / p_inpic->planes[ i_index ].i_line_bytes;
+
+        i_first_line = i_num_lines * 3 / 4;
+
+        p_in = p_inpic->planes[ i_index ].p_data;
+        p_out = p_outpic->planes[ i_index ].p_data;
+
+        p_main->fast_memcpy( p_out, p_in,
+                    i_first_line * p_inpic->planes[ i_index ].i_line_bytes );
+
+        p_in += i_first_line * p_inpic->planes[ i_index ].i_line_bytes;
+        p_out += i_first_line * p_outpic->planes[ i_index ].i_line_bytes;
+
+        /* Ok, we do 3 times the sin() calculation for each line. So what ? */
+        for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
+        {
+            /* Calculate today's offset, don't go above 1/20th of the screen */
+            i_offset = (double)(p_inpic->planes[ i_index ].i_line_bytes)
+                         * sin( f_angle + 80.0 * (double)i_line
+                                               / (double)i_num_lines )
+                         * (double)( i_line - i_first_line)
+                         / (double)i_num_lines
+                         / 4.0;
+
+            if( i_offset )
+            {
+                if( i_offset < 0 )
+                {
+                    p_main->fast_memcpy( p_out, p_in - i_offset,
+                         p_inpic->planes[ i_index ].i_line_bytes + i_offset );
+                    p_in -= p_inpic->planes[ i_index ].i_line_bytes;
+                    p_out += p_outpic->planes[ i_index ].i_line_bytes;
+                    memset( p_out + i_offset, black_pixel, -i_offset );
+                }
+                else
+                {
+                    p_main->fast_memcpy( p_out + i_offset, p_in,
+                         p_inpic->planes[ i_index ].i_line_bytes - i_offset );
+                    memset( p_out, black_pixel, i_offset );
+                    p_in -= p_inpic->planes[ i_index ].i_line_bytes;
+                    p_out += p_outpic->planes[ i_index ].i_line_bytes;
+                }
+            }
+            else
+            {
+                p_main->fast_memcpy( p_out, p_in,
+                                     p_inpic->planes[ i_index ].i_line_bytes );
+                p_in -= p_inpic->planes[ i_index ].i_line_bytes;
+                p_out += p_outpic->planes[ i_index ].i_line_bytes;
+            }
+
+        }
+    }
 }
 
