@@ -919,6 +919,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
         return VLC_SUCCESS;
 
+    case VOUT_CLOSE:
+        ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
     case VOUT_REPARENT:
         /* Change window style, borders and title bar */
         vlc_mutex_lock( &p_vout->p_sys->lock );
@@ -932,14 +934,11 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
                        WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
-                       WS_SIZEBOX | WS_VISIBLE );
+                       WS_SIZEBOX | (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
         SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
                       SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
         return vout_vaControlDefault( p_vout, i_query, args );
-
-    case VOUT_CLOSE:
-        return VLC_SUCCESS;
 
     case VOUT_SET_STAY_ON_TOP:
         if( p_vout->p_sys->hparent )
