@@ -107,6 +107,7 @@ int aout_BeOpen( aout_thread_t *p_aout )
     p_aout->p_sys->p_format->format = gs_audio_format::B_GS_S16;
     p_aout->p_sys->p_format->byte_order = B_MEDIA_LITTLE_ENDIAN;
     p_aout->p_sys->p_format->buffer_size = 8192;
+    p_aout->p_sys->i_buffer_pos = 0;
 
     /* Allocate BPushGameSound */
     p_aout->p_sys->p_sound = new BPushGameSound( 8192,
