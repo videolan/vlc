@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.5 2002/11/26 01:06:08 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.6 2002/11/27 05:36:41 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -152,7 +152,7 @@ class InterfaceWindow : public BWindow
 	BMessage*				fSettings;	// we keep the message arround
 										// for forward compatibility
 	
-	Intf_VLCWrapper *  p_wrapper;
+	VlcWrapper * p_wrapper;
 };
 
 #endif	// BEOS_INTERFACE_WINDOW_H

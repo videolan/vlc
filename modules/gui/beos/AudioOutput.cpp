@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout.cpp: BeOS audio output
+ * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.16 2002/11/22 19:37:25 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.17 2002/11/27 05:36:41 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,7 +38,8 @@
 #include <vlc/aout.h>
 #include <aout_internal.h>
 
-#define FRAME_SIZE 2048
+#define FRAME_SIZE  2048
+#define BUFFER_SIZE 16384
 
 /*****************************************************************************
  * aout_sys_t: BeOS audio output method descriptor
@@ -94,12 +95,12 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
 #endif
     p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
 
-    p_format->buffer_size = 16384;
+    p_format->buffer_size = BUFFER_SIZE;
     p_aout->output.i_nb_samples = FRAME_SIZE;
     p_aout->output.pf_play = DoNothing;
     
     p_sys->p_player = new BSoundPlayer( p_format, "player",
-                                        Play, NULL, p_this );
+                                        Play, NULL, p_aout );
     p_sys->p_player->Start();
     p_sys->p_player->SetHasData( true );
         
@@ -122,22 +123,25 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
 /*****************************************************************************
  * Play
  *****************************************************************************/
-static void Play( void *aout, void *buffer, size_t size,
+static void Play( void *aout, void *p_buffer, size_t i_size,
                   const media_raw_audio_format &format )
 {
     aout_buffer_t * p_aout_buffer;
     aout_instance_t *p_aout = (aout_instance_t*) aout;
 
-    float *p_buffer = (float*) buffer;
-
     p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-    
+
     if( p_aout_buffer != NULL )
     {
-       memcpy( p_buffer,
-               p_aout_buffer->p_buffer,
-               MIN( size, p_aout_buffer->i_nb_bytes ) );
-       aout_BufferFree( p_aout_buffer );
+        /* sometimes p_aout_buffer is not NULL but still isn't valid.
+           we check i_nb_bytes so we are sure it is */
+        if( p_aout_buffer->i_nb_bytes == BUFFER_SIZE )
+        {
+           memcpy( (float*)p_buffer,
+                   p_aout_buffer->p_buffer,
+                   BUFFER_SIZE );
+           aout_BufferFree( p_aout_buffer );
+        }
     }
 }
 

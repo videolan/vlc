@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.9 2002/11/26 01:06:08 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.10 2002/11/27 05:36:41 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -212,7 +212,7 @@ InterfaceWindow::FrameResized(float width, float height)
 void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
 	int playback_status;	  // remember playback state
-	playback_status = p_wrapper->inputGetStatus();
+	playback_status = p_wrapper->InputStatus();
 
 	switch( p_message->what )
 	{
@@ -266,7 +266,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_wrapper->playlistStop();
+				p_wrapper->PlaylistStop();
 				p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
 			}
 			break;
@@ -283,18 +283,18 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				{
 					p_wrapper->volume_mute();
 					snooze( 400000 );
-					p_wrapper->playlistPause();
+					p_wrapper->PlaylistPause();
 				}
 				else
 				{
 					p_wrapper->volume_restore();
-					p_wrapper->playlistPlay();
+					p_wrapper->PlaylistPlay();
 				}
 			}
 			else
 			{
 				/* Play a new file */
-				p_wrapper->playlistPlay();
+				p_wrapper->PlaylistPlay();
 			}	
 			break;
 	
@@ -304,7 +304,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_wrapper->playFaster();
+				p_wrapper->InputFaster();
 			}
 			break;
 	
@@ -314,7 +314,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				p_wrapper->volume_mute();
 				snooze( 400000 );
-				p_wrapper->playSlower();
+				p_wrapper->InputSlower();
 			}
 			break;
 	
@@ -323,7 +323,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			if (playback_status > UNDEF_S)
 			{
 				p_wrapper->volume_restore();
-				p_wrapper->playlistPlay();
+				p_wrapper->PlaylistPlay();
 			}
 			break;
 	
@@ -411,10 +411,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			}
 			break;
 		case PREV_FILE:
-			p_wrapper->playlistPrev();
+			p_wrapper->PlaylistPrev();
 			break;
 		case NEXT_FILE:
-			p_wrapper->playlistNext();
+			p_wrapper->PlaylistNext();
 			break;
 		// general next/prev functionality (skips to whatever makes most sense)
 		case NAVIGATE_PREV:
@@ -471,7 +471,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 bool InterfaceWindow::QuitRequested()
 {
-	p_wrapper->playlistStop();
+	p_wrapper->PlaylistStop();
 	p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
 	
 	p_intf->b_die = 1;

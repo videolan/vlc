@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.5 2002/11/26 01:06:08 titer Exp $
+ * $Id: Interface.cpp,v 1.6 2002/11/27 05:36:41 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -72,7 +72,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         return( 1 );
     }
     
-    p_intf->p_sys->p_wrapper = new Intf_VLCWrapper( p_intf );
+    p_intf->p_sys->p_wrapper = new VlcWrapper( p_intf );
 
     p_intf->pf_run = Run;
 
