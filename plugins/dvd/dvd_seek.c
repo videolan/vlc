@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.2 2002/03/08 22:58:12 stef Exp $
+ * $Id: dvd_seek.c,v 1.3 2002/03/09 16:48:33 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -69,9 +69,9 @@ int CellIsInterleaved( thread_dvd_data_t * p_dvd )
     return title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000;
 }
 
-u32 CellPrg2Map( thread_dvd_data_t * p_dvd )
+int CellPrg2Map( thread_dvd_data_t * p_dvd )
 {
-    u32                 i_cell;
+    int                 i_cell;
 
     i_cell = p_dvd->i_map_cell;
 
@@ -97,9 +97,14 @@ u32 CellPrg2Map( thread_dvd_data_t * p_dvd )
     return i_cell;    
 }
 
-u32 CellAngleOffset( thread_dvd_data_t * p_dvd, u32 i_prg_cell )
+int CellAngleOffset( thread_dvd_data_t * p_dvd, int i_prg_cell )
 {
-    u32     i_cell_off;
+    int     i_cell_off;
+    
+    if( i_prg_cell >= title.i_cell_nb )
+    {
+        return 0;
+    }
     
     /* basic handling of angles */
     switch( ( ( title.p_cell_play[i_prg_cell].i_category & 0xf000 )
@@ -122,21 +127,21 @@ u32 CellAngleOffset( thread_dvd_data_t * p_dvd, u32 i_prg_cell )
     return i_cell_off;
 }
 
-u32 CellStartSector( thread_dvd_data_t * p_dvd )
+int CellStartSector( thread_dvd_data_t * p_dvd )
 {
     return __MAX( cell.p_cell_map[p_dvd->i_map_cell].i_start_sector,
                   title.p_cell_play[p_dvd->i_prg_cell].i_start_sector );
 }
     
-u32 CellEndSector( thread_dvd_data_t * p_dvd )
+int CellEndSector( thread_dvd_data_t * p_dvd )
 {
     return __MIN( cell.p_cell_map[p_dvd->i_map_cell].i_end_sector,
                   title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 }
 
-u32 NextCellPrg( thread_dvd_data_t * p_dvd )
+int NextCellPrg( thread_dvd_data_t * p_dvd )
 {
-    u32     i_cell = p_dvd->i_prg_cell;
+    int     i_cell = p_dvd->i_prg_cell;
     
     if( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_end_sector )
     {
@@ -152,9 +157,9 @@ u32 NextCellPrg( thread_dvd_data_t * p_dvd )
     return i_cell;
 }
 
-u32 Lb2CellPrg( thread_dvd_data_t * p_dvd )
+int Lb2CellPrg( thread_dvd_data_t * p_dvd )
 {
-    u32     i_cell = 0;
+    int     i_cell = 0;
     
     while( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_end_sector )
     {
@@ -170,9 +175,9 @@ u32 Lb2CellPrg( thread_dvd_data_t * p_dvd )
     return i_cell;
 }
 
-u32 Lb2CellMap( thread_dvd_data_t * p_dvd )
+int Lb2CellMap( thread_dvd_data_t * p_dvd )
 {
-    u32     i_cell = 0;
+    int     i_cell = 0;
     
     while( p_dvd->i_vts_lb > cell.p_cell_map[i_cell].i_end_sector )
     {
@@ -187,9 +192,9 @@ u32 Lb2CellMap( thread_dvd_data_t * p_dvd )
     return i_cell;
 }
 
-u32 LbMaxOnce( thread_dvd_data_t * p_dvd )
+int LbMaxOnce( thread_dvd_data_t * p_dvd )
 {
-    u32 i_block_once = p_dvd->i_end_lb - p_dvd->i_vts_lb + 1;
+    int i_block_once = p_dvd->i_end_lb - p_dvd->i_vts_lb + 1;
 
     /* Get the position of the next cell if we're at cell end */
     if( i_block_once <= 0 )
@@ -210,6 +215,11 @@ u32 LbMaxOnce( thread_dvd_data_t * p_dvd )
 
         p_dvd->i_vts_lb   = CellStartSector( p_dvd );
         p_dvd->i_end_lb   = CellEndSector( p_dvd );
+        
+        if( ( p_dvd->i_chapter = NextChapter( p_dvd ) ) < 0)
+        {
+            return 0;
+        }
 
         /* Position the fd pointer on the right address */
         if( ( dvdcss_seek( p_dvd->dvdhandle,
@@ -220,8 +230,6 @@ u32 LbMaxOnce( thread_dvd_data_t * p_dvd )
                          dvdcss_error( p_dvd->dvdhandle ) );
             return 0;
         }
-
-        p_dvd->i_chapter = NextChapter( p_dvd );
 
         i_block_once = p_dvd->i_end_lb - p_dvd->i_vts_lb + 1;
     }
@@ -264,9 +272,9 @@ int NextChapter( thread_dvd_data_t * p_dvd )
     if( title.chapter_map.pi_start_cell[p_dvd->i_chapter] <= i_cell+1 )
     {
         p_dvd->i_chapter++;
-        if( p_dvd->i_chapter >= p_dvd->i_chapter_nb )
+        if( p_dvd->i_chapter > p_dvd->i_chapter_nb )
         {
-            return 0;
+            return -1;
         }
         p_dvd->b_new_chapter = 1;
         return p_dvd->i_chapter;

@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.4 2002/03/09 13:42:46 sam Exp $
+ * $Id: dvd_access.c,v 1.5 2002/03/09 16:48:33 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -416,7 +416,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             vts.i_pos + vts.manager_inf.i_title_vob_start_sector;
 
         /* last cell */
-        intf_WarnMsg( 4, "prg_cell nb %d", vts.title_unit.p_title[p_dvd->i_title_id-1].title.i_cell_nb );
         p_dvd->i_prg_cell = -1 +
             vts.title_unit.p_title[p_dvd->i_title_id-1].title.i_cell_nb;
         p_dvd->i_map_cell = 0;
@@ -424,11 +423,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         i_size            = CellEndSector( p_dvd );
 
         /* first cell */
-        p_dvd->i_prg_cell = 0;
-        p_dvd->i_map_cell = 0;
-        p_dvd->i_map_cell = CellPrg2Map    ( p_dvd );
-        p_dvd->i_vts_lb   = CellStartSector( p_dvd );
-        p_dvd->i_end_lb   = CellEndSector  ( p_dvd );
+        p_dvd->i_prg_cell   = 0;
+        p_dvd->i_map_cell   = 0;
+        p_dvd->i_angle_cell = 0;
+        p_dvd->i_map_cell   = CellPrg2Map    ( p_dvd );
+        p_dvd->i_vts_lb     = CellStartSector( p_dvd );
+        p_dvd->i_end_lb     = CellEndSector  ( p_dvd );
 
         /* Force libdvdcss to check its title key.
          * It is only useful for title cracking method. Methods using the
@@ -551,7 +551,7 @@ static int DVDRead( input_thread_t * p_input,
 
     if( ( p_input->stream.p_selected_area->i_tell
             >= p_input->stream.p_selected_area->i_size )
-       || ( i_block_once  < 0 ) )
+       || ( i_block_once  <= 0 ) )
     {
         if( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb )
         {

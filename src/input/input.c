@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.187 2002/03/06 01:20:56 stef Exp $
+ * $Id: input.c,v 1.188 2002/03/09 16:48:33 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -339,6 +339,8 @@ static int RunThread( input_thread_t *p_input )
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
+
+                input_AccessReinit( p_input );
             }
             p_input->stream.p_new_area = NULL;
         }
