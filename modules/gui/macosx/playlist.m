@@ -35,7 +35,6 @@
  */
 
 
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -99,8 +98,9 @@
 - (id)init
 {
     self = [super init];
-    if ( self !=nil )
+    if ( self != nil )
     {
+        o_outline_dict = [[NSMutableDictionary alloc] init];
         //i_moveRow = -1;
     }
     return self;
@@ -108,6 +108,10 @@
 
 - (void)awakeFromNib
 {
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    i_current_view = VIEW_CATEGORY;
+    playlist_ViewUpdate( p_playlist, i_current_view );
     [o_outline_view setTarget: self];
     [o_outline_view setDelegate: self];
     [o_outline_view setDataSource: self];
@@ -139,7 +143,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         o_descendingSortingImage = nil;
     }
 
-    o_outline_dict = [[NSMutableDictionary alloc] init];
     o_tc_sortColumn = nil;
 
     [self initStrings];
@@ -169,6 +172,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
+}
+
+- (NSOutlineView *)playlistView
+{
+    return o_outline_view;
 }
 
 - (IBAction)toggleWindow:(id)sender
@@ -242,14 +250,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     [o_outline_view setHighlightedTableColumn:nil];
     o_tc_sortColumn = nil;
-    [o_outline_dict removeAllObjects];
+    // TODO Find a way to keep the dict size to a minimum
+    //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
 }
 
+
 - (void)updateTogglePlaylistState
 {
-    if ([o_controller getSizeWithPlaylist].height ==
-                                    [o_controller minSize].height)
+    if( [o_controller getSizeWithPlaylist].height ==
+                                    [o_controller minSize].height )
     {
         [o_btn_playlist setState: NO];
     }
@@ -261,25 +271,26 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)updateRowSelection
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-    playlist_item_t * p_item, * p_temp_item;
-    NSMutableArray * o_array = [NSMutableArray array];
     int i,i_row;
     unsigned int j;
+    
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    playlist_item_t *p_item, *p_temp_item;
+    NSMutableArray *o_array = [NSMutableArray array];
 
-    if (p_playlist == NULL)
+    if( p_playlist == NULL )
         return;
 
     p_item = p_playlist->status.p_item;
     p_temp_item = p_item;
 
-    while (p_temp_item->i_parents > 0)
+    while( p_temp_item->i_parents > 0 )
     {
         [o_array insertObject: [NSValue valueWithPointer: p_temp_item] atIndex: 0];
         for (i = 0 ; i < p_temp_item->i_parents ; i++)
         {
-            if (p_temp_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+            if( p_temp_item->pp_parents[i]->i_view == i_current_view )
             {
                 p_temp_item = p_temp_item->pp_parents[i]->p_parent;
                 break;
@@ -304,27 +315,28 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release(p_playlist);
 }
 
-- (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
+
+- (BOOL)isItem: (playlist_item_t *)p_item inNode: (playlist_item_t *)p_node
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
-    playlist_item_t * p_temp_item = p_item;
+    playlist_item_t *p_temp_item = p_item;
 
-    if ( p_playlist == NULL )
+    if( p_playlist == NULL )
     {
         return NO;
     }
 
-    while ( p_temp_item->i_parents > 0 )
+    while( p_temp_item->i_parents > 0 )
     {
         int i;
-        for (i = 0; i < p_temp_item->i_parents ; i++)
+        for( i = 0; i < p_temp_item->i_parents ; i++ )
         {
-            if (p_temp_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+            if( p_temp_item->pp_parents[i]->i_view == i_current_view )
             {
-                if (p_temp_item->pp_parents[i]->p_parent == p_node)
+                if( p_temp_item->pp_parents[i]->p_parent == p_node )
                 {
-                    vlc_object_release(p_playlist);
+                    vlc_object_release( p_playlist );
                     return YES;
                 }
                 else
@@ -336,11 +348,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
     }
 
-    vlc_object_release(p_playlist);
+    vlc_object_release( p_playlist );
     return NO;
 }
 
 
+/* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)playItem:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -357,11 +370,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
         if( p_item )
         {
-            if (p_item->i_children == -1)
+            if( p_item->i_children == -1 )
             {
-                for (i = 0 ; i < p_item->i_parents ; i++)
+                for( i = 0 ; i < p_item->i_parents ; i++ )
                 {
-                    if (p_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+                    if( p_item->pp_parents[i]->i_view == i_current_view )
                     {
                         p_node = p_item->pp_parents[i]->p_parent;
                     }
@@ -370,8 +383,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             else
             {
                 p_node = p_item;
-                if (p_node->pp_children[0]->i_children == -1 &&
-                    p_node->i_children > 0)
+                if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
                 {
                     p_item = p_node->pp_children[0];
                 }
@@ -381,11 +393,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 }
             }
 
-//        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
-
-
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_node, p_item );
-//            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VIEW_SIMPLE, p_view ? p_view->p_root : NULL, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, i_current_view, p_node, p_item );
         }
         vlc_object_release( p_playlist );
     }
@@ -398,7 +406,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (IBAction)deleteItem:(id)sender
 {
-    int i, c, i_row;
+    int i, i_count, i_row;
     NSMutableArray *o_to_delete;
     NSNumber *o_number;
 
@@ -413,39 +421,41 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         return;
     }
     o_to_delete = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
-    c = [o_to_delete count];
+    i_count = [o_to_delete count];
 
-    for( i = 0; i < c; i++ ) {
+    for( i = 0; i < i_count; i++ )
+    {
         playlist_item_t * p_item;
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
 
         [o_to_delete removeObject: o_number];
         [o_outline_view deselectRow: i_row];
-        p_item = (playlist_item_t *)[[o_outline_view itemAtRow: i_row]pointerValue];
-        if (p_item->i_children > -1)
+
+        p_item = (playlist_item_t *)[[o_outline_view itemAtRow: i_row] pointerValue];
+
+        if( p_item->i_children > -1 ) //is a node and not an item
         {
-            if (p_playlist->status.i_status)
+            if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
+                [self isItem: p_playlist->status.p_item inNode: p_item] == YES )
             {
-                if ([self isItem:p_playlist->status.p_item inNode: p_item]
-                                    == YES && p_playlist->status.i_status)
-                {
-                    playlist_Stop( p_playlist );
-                }
+                // if current item is in selected node and is playing then stop playlist
+                playlist_Stop( p_playlist );
             }
             playlist_NodeDelete( p_playlist, p_item, VLC_TRUE);
         }
         else
         {
-            if( p_playlist->status.p_item == [[o_outline_view itemAtRow: i_row]
-                        pointerValue] && p_playlist->status.i_status )
+            if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
+                p_playlist->status.p_item == [[o_outline_view itemAtRow: i_row] pointerValue] )
             {
                 playlist_Stop( p_playlist );
             }
             playlist_LockDelete( p_playlist, p_item->input.i_id );
         }
-        [self playlistUpdated];
     }
+    [self playlistUpdated];
+    vlc_object_release( p_playlist );
 }
 
 - (IBAction)sortNodeByName:(id)sender
@@ -469,7 +479,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         return;
     }
 
-    if ([o_outline_view selectedRow] > -1)
+    if( [o_outline_view selectedRow] > -1 )
     {
         p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
                                                                 pointerValue];
@@ -477,33 +487,33 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     else
     /*If no item is selected, sort the whole playlist*/
     {
-        playlist_view_t * p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        playlist_view_t * p_view = playlist_ViewFind( p_playlist, i_current_view );
         p_item = p_view->p_root;
     }
 
-    if (p_item->i_children > -1)
+    if( p_item->i_children > -1 ) // the item is a node
     {
-        vlc_mutex_lock(&p_playlist->object_lock );
+        vlc_mutex_lock( &p_playlist->object_lock );
         playlist_RecursiveNodeSort( p_playlist, p_item, i_mode, ORDER_NORMAL );
-        vlc_mutex_unlock(&p_playlist->object_lock );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else
     {
         int i;
 
-        for (i = 0 ; i < p_item->i_parents ; i++)
+        for( i = 0 ; i < p_item->i_parents ; i++ )
         {
-            if (p_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+            if( p_item->pp_parents[i]->i_view == i_current_view )
             {
-                vlc_mutex_lock(&p_playlist->object_lock );
+                vlc_mutex_lock( &p_playlist->object_lock );
                 playlist_RecursiveNodeSort( p_playlist,
                         p_item->pp_parents[i]->p_parent, i_mode, ORDER_NORMAL );
-                vlc_mutex_unlock(&p_playlist->object_lock );
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 break;
             }
         }
     }
-    vlc_object_release(p_playlist);
+    vlc_object_release( p_playlist );
     [self playlistUpdated];
 }
 
@@ -519,7 +529,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         return;
     }
 
-    for ( i_item = 0; i_item < (int)[o_array count]; i_item++ )
+    for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
         /* One item */
         NSDictionary *o_one_item;
@@ -575,11 +585,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                       i_position == -1 ? PLAYLIST_END : i_position + i_item,
                       0, (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options );
 
-        /* clean up
-        for( j = 0; j < i_total_options; j++ )
-            free( ppsz_options[j] );
-        if( ppsz_options ) free( ppsz_options ); */
-
         /* Recent documents menu */
         o_true_file = [NSURL fileURLWithPath: o_uri];
         if( o_true_file != nil )
@@ -601,16 +606,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (IBAction)handlePopUp:(id)sender
 
 {
-             intf_thread_t * p_intf = VLCIntf;
-             vlc_value_t val1,val2;
-             playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                        FIND_ANYWHERE );
-             if( p_playlist == NULL )
-             {
-                 return;
-             }
+    intf_thread_t * p_intf = VLCIntf;
+    vlc_value_t val1,val2;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                            FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
-    switch ([o_loop_popup indexOfSelectedItem])
+    switch( [o_loop_popup indexOfSelectedItem] )
     {
         case 1:
 
@@ -632,7 +637,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         default:
              var_Get( p_playlist, "repeat", &val1 );
              var_Get( p_playlist, "loop", &val2 );
-             if (val1.b_bool || val2.b_bool)
+             if( val1.b_bool || val2.b_bool )
              {
                   val1.b_bool = 0;
                   var_Set( p_playlist, "repeat", val1 );
@@ -647,12 +652,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    playlist_item_t * p_selected_item;
+    playlist_item_t *p_selected_item;
     int i_current, i_selected_row;
 
-    if (!p_playlist)
+    if( !p_playlist )
         return NULL;
 
     i_selected_row = [o_outline_view selectedRow];
@@ -662,57 +667,57 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     p_selected_item = (playlist_item_t *)[[o_outline_view itemAtRow:
                                             i_selected_row] pointerValue];
 
-    for (i_current = 0; i_current < p_item->i_children ; i_current++)
+    for( i_current = 0; i_current < p_item->i_children ; i_current++ )
     {
-        char * psz_temp;
-        NSString * o_current_name, * o_current_author;
+        char *psz_temp;
+        NSString *o_current_name, *o_current_author;
 
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String:
             p_item->pp_children[i_current]->input.psz_name];
-        psz_temp = vlc_input_item_GetInfo(&p_item->input ,
+        psz_temp = vlc_input_item_GetInfo( &p_item->input ,
 				   _("Meta-information"),_("Author") );
         o_current_author = [NSString stringWithUTF8String: psz_temp];
         free( psz_temp);
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        if (p_selected_item == p_item->pp_children[i_current] &&
-                    b_selected_item_met == NO)
+        if( p_selected_item == p_item->pp_children[i_current] &&
+                    b_selected_item_met == NO )
         {
             b_selected_item_met = YES;
         }
-        else if (p_selected_item == p_item->pp_children[i_current] &&
-                    b_selected_item_met == YES)
+        else if( p_selected_item == p_item->pp_children[i_current] &&
+                    b_selected_item_met == YES )
         {
-            vlc_object_release(p_playlist);
+            vlc_object_release( p_playlist );
             return NULL;
         }
-        else if (b_selected_item_met == YES &&
-                    ([o_current_name rangeOfString:[o_search_field
+        else if( b_selected_item_met == YES &&
+                    ( [o_current_name rangeOfString:[o_search_field
                         stringValue] options:NSCaseInsensitiveSearch ].length ||
-                    [o_current_author rangeOfString:[o_search_field
-                        stringValue] options:NSCaseInsensitiveSearch ].length))
+                      [o_current_author rangeOfString:[o_search_field
+                        stringValue] options:NSCaseInsensitiveSearch ].length ) )
         {
-            vlc_object_release(p_playlist);
+            vlc_object_release( p_playlist );
             /*Adds the parent items in the result array as well, so that we can
             expand the tree*/
             return [NSMutableArray arrayWithObject: [NSValue
                             valueWithPointer: p_item->pp_children[i_current]]];
         }
-        if (p_item->pp_children[i_current]->i_children > 0)
+        if( p_item->pp_children[i_current]->i_children > 0 )
         {
             id o_result = [self subSearchItem:
                                             p_item->pp_children[i_current]];
-            if (o_result != NULL)
+            if( o_result != NULL )
             {
-                vlc_object_release(p_playlist);
+                vlc_object_release( p_playlist );
                 [o_result insertObject: [NSValue valueWithPointer:
                                 p_item->pp_children[i_current]] atIndex:0];
                 return o_result;
             }
         }
     }
-    vlc_object_release(p_playlist);
+    vlc_object_release( p_playlist );
     return NULL;
 }
 
@@ -731,21 +736,21 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     if( p_playlist == NULL )
         return;
 
-    p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+    p_view = playlist_ViewFind( p_playlist, i_current_view );
 
-    if (p_view)
+    if( p_view )
     {
         /*First, only search after the selected item:*
          *(b_selected_item_met = NO)                 */
         o_result = [self subSearchItem:p_view->p_root];
-        if (o_result == NULL)
+        if( o_result == NULL )
         {
             /* If the first search failed, search again from the beginning */
             o_result = [self subSearchItem:p_view->p_root];
         }
-        if (o_result != NULL)
+        if( o_result != NULL )
         {
-            for (i = 0 ; i < [o_result count] - 1 ; i++)
+            for( i = 0 ; i < [o_result count] - 1 ; i++ )
             {
                 [o_outline_view expandItem: [o_outline_dict objectForKey:
                             [NSString stringWithFormat: @"%p",
@@ -756,14 +761,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                             [[o_result objectAtIndex: [o_result count] - 1 ]
                             pointerValue]]]];
         }
-        if (i_row > -1)
+        if( i_row > -1 )
         {
             [o_outline_view selectRow:i_row byExtendingSelection: NO];
             [o_outline_view scrollRowToVisible: i_row];
         }
     }
-    vlc_object_release(p_playlist);
-
+    vlc_object_release( p_playlist );
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
@@ -792,27 +796,29 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                                                                 pointerValue];
 }
 
-- (void) outlineView:(NSTableView*)o_tv
+- (void)outlineView: (NSTableView*)o_tv
                   didClickTableColumn:(NSTableColumn *)o_tc
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                       FIND_ANYWHERE );
-    playlist_view_t * p_view  = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
     int i_mode = 0, i_type;
+    intf_thread_t *p_intf = VLCIntf;
+    playlist_view_t *p_view;
 
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
     }
-
+    
     /* Check whether the selected table column header corresponds to a
        sortable table column*/
-    if ( !(o_tc == o_tc_name || o_tc == o_tc_author))
+    if( !( o_tc == o_tc_name || o_tc == o_tc_author ) )
     {
+        vlc_object_release( p_playlist );
         return;
     }
+
+    p_view = playlist_ViewFind( p_playlist, i_current_view );
 
     if( o_tc_sortColumn == o_tc )
     {
@@ -823,16 +829,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         b_isSortDescending = VLC_FALSE;
     }
 
-    if (o_tc == o_tc_name)
+    if( o_tc == o_tc_name )
     {
         i_mode = SORT_TITLE;
     }
-    else if (o_tc == o_tc_author)
+    else if( o_tc == o_tc_author )
     {
         i_mode = SORT_AUTHOR;
     }
 
-    if (b_isSortDescending)
+    if( b_isSortDescending )
     {
         i_type = ORDER_REVERSE;
     }
@@ -841,9 +847,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         i_type = ORDER_NORMAL;
     }
 
-    vlc_mutex_lock(&p_playlist->object_lock );
-    playlist_RecursiveNodeSort(p_playlist, p_view->p_root, i_mode, i_type);
-    vlc_mutex_unlock(&p_playlist->object_lock );
+    vlc_mutex_lock( &p_playlist->object_lock );
+    playlist_RecursiveNodeSort( p_playlist, p_view->p_root, i_mode, i_type );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     vlc_object_release( p_playlist );
     [self playlistUpdated];
@@ -851,7 +857,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     o_tc_sortColumn = o_tc;
     [o_outline_view setHighlightedTableColumn:o_tc];
 
-    if (b_isSortDescending)
+    if( b_isSortDescending )
     {
         [o_outline_view setIndicatorImage:o_descendingSortingImage
                                                         inTableColumn:o_tc];
@@ -873,14 +879,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     int i_return = 0;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist == NULL || outlineView != o_outline_view )
         return 0;
 
     if( item == nil )
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        p_view = playlist_ViewFind( p_playlist, i_current_view );
         if( p_view && p_view->p_root )
             i_return = p_view->p_root->i_children;
     }
@@ -891,8 +897,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             i_return = p_item->i_children;
     }
     vlc_object_release( p_playlist );
-    if( i_return == -1 ) i_return = 0;
-    msg_Dbg( p_playlist, "I have %d children", i_return );
+    
+    if( i_return <= 0 )
+        i_return = 0;
+    
     return i_return;
 }
 
@@ -902,7 +910,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     playlist_item_t *p_return = NULL;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    NSValue * o_value;
+    NSValue *o_value;
 
     if( p_playlist == NULL )
         return nil;
@@ -911,40 +919,45 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
-        if( p_view && index < p_view->p_root->i_children )
+        p_view = playlist_ViewFind( p_playlist, i_current_view );
+        if( p_view && index < p_view->p_root->i_children && index >= 0 )
             p_return = p_view->p_root->pp_children[index];
     }
     else
     {
         playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
-        if( p_item && index < p_item->i_children )
-        {
+        if( p_item && index < p_item->i_children && index >= 0 )
             p_return = p_item->pp_children[index];
-        }
     }
     
     if( p_playlist->i_size >= 2 )
+    {
+        [o_status_field setStringValue: [NSString stringWithFormat:
+                    _NS("%i items in playlist"), p_playlist->i_size]];
+    }
+    else
+    {
+        if( p_playlist->i_size == 0 )
         {
             [o_status_field setStringValue: [NSString stringWithFormat:
-                        _NS("%i items in playlist"), p_playlist->i_size]];
-        } else {
-            if( p_playlist->i_size == 0 )
-            {
-                [o_status_field setStringValue: [NSString stringWithFormat:
-                        _NS("no items in playlist"), p_playlist->i_size]];
-            } else {
-                [o_status_field setStringValue: [NSString stringWithFormat:
-                        _NS("1 item in playlist"), p_playlist->i_size]];
-            }
+                    _NS("no items in playlist"), p_playlist->i_size]];
+        }
+        else
+        {
+            [o_status_field setStringValue: [NSString stringWithFormat:
+                    _NS("1 item in playlist"), p_playlist->i_size]];
+        }
     }
 
     vlc_object_release( p_playlist );
-    msg_Dbg( p_playlist, "childitem with index %d", index );
+    
 
-    o_value = [NSValue valueWithPointer: p_return];
+    o_value = [[NSValue valueWithPointer: p_return] retain];
 
-    [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",                                                                      p_return]];
+    if( [o_outline_dict objectForKey: [NSString stringWithFormat:@"%p", p_return]] == nil )
+    {
+        [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p", p_return]];
+    }
     return o_value;
 }
 
@@ -961,7 +974,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* root object */
         playlist_view_t *p_view;
-        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+        p_view = playlist_ViewFind( p_playlist, i_current_view );
         if( p_view && p_view->p_root )
             i_return = p_view->p_root->i_children;
     }
@@ -973,7 +986,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     vlc_object_release( p_playlist );
 
-    if( i_return == -1 || i_return == 0 )
+    if( i_return <= 0 )
         return NO;
     else
         return YES;
@@ -983,14 +996,25 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
 {
     id o_value = nil;
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    intf_thread_t *p_intf = VLCIntf;
+    playlist_t *p_playlist;
+    playlist_item_t *p_item;
+    
+    if( item == nil || ![item isKindOfClass: [NSValue class]] ) return( @"error" );
+    
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
-
-    if( p_playlist == NULL || p_item == NULL )
+    if( p_playlist == NULL )
     {
         return( @"error" );
+    }
+    
+    p_item = (playlist_item_t *)[item pointerValue];
+
+    if( p_item == NULL )
+    {
+        vlc_object_release( p_playlist );
+        return( @"error");
     }
 
     if( [[o_tc identifier] isEqualToString:@"1"] )
@@ -1032,7 +1056,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             o_value = @"-:--:--";
         }
     }
-
     vlc_object_release( p_playlist );
 
     return( o_value );

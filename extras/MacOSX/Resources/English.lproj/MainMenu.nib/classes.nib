@@ -125,6 +125,7 @@
                 "o_btn_prev" = id; 
                 "o_btn_rewind" = id; 
                 "o_btn_stop" = id; 
+                "o_clip_view" = id; 
                 "o_controls" = id; 
                 "o_dmi_mute" = id; 
                 "o_dmi_next" = id; 

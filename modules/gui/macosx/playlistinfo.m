@@ -97,7 +97,6 @@
     char *psz_temp;
     vlc_mutex_lock( &p_item->input.lock );
 
-
     /*fill uri / title / author info */
     if( p_item->input.psz_uri )
     {
@@ -115,7 +114,7 @@
             [NSString stringWithUTF8String:p_item->input.psz_name]];
     }
     vlc_mutex_unlock( &p_item->input.lock );
-    
+
     psz_temp = vlc_input_item_GetInfo( &p_item->input, _("Meta-information"), _("Artist") );
 
     if( psz_temp )

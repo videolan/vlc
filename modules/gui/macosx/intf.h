@@ -87,6 +87,7 @@ struct intf_sys_t
     BOOL nib_open_loaded;       /* reference to the open-nib */
 
     IBOutlet id o_window;       /* main window    */
+    IBOutlet id o_clip_view;    /* playlist clipview    */
     IBOutlet id o_scrollfield;  /* info field     */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
@@ -232,6 +233,10 @@ struct intf_sys_t
     IBOutlet id o_dmi_next;
     IBOutlet id o_dmi_previous;
     IBOutlet id o_dmi_mute;
+    
+    /* stupid outline views .... */
+    NSRect rect_remember;
+    NSView *o_document_view;
 }
 
 + (VLCMain *)sharedInstance;

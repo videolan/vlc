@@ -60,18 +60,20 @@
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
-    NSMutableDictionary * o_outline_dict;
+    NSMutableDictionary *o_outline_dict;
 
-    bool b_selected_item_met;
-    bool b_isSortDescending;
+    BOOL b_selected_item_met;
+    BOOL b_isSortDescending;
+    int i_current_view;
     id o_tc_sortColumn;
 }
 
-- (IBAction)handlePopUp:(id)sender;
-- (IBAction)searchItem:(id)sender;
-
 - (void)initStrings;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
+- (NSOutlineView *)playlistView;
+
+- (IBAction)handlePopUp:(id)sender;
+- (IBAction)searchItem:(id)sender;
 
 - (void)updateTogglePlaylistState;
 - (void)playlistUpdated;

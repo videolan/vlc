@@ -220,7 +220,7 @@
     [super close];
 }
 
-- (void)setOnTop:(bool)b_on_top
+- (void)setOnTop:(BOOL)b_on_top
 {
     if( b_on_top )
     {
@@ -232,7 +232,7 @@
     }
 }
 
-- (void)hideMouse:(bool)b_hide
+- (void)hideMouse:(BOOL)b_hide
 {
     BOOL b_inside;
     NSPoint ml;

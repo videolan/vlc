@@ -377,6 +377,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
+    [o_window setDelegate: self];
 
     p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -1435,6 +1436,33 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         [o_msg_lock unlock];
     }
+}
+
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
+{
+    if( proposedFrameSize.height <= 200 )
+    {
+        if( [sender frame].size.height > 200 )
+        {
+            //rect_remember = [[o_playlist playlistView] frame];
+            o_document_view = [o_clip_view documentView];
+            [o_document_view retain];
+            [o_clip_view setDocumentView: NULL];
+        }
+        return NSMakeSize( proposedFrameSize.width, 95 );
+    }
+    else
+    {
+        if( [sender frame].size.height <= 200 )
+        {
+            [o_clip_view setDocumentView: o_document_view];
+            [o_document_view release];
+            [o_document_view setFrameSize: NSMakeSize( proposedFrameSize.width - 22, proposedFrameSize.height - 120 )];
+            //[[o_playlist playlistView] setFrame: rect_remember];
+        }
+        return proposedFrameSize;
+    }
+    return proposedFrameSize;
 }
 
 @end

@@ -39,9 +39,9 @@
 - (id)initWithVout:(vout_thread_t *)_p_vout
     frame:(NSRect *)s_frame;
 - (void)close;
-- (void)setOnTop:(bool)b_on_top;
+- (void)setOnTop:(BOOL)b_on_top;
 
-- (void)hideMouse:(bool)b_hide;
+- (void)hideMouse:(BOOL)b_hide;
 - (void)manage;
 
 - (void)scaleWindowWithFactor: (float)factor;
