@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.10 2004/01/30 14:27:48 fenrir Exp $
+ * $Id: dvdnav.c,v 1.11 2004/01/30 14:45:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -786,7 +786,6 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     ButtonUpdate( p_demux );
 
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
-    msg_Err( p_demux, "title=%d part=%d", i_title, i_part );
     if( i_title > 0 )
     {
         return;
