@@ -777,6 +777,12 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_atof NULL
 #endif
 
+#ifndef HAVE_STRTOF
+#   ifdef HAVE_STRTOD
+#       define strtof strtod
+#   endif
+#endif
+
 #ifndef HAVE_ATOLL
 #   define atoll vlc_atoll
     VLC_EXPORT( int64_t, vlc_atoll, ( const char *nptr ) );
