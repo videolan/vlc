@@ -209,6 +209,7 @@ DIST_skins2 = \
 	\
 	skins2/fonts/FreeSans.ttf \
 	skins2/skin.dtd \
+	skins2/skin.catalog \
 	$(NULL)
 
 DIST_http = \

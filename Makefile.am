@@ -621,6 +621,9 @@ package-win32-base:
 	for i in $(srcdir)/share/skins2/default/*.*; do \
 	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/default/ || true ; \
 	done
+	for i in $(srcdir)/share/skins2/*.*; do \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/ || true ; \
+	done
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
 	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;

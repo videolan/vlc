@@ -42,15 +42,31 @@ SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
     // Avoid duplicate initialization (mutex needed ?)
     if( !m_initialized )
     {
-        // Initialize XML catalog support
-        xmlInitializeCatalog();
-
         // Get the resource path and look for the DTD
         OSFactory *pOSFactory = OSFactory::instance( getIntf() );
         const list<string> &resPath = pOSFactory->getResourcePath();
         const string &sep = pOSFactory->getDirSeparator();
         list<string>::const_iterator it;
         struct stat statBuf;
+
+        // Try to load the catalog first (needed at least on win32 where
+        // we don't have a default catalog)
+        for( it = resPath.begin(); it != resPath.end(); it++ )
+        {
+            string catalog_path = (*it) + sep + "skin.catalog";
+            if( !stat( catalog_path.c_str(), &statBuf ) )
+            {
+                msg_Dbg( getIntf(), "Using catalog %s", catalog_path.c_str() );
+                xmlLoadCatalog( catalog_path.c_str() );
+                break;
+            }
+        }
+        if( it == resPath.end() )
+        {
+            // Ok, try the default one
+            xmlInitializeCatalog();
+        }
+
         for( it = resPath.begin(); it != resPath.end(); it++ )
         {
             string path = (*it) + sep + "skin.dtd";
@@ -58,6 +74,7 @@ SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
             {
                 // DTD found
                 msg_Dbg( getIntf(), "Using DTD %s", path.c_str() );
+
                 // Add an entry in the default catalog
                 xmlCatalogAdd( (xmlChar*)"public",
                                (xmlChar*)("-//VideoLAN//DTD VLC Skins V"
