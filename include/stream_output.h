@@ -322,6 +322,9 @@ struct sap_handler_t
 
     int (*pf_add)  ( sap_handler_t*, session_descriptor_t *,announce_method_t*);
     int (*pf_del)  ( sap_handler_t*, session_descriptor_t *);
+
+    /* private data, not in p_sys as there is one kind of sap_handler_t */
+    vlc_iconv_t iconvHandle;
 };
 
 /* The main announce handler object */

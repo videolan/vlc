@@ -274,7 +274,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
 
     vlc_current_charset( &psz_charset );
-    p_sys->iconvHandle = vlc_iconv_open( psz_charset, "UTF-8");
+    p_sys->iconvHandle = vlc_iconv_open( psz_charset, "UTF-8" );
     free( psz_charset );
     if( p_sys->iconvHandle == (vlc_iconv_t)(-1) )
     {
@@ -812,9 +812,13 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     char                *psz_value;
     sap_announce_t *p_sap = (sap_announce_t *)malloc(
                                         sizeof(sap_announce_t ) );
-    if( !p_sap )
+
+    psz_value = convert_from_utf8( p_sd, p_sdp->psz_sessionname );
+    if( p_sap == NULL || psz_value == NULL )
     {
         msg_Err( p_sd, "out of memory");
+        FREE( p_sap );
+        FREE( psz_value );
         p_sd->b_die = VLC_TRUE;
         return NULL;
     }
@@ -824,9 +828,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_item = NULL;
 
     /* Create the playlist item here */
-    psz_value = convert_from_utf8( p_sd, p_sap->p_sdp->psz_sessionname );
     p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri, psz_value );
-    FREE( psz_value );
+    free( psz_value );
 
     if( !p_item )
     {
@@ -853,16 +856,24 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     if( psz_value != NULL )
     {
         char *psz_grp = convert_from_utf8( p_sd, psz_value );
-        free( psz_value );
 
-        p_child = playlist_ChildSearchName( p_sd->p_sys->p_node, psz_grp );
-
-        if( p_child == NULL )
+        if( psz_grp != NULL )
         {
-            p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                           psz_grp, p_sd->p_sys->p_node );
+            p_child = playlist_ChildSearchName( p_sd->p_sys->p_node,
+                                                psz_grp );
+
+            if( p_child == NULL )
+                p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+                                               psz_grp, p_sd->p_sys->p_node );
+            free( psz_grp );
         }
-        free( psz_grp );
+        else
+        {
+            vlc_object_release( p_playlist );
+            msg_Err( p_sd, "out of memory");
+            free( p_sap );
+            return NULL;
+        }
     }
     else
     {
