@@ -1,8 +1,8 @@
 /*****************************************************************************
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: cvd_parse.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
+ * Copyright (C) 2003, 2004 VideoLAN
+ * $Id: cvd_parse.c,v 1.5 2004/01/03 12:54:56 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -36,6 +36,10 @@
 #include "render.h"
 #include "cvd.h"
 #include "common.h"
+
+#ifdef HAVE_LIBPNG
+#include <png.h>
+#endif
 
 /* An image color is a two-bit palette entry: 0..3 */ 
 typedef uint8_t ogt_color_t;
@@ -264,6 +268,14 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     for ( i_field=0; i_field < 2; i_field++ ) {
       i_nibble_field = 2;  /* 4-bit pieces available in *p */
 
+#if 0
+      unsigned int i;
+      int8_t *b=p;
+      for (i=0; i< i_width * i_height; i++)
+	printf ("%02x", b[i]);
+      printf("\n");
+#endif
+    
       for ( i_row=i_field; i_row < i_height; i_row += 2 ) {
 	b_filling   = VLC_FALSE;
 	for ( i_column=0; i_column<i_width; i_column++ ) {
@@ -326,18 +338,31 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
       }
     }
 
-    /* Dump out image not interlaced... */
-    if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE) {
-      uint8_t *p = p_dest;
-      printf("-------------------------------------\n++");
-      for ( i_row=0; i_row < i_height; i_row ++ ) {
-	for ( i_column=0; i_column<i_width; i_column++ ) {
-	  printf("%1d", *p++ & 0x03);
-	}
-	printf("\n++");
-      }
-      printf("\n-------------------------------------\n");
+    if (p_sys && (p_sys->i_debug & DECODE_DBG_IMAGE)) {
+      /* Dump out image not interlaced... */
+      VCDSubDumpImage( p_dest, i_height, i_width );
     }
+
+#ifdef HAVE_LIBPNG
+    if (p_sys && (p_sys->i_debug & DECODE_DBG_PNG)) {
+#define TEXT_COUNT 2
+      /* Dump image to a file in PNG format. */
+      char filename[300];
+      png_text text_ptr[TEXT_COUNT];
+
+      text_ptr[0].key = "Preparer";
+      text_ptr[0].text = "VLC";
+      text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+      text_ptr[1].key = "Description";
+      text_ptr[1].text = "CVD Subtitle";
+      text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
+
+      snprintf(filename, 300, "%s%d.png", "/tmp/vlc-cvd-sub", p_sys->i_image);
+      VCDSubDumpPNG( p_dest, p_dec, i_height, i_width, filename,
+		     text_ptr, TEXT_COUNT );
+    }
+#endif /*HAVE_LIBPNG*/
+
 
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
 

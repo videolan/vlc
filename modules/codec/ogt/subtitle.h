@@ -1,8 +1,8 @@
 /*****************************************************************************
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: subtitle.h,v 1.2 2003/12/28 11:26:52 rocky Exp $
+ * Copyright (C) 2003,2004 VideoLAN
+ * $Id: subtitle.h,v 1.3 2004/01/03 12:54:56 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -30,7 +30,19 @@
 #define DECODE_DBG_IMAGE       8 /* image bitmaps */
 #define DECODE_DBG_TRANSFORM  16 /* bitmap transformations */
 #define DECODE_DBG_RENDER     32 /* rendering information */
-#define DECODE_DBG_INFO       64
+#define DECODE_DBG_PNG        64 /* Extract subtitles to PNG files. */
+#define DECODE_DBG_INFO      128
+
+#define DEBUG_LONGTEXT N_( \
+    "This integer when viewed in binary is a debugging mask\n" \
+    "external call          1\n" \
+    "all calls              2\n" \
+    "packet assembly info   4\n" \
+    "image bitmaps          8\n" \
+    "image transformations 16\n" \
+    "rendering information 32\n" \
+    "extract subtitles     64\n" \
+    "misc info            128\n" )
 
 #define DECODE_DEBUG 1
 #if DECODE_DEBUG
@@ -124,11 +136,11 @@ struct decoder_sys_t
 				     image when displayed */
   uint16_t i_width, i_height;	/* dimensions in pixels of image */
 
-  ogt_yuvt_t pi_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
+  ogt_yuvt_t p_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
 						  in subtitle */
 
 
-  ogt_yuvt_t pi_palette_highlight[NUM_SUBTITLE_COLORS]; /* Only used
+  ogt_yuvt_t p_palette_highlight[NUM_SUBTITLE_COLORS]; /* Only used
 							   for CVD */
 
   uint8_t i_options;

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: ogt_parse.c,v 1.4 2003/12/30 04:43:52 rocky Exp $
+ * Copyright (C) 2003, 2004 VideoLAN
+ * $Id: ogt_parse.c,v 1.5 2004/01/03 12:54:56 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -36,6 +36,10 @@
 #include "common.h"
 #include "render.h"
 #include "ogt.h"
+
+#ifdef HAVE_LIBPNG
+#include <png.h>
+#endif
 
 /* An image color is a two-bit palette entry: 0..3 */ 
 typedef uint8_t ogt_color_t;
@@ -104,14 +108,14 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   p_sys->i_height = GETINT16(p);
   
   for (i=0; i<4; i++) {
-    p_sys->pi_palette[i].s.y = *p++;
-    p_sys->pi_palette[i].s.u = *p++;
-    p_sys->pi_palette[i].s.v = *p++;
+    p_sys->p_palette[i].s.y = *p++;
+    p_sys->p_palette[i].s.u = *p++;
+    p_sys->p_palette[i].s.v = *p++;
     /* OGT has 8-bit resolution for alpha, but DVD's and CVDS use 4-bits.
        Since we want to use the same render routine, rather than scale up
        CVD (and DVD) subtitles, we'll scale down ours. 
     */
-    p_sys->pi_palette[i].s.t = (*p++) >> 4;
+    p_sys->p_palette[i].s.t = (*p++) >> 4;
   }
   p_sys->i_cmd = *p++;
       /* We do not really know this, FIXME */
@@ -136,8 +140,8 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
     
     for (i=0; i<4; i++) {
       msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
-	       p_sys->pi_palette[i].s.t, p_sys->pi_palette[i].s.y, 
-	       p_sys->pi_palette[i].s.u, p_sys->pi_palette[i].s.v );
+	       p_sys->p_palette[i].s.t, p_sys->p_palette[i].s.y, 
+	       p_sys->p_palette[i].s.u, p_sys->p_palette[i].s.v );
     }
   }
 }
@@ -325,7 +329,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 
 	}
 
-	if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE)	
+	if (p_sys && (p_sys->i_debug & DECODE_DBG_IMAGE))
 	  printf("\n");
 
 	if ( i_2bit_field != 4 ) {
@@ -337,20 +341,33 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	+ p_sys->second_field_offset;
     }
 
-    /* Dump out image not interlaced... */
-    if (p_sys && p_sys->i_debug & DECODE_DBG_IMAGE) {
-      uint8_t *p = p_dest;
-      printf("-------------------------------------\n++");
-      for ( i_row=0; i_row < i_height; i_row ++ ) {
-	for ( i_column=0; i_column<i_width; i_column++ ) {
-	  printf("%1d", *p++ & 0x03);
-	}
-	printf("\n++");
-      }
-      printf("\n-------------------------------------\n");
+    if (p_sys && (p_sys->i_debug & DECODE_DBG_IMAGE)) {
+      /* Dump out image not interlaced... */
+      VCDSubDumpImage( p_dest, i_height, i_width );
     }
 
+#ifdef HAVE_LIBPNG
+    if (p_sys && (p_sys->i_debug & DECODE_DBG_PNG)) {
+#define TEXT_COUNT 2
+      /* Dump image to a file in PNG format. */
+      char filename[300];
+      png_text text_ptr[TEXT_COUNT];
+
+      text_ptr[0].key = "Preparer";
+      text_ptr[0].text = "VLC";
+      text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+      text_ptr[1].key = "Description";
+      text_ptr[1].text = "SVCD Subtitle";
+      text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
+
+      snprintf(filename, 300, "%s%d.png", "/tmp/vlc-svcd-sub", p_sys->i_image);
+      VCDSubDumpPNG( p_dest, p_dec, i_height, i_width, filename,
+		     text_ptr, TEXT_COUNT );
+    }
+#endif /*HAVE_LIBPNG*/
+    
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
+    
 
     /* The video is automatically scaled. However subtitle bitmaps
        assume a 1:1 aspect ratio. So we need to scale to compensate for

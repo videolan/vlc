@@ -1,8 +1,8 @@
 /*****************************************************************************
  * Header for Common SVCD and VCD subtitle routines.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: common.h,v 1.2 2003/12/30 04:43:52 rocky Exp $
+ * Copyright (C) 2003, 2004 VideoLAN
+ * $Id: common.h,v 1.3 2004/01/03 12:54:56 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -22,22 +22,37 @@
  *****************************************************************************/
 
 void           VCDSubClose  ( vlc_object_t * );
+
 void           VCDSubInitSubtitleBlock( decoder_sys_t * p_sys );
+
 void           VCDSubInitSubtitleData(decoder_sys_t *p_sys);
+
 void           VCDSubAppendData( decoder_t *p_dec, uint8_t *buffer, 
 				 uint32_t buf_len );
 vout_thread_t *VCDSubFindVout( decoder_t *p_dec );
 
 void           VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu, 
 			     unsigned int i_scale_x, unsigned int i_scale_y );
+
 void           VCDSubDestroySPU( subpicture_t *p_spu );
+
 int            VCDSubCropCallback( vlc_object_t *p_object, char const *psz_var,
 				   vlc_value_t oldval, vlc_value_t newval, 
 				   void *p_data );
+
 void           VCDSubUpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object );
+
 void           VCDInlinePalette ( /*inout*/ uint8_t *p_dest, 
 				  decoder_sys_t *p_sys, unsigned int i_height, 
 				  unsigned int i_width );
 
+void           VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, 
+				uint32_t i_width );
 
-
+#ifdef HAVE_LIBPNG
+#include <png.h>
+void           VCDSubDumpPNG( uint8_t *p_image, decoder_t *p_dec,
+			      uint32_t i_height, uint32_t i_width,
+			      const char *filename,  /*in*/ png_text *text_ptr,
+			      int i_text_count );
+#endif /*HAVE_LIBPNG*/

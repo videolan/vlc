@@ -1,8 +1,8 @@
 /*****************************************************************************
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: common.c,v 1.2 2003/12/30 04:43:52 rocky Exp $
+ * Copyright (C) 2003, 2004 VideoLAN
+ * $Id: common.c,v 1.3 2004/01/03 12:54:56 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -34,6 +34,9 @@
 
 #include "subtitle.h"
 #include "common.h"
+#ifdef HAVE_LIBPNG
+#include "write_png.h"
+#endif
 
 /*****************************************************************************
  Free Resources associated with subtitle packet.
@@ -123,6 +126,14 @@ VCDSubAppendData ( decoder_t *p_dec, uint8_t *buffer, uint32_t buf_len )
   }
 
   if ( chunk_length > 0 ) {
+#if 0
+    int i;
+    int8_t *b=buffer;
+    for (i=0; i<chunk_length; i++)
+      printf ("%02x", b[i]);
+    printf("\n");
+#endif
+    
     memcpy(p_sys->subtitle_data + p_sys->subtitle_data_pos,
 	   buffer, chunk_length);
     p_sys->subtitle_data_pos += chunk_length;
@@ -175,7 +186,7 @@ VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
   ogt_yuvt_t *p_to   = (ogt_yuvt_t *) p_dest;
   
   for ( ; n >= 0 ; n-- ) {
-    p_to[n] = p_sys->pi_palette[p_from[n]];
+    p_to[n] = p_sys->p_palette[p_from[n]];
   }
 }
 
@@ -302,3 +313,131 @@ void VCDSubUpdateSPU( subpicture_t *p_spu, vlc_object_t *p_object )
 
 }
 
+/* 
+   Dump an a subtitle image to standard output - for debugging.
+ */
+void VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, uint32_t i_width )
+{
+  uint8_t *p = p_image;
+  unsigned int i_row;    /* scanline row number */
+  unsigned int i_column; /* scanline column number */
+
+  printf("-------------------------------------\n++");
+  for ( i_row=0; i_row < i_height; i_row ++ ) {
+    for ( i_column=0; i_column<i_width; i_column++ ) {
+      printf("%1d", *p++ & 0x03);
+    }
+    printf("\n++");
+  }
+  printf("\n-------------------------------------\n");
+}
+
+/* 
+   FIXME: 
+   MOVE clip_8_bit and uuv2rgb TO A MORE GENERIC PLACE.
+ */
+
+/* Force v in the range 0.255 */
+static inline uint8_t 
+clip_8_bit(int v)
+{
+  if (v<0)   return 0;
+  if (v>255) return 255;
+  return (uint8_t) v;
+}
+
+/***************************************************
+   Color conversion from
+    http://www.inforamp.net/~poynton/notes/colour_and_gamma/ColorFAQ.html#RTFToC30
+    http://people.ee.ethz.ch/~buc/brechbuehler/mirror/color/ColorFAQ.html
+ 
+    Thanks to Billy Biggs <vektor@dumbterm.net> for the pointer and
+    the following conversion.
+ 
+    R' = [ 1.1644         0    1.5960 ]   ([ Y' ]   [  16 ])
+    G' = [ 1.1644   -0.3918   -0.8130 ] * ([ Cb ] - [ 128 ])
+    B' = [ 1.1644    2.0172         0 ]   ([ Cr ]   [ 128 ])
+
+  See also vlc/modules/video_chroma/i420_rgb.h and
+  vlc/modules/video_chroma/i420_rgb_c.h for a way to do this in a way
+  more optimized for integer arithmetic. Would be nice to merge the
+  two routines.
+ 
+***************************************************/
+
+static inline void
+yuv2rgb(ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )
+{
+  
+  int i_Y  = p_yuv->s.y - 16;
+  int i_Cb = p_yuv->s.v - 128;
+  int i_Cr = p_yuv->s.u - 128;
+  
+  int i_red   = (1.1644 * i_Y) + (1.5960 * i_Cr);
+  int i_green = (1.1644 * i_Y) - (0.3918 * i_Cb) - (0.8130 * i_Cr);
+  int i_blue  = (1.1644 * i_Y) + (2.0172 * i_Cb);
+  
+  i_red   = clip_8_bit( i_red );
+  i_green = clip_8_bit( i_green );
+  i_blue  = clip_8_bit( i_blue );
+  
+  *p_rgb_out++ = i_red;
+  *p_rgb_out++ = i_green;
+  *p_rgb_out++ = i_blue;
+  
+}
+
+#ifdef HAVE_LIBPNG
+
+#define BYTES_PER_RGB 3
+#define PALETTE_SIZE  4
+/* Note the below assumes the above is a power of 2 */
+#define PALETTE_SIZE_MASK (PALETTE_SIZE-1)
+
+/* 
+   Dump an a subtitle image to a Portable Network Graphics (PNG) file.
+   All we do here is convert YUV palette entries to RGB, expand
+   the image into a linear RGB pixel array, and call the routine
+   that does the PNG writing.
+ */
+
+void 
+VCDSubDumpPNG( uint8_t *p_image, decoder_t *p_dec,
+	       uint32_t i_height, uint32_t i_width, const char *filename,
+	       png_text *text_ptr, int i_text_count )
+{
+  decoder_sys_t *p_sys = p_dec->p_sys;
+  uint8_t *p = p_image;
+  uint8_t *image_data = malloc(BYTES_PER_RGB * i_height * i_width );
+  uint8_t *q = image_data;
+  unsigned int i_row;    /* scanline row number */
+  unsigned int i_column; /* scanline column number */
+  uint8_t rgb_palette[PALETTE_SIZE * BYTES_PER_RGB];
+  int i;
+
+  dbg_print( (DECODE_DBG_CALL), "%s", filename);
+  
+  if (NULL == image_data) return;
+
+  /* Convert palette YUV into RGB. */
+  for (i=0; i<PALETTE_SIZE; i++) {
+    ogt_yuvt_t *p_yuv     = &(p_sys->p_palette[i]);
+    uint8_t   *p_rgb_out  = &(rgb_palette[i*BYTES_PER_RGB]);
+    yuv2rgb( p_yuv, p_rgb_out );
+  }
+  
+  /* Convert palette entries into linear RGB array. */
+  for ( i_row=0; i_row < i_height; i_row ++ ) {
+    for ( i_column=0; i_column<i_width; i_column++ ) {
+      uint8_t *p_rgb = &rgb_palette[ ((*p)&PALETTE_SIZE_MASK)*BYTES_PER_RGB ];
+      *q++ = p_rgb[0];
+      *q++ = p_rgb[1];
+      *q++ = p_rgb[2];
+      p++;
+    }
+  }
+  
+  write_png( filename, i_height, i_width, image_data, text_ptr, i_text_count );
+  free(image_data);
+}
+#endif /*HAVE_LIBPNG*/

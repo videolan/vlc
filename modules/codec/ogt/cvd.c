@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.5 2004/01/01 13:54:24 rocky Exp $
+ * $Id: cvd.c,v 1.6 2004/01/03 12:54:56 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -35,15 +35,6 @@
 #include "subtitle.h"
 #include "cvd.h"
 #include "common.h"
-
-#define DEBUG_LONGTEXT N_( \
-    "This integer when viewed in binary is a debugging mask\n" \
-    "external call          1\n" \
-    "all calls              2\n" \
-    "packet assembly info   4\n" \
-    "image bitmaps          8\n" \
-    "image transformations 16\n" \
-    "misc info             32\n" )
 
 /*****************************************************************************
  * Module descriptor.
@@ -324,9 +315,9 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 		       "primary palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
 		       v, p[1], p[2], p[3]);
 	    
-	    p_sys->pi_palette[v].s.y = p[1];
-	    p_sys->pi_palette[v].s.u = p[2];
-	    p_sys->pi_palette[v].s.v = p[3];
+	    p_sys->p_palette[v].s.y = p[1];
+	    p_sys->p_palette[v].s.u = p[2];
+	    p_sys->p_palette[v].s.v = p[3];
 	    break;
 	  }
 	  
@@ -343,43 +334,43 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 		       v, p[1], p[2], p[3]);
 	    
 	    /* Highlight Palette */
-	    p_sys->pi_palette_highlight[v].s.y = p[1];
-	    p_sys->pi_palette_highlight[v].s.u = p[2];
-	    p_sys->pi_palette_highlight[v].s.v = p[3];
+	    p_sys->p_palette_highlight[v].s.y = p[1];
+	    p_sys->p_palette_highlight[v].s.u = p[2];
+	    p_sys->p_palette_highlight[v].s.v = p[3];
 	    break;
 	  }
 
 	case 0x37:
 	  /* transparency for primary palette */
-	  p_sys->pi_palette[0].s.t = p[3] & 0x0f;
-	  p_sys->pi_palette[1].s.t = p[3] >> 4;
-	  p_sys->pi_palette[2].s.t = p[2] & 0x0f;
-	  p_sys->pi_palette[3].s.t = p[2] >> 4;
+	  p_sys->p_palette[0].s.t = p[3] & 0x0f;
+	  p_sys->p_palette[1].s.t = p[3] >> 4;
+	  p_sys->p_palette[2].s.t = p[2] & 0x0f;
+	  p_sys->p_palette[3].s.t = p[2] >> 4;
 
 	  dbg_print( DECODE_DBG_PACKET,
 		     "transparancy for primary palette 0..3: "
 		     "0x%0x 0x%0x 0x%0x 0x%0x",
-		     p_sys->pi_palette[0].s.t,
-		     p_sys->pi_palette[1].s.t,
-		     p_sys->pi_palette[2].s.t,
-		     p_sys->pi_palette[3].s.t );
+		     p_sys->p_palette[0].s.t,
+		     p_sys->p_palette[1].s.t,
+		     p_sys->p_palette[2].s.t,
+		     p_sys->p_palette[3].s.t );
 
 	  break;
 
 	case 0x3f:
 	  /* transparency for highlight palette */
-	  p_sys->pi_palette_highlight[0].s.t = p[2] & 0x0f;
-	  p_sys->pi_palette_highlight[1].s.t = p[2] >> 4;
-	  p_sys->pi_palette_highlight[2].s.t = p[1] & 0x0f;
-	  p_sys->pi_palette_highlight[3].s.t = p[1] >> 4;
+	  p_sys->p_palette_highlight[0].s.t = p[2] & 0x0f;
+	  p_sys->p_palette_highlight[1].s.t = p[2] >> 4;
+	  p_sys->p_palette_highlight[2].s.t = p[1] & 0x0f;
+	  p_sys->p_palette_highlight[3].s.t = p[1] >> 4;
 
 	  dbg_print( DECODE_DBG_PACKET,
 		     "transparancy for primary palette 0..3: "
 		     "0x%0x 0x%0x 0x%0x 0x%0x",
-		     p_sys->pi_palette_highlight[0].s.t,
-		     p_sys->pi_palette_highlight[1].s.t,
-		     p_sys->pi_palette_highlight[2].s.t,
-		     p_sys->pi_palette_highlight[3].s.t );
+		     p_sys->p_palette_highlight[0].s.t,
+		     p_sys->p_palette_highlight[1].s.t,
+		     p_sys->p_palette_highlight[2].s.t,
+		     p_sys->p_palette_highlight[3].s.t );
 
 	  break;
 	  
