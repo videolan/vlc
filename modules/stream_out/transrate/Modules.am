@@ -1,1 +1,1 @@
-SOURCES_stream_out_transrate = transrate.c
+SOURCES_stream_out_transrate = transrate.c getvlc.h putvlc.h
