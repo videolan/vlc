@@ -39,6 +39,7 @@ TRACE = @TRACE@
 CPROF = @CPROF@
 GPROF = @GPROF@
 OPTIMS = @OPTIMS@
+TUNING = @TUNING@
 
 # 
 # Build environment
@@ -226,17 +227,13 @@ endif
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
-# Optional Pentium Pro optimizations
-ifneq (,$(findstring ppro,$(ARCH)))
-CFLAGS += -mcpu=pentiumpro
-else
-CFLAGS += -mcpu=pentium
-endif
+CFLAGS += -mcpu=$(TUNING)
 endif
 
 # Optimizations for PowerPC
 ifneq (,$(findstring powerpc,$(ARCH)))
-CFLAGS += -mmultiple -mhard-float -mstring
+CFLAGS += -mmultiple -mhard-float -mstring -mcpu=powerpc
+CFLAGS += -mtune=$(TUNING)
 endif
 
 # Optimizations for Sparc
