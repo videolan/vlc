@@ -259,22 +259,11 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
 
-    // Test that we have a valid .tar.gz file, based on the extension
+    // Test that we have a valid .vlt file, based on the extension
     // TODO: an actual check of the contents would be better...
-    if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL )
+    if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
+        strcasecmp( ext, ".vlt" ) )
     {
-        msg_Warn( p_this, "skins2 module discarded (path=%s)",
-                  p_demux->psz_path );
-        return VLC_EGENERIC;
-    }
-
-    // Skip '.'
-    ext++;
-
-    if( strcasecmp( ext, "tar.gz" ) && strcasecmp( ext, "vlt" ) )
-    {
-        msg_Warn( p_this, "skins2 module discarded (unknown extension '%s')",
-                  ext );
         return VLC_EGENERIC;
     }
 
@@ -283,7 +272,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( p_intf != NULL )
     {
         // Do nothing is skins2 is not the main interface
-        if( ! strcmp( p_intf->p_module->psz_shortname, "skins2" ) )
+        if( var_Type( p_intf, "skin-to-load" ) != VLC_VAR_STRING )
         {
             playlist_t *p_playlist =
                 (playlist_t *) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
@@ -297,7 +286,7 @@ static int DemuxOpen( vlc_object_t *p_this )
             }
 
             vlc_value_t val;
-            val.psz_string = strdup( p_demux->psz_path );
+            val.psz_string = p_demux->psz_path;
             var_Set( p_intf, "skin-to-load", val );
         }
         else
@@ -305,6 +294,7 @@ static int DemuxOpen( vlc_object_t *p_this )
             msg_Warn( p_this,
                       "skin could not be loaded (not using skins2 intf)" );
         }
+
         vlc_object_release( p_intf );
     }
 
