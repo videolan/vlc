@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.21 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: mkv.cpp,v 1.22 2003/08/18 00:17:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1087,44 +1087,7 @@ static int Activate( vlc_object_t * p_this )
                 p_wf->wBitsPerSample    = GetWLE( &p_wf->wBitsPerSample );
                 p_wf->cbSize            = GetWLE( &p_wf->cbSize );
 
-                switch( p_wf->wFormatTag )
-                {
-                    case WAVE_FORMAT_PCM:
-                        tk.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
-                        break;
-                    case WAVE_FORMAT_ADPCM:
-                        tk.i_codec = VLC_FOURCC( 'm', 's', 0x00, 0x02 );
-                        break;
-                    case WAVE_FORMAT_ALAW:
-                        tk.i_codec = VLC_FOURCC( 'a', 'l', 'a', 'w' );
-                        break;
-                    case WAVE_FORMAT_MULAW:
-                        tk.i_codec = VLC_FOURCC( 'm', 'l', 'a', 'w' );
-                        break;
-                    case WAVE_FORMAT_IMA_ADPCM:
-                        tk.i_codec = VLC_FOURCC( 'm', 's', 0x00, 0x11 );
-                        break;
-                    case WAVE_FORMAT_MPEG:
-                    case WAVE_FORMAT_MPEGLAYER3:
-                        tk.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-                        break;
-                    case WAVE_FORMAT_A52:
-                        tk.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
-                        break;
-                    case WAVE_FORMAT_WMA1:
-                        tk.i_codec = VLC_FOURCC( 'w', 'm', 'a', '1' );
-                        break;
-                    case WAVE_FORMAT_WMA2:
-                        tk.i_codec = VLC_FOURCC( 'w', 'm', 'a', '2' );
-                        break;
-                    case WAVE_FORMAT_WMA3:
-                        tk.i_codec = VLC_FOURCC( 'w', 'm', 'a', '3' );
-                        break;
-                    default:
-                        msg_Err( p_input, "unknown wFormatTag=0x%x", p_wf->wFormatTag );
-                        tk.i_codec = VLC_FOURCC( 'm', 's', p_wf->wFormatTag >> 8, p_wf->wFormatTag&0xff );
-                        break;
-                }
+                wf_tag_to_fourcc( p_wf->wFormatTag, &tk.i_codec, NULL );
                 tk.p_es->p_waveformatex = p_wf;
             }
         }

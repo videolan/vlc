@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.3 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: wav.c,v 1.4 2003/08/18 00:17:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -89,6 +89,7 @@ static int Open( vlc_object_t * p_this )
     uint8_t        *p_peek;
     unsigned int   i_size;
     vlc_fourcc_t   i_fourcc;
+    char *psz_name;
 
     /* Is it a wav file ? */
     if( input_Peek( p_input, &p_peek, 12 ) < 12 )
@@ -167,50 +168,41 @@ static int Open( vlc_object_t * p_this )
 
     stream_Read( p_sys->s, NULL, 8 );   /* cannot fail */
 
-    /* XXX p_sys->psz_demux shouldn't be NULL ! */
-    switch( p_sys->p_wf->wFormatTag )
+    wf_tag_to_fourcc( p_sys->p_wf->wFormatTag, &i_fourcc, &psz_name );
+    if( i_fourcc == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
     {
-        case( WAVE_FORMAT_PCM ):
-            msg_Dbg( p_input,"found raw pcm audio format" );
-            i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+        msg_Err( p_input,"unrecognize audio format(0x%x)",
+                 p_sys->p_wf->wFormatTag );
+        goto error;
+    }
+
+    switch( i_fourcc )
+    {
+        case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
+        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
             FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
             break;
-        case( WAVE_FORMAT_MULAW ):
-            msg_Dbg( p_input,"found mulaw pcm audio format" );
-            i_fourcc = VLC_FOURCC( 'u', 'l', 'a', 'w' );
-            FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case( WAVE_FORMAT_ALAW ):
-            msg_Dbg( p_input,"found alaw pcm audio format" );
-            i_fourcc = VLC_FOURCC( 'a', 'l', 'a', 'w' );
-            FrameInfo_PCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
-            break;
-        case( WAVE_FORMAT_ADPCM ):
-            msg_Dbg( p_input, "found ms adpcm audio format" );
-            i_fourcc = VLC_FOURCC( 'm', 's', 0x00, 0x02 );
+        case VLC_FOURCC( 'm', 's', 0x00, 0x02 ):
             FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
             break;
-        case( WAVE_FORMAT_IMA_ADPCM ):
-            msg_Dbg( p_input, "found ima adpcm audio format" );
-            i_fourcc = VLC_FOURCC( 'm', 's', 0x00, 0x11 );
+        case VLC_FOURCC( 'm', 's', 0x00, 0x11 ):
             FrameInfo_IMA_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
             break;
-
-        case( WAVE_FORMAT_MPEG ):
-        case( WAVE_FORMAT_MPEGLAYER3 ):
-            msg_Dbg( p_input, "found mpeg audio format (relaying to another demux)" );
+        case VLC_FOURCC( 'm', 's', 0x00, 0x61 ):
+        case VLC_FOURCC( 'm', 's', 0x00, 0x62 ):
+            /* FIXME not sure at all FIXME */
+            FrameInfo_MS_ADPCM( p_input, &p_sys->i_frame_size, &p_sys->i_frame_length );
+            break;
+        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_FOURCC( 'a', '5', '2', ' ' ):
             /* FIXME set end of area FIXME */
             goto relay;
-        case( WAVE_FORMAT_A52 ):
-            msg_Dbg( p_input,"found a52 audio format (relaying to another demux)" );
-            /* FIXME set end of area FIXME */
-            goto relay;
-
         default:
-            msg_Err( p_input,"unrecognize audio format(0x%x)",
-                     p_sys->p_wf->wFormatTag );
+            msg_Err( p_input, "unsupported codec (%4.4s)", (char*)&i_fourcc );
             goto error;
     }
+    msg_Dbg( p_input, "found %s audio format", psz_name );
 
 
     /*  create one program */
@@ -231,7 +223,8 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->i_data_size > 0 )
     {
-        p_input->stream.i_mux_rate = (mtime_t)p_sys->i_frame_size * (mtime_t)1000000 / 50 / p_sys->i_frame_length;
+        p_input->stream.i_mux_rate = (mtime_t)p_sys->i_frame_size *
+                                     (mtime_t)1000000 / 50 / p_sys->i_frame_length;
     }
     else
     {

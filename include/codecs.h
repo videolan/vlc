@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.4 2003/07/01 17:14:58 sam Exp $
+ * $Id: codecs.h,v 1.5 2003/08/18 00:17:44 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -82,14 +82,64 @@ typedef struct {
 #define  WAVE_FORMAT_MPEGLAYER3         0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define  WAVE_FORMAT_DOLBY_AC3_SPDIF    0x0092 /* Sonic Foundry */
 
-/* Need to check these */
 #define WAVE_FORMAT_A52             0x2000
 #define WAVE_FORMAT_WMA1            0x0160
 #define WAVE_FORMAT_WMA2            0x0161
 #define WAVE_FORMAT_WMA3            0x0162
 
+/* Need to check these */
+#define WAVE_FORMAT_DK3             0x0061
+#define WAVE_FORMAT_DK4             0x0061
+
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
 #define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE /* Microsoft */
 #endif
 
+static struct
+{
+    uint16_t     i_tag;
+    vlc_fourcc_t i_fourcc;
+    char         *psz_name;
+}
+wave_format_tag_to_fourcc[] =
+{
+    { WAVE_FORMAT_PCM,      VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
+    { WAVE_FORMAT_ADPCM,    VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
+    { WAVE_FORMAT_ALAW,     VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
+    { WAVE_FORMAT_MULAW,    VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
+    { WAVE_FORMAT_IMA_ADPCM,VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
+    { WAVE_FORMAT_MPEGLAYER3,VLC_FOURCC('m', 'p', 'g', 'a' ), "Mpeg Audio" },
+    { WAVE_FORMAT_MPEG,     VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
+    { WAVE_FORMAT_A52,      VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
+    { WAVE_FORMAT_WMA1,     VLC_FOURCC( 'w', 'm', 'a', '1' ), "Window Media Audio 1" },
+    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', '2' ), "Window Media Audio 2" },
+    { WAVE_FORMAT_WMA3,     VLC_FOURCC( 'w', 'm', 'a', '3' ), "Window Media Audio 3" },
+    { WAVE_FORMAT_DK3,      VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
+    { WAVE_FORMAT_DK4,      VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
+    { WAVE_FORMAT_UNKNOWN,  VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
+};
+
+static inline void wf_tag_to_fourcc( uint16_t i_tag,
+                                     vlc_fourcc_t *fcc, char **ppsz_name )
+{
+    int i;
+    for( i = 0; wave_format_tag_to_fourcc[i].i_tag != 0; i++ )
+    {
+        if( wave_format_tag_to_fourcc[i].i_tag == i_tag )
+        {
+            break;
+        }
+    }
+    if( fcc )
+    {
+        *fcc = wave_format_tag_to_fourcc[i].i_fourcc;
+    }
+    if( ppsz_name )
+    {
+        *ppsz_name = wave_format_tag_to_fourcc[i].psz_name;
+    }
+}
+
+
 #endif /* "codecs.h" */
+

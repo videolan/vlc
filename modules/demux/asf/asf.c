@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.32 2003/08/17 23:42:37 fenrir Exp $
+ * $Id: asf.c,v 1.33 2003/08/18 00:17:44 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -198,34 +198,9 @@ static int Open( vlc_object_t * p_this )
                     "adding new audio stream(codec:0x%x,ID:%d)",
                     i_codec,
                     p_sp->i_stream_number );
-            switch( i_codec )
-            {
-                case( 0x01 ):
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'a', 'r', 'a', 'w' );
-                    break;
-                case( 0x50 ):
-                case( 0x55 ):
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'm','p','g','a' );
-                    break;
-                case( 0x2000 ):
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'a','5','2',' ' );
-                    break;
-                case( 0x160 ):
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'w','m','a','1' );
-                    break;
-                case( 0x161 ):
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'w','m','a','2' );
-                    break;
-                default:
-                    p_stream->p_es->i_fourcc =
-                        VLC_FOURCC( 'm','s',(i_codec >> 8)&0xff,i_codec&0xff );
-            }
+            wf_tag_to_fourcc( i_codec, &p_stream->p_es->i_fourcc, NULL );
             input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&p_stream->p_es->i_fourcc );
+
             if( p_sp->i_type_specific_data_length > 0 )
             {
                 WAVEFORMATEX    *p_wf;

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.54 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: avi.c,v 1.55 2003/08/18 00:17:44 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -200,23 +200,9 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
     switch( i_cat )
     {
         case AUDIO_ES:
-            switch( i_codec )
-            {
-                case WAVE_FORMAT_PCM:
-                    return VLC_FOURCC( 'a', 'r', 'a', 'w' );
-                case WAVE_FORMAT_MPEG:
-                case WAVE_FORMAT_MPEGLAYER3:
-                    return VLC_FOURCC( 'm', 'p', 'g', 'a' );
-                case WAVE_FORMAT_A52:
-                    return VLC_FOURCC( 'a', '5', '2', ' ' );
-                case WAVE_FORMAT_WMA1:
-                    return VLC_FOURCC( 'w', 'm', 'a', '1' );
-                case WAVE_FORMAT_WMA2:
-                    return VLC_FOURCC( 'w', 'm', 'a', '2' );
-                default:
-                    return VLC_FOURCC( 'm', 's',
-                                       ( i_codec >> 8 )&0xff, i_codec&0xff );
-            }
+            wf_tag_to_fourcc( i_codec, &i_codec, NULL );
+            return i_codec;
+
         case VIDEO_ES:
             // XXX DIV1 <- msmpeg4v1, DIV2 <- msmpeg4v2, DIV3 <- msmpeg4v3, mp4v for mpeg4
             switch( i_codec )
