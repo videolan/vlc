@@ -541,6 +541,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
+    uint32_t i_dummy;
 #endif
 
     GETCLASS GetClass;
@@ -602,7 +603,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
 
     /* Pickup the first available codec */
     if( p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
-                              &psz_dmo_name, NULL ) )
+            &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) )
     {
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
