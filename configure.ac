@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.86 2003/10/07 18:53:01 sam Exp $
+dnl $Id: configure.ac,v 1.87 2003/10/07 21:13:01 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1453,18 +1453,18 @@ AC_ARG_ENABLE(vcdx,
 if test "${enable_vcdx}" != "no"
 then
   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.63,
-    enable_cdda="no"
+   [enable_cdda="no"
     AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
     AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    AX_ADD_PLUGINS([cddax]), 
-    [AC_MSG_WARN(libcdio library not found)])
+    AX_ADD_PLUGINS([cddax])], 
+   [AC_MSG_WARN(libcdio library not found)])
 
   PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.18-cdio,
-    enable_vcd="no"
+   [enable_vcd="no"
     AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
     AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
-    AX_ADD_PLUGINS([vcdx]), 
-[AC_MSG_WARN(vcdinfo library not found)])
+    AX_ADD_PLUGINS([vcdx])], 
+   [AC_MSG_WARN(vcdinfo library not found)])
 fi
 
 dnl
@@ -2650,7 +2650,7 @@ then
 fi
 
 dnl
-dnl  Gtk+2 module ! Disabled for know as it is unuseable and confuses users
+dnl  Gtk+2 module ! Disabled for now as it is unusable and confuses users
 dnl
 dnl AC_ARG_ENABLE(gtk2,
 dnl   [  --enable-gtk2           Gtk2 support (default disabled)])
