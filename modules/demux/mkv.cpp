@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.4 2003/06/22 16:27:11 fenrir Exp $
+ * $Id: mkv.cpp,v 1.5 2003/06/22 23:22:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1555,6 +1555,28 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
     }
 }
 
+static pes_packet_t *MemToPES( input_thread_t *p_input, uint8_t *p_mem, int i_mem )
+{
+    pes_packet_t *p_pes;
+    data_packet_t *p_data;
+
+    if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
+    {
+        return NULL;
+    }
+
+    p_data = input_NewPacket( p_input->p_method_data, i_mem);
+
+    memcpy( p_data->p_payload_start, p_mem, i_mem );
+    p_data->p_payload_end = p_data->p_payload_start + i_mem;
+
+    p_pes->p_first = p_pes->p_last = p_data;
+    p_pes->i_nb_data = 1;
+    p_pes->i_pes_size = i_mem;
+
+    return p_pes;
+}
+
 static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts, mtime_t i_duration )
 {
     demux_sys_t    *p_sys   = p_input->p_demux_data;
@@ -1642,21 +1664,61 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     if( !tk.b_inited && tk.i_data_init > 0 )
     {
         pes_packet_t *p_init;
-        data_packet_t *p_data;
 
         msg_Dbg( p_input, "sending header (%d bytes)", tk.i_data_init );
 
-        p_init = input_NewPES( p_input->p_method_data );
+        if( tk.i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        {
+            int i;
+            int i_offset = 1;
+            int i_size[3];
 
-        p_data = input_NewPacket( p_input->p_method_data, tk.i_data_init );
-        memcpy( p_data->p_payload_start, tk.p_data_init, tk.i_data_init );
-        p_data->p_payload_end = p_data->p_payload_start + tk.i_data_init;
+            /* XXX hack split the 3 headers */
+            if( tk.p_data_init[0] != 0x02 )
+            {
+                msg_Err( p_input, "invalid vorbis header" );
+            }
 
-        p_init->p_first = p_init->p_last = p_data;
-        p_init->i_nb_data = 1;
-        p_init->i_pes_size = tk.i_data_init;
+            for( i = 0; i < 2; i++ )
+            {
+                i_size[i] = 0;
+                while( i_offset < tk.i_data_init )
+                {
+                    i_size[i] += tk.p_data_init[i_offset];
+                    if( tk.p_data_init[i_offset++] != 0xff )
+                    {
+                        break;
+                    }
+                }
+            }
+            i_size[0] = __MIN( i_size[0], tk.i_data_init - i_offset );
+            i_size[1] = __MIN( i_size[1], tk.i_data_init - i_offset - i_size[0] );
+            i_size[2] = tk.i_data_init - i_offset - i_size[0] - i_size[1];
 
-        input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+            p_init = MemToPES( p_input, &tk.p_data_init[i_offset], i_size[0] );
+            if( p_init )
+            {
+                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+            }
+            p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]], i_size[1] );
+            if( p_init )
+            {
+                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+            }
+            p_init = MemToPES( p_input, &tk.p_data_init[i_offset+i_size[0]+i_size[1]], i_size[2] );
+            if( p_init )
+            {
+                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+            }
+        }
+        else
+        {
+            p_init = MemToPES( p_input, tk.p_data_init, tk.i_data_init );
+            if( p_init )
+            {
+                input_DecodePES( tk.p_es->p_decoder_fifo, p_init );
+            }
+        }
     }
     tk.b_inited = VLC_TRUE;
 
