@@ -574,8 +574,8 @@ package-win32-base:
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/mozilla"
 if BUILD_MOZILLA
-	cp $(srcdir)/mozilla/npvlc.dll $(srcdir)/vlc-${VERSION}/mozilla/ ;
-	$(STRIP) $(srcdir)/vlc-${VERSION}/mozilla/npvlc.dll;
+	cp $(srcdir)/mozilla/*$(LIBEXT) $(srcdir)/vlc-${VERSION}/mozilla/ ;
+	$(STRIP) $(srcdir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
 	cp $(srcdir)/mozilla/vlcintf.xpt  $(srcdir)/vlc-${VERSION}/mozilla/ ;
 endif
 
