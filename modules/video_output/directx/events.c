@@ -455,8 +455,11 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
         /* We don't want the window owner to overwrite our client area */
         i_style = GetWindowLong( p_vout->p_sys->hparent, GWL_STYLE );
-        SetWindowLong( p_vout->p_sys->hparent, GWL_STYLE,
-                       i_style | WS_CLIPCHILDREN );
+
+        if( !(i_style & WS_CLIPCHILDREN) )
+            /* Hmmm, apparently this is a blocking call... */
+            SetWindowLong( p_vout->p_sys->hparent, GWL_STYLE,
+                           i_style | WS_CLIPCHILDREN );
 
     }
 
