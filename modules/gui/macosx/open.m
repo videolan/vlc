@@ -164,7 +164,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
-    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS")];
+    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS/RTSP")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
@@ -629,7 +629,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     if( [o_mode isEqualToString: _NS("UDP/RTP")] ) b_udp = TRUE;   
     else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) b_udpm = TRUE;
-    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] ) b_http = TRUE;
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS/RTSP")] ) b_http = TRUE;
 
     [o_net_udp_port setEnabled: b_udp];
     [o_net_udp_port_stp setEnabled: b_udp];
@@ -690,12 +690,12 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
         } 
     }
-    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] )
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS/RTSP")] )
     {
         NSString *o_url = [o_net_http_url stringValue];
 
         if ( ![o_url hasPrefix:@"http:"] && ![o_url hasPrefix:@"ftp:"]
-              && ![o_url hasPrefix:@"mms"] )
+              && ![o_url hasPrefix:@"mms"] && ![o_url hasPrefix:@"rtsp"] )
             o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
         else
             o_mrl_string = o_url;
