@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.26 2003/04/09 14:12:49 hartman Exp $
+ * $Id: asf.c,v 1.27 2003/04/24 20:26:32 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -73,6 +73,8 @@ static int Activate( vlc_object_t * p_this )
     demux_sys_t     *p_demux;
     int             i_stream;
 
+    vlc_bool_t      b_seekable;
+
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
     {
@@ -107,7 +109,15 @@ static int Activate( vlc_object_t * p_this )
     p_demux->i_time = -1;
 
     /* Now load all object ( except raw data ) */
-    if( !ASF_ReadObjectRoot( p_input, &p_demux->root, p_input->stream.b_seekable ) )
+    if( p_input->stream.b_seekable && p_input->stream.i_method == INPUT_METHOD_FILE )
+    {
+        b_seekable = VLC_TRUE;
+    }
+    else
+    {
+        b_seekable = VLC_FALSE;
+    }
+    if( !ASF_ReadObjectRoot( p_input, &p_demux->root, b_seekable ) )
     {
         msg_Warn( p_input, "ASF v1.0 plugin discarded (not a valid file)" );
         free( p_demux );
