@@ -2,10 +2,24 @@
 
 FEATURES="
 GNOME gnome
+GNOME2 gnome2
 GTK gtk
+GTK2 gtk2
+SKINS skins
+FAMILIAR familiar
+WXWINDOWS wxwindows
+QT qt
+KDE kde
+OPIE opie
+MACOSX macosx
+QNX qnx
+INTFWIN intfwin
+NCURSES ncurses
+XOSD xosd
 DVDOLD dvd
 DVDREAD dvdread
 DVDPLAY dvdplay
+DVBPSI dvbpsi
 VCD vcd
 V4L v4l
 SAT satellite
@@ -13,11 +27,36 @@ X11 x11
 XVIDEO xvideo
 SDL sdl
 FB fb
+DIRECTX directx
+WINGDI wingdi
+FREETYPE freetype
+QTE qte
+MGA mga
+SVGALIB svgalib
+GGI ggi
+GLIDE glide
+AA aa
 OSS oss
 ESD esd
+ARTS arts
+ALSA alsa
+WAVEOUT waveout
+COREAUDIO coreaudio
+OGG ogg
 A52 a52
 MAD mad
 FFMPEG ffmpeg
+FAAD faad
+XVID xvid
+DV dv
+FLAC flac
+LIBMPEG2 libmpeg2
+VORBIS vorbis
+TREMOR tremor
+TARKIN tarkin
+THEORA theoea
+SOUT sout
+DEBUG debug
 "
 PATHS="
 FFMPEG_TREE ffmpeg-tree

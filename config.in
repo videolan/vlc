@@ -6,21 +6,40 @@ mainmenu_name "VLC Configuration"
 
 choice 'Operating System' \
    "Linux		CONFIG_LINUX \
+    MacOS_X		CONFIG_MAC \
     Win32		CONFIG_WIN32" Linux
 
 mainmenu_option next_comment
 comment 'Graphical User Interfaces'
-bool 'Gnome interface' CONFIG_GNOME
-bool 'GTK interface' CONFIG_GTK
+bool 'Gnome interface support' CONFIG_GNOME
+bool 'Gnome2 support' CONFIG_GNOME2
+bool 'GTK+ support' CONFIG_GTK
+bool 'GTK2 support' CONFIG_GTK2
+bool 'Win32 skins module' CONFIG_SKINS
+bool 'Familiar GTK+ support' CONFIG_FAMILIAR
+bool 'wxWindows support' CONFIG_WXWINDOWS
+bool 'Qt interface support' CONFIG_QT
+bool 'KDE interface support' CONFIG_KDE
+bool 'Qt embedded interface support' CONFIG_OPIE
+if [ "$CONFIG_MAC" = "y" ]; then
+   bool 'MacOS X support' CONFIG_MACOSX
+fi
+bool 'QNX RTOS support' CONFIG_QNX
+if [ "$CONFIG_WIN32" = "y" ]; then
+   bool 'Win32 interface support' CONFIG_INTFWIN
+fi
+bool 'ncurses interface support' CONFIG_NCURSES
+bool 'xosd interface support' CONFIG_XOSD
 endmenu
 
 mainmenu_option next_comment
 comment 'Inputs'
 bool 'DVD support' CONFIG_DVD
 if [ "$CONFIG_DVD" = "y" ]; then
-   bool '    standard DVD input' CONFIG_DVDOLD
-   bool '    libdvdread' CONFIG_DVDREAD
-   bool '    libdvdplay' CONFIG_DVDPLAY
+   bool '    DVD input module' CONFIG_DVDOLD
+   bool '    dvdread input module' CONFIG_DVDREAD
+   bool '    dvdplay input module' CONFIG_DVDPLAY
+   bool '    dvbpsi ts mux and demux module' CONFIG_DVDPSI
 fi
 bool 'VCD support' CONFIG_VCD
 bool 'Video for Linux (V4L) support' CONFIG_V4L
@@ -30,28 +49,66 @@ endmenu
 mainmenu_option next_comment
 comment 'Video outputs'
 if [ "$CONFIG_LINUX" = "y" ]; then
-   bool 'X11 output' CONFIG_X11
-   bool 'XVideo output' CONFIG_XVIDEO
-   bool 'Framebuffer output' CONFIG_FB
+   bool 'X11 support' CONFIG_X11
+   bool 'XVideo support' CONFIG_XVIDEO
+   bool 'Linux framebuffer support' CONFIG_FB
+fi
+if [ "$CONFIG_WIN32" = "y" ]; then
+   bool 'Win32 DirectX support' CONFIG_DIRECTX
+   bool 'Win32 GDI module' CONFIG_WINGDI
 fi
 bool 'SDL video output' CONFIG_SDL
+bool 'freetype support' CONFIG_FREETYPE
+bool 'QT Embedded support' CONFIG_QTE
+bool 'Linux kernel Matrox support' CONFIG_MGA
+bool 'SVGAlib support' CONFIG_SVGALIB
+bool 'GGI support' CONFIG_GGI
+bool 'Glide (3dfx) support' CONFIG_GLIDE
+bool 'aalib output' CONFIG_AA
 endmenu
 
 mainmenu_option next_comment
 comment 'Audio outputs'
 if [ "$CONFIG_LINUX" = "y" ]; then
-   bool 'Open Sound System (OSS)' CONFIG_OSS
-   bool 'Enlightenment Sound Daemon (ESD)' CONFIG_ESD
+   bool 'Linux OSS /dev/dsp support' CONFIG_OSS
+   bool 'Esound library support' CONFIG_ESD
+   bool 'aRts sound server' CONFIG_ARTS
+   bool 'ALSA sound support for Linux' CONFIG_ALSA
+fi
+if [ "$CONFIG_WIN32" = "y" ]; then
+   bool 'Win32 waveOut module' CONFIG_WAVEOUT
+fi
+if [ "$CONFIG_MAC" = "y" ]; then
+   bool 'CoreAudio module' CONFIG_COREAUDIO
 fi
 endmenu
 
 mainmenu_option next_comment
 comment 'Codecs'
-bool 'A52 support' CONFIG_A52
-bool 'MAD support' CONFIG_MAD
-bool 'FFMPEG' CONFIG_FFMPEG
+bool 'Ogg demux support' CONFIG_OGG
+bool 'A/52 support' CONFIG_A52
+bool 'libmad module' CONFIG_MAD
+bool 'ffmpeg codec' CONFIG_FFMPEG
 if [ "$CONFIG_FFMPEG" = "y" ]; then
    string "ffmpeg tree" CONFIG_FFMPEG_TREE /home/videolan/ffmpeg
 fi
+bool 'faad codec' CONFIG_FAAD
+bool 'xvid codec' CONFIG_XVID
+bool 'DV decoder support' CONFIG_DV
+bool 'flac decoder support' CONFIG_FLAC
+bool 'libmpeg2 decoder support' CONFIG_LIBMPEG2
+bool 'Vorbis decoder support' CONFIG_VORBIS
+bool 'Tremor decoder support' CONFIG_TREMOR
+bool 'tarkin codec' CONFIG_TARKIN
+bool 'theora codec' CONFIG_THEORA
 endmenu
 
+mainmenu_option next_comment
+comment 'Streaming'
+bool 'Stream output modules' CONFIG_SOUT
+endmenu
+
+mainmenu_option next_comment
+comment 'Compilation options'
+bool 'Debug mode' CONFIG_DEBUG
+endmenu
