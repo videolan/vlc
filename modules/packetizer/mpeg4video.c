@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.15 2003/11/17 18:48:08 gbazin Exp $
+ * $Id: mpeg4video.c,v 1.16 2003/11/18 20:15:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -26,36 +26,49 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-
-#include "codecs.h"
+#include "vlc_bits.h"
 
 /*****************************************************************************
- * decoder_sys_t : decoder descriptor
+ * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+vlc_module_begin();
+    set_description( _("MPEG4 Video packetizer") );
+    set_capability( "packetizer", 50 );
+    set_callbacks( Open, Close );
+vlc_module_end();
+
+
+/****************************************************************************
+ * Local prototypes
+ ****************************************************************************/
+static block_t *Packetize( decoder_t *, block_t ** );
+
 struct decoder_sys_t
 {
     /*
      * Common properties
      */
     mtime_t i_pts;
+    mtime_t i_dts;
+
+
+    vlc_bool_t  b_vop;
+    int         i_buffer;
+    int         i_buffer_size;
+    uint8_t     *p_buffer;
 };
 
-/****************************************************************************
- * Local prototypes
- ****************************************************************************/
-static int  OpenPacketizer ( vlc_object_t * );
-static void ClosePacketizer( vlc_object_t * );
-
-static block_t *PacketizeBlock( decoder_t *, block_t ** );
-
-static int m4v_FindVol( decoder_t *p_dec, block_t *p_block );
+static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end );
+static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol );
 
 #define VIDEO_OBJECT_MASK                       0x01f
 #define VIDEO_OBJECT_LAYER_MASK                 0x00f
@@ -78,23 +91,14 @@ static int m4v_FindVol( decoder_t *p_dec, block_t *p_block );
 #define TEXTURE_SNR_LAYER_START_CODE            0x1c0
 
 /*****************************************************************************
- * Module descriptor
+ * Open: probe the packetizer and return score
  *****************************************************************************/
-vlc_module_begin();
-    set_description( _("MPEG4 Video packetizer") );
-    set_capability( "packetizer", 50 );
-    set_callbacks( OpenPacketizer, ClosePacketizer );
-vlc_module_end();
-
-/*****************************************************************************
- * OpenPacketizer: probe the packetizer and return score
- *****************************************************************************/
-static int OpenPacketizer( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    switch( p_dec->p_fifo->i_fourcc )
+    switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC( 'm', '4', 's', '2'):
         case VLC_FOURCC( 'M', '4', 'S', '2'):
@@ -116,12 +120,16 @@ static int OpenPacketizer( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) ) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
+    p_sys->i_pts = 0;
+    p_sys->b_vop = VLC_FALSE;
+    p_sys->i_buffer = 0;
+    p_sys->i_buffer_size = 10000;
+    p_sys->p_buffer = malloc( p_sys->i_buffer_size );
 
     /* Setup properties */
     p_dec->fmt_out = p_dec->fmt_in;
@@ -136,6 +144,8 @@ static int OpenPacketizer( vlc_object_t *p_this )
                 p_dec->fmt_in.i_extra );
 
         msg_Dbg( p_dec, "opening with vol size:%d", p_dec->fmt_in.i_extra );
+        m4v_VOLParse( &p_dec->fmt_out,
+                      p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
     }
     else
     {
@@ -145,135 +155,292 @@ static int OpenPacketizer( vlc_object_t *p_this )
     }
 
     /* Set callback */
-    p_dec->pf_packetize = PacketizeBlock;
-
-    return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * PacketizeBlock: the whole thing
- ****************************************************************************/
-static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
-{
-    block_t *p_block;
-
-    if( !pp_block || !*pp_block ) return NULL;
-
-    p_block = *pp_block;
-
-    if( !p_dec->fmt_out.i_extra )
-    {
-        m4v_FindVol( p_dec, p_block );
-    }
-
-    /* Drop blocks until we have a VOL */
-    if( !p_dec->fmt_out.i_extra )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    /* TODO: Date management */
-    p_block->i_length = 1000000 / 25;
-
-    *pp_block = NULL;
-    return p_block;
-}
-
-/****************************************************************************
- * m4v_FindStartCode
- ****************************************************************************/
-static int m4v_FindStartCode( uint8_t **pp_data, uint8_t *p_end )
-{
-    for( ; *pp_data < p_end - 4; (*pp_data)++ )
-    {
-        if( (*pp_data)[0] == 0 && (*pp_data)[1] == 0 && (*pp_data)[2] == 1 )
-        {
-            return 0;
-        }
-    }
-    return -1;
-}
-
-static int m4v_FindVol( decoder_t *p_dec, block_t *p_block )
-{
-    uint8_t *p_vol_begin, *p_vol_end, *p_end;
-
-    /* search if p_block contains with a vol */
-    p_vol_begin = p_block->p_buffer;
-    p_vol_end   = NULL;
-    p_end       = p_block->p_buffer + p_block->i_buffer;
-
-    for( ;; )
-    {
-        if( m4v_FindStartCode( &p_vol_begin, p_end ) )
-        {
-            break;
-        }
-
-        msg_Dbg( p_dec, "starcode 0x%2.2x%2.2x%2.2x%2.2x",
-                 p_vol_begin[0], p_vol_begin[1],
-                 p_vol_begin[2], p_vol_begin[3] );
-
-        if( ( p_vol_begin[3] & ~VIDEO_OBJECT_MASK ) ==
-            ( VIDEO_OBJECT_START_CODE&0xff ) )
-        {
-            p_vol_end = p_vol_begin + 4;
-            if( m4v_FindStartCode( &p_vol_end, p_end ) )
-            {
-                p_vol_begin++;
-                continue;
-            }
-            if( ( p_vol_end[3] & ~VIDEO_OBJECT_LAYER_MASK ) ==
-                ( VIDEO_OBJECT_LAYER_START_CODE&0xff ) )
-            {
-                p_vol_end += 4;
-                if( m4v_FindStartCode( &p_vol_end, p_end ) )
-                {
-                    p_vol_end = p_end;
-                }
-            }
-            else
-            {
-                p_vol_begin++;
-                continue;
-            }
-        }
-        else if( ( p_vol_begin[3] & ~VIDEO_OBJECT_LAYER_MASK ) ==
-                 ( VIDEO_OBJECT_LAYER_START_CODE&0xff) )
-        {
-            p_vol_end = p_vol_begin + 4;
-            if( m4v_FindStartCode( &p_vol_end, p_end ) )
-            {
-                p_vol_end = p_end;
-            }
-        }
-
-        if( p_vol_end != NULL && p_vol_begin < p_vol_end )
-        {
-            p_dec->fmt_out.i_extra = p_vol_end - p_vol_begin;
-            msg_Dbg( p_dec, "Found VOL" );
-
-            p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
-            memcpy( p_dec->fmt_out.p_extra, p_vol_begin,
-                    p_dec->fmt_out.i_extra );
-            return VLC_SUCCESS;
-        }
-        else
-        {
-            p_vol_begin++;
-        }
-    }
+    p_dec->pf_packetize = Packetize;
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * ClosePacketizer: clean up the packetizer
+ * Close: clean up the packetizer
  *****************************************************************************/
-static void ClosePacketizer( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
     free( p_dec->p_sys );
 }
+
+/****************************************************************************
+ * Packetize: the whole thing
+ ****************************************************************************/
+static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    block_t *p_chain_out = NULL;
+    block_t *p_block;
+    uint8_t *p_vol = NULL;
+    uint8_t *p_start;
+
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
+
+    /* Append data */
+    if( p_sys->i_buffer + p_block->i_buffer > p_sys->i_buffer_size )
+    {
+        p_sys->i_buffer_size += p_block->i_buffer + 1024;
+        p_sys->p_buffer = realloc( p_sys->p_buffer, p_sys->i_buffer_size );
+    }
+    memcpy( &p_sys->p_buffer[p_sys->i_buffer], p_block->p_buffer,
+            p_block->i_buffer );
+    p_sys->i_buffer += p_block->i_buffer;
+
+    if( p_sys->i_buffer > 10*1000000 )
+    {
+        msg_Err( p_dec, "mmh reseting context" );
+        p_sys->i_buffer = 0;
+    }
+
+    /* Search vop */
+    p_start = &p_sys->p_buffer[p_sys->i_buffer - p_block->i_buffer - 4];
+    if( p_start < p_sys->p_buffer )
+    {
+        p_start = p_sys->p_buffer;
+    }
+    for( ;; )
+    {
+        if( m4v_FindStartCode( &p_start, &p_sys->p_buffer[p_sys->i_buffer] ) )
+        {
+            block_Release( p_block );
+            *pp_block = NULL;
+            return p_chain_out;
+        }
+        /* fprintf( stderr, "start code=0x1%2.2x\n", p_start[3] ); */
+
+        if( p_vol )
+        {
+            /* Copy the complete VOL */
+            p_dec->fmt_out.i_extra = p_start - p_vol;
+            p_dec->fmt_out.p_extra = malloc( p_dec->fmt_out.i_extra );
+            memcpy( p_dec->fmt_out.p_extra, p_vol, p_dec->fmt_out.i_extra );
+            m4v_VOLParse( &p_dec->fmt_out,
+                          p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+
+            p_vol = NULL;
+        }
+        if( p_sys->b_vop )
+        {
+            /* Output the complete VOP we have */
+            int     i_out = p_start - p_sys->p_buffer;
+            block_t *p_out = block_New( p_dec, i_out );
+
+            /* extract data */
+            memcpy( p_out->p_buffer, p_sys->p_buffer, i_out );
+            if( i_out < p_sys->i_buffer )
+            {
+                memmove( p_sys->p_buffer, &p_sys->p_buffer[i_out],
+                         p_sys->i_buffer - i_out );
+            }
+            p_sys->i_buffer -= i_out;
+            p_start -= i_out;
+
+            /* FIXME do proper dts/pts */
+            p_out->i_pts = p_sys->i_pts;
+            p_out->i_dts = p_sys->i_dts;
+            /* FIXME doesn't work when there is multiple VOP in one block */
+            if( p_block->i_dts > p_sys->i_dts )
+            {
+                p_out->i_length = p_block->i_dts - p_sys->i_dts;
+            }
+
+            if( p_dec->fmt_out.i_extra > 0 )
+            {
+                block_ChainAppend( &p_chain_out, p_out );
+            }
+            else
+            {
+                msg_Warn( p_dec, "waiting for VOL" );
+                block_Release( p_out );
+            }
+
+#if 0
+            fprintf( stderr, "pts=%lld dts=%lld length=%lldms\n",
+                     p_out->i_pts, p_out->i_dts,
+                     p_out->i_length / 1000 );
+#endif
+            p_sys->b_vop = VLC_FALSE;
+        }
+
+        if( p_start[3] >= 0x20 && p_start[3] <= 0x2f )
+        {
+            /* Start of the VOL */
+            p_vol = p_start;
+        }
+        else if( p_start[3] == 0xb6 )
+        {
+            p_sys->b_vop = VLC_TRUE;
+            p_sys->i_pts = p_block->i_pts;
+            p_sys->i_dts = p_block->i_dts;
+        }
+        p_start += 4; /* Next */
+    }
+}
+
+/****************************************************************************
+ * m4v_FindStartCode
+ ****************************************************************************/
+static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end )
+{
+    uint8_t *p = *pp_start;
+
+    for( p = *pp_start; p < p_end - 4; p++ )
+    {
+        if( p[0] == 0 && p[1] == 0 && p[2] == 1 )
+        {
+            *pp_start = p;
+            return VLC_SUCCESS;
+        }
+    }
+
+    *pp_start = p_end;
+    return VLC_EGENERIC;
+}
+
+
+/* look at ffmpeg av_log2 ;) */
+static int vlc_log2( unsigned int v )
+{
+    int n = 0;
+    static const int vlc_log2_table[16] =
+    {
+        0,0,1,1,2,2,2,2, 3,3,3,3,3,3,3,3
+    };
+
+    if( v&0xffff0000 )
+    {
+        v >>= 16;
+        n += 16;
+    }
+    if( v&0xff00 )
+    {
+        v >>= 8;
+        n += 8;
+    }
+    if( v&0xf0 )
+    {
+        v >>= 4;
+        n += 4;
+    }
+    n += vlc_log2_table[v];
+
+    return n;
+}
+
+/* m4v_VOLParse:
+ *  TODO:
+ *      - support aspect ratio
+ */
+static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol )
+{
+    bs_t s;
+    int i_vo_type;
+    int i_vo_ver_id;
+    int i_ar;
+    int i_shape;
+    int i_time_increment_resolution;
+
+    for( ;; )
+    {
+        if( p_vol[0] == 0x00 && p_vol[1] == 0x00 &&
+            p_vol[2] == 0x01 &&
+            p_vol[3] >= 0x20 && p_vol[3] <= 0x2f )
+        {
+            break;
+        }
+        p_vol++;
+        i_vol--;
+        if( i_vol <= 4 )
+        {
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* parse the vol */
+    bs_init( &s, &p_vol[4], i_vol - 4 );
+
+    bs_skip( &s, 1 );   /* random access */
+    i_vo_type = bs_read( &s, 8 );
+    if( bs_read1( &s ) )
+    {
+        i_vo_ver_id = bs_read( &s, 4 );
+        bs_skip( &s, 3 );
+    }
+    else
+    {
+        i_vo_ver_id = 1;
+    }
+    i_ar = bs_read( &s, 4 );
+    if( i_ar == 0xf )
+    {
+        int i_ar_width = bs_read( &s, 8 );
+        int i_ar_height= bs_read( &s, 8 );
+    }
+    if( bs_read1( &s ) )
+    {
+        /* vol control parameter */
+        int i_chroma_format = bs_read( &s, 2 );
+        int i_low_delay = bs_read1( &s );
+
+        if( bs_read1( &s ) )
+        {
+            bs_skip( &s, 16 );
+            bs_skip( &s, 16 );
+            bs_skip( &s, 16 );
+            bs_skip( &s, 3 );
+            bs_skip( &s, 11 );
+            bs_skip( &s, 1 );
+            bs_skip( &s, 16 );
+        }
+    }
+    /* shape 0->RECT, 1->BIN, 2->BIN_ONLY, 3->GRAY */
+    i_shape = bs_read( &s, 2 );
+    if( i_shape == 3 && i_vo_ver_id != 1 )
+    {
+        bs_skip( &s, 4 );
+    }
+
+    if( !bs_read1( &s ) )
+    {
+        /* marker */
+        return VLC_EGENERIC;
+    }
+    i_time_increment_resolution = bs_read( &s, 16 );
+    if( !bs_read1( &s ) )
+    {
+        /* marker */
+        return VLC_EGENERIC;
+    }
+
+    if( bs_read1( &s ) )
+    {
+        int i_time_increment_bits = vlc_log2( i_time_increment_resolution - 1 ) + 1;
+        if( i_time_increment_bits < 1 )
+        {
+            i_time_increment_bits = 1;
+        }
+        bs_skip( &s, i_time_increment_bits );
+    }
+    if( i_shape == 0 )
+    {
+        bs_skip( &s, 1 );
+        fmt->video.i_width = bs_read( &s, 13 );
+        bs_skip( &s, 1 );
+        fmt->video.i_height= bs_read( &s, 13 );
+        bs_skip( &s, 1 );
+    }
+    return VLC_SUCCESS;
+}
+
+
+
