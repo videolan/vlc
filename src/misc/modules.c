@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.62.2.1 2002/10/11 09:01:18 gbazin Exp $
+ * $Id: modules.c,v 1.62.2.2 2002/10/29 18:59:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -611,7 +611,8 @@ static void AllocateAllPlugins( void )
 
                 /* We only load files ending with ".so" */
                 if( i_filelen > 3
-                        && !strncmp( file->d_name + i_filelen - 3, ".so", 3 ) )
+                        && !strncasecmp( file->d_name + i_filelen - 3,
+                                         ".so", 3 ) )
                 {
                     psz_file = malloc( i_dirlen + i_filelen + 2 );
                     if( psz_file == NULL )
