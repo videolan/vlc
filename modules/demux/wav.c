@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: wav.c,v 1.10 2003/11/16 22:54:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -137,7 +137,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt.audio.i_channels = GetWLE ( &p_wf->nChannels );
     p_sys->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
     p_sys->fmt.audio.i_blockalign = GetWLE ( &p_wf->nBlockAlign );
-    p_sys->fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
+    p_sys->fmt.i_bitrate = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
     p_sys->fmt.audio.i_bitspersample = GetWLE ( &p_wf->wBitsPerSample );;
 
     p_sys->fmt.i_extra = GetWLE ( &p_wf->cbSize );
@@ -151,7 +151,7 @@ static int Open( vlc_object_t * p_this )
             GetWLE( &p_wf->wFormatTag ),
             p_sys->fmt.audio.i_channels,
             p_sys->fmt.audio.i_rate,
-            p_sys->fmt.audio.i_bitrate / 8 / 1024,
+            p_sys->fmt.i_bitrate / 8 / 1024,
             p_sys->fmt.audio.i_blockalign,
             p_sys->fmt.audio.i_bitspersample,
             p_sys->fmt.i_extra );

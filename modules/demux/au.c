@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.9 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: au.c,v 1.10 2003/11/16 22:54:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -262,9 +262,9 @@ static int Open( vlc_object_t * p_this )
             i_cat                    = AU_CAT_UNKNOWN;
             goto error;
     }
-    p_sys->fmt.audio.i_bitrate = p_sys->fmt.audio.i_rate *
-                                 p_sys->fmt.audio.i_channels *
-                                 p_sys->fmt.audio.i_bitspersample;
+    p_sys->fmt.i_bitrate = p_sys->fmt.audio.i_rate *
+                           p_sys->fmt.audio.i_channels *
+                           p_sys->fmt.audio.i_bitspersample;
 
     if( i_cat == AU_CAT_UNKNOWN || i_cat == AU_CAT_ADPCM )
     {
@@ -306,7 +306,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    p_input->stream.i_mux_rate =  p_sys->fmt.audio.i_bitrate / 50 / 8;
+    p_input->stream.i_mux_rate =  p_sys->fmt.i_bitrate / 50 / 8;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_sys->p_es = es_out_Add( p_input->p_es_out, &p_sys->fmt );

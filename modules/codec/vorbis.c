@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.22 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: vorbis.c,v 1.23 2003/11/16 22:54:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -259,10 +259,10 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Setup the format */
         p_dec->fmt_out.audio.i_rate     = p_sys->vi.rate;
         p_dec->fmt_out.audio.i_channels = p_sys->vi.channels;
-        p_dec->fmt_out.audio.i_bitrate  = p_sys->vi.bitrate_nominal;
         p_dec->fmt_out.audio.i_physical_channels =
             p_dec->fmt_out.audio.i_original_channels =
                 pi_channels_maps[p_sys->vi.channels];
+        p_dec->fmt_out.i_bitrate = p_sys->vi.bitrate_nominal;
 
         aout_DateInit( &p_sys->end_date, p_sys->vi.rate );
 

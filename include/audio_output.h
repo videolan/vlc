@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.84 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: audio_output.h,v 1.85 2003/11/16 22:54:11 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,7 +55,6 @@ struct audio_format_t
      */
 
     /* FIXME ? (used by the codecs) */
-    int i_bitrate;
     int i_channels;
     int i_blockalign;
     int i_bitspersample;

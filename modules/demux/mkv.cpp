@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.40 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: mkv.cpp,v 1.41 2003/11/16 22:54:12 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1069,7 +1069,7 @@ static int Open( vlc_object_t * p_this )
 
                 tk.fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
                 tk.fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
-                tk.fmt.audio.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
+                tk.fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
                 tk.fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
                 tk.fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
 

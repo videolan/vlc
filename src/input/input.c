@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.255 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: input.c,v 1.256 2003/11/16 22:54:11 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1073,7 +1073,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             p_wf->wFormatTag        = WAVE_FORMAT_UNKNOWN;
             p_wf->nChannels         = fmt->audio.i_channels;
             p_wf->nSamplesPerSec    = fmt->audio.i_rate;
-            p_wf->nAvgBytesPerSec   = fmt->audio.i_bitrate / 8;
+            p_wf->nAvgBytesPerSec   = fmt->i_bitrate / 8;
             p_wf->nBlockAlign       = fmt->audio.i_blockalign;
             p_wf->wBitsPerSample    = fmt->audio.i_bitspersample;
             p_wf->cbSize            = fmt->i_extra;
@@ -1182,10 +1182,10 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                     input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                    fmt->audio.i_rate );
                 }
-                if( fmt->audio.i_bitrate > 0 )
+                if( fmt->i_bitrate > 0 )
                 {
                     input_AddInfo( p_cat, _("Bitrate"), "%d",
-                                   fmt->audio.i_bitrate );
+                                   fmt->i_bitrate );
                 }
                 if( fmt->audio.i_bitspersample )
                 {
