@@ -2,10 +2,9 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.18 2003/07/24 18:27:07 bigben Exp $
+ * $Id: v4l.c,v 1.19 2003/07/24 22:05:16 sam Exp $
  *
- * Author: Samuel Hocevar <sam@zoy.org>
- *         Laurent Aimar <fenrir@via.ecp.fr>
+ * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -481,13 +480,13 @@ static int AccessOpen( vlc_object_t *p_this )
 
     if( ( p_sys->fd = open( p_sys->psz_video_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_input, "cannot open device" );
+        msg_Err( p_input, "cannot open device (%s)", strerror( errno ) );
         goto failed;
     }
 
     if( ioctl( p_sys->fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
     {
-        msg_Err( p_input, "cannot get capabilities" );
+        msg_Err( p_input, "cannot get capabilities (%s)", strerror( errno ) );
         goto failed;
     }
 
@@ -513,17 +512,17 @@ static int AccessOpen( vlc_object_t *p_this )
     if( p_sys->i_width < p_sys->vid_cap.minwidth ||
         p_sys->i_width > p_sys->vid_cap.maxwidth )
     {
-        msg_Dbg( p_input, "invalid width" );
+        msg_Dbg( p_input, "invalid width %i", p_sys->i_width );
         p_sys->i_width = 0;
     }
     if( p_sys->i_height < p_sys->vid_cap.minheight ||
         p_sys->i_height > p_sys->vid_cap.maxheight )
     {
-        msg_Dbg( p_input, "invalid height" );
+        msg_Dbg( p_input, "invalid height %i", p_sys->i_height );
         p_sys->i_height = 0;
     }
 
-    if( !( p_sys->vid_cap.type&VID_TYPE_CAPTURE ) )
+    if( !( p_sys->vid_cap.type & VID_TYPE_CAPTURE ) )
     {
         msg_Err( p_input, "cannot grab" );
         goto failed;
@@ -532,7 +531,8 @@ static int AccessOpen( vlc_object_t *p_this )
     vid_channel.channel = p_sys->i_channel;
     if( ioctl( p_sys->fd, VIDIOCGCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_input, "cannot get channel infos" );
+        msg_Err( p_input, "cannot get channel infos (%s)",
+                          strerror( errno ) );
         goto failed;
     }
     msg_Dbg( p_input,
@@ -553,7 +553,7 @@ static int AccessOpen( vlc_object_t *p_this )
     vid_channel.norm = p_sys->i_norm;
     if( ioctl( p_sys->fd, VIDIOCSCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_input, "cannot set channel" );
+        msg_Err( p_input, "cannot set channel (%s)", strerror( errno ) );
         goto failed;
     }
 
@@ -568,7 +568,7 @@ static int AccessOpen( vlc_object_t *p_this )
             vid_tuner.tuner = p_sys->i_tuner;
             if( ioctl( p_sys->fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_input, "cannot get tuner" );
+                msg_Err( p_input, "cannot get tuner (%s)", strerror( errno ) );
                 goto failed;
             }
             msg_Dbg( p_input, "tuner %s low=%d high=%d, flags=0x%x "
@@ -582,7 +582,7 @@ static int AccessOpen( vlc_object_t *p_this )
             //vid_tuner.mode = p_sys->i_norm; /* FIXME FIXME to be checked FIXME FIXME */
             if( ioctl( p_sys->fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_input, "cannot set tuner" );
+                msg_Err( p_input, "cannot set tuner (%s)", strerror( errno ) );
                 goto failed;
             }
         }
@@ -597,11 +597,12 @@ static int AccessOpen( vlc_object_t *p_this )
             int driver_frequency = p_sys->i_frequency * 16 /1000;
             if( ioctl( p_sys->fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
-                msg_Err( p_input, "cannot set frequency" );
+                msg_Err( p_input, "cannot set frequency (%s)",
+                                  strerror( errno ) );
                 goto failed;
             }
-            msg_Dbg( p_input, "frequency %d (%d)", p_sys->i_frequency, 
-                                                    driver_frequency );
+            msg_Dbg( p_input, "frequency %d (%d)", p_sys->i_frequency,
+                                                   driver_frequency );
         }
     }
 
@@ -616,7 +617,7 @@ static int AccessOpen( vlc_object_t *p_this )
             vid_audio.audio = p_sys->i_audio;
             if( ioctl( p_sys->fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_input, "cannot get audio" );
+                msg_Err( p_input, "cannot get audio (%s)", strerror( errno ) );
                 goto failed;
             }
 
@@ -625,7 +626,7 @@ static int AccessOpen( vlc_object_t *p_this )
 
             if( ioctl( p_sys->fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_input, "cannot set audio" );
+                msg_Err( p_input, "cannot set audio (%s)", strerror( errno ) );
                 goto failed;
             }
         }
@@ -637,7 +638,8 @@ static int AccessOpen( vlc_object_t *p_this )
         int    i_format;
         if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY|O_NONBLOCK ) ) < 0 )
         {
-            msg_Err( p_input, "cannot open audio device" );
+            msg_Err( p_input, "cannot open audio device (%s)",
+                              strerror( errno ) );
             goto failed;
         }
 
@@ -645,22 +647,24 @@ static int AccessOpen( vlc_object_t *p_this )
         if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SETFMT, &i_format ) < 0
             || i_format != AFMT_S16_LE )
         {
-            msg_Err( p_input,
-                     "cannot set audio format (16b little endian)" );
+            msg_Err( p_input, "cannot set audio format (16b little endian) "
+                              "(%s)", strerror( errno ) );
             goto failed;
         }
 
         if( ioctl( p_sys->fd_audio, SNDCTL_DSP_STEREO,
                    &p_sys->b_stereo ) < 0 )
         {
-            msg_Err( p_input, "cannot set audio channels count" );
+            msg_Err( p_input, "cannot set audio channels count (%s)",
+                              strerror( errno ) );
             goto failed;
         }
 
         if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED,
                    &p_sys->i_sample_rate ) < 0 )
         {
-            msg_Err( p_input, "cannot set audio sample rate" );
+            msg_Err( p_input, "cannot set audio sample rate (%s)",
+                              strerror( errno ) );
             goto failed;
         }
 
@@ -685,7 +689,8 @@ static int AccessOpen( vlc_object_t *p_this )
 
         if( ioctl( p_sys->fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_input, "cannot get mjpeg params" );
+            msg_Err( p_input, "cannot get mjpeg params (%s)",
+                              strerror( errno ) );
             goto failed;
         }
         mjpeg.input = p_sys->i_channel;
@@ -735,7 +740,8 @@ static int AccessOpen( vlc_object_t *p_this )
 
         if( ioctl( p_sys->fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_input, "cannot set mjpeg params" );
+            msg_Err( p_input, "cannot set mjpeg params (%s)",
+                              strerror( errno ) );
             goto failed;
         }
 
@@ -751,7 +757,7 @@ static int AccessOpen( vlc_object_t *p_this )
 
         if( ioctl( p_sys->fd, VIDIOCGWIN, &vid_win ) < 0 )
         {
-            msg_Err( p_input, "cannot get win" );
+            msg_Err( p_input, "cannot get win (%s)", strerror( errno ) );
             goto failed;
         }
         p_sys->i_width  = vid_win.width;
