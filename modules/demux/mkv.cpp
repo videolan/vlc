@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.3 2003/06/22 14:36:34 fenrir Exp $
+ * $Id: mkv.cpp,v 1.4 2003/06/22 16:27:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1575,14 +1575,11 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
     if( i_track >= p_sys->i_track )
     {
         msg_Err( p_input, "invalid track number=%d", block->TrackNum() );
-        delete block;
-
         return;
     }
 
     if( tk.p_es->p_decoder_fifo == NULL )
     {
-        delete block;
         return;
     }
 
