@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.28 2003/11/06 00:12:17 gbazin Exp $
+ * $Id: v4l.c,v 1.29 2003/11/09 15:29:41 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -1359,7 +1359,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     while( i_len > 0 )
     {
         /* First copy header if any */
-        if( i_len > 0 && p_sys->i_header_pos < p_sys->i_header_size )
+        if( p_sys->i_header_pos < p_sys->i_header_size )
         {
             int i_copy;
 
@@ -1390,9 +1390,9 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         }
 
         /* The caller got what he wanted */
-        if( i_len <= 0 )
+        if( i_len == 0 )
         {
-            return( i_data );
+            return i_data;
         }
 
         /* Read no more than one frame at a time.
@@ -1400,11 +1400,11 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         if( p_sys->i_data_size && p_sys->i_data_pos == p_sys->i_data_size )
         {
             p_sys->i_data_pos = 0; p_sys->i_data_size = 0;
-            return( i_data );
+            return i_data;
         }
 
         /* Re-fill data by grabbing audio/video */
-        p_sys->i_data_pos = 0;
+        p_sys->i_data_pos = p_sys->i_data_size = 0;
 
         /* Try grabbing audio frames first */
         i_stream = p_sys->i_streams - 1;
@@ -1421,6 +1421,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
                 /* Sleep so we do not consume all the cpu, 10ms seems
                  * like a good value (100fps) */
                 msleep( 10000 );
+                continue;
             }
         }
 
