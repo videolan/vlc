@@ -348,23 +348,27 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         record.p_data = 0;
 
         /* get name */
-        record.psz_name = malloc( i_name/2 );
+        record.psz_name = malloc( i_name/2 + 1 );
         for( j = 0; j < i_name/2; j++ )
         {
             record.psz_name[j] = GetWLE( p_peek + i_peek ); i_peek += 2;
         }
+        record.psz_name[j] = 0; /* just to make sure */
 
         /* get data */
         if( record.i_type == ASF_METADATA_TYPE_STRING )
         {
-            record.p_data = malloc( i_data/2 );
+            record.p_data = malloc( i_data/2 + 1 );
             record.i_data = i_data/2;
             for( j = 0; j < i_data/2; j++ )
             {
                 record.p_data[j] = GetWLE( p_peek + i_peek ); i_peek += 2;
             }
+            record.p_data[j] = 0; /* just to make sure */
 
+#ifdef ASF_DEBUG
             msg_Dbg( s, "metadata: %s=%s", record.psz_name, record.p_data );
+#endif
         }
         else if( record.i_type == ASF_METADATA_TYPE_BYTE )
         {
@@ -373,8 +377,10 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
             memcpy( record.p_data, p_peek + i_peek, i_data );
             p_peek += i_data;
 
+#ifdef ASF_DEBUG
             msg_Dbg( s, "metadata: %s (%i bytes)", record.psz_name,
                      record.i_data );
+#endif
         }
         else
         {
@@ -391,7 +397,9 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
                 record.i_val = GetWLE( p_peek + i_peek ); i_peek += 2;
             }
 
+#ifdef ASF_DEBUG
             msg_Dbg( s, "metadata: %s=%i", record.psz_name, record.i_val );
+#endif
         }
 
         p_meta->i_record_entries_count++;
@@ -880,7 +888,6 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     p_root->p_data  = NULL;
     p_root->p_fp    = NULL;
     p_root->p_index = NULL;
-    p_root->p_hdr_ext = NULL;
     p_root->p_metadata = NULL;
 
     for( ; ; )
@@ -902,9 +909,6 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                 break;
             case( ASF_OBJECT_TYPE_INDEX ):
                 p_root->p_index = (asf_object_index_t*)p_obj;
-                break;
-            case( ASF_OBJECT_TYPE_HEADER_EXTENSION ):
-                p_root->p_hdr_ext = (asf_object_header_extension_t*)p_obj;
                 break;
             default:
                 msg_Warn( (vlc_object_t*)s, "unknow object found" );
@@ -935,17 +939,19 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
 
         if( p_root->p_fp )
         {
-
-            if( p_root->p_hdr_ext != NULL )
+            asf_object_t *p_hdr_ext =
+                ASF_FindObject( p_root->p_hdr,
+                                &asf_object_header_extension_guid, 0 );
+            if( p_hdr_ext )
             {
                 p_root->p_metadata =
-                    ASF_FindObject( p_root->p_hdr_ext,
+                    ASF_FindObject( p_hdr_ext,
                                     &asf_object_metadata_guid, 0 );
             }
 
             return p_root;
         }
-        msg_Warn( (vlc_object_t*)s, "cannot find file properties object" );
+        msg_Warn( s, "cannot find file properties object" );
     }
 
     /* Invalid file */

@@ -308,7 +308,6 @@ typedef struct asf_object_root_s
     asf_object_data_t   *p_data;
     /* could be NULL if !b_seekable or not-present */
     asf_object_index_t  *p_index;
-    asf_object_header_extension_t *p_hdr_ext;
 
     /* from asf_object_header_t */
     asf_object_file_properties_t *p_fp;
