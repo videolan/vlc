@@ -3,7 +3,7 @@
 # based on Joey Hess's one.
 # Kludged for ipkg
 
-VERSION=0.7.2
+VERSION=0.8.0
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"

@@ -1,7 +1,7 @@
 Package: gpe-vlc-h3600
 Section: graphics
 Priority: optional
-Version: 0.7.2
+Version: 0.8.0
 Release: 1
 Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
