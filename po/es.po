@@ -2310,11 +2310,11 @@ msgstr "Elige tecla a usar para saltar 5 minutos adelante."
 #: src/libvlc.h:697 modules/control/hotkeys.c:258 modules/control/lirc.c:194
 #: modules/gui/beos/InterfaceWindow.cpp:257
 msgid "Quit"
-msgstr "Quitar"
+msgstr "Salir"
 
 #: src/libvlc.h:698
 msgid "Select the hotkey to quit the application."
-msgstr "Elige tecla para quitar la aplicación"
+msgstr "Elige tecla para salir la aplicación"
 
 #: src/libvlc.h:699
 msgid "Navigate up"
@@ -6664,7 +6664,7 @@ msgstr "| logout  . . . . . . salir (si en conexión socket)\n"
 
 #: modules/control/rc.c:644 modules/control/rtci.c:644
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
-msgstr "| quit  . . . . . . . . . . . . . . . .  quitar vlc\n"
+msgstr "| quit  . . . . . . . . . . . . . . . .  salir vlc\n"
 
 #: modules/control/rc.c:646 modules/control/rtci.c:646
 msgid "+----[ end of help ]\n"
