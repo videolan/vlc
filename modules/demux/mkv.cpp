@@ -290,6 +290,7 @@ typedef struct
 
     /* hack : it's for seek */
     vlc_bool_t      b_search_keyframe;
+    vlc_bool_t      b_silent;
 
     /* informative */
     char         *psz_codec_name;
@@ -1216,6 +1217,12 @@ int matroska_segment_t::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
                     IndexAppendCluster( cluster );
                 }
 
+                // reset silent tracks
+                for (size_t i=0; i<tracks.size(); i++)
+                {
+                    tracks[i]->b_silent = VLC_FALSE;
+                }
+
                 ep->Down();
             }
             else if( MKV_IS_ID( el, KaxCues ) )
@@ -1236,6 +1243,10 @@ int matroska_segment_t::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
 
                 ctc.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 cluster->InitTimecode( uint64( ctc ), i_timescale );
+            }
+            else if( MKV_IS_ID( el, KaxClusterSilentTracks ) )
+            {
+                ep->Down();
             }
             else if( MKV_IS_ID( el, KaxBlockGroup ) )
             {
@@ -1272,6 +1283,20 @@ int matroska_segment_t::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
                 else
                 {
                     *pi_ref2 = int64( ref );
+                }
+            }
+            else if( MKV_IS_ID( el, KaxClusterSilentTrackNumber ) )
+            {
+                KaxClusterSilentTrackNumber &track_num = *(KaxClusterSilentTrackNumber*)el;
+                track_num.ReadData( es.I_O() );
+                // find the track
+                for (size_t i=0; i<tracks.size(); i++)
+                {
+                    if ( tracks[i]->i_number == uint32(track_num))
+                    {
+                        tracks[i]->b_silent = VLC_TRUE;
+                        break;
+                    }
                 }
             }
         }
@@ -2310,6 +2335,7 @@ void matroska_segment_t::ParseTrackEntry( EbmlMaster *m )
 
     tk->b_default = VLC_TRUE;
     tk->b_enabled = VLC_TRUE;
+    tk->b_silent = VLC_FALSE;
     tk->i_number = tracks.size() - 1;
     tk->i_extra_data = 0;
     tk->p_extra_data = NULL;
