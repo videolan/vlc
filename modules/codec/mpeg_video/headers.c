@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.8 2003/01/30 00:39:41 massiot Exp $
+ * $Id: headers.c,v 1.9 2003/01/30 02:16:09 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -613,6 +613,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_progressive = 1;
     }
 
+    p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
+
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
@@ -766,7 +768,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
 #define P_picture p_vpar->picture.p_picture
     p_vpar->picture.b_error = 0;
-    p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
 
     if( !p_vpar->picture.i_current_structure )
     {
