@@ -1,8 +1,8 @@
-# ***************************************************************************
+
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.16 2004/03/02 00:59:16 hartman Exp $
+# $Id: packages.mak,v 1.17 2004/03/02 19:21:03 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -91,4 +91,6 @@ GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.9
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 LIBDTS_VERSION=0.0.2
-DTSDEC_URL=http://download.videolan.org/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
+LIBDTS_URL=http://download.videolan.org/pub/videolan/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
+MODPLUG_VERSION=0.7
+MODPLUG_URL=http://download.videolan.org/pub/videolan/contrib/libmodplug-$(MODPLUG_VERSION).tar.gz

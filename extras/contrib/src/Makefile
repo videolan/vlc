@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.17 2004/03/02 01:10:26 hartman Exp $
+# $Id: Makefile,v 1.18 2004/03/02 19:21:03 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -43,7 +43,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca .dts
+	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca .dts .mod
 FORCE:
 
 # ***************************************************************************
@@ -713,7 +713,7 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # libdts
 # ***************************************************************************
 
-libdts-$(LIBDTS_VERSION).tar.bz:
+libdts-$(LIBDTS_VERSION).tar.gz:
 	$(WGET) $(LIBDTS_URL)
 
 libdts: libdts-$(LIBDTS_VERSION).tar.gz
@@ -726,6 +726,24 @@ libdts: libdts-$(LIBDTS_VERSION).tar.gz
 CLEAN_FILE += .dts
 CLEAN_PKG += libdts
 DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
+
+# ***************************************************************************
+# libmodplug
+# ***************************************************************************
+
+libmodplug-$(MODPLUG_VERSION).tar.gz:
+	$(WGET) $(MODPLUG_URL)
+
+libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.mod: libmodplug
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .mod
+CLEAN_PKG += libmodplug
+DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 
 # ***************************************************************************
 # Some cleansing
