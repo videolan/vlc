@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.12 2001/08/06 13:28:00 sam Exp $
+ * $Id: dvd.c,v 1.13 2001/08/07 02:48:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -169,6 +169,8 @@ static void ProbeLibDVDCSS( void )
     {
         intf_ErrMsg( "dvd warning: no valid libdvdcss found, "
                      "I will only play unencrypted DVDs" );
+        intf_ErrMsg( "dvd warning: get libdvdcss at "
+                     "http://www.videolan.org/libdvdcss/" );
 
         dvdcss_open = dummy_dvdcss_open;
         dvdcss_close = dummy_dvdcss_close;

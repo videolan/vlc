@@ -3,12 +3,13 @@
 # (c)2001 VideoLAN
 ###############################################################################
 
--include ../../Makefile.opts
-
 BASE_A := libdvdcss.a
 BASE_SO := libdvdcss.so
 MAJOR_SO := libdvdcss.so.$(shell echo $(LIBDVDCSS_VERSION) | cut -f1 -d.)
 FULL_SO := libdvdcss.so.$(LIBDVDCSS_VERSION)
+ifneq (,$(SOFLAGS))
+ALL_SOFLAGS := $(SOFLAGS)$(MAJOR_SO)
+endif
 
 #
 # Objects
@@ -24,7 +25,7 @@ $(LIBDVDCSS_O): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
 ../../lib/$(FULL_SO): $(LIBDVDCSS_O)
-	$(CC) $(PCFLAGS) -Wl,-soname -Wl,$(MAJOR_SO) -o $@ $^ $(PLCFLAGS)
+	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDCSS)
 	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
 	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
 

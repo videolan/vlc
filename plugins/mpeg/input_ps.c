@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.31 2001/07/31 21:13:30 gbazin Exp $
+ * $Id: input_ps.c,v 1.32 2001/08/07 02:48:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
@@ -70,6 +71,19 @@
 
 #include "modules.h"
 #include "modules_export.h"
+
+/*****************************************************************************
+ * fseeko: fseeko replacement for BSDI.
+ *****************************************************************************/
+#ifdef __bsdi__
+int    __sfseek __P(( FILE *, fpos_t, int ));
+fpos_t __sftell __P(( FILE * ));
+
+static __inline__ off_t fseeko( FILE *p_file, off_t i_offset, int i_pos )
+{
+    return __sfseek( p_file, i_offset, i_pos );
+}
+#endif
 
 /*****************************************************************************
  * Local prototypes

@@ -20,8 +20,9 @@ if test -r extras/libdvdcss/libdvdcss.c; then
   AC_SUBST(LIBDVDCSS_VERSION)
 fi
 
-dnl Save CFLAGS
+dnl Save CFLAGS and LDFLAGS
 save_CFLAGS="${CFLAGS}"
+save_LDFLAGS="${LDFLAGS}"
 
 dnl Check for tools
 AC_PROG_MAKE_SET
@@ -72,6 +73,7 @@ AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
 AC_CHECK_LIB(m,pow,LIB_YUV="${LIB_YUV} -lm")
+AC_CHECK_LIB(dvd,dvd_cdrom_ioctl,LIB_LIBDVDCSS="${LIB_LIBDVDCSS} -ldvd")
 
 CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 CFLAGS="${CFLAGS} -I/usr/local/include"
@@ -126,20 +128,41 @@ AC_TRY_COMPILE([],,
 
 dnl Check for Darwin plugin linking flags
 CFLAGS="${save_CFLAGS} -bundle -undefined suppress"
-AC_MSG_CHECKING([if \$CC compiles plugins with -bundle -undefined suppress])
+AC_MSG_CHECKING([if \$CC accepts -bundle -undefined suppress])
 AC_TRY_COMPILE([],,
  PLCFLAGS="${PLCFLAGS} -bundle -undefined suppress"; AC_MSG_RESULT(yes),
  AC_MSG_RESULT(no))
 
 dnl Check for standard plugin linking flags
 CFLAGS="${save_CFLAGS} -shared"
-AC_MSG_CHECKING([if \$CC compiles plugins with -shared])
+AC_MSG_CHECKING([if \$CC accepts -shared])
 AC_TRY_COMPILE([],,
  PLCFLAGS="${PLCFLAGS} -shared"; AC_MSG_RESULT(yes),
  AC_MSG_RESULT(no))
 
+dnl Check for standard soname setting
+if test x"${SOFLAGS}" = x; then
+  try_SOFLAGS="-Wl,-soname -Wl,"
+  LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
+  AC_MSG_CHECKING([if linker accepts ${try_SOFLAGS}foo.so.0])
+  AC_TRY_LINK([],,
+   SOFLAGS="${try_SOFLAGS}"; AC_MSG_RESULT(yes),
+   AC_MSG_RESULT(no))
+fi
+
+dnl Check for SunOS soname setting
+if test x"${SOFLAGS}" = x; then
+  try_SOFLAGS="-Wl,-h -Wl,"
+  LDFLAGS="${save_LDFLAGS} ${try_SOFLAGS}foo.so.0"
+  AC_MSG_CHECKING([if linker accepts ${try_SOFLAGS}foo.so.0])
+  AC_TRY_LINK([],,
+   SOFLAGS="${try_SOFLAGS}"; AC_MSG_RESULT(yes),
+   AC_MSG_RESULT(no))
+fi
+
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
+LDFLAGS="${save_LDFLAGS}"
 
 dnl Check for boolean_t
 AC_MSG_CHECKING([for boolean_t in sys/types.h])
@@ -197,8 +220,9 @@ AC_CHECK_HEADERS(winioctl.h,[
 dnl  for Un*x and BeOS
 AC_CHECK_HEADERS(sys/ioctl.h,[
   CAN_BUILD_LIBDVDCSS="${HAVE_LIBDVDCSS}"
-  AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h)
+  AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h dvd.h)
   BSD_DVD_STRUCT=0
+  LINUX_DVD_STRUCT=0
   dnl
   dnl Old FreeBSD: sys/cdio.h
   dnl
@@ -215,17 +239,34 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
               Define if <sys/cdio.h> defines dvd_struct.)
     BSD_DVD_STRUCT=1
   ])
-  if test x$BSD_DVD_STRUCT = x1; then
-    AC_DEFINE(HAVE_BSD_DVD_STRUCT, 1,
-              Define if BSD-like dvd_struct is defined.)
-  fi
   dnl
   dnl Linux: linux/cdrom.h
   dnl
   AC_EGREP_HEADER(dvd_struct,linux/cdrom.h,[
     AC_DEFINE(DVD_STRUCT_IN_LINUX_CDROM_H, 1,
               Define if <linux/cdrom.h> defines DVD_STRUCT.)
+    LINUX_DVD_STRUCT=1
   ])
+  dnl
+  dnl BSDI: dvd.h
+  dnl
+  AC_EGREP_HEADER(dvd_struct,dvd.h,[
+    AC_DEFINE(DVD_STRUCT_IN_DVD_H, 1,
+              Define if <dvd.h> defines DVD_STRUCT.)
+    LINUX_DVD_STRUCT=1
+  ])
+  dnl
+  dnl Final tests to check what was detected
+  dnl
+  if test x$LINUX_DVD_STRUCT = x1; then
+    AC_DEFINE(HAVE_LINUX_DVD_STRUCT, 1,
+              Define if Linux-like dvd_struct is defined.)
+  else
+    if test x$BSD_DVD_STRUCT = x1; then
+      AC_DEFINE(HAVE_BSD_DVD_STRUCT, 1,
+                Define if BSD-like dvd_struct is defined.)
+    fi
+  fi
 ])
 
 
@@ -233,6 +274,9 @@ dnl
 dnl  Check the operating system
 dnl
 case ${host_os} in
+  bsdi*)
+    SYS=bsdi
+    ;;
   darwin*)
     SYS=darwin
     ;;
@@ -343,8 +387,8 @@ AC_ARG_WITH(dvdcss,
         STATIC_LIBDVDCSS=1
         BUILTINS="${BUILTINS} dvd"
         CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-        LIB_DVD="${LIB_DVD} lib/libdvdcss.a"
-        LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a"
+        LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
+        LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
       fi
     ;;
     xlocal-shared)
@@ -364,6 +408,7 @@ AC_ARG_WITH(dvdcss,
       BUILTINS="${BUILTINS} dvd"
       OBJ_DVD="${OBJ_DVD} dummy_dvdcss.o"
       CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
+      CFLAGS_DVD="${CFLAGS_DVD} -DLIBDVDCSS_VERSION=\"${LIBDVDCSS_VERSION}\""
       LIB_DVD="${LIB_DVD} -ldl"
       LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} -ldl"
     ;;
@@ -386,8 +431,8 @@ AC_ARG_WITH(dvdcss,
       STATIC_LIBDVDCSS=1
       BUILTINS="${BUILTINS} dvd"
       CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
-      LIB_DVD="${LIB_DVD} lib/libdvdcss.a"
-      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a"
+      LIB_DVD="${LIB_DVD} lib/libdvdcss.a ${LIB_LIBDVDCSS}"
+      LIB_DVD_PLUGIN="${LIB_DVD_PLUGIN} ../../lib/libdvdcss.a ${LIB_LIBDVDCSS}"
     else
       # XXX: no check for libdl is done, don't try this at home !
       DUMMY_LIBDVDCSS=1
@@ -790,8 +835,9 @@ AC_SUBST(WINDRES)
 
 AC_SUBST(LCFLAGS)
 AC_SUBST(PLCFLAGS)
-AC_SUBST(LIB)
+AC_SUBST(SOFLAGS)
 
+AC_SUBST(LIB)
 AC_SUBST(LIB_ALSA)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
@@ -803,6 +849,7 @@ AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GNOME)
 AC_SUBST(LIB_GTK)
 AC_SUBST(LIB_IDCTALTIVEC)
+AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_QNX)

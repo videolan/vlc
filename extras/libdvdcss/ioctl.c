@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.6 2001/08/06 13:28:00 sam Exp $
+ * $Id: ioctl.c,v 1.7 2001/08/07 02:48:24 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,6 +48,9 @@
 #ifdef DVD_STRUCT_IN_LINUX_CDROM_H
 #   include <linux/cdrom.h>
 #endif
+#ifdef DVD_STRUCT_IN_DVD_H
+#   include <dvd.h>
+#endif
 #ifdef SYS_BEOS
 #   include <malloc.h>
 #   include <scsi.h>
@@ -84,7 +87,7 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_COPYRIGHT;
@@ -190,7 +193,7 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_DISCKEY;
@@ -298,7 +301,7 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_AGID;
@@ -375,7 +378,7 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_CHALLENGE;
@@ -465,7 +468,7 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_ASF;
@@ -559,7 +562,7 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_KEY1;
@@ -643,7 +646,7 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 {
     int i_ret;
 
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_INVALIDATE_AGID;
@@ -716,7 +719,7 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
  *****************************************************************************/
 int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 {
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_HOST_SEND_CHALLENGE;
@@ -800,7 +803,7 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
  *****************************************************************************/
 int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
 {
-#if defined( DVD_STRUCT_IN_LINUX_CDROM_H )
+#if defined( HAVE_LINUX_DVD_STRUCT )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_HOST_SEND_KEY2;

@@ -75,6 +75,7 @@ LIB_GLIDE = @LIB_GLIDE@
 LIB_GNOME = @LIB_GNOME@
 LIB_GTK = @LIB_GTK@
 LIB_IDCTALTIVEC = @LIB_IDCTALTIVEC@
+LIB_LIBDVDCSS = @LIB_LIBDVDCSS@
 LIB_KDE = @LIB_KDE@
 LIB_MACOSX = @LIB_MACOSX@
 LIB_QNX = @LIB_QNX@
@@ -171,7 +172,7 @@ endif
 # Libraries
 #
 ifneq (,$(findstring mingw32,$(SYS)))
-LIB += -lws2_32 -lnetapi32
+LIB += -lws2_32 -lnetapi32 -lmsvcrt40
 endif
 
 LIB += -L/usr/local/lib @LIB@
@@ -251,6 +252,11 @@ LCFLAGS += -Wall
 ifneq (,$(findstring mingw32,$(SYS)))
 LCFLAGS += -mwindows -Xlinker --force-exe-suffix
 endif
+
+#
+# C compiler and linker flags: setting soname
+#
+SOFLAGS += @SOFLAGS@
 
 #
 # C compiler flags: plugin compilation

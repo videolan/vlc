@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.110 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: main.c,v 1.111 2001/08/07 02:48:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1008,7 +1008,11 @@ static void InstructionSignalHandler( int i_signal )
      * to an interface having been destroyed */
 
     /* Acknowledge the signal received */
-    fprintf( stderr, "illegal instruction : optimization disabled\n" );
+    fprintf( stderr, "warning: extended instructions unsupported, "
+                     "some optimizations will be disabled\n" );
+#ifdef SYS_LINUX
+    fprintf( stderr, "upgrade to kernel 2.4.x to get rid of this warning\n" );
+#endif
 
     i_illegal = 1;
     
@@ -1050,7 +1054,7 @@ static int CPUCapabilities( void )
 
     if( ret != KERN_SUCCESS )
     {
-        intf_ErrMsg( "error: couldn't get CPU information" );
+        fprintf( stderr, "error: couldn't get CPU information\n" );
         return( i_capabilities );
     }
 
@@ -1198,10 +1202,17 @@ static int RedirectSTDOUT( void )
         i_stdout_filedesc = open( psz_stdout_filename,
                                   O_CREAT | O_TRUNC | O_RDWR,
                                   S_IREAD | S_IWRITE );
+
         if( dup2( i_stdout_filedesc, fileno(stdout) ) == -1 )
-            intf_ErrMsg("Unable to redirect stdout!\n");
+        {
+            intf_ErrMsg( "warning: unable to redirect stdout" );
+        }
+
         if( dup2( i_stdout_filedesc, fileno(stderr) ) == -1 )
-            intf_ErrMsg("Unable to redirect stderr!\n");
+        {
+            intf_ErrMsg( "warning: unable to redirect stderr" );
+        }
+
         close( i_stdout_filedesc );
     }
     else

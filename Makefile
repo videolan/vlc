@@ -109,17 +109,16 @@ all: Makefile.opts vlc ${ALIASES} vlc.app
 Makefile.opts:
 	@echo "**** No configuration found, running ./configure..."
 	./configure
-
-# Include Makefile.opts again in case we just generated it
-ifneq (1,$(HAVE_MAKEFILE_OPTS))
-    -include Makefile.opts
-endif
+	$(MAKE) $(MAKECMDGOALS)
+	exit
 
 show:
 	@echo CC: $(CC)
 	@echo CFLAGS: $(CFLAGS)
 	@echo DCFLAGS: $(DCFLAGS)
 	@echo LCFLAGS: $(LCFLAGS)
+	@echo PCFLAGS: $(PCFLAGS)
+	@echo PLCFLAGS: $(PLCFLAGS)
 	@echo C_OBJ: $(C_OBJ)
 	@echo CPP_OBJ: $(CPP_OBJ)
 	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
@@ -227,9 +226,9 @@ snapshot-common: clean
 		configure configure.in install-sh config.sub config.guess \
 			/tmp/vlc/
 	# Copy Debian control files
-	for file in debian/*dirs debian/*menu debian/*desktop ; do \
-		cp $$file /tmp/vlc/debian ; done
-	for file in control changelog rules vlc.copyright vlc.docs ; do \
+	for file in debian/*dirs debian/*docs debian/*menu debian/*desktop \
+		debian/*copyright ; do cp $$file /tmp/vlc/debian ; done
+	for file in control changelog rules ; do \
 		cp debian/$$file /tmp/vlc/debian/ ; done
 	# Copy fonts and icons
 	for file in share/*png share/*xpm share/*psf ; do \

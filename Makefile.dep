@@ -46,7 +46,7 @@ default:
 -include $(MAKECMDGOALS)
 
 $(C_DEP): .dep/%.d: %.c
-	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
+	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
 	@echo "regenerating dependencies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
@@ -54,7 +54,7 @@ $(C_DEP): .dep/%.d: %.c
 	[ -s $@ ] || rm -f $@'
 
 $(CPP_DEP): .dep/%.dpp: %.cpp
-	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
+	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$$*)
 	@echo "regenerating dependencies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
