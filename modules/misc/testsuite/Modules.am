@@ -1,0 +1,3 @@
+SOURCES_test1 = modules/misc/testsuite/test1.c
+SOURCES_test2 = modules/misc/testsuite/test2.cpp
+SOURCES_test3 = modules/misc/testsuite/test3.m

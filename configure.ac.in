@@ -507,8 +507,7 @@ esac
 dnl
 dnl  default modules
 dnl
-PLUGINS="${PLUGINS} dummy null"
-PLUGINS="${PLUGINS} rc logger access_file memcpy"
+PLUGINS="${PLUGINS} dummy rc logger access_file memcpy"
 PLUGINS="${PLUGINS} es audio mpeg_system ps ts"
 PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
 #PLUGINS="${PLUGINS} a52old imdct downmix"
@@ -2092,12 +2091,29 @@ fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
+dnl  test plugins
+dnl
+AC_ARG_ENABLE(testsuite,
+  [  --enable-testsuite      build test modules (default disabled)])
+if test "x${enable_testsuite}" = "xyes"
+then
+  TESTS="test1 test2 test3"
+  dnl  we define those so that bootstrap sets the right linker
+  CXXFLAGS_test2="${CXXFLAGS_test2}"
+  OBJCFLAGS_test3="${OBJCFLAGS_test3}"
+  dnl  this one is needed until automake knows what to do
+  LDFLAGS_test3="${LDFLAGS_test3} -lobjc"
+  PLUGINS="${PLUGINS} ${TESTS}"
+  BUILTINS="${BUILTINS} ${TESTS}"
+fi
+
+dnl
 dnl  gtk_main plugin
 dnl
 if test "x${NEED_GTK_MAIN}" != "xno"
 then
     PLUGINS="${PLUGINS} gtk_main"
-    CFLAGS_gtk = "${CFLAGS_gtk} -DNEED_GTK_MAIN"
+    CFLAGS_gtk="${CFLAGS_gtk} -DNEED_GTK_MAIN"
     CFLAGS_gtk_main="${CFLAGS_gtk_main} ${CFLAGS_gtk} ${CFLAGS_familiar}"
     LDFLAGS_gtk_main="${LDFLAGS_gtk_main} ${LDFLAGS_gtk} ${LDFLAGS_familiar}"
 fi
@@ -2123,8 +2139,9 @@ AC_ARG_ENABLE(plugins,
      plugin_support=false
    fi])
 
-dnl Automagically disable plugins if there is no system support for .so files
-dnl don't forget vlc-win32 still can load .so as plugins
+dnl Automagically disable plugins if there is no system support for
+dnl dynamically loadable files (.so, .dll, .dylib).
+dnl don't forget vlc-win32 still can load .dll as plugins
 if test "x${ac_cv_header_dlfcn_h}" = "xno" -a "x${ac_cv_header_image_h}" = "xno" -a "x${SYS}" != "xmingw32"
 then
   echo "*** Your system doesn't have plugin support. All plugins will be built"

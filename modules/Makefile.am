@@ -49,6 +49,7 @@ EXTRA_DIST = \
 	misc/logger/Modules.am \
 	misc/memcpy/Modules.am \
 	misc/network/Modules.am \
+	misc/testsuite/Modules.am \
 	video_chroma/Modules.am \
 	video_filter/Modules.am \
 	video_filter/deinterlace/Modules.am \

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * null.c : NULL module for vlc
+ * test2.cpp : Empty C++ module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: null.c,v 1.1 2002/08/20 18:08:51 sam Exp $
+ * $Id: test2.cpp,v 1.1 2002/10/04 13:13:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,10 +26,15 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
+#include <string>
+
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("the module that does nothing") );
+    /* Minimal C++ usage */
+    string description = "C++ module that does nothing";
+    set_description( _( description.c_str() ) );
 vlc_module_end();
+
 

@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.7 2002/10/03 13:21:55 sam Exp $
+ * $Id: gtk_main.c,v 1.8 2002/10/04 13:13:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -139,10 +139,7 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_this->p_libvlc->global_lock );
 }
 
-static gint foo(gpointer foo)
-{
-    return TRUE;
-}
+static gint foo( gpointer bar ) { return TRUE; }
 
 /*****************************************************************************
  * GtkMain: Gtk+ thread
@@ -174,7 +171,8 @@ static void GtkMain( vlc_object_t *p_this )
 
     vlc_thread_ready( p_this );
 
-    /* If we don't add this simple timeout, gtk_main remains stuck ... */
+    /* If we don't add this simple timeout, gtk_main remains stuck if
+     * we try to close the window without having sent any gtk event. */
     gtk_timeout_add( INTF_IDLE_SLEEP / 1000, foo, p_this );
 
     /* Enter Gtk mode */

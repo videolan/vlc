@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: ipv6.c,v 1.3 2002/10/04 13:13:54 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -146,7 +146,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
             p_socket->sin6_scope_id = 0;
 #endif
 #if 0
-            msg_Warn( p_this, " = #%i\n", p_socket->sin6_scope_id );
+            msg_Warn( p_this, " = #%i", p_socket->sin6_scope_id );
 #endif
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
