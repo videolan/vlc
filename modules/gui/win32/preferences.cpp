@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preferences.cpp: the "Preferences" dialog box
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2003 VideoLAN
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *          Boris Dores <babal@via.ecp.fr>
@@ -85,9 +85,10 @@ __fastcall TCleanCheckListBox::~TCleanCheckListBox()
  * Functions to help components creation
  ****************************************************************************/
 __fastcall TPanelPref::TPanelPref( TComponent* Owner,
-            module_config_t *p_config_arg ) : TPanel( Owner )
+    module_config_t *_p_config, intf_thread_t *_p_intf ) : TPanel( Owner )
 {
-    p_config = p_config_arg;
+    p_intf = _p_intf;
+    p_config = _p_config;
     BevelInner = bvNone;
     BevelOuter = bvNone;
     BorderStyle = bsNone;
@@ -175,9 +176,6 @@ TCSpinEdit * __fastcall TPanelPref::CreateSpinEdit( TWinControl *Parent,
     return SpinEdit;
 }
 //---------------------------------------------------------------------------
-void __fastcall TPanelPref::UpdateChanges()
-{
-}
 
 #define LIBWIN32_PREFSIZE_VPAD                4
 #define LIBWIN32_PREFSIZE_HPAD                4
@@ -199,11 +197,9 @@ void __fastcall TPanelPref::UpdateChanges()
  * Panel for module management
  ****************************************************************************/
 __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
-    module_config_t *p_config, intf_thread_t *_p_intf )
-    : TPanelPref( Owner, p_config )
+        module_config_t *p_config, intf_thread_t *_p_intf )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
-    p_intf = _p_intf;
-
     /* init configure button */
     ButtonConfig = CreateButton( this,
             LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH,
@@ -312,15 +308,13 @@ void __fastcall TPanelPlugin::UpdateChanges()
         if( CleanCheckListBox->Checked[item] )
         {
             Name = ((TObjectString*)CleanCheckListBox->Items->Objects[item])
-                   ->String().c_str();
+                   ->String();
             break;
         }
     }
 
-    /* XXX: Necessary, since c_str() returns only a temporary pointer... */
-    free( p_config->psz_value );
-    p_config->psz_value = (char *)malloc( Name.Length() + 1 );
-    strcpy( p_config->psz_value, Name.c_str() );
+    config_PutPsz( p_intf, p_config->psz_name,
+                   Name.Length() ? Name.c_str() : NULL );
 }
 
 
@@ -328,7 +322,8 @@ void __fastcall TPanelPlugin::UpdateChanges()
  * Panel for string management
  ****************************************************************************/
 __fastcall TPanelString::TPanelString( TComponent* Owner,
-            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+        module_config_t *p_config, intf_thread_t *_p_intf )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
     /* init description label */
     AnsiString Text = AnsiString ( p_config->psz_text ) + ":";
@@ -358,10 +353,8 @@ __fastcall TPanelString::TPanelString( TComponent* Owner,
 //---------------------------------------------------------------------------
 void __fastcall TPanelString::UpdateChanges()
 {
-    /* XXX: Necessary, since c_str() returns only a temporary pointer... */
-    free( p_config->psz_value );
-    p_config->psz_value = (char *)malloc( Edit->Text.Length() + 1 );
-    strcpy( p_config->psz_value, Edit->Text.c_str() );
+    config_PutPsz( p_intf, p_config->psz_name,
+                   Edit->Text.Length() ? Edit->Text.c_str() : NULL );
 }
 
 
@@ -369,7 +362,8 @@ void __fastcall TPanelString::UpdateChanges()
  * Panel for integer management
  ****************************************************************************/
 __fastcall TPanelInteger::TPanelInteger( TComponent* Owner,
-            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+        module_config_t *p_config, intf_thread_t *_p_intf )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
     /* init description label */
     AnsiString Text = AnsiString ( p_config->psz_text ) + ":";
@@ -406,7 +400,7 @@ __fastcall TPanelInteger::TPanelInteger( TComponent* Owner,
 void __fastcall TPanelInteger::UpdateChanges()
 {
     /* Warning: we're casting from long to int */
-    p_config->i_value = (int)SpinEdit->Value;
+    config_PutInt( p_intf, p_config->psz_name, (int)SpinEdit->Value );
 }
 
 
@@ -414,7 +408,8 @@ void __fastcall TPanelInteger::UpdateChanges()
  * Panel for float management
  ****************************************************************************/
 __fastcall TPanelFloat::TPanelFloat( TComponent* Owner,
-            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+        module_config_t *p_config, intf_thread_t *_p_intf )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
 #define MAX_FLOAT_CHARS 20
     /* init description label */
@@ -458,7 +453,7 @@ __fastcall TPanelFloat::TPanelFloat( TComponent* Owner,
 void __fastcall TPanelFloat::UpdateChanges()
 {
     /* Warning: we're casting from double to float */
-    p_config->f_value = atof( Edit->Text.c_str() );
+    config_PutFloat( p_intf, p_config->psz_name, atof( Edit->Text.c_str() ) );
 }
 
 
@@ -466,7 +461,8 @@ void __fastcall TPanelFloat::UpdateChanges()
  * Panel for boolean management
  ****************************************************************************/
 __fastcall TPanelBool::TPanelBool( TComponent* Owner,
-            module_config_t *p_config ) : TPanelPref( Owner, p_config )
+        module_config_t *p_config, intf_thread_t *_p_intf )
+        : TPanelPref( Owner, p_config, _p_intf )
 {
     /* init checkbox */
     CheckBox = CreateCheckBox( this,
@@ -484,7 +480,7 @@ __fastcall TPanelBool::TPanelBool( TComponent* Owner,
 //---------------------------------------------------------------------------
 void __fastcall TPanelBool::UpdateChanges()
 {
-    p_config->i_value = CheckBox->Checked ? 1 : 0;
+    config_PutInt( p_intf, p_config->psz_name, CheckBox->Checked ? 1 : 0 );
 }
 
 
@@ -634,7 +630,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_STRING:
 
             /* add new panel for the config option */
-            PanelString = new TPanelString( this, p_item );
+            PanelString = new TPanelString( this, p_item, p_intf );
             PanelString->Parent = ScrollBox;
 
             break;
@@ -642,7 +638,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_INTEGER:
 
             /* add new panel for the config option */
-            PanelInteger = new TPanelInteger( this, p_item );
+            PanelInteger = new TPanelInteger( this, p_item, p_intf );
             PanelInteger->Parent = ScrollBox;
 
             break;
@@ -650,7 +646,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_FLOAT:
 
             /* add new panel for the config option */
-            PanelFloat = new TPanelFloat( this, p_item );
+            PanelFloat = new TPanelFloat( this, p_item, p_intf );
             PanelFloat->Parent = ScrollBox;
 
             break;
@@ -658,7 +654,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
         case CONFIG_ITEM_BOOL:
 
             /* add new panel for the config option */
-            PanelBool = new TPanelBool( this, p_item );
+            PanelBool = new TPanelBool( this, p_item, p_intf );
             PanelBool->Parent = ScrollBox;
 
             break;
@@ -719,7 +715,6 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
             {
                 Panel = (TPanelPref *)ScrollBox->Controls[j];
                 Panel->UpdateChanges();
-                SaveValue( Panel->p_config );
             }
         }
     }
@@ -736,27 +731,3 @@ void __fastcall TPreferencesDlg::ButtonCancelClick( TObject *Sender )
     Hide();
 }
 //---------------------------------------------------------------------------
-void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
-{
-    switch( p_config->i_type )
-    {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_FILE:
-        case CONFIG_ITEM_MODULE:
-            config_PutPsz( p_intf, p_config->psz_name,
-                           *p_config->psz_value ? p_config->psz_value : NULL );
-            break;
-        case CONFIG_ITEM_INTEGER:
-        case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intf, p_config->psz_name, p_config->i_value );
-            break;
-        case CONFIG_ITEM_FLOAT:
-            config_PutFloat( p_intf, p_config->psz_name, p_config->f_value );
-            break;
-        default:
-            msg_Warn( p_intf, "unknown config type" );
-            break;
-    }
-}
-//---------------------------------------------------------------------------
-

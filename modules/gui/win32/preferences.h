@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preferences.h: the "Preferences" dialog box
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2003 VideoLAN
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *          Boris Dores <babal@via.ecp.fr>
@@ -65,10 +65,13 @@ public:
 class TPanelPref : public TPanel
 {
 public:
-    __fastcall TPanelPref( TComponent* Owner, module_config_t *p_config_arg );
-    module_config_t *p_config;
+    __fastcall TPanelPref( TComponent* Owner, module_config_t *_p_config,
+            intf_thread_t *_p_intf );
     virtual void __fastcall UpdateChanges() = 0;
-    TCleanCheckListBox * __fastcall CreateCleanCheckListBox( TWinControl *Parent,
+protected:
+    module_config_t * p_config;
+    intf_thread_t * p_intf;
+    TCleanCheckListBox * __fastcall CreateCleanCheckListBox(TWinControl *Parent,
             int Left, int Width, int Top, int Height );
     TButton * __fastcall CreateButton( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption );
@@ -88,7 +91,7 @@ class TPanelPlugin : public TPanelPref
 {
 public:
     __fastcall TPanelPlugin( TComponent* Owner, module_config_t *p_config,
-        intf_thread_t *_p_intf );
+            intf_thread_t *_p_intf );
     TCleanCheckListBox *CleanCheckListBox;
     TButton *ButtonConfig;
     TLabel *Label;
@@ -97,14 +100,13 @@ public:
     void __fastcall CheckListBoxClick( TObject *Sender );
     void __fastcall CheckListBoxClickCheck( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
-private:
-    intf_thread_t *p_intf;
 };
 //---------------------------------------------------------------------------
 class TPanelString : public TPanelPref
 {
 public:
-    __fastcall TPanelString( TComponent* Owner, module_config_t *p_config );
+    __fastcall TPanelString( TComponent* Owner, module_config_t *p_config,
+            intf_thread_t *_p_intf );
     TLabel *Label;
     TEdit *Edit;
     virtual void __fastcall UpdateChanges();
@@ -113,7 +115,8 @@ public:
 class TPanelInteger : public TPanelPref
 {
 public:
-    __fastcall TPanelInteger( TComponent* Owner, module_config_t *p_config );
+    __fastcall TPanelInteger( TComponent* Owner, module_config_t *p_config,
+            intf_thread_t *_p_intf );
     TLabel *Label;
     TCSpinEdit *SpinEdit;
     virtual void __fastcall UpdateChanges();
@@ -122,7 +125,8 @@ public:
 class TPanelFloat : public TPanelPref
 {
 public:
-    __fastcall TPanelFloat( TComponent* Owner, module_config_t *p_config );
+    __fastcall TPanelFloat( TComponent* Owner, module_config_t *p_config,
+            intf_thread_t *_p_intf );
     TLabel *Label;
     TEdit *Edit;
     virtual void __fastcall UpdateChanges();
@@ -131,7 +135,8 @@ public:
 class TPanelBool : public TPanelPref
 {
 public:
-    __fastcall TPanelBool( TComponent* Owner, module_config_t *p_config );
+    __fastcall TPanelBool( TComponent* Owner, module_config_t *p_config,
+            intf_thread_t *_p_intf );
     TCheckBox *CheckBox;
     virtual void __fastcall UpdateChanges();
 };
@@ -154,7 +159,6 @@ private:	// User declarations
 public:		// User declarations
     __fastcall TPreferencesDlg( TComponent* Owner, intf_thread_t *_p_intf );
     void __fastcall CreateConfigDialog( char *psz_module_name );
-    void __fastcall SaveValue( module_config_t *p_config );
 };
 //---------------------------------------------------------------------------
 #endif
