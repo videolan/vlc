@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.10 2003/02/16 08:56:24 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.11 2003/02/18 00:51:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -203,6 +203,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) break;
 
         /* Set the Presentation Time Stamp */
+        fprintf( stderr, "mpgadec pts:%lld\n", pts );
         if ( pts != 0 && pts != aout_DateGet( &end_date ) )
         {
             aout_DateSet( &end_date, pts );
@@ -288,6 +289,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             byte_t p_junk[MAX_FRAME_SIZE];
             int    i_skip = i_current_frame_size - MAD_BUFFER_GUARD;
 
+            fprintf( stderr, "waiting pts\n" );
             /* We've just started the stream, wait for the first PTS. */
             while( i_skip > 0 )
             {
@@ -390,7 +392,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         p_buffer->i_nb_bytes = i_current_frame_size + MAD_BUFFER_GUARD;
 
         /* Send the buffer to the aout core. */
+        fprintf( stderr, "sending.." );
         aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
+        fprintf( stderr, "..done\n" );
     }
 
     if( p_dec->p_fifo->b_error )
@@ -524,10 +528,10 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             break;
 
         case 3:
-            i_current_frame_size = 144000 *
-                                      *pi_bit_rate / *pi_sample_rate
-                                      + b_padding;
-            *pi_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
+            i_current_frame_size = ( i_version ? 72000 : 144000 ) *
+                                   *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_frame_size = ( i_version ? 72000 : 144000 ) *
+                                 i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = i_version ? 576 : 1152;
             break;
 

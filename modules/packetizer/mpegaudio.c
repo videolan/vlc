@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.2 2002/12/18 01:34:44 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.3 2003/02/18 00:51:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -260,10 +260,13 @@ static void PacketizeThread( packetizer_t *p_pack )
             switch( i_layer )
             {
                 case 0:
-                    i_framelength = ( ( i_version ? 6000 : 12000 ) *
-                                    i_bitrate / i_samplerate + i_padding ) * 4;
+                    i_framelength = ( 12000 * i_bitrate /
+                                      i_samplerate + i_padding ) * 4;
                     break;
                  case 1:
+                    i_framelength = 144000 * i_bitrate /
+                                      i_samplerate + i_padding;
+                    break;
                  case 2:
                     i_framelength = ( i_version ? 72000 : 144000 ) *
                                     i_bitrate / i_samplerate + i_padding;

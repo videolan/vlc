@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.12 2003/02/16 08:56:24 fenrir Exp $
+ * $Id: audio.c,v 1.13 2003/02/18 00:51:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -429,11 +429,19 @@ static void ExtractConfiguration( demux_sys_t *p_demux )
             p_demux->i_framelength =
                 ( ( 12000 * p_demux->mpeg.i_bitrate ) /
                        p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding ) * 4;
+            break;
         case( 1 ):
-        case( 2 ):
             p_demux->i_framelength =
                   ( 144000 * p_demux->mpeg.i_bitrate ) /
                        p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding;
+            break;
+        case( 2 ):
+            p_demux->i_framelength =
+                  (p_demux->mpeg.i_version ? 72000 : 144000) *
+                  p_demux->mpeg.i_bitrate /
+                       p_demux->mpeg.i_samplerate + p_demux->mpeg.i_padding;
+            break;
+
     }
 }
 
