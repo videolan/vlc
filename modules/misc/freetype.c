@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.33 2003/11/19 12:13:00 hartman Exp $
+ * $Id: freetype.c,v 1.34 2003/11/19 13:25:48 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -88,18 +88,21 @@ static line_desc_t *NewLine( byte_t * );
  *****************************************************************************/
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Filename of Font")
-#define FONTSIZE_TEXT N_("Font size")
-#define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module" )
+#define FONTSIZE_TEXT N_("Font size in pixels")
+#define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. If \
+ set to something different than 0 this option will override the relative font size " )
+#define FONTSIZER_TEXT N_("Font size")
+#define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
 
-static int  *pi_sizes[] = { 20, 18, 16, 12, 6};
+static int  *pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
 
 vlc_module_begin();
     add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
-    add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT,
+    add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
+    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT, FONTSIZER_LONGTEXT,
                  VLC_FALSE );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
     set_description( _("freetype2 font renderer") );
@@ -160,7 +163,6 @@ static int Create( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *psz_fontfile;
     int i, i_error;
-    int i_font_factor = 0;
     int i_fontsize = 0;
     double gamma_inv = 1.0f / gamma_value;
     vlc_value_t val;
@@ -247,17 +249,18 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_text_renderer_data->i_use_kerning =
         FT_HAS_KERNING(p_vout->p_text_renderer_data->p_face);
 
-    var_Get( p_vout, "freetype-rel-fontsize", &val );
+    var_Get( p_vout, "freetype-fontsize", &val );
     
     if( val.i_int )
     {
-        i_fontsize = (int) p_vout->render.i_height / val.i_int;
+        i_fontsize = val.i_int;
     }
     else
     {
-        var_Get( p_vout, "freetype-fontsize", &val );
-        i_fontsize = val.i_int;
+        var_Get( p_vout, "freetype-rel-fontsize", &val );
+        i_fontsize = (int) p_vout->render.i_height / val.i_int;
     }
+    msg_Dbg( p_vout, "Using fontsize: %i", i_fontsize);
 
     i_error = FT_Set_Pixel_Sizes( p_vout->p_text_renderer_data->p_face, 0,
                                   i_fontsize );

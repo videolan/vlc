@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.9 2003/11/18 23:58:10 fenrir Exp $
+ * $Id: subsdec.c,v 1.10 2003/11/19 13:25:48 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,10 +156,12 @@ static int OpenDecoder( vlc_object_t *p_this )
         char *psz_charset =(char*)malloc( 100 );
         vlc_current_charset( &psz_charset );
         p_sys->iconv_handle = iconv_open( "UTF-8", psz_charset );
+        msg_Dbg( p_dec, "Using character encoding: %s", psz_charset );
         free( psz_charset );
     }
-    else
+    else if( val.psz_string )
     {
+        msg_Dbg( p_dec, "Using character encoding: %s", val.psz_string );
         p_sys->iconv_handle = iconv_open( "UTF-8", val.psz_string );
     }
 
@@ -201,6 +203,7 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !p_vout )
     {
         msg_Warn( p_dec, "couldn't find a video output, trashing subtitle" );
+        return;
     }
 
     ParseText( p_dec, *pp_block, p_vout );
