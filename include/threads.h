@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.34 2002/01/04 14:01:34 sam Exp $
+ * $Id: threads.h,v 1.35 2002/02/25 23:59:07 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -31,6 +31,9 @@
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
 #   include <pth.h>
+
+#elif defined( ST_INIT_IN_ST_H )                            /* State threads */
+#   include <st.h>
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
 #   include <pthread.h>
@@ -91,6 +94,11 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 typedef pth_t            vlc_thread_t;
 typedef pth_mutex_t      vlc_mutex_t;
 typedef pth_cond_t       vlc_cond_t;
+
+#elif defined( ST_INIT_IN_ST_H )
+typedef st_thread_t *    vlc_thread_t;
+typedef st_mutex_t *     vlc_mutex_t;
+typedef st_cond_t *      vlc_cond_t;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 typedef pthread_t        vlc_thread_t;
@@ -200,6 +208,9 @@ static __inline__ int vlc_threads_init( void )
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_init();
 
+#elif defined( ST_INIT_IN_ST_H )
+    return st_init();
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return 0;
 
@@ -223,6 +234,9 @@ static __inline__ int vlc_threads_end( void )
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_kill();
 
+#elif defined( ST_INIT_IN_ST_H )
+    return 0;
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return 0;
 
@@ -245,6 +259,10 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_init( p_mutex );
+
+#elif defined( ST_INIT_IN_ST_H )
+    *p_mutex = st_mutex_new();
+    return ( *p_mutex == NULL ) ? errno : 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 #   if defined(DEBUG) && defined(SYS_LINUX)
@@ -311,6 +329,9 @@ static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_acquire( p_mutex, TRUE, NULL );
 
+#elif defined( ST_INIT_IN_ST_H )
+    return st_mutex_lock( *p_mutex );
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_return = pthread_mutex_lock( p_mutex );
     if( i_return )
@@ -364,6 +385,9 @@ static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_mutex_release( p_mutex );
 
+#elif defined( ST_INIT_IN_ST_H )
+    return st_mutex_unlock( *p_mutex );
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_return = pthread_mutex_unlock( p_mutex );
     if( i_return )
@@ -415,6 +439,9 @@ static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
 
+#elif defined( ST_INIT_IN_ST_H )
+    return st_mutex_destroy( *p_mutex );
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )    
     int i_return = pthread_mutex_destroy( p_mutex );
     if( i_return )
@@ -450,6 +477,10 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_init( p_condvar );
+
+#elif defined( ST_INIT_IN_ST_H )
+    *p_condvar = st_cond_new();
+    return ( *p_condvar == NULL ) ? errno : 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_init( p_condvar, NULL );
@@ -500,6 +531,9 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_notify( p_condvar, FALSE );
+
+#elif defined( ST_INIT_IN_ST_H )
+    return st_cond_signal( *p_condvar );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_signal( p_condvar );
@@ -576,6 +610,9 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_notify( p_condvar, FALSE );
+
+#elif defined( ST_INIT_IN_ST_H )
+    return st_cond_broadcast( p_condvar );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_broadcast( p_condvar );
@@ -655,6 +692,15 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
 {
 #if defined( PTH_INIT_IN_PTH_H )
     return pth_cond_await( p_condvar, p_mutex, NULL );
+
+#elif defined( ST_INIT_IN_ST_H )
+    int i_ret;
+
+    st_mutex_unlock( *p_mutex );
+    i_ret = st_cond_wait( *p_condvar );
+    st_mutex_lock( *p_mutex );
+
+    return i_ret;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 
@@ -762,6 +808,9 @@ static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
 
+#elif defined( ST_INIT_IN_ST_H )
+    return st_cond_destroy( *p_condvar );
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_result = pthread_cond_destroy( p_condvar );
     if( i_result )
@@ -824,6 +873,10 @@ static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
     *p_thread = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
     i_ret = ( p_thread == NULL );
 
+#elif defined( ST_INIT_IN_ST_H )
+    *p_thread = st_thread_create( func, p_data, 1, 0 );
+    i_ret = ( p_thread == NULL );
+    
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( p_thread, NULL, func, p_data );
 
@@ -888,6 +941,10 @@ static __inline__ void vlc_thread_exit( void )
 #if defined( PTH_INIT_IN_PTH_H )
     pth_exit( 0 );
 
+#elif defined( ST_INIT_IN_ST_H )
+    int result;
+    st_thread_exit( &result );
+    
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_exit( 0 );
 
@@ -928,6 +985,9 @@ static __inline__ void _vlc_thread_join( char * psz_file, int i_line,
 #if defined( PTH_INIT_IN_PTH_H )
     i_ret = pth_join( thread, NULL );
 
+#elif defined( ST_INIT_IN_ST_H )
+    i_ret = st_thread_join( thread, NULL );
+    
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_join( thread, NULL );
 

@@ -313,6 +313,9 @@
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH
 
+/* Define if you have the st library (-lst).  */
+#undef HAVE_LIBST
+
 /* css decryption with player keys */
 #undef HAVE_CSSKEYS
 
@@ -412,6 +415,9 @@
 
 /* Define if <pth.h> defines pth_init */
 #undef PTH_INIT_IN_PTH_H
+
+/* Define if <st.h> defines st_init */
+#undef ST_INIT_IN_ST_H
 
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.176 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: input.c,v 1.177 2002/02/25 23:59:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,7 +76,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RunThread       ( input_thread_t *p_input );
+static  int RunThread       ( input_thread_t *p_input );
 static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
 static void CloseThread     ( input_thread_t *p_input );
@@ -206,8 +206,8 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     intf_WarnMsg( 1, "input: playlist item `%s'", p_input->p_source );
 
     /* Create thread. */
-    if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
-                           (void *) p_input ) )
+    if( vlc_thread_create( &p_input->thread_id, "input",
+                           (vlc_thread_func_t)RunThread, (void *) p_input ) )
     {
         intf_ErrMsg( "input error: can't create input thread (%s)",
                      strerror(errno) );
@@ -271,6 +271,7 @@ void input_DestroyThread( input_thread_t *p_input )
 
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );
+    vlc_cond_destroy( &p_input->stream.stream_wait );
     vlc_mutex_destroy( &p_input->stream.stream_lock );
     
     /* Free input structure */
@@ -282,7 +283,7 @@ void input_DestroyThread( input_thread_t *p_input )
  *****************************************************************************
  * Thread in charge of processing the network packets and demultiplexing.
  *****************************************************************************/
-static void RunThread( input_thread_t *p_input )
+static int RunThread( input_thread_t *p_input )
 {
     if( InitThread( p_input ) )
     {
@@ -291,7 +292,7 @@ static void RunThread( input_thread_t *p_input )
         p_input->b_error = 1;
         ErrorThread( p_input );
         DestroyThread( p_input );
-        return;
+        return 0;
     }
 
     p_input->i_status = THREAD_READY;
@@ -440,6 +441,8 @@ static void RunThread( input_thread_t *p_input )
     EndThread( p_input );
 
     DestroyThread( p_input );
+
+    return 0;
 }
 
 /*****************************************************************************

@@ -759,6 +759,20 @@ AC_ARG_ENABLE(pth,
     fi])
 ])
 
+dnl
+dnl  State Threads
+dnl
+AC_ARG_ENABLE(st,
+  [  --enable-st             Enable State Threads (default disabled)],
+  [ if test x$enableval = xyes; then
+    AC_CHECK_LIB(st,st_init)
+    AC_EGREP_HEADER(st_init,st.h,[
+      AC_DEFINE(ST_INIT_IN_ST_H, 1,
+                Define if <st.h> defines st_init)
+    THREAD_LIB="-lst"
+    fi])
+])
+
 LIB="${LIB} ${THREAD_LIB}"
 
 dnl

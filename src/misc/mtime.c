@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.27 2001/12/30 07:09:56 sam Exp $
+ * $Id: mtime.c,v 1.28 2002/02/25 23:59:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -166,6 +166,9 @@ void mwait( mtime_t date )
 #   if defined( PTH_INIT_IN_PTH_H )
     pth_usleep( delay );
 
+#   elif defined( ST_INIT_IN_ST_H )
+    st_usleep( delay );
+
 #   elif defined( HAVE_USLEEP )
     usleep( delay );
 
@@ -191,10 +194,10 @@ void msleep( mtime_t delay )
     snooze( delay );
 
 #elif defined( PTH_INIT_IN_PTH_H )
-    struct timeval tv_delay;
-    tv_delay.tv_sec = delay / 1000000;
-    tv_delay.tv_usec = delay % 1000000;
-    pth_select( 0, NULL, NULL, NULL, &tv_delay );
+    pth_usleep( delay );
+
+#elif defined( ST_INIT_IN_ST_H )
+    st_usleep( delay );
 
 #elif defined( HAVE_USLEEP )
     usleep( delay );
