@@ -415,6 +415,21 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         }
     }
 
+    /* Register the video sub-window class */
+    wc.lpszClassName = "VLC DirectX video"; wc.hIconSm = 0; wc.hIcon = 0;
+    if( !RegisterClassEx(&wc) )
+    {
+        WNDCLASS wndclass;
+
+        /* Check why it failed. If it's because one already exists
+         * then fine, otherwise return with an error. */
+        if( !GetClassInfo( hInstance, "VLC DirectX video", &wndclass ) )
+        {
+            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
+            return VLC_EGENERIC;
+        }
+    }
+
     /* When you create a window you give the dimensions you wish it to
      * have. Unfortunatly these dimensions will include the borders and
      * titlebar. We use the following function to find out the size of
@@ -752,7 +767,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_VLC_CREATE_VIDEO_WIN:
         /* Create video sub-window */
         p_vout->p_sys->hvideownd =
-            CreateWindow( "VLC DirectX", "",  /* window class/title bar text */
+            CreateWindow( "VLC DirectX video", "",      /* window class text */
                     WS_CHILD | WS_VISIBLE,                   /* window style */
                     CW_USEDEFAULT, CW_USEDEFAULT,     /* default coordinates */
                     CW_USEDEFAULT, CW_USEDEFAULT,
