@@ -274,7 +274,7 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t*)p_this;
     char *      psz_source = NULL;
-    cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda    = NULL;
     CdIo        *p_cdio;
     track_t     i_track = 1;
     vlc_bool_t  b_single_track = false;
@@ -557,8 +557,9 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             *((int*)va_arg( args, int* )) = 1; /* Title offset */
 
             /* Duplicate title info */
-            printf("+++ i_tracks %d, i_titles %d\n",
-                 p_cdda->i_tracks, p_cdda->i_titles);
+            dbg_print ( INPUT_DBG_EVENT, 
+			"GET TITLE: i_tracks %d, i_titles %d",
+			p_cdda->i_tracks, p_cdda->i_titles );
             if( p_cdda->i_titles == 0 )
             {
                 *pi_int = 0; ppp_title = NULL;
