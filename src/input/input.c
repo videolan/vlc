@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.212 2002/08/29 23:53:22 massiot Exp $
+ * $Id: input.c,v 1.213 2002/10/08 16:02:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -505,8 +505,9 @@ static int InitThread( input_thread_t * p_input )
     psz_parser = config_GetPsz( p_input, "sout" );
     if ( psz_parser != NULL )
     {
-        if ( (p_input->stream.p_sout = sout_NewInstance( p_input, psz_parser ))
-              == NULL )
+        if ( *psz_parser &&
+             (p_input->stream.p_sout = sout_NewInstance( p_input, psz_parser ))
+               == NULL )
         {
             msg_Err( p_input, "cannot start stream output instance, aborting" );
             free( psz_parser );
