@@ -43,7 +43,7 @@ int Export_M3U( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t*)p_this;
     playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
-    int i;
+    int i, j;
 
     msg_Dbg(p_playlist, "Saving using M3U format");
 
@@ -53,16 +53,29 @@ int Export_M3U( vlc_object_t *p_this )
     /* Go through the playlist and add items */
     for( i = 0; i< p_playlist->i_size ; i++)
     {
-        if( strcmp( p_playlist->pp_items[i]->input.psz_name,
+        /* General info */
+        if( p_playlist->pp_items[i]->input.psz_name &&
+	    strcmp( p_playlist->pp_items[i]->input.psz_name,
                     p_playlist->pp_items[i]->input.psz_uri ) )
         {
-            char *psz_author = playlist_GetInfo( p_playlist, i, _("General"),
-                                                 _("Author") );
-            fprintf( p_export->p_file,"#EXTINF:%i,%s%s\n",
+            char *psz_author =
+	        playlist_GetInfo( p_playlist, i, _("General"), _("Author") );
+
+            fprintf( p_export->p_file, "#EXTINF:%i,%s,%s\n",
                      (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
                      psz_author ? psz_author : "",
                      p_playlist->pp_items[i]->input.psz_name );
         }
+
+        /* VLC specific options */
+        for( j = 0; j < p_playlist->pp_items[i]->input.i_options; j++ )
+        {
+            fprintf( p_export->p_file, "#EXTVLCOPT:%s\n",
+                     p_playlist->pp_items[i]->input.ppsz_options[j][0] == ':' ?
+                     p_playlist->pp_items[i]->input.ppsz_options[j] + 1 :
+                     p_playlist->pp_items[i]->input.ppsz_options[j] );
+        }
+
         fprintf( p_export->p_file, "%s\n",
                  p_playlist->pp_items[i]->input.psz_uri );
     }

@@ -226,7 +226,6 @@ static void XMLSpecialChars ( char *str )
     *dst = '\0';
 }
 
-
 /*****************************************************************************
  * ParseLine: read a "line" from the file and add any entries found
  * to the playlist. Returns:
@@ -237,11 +236,11 @@ static void XMLSpecialChars ( char *str )
  * XXX psz_data has the same length that psz_line so no problem if you don't
  * expand it
  *    psz_line is \0 terminated
- ******************************************************************************/
-static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, vlc_bool_t *pb_next )
+ *****************************************************************************/
+static int ParseLine( input_thread_t *p_input, char *psz_line, char *psz_data,
+                      vlc_bool_t *pb_next )
 {
     demux_sys_t   *p_m3u = p_input->p_demux_data;
-
     char          *psz_bol, *psz_name;
 
     psz_bol = psz_line;
@@ -261,17 +260,32 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
         if( *psz_bol == '#' )
         {
             while( *psz_bol &&
-                   strncasecmp( psz_bol, "EXTINF:", sizeof("EXTINF:") - 1 ) )
-               psz_bol++;
+                   strncasecmp( psz_bol, "EXTINF:",
+                                sizeof("EXTINF:") - 1 ) &&
+                   strncasecmp( psz_bol, "EXTVLCOPT:",
+                                sizeof("EXTVLCOPT:") - 1 ) ) psz_bol++;
+
             if( !*psz_bol ) return 0;
 
-            psz_bol = strchr( psz_bol, ',' );
-            if ( !psz_bol ) return 0;
-            psz_bol++;
-            /* From now, we have a name line */
+            if( !strncasecmp( psz_bol, "EXTINF:", sizeof("EXTINF:") - 1 ) )
+            {
+                psz_bol = strchr( psz_bol, ',' );
+                if ( !psz_bol ) return 0;
+                psz_bol++;
 
-            strcpy( psz_data , psz_bol );
-            return 2;
+                /* From now, we have a name line */
+                strcpy( psz_data , psz_bol );
+                return 2;
+            }
+            else
+            {
+                psz_bol = strchr( psz_bol, ':' );
+                if ( !psz_bol ) return 0;
+                psz_bol++;
+
+                strcpy( psz_data , psz_bol );
+                return 3;
+            }
         }
         /* If we don't have a comment, the line is directly the URI */
     }
@@ -525,6 +539,7 @@ static int ParseLine ( input_thread_t *p_input, char *psz_line, char *psz_data, 
 static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
                           char *psz_line,
                           char **ppsz_uri, char **ppsz_name,
+                          int *pi_options, char ***pppsz_options,
                           int *pi_position )
 {
     char          psz_data[MAX_LINE];
@@ -546,6 +561,12 @@ static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
             }
             *ppsz_name = strdup( psz_data );
             break;
+        case 3:
+            (*pi_options)++;
+            *pppsz_options = realloc( *pppsz_options,
+                                      sizeof(char *) * *pi_options );
+            (*pppsz_options)[*pi_options - 1] = strdup( psz_data );
+            break;
         case 0:
         default:
             break;
@@ -553,17 +574,20 @@ static void ProcessLine ( input_thread_t *p_input, playlist_t *p_playlist,
 
     if( b_next && *ppsz_uri )
     {
-        playlist_Add( p_playlist, *ppsz_uri,
-                         *ppsz_name ? *ppsz_name : *ppsz_uri,
-                          PLAYLIST_INSERT, *pi_position );
+        playlist_AddExt( p_playlist, *ppsz_uri, *ppsz_name,
+                         PLAYLIST_INSERT, *pi_position,
+                         -1, (const char **)*pppsz_options, *pi_options );
+
         (*pi_position)++;
-        if( *ppsz_name )
+        if( *ppsz_name ) free( *ppsz_name ); *ppsz_name = NULL;
+        free( *ppsz_uri ); *ppsz_uri  = NULL;
+
+        for( ; *pi_options; (*pi_options)-- )
         {
-            free( *ppsz_name );
+            free( (*pppsz_options)[*pi_options - 1] );
+            if( *pi_options == 1 ) free( *pppsz_options );
         }
-        free( *ppsz_uri );
-        *ppsz_name = NULL;
-        *ppsz_uri  = NULL;
+        *pppsz_options = NULL;
     }
 }
 
@@ -583,9 +607,10 @@ static int Demux ( input_thread_t *p_input )
     playlist_t    *p_playlist;
     vlc_bool_t    b_discard = VLC_FALSE;
 
-
     char          *psz_name = NULL;
     char          *psz_uri  = NULL;
+    int           i_options = 0;
+    char          **ppsz_options = NULL;
 
     int           i_position;
 
@@ -647,7 +672,7 @@ static int Demux ( input_thread_t *p_input )
             i_linepos = 0;
 
             ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name,
-                         &i_position );
+                         &i_options, &ppsz_options, &i_position );
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
@@ -658,22 +683,23 @@ static int Demux ( input_thread_t *p_input )
         psz_line[i_linepos] = '\0';
 
         ProcessLine( p_input, p_playlist, psz_line, &psz_uri, &psz_name,
-                     &i_position );
-        /* is there a pendding uri without b_next */
+                     &i_options, &ppsz_options, &i_position );
+
+        /* Is there a pendding uri without b_next */
         if( psz_uri )
         {
-            playlist_Add( p_playlist, psz_uri, psz_uri,
-                          PLAYLIST_INSERT, i_position );
+            playlist_AddExt( p_playlist, psz_uri, psz_name,
+                             PLAYLIST_INSERT, i_position,
+                             -1, (const char **)ppsz_options, i_options );
         }
     }
 
-    if( psz_uri )
+    if( psz_uri ) free( psz_uri );
+    if( psz_name ) free( psz_name );
+    for( ; i_options; i_options-- )
     {
-        free( psz_uri );
-    }
-    if( psz_name )
-    {
-        free( psz_name );
+        free( ppsz_options[i_options - 1] );
+        if( i_options == 1 ) free( ppsz_options );
     }
 
     vlc_object_release( p_playlist );
