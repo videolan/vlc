@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2003 VideoLAN
- * $Id: input_ext-intf.h,v 1.102 2003/12/03 13:27:51 rocky Exp $
+ * $Id: input_ext-intf.h,v 1.103 2004/01/26 20:48:09 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
 #ifndef _VLC_INPUT_EXT_INTF_H
 #define _VLC_INPUT_EXT_INTF_H 1
 
+#include "vlc_block.h"
 #include "ninput.h"
 
 /*
@@ -237,9 +238,8 @@ struct stream_descriptor_t
     int                     b_new_mute;          /* int because it can be -1 */
     vlc_cond_t              stream_wait; /* interface -> input in case of a
                                           * status change request            */
-
     /* Demultiplexer data */
-    stream_sys_t *          p_demux_data;
+    void *                  p_demux_data;
 
     /* Programs descriptions */
     unsigned int            i_pgrm_number;    /* size of the following array */

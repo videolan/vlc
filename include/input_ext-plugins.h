@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.46 2003/11/30 22:47:55 gbazin Exp $
+ * $Id: input_ext-plugins.h,v 1.47 2004/01/26 20:48:09 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -70,6 +70,9 @@ void input_EscapeAudioDiscontinuity( input_thread_t * );
 /* input internal use only */
 es_out_t *input_EsOutNew( input_thread_t * );
 void      input_EsOutDelete( es_out_t * );
+
+stream_t *input_StreamNew( input_thread_t * );
+void      input_StreamDelete( stream_t * );
 
 /*****************************************************************************
  * Prototypes from input_clock.c

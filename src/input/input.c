@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.279 2004/01/26 20:26:54 gbazin Exp $
+ * $Id: input.c,v 1.280 2004/01/26 20:48:10 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -736,7 +736,7 @@ static int InitThread( input_thread_t * p_input )
     }
 
     /* Create the stream_t facilities */
-    p_input->s = stream_OpenInput( p_input );
+    p_input->s = input_StreamNew( p_input );
     if( p_input->s == NULL )
     {
         /* should never occur yet */
@@ -768,7 +768,7 @@ static int InitThread( input_thread_t * p_input )
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
 
-        stream_Release( p_input->s );
+        input_StreamDelete( p_input->s );
         module_Unneed( p_input, p_input->p_access );
         if ( p_input->stream.p_sout != NULL )
         {
@@ -945,7 +945,7 @@ static void EndThread( input_thread_t * p_input )
     }
 
     /* Destroy the stream_t facilities */
-    if( p_input->s ) stream_Release( p_input->s );
+    if( p_input->s ) input_StreamDelete( p_input->s );
 
     /* Destroy es out */
     if( p_input->p_es_out ) input_EsOutDelete( p_input->p_es_out );

@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.13 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: stream.c,v 1.14 2004/01/26 20:48:10 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -27,55 +27,101 @@
 
 #include "ninput.h"
 
-#define MAX_LINE 1024
 /****************************************************************************
- * stream_* :
- * XXX for now it's just a wrapper
- *
+ * stream_ReadLine:
  ****************************************************************************/
-
 /**
- * Handle to a stream.
+ * Read from the stream untill first newline.
+ * \param s Stream handle to read from
+ * \return A null-terminated string. This must be freed,
  */
-struct stream_t
+/* FIXME don't use stupid MAX_LINE -> do the same than net_ReadLine */
+#define MAX_LINE 1024
+char *stream_ReadLine( stream_t *s )
 {
-    VLC_COMMON_MEMBERS
+    uint8_t *p_data;
+    char    *p_line;
+    int      i_data;
+    int      i = 0;
+    i_data = stream_Peek( s, &p_data, MAX_LINE );
+    msg_Dbg( s, "i_data %d", i_data );
+    while( i < i_data && p_data[i] != '\n' )
+    {
+        i++;
+    }
+    if( i_data <= 0 )
+    {
+        return NULL;
+    }
+    else
+    {
+        p_line = malloc( i + 1 );
+        if( p_line == NULL )
+        {
+            msg_Err( s, "out of memory" );
+            return NULL;
+        }
+        i = stream_Read( s, p_line, i + 1 );
+        p_line[ i - 1 ] = '\0';
+        msg_Dbg( s, "found %d chars long line", i );
+        return p_line;
+    }
+}
 
-    /** pointer to the input thread */
+
+
+/* TODO: one day we should create a special module stream
+ * when we would have a access wrapper, and stream filter
+ * (like caching, progessive, gunzip, ... )
+ */
+
+/* private stream_sys_t for input_Stream* */
+struct stream_sys_t
+{
     input_thread_t *p_input;
-
 };
 
-/**
- * Create a "stream_t *" from an "input_thread_t *".
- */
-stream_t *stream_OpenInput( input_thread_t *p_input )
-{
-    stream_t *s;
+/* private pf_* functions declarations */
+static int      IStreamRead   ( stream_t *, void *p_read, int i_read );
+static int      IStreamPeek   ( stream_t *, uint8_t **pp_peek, int i_peek );
+static int      IStreamControl( stream_t *, int i_query, va_list );
 
-    s = vlc_object_create( p_input, sizeof( stream_t ) );
+/****************************************************************************
+ * input_StreamNew: create a wrapper for p_input access
+ ****************************************************************************/
+stream_t *input_StreamNew( input_thread_t *p_input )
+{
+    stream_t *s = vlc_object_create( p_input, sizeof( stream_t ) );
     if( s )
     {
-        s->p_input = p_input;
-    }
+        s->pf_block  = NULL;
+        s->pf_read   = IStreamRead;
+        s->pf_peek   = IStreamPeek;
+        s->pf_control= IStreamControl;
 
+        s->p_sys = malloc( sizeof( stream_sys_t ) );
+        s->p_sys->p_input = p_input;
+    }
     return s;
 }
 
-/**
- * Destroy a previously created "stream_t *" instance.
- */
-void stream_Release( stream_t *s )
+/****************************************************************************
+ * input_StreamDelete:
+ ****************************************************************************/
+void input_StreamDelete( stream_t *s )
 {
+    free( s->p_sys );
     vlc_object_destroy( s );
 }
 
-/**
- * Similar to #stream_Control(), but takes a va_list and not variable
- * arguments.
- */
-int stream_vaControl( stream_t *s, int i_query, va_list args )
+
+/****************************************************************************
+ * IStreamControl:
+ ****************************************************************************/
+static int IStreamControl( stream_t *s, int i_query, va_list args )
 {
+    input_thread_t *p_input = s->p_sys->p_input;
+
     vlc_bool_t *p_b;
     int64_t    *p_i64, i64;
     int        *p_int;
@@ -85,34 +131,34 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
         case STREAM_GET_SIZE:
             p_i64 = (int64_t*) va_arg( args, int64_t * );
 
-            vlc_mutex_lock( &s->p_input->stream.stream_lock );
-            *p_i64 = s->p_input->stream.p_selected_area->i_size;
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            *p_i64 = p_input->stream.p_selected_area->i_size;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
             return VLC_SUCCESS;
 
         case STREAM_CAN_SEEK:
             p_b = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
-            vlc_mutex_lock( &s->p_input->stream.stream_lock );
-            *p_b = s->p_input->stream.b_seekable;
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            *p_b = p_input->stream.b_seekable;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
             return VLC_SUCCESS;
 
         case STREAM_CAN_FASTSEEK:
             p_b = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
-            vlc_mutex_lock( &s->p_input->stream.stream_lock );
-            *p_b = s->p_input->stream.b_seekable &&
-                   s->p_input->stream.i_method == INPUT_METHOD_FILE;
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            *p_b = p_input->stream.b_seekable &&
+                   p_input->stream.i_method == INPUT_METHOD_FILE;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
             return VLC_SUCCESS;
 
         case STREAM_GET_POSITION:
             p_i64 = (int64_t*) va_arg( args, int64_t * );
 
-            vlc_mutex_lock( &s->p_input->stream.stream_lock );
-            *p_i64 = s->p_input->stream.p_selected_area->i_tell;
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            *p_i64 = p_input->stream.p_selected_area->i_tell;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
             return VLC_SUCCESS;
 
         case STREAM_SET_POSITION:
@@ -120,42 +166,42 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
             i64 = (int64_t) va_arg( args, int64_t );
             int64_t i_skip;
 
-            vlc_mutex_lock( &s->p_input->stream.stream_lock );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
             if( i64 < 0 ||
-                ( s->p_input->stream.p_selected_area->i_size > 0 &&
-                  s->p_input->stream.p_selected_area->i_size < i64 ) )
+                ( p_input->stream.p_selected_area->i_size > 0 &&
+                  p_input->stream.p_selected_area->i_size < i64 ) )
             {
-                vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
                 msg_Warn( s, "seek out of bound" );
                 return VLC_EGENERIC;
             }
 
-            i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
+            i_skip = i64 - p_input->stream.p_selected_area->i_tell;
 
             if( i_skip == 0 )
             {
-                vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
                 return VLC_SUCCESS;
             }
 
-            if( i_skip > 0 && i_skip < s->p_input->p_last_data -
-                            s->p_input->p_current_data - 1 )
+            if( i_skip > 0 && i_skip < p_input->p_last_data -
+                            p_input->p_current_data - 1 )
             {
                 /* We can skip without reading/seeking */
-                s->p_input->p_current_data += i_skip;
-                s->p_input->stream.p_selected_area->i_tell = i64;
-                vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+                p_input->p_current_data += i_skip;
+                p_input->stream.p_selected_area->i_tell = i64;
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
                 return VLC_SUCCESS;
             }
-            vlc_mutex_unlock( &s->p_input->stream.stream_lock );
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-            if( s->p_input->stream.b_seekable &&
-                ( s->p_input->stream.i_method == INPUT_METHOD_FILE ||
-                  i_skip < 0 || i_skip >= ( s->p_input->i_mtu > 0 ?
-                                            s->p_input->i_mtu : 4096 ) ) )
+            if( p_input->stream.b_seekable &&
+                ( p_input->stream.i_method == INPUT_METHOD_FILE ||
+                  i_skip < 0 || i_skip >= ( p_input->i_mtu > 0 ?
+                                            p_input->i_mtu : 4096 ) ) )
             {
-                input_AccessReinit( s->p_input );
-                s->p_input->pf_seek( s->p_input, i64 );
+                input_AccessReinit( p_input );
+                p_input->pf_seek( p_input, i64 );
                 return VLC_SUCCESS;
             }
 
@@ -172,15 +218,15 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
                 {
                     int i_read;
 
-                    i_read = input_SplitBuffer( s->p_input, &p_data,
-                                 __MIN( (int)s->p_input->i_bufsize, i_skip ) );
+                    i_read = input_SplitBuffer( p_input, &p_data,
+                                 __MIN( (int)p_input->i_bufsize, i_skip ) );
                     if( i_read < 0 )
                     {
                         return VLC_EGENERIC;
                     }
                     i_skip -= i_read;
 
-                    input_DeletePacket( s->p_input->p_method_data, p_data );
+                    input_DeletePacket( p_input->p_method_data, p_data );
                     if( i_read == 0 && i_skip > 0 )
                     {
                         return VLC_EGENERIC;
@@ -192,7 +238,7 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_GET_MTU:
             p_int = (int*) va_arg( args, int * );
-            *p_int = s->p_input->i_mtu;
+            *p_int = p_input->i_mtu;
             return VLC_SUCCESS;
 
         default:
@@ -201,31 +247,12 @@ int stream_vaControl( stream_t *s, int i_query, va_list args )
     }
 }
 
-/**
- * Use to control the "stream_t *". Look at #stream_query_e for
- * possible "i_query" value and format arguments.  Return VLC_SUCCESS
- * if ... succeed ;) and VLC_EGENERIC if failed or unimplemented
- */
-int stream_Control( stream_t *s, int i_query, ... )
+/****************************************************************************
+ * IStreamRead:
+ ****************************************************************************/
+static int IStreamRead( stream_t *s, void *p_data, int i_data )
 {
-    va_list args;
-    int     i_result;
-
-    va_start( args, i_query );
-    i_result = stream_vaControl( s, i_query, args );
-    va_end( args );
-
-    return i_result;
-}
-
-/**
- * Try to read "i_read" bytes into a buffer pointed by "p_read".  If
- * "p_read" is NULL then data are skipped instead of read.  The return
- * value is the real numbers of bytes read/skip. If this value is less
- * than i_read that means that it's the end of the stream.
- */
-int stream_Read( stream_t *s, void *p_data, int i_data )
-{
+    input_thread_t *p_input = s->p_sys->p_input;
     uint8_t       *p = (uint8_t*)p_data;
     data_packet_t *p_packet;
 
@@ -245,17 +272,17 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
         return i_data;
     }
 
-    while( i_data > 0 && !s->p_input->b_die )
+    while( i_data > 0 && !p_input->b_die )
     {
         int i_count;
 
-        i_count = input_SplitBuffer( s->p_input, &p_packet,
-                      __MIN( i_data, (int)s->p_input->i_bufsize ) );
+        i_count = input_SplitBuffer( p_input, &p_packet,
+                      __MIN( i_data, (int)p_input->i_bufsize ) );
 
         if( i_count <= 0 )
         {
             if( i_count == 0 )
-                input_DeletePacket( s->p_input->p_method_data, p_packet );
+                input_DeletePacket( p_input->p_method_data, p_packet );
 
             return i_read;
         }
@@ -266,7 +293,7 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
             p += i_count;
         }
 
-        input_DeletePacket( s->p_input->p_method_data, p_packet );
+        input_DeletePacket( p_input->p_method_data, p_packet );
 
         i_data -= i_count;
         i_read += i_count;
@@ -274,76 +301,10 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
 
     return i_read;
 }
-
-/**
- * Store in pp_peek a pointer to the next "i_peek" bytes in the stream
- * \return The real numbers of valid bytes, if it's less
- * or equal to 0, *pp_peek is invalid.
- * \note pp_peek is a pointer to internal buffer and it will be invalid as
- * soons as other stream_* functions are called.
- * \note Due to input limitation, it could be less than i_peek without meaning
- * the end of the stream (but only when you have i_peek >=
- * p_input->i_bufsize)
- */
-int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_peek )
+/****************************************************************************
+ * IStreamPeek:
+ ****************************************************************************/
+static int IStreamPeek( stream_t *s, uint8_t **pp_peek, int i_peek )
 {
-    return input_Peek( s->p_input, pp_peek, i_peek );
-}
-
-/**
- * Read "i_size" bytes and store them in a block_t. If less than "i_size"
- * bytes are available then return what is left and if nothing is availble,
- * return NULL.
- */
-block_t *stream_Block( stream_t *s, int i_size )
-{
-    block_t *p_block;
-
-    if( i_size <= 0 ) return NULL;
-    if( !(p_block = block_New( s->p_input, i_size ) ) ) return NULL;
-
-    p_block->i_buffer = stream_Read( s, p_block->p_buffer, i_size );
-    if( !p_block->i_buffer )
-    {
-        block_Release( p_block );
-        p_block = NULL;
-    }
-
-    return p_block;
-}
-
-/**
- * Read from the stream untill first newline.
- * \param s Stream handle to read from
- * \return A null-terminated string. This must be freed,
- */
-char *stream_ReadLine( stream_t *s )
-{
-    uint8_t *p_data;
-    char    *p_line;
-    int      i_data;
-    int      i = 0;
-    i_data = stream_Peek( s, &p_data, MAX_LINE );
-    msg_Dbg( s->p_input, "i_data %d", i_data );
-    while( i < i_data && p_data[i] != '\n' )
-    {
-        i++;
-    }
-    if( i_data <= 0 )
-    {
-        return NULL;
-    }
-    else
-    {
-        p_line = malloc( i + 1 );
-        if( p_line == NULL )
-        {
-            msg_Err( s->p_input, "out of memory" );
-            return NULL;
-        }
-        i = stream_Read( s, p_line, i + 1 );
-        p_line[ i - 1 ] = '\0';
-        msg_Dbg( s->p_input, "found %d chars long line", i );
-        return p_line;
-    }
+    return input_Peek( s->p_sys->p_input, pp_peek, i_peek );
 }
