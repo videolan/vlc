@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.64 2003/11/29 13:12:11 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.65 2003/11/29 18:06:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -36,8 +36,8 @@
 #   include <avcodec.h>
 #endif
 
-#if LIBAVCODEC_BUILD < 4655
-#   error You must have a libavcodec >= 4655 (get CVS)
+#if LIBAVCODEC_BUILD < 4680
+#   error You must have a libavcodec >= 4680 (get CVS)
 #endif
 
 #include "ffmpeg.h"
@@ -244,13 +244,8 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
     case VLC_FOURCC('m','p','2','v'):
     case VLC_FOURCC('m','p','g','v'):
         i_cat = VIDEO_ES;
-#if LIBAVCODEC_BUILD >= 4676
         i_codec = CODEC_ID_MPEG2VIDEO;
         psz_name = "MPEG-2 Video";
-#else
-        i_codec = CODEC_ID_MPEG1VIDEO;
-        psz_name = "MPEG-1 Video";
-#endif
         break;
 
     /* MPEG-4 Video */
@@ -371,14 +366,12 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         psz_name = "I263.I";
         break;
 
-#if LIBAVCODEC_BUILD >= 4669
     /* Flash (H263) variant */
     case VLC_FOURCC('F','L','V','1'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_FLV1;
         psz_name = "Flash Video";
         break;
-#endif
 
     /* MJPEG */
     case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
@@ -445,7 +438,7 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         break;
 #endif
 
-#if( ( LIBAVCODEC_BUILD >= 4663 ) && ( !defined( WORDS_BIGENDIAN ) ) )
+#if( !defined( WORDS_BIGENDIAN ) )
     /* Indeo Video Codecs (Quality of this decoder on ppc is not good) */
     case VLC_FOURCC('I','V','3','1'):
     case VLC_FOURCC('i','v','3','1'):
@@ -471,7 +464,6 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         psz_name ="Creative YUV";
         break;
 
-#if LIBAVCODEC_BUILD >= 4668
     /* On2 VP3 Video Codecs */
     case VLC_FOURCC('V','P','3','1'):
     case VLC_FOURCC('v','p','3','1'):
@@ -479,52 +471,41 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         i_codec  = CODEC_ID_VP3;
         psz_name = "On2's VP3 Video";
         break;
-#endif
 
 #if ( !defined( WORDS_BIGENDIAN ) )
-#if LIBAVCODEC_BUILD >= 4668
     /* Asus Video (Another thing that doesn't work on PPC) */
     case VLC_FOURCC('A','S','V','1'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_ASV1;
         psz_name = "Asus V1";
         break;
-#endif
-#if LIBAVCODEC_BUILD >= 4677
     case VLC_FOURCC('A','S','V','2'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_ASV2;
         psz_name = "Asus V2";
         break;
 #endif
-#endif
 
-#if LIBAVCODEC_BUILD >= 4668
     /* FFMPEG Video 1 (lossless codec) */
     case VLC_FOURCC('F','F','V','1'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_FFV1;
         psz_name = "FFMpeg Video 1";
         break;
-#endif
 
-#if LIBAVCODEC_BUILD >= 4669
     /* ATI VCR1 */
     case VLC_FOURCC('V','C','R','1'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_VCR1;
         psz_name = "ATI VCR1";
         break;
-#endif
 
-#if LIBAVCODEC_BUILD >= 4672
     /* Cirrus Logic AccuPak */
     case VLC_FOURCC('C','L','J','R'):
         i_cat    = VIDEO_ES;
         i_codec  = CODEC_ID_CLJR;
         psz_name = "Creative Logic AccuPak";
         break;
-#endif
 
 #if LIBAVCODEC_BUILD >= 4683
     /* Apple Video */
@@ -585,7 +566,6 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         psz_name = "MACE-6 audio";
         break;
 
-#if LIBAVCODEC_BUILD >= 4668
     /* RealAudio 1.0 */
     case VLC_FOURCC('1','4','_','4'):
         i_cat    = AUDIO_ES;
@@ -599,7 +579,6 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         i_codec  = CODEC_ID_RA_288;
         psz_name = "RealAudio 2.0";
         break;
-#endif
 
     /* MPEG Audio layer 1/2/3 */
     case VLC_FOURCC('m','p','g','a'):
@@ -609,11 +588,7 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         break;
     case VLC_FOURCC('m','p','3',' '):
         i_cat    = AUDIO_ES;
-#if LIBAVCODEC_BUILD >= 4678
         i_codec  = CODEC_ID_MP3;
-#else
-        i_codec  = CODEC_ID_MP3LAME;
-#endif
         psz_name = "MPEG Audio layer 1/2/3";
         break;
 

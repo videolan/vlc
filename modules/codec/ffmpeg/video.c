@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.54 2003/11/27 12:32:03 fenrir Exp $
+ * $Id: video.c,v 1.55 2003/11/29 18:06:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -221,22 +221,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     if( val.b_bool ) p_sys->p_context->flags |= CODEC_FLAG_GRAY;
 
     /* Decide if we set CODEC_FLAG_TRUNCATED */
-#if LIBAVCODEC_BUILD >= 4662
     var_Create( p_dec, "ffmpeg-truncated", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-truncated", &val );
     if( val.i_int > 0 ) p_sys->p_context->flags |= CODEC_FLAG_TRUNCATED;
-#endif
-
-    /* ***** Open the codec ***** */
-    vlc_mutex_lock( lockval.p_address );
-    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
-    {
-        vlc_mutex_unlock( lockval.p_address );
-        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
-        return VLC_EGENERIC;
-    }
-    vlc_mutex_unlock( lockval.p_address );
-    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -281,21 +268,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** init this codec with special data ***** */
     if( p_dec->fmt_in.i_extra )
     {
-        int b_gotpicture;
         int i_size = p_dec->fmt_in.i_extra;
 
-        if( p_sys->i_codec_id == CODEC_ID_MPEG4 )
-        {
-            uint8_t *p_vol = malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
-            memcpy( p_vol, p_dec->fmt_in.p_extra, i_size );
-            memset( &p_vol[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
-
-            avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
-                                  &b_gotpicture, p_vol, i_size );
-            free( p_vol );
-        }
-#if LIBAVCODEC_BUILD >= 4666
-        else if( p_sys->i_codec_id == CODEC_ID_SVQ3 )
+        if( p_sys->i_codec_id == CODEC_ID_SVQ3 )
         {
             uint8_t *p;
 
@@ -307,7 +282,6 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
             memset( &p[4], 0, 8 );
             memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
         }
-#endif
         else
         {
             p_sys->p_context->extradata_size = i_size;
@@ -332,6 +306,18 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
+
+    /* ***** Open the codec ***** */
+    vlc_mutex_lock( lockval.p_address );
+    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        return VLC_EGENERIC;
+    }
+    vlc_mutex_unlock( lockval.p_address );
+    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
+
 
     return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.15 2003/11/29 13:12:11 fenrir Exp $
+ * $Id: encoder.c,v 1.16 2003/11/29 18:06:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -179,9 +179,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->height = p_enc->fmt_in.video.i_height;
 
         p_context->frame_rate = p_enc->fmt_in.video.i_frame_rate;
-#if LIBAVCODEC_BUILD >= 4662
         p_context->frame_rate_base= p_enc->fmt_in.video.i_frame_rate_base;
-#endif
 
 #if LIBAVCODEC_BUILD >= 4687
         p_context->sample_aspect_ratio =
@@ -234,14 +232,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_context->qmin = p_enc->i_qmin;
     p_context->qmax = p_enc->i_qmax;
 
-#if LIBAVCODEC_BUILD >= 4673
     p_context->mb_decision = p_enc->i_hq;
-#else
-    if( p_enc->i_hq )
-    {
-        p_context->flags |= CODEC_FLAG_HQ;
-    }
-#endif
 
     if( i_codec_id == CODEC_ID_RAWVIDEO )
     {
@@ -318,7 +309,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
     {
         frame.pts = p_pict->date;
-#if LIBAVCODEC_BUILD >= 4673
         if ( frame.pts && mdate() + HURRY_UP_GUARD > frame.pts
               && p_enc->b_hurry_up )
         {
@@ -326,7 +316,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             p_sys->p_context->mb_decision = FF_MB_DECISION_SIMPLE;
             b_hurry_up = 1;
         }
-#endif
     }
     else
     {
@@ -345,12 +334,10 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
                                   AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );
 
-#if LIBAVCODEC_BUILD >= 4673
     if ( b_hurry_up )
     {
         p_sys->p_context->mb_decision = p_enc->i_hq;
     }
-#endif
 
     if( i_out > 0 )
     {
