@@ -228,38 +228,15 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
 
     switch( i_query )
     {
-        case VOUT_SET_ZOOM:
-        {
-            double f_arg = va_arg( args, double );
-
-#if 0
-            /* Update dimensions */
-            wxSizeEvent event( wxSize((int)(p_vout->i_window_width * f_arg),
-                                      (int)(p_vout->i_window_height * f_arg)),
-                               UpdateSize_Event );
-            AddPendingEvent( event );
-#endif
-
-            i_ret = VLC_SUCCESS;
-        }
+    case VOUT_SET_ZOOM:
         break;
 
-        case VOUT_SET_STAY_ON_TOP:
-        {
-            int i_arg = va_arg( args, int );
-#if 0
-            wxCommandEvent event( wxEVT_VLC_VIDEO, SetStayOnTop_Event );
-            event.SetInt( i_arg );
-            AddPendingEvent( event );
-#endif
-
-            i_ret = VLC_SUCCESS;
-        }
+    case VOUT_SET_STAY_ON_TOP:
         break;
 
-        default:
-            msg_Dbg( p_intf, "control query not supported" );
-            break;
+    default:
+        msg_Dbg( p_intf, "control query not supported" );
+        break;
     }
 
     vlc_mutex_unlock( &lock );

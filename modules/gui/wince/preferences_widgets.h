@@ -26,8 +26,7 @@ class ConfigControl
 {
 public:
     ConfigControl( vlc_object_t *, module_config_t *, HWND, HINSTANCE );
-    ~ConfigControl();
-    /*wxSizer *Sizer();*/
+    virtual ~ConfigControl();
 
     virtual int GetIntValue() {return 0;}
     virtual float GetFloatValue() {return 0;}

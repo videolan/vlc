@@ -78,8 +78,6 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
     OPENFILENAME ofn;
     int i_dummy;
     HANDLE fichier;
-    int nList=0;
-
 
     LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
     BOOL bWasProcessed = *pbProcessed;
@@ -240,7 +238,7 @@ void Messages::UpdateLog()
             lv.iItem = ListView_GetItemCount( hListView );
             ListView_InsertItem( hListView, &lv );
             ListView_SetItemText( hListView, lv.iItem, 0,
-                                  _FROMMB(debug.c_str()) );
+                                  (TCHAR *)_FROMMB(debug.c_str()) );
         }
 
         vlc_mutex_lock( p_sub->p_lock );

@@ -69,7 +69,8 @@ class PrefsTreeCtrl
 public:
 
     PrefsTreeCtrl() { }
-    PrefsTreeCtrl( intf_thread_t *_p_intf, PrefsDialog *p_prefs_dialog, HWND hwnd, HINSTANCE _hInst );
+    PrefsTreeCtrl( intf_thread_t *_p_intf, PrefsDialog *p_prefs_dialog,
+                   HWND hwnd, HINSTANCE _hInst );
     virtual ~PrefsTreeCtrl();
 
     void ApplyChanges();
@@ -157,10 +158,10 @@ FUNCTION:
 
 PURPOSE: 
   Processes messages sent to the main window.
-  
+
 ***********************************************************************/
 LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-                              PBOOL pbProcessed  )
+                              PBOOL pbProcessed )
 {
     SHINITDLGINFO shidi;
     SHMENUBARINFO mbi;
@@ -172,7 +173,7 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_INITDIALOG:
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
             SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
@@ -186,11 +187,11 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         mbi.nToolBarId = IDR_DUMMYMENU;
         mbi.hInstRes   = hInst;
         mbi.nBmpId     = 0;
-        mbi.cBmpImages = 0;  
+        mbi.cBmpImages = 0;
 
         if( !SHCreateMenuBar(&mbi) )
         {
-            MessageBox(hwnd, L"SHCreateMenuBar Failed", L"Error", MB_OK);
+            MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
             //return -1;
         }
 
@@ -199,7 +200,7 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         // Get the client area rect to put the panels in
         GetClientRect(hwnd, &rcClient);
 
-        /* Create the buttons */                
+        /* Create the buttons */            
         advanced_checkbox =
             CreateWindow( _T("BUTTON"), _T("Advanced options"),
                         WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
@@ -330,11 +331,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
 
     INITCOMMONCONTROLSEX iccex;
     RECT rcClient;
-
-    int size;
-    char *szAnsi;
-    LPWSTR wUnicode;
-    BOOL bTemp;
     TVITEM tvi = {0}; 
     TVINSERTSTRUCT tvins = {0}; 
     HTREEITEM hPrev;
@@ -504,27 +500,19 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         while( capability_item != 0 )
         {
             TVITEM capability_tvi = {0};
-
+            TCHAR psz_text[256];
             i_child_index++;
 
             capability_tvi.mask = TVIF_TEXT;
-            capability_tvi.pszText = new WCHAR[200];
-            capability_tvi.cchTextMax = 200;
+            capability_tvi.pszText = psz_text;
+            capability_tvi.cchTextMax = 256;
             capability_tvi.hItem = capability_item;
             TreeView_GetItem( hwndTV, &capability_tvi );
-            size = WideCharToMultiByte( CP_ACP, 0, capability_tvi.pszText, -1, NULL, 0, NULL, &bTemp );
-            szAnsi = new char[size];
-            WideCharToMultiByte( CP_ACP, 0, capability_tvi.pszText, -1, szAnsi, size, NULL, &bTemp );       
-            if( !strcmp( szAnsi, p_module->psz_capability ) )
-            {
-                free( szAnsi );
-                free( capability_tvi.pszText );
-                break;
-            }
-            free( szAnsi );
-            free( capability_tvi.pszText );
-
-            capability_item = TreeView_GetNextSibling( hwndTV, capability_item );
+            if( !strcmp( _TOMB(capability_tvi.pszText),
+                         p_module->psz_capability ) ) break;
+ 
+            capability_item =
+                TreeView_GetNextSibling( hwndTV, capability_item );
         }
 
         if( i_child_index == i_capability_count &&
@@ -565,7 +553,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         tvins.hParent = capability_item;// level 4
 
         // Add the item to the tree-view control. 
-        TreeView_InsertItem( hwndTV, &tvins);
+        TreeView_InsertItem( hwndTV, &tvins );
     }
 
     /* Sort all this mess */

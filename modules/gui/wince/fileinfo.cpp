@@ -76,13 +76,13 @@ BOOL FileInfo::CreateTreeView(HWND hwnd)
 
     // Assign the window styles for the tree view.
     dwStyle = WS_VISIBLE | WS_CHILD | TVS_HASLINES | TVS_LINESATROOT | 
-			  TVS_HASBUTTONS;
+                          TVS_HASBUTTONS;
 
     // Create the tree-view control.
     hwndTV = CreateWindowEx( 0, WC_TREEVIEW, NULL, dwStyle, 0, MENU_HEIGHT,
-			     rect.right-rect.left,
-			     rect.bottom-rect.top-MENU_HEIGHT,
-			     hwnd, NULL, hInst, NULL );
+                             rect.right-rect.left,
+                             rect.bottom-rect.top-MENU_HEIGHT,
+                             hwnd, NULL, hInst, NULL );
 
     // Be sure that the tree view actually was created.
     if( !hwndTV ) return FALSE;
@@ -140,40 +140,40 @@ void FileInfo::UpdateFileInfo(HWND hwnd)
         info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
 
         // Set the text of the item. 
-	tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
-	tvi.cchTextMax = _tcslen( tvi.pszText );
-	
-	// Save the heading level in the item's application-defined data area
-	tvi.lParam = (LPARAM)2; // level 2
-	tvins.item = tvi; 
-	tvins.hInsertAfter = hPrev; 
-	tvins.hParent = hPrevRootItem;
+        tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
+        tvi.cchTextMax = _tcslen( tvi.pszText );
+        
+        // Save the heading level in the item's application-defined data area
+        tvi.lParam = (LPARAM)2; // level 2
+        tvins.item = tvi; 
+        tvins.hInsertAfter = hPrev; 
+        tvins.hParent = hPrevRootItem;
 
-	// Add the item to the tree-view control. 
-	hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
+        // Add the item to the tree-view control. 
+        hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
 
-	hPrevLev2Item = hPrev;
+        hPrevLev2Item = hPrev;
 
         for( int j = 0; j < p_cat->i_infos; j++ )
         {
             info_t *p_info = p_cat->pp_infos[j];
 
-	    // Set the text of the item. 
-	    string szAnsi = (string)p_info->psz_name;
-	    szAnsi += ": ";
-	    szAnsi += p_info->psz_value;
-	    tvi.pszText = _FROMMB( szAnsi.c_str() );
-	    tvi.cchTextMax = _tcslen( tvi.pszText );
-	    tvi.lParam = (LPARAM)3; // level 3
-	    tvins.item = tvi; 
-	    tvins.hInsertAfter = hPrev; 
-	    tvins.hParent = hPrevLev2Item;
+            // Set the text of the item. 
+            string szAnsi = (string)p_info->psz_name;
+            szAnsi += ": ";
+            szAnsi += p_info->psz_value;
+            tvi.pszText = (TCHAR *)_FROMMB( szAnsi.c_str() );
+            tvi.cchTextMax = _tcslen( tvi.pszText );
+            tvi.lParam = (LPARAM)3; // level 3
+            tvins.item = tvi; 
+            tvins.hInsertAfter = hPrev; 
+            tvins.hParent = hPrevLev2Item;
     
-	    // Add the item to the tree-view control. 
-	    hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
+            // Add the item to the tree-view control. 
+            hPrev = (HTREEITEM)TreeView_InsertItem( hwnd, &tvins );
         }
 
-	TreeView_Expand( hwnd, hPrevLev2Item, TVE_EXPANDPARTIAL |TVE_EXPAND );
+        TreeView_Expand( hwnd, hPrevLev2Item, TVE_EXPANDPARTIAL |TVE_EXPAND );
     }
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
@@ -192,7 +192,7 @@ PURPOSE:
   
 ***********************************************************************/
 LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
-			   PBOOL pbProcessed  )
+                           PBOOL pbProcessed  )
 {
     SHINITDLGINFO shidi;
 
@@ -205,13 +205,13 @@ LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
     case WM_INITDIALOG: 
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
-	    SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
+            SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
         shidi.hDlg = hwnd;
         SHInitDialog( &shidi );
-	CreateTreeView( hwnd );
-	UpdateWindow( hwnd );
-	SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-	return lResult;
+        CreateTreeView( hwnd );
+        UpdateWindow( hwnd );
+        SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+        return lResult;
 
     case WM_COMMAND:
         if ( LOWORD(wp) == IDOK )

@@ -84,37 +84,37 @@ enum
 // The TBBUTTON structure contains information the toolbar buttons.
 static TBBUTTON tbButton2[] =      
 {
-  {0, ID_MANAGE_OPENPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {1, ID_MANAGE_SAVEPL,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {2, ID_MANAGE_SIMPLEADD,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {3, ID_MANAGE_ADDMRL,        TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {4, ID_SEL_DELETE,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {5, Infos_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {6, Up_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {7, Down_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {8, Random_Event,      TBSTATE_ENABLED, TBSTYLE_CHECK,  0, -1},
-  {9, Loop_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK,   0, -1},
-  {10, Repeat_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK,   0, -1}
+  {0, ID_MANAGE_OPENPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {1, ID_MANAGE_SAVEPL,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {2, ID_MANAGE_SIMPLEADD,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {3, ID_MANAGE_ADDMRL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {4, ID_SEL_DELETE,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {5, Infos_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {6, Up_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {7, Down_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {8, Random_Event,      TBSTATE_ENABLED, TBSTYLE_CHECK},
+  {9, Loop_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK},
+  {10, Repeat_Event,       TBSTATE_ENABLED, TBSTYLE_CHECK}
 };
 
 // Toolbar ToolTips
 TCHAR * szToolTips2[] = 
 {
     HELP_OPENPL,
-        HELP_SAVEPL,
-        HELP_SIMPLEADD,
-        HELP_ADDMRL,
-        HELP_DELETE,
-        HELP_INFOS,
-        HELP_UP,
-        HELP_DOWN,
-        HELP_RANDOM,
-        HELP_LOOP,
-        HELP_REPEAT
+    HELP_SAVEPL,
+    HELP_SIMPLEADD,
+    HELP_ADDMRL,
+    HELP_DELETE,
+    HELP_INFOS,
+    HELP_UP,
+    HELP_DOWN,
+    HELP_RANDOM,
+    HELP_LOOP,
+    HELP_REPEAT
 };
 
 /*****************************************************************************
@@ -185,7 +185,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
 
         if( !SHCreateMenuBar(&mbi) )
         {
-            MessageBox(hwnd, L"SHCreateMenuBar Failed", L"Error", MB_OK);
+            MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
             //return -1;
         }
 
@@ -201,7 +201,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
         dwStyle = WS_VISIBLE | WS_CHILD | TBSTYLE_TOOLTIPS |
             WS_EX_OVERLAPPEDWINDOW | CCS_NOPARENTALIGN;
 
-        hwndTB = CreateToolbarEx( hwnd, dwStyle, NULL, NUMIMAGES,
+        hwndTB = CreateToolbarEx( hwnd, dwStyle, 0, NUMIMAGES,
                                   hInst, IDB_BITMAP3, tbButton2,
                                   sizeof (tbButton2) / sizeof (TBBUTTON),
                                   BUTTONWIDTH, BUTTONHEIGHT,
@@ -684,44 +684,41 @@ void Playlist::OnSave()
 {
     TCHAR szFile[NMAXFILE] = _T("\0");
     OPENFILENAME ofn;
+    TCHAR psz_filters[1000];
 
-    LPWSTR wUnicode;
-    int len;
-
-    struct {
-        TCHAR *psz_desc;
-        TCHAR *psz_filter;
-        char *psz_module;
-    } formats[] = {{ _T("M3U file"), _T("*.m3u"), "export-m3u" },       
-                { _T("PLS file"), _T("*.pls"), "export-pls" }};
-    wUnicode = new TCHAR[100];
-    wcscpy( wUnicode, _T("") );
-    len = 0;
-
-    for( unsigned int i = 0; i < sizeof(formats)/sizeof(formats[0]); i++)
+    struct
     {
-        wcscpy( &wUnicode[len], formats[i].psz_desc );
-                len = len + wcslen( formats[i].psz_desc );
-        wUnicode[len] = '\0';
-                len++;
-        wcscpy( &wUnicode[len], formats[i].psz_filter );
-                len = len + wcslen( formats[i].psz_filter );
-        wUnicode[len] = '\0';
-                len++;
+        char *psz_desc;
+        char *psz_filter;
+        char *psz_module;
+
+    } formats[] =
+    { { "M3U file", "*.m3u", "export-m3u" },       
+      { "PLS file", "*.pls", "export-pls" }
+    };
+
+    for( int i_len = 0, i = 0; i < sizeof(formats)/sizeof(formats[0]); i++ )
+    {
+        _tcscpy( psz_filters + i_len, _FROMMB(formats[i].psz_desc) );
+        i_len = i_len + _tcslen( psz_filters + i_len );
+        psz_filters[i_len++] = '\0';
+        _tcscpy( psz_filters + i_len, _FROMMB(formats[i].psz_filter) );
+        i_len = i_len + _tcslen( psz_filters + i_len );
+        psz_filters[i_len++] = '\0';
+        if( i == sizeof(formats)/sizeof(formats[0]) -1 )
+            psz_filters[i_len] = '\0';
     }
-    wUnicode[len] = '\0';
 
     memset( &(ofn), 0, sizeof(ofn));
     ofn.lStructSize     = sizeof(ofn);
     ofn.hwndOwner = NULL;
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = NMAXFILE;    
-    ofn.lpstrFilter = wUnicode;
+    ofn.lpstrFilter = psz_filters;
     ofn.lpstrTitle = _T("Save playlist");
     ofn.Flags = OFN_HIDEREADONLY; 
-    free( wUnicode );
 
-    if( GetSaveFileName((LPOPENFILENAME) &ofn) )
+    if( GetSaveFileName( (LPOPENFILENAME)&ofn ) )
     {
         playlist_t * p_playlist = (playlist_t *)
             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -762,7 +759,7 @@ void Playlist::OnAddFile()
     ofn.nMaxFileTitle = 40;
     ofn.lpstrInitialDir = NULL;
     ofn.lpstrTitle = _T("Quick Open File");
-    ofn.Flags = NULL; 
+    ofn.Flags = 0; 
     ofn.nFileOffset = 0;
     ofn.nFileExtension = 0;
     ofn.lpstrDefExt = NULL;

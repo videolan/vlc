@@ -340,11 +340,11 @@ void OpenDialog::FilePanel( HWND hwnd )
 void OpenDialog::NetPanel( HWND hwnd )
 {  
     INITCOMMONCONTROLSEX ic;
-    LPWSTR wUnicode;
+    TCHAR psz_text[256];
 
     struct net_type
     {
-        LPWSTR szAnsi;
+        TCHAR *psz_text;
         int length;
     };
 
@@ -360,48 +360,45 @@ void OpenDialog::NetPanel( HWND hwnd )
     GetWindowRect( notebook, &rc);
 
     /* UDP/RTP row */
-    net_radios[0] = CreateWindow( _T("BUTTON"), net_type_array[0].szAnsi,
+    net_radios[0] = CreateWindow( _T("BUTTON"), net_type_array[0].psz_text,
                 WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
-                rc.left + 5, rc.top + 10, 15, 15,
-                hwnd, NULL, hInst, NULL);
-        
-    net_label[0] = CreateWindow( _T("STATIC"), net_type_array[0].szAnsi,
+                rc.left + 5, rc.top + 10, 15, 15, hwnd, NULL, hInst, NULL );
+
+    net_label[0] = CreateWindow( _T("STATIC"), net_type_array[0].psz_text,
                 WS_CHILD | WS_VISIBLE | SS_LEFT,
-                rc.left + 5 + 15 + 5, rc.top + 10, net_type_array[0].length, 15,
-                hwnd, NULL, hInst, NULL);
+                rc.left + 5 + 15 + 5, rc.top + 10, net_type_array[0].length,
+                15, hwnd, NULL, hInst, NULL );
 
     i_net_ports[0] = config_GetInt( p_intf, "server-port" );
-        
+
     net_port_label[0] = CreateWindow( _T("STATIC"), _T("Port"),
                 WS_CHILD | WS_VISIBLE | SS_LEFT,
                 rc.left + 5 , rc.top + 10 + 2*(15 + 10), 30, 15,
-                hwnd, NULL, hInst, NULL);
-        
-    wUnicode = new WCHAR[80];
-    swprintf( wUnicode, _T("%d"), i_net_ports[0] );
-    net_ports[0] = CreateWindow( _T("EDIT"), wUnicode,
-    WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
-    rc.left + 5 + 30 + 5, rc.top + 10 + 2*(15 + 10) - 3,
-    rc.right - 5 - (rc.left + 5 + 30 + 5), 15 + 6, hwnd, NULL, hInst, NULL );
-    free( wUnicode );
+                hwnd, NULL, hInst, NULL );
+
+    _stprintf( psz_text, _T("%d"), i_net_ports[0] );
+    net_ports[0] = CreateWindow( _T("EDIT"), psz_text,
+        WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
+        rc.left + 5 + 30 + 5, rc.top + 10 + 2*(15 + 10) - 3,
+        rc.right - 5 - (rc.left + 5 + 30 + 5), 15 + 6, hwnd, NULL, hInst, NULL );
 
     ic.dwSize = sizeof(INITCOMMONCONTROLSEX);
     ic.dwICC = ICC_UPDOWN_CLASS;
     InitCommonControlsEx(&ic);
-        
+
     hUpdown[0] = CreateUpDownControl(
                 WS_CHILD | WS_VISIBLE | WS_BORDER | UDS_ALIGNRIGHT |
                 UDS_SETBUDDYINT | UDS_NOTHOUSANDS,
-                0, 0, 0, 0, hwnd, NULL, hInst,
+                0, 0, 0, 0, hwnd, 0, hInst,
                 net_ports[0], 16000, 0, i_net_ports[0]);
 
     /* UDP/RTP Multicast row */
-    net_radios[1] = CreateWindow( _T("BUTTON"), net_type_array[1].szAnsi,
+    net_radios[1] = CreateWindow( _T("BUTTON"), net_type_array[1].psz_text,
                 WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
                 rc.left + 5, rc.top + 10 + 15 + 10, 15, 15,
                 hwnd, NULL, hInst, NULL);
 
-    net_label[1] = CreateWindow( _T("STATIC"), net_type_array[1].szAnsi,
+    net_label[1] = CreateWindow( _T("STATIC"), net_type_array[1].psz_text,
                 WS_CHILD | WS_VISIBLE | SS_LEFT,
                 rc.left + 5 + 15 + 5, rc.top + 10 + 15 + 10,
                 net_type_array[1].length, 15, hwnd, NULL, hInst, NULL );
@@ -424,14 +421,12 @@ void OpenDialog::NetPanel( HWND hwnd )
 
     i_net_ports[1] = i_net_ports[0];
 
-    wUnicode = new WCHAR[80];
-    swprintf( wUnicode, _T("%d"), i_net_ports[1] );
-    net_ports[1] = CreateWindow( _T("EDIT"), wUnicode,
+    _stprintf( psz_text, _T("%d"), i_net_ports[1] );
+    net_ports[1] = CreateWindow( _T("EDIT"), psz_text,
                 WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
                 rc.left + 5 + 30 + 5, rc.top + 10 + 3*(15 + 10) - 3,
                 rc.right - 5 -(rc.left + 5 + 30 + 5), 15 + 6,
                 hwnd, NULL, hInst, NULL );
-    free( wUnicode );
 
     ic.dwSize = sizeof(INITCOMMONCONTROLSEX);
     ic.dwICC = ICC_UPDOWN_CLASS;
@@ -439,16 +434,16 @@ void OpenDialog::NetPanel( HWND hwnd )
 
     hUpdown[1] = CreateUpDownControl( WS_CHILD | WS_VISIBLE | WS_BORDER |
         UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_NOTHOUSANDS,
-        0, 0, 0, 0, hwnd, NULL, hInst,
+        0, 0, 0, 0, hwnd, 0, hInst,
         net_ports[1], 16000, 0, i_net_ports[1] );
 
     /* HTTP and RTSP rows */
-    net_radios[2] = CreateWindow( _T("BUTTON"), net_type_array[2].szAnsi,
+    net_radios[2] = CreateWindow( _T("BUTTON"), net_type_array[2].psz_text,
         WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
         rc.left + 5 + 15 + 5 + net_type_array[0].length + 5,
         rc.top + 10, 15, 15, hwnd, NULL, hInst, NULL );
         
-    net_label[2] = CreateWindow( _T("STATIC"), net_type_array[2].szAnsi,
+    net_label[2] = CreateWindow( _T("STATIC"), net_type_array[2].psz_text,
         WS_CHILD | WS_VISIBLE | SS_LEFT,
         rc.left + 5 + 15 + 5 + net_type_array[0].length + 5 + 15 + 5,
         rc.top + 10, net_type_array[2].length, 15,
@@ -465,12 +460,12 @@ void OpenDialog::NetPanel( HWND hwnd )
         rc.right - 5 - (rc.left + 5 + 30 + 5), 15 + 6,
         hwnd, NULL, hInst, NULL);
 
-    net_radios[3] = CreateWindow( _T("BUTTON"), net_type_array[3].szAnsi,
+    net_radios[3] = CreateWindow( _T("BUTTON"), net_type_array[3].psz_text,
         WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
         rc.left + 5 + 15 + 5 + net_type_array[1].length + 5,
         rc.top + 10 + 15 + 10, 15, 15, hwnd, NULL, hInst, NULL );
 
-    net_label[3] = CreateWindow( _T("STATIC"), net_type_array[3].szAnsi,
+    net_label[3] = CreateWindow( _T("STATIC"), net_type_array[3].psz_text,
         WS_CHILD | WS_VISIBLE | SS_LEFT,
         rc.left + 5 + 15 + 5 + net_type_array[1].length + 5 + 15 + 5,
         rc.top + 10 + 15 + 10, net_type_array[3].length, 15,
@@ -498,22 +493,16 @@ void OpenDialog::UpdateMRL()
 void OpenDialog::UpdateMRL( int i_access_method )
 {
     string demux, mrltemp;
-
-    int size;
-    BOOL bTemp;
-    LPSTR szAnsi;
-    LPWSTR wUnicode;
+    TCHAR psz_text[2048];
+    char psz_tmp[256];
 
     i_current_access_method = i_access_method;
 
     switch( i_access_method )
     {
     case FILE_ACCESS:
-        //mrltemp = wxT("file") + demux + wxT(":") + file_combo->GetValue();
-        size = GetWindowTextLength( file_combo ) + 1;
-        wUnicode = new WCHAR[ size ];
-        GetWindowText( file_combo, wUnicode, size );
-        mrltemp = _TOMB(wUnicode);
+        GetWindowText( file_combo, psz_text, 2048 );
+        mrltemp = _TOMB(psz_text);
         break;
     case NET_ACCESS:
         switch( i_net_type )
@@ -523,61 +512,40 @@ void OpenDialog::UpdateMRL( int i_access_method )
             if( i_net_ports[0] !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                szAnsi = new char[50];
-                sprintf( szAnsi, "@:%d", i_net_ports[0] );
-                mrltemp += szAnsi;
-                delete [] szAnsi;
+                sprintf( psz_tmp, "@:%d", i_net_ports[0] );
+                mrltemp += psz_tmp;
             }
             break;
 
         case 1:
             mrltemp = "udp" + demux + "://@";
-            size = Edit_GetTextLength( net_addrs[1] );  
-            wUnicode = new WCHAR[size + 1]; //Add 1 for the NULL
-            Edit_GetText( net_addrs[1], wUnicode, size + 1);
-            mrltemp += _TOMB(wUnicode);
-            delete [] wUnicode;
+            Edit_GetText( net_addrs[1], psz_text, 2048 );
+            mrltemp += _TOMB(psz_text);
             if( i_net_ports[1] != config_GetInt( p_intf, "server-port" ) )
             {
-                szAnsi = new char[50];
-                sprintf( szAnsi, ":%d", i_net_ports[1] );
-                mrltemp += szAnsi;
-                delete [] szAnsi;
+                sprintf( psz_tmp, ":%d", i_net_ports[1] );
+                mrltemp += psz_tmp;
             }
             break;
 
         case 2:
             /* http access */
-            size = Edit_GetTextLength( net_addrs[2] );  
-            wUnicode = new WCHAR[size + 1]; //Add 1 for the NULL
-            Edit_GetText( net_addrs[2], wUnicode, size + 1);
-            size = WideCharToMultiByte( CP_ACP, 0, wUnicode, -1, NULL, 0, NULL, &bTemp );
-            szAnsi = new char[size];
-            WideCharToMultiByte( CP_ACP, 0, wUnicode, -1, szAnsi, size, NULL, &bTemp );
-            free( wUnicode );
-            if( !strstr( szAnsi, "http://" ) )
+            Edit_GetText( net_addrs[2], psz_text, 2048 );
+            if( !strstr( _TOMB(psz_text), "http://" ) )
             {
                 mrltemp = "http" + demux + "://";
             }
-            mrltemp += szAnsi;
-            free( szAnsi );
+            mrltemp += _TOMB(psz_text);
             break;
 
         case 3:
             /* RTSP access */
-            size = Edit_GetTextLength( net_addrs[3] );  
-            wUnicode = new WCHAR[size + 1]; //Add 1 for the NULL
-            Edit_GetText( net_addrs[3], wUnicode, size + 1);
-            size = WideCharToMultiByte( CP_ACP, 0, wUnicode, -1, NULL, 0, NULL, &bTemp );
-            szAnsi = new char[size];
-            WideCharToMultiByte( CP_ACP, 0, wUnicode, -1, szAnsi, size, NULL, &bTemp );
-            free( wUnicode );
-            if( !strstr( szAnsi, "rtsp://" ) )
+            Edit_GetText( net_addrs[3], psz_text, 2048 );
+            if( !strstr( _TOMB(psz_text), "rtsp://" ) )
             {
                 mrltemp = "rtsp" + demux + "://";
             }
-            mrltemp += szAnsi;
-            free( szAnsi );
+            mrltemp += _TOMB(psz_text);
             break;
         }
         break;
@@ -652,18 +620,14 @@ void OpenDialog::OnPageChange()
 
 void OpenDialog::OnOk()
 {
-    int size;
-    LPWSTR wUnicode;
+    TCHAR psz_text[2048];
 
-    size = GetWindowTextLength( mrl_combo ) + 1;
-    wUnicode = new WCHAR[ size ];
-    GetWindowText( mrl_combo, wUnicode, size ); // a remplacer par ComboBox_GetText( mrl_combo, wUnicode, size )
-    mrl = SeparateEntries( wUnicode );
-    ComboBox_AddString( mrl_combo, wUnicode );
+    GetWindowText( mrl_combo, psz_text, 2048 ); // replace by ComboBox_GetText( mrl_combo, wUnicode, size )
+    mrl = SeparateEntries( psz_text );
+    ComboBox_AddString( mrl_combo, psz_text );
     if( ComboBox_GetCount( mrl_combo ) > 10 ) 
         ComboBox_DeleteString( mrl_combo, 0 );
     ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );
-    delete [] wUnicode;
 
     /* Update the playlist */
     playlist_t *p_playlist =
@@ -696,8 +660,8 @@ void OpenDialog::OnOk()
             }
         }
 
-        int i_id = playlist_AddItem( p_playlist, p_item,
-                                     PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_AddItem( p_playlist, p_item,
+                          PLAYLIST_APPEND, PLAYLIST_END );
 
         if( b_start )
         {
@@ -721,12 +685,9 @@ void OpenDialog::OnFilePanelChange()
 void OpenDialog::OnFileBrowse()
 {       
     OPENFILENAME ofn;
-    TCHAR DateiName[80+1] = _T("\0");
     static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
-    LPSTR psz_filename;
-    BOOL bTemp;
-    string path;
-    int size;
+    TCHAR psz_file[PATH_MAX] = _T("\0");
+    TCHAR psz_tmp[PATH_MAX+2] = _T("\0");
 
     memset(&ofn, 0, sizeof(OPENFILENAME));
     ofn.lStructSize = sizeof (OPENFILENAME);
@@ -736,13 +697,13 @@ void OpenDialog::OnFileBrowse()
     ofn.lpstrCustomFilter = NULL;
     ofn.nMaxCustFilter = 0;
     ofn.nFilterIndex = 1;     
-    ofn.lpstrFile = (LPTSTR) DateiName; 
-    ofn.nMaxFile = 80;
+    ofn.lpstrFile = psz_file; 
+    ofn.nMaxFile = PATH_MAX;
     ofn.lpstrFileTitle = NULL; 
     ofn.nMaxFileTitle = 40;
     ofn.lpstrInitialDir = NULL;
     ofn.lpstrTitle = _T("Open File");
-    ofn.Flags = NULL; 
+    ofn.Flags = 0;
     ofn.nFileOffset = 0;
     ofn.nFileExtension = 0;
     ofn.lpstrDefExt = NULL;
@@ -751,23 +712,16 @@ void OpenDialog::OnFileBrowse()
     ofn.lpTemplateName = NULL;
     if( GetOpenFileName((LPOPENFILENAME) &ofn) )
     {
-        size = WideCharToMultiByte( CP_ACP, 0, ofn.lpstrFile, -1, NULL,
-                                    0, NULL, &bTemp );
-        psz_filename = ( char * )malloc( size );
-        WideCharToMultiByte( CP_ACP, 0, ofn.lpstrFile, -1, psz_filename,
-                             size, NULL, &bTemp );
-
-        if( strchr( psz_filename, ' ' ) )
+        if( _tcschr( ofn.lpstrFile, _T(' ') ) )
         {
-            path = "\"";
-            path += psz_filename;
-            path += "\"";
+            _tcscat( psz_tmp, _T("\"") );
+            _tcscat( psz_tmp, ofn.lpstrFile );
+            _tcscat( psz_tmp, _T("\"") );
         }
-        else
-            path = psz_filename;
+        else _tcscat( psz_tmp, ofn.lpstrFile );
 
-        SetWindowText( file_combo, _FROMMB(path.c_str()) );
-        ComboBox_AddString( file_combo, _FROMMB(path.c_str()) );
+        SetWindowText( file_combo, psz_tmp );
+        ComboBox_AddString( file_combo, psz_tmp );
         if( ComboBox_GetCount( file_combo ) > 10 ) 
             ComboBox_DeleteString( file_combo, 0 );
 
@@ -780,18 +734,14 @@ void OpenDialog::OnFileBrowse()
  *****************************************************************************/
 void OpenDialog::OnNetPanelChange( int event )
 {
+    TCHAR psz_text[2048];
     int port;
-    int size;
-    LPWSTR wUnicode;
 
     if( event >= NetPort1_Event && event <= NetPort2_Event )
     {
-        size = Edit_GetTextLength( net_ports[event - NetPort1_Event] );
-        wUnicode = new WCHAR[size + 1]; //Add 1 for the NULL
-        Edit_GetText( net_ports[event - NetPort1_Event], wUnicode, size + 1);
-        swscanf( wUnicode, _T("%d"), &port );
+        Edit_GetText( net_ports[event - NetPort1_Event], psz_text, 2048 );
+        _stscanf( psz_text, _T("%d"), &port );
         i_net_ports[event - NetPort1_Event] = port;
-        delete[] wUnicode;
     }
 
     UpdateMRL( NET_ACCESS );
@@ -845,14 +795,18 @@ void OpenDialog::OnNetTypeChange( int event )
 
 void OpenDialog::DisableNETCtrl()
 {
-        for( int i=0; i<4; i++ )
+    for( int i=0; i<4; i++ )
     {
-                SetWindowPos( net_port_label[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-                SetWindowPos( net_ports[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-                SetWindowPos( hUpdown[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-                
-                SetWindowPos( net_addrs_label[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-                SetWindowPos( net_addrs[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+        SetWindowPos( net_port_label[i], HWND_BOTTOM, 0, 0, 0, 0,
+                      SWP_NOMOVE | SWP_NOSIZE );
+        SetWindowPos( net_ports[i], HWND_BOTTOM, 0, 0, 0, 0,
+                      SWP_NOMOVE | SWP_NOSIZE );
+        SetWindowPos( hUpdown[i], HWND_BOTTOM, 0, 0, 0, 0,
+                      SWP_NOMOVE | SWP_NOSIZE );
+        SetWindowPos( net_addrs_label[i], HWND_BOTTOM, 0, 0, 0, 0,
+                      SWP_NOMOVE | SWP_NOSIZE );
+        SetWindowPos( net_addrs[i], HWND_BOTTOM, 0, 0, 0, 0,
+                      SWP_NOMOVE | SWP_NOSIZE );
     }
 
     UpdateMRL( FILE_ACCESS );
@@ -878,7 +832,7 @@ void OpenDialog::OnSubsFileSettings( HWND hwnd )
 
     subsfile_mrl.clear();
 
-    for( int i = 0; i < subsfile_dialog->subsfile_mrl.size(); i++ )
+    for( int i = 0; i < (int)subsfile_dialog->subsfile_mrl.size(); i++ )
         subsfile_mrl.push_back( subsfile_dialog->subsfile_mrl[i] );
 
     delete subsfile_dialog;
@@ -887,66 +841,65 @@ void OpenDialog::OnSubsFileSettings( HWND hwnd )
 /*****************************************************************************
  * Utility functions.
  *****************************************************************************/
-vector<string> SeparateEntries( LPWSTR entries )
+vector<string> SeparateEntries( TCHAR *entries )
 {
-    int length;
     vlc_bool_t b_quotes_mode = VLC_FALSE;
     vector<string> entries_array;
-    LPWSTR entry = new TCHAR[ wcslen(entries) + 1 ];
+    TCHAR *entry = new TCHAR[ _tcslen(entries) + 1 ];
+    TCHAR *strToken = entries;
+    int length = _tcscspn( strToken, _T(" \t\r\n\"") );
+    *entry = 0;
 
-    LPWSTR strToken = entries;
-    length = wcscspn( strToken, _T(" \t\r\n\"") );
-    swprintf( entry, _T("") );
-
-    while( strToken - entries < wcslen(entries) )
+    while( strToken - entries < _tcslen(entries) )
     { 
-        wcsncat( entry, strToken, length );
+        _tcsncat( entry, strToken, length );
 
-        wcsncat( entry, strToken + length, 1 );
+        _tcsncat( entry, strToken + length, 1 );
 
         if( !b_quotes_mode && strToken[length] == _T('\"') )
         {
             /* Enters quotes mode */
-            entry[ wcslen(entry) - 1 ] = NULL;
+            entry[ _tcslen(entry) - 1 ] = 0;
             b_quotes_mode = VLC_TRUE;
         }
         else if( b_quotes_mode && strToken[length] == _T('\"') )
         {
             /* Finished the quotes mode */
-            entry[ wcslen(entry) - 1 ] = NULL;
-            if( wcscmp( entry, _T("") ) != 0 )
+            entry[ _tcslen(entry) - 1 ] = 0;
+            if( _tcscmp( entry, _T("") ) != 0 )
             {
                 entries_array.push_back( _TOMB(entry) );
             }
-            swprintf( entry, _T("") );
+            *entry = 0;
             b_quotes_mode = VLC_FALSE;
         }
         else if( !b_quotes_mode && strToken[length] != _T('\"') )
         {
             /* we found a non-quoted standalone string */
-            if( strToken + length - entries < wcslen(entries) ||/*token.HasMoreTokens() ||*/ //FIX ME IF YOU CAN
+            if( strToken + length - entries < _tcslen(entries) ||/*token.HasMoreTokens() ||*/ //FIX ME IF YOU CAN
                 strToken[length] == _T(' ') ||
                 strToken[length] == _T('\t') ||
                 strToken[length] == _T('\r') ||
                 strToken[length] == _T('\n') )
-              entry[ wcslen(entry) - 1 ]/*strToken[length]*/ = NULL;
-            if( wcscmp( entry, _T("") ) != 0 )
+              entry[ _tcslen(entry) - 1 ]/*strToken[length]*/ = 0;
+            if( _tcscmp( entry, _T("") ) != 0 )
             {
                 entries_array.push_back( _TOMB(entry) );
             }
-            swprintf( entry, _T("") );
+            *entry = 0;
         }
         else
         {;}
 
         strToken += length + 1;
-        length = wcscspn( strToken, _T(" \t\r\n\"") );
+        length = _tcscspn( strToken, _T(" \t\r\n\"") );
     }
 
-    if( wcscmp( entry, _T("") ) != 0 )
+    if( _tcscmp( entry, _T("") ) != 0 )
     {
         entries_array.push_back( _TOMB(entry) );
     }
 
+    delete [] entry;
     return entries_array;
 }

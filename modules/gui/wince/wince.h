@@ -36,7 +36,6 @@
 
 #if defined( UNDER_CE ) && defined(__MINGW32__)
     /* This is a gross hack for the wince gcc cross-compiler */
-    char *strerror( int );
 #   define _off_t long
 #endif
 
@@ -47,7 +46,7 @@
 #include <vector>
 using namespace std; 
 
-vector<string> SeparateEntries( LPWSTR entries );
+vector<string> SeparateEntries( TCHAR *entries );
 
 class MenuItemExt;
 class VideoWindow;
@@ -544,8 +543,8 @@ protected:
         return psz_wtomb;
     }
 #else
-#   define _FROMMB(a)
-#   define _TOMB(a)
+#   define _FROMMB(a) a
+#   define _TOMB(a) a
 #endif
 
 #if defined( ENABLE_NLS ) && defined( ENABLE_UTF8 )
@@ -605,6 +604,12 @@ extern "C" {
         DWORD dwItemSpec;
     } NMRGINFO, *PNMRGINFO;
 }
+
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   define SHFullScreen(a,b)
+#   define SHInitDialog(a)
+#   define SHCreateMenuBar(a) 1
+#endif
 
 #endif //WINCE_RESOURCE
 

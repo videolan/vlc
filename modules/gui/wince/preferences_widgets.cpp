@@ -112,9 +112,8 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
 ConfigControl::ConfigControl( vlc_object_t *_p_this,
                               module_config_t *p_item,
                               HWND parent, HINSTANCE hInst )
-  : parent( parent ), p_this( _p_this ),
-    pf_update_callback( NULL ), p_update_data( NULL ),
-    name( p_item->psz_name ), i_type( p_item->i_type ),
+  : p_this( _p_this ), pf_update_callback( NULL ), p_update_data( NULL ),
+    parent( parent ), name( p_item->psz_name ), i_type( p_item->i_type ),
     b_advanced( p_item->b_advanced )
 
 {

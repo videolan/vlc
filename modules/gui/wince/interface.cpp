@@ -81,19 +81,19 @@
 // The TBBUTTON structure contains information the toolbar buttons.
 static TBBUTTON tbButton[] =      
 {
-  {0, ID_FILE_QUICKOPEN,        TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {1, ID_FILE_OPENNET,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {2, StopStream_Event,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {3, PlayStream_Event,        TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {4, ID_VIEW_PLAYLIST,       TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {5, PrevStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {6, NextStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP,     0, -1},
-  {7, SlowStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON,  0, -1},
-  {8, FastStream_Event,       TBSTATE_ENABLED, TBSTYLE_BUTTON,   0, -1},
+  {0, ID_FILE_QUICKOPEN,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {1, ID_FILE_OPENNET,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {2, StopStream_Event,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {3, PlayStream_Event,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {4, ID_VIEW_PLAYLIST,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {5, PrevStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {6, NextStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
+  {7, SlowStream_Event,      TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {8, FastStream_Event,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
 };
 
 // Toolbar ToolTips
@@ -169,7 +169,7 @@ HWND WINAPI Interface::CreateToolbar( HWND hwnd )
     dwStyle = WS_VISIBLE | WS_CHILD | TBSTYLE_TOOLTIPS |
         WS_EX_OVERLAPPEDWINDOW | CCS_NOPARENTALIGN;
 
-    hwndTB = CreateToolbarEx( hwnd, dwStyle, NULL, NUMIMAGES,
+    hwndTB = CreateToolbarEx( hwnd, dwStyle, 0, NUMIMAGES,
         hInst, IDB_BITMAP1, tbButton, sizeof(tbButton) / sizeof(TBBUTTON),
         BUTTONWIDTH, BUTTONHEIGHT, IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
 
@@ -209,7 +209,7 @@ HWND WINAPI Interface::CreateSliderbar( HWND hwnd )
     // Registers TRACKBAR_CLASS control classes from the common control dll
     InitCommonControlsEx( &iccex );
 
-    hwndSlider = CreateWindowEx( NULL, TRACKBAR_CLASS, NULL,
+    hwndSlider = CreateWindowEx( 0, TRACKBAR_CLASS, NULL,
                 WS_CHILD | WS_VISIBLE | TBS_HORZ | WS_EX_OVERLAPPEDWINDOW |
                 TBS_BOTTOM,  //|WS_CLIPSIBLINGS,
                 0, 0, 0, 0, hwnd, NULL, hInst, NULL );
@@ -274,7 +274,7 @@ HWND WINAPI Interface::CreateVolTrackbar( HWND hwnd )
     // Registers TRACKBAR_CLASS control classes from the common control dll
     InitCommonControlsEx( &iccex );
 
-    hwndVol = CreateWindowEx( NULL, TRACKBAR_CLASS, NULL,
+    hwndVol = CreateWindowEx( 0, TRACKBAR_CLASS, NULL,
                 WS_CHILD | WS_VISIBLE | TBS_VERT | TBS_RIGHT | TBS_AUTOTICKS |
                 WS_EX_OVERLAPPEDWINDOW, //|WS_CLIPSIBLINGS,
                 0, 0, 0, 0, hwnd, NULL, hInst, NULL );
@@ -322,7 +322,7 @@ HWND WINAPI Interface::CreateStatusbar( HWND hwnd )
     // Create the statusbar control
     dwStyle = WS_VISIBLE | WS_CHILD | TBSTYLE_TOOLTIPS | CCS_NOPARENTALIGN;
 
-    hwndSB = CreateWindowEx( NULL, STATUSCLASSNAME, NULL,
+    hwndSB = CreateWindowEx( 0, STATUSCLASSNAME, NULL,
                              WS_CHILD | WS_VISIBLE | TBS_VERT | TBS_BOTTOM |
                              TBS_RIGHT  |WS_CLIPSIBLINGS,
                              0, 0, CW_USEDEFAULT, 50, hwnd, NULL, hInst, 0 );
@@ -416,7 +416,6 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 
     // call the base class first
     LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
-    BOOL bWasProcessed = *pbProcessed;
     *pbProcessed = TRUE;
 
     switch( msg )
@@ -433,7 +432,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 
         if( !SHCreateMenuBar(&mbi) )
         {
-            MessageBox(hwnd, L"SHCreateMenuBar Failed", L"Error", MB_OK);
+            MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
             //return -1;
         }
 
@@ -643,8 +642,8 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         return lResult;
 
     case WM_DESTROY:
-      PostQuitMessage( 0 );
-      return lResult;
+        PostQuitMessage( 0 );
+        return lResult;
     }
 
     return DefWindowProc( hwnd, msg, wp, lp );
@@ -674,7 +673,7 @@ void Interface::OnOpenFileSimple( void )
     ofn.nMaxFileTitle = 40;
     ofn.lpstrInitialDir = NULL;
     ofn.lpstrTitle = _T("Quick Open File");
-    ofn.Flags = NULL; 
+    ofn.Flags = 0; 
     ofn.nFileOffset = 0;
     ofn.nFileExtension = 0;
     ofn.lpstrDefExt = NULL;
@@ -795,7 +794,7 @@ void Interface::OnSliderUpdate( int wp )
     vlc_mutex_lock( &pIntf->change_lock );
     input_thread_t *p_input = pIntf->p_sys->p_input;
 
-    DWORD dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 ); 
+    int dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 ); 
 
     if( (int)LOWORD(wp) == SB_THUMBPOSITION ||
         (int)LOWORD(wp) == SB_ENDSCROLL )

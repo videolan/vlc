@@ -88,10 +88,8 @@ Timer::~Timer()
  *****************************************************************************/
 void Timer::Notify( void )
 {
-    int size;
     vlc_value_t val;
     char *shortname;
-    LPWSTR wUnicode;
 
     vlc_mutex_lock( &p_intf->change_lock );
 
@@ -105,25 +103,18 @@ void Timer::Notify( void )
         /* Show slider */
         if( p_intf->p_sys->p_input )
         {
-            ShowWindow( p_main_interface->hwndSlider, SW_SHOW);
-            ShowWindow( p_main_interface->hwndLabel, SW_SHOW);
-            ShowWindow( p_main_interface->hwndVol, SW_SHOW);
+            ShowWindow( p_main_interface->hwndSlider, SW_SHOW );
+            ShowWindow( p_main_interface->hwndLabel, SW_SHOW );
+            ShowWindow( p_main_interface->hwndVol, SW_SHOW );
 
             // only for local file, check if works well with net url
             shortname = strrchr( p_intf->p_sys->p_input->input.p_item->psz_name, '\\' );
             if (! shortname)
                 shortname = p_intf->p_sys->p_input->input.p_item->psz_name;
-            else
-                shortname++;
+            else shortname++;
                         
-            size = MultiByteToWideChar (CP_ACP, 0, shortname, -1, NULL, 0);
-            wUnicode = new WCHAR[size+1];
-            MultiByteToWideChar (CP_ACP, 0, shortname, -1, wUnicode + 1, size) ;
-            wUnicode[0] = L'\t';
-
             SendMessage( p_main_interface->hwndSB, SB_SETTEXT, 
-                         (WPARAM) 0, (LPARAM)(LPCTSTR) wUnicode);
-            free( wUnicode );
+                         (WPARAM) 0, (LPARAM)_FROMMB(shortname) );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
@@ -179,20 +170,15 @@ void Timer::Notify( void )
                         p_intf->p_sys->i_slider_pos =
                             (int)(SLIDER_MAX_POS * pos.f_float);
 
-                        SendMessage( p_main_interface->hwndSlider,TBM_SETPOS, 
+                        SendMessage( p_main_interface->hwndSlider, TBM_SETPOS, 
                                      1, p_intf->p_sys->i_slider_pos );
 
                         var_Get( p_intf->p_sys->p_input, "time", &time );
                         i_seconds = time.i_time / 1000000;
-
                         secstotimestr ( psz_time, i_seconds );
 
-                        size = MultiByteToWideChar (CP_ACP, 0, psz_time, -1, NULL, 0);
-                        wUnicode = new WCHAR[size];
-                        MultiByteToWideChar (CP_ACP, 0, psz_time, -1, wUnicode, size) ;
                         SendMessage( p_main_interface->hwndLabel, WM_SETTEXT, 
-                                     (WPARAM) 1, (LPARAM)(LPCTSTR) wUnicode );
-                        free( wUnicode );
+                                     (WPARAM)1, (LPARAM)_FROMMB(psz_time) );
                     }
                 }
             }
@@ -216,15 +202,12 @@ void Timer::Notify( void )
             var_Get( p_input, "rate", &val );
             if( i_old_rate != val.i_int )
             {
-                wUnicode = new WCHAR[10];
-                swprintf( wUnicode + 2, TEXT("x%.2f"), 1000.0 / val.i_int );
-                wUnicode[0] = L'\t';
-                wUnicode[1] = L'\t';
+                TCHAR psz_text[15];
+                _stprintf( psz_text + 2, _T("x%.2f"), 1000.0 / val.i_int );
+                psz_text[0] = psz_text[1] = _T('\t');
 
                 SendMessage( p_main_interface->hwndSB, SB_SETTEXT, 
-                             (WPARAM) 1, (LPARAM)(LPCTSTR) wUnicode);
-
-                free(wUnicode); 
+                             (WPARAM) 1, (LPARAM)(LPCTSTR) psz_text );
 
                 i_old_rate = val.i_int;
             }

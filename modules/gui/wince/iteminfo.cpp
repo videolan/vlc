@@ -97,7 +97,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
 
         if( !SHCreateMenuBar(&mbi) )
         {
-            MessageBox( hwnd, L"SHCreateMenuBar Failed", L"Error", MB_OK );
+            MessageBox( hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK );
             //return -1;
         }
 
@@ -235,7 +235,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             string szAnsi = (string)p_info->psz_name;
             szAnsi += ": ";
             szAnsi += p_info->psz_value;
-            tvi.pszText = _FROMMB( szAnsi.c_str() );
+            tvi.pszText = (TCHAR *)_FROMMB( szAnsi.c_str() );
             tvi.cchTextMax = _tcslen( tvi.pszText );
             tvi.lParam = (LPARAM)3; // level 3
             tvins.item = tvi; 
@@ -259,7 +259,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
  *****************************************************************************/
 void ItemInfoDialog::OnOk()
 {
-    int b_state, i_item;
+    int b_state = VLC_FALSE;
 
     vlc_mutex_lock( &p_item->input.lock );
 
