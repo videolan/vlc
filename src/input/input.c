@@ -844,6 +844,7 @@ static int Init( input_thread_t * p_input )
             vlc_meta_Delete( p_meta );
         }
     }
+    else if( p_meta ) vlc_meta_Delete( p_meta );
 
     msg_Dbg( p_input, "`%s' sucessfully opened",
              p_input->input.p_item->psz_uri );
@@ -1411,7 +1412,7 @@ static int UpdateFromDemux( input_thread_t *p_input )
         int i_seekpoint_end = p_input->input.i_seekpoint_end -
             p_input->input.i_seekpoint_offset;
 
-        if( i_title_end >= 0 && i_seekpoint_end >=0 )
+        if( i_title_end >= 0 && i_seekpoint_end >= 0 )
         {
             if( p_demux->info.i_title > i_title_end ||
                 ( p_demux->info.i_title == i_title_end &&
