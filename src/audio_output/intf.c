@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.4 2002/09/26 22:40:25 massiot Exp $
+ * $Id: intf.c,v 1.5 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -355,3 +355,16 @@ int aout_Restart( aout_instance_t * p_aout )
     return b_error;
 }
 
+/*****************************************************************************
+ * aout_FindAndRestart : find the audio output instance and restart
+ *****************************************************************************/
+void aout_FindAndRestart( vlc_object_t * p_this )
+{
+    aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+
+    if ( p_aout == NULL ) return;
+
+    aout_Restart( p_aout );
+    vlc_object_release( p_aout );
+}

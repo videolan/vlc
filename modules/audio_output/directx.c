@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout.c: Windows DirectX audio output method
+ * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.3 2002/10/11 10:08:06 gbazin Exp $
+ * $Id: directx.c,v 1.4 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -130,7 +130,7 @@ static int OpenAudio( vlc_object_t *p_this )
     if( p_aout->output.p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return 1;
+        return VLC_EGENERIC;
     }
 
     /* Initialize some variables */
@@ -223,7 +223,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
  error:
     CloseAudio( VLC_OBJECT(p_aout) );
-    return 1;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -269,12 +269,7 @@ static void CloseAudio( vlc_object_t *p_this )
     if( p_aout->output.p_sys->hdsound_dll )
        FreeLibrary( p_aout->output.p_sys->hdsound_dll );
 
-    /* Close the Output. */
-    if ( p_aout->output.p_sys  )
-    { 
-        free( p_aout->output.p_sys );
-        p_aout->output.p_sys = NULL;
-    }
+    free( p_aout->output.p_sys );
 }
 
 /*****************************************************************************
@@ -355,14 +350,19 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
     WAVEFORMATEX         waveformat;
     DSBUFFERDESC         dsbdesc;
     DSBCAPS              dsbcaps;
+    int                  i_nb_channels;
 
-    if( p_aout->output.output.i_channels > 2 )
-        p_aout->output.output.i_channels = 2;
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
+    {
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+    }
 
     /* First set the buffer format */
     memset(&waveformat, 0, sizeof(WAVEFORMATEX));
     waveformat.wFormatTag      = WAVE_FORMAT_PCM;
-    waveformat.nChannels       = p_aout->output.output.i_channels;
+    waveformat.nChannels       = i_nb_channels;
     waveformat.nSamplesPerSec  = p_aout->output.output.i_rate;
     waveformat.wBitsPerSample  = 16;
     waveformat.nBlockAlign     = waveformat.wBitsPerSample / 8 *
@@ -377,7 +377,7 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
                     | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
     dsbdesc.dwBufferBytes = FRAME_SIZE * 2 /* frames*/ *      /* buffer size */
-                            sizeof(s16) * p_aout->output.output.i_channels;
+                            sizeof(s16) * i_nb_channels;
     dsbdesc.lpwfxFormat = &waveformat;
  
     if( IDirectSound_CreateSoundBuffer( p_aout->output.p_sys->p_dsobject,
@@ -391,7 +391,7 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
 
     /* backup the size of a frame */
     p_aout->output.p_sys->p_notif->i_buffer_size = FRAME_SIZE * sizeof(s16)
-                                            * p_aout->output.output.i_channels;
+                                            * i_nb_channels;
 
     memset(&dsbcaps, 0, sizeof(DSBCAPS));
     dsbcaps.dwSize = sizeof(DSBCAPS);
@@ -439,7 +439,7 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
         IDirectSoundBuffer_Release( p_aout->output.p_sys->p_dsbuffer );
         p_aout->output.p_sys->p_dsnotify = NULL;
     }
-    return 1;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

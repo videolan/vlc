@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.17 2002/09/28 13:05:16 massiot Exp $
+ * $Id: mixer.c,v 1.18 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,6 +136,14 @@ static int MixBuffer( aout_instance_t * p_aout )
             if ( p_input->b_error ) continue;
 
             p_buffer = p_fifo->p_first;
+            while ( p_buffer != NULL && p_buffer->start_date < mdate() )
+            {
+                msg_Warn( p_aout, "input PTS is out of range (%lld), trashing",
+                          mdate() - p_buffer->start_date );
+                aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+                p_buffer = p_fifo->p_first;
+            }
+
             if ( p_buffer == NULL )
             {
                 break;

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.12 2002/09/30 21:32:32 massiot Exp $
+ * $Id: file.c,v 1.13 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,7 +98,6 @@ static int Open( vlc_object_t * p_this )
     if ( p_file == NULL ) return -1;
 
     p_aout->output.pf_play = Play;
-    aout_VolumeSoftInit( p_aout );
 
     while ( *ppsz_compare != NULL )
     {
@@ -117,15 +116,17 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_aout->output.output.i_format = format_int[i];
-    if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
+        aout_VolumeNoneInit( p_aout );
     }
     else
     {
         p_aout->output.i_nb_samples = FRAME_SIZE;
+        aout_VolumeSoftInit( p_aout );
     }
     return 0;
 }

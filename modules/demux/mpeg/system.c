@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.5 2002/10/03 21:45:16 massiot Exp $
+ * $Id: system.c,v 1.6 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -654,6 +654,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 p_es->i_cat = AUDIO_ES;
                 break;
             case A52_AUDIO_ES:
+            case A52DVB_AUDIO_ES:
                 p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                 p_es->i_cat = AUDIO_ES;
                 break;

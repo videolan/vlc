@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.13 2002/09/18 21:21:23 massiot Exp $
+ * $Id: esd.c,v 1.14 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,6 +75,7 @@ static int Open( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
+    int i_nb_channels;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( aout_sys_t ) );
@@ -93,7 +94,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->esd_format = ESD_BITS16 | ESD_STREAM | ESD_PLAY;
     p_sys->esd_format &= ~ESD_MASK_CHAN;
 
-    switch( p_aout->output.output.i_channels )
+    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
+    {
+        /* EsounD doesn't support more than two channels. */
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+    }
+
+    switch( i_nb_channels )
     {
     case 1:
         p_sys->esd_format |= ESD_MONO;
@@ -101,8 +111,6 @@ static int Open( vlc_object_t *p_this )
     case 2:
         p_sys->esd_format |= ESD_STEREO;
         break;
-    default:
-        return -1;
     }
 
     /* open a socket for playing a stream
@@ -113,10 +121,10 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %ld Hz)",
                          p_sys->esd_format, p_aout->output.output.i_rate );
+        free( p_sys );
         return -1;
     }
 
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = ESD_BUF_SIZE * 2;
 
     /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
@@ -135,6 +143,7 @@ static int Open( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
+        close( p_sys->i_fd );
         free( p_sys );
         return -1;
     }

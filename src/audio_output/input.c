@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.16 2002/10/09 22:54:22 massiot Exp $
+ * $Id: input.c,v 1.17 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,6 +42,8 @@
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
     audio_sample_format_t intermediate_format;
+
+    aout_FormatPrint( p_aout, "input", &p_input->input );
 
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
@@ -162,7 +164,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%lld), clearing out",
-                  start_date );
+                  mdate() - start_date );
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );

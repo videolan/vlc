@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.11 2002/09/30 21:32:33 massiot Exp $
+ * $Id: filters.c,v 1.12 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -128,11 +128,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         return 0;
     }
 
-    msg_Dbg( p_aout, "filter(s) format=%4.4s->%4.4s rate=%d->%d channels=%d->%d",
-             (char *)&p_input_format->i_format,
-             (char *)&p_output_format->i_format,
-             p_input_format->i_rate, p_output_format->i_rate,
-             p_input_format->i_channels, p_output_format->i_channels );
+    aout_FormatsPrint( p_aout, "filter(s)", p_input_format, p_output_format );
 
     /* Try to find a filter to do the whole conversion. */
     pp_filters[0] = FindFilter( p_aout, p_input_format, p_output_format );

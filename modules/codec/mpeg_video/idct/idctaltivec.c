@@ -2,9 +2,9 @@
  * idctaltivec.c : AltiVec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: idctaltivec.c,v 1.2 2002/10/20 12:23:47 massiot Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Michel Lespinasse <walken@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

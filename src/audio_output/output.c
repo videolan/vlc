@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.17 2002/10/03 18:56:09 sam Exp $
+ * $Id: output.c,v 1.18 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,6 +59,12 @@ int aout_OutputNew( aout_instance_t * p_aout,
                      = (p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         VLC_FOURCC('f','l','3','2') :
                         VLC_FOURCC('f','i','3','2');
+
+        if ( p_aout->output.output.i_channels == AOUT_CHAN_DOLBY )
+        {
+            /* Do not do Dolby surround unless the user requests it. */
+            p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        }
     }
     aout_FormatPrepare( &p_aout->output.output );
 
@@ -81,10 +87,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
 
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
-    msg_Dbg( p_aout, "output format=%4.4s rate=%d channels=%d",
-             (char *)&p_aout->output.output.i_format,
-             p_aout->output.output.i_rate,
-             p_aout->output.output.i_channels );
+    aout_FormatPrint( p_aout, "output", &p_aout->output.output );
 
     /* Calculate the resulting mixer output format. */
     memcpy( &p_aout->mixer.mixer, &p_aout->output.output,
@@ -103,9 +106,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->mixer.mixer.i_format = p_format->i_format;
     }
 
-    msg_Dbg( p_aout, "mixer format=%4.4s rate=%d channels=%d",
-             (char *)&p_aout->mixer.mixer.i_format, p_aout->mixer.mixer.i_rate,
-             p_aout->mixer.mixer.i_channels );
+    aout_FormatPrint( p_aout, "mixer", &p_aout->output.output );
 
     /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,

@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.2 2002/09/30 21:32:33 massiot Exp $
+ * $Id: common.c,v 1.3 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -164,6 +164,66 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
 
     p_format->i_bytes_per_frame = i_result * aout_FormatNbChannels( p_format );
     p_format->i_frame_length = 1;
+}
+
+/*****************************************************************************
+ * FormatPrintChannels : print a channel in a human-readable form
+ *****************************************************************************/
+static const char * FormatPrintChannels( int i_channels )
+{
+    switch ( i_channels )
+    {
+    case AOUT_CHAN_CHANNEL: return "CHANNEL";
+    case AOUT_CHAN_CHANNEL1: return "CHANNEL1";
+    case AOUT_CHAN_CHANNEL2: return "CHANNEL2";
+    case AOUT_CHAN_MONO: return "MONO";
+    case AOUT_CHAN_STEREO: return "STEREO";
+    case AOUT_CHAN_3F: return "3F";
+    case AOUT_CHAN_2F1R: return "2F1R";
+    case AOUT_CHAN_3F1R: return "3F1R";
+    case AOUT_CHAN_2F2R: return "2F2R";
+    case AOUT_CHAN_3F2R: return "3F2R";
+    case AOUT_CHAN_DOLBY: return "DOLBY";
+    case AOUT_CHAN_CHANNEL | AOUT_CHAN_LFE: return "CHANNEL|LFE";
+    case AOUT_CHAN_CHANNEL1 | AOUT_CHAN_LFE: return "CHANNEL1|LFE";
+    case AOUT_CHAN_CHANNEL2 | AOUT_CHAN_LFE: return "CHANNEL2|LFE";
+    case AOUT_CHAN_MONO | AOUT_CHAN_LFE: return "MONO|LFE";
+    case AOUT_CHAN_STEREO | AOUT_CHAN_LFE: return "STEREO|LFE";
+    case AOUT_CHAN_3F | AOUT_CHAN_LFE: return "3F|LFE";
+    case AOUT_CHAN_2F1R | AOUT_CHAN_LFE: return "2F1R|LFE";
+    case AOUT_CHAN_3F1R | AOUT_CHAN_LFE: return "3F1R|LFE";
+    case AOUT_CHAN_2F2R | AOUT_CHAN_LFE: return "2F2R|LFE";
+    case AOUT_CHAN_3F2R | AOUT_CHAN_LFE: return "3F2R|LFE";
+    case AOUT_CHAN_DOLBY | AOUT_CHAN_LFE: return "DOLBY|LFE";
+    }
+
+    return "ERROR";
+}
+
+/*****************************************************************************
+ * aout_FormatPrint : print a format in a human-readable form
+ *****************************************************************************/
+void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
+                       audio_sample_format_t * p_format )
+{
+    msg_Dbg( p_aout, "%s format='%4.4s' rate=%d channels=%s", psz_text,
+             (char *)&p_format->i_format, p_format->i_rate,
+             FormatPrintChannels( p_format->i_channels ) );
+}
+
+/*****************************************************************************
+ * aout_FormatsPrint : print two formats in a human-readable form
+ *****************************************************************************/
+void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
+                        audio_sample_format_t * p_format1,
+                        audio_sample_format_t * p_format2 )
+{
+    msg_Dbg( p_aout, "%s format='%4.4s'->'%4.4s' rate=%d->%d channels=%s->%s",
+             psz_text,
+             (char *)&p_format1->i_format, (char *)&p_format2->i_format,
+             p_format1->i_rate, p_format2->i_rate,
+             FormatPrintChannels( p_format1->i_channels ),
+             FormatPrintChannels( p_format2->i_channels ) );
 }
 
 

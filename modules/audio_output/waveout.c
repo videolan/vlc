@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.8 2002/10/11 10:08:06 gbazin Exp $
+ * $Id: waveout.c,v 1.9 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -92,6 +92,7 @@ static int Open( vlc_object_t *p_this )
 {   
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     aout_buffer_t *p_buffer;
+    int i_nb_channels;
 
     /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -99,44 +100,43 @@ static int Open( vlc_object_t *p_this )
     if( p_aout->output.p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return 1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    /* FIXME */
-    if ( p_aout->output.output.i_channels > 2 )
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
     {
-        msg_Warn( p_aout, "only two channels are supported at the moment" );
-        /* Trigger downmixing */
-        p_aout->output.output.i_channels = 2;
+        /* Waveout doesn't support more than two channels. */
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
     }
 
     /* We need to open the device with default values to be sure it is
      * available */
-    if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM,
-                      p_aout->output.output.i_channels,
+    if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, i_nb_channels,
                       p_aout->output.output.i_rate ) )
     {
         msg_Err( p_aout, "cannot open waveout audio device with output "
                          "rate (%i)",
                           p_aout->output.output.i_rate );
-        return 1;
+        return VLC_EGENERIC;
 
-        if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM,
-                          p_aout->output.output.i_channels,
+        if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, i_nb_channels,
                           44100 ) )
         {
             msg_Err( p_aout, "cannot open waveout audio device with output "
                              "rate (44100)" );
-            return 1;
+            return VLC_EGENERIC;
         }
+        p_aout->output.output.i_rate = 44100;
     }
 
     waveOutReset( p_aout->output.p_sys->h_waveout );
 
-    /* calculate the frame size in bytes */
+    /* Calculate the frame size in bytes */
     p_aout->output.p_sys->i_buffer_size = FRAME_SIZE * sizeof(s16)
                                   * p_aout->output.p_sys->waveformat.nChannels;
     /* Allocate silence buffer */
@@ -194,11 +194,7 @@ static void Close( vlc_object_t *p_this )
     /* Free silence buffer */
     free( p_aout->output.p_sys->p_silence_buffer );
 
-    if( p_aout->output.p_sys != NULL )
-    { 
-        free( p_aout->output.p_sys );
-        p_aout->output.p_sys = NULL;
-    }
+    free( p_aout->output.p_sys );
 }
 
 /*****************************************************************************

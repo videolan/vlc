@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.13 2002/10/04 18:07:21 sam Exp $
+ * $Id: arts.c,v 1.14 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -77,6 +77,7 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     int i_err;
+    int i_nb_channels;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( aout_sys_t ) );
@@ -99,19 +100,22 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    p_sys->stream = NULL;
-
-    if( p_sys->stream )
+    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
     {
-        arts_close_stream( p_sys->stream );
+        /* aRts doesn't support more than two channels. */
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
     }
 
     /* Open a socket for playing a stream, set format to 16 bits */
     p_sys->stream = arts_play_stream( p_aout->output.output.i_rate, 16,
-                                      p_aout->output.output.i_channels, "vlc" );
+                                      i_nb_channels, "vlc" );
     if( p_sys->stream == NULL )
     {
         msg_Err( p_aout, "cannot open aRts socket" );
+        free( p_sys );
         return -1;
     }
 
@@ -128,16 +132,15 @@ static int Open( vlc_object_t *p_this )
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_COUNT ),
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE ) );
 
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = p_sys->i_size
-                                   / sizeof(u16)
-                                   / p_aout->output.output.i_channels;
+    p_aout->output.i_nb_samples = p_sys->i_size / sizeof(u16) / i_nb_channels;
 
     /* Create aRts thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", aRtsThread,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create aRts thread (%s)", strerror(errno) );
+        arts_close_stream( p_sys->stream );
+        arts_free();
         free( p_sys );
         return -1;
     }
@@ -164,11 +167,7 @@ static void Close( vlc_object_t *p_this )
     p_aout->b_die = 1;
     vlc_thread_join( p_aout );
 
-    if( p_sys->stream )
-    {
-        arts_close_stream( p_sys->stream );
-    }
-
+    arts_close_stream( p_sys->stream );
     arts_free();
     free( p_sys );
 }

@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.2 2002/08/30 22:22:24 massiot Exp $
+ * $Id: system.h,v 1.3 2002/10/20 12:23:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,6 +46,7 @@
 #define MPEG2_VIDEO_ES      0x02
 #define MPEG1_AUDIO_ES      0x03
 #define MPEG2_AUDIO_ES      0x04
+#define A52DVB_AUDIO_ES     0x06
 #define A52_AUDIO_ES        0x81
 /* These ones might violate the usage : */
 #define DVD_SPU_ES          0x82

@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: synchro.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: synchro.c,v 1.3 2002/10/20 12:23:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -377,9 +377,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         if( p_vpar->synchro.i_eta_p
              && p_vpar->synchro.i_eta_p != p_vpar->synchro.i_n_p )
         {
-            msg_Warn( p_vpar->p_fifo,
-                      "stream periodicity changed from P[%d] to P[%d]",
-                      p_vpar->synchro.i_n_p, p_vpar->synchro.i_eta_p );
+            msg_Dbg( p_vpar->p_fifo,
+                     "stream periodicity changed from P[%d] to P[%d]",
+                     p_vpar->synchro.i_n_p, p_vpar->synchro.i_eta_p );
             p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p;
         }
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
