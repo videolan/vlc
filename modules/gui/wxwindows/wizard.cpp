@@ -803,7 +803,8 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line 2 : codec */
     video_sizer1->Add( new wxStaticText(this, -1, wxU(_("Codec"))),0,wxLEFT ,5);
     video_combo = new wxComboBox( this, VideoCodec_Event, wxT(""),
-                                  wxDefaultPosition, wxSize(200,25) );
+                                  wxDefaultPosition, wxSize(200,25), 0, NULL, 
+                                  wxCB_DROPDOWN| wxCB_READONLY );
     for( int i= 0; vcodecs_array[i].psz_display != NULL; i++ )
     {
         video_combo->Append( wxU( vcodecs_array[i].psz_display ) ,
@@ -842,7 +843,8 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line 2 : codec */
     audio_sizer1->Add( new wxStaticText(this, -1, wxU(_("Codec"))),0,wxLEFT,5);
     audio_combo = new wxComboBox( this, AudioCodec_Event, wxT(""),
-                                  wxDefaultPosition, wxSize(200,25) );
+                                  wxDefaultPosition, wxSize(200,25), 0, NULL, 
+                                  wxCB_DROPDOWN| wxCB_READONLY );
     for( int i= 0; acodecs_array[i].psz_display != NULL; i++ )
     {
         audio_combo->Append( wxU( acodecs_array[i].psz_display ) ,
