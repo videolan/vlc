@@ -444,10 +444,10 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
     {
         p_vpar->synchro.kludge_nbframes = 0;
         p_vpar->synchro.kludge_date = DECODER_FIFO_START(p_vpar->fifo)->i_pts;
-        DECODER_FIFO_START(p_vpar->fifo)->b_has_pts = 0;
     }
     else
         p_vpar->synchro.kludge_nbframes++;
+    DECODER_FIFO_START(p_vpar->fifo)->b_has_pts = 0;
 }
 
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
