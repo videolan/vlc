@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.26 2001/01/06 03:16:00 henri Exp $
+ * $Id: input_netlist.c,v 1.27 2001/01/06 05:44:45 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -190,7 +190,7 @@ struct iovec * input_NetlistGetiovec( void * p_method_data )
  
     /* Initialize payload start and end */
     p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start 
-        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_buffers;
+        = p_netlist->pp_free_data[p_netlist->i_data_start]->p_buffer;
  
     p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_end 
         = p_netlist->pp_free_data[p_netlist->i_data_start]->p_payload_start
@@ -268,7 +268,7 @@ struct data_packet_s * input_NetlistNewPacket( void * p_method_data,
     p_return->p_next = NULL;
     p_return->b_discard_payload = 0;
     
-    p_return->p_payload_start = p_return->p_buffers;
+    p_return->p_payload_start = p_return->p_buffer;
     p_return->p_payload_end = p_return->p_payload_start + i_buffer_size;
     
     return ( p_return );
