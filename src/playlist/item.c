@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item.c,v 1.13 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: item.c,v 1.14 2004/02/08 18:17:22 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -164,4 +164,22 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     var_Set( p_playlist, "intf-change", val );
 
     return p_item->i_id;
+}
+
+/**
+ *  Add a option to one item ( no need for p_playlist )
+ *
+ * \param p_item the item on which we want the info
+ * \param psz_format the option
+ * \return 0 on success
+*/
+int playlist_ItemAddOption( playlist_item_t *p_item,
+                            const char *psz_option )
+{
+    if( !psz_option ) return VLC_EGENERIC;
+
+    INSERT_ELEM( p_item->ppsz_options, p_item->i_options, p_item->i_options,
+                 strdup( psz_option ) );
+
+    return VLC_SUCCESS;
 }

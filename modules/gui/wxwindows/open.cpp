@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.67 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: open.cpp,v 1.68 2004/02/08 18:17:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -889,23 +889,17 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
-        int i_options = 0;
+        vlc_bool_t b_start = !i && i_open_arg;
         playlist_item_t *p_item =
-                  playlist_ItemNew( p_intf,
-                                    (const char*)mrl[i].mb_str(),
-                                    (const char *)mrl[i].mb_str() );
-
-        /* Count the input options */
-        while( i + i_options + 1 < (int)mrl.GetCount() &&
-               ((const char *)mrl[i + i_options + 1].mb_str())[0] == ':' )
-        {
-            i_options++;
-        }
+            playlist_ItemNew( p_intf, (const char*)mrl[i].mb_str(),
+                              (const char *)mrl[i].mb_str() );
 
         /* Insert options */
-        for( int j = 0; j < i_options; j++ )
+        while( i + 1 < (int)mrl.GetCount() &&
+               ((const char *)mrl[i + 1].mb_str())[0] == ':' )
         {
-            playlist_ItemAddOption( p_item, mrl[i + j  + 1].mb_str() );
+            playlist_ItemAddOption( p_item, mrl[i + 1].mb_str() );
+            i++;
         }
 
         /* Get the options from the subtitles dialog */
@@ -926,15 +920,14 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             }
         }
 
-       int i_id = playlist_AddItem( p_playlist, p_item,
-                      PLAYLIST_APPEND, PLAYLIST_END );
+        int i_id = playlist_AddItem( p_playlist, p_item,
+                                     PLAYLIST_APPEND, PLAYLIST_END );
 
-        if( !i && i_open_arg )
+        if( b_start )
         {
             int i_pos = playlist_GetPositionById( p_playlist , i_id );
             playlist_Command( p_playlist, PLAYLIST_GOTO, i_pos );
         }
-        i += i_options;
     }
 
     //TogglePlayButton( PLAYING_S );
