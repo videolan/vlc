@@ -65,6 +65,14 @@ typedef struct function_list_s
 
     union
     {
+        /* Interface plugin */
+        struct
+        {
+            int  ( * pf_open ) ( struct intf_thread_s * );
+            void ( * pf_close )( struct intf_thread_s * );
+            void ( * pf_run )  ( struct intf_thread_s * );
+        } intf;
+
         /* Input plugin */
         struct
         {
@@ -97,6 +105,19 @@ typedef struct function_list_s
             void ( * pf_play )       ( struct aout_thread_s *, byte_t *, int );
             void ( * pf_close )      ( struct aout_thread_s * );
         } aout;
+
+        /* Video output plugin */
+        struct
+        {
+            int  ( * pf_create )     ( struct vout_thread_s * );
+            int  ( * pf_init )       ( struct vout_thread_s * );
+            void ( * pf_end )        ( struct vout_thread_s * );
+            void ( * pf_destroy )    ( struct vout_thread_s * );
+            int  ( * pf_manage )     ( struct vout_thread_s * );
+            void ( * pf_display )    ( struct vout_thread_s * );
+            void ( * pf_setpalette ) ( struct vout_thread_s *, u16 *red,
+                                       u16 *green, u16 *blue, u16 *transp );
+        } vout;
 
         /* Motion compensation plugin */
         struct

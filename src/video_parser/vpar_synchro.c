@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.80 2001/01/24 19:05:55 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.81 2001/02/11 01:15:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -100,7 +100,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "intf_msg.h"
 

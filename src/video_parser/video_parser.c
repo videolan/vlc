@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.72 2001/02/08 17:44:13 massiot Exp $
+ * $Id: video_parser.c,v 1.73 2001/02/11 01:15:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -40,7 +40,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 #include "modules.h"
 
 #include "intf_msg.h"
@@ -104,7 +103,7 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     /*
      * Choose the best motion compensation module
      */
-    p_vpar->p_motion_module = module_Need( p_main->p_module_bank,
+    p_vpar->p_motion_module = module_Need( p_main->p_bank,
                                            MODULE_CAPABILITY_MOTION, NULL );
 
     if( p_vpar->p_motion_module == NULL )
@@ -170,13 +169,13 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
      /*
       * Choose the best IDCT module
       */
-    p_vpar->p_idct_module = module_Need( p_main->p_module_bank,
+    p_vpar->p_idct_module = module_Need( p_main->p_bank,
                                          MODULE_CAPABILITY_IDCT, NULL );
 
     if( p_vpar->p_idct_module == NULL )
     {
         intf_ErrMsg( "vpar error: no suitable IDCT module" );
-        module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
+        module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
         free( p_vpar );
         return( 0 );
     }
@@ -193,8 +192,8 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
                             (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread");
-        module_Unneed( p_main->p_module_bank, p_vpar->p_idct_module );
-        module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
+        module_Unneed( p_main->p_bank, p_vpar->p_idct_module );
+        module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
         free( p_vpar );
         return( 0 );
     }
@@ -511,8 +510,8 @@ static void EndThread( vpar_thread_t *p_vpar )
     
     vlc_mutex_destroy( &(p_vpar->synchro.fifo_lock) );
     
-    module_Unneed( p_main->p_module_bank, p_vpar->p_idct_module );
-    module_Unneed( p_main->p_module_bank, p_vpar->p_motion_module );
+    module_Unneed( p_main->p_bank, p_vpar->p_idct_module );
+    module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
 
     free( p_vpar );
 

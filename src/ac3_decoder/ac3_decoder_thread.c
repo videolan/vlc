@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.23 2001/01/05 18:46:44 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.24 2001/02/11 01:15:10 sam Exp $
  *
  * Authors:
  *
@@ -44,7 +44,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 

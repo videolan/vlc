@@ -27,7 +27,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "intf_msg.h"
 

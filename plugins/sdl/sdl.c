@@ -36,14 +36,12 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "plugins.h"
 
-#include "interface.h"
 #include "audio_output.h"
+
 #include "video.h"
 #include "video_output.h"
 
-/* audio includes */
 #include "modules.h"
 #include "modules_inner.h"
 
@@ -59,6 +57,7 @@ MODULE_CONFIG_END
  * Capabilities defined in the other files.
  ******************************************************************************/
 extern void aout_getfunctions( function_list_t * p_function_list );
+extern void vout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -75,6 +74,7 @@ int InitModule( module_t * p_module )
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_VOUT
                                 | MODULE_CAPABILITY_AOUT;
 
     return( 0 );
@@ -97,6 +97,7 @@ int ActivateModule( module_t * p_module )
     }
 
     aout_getfunctions( &p_module->p_functions->aout );
+    vout_getfunctions( &p_module->p_functions->vout );
 
     p_module->p_config = p_config;
 
@@ -116,83 +117,4 @@ int DeactivateModule( module_t * p_module )
 
     return( 0 );
 }
-
-/* old plugin API */
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static void vout_GetPlugin( p_vout_thread_t p_vout );
-static void intf_GetPlugin( p_intf_thread_t p_intf );
-
-/* Video output */
-int     vout_SDLCreate       ( vout_thread_t *p_vout, char *psz_display,
-                               int i_root_window, void *p_data );
-int     vout_SDLInit         ( p_vout_thread_t p_vout );
-void    vout_SDLEnd          ( p_vout_thread_t p_vout );
-void    vout_SDLDestroy      ( p_vout_thread_t p_vout );
-int     vout_SDLManage       ( p_vout_thread_t p_vout );
-void    vout_SDLDisplay      ( p_vout_thread_t p_vout );
-void    vout_SDLSetPalette   ( p_vout_thread_t p_vout,
-                               u16 *red, u16 *green, u16 *blue, u16 *transp );
-/* Interface */
-int     intf_SDLCreate       ( p_intf_thread_t p_intf );
-void    intf_SDLDestroy      ( p_intf_thread_t p_intf );
-void    intf_SDLManage       ( p_intf_thread_t p_intf );
-
-
-/*****************************************************************************
- * GetConfig: get the plugin structure and configuration
- *****************************************************************************/
-plugin_info_t * GetConfig( void )
-{
-    plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
-
-    p_info->psz_name    = "SDL (video)";
-    p_info->psz_version = VERSION;
-    p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
-
-    p_info->aout_GetPlugin = NULL;
-    p_info->vout_GetPlugin = vout_GetPlugin;
-    p_info->intf_GetPlugin = intf_GetPlugin;
-    p_info->yuv_GetPlugin = NULL;
-  
-    
-    /* if the SDL libraries are there, assume we can enter the
-     * initialization part at least, even if we fail afterwards */
-    
-    p_info->i_score = 0x100;
-    
-    /* If this plugin was requested, score it higher */
-    if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
-    {
-        p_info->i_score += 0x200;
-    }
-
-    return( p_info );
-}
-
-/*****************************************************************************
- * Following functions are only called through the p_info structure
- *****************************************************************************/
-
-static void vout_GetPlugin( p_vout_thread_t p_vout )
-{
-    p_vout->p_sys_create  = vout_SDLCreate;
-    p_vout->p_sys_init    = vout_SDLInit;
-    p_vout->p_sys_end     = vout_SDLEnd;
-    p_vout->p_sys_destroy = vout_SDLDestroy;
-    p_vout->p_sys_manage  = vout_SDLManage;
-    p_vout->p_sys_display = vout_SDLDisplay;
-    p_vout->p_set_palette = vout_SDLSetPalette;
-
-}
-
-static void intf_GetPlugin( p_intf_thread_t p_intf )
-{
-    p_intf->p_sys_create  = intf_SDLCreate;
-    p_intf->p_sys_destroy = intf_SDLDestroy;
-    p_intf->p_sys_manage  = intf_SDLManage;
-}
-
 

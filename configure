@@ -22,7 +22,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --disable-optimizations Disable compiler optimizations (default enabled)"
 ac_help="$ac_help
-  --disable-dummy         dummy audio and video support (default enabled)"
+  --enable-dummy          dummy audio and video support (default disabled)"
 ac_help="$ac_help
   --disable-null          Null module (default enabled)"
 ac_help="$ac_help
@@ -34,13 +34,13 @@ ac_help="$ac_help
 ac_help="$ac_help
   --with-ggi[=name]       GGI support (default disabled)"
 ac_help="$ac_help
-  --with-sdl[=name]       SDL support (default disabled)"
+  --with-sdl[=name]       SDL support (default enabled)"
 ac_help="$ac_help
   --with-glide[=name]     Glide (3dfx) support (default disabled)"
 ac_help="$ac_help
-  --enable-gnome          Gnome support (default disabled)"
+  --disable-gnome         Gnome support (default enabled)"
 ac_help="$ac_help
-  --disable-x11           X11 support (default enabled)"
+  --enable-x11            X11 support (default disabled)"
 ac_help="$ac_help
   --enable-alsa           Alsa sound drivers support (Only for linux) (default disabled)"
 
@@ -3419,10 +3419,9 @@ else
 # Check whether --enable-dummy or --disable-dummy was given.
 if test "${enable_dummy+set}" = set; then
   enableval="$enable_dummy"
-  :
+  if test x$enable_dummy = xyes; then PLUGINS=${PLUGINS}"dummy "; fi
 fi
 
-if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
 # Check whether --enable-null or --disable-null was given.
 if test "${enable_null+set}" = set; then
   enableval="$enable_null"
@@ -3473,6 +3472,11 @@ if test "${with_sdl+set}" = set; then
     fi 
 fi
 
+    if test "x$withval" == "x";
+    then
+      PLUGINS=${PLUGINS}"sdl "
+      LIB_SDL="-lSDL"
+    fi
 # Check whether --with-glide or --without-glide was given.
 if test "${with_glide+set}" = set; then
   withval="$with_glide"
@@ -3488,32 +3492,33 @@ fi
 # Check whether --enable-gnome or --disable-gnome was given.
 if test "${enable_gnome+set}" = set; then
   enableval="$enable_gnome"
-  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi
-fi
-
-# Check whether --enable-x11 or --disable-x11 was given.
-if test "${enable_x11+set}" = set; then
-  enableval="$enable_x11"
   :
 fi
 
-if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
+if test x$enable_gnome != xno; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi
+# Check whether --enable-x11 or --disable-x11 was given.
+if test "${enable_x11+set}" = set; then
+  enableval="$enable_x11"
+  if test x$enable_x11 = xyes; then PLUGINS=${PLUGINS}"x11 "; fi
+fi
+
+
 # Check whether --enable-alsa or --disable-alsa was given.
 if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3507: checking for sys/asoundlib.h" >&5
+echo "configure:3512: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3512 "configure"
+#line 3517 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3517: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3522: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3530,7 +3535,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3534: checking for main in -lasound" >&5
+echo "configure:3539: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3538,14 +3543,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3542 "configure"
+#line 3547 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3549: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3554: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

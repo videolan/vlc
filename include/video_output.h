@@ -112,18 +112,6 @@ typedef struct vout_buffer_s
  * is represented by a video output thread, and described using the following
  * structure.
  *****************************************************************************/
-typedef int  (vout_sys_create_t)    ( p_vout_thread_t p_vout,
-                                      char *psz_display,
-                                      int i_root_window, void *p_data );
-typedef int  (vout_sys_init_t)      ( p_vout_thread_t p_vout );
-typedef void (vout_sys_end_t)       ( p_vout_thread_t p_vout );
-typedef void (vout_sys_destroy_t)   ( p_vout_thread_t p_vout );
-typedef int  (vout_sys_manage_t)    ( p_vout_thread_t p_vout );
-typedef void (vout_sys_display_t)   ( p_vout_thread_t p_vout );
-
-typedef void (vout_set_palette_t)   ( p_vout_thread_t p_vout, u16 *red,
-                                      u16 *green, u16 *blue, u16 *transp );
-
 typedef struct vout_thread_s
 {
     /* Thread properties and lock */
@@ -165,15 +153,16 @@ typedef struct vout_thread_s
     u32                 i_gray_pixel;                                /* gray */
     u32                 i_blue_pixel;                                /* blue */
 
-    /* Plugins */
-    vout_sys_create_t *     p_sys_create;          /* allocate output method */
-    vout_sys_init_t *       p_sys_init;          /* initialize output method */
-    vout_sys_end_t *        p_sys_end;            /* terminate output method */
-    vout_sys_destroy_t *    p_sys_destroy;          /* destroy output method */
-    vout_sys_manage_t *     p_sys_manage;                   /* handle events */
-    vout_sys_display_t *    p_sys_display;         /* display rendered image */
-
-    vout_set_palette_t *    p_set_palette;               /* set 8bpp palette */
+    /* Plugin used and shortcuts to access its capabilities */
+    struct module_s *   p_module;
+    int              ( *pf_create )     ( struct vout_thread_s * );
+    int              ( *pf_init )       ( struct vout_thread_s * );
+    void             ( *pf_end )        ( struct vout_thread_s * );
+    void             ( *pf_destroy )    ( struct vout_thread_s * );
+    int              ( *pf_manage )     ( struct vout_thread_s * );
+    void             ( *pf_display )    ( struct vout_thread_s * );
+    void             ( *pf_setpalette ) ( struct vout_thread_s *, u16 *red,
+                                          u16 *green, u16 *blue, u16 *transp );
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */
@@ -243,17 +232,16 @@ typedef struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vout_thread_t * vout_CreateThread       ( char *psz_display, int i_root_window,
-                                          int i_width, int i_height, int *pi_status,
-                                          int i_method, void *p_data );
-void            vout_DestroyThread      ( vout_thread_t *p_vout, int *pi_status );
-picture_t *     vout_CreatePicture      ( vout_thread_t *p_vout, int i_type,
-                                          int i_width, int i_height );
-void            vout_DestroyPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
-void            vout_DisplayPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
-void            vout_DatePicture        ( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date );
-void            vout_LinkPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
-void            vout_UnlinkPicture      ( vout_thread_t *p_vout, picture_t *p_pic );
+vout_thread_t * vout_CreateThread   ( int *pi_status );
+void            vout_DestroyThread  ( vout_thread_t *p_vout, int *pi_status );
+picture_t *     vout_CreatePicture  ( vout_thread_t *p_vout, int i_type,
+                                      int i_width, int i_height );
+void            vout_DestroyPicture ( vout_thread_t *p_vout, picture_t *p_pic );
+void            vout_DisplayPicture ( vout_thread_t *p_vout, picture_t *p_pic );
+void            vout_DatePicture    ( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date );
+void            vout_LinkPicture    ( vout_thread_t *p_vout, picture_t *p_pic );
+void            vout_UnlinkPicture  ( vout_thread_t *p_vout, picture_t *p_pic );
+
 subpicture_t *  vout_CreateSubPicture   ( vout_thread_t *p_vout, int i_type, int i_size );
 void            vout_DestroySubPicture  ( vout_thread_t *p_vout, subpicture_t *p_subpic );
 void            vout_DisplaySubPicture  ( vout_thread_t *p_vout, subpicture_t *p_subpic );

@@ -39,7 +39,7 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+
 #include "intf_msg.h"
 #include "interface.h"
 #include "intf_console.h"
@@ -224,7 +224,7 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
 {
     va_list ap;
     
-    if( i_level >= p_main->p_intf->i_warning_level )
+    if( i_level >= p_main->i_warning_level )
     {
         va_start( ap, psz_format );
         QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
@@ -316,7 +316,7 @@ void intf_WarnMsgImm( int i_level, char *psz_format, ... )
 {
     va_list ap;
 
-    if( i_level >= p_main->p_intf->i_warning_level )
+    if( i_level >= p_main->i_warning_level )
     {
         va_start( ap, psz_format );
         QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );

@@ -1,7 +1,8 @@
 /*****************************************************************************
- * intf_gnome_thread.h: Gnome thread
+ * gnome_sys.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: gnome_sys.h,v 1.1 2001/02/11 01:15:10 sam Exp $
  *
  * Authors:
  *
@@ -17,18 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Boston, MA 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gnome interface
  *****************************************************************************/
-typedef struct gnome_thread_s
+typedef struct intf_sys_s
 {
-    vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
-
     /* special actions */
     vlc_mutex_t         change_lock;                      /* the change lock */
 
@@ -43,16 +40,18 @@ typedef struct gnome_thread_s
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
     boolean_t           b_playlist;                    /* display playlist ? */
 
+    /* intf_Manage callback timeout */
+    int                 i_timeout;
+
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */
     GtkWidget *         p_popup;                               /* popup menu */
     GtkWidget *         p_playlist;                              /* playlist */
     GtkWidget *         p_about;                             /* about window */
 
-} gnome_thread_t;
+    /* XXX: ugly kludge */
+    void             ( *pf_gtk_callback ) ( void );
+    void             ( *pf_gdk_callback ) ( void );
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-void        GnomeThread              ( gnome_thread_t *p_gnome );
+} intf_sys_t;
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.78 2001/02/08 13:52:35 massiot Exp $
+ * $Id: input.c,v 1.79 2001/02/11 01:15:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -115,7 +115,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
 
     /* Initialize default settings for spawned decoders */
     p_input->p_default_aout = p_main->p_aout;
-    p_input->p_default_vout = p_main->p_intf->p_vout;
+    p_input->p_default_vout = p_main->p_vout;
 
     /* Create thread and set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
@@ -268,7 +268,7 @@ static void InitThread( input_thread_t * p_input )
     p_input->c_packets_trashed          = 0;
 #endif
 
-    p_input->p_input_module = module_Need( p_main->p_module_bank,
+    p_input->p_input_module = module_Need( p_main->p_bank,
                                            MODULE_CAPABILITY_INPUT, NULL );
 
     if( p_input->p_input_module == NULL )
@@ -297,7 +297,7 @@ static void InitThread( input_thread_t * p_input )
 
     if( p_input->b_error )
     {
-        module_Unneed( p_main->p_module_bank, p_input->p_input_module );
+        module_Unneed( p_main->p_bank, p_input->p_input_module );
     }
     else
     {
@@ -352,7 +352,7 @@ static void EndThread( input_thread_t * p_input )
     p_input->pf_end( p_input );
 
     /* Release modules */
-    module_Unneed( p_main->p_module_bank, p_input->p_input_module );
+    module_Unneed( p_main->p_bank, p_input->p_input_module );
 
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );

@@ -95,7 +95,7 @@ void module_InitBank( module_bank_t * p_bank )
     p_bank->first = NULL;
     vlc_mutex_init( &p_bank->lock );
 
-    intf_Msg( "module: module bank initialized" );
+    intf_WarnMsg( 1, "module: module bank initialized" );
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
@@ -308,7 +308,11 @@ module_t * module_Need( module_bank_t *p_bank,
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
 
-    intf_WarnMsg( 1, "module: locking module `%s'", p_bestmodule->psz_name );
+    if( p_bestmodule != NULL )
+    {
+        intf_WarnMsg( 1, "module: locking module `%s'",
+                      p_bestmodule->psz_name );
+    }
 
     /* Don't forget that the module is still locked if bestmodule != NULL */
     return( p_bestmodule );
@@ -357,8 +361,8 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     if( module_load( psz_filename, &handle ) )
     {
         /* The dynamic module couldn't be opened */
-        intf_ErrMsg( "module warning: cannot open %s (%s)",
-                     psz_filename, module_error() );
+        intf_WarnMsgImm( 1, "module warning: cannot open %s (%s)",
+                         psz_filename, module_error() );
         return( -1 );
     }
 

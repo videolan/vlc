@@ -55,7 +55,7 @@
 int vout_InitYUV( vout_thread_t *p_vout )
 {
     /* Choose the best module */
-    p_vout->yuv.p_module = module_Need( p_main->p_module_bank,
+    p_vout->yuv.p_module = module_Need( p_main->p_bank,
                                         MODULE_CAPABILITY_YUV, NULL );
 
     if( p_vout->yuv.p_module == NULL )
@@ -93,6 +93,6 @@ int vout_ResetYUV( vout_thread_t *p_vout )
 void vout_EndYUV( vout_thread_t *p_vout )
 {
     p_vout->yuv.pf_end( p_vout );
-    module_Unneed( p_main->p_module_bank, p_vout->yuv.p_module );
+    module_Unneed( p_main->p_bank, p_vout->yuv.p_module );
 }
 

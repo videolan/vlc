@@ -41,7 +41,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "modules.h"
+
 #include "video.h"
 #include "video_output.h"
 #include "video_text.h"
@@ -49,6 +50,7 @@
 #include "video_yuv.h"
 
 #include "intf_msg.h"
+
 #include "main.h"
 
 /*****************************************************************************
@@ -90,15 +92,11 @@ static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
-                          int i_width, int i_height, int *pi_status,
-                          int i_method, void *p_data )
+vout_thread_t * vout_CreateThread   ( int *pi_status )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
-    typedef void    ( vout_getplugin_t ) ( vout_thread_t * p_vout );
     int             i_status;                               /* thread status */
     int             i_index;               /* index for array initialization */
-    int             i_best_index = 0, i_best_score = 0;
 
     /* Allocate descriptor */
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
@@ -109,37 +107,31 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
 
-    p_vout->p_set_palette       = SetPalette;
+    /* Choose the best module */
+    p_vout->p_module = module_Need( p_main->p_bank,
+                                    MODULE_CAPABILITY_VOUT, NULL );
 
-    /* Get a suitable video plugin */
-    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
+    if( p_vout->p_module == NULL )
     {
-        /* If there's a plugin in p_info ... */
-        if( p_main->p_bank->p_info[ i_index ] != NULL )
-        {
-            /* ... and if this plugin provides the functions we want ... */
-            if( p_main->p_bank->p_info[ i_index ]->vout_GetPlugin != NULL )
-            {
-                /* ... and if this plugin has a good score ... */
-                if( p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
-                {
-                    /* ... then take it */
-                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
-                    i_best_index = i_index;
-                }
-            }
-        }
-    }
-
-    if( i_best_score == 0 )
-    {
+        intf_ErrMsg( "vout error: no suitable vout module" );
         free( p_vout );
         return( NULL );
     }
 
-    /* Get the plugin functions */
-    ( (vout_getplugin_t *)
-      p_main->p_bank->p_info[ i_best_index ]->vout_GetPlugin )( p_vout );
+#define f p_vout->p_module->p_functions->vout.functions.vout
+    p_vout->pf_create     = f.pf_create;
+    p_vout->pf_init       = f.pf_init;
+    p_vout->pf_end        = f.pf_end;
+    p_vout->pf_destroy    = f.pf_destroy;
+    p_vout->pf_manage     = f.pf_manage;
+    p_vout->pf_display    = f.pf_display;
+    p_vout->pf_setpalette = f.pf_setpalette;
+#undef f
+
+    if( p_vout->pf_setpalette == NULL )
+    {
+        p_vout->pf_setpalette = SetPalette;
+    }
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -153,16 +145,18 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
      * fields will probably be modified by the method, and are only
      * preferences */
     p_vout->i_changes             = 0;
-    p_vout->i_width               = i_width;
-    p_vout->i_height              = i_height;
-    p_vout->i_bytes_per_line      = i_width * 2;
+    p_vout->i_width               = main_GetIntVariable( VOUT_WIDTH_VAR,
+                                                         VOUT_WIDTH_DEFAULT );
+    p_vout->i_height              = main_GetIntVariable( VOUT_HEIGHT_VAR,
+                                                         VOUT_HEIGHT_DEFAULT );
+    p_vout->i_bytes_per_line      = p_vout->i_width * 2;
     p_vout->i_screen_depth        = 15;
     p_vout->i_bytes_per_pixel     = 2;
     p_vout->f_gamma               = VOUT_GAMMA;
     p_vout->b_need_render         = 1;
 
     p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
-                                                       VOUT_GRAYSCALE_DEFAULT );
+                                                     VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info                = 0;
     p_vout->b_interface           = 0;
     p_vout->b_scale               = 1;
@@ -199,8 +193,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
-    if( p_vout->p_sys_create( p_vout, psz_display, i_root_window, p_data ) )
+    if( p_vout->pf_create( p_vout ) )
     {
+        module_Unneed( p_main->p_bank, p_vout->p_module );
         free( p_vout );
         return( NULL );
     }
@@ -235,7 +230,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( p_vout->p_default_font == NULL )
     {
         intf_ErrMsg( "vout error: could not load default font" );
-        p_vout->p_sys_destroy( p_vout );
+        p_vout->pf_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -248,7 +243,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     {
         intf_ErrMsg( "vout error: could not load large font" );
         vout_UnloadFont( p_vout->p_default_font );
-        p_vout->p_sys_destroy( p_vout );
+        p_vout->pf_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -264,7 +259,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         intf_ErrMsg("vout error: %s", strerror(ENOMEM));
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
-        p_vout->p_sys_destroy( p_vout );
+        p_vout->pf_destroy( p_vout );
         free( p_vout );
         return( NULL );
     }
@@ -930,7 +925,7 @@ static int InitThread( vout_thread_t *p_vout )
 #endif
 
    /* Initialize output method - this function issues its own error messages */
-    if( p_vout->p_sys_init( p_vout ) )
+    if( p_vout->pf_init( p_vout ) )
     {
         return( 1 );
     }
@@ -1191,7 +1186,7 @@ static void RunThread( vout_thread_t *p_vout)
 #endif
         if( b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ )
         {
-            p_vout->p_sys_display( p_vout );
+            p_vout->pf_display( p_vout );
 #ifndef SYS_BEOS
             p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
 #endif
@@ -1217,7 +1212,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Check events and manage thread
          */
-        if( p_vout->p_sys_manage( p_vout ) | Manage( p_vout ) )
+        if( p_vout->pf_manage( p_vout ) | Manage( p_vout ) )
         {
             /* A fatal error occured, and the thread must terminate immediately,
              * without displaying anything - setting b_error to 1 cause the
@@ -1299,7 +1294,7 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* Destroy translation tables */
     vout_EndYUV( p_vout );
-    p_vout->p_sys_end( p_vout );
+    p_vout->pf_end( p_vout );
 
     /* Release the change lock */
     vlc_mutex_unlock( &p_vout->change_lock );
@@ -1321,13 +1316,16 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     /* Destroy thread structures allocated by Create and InitThread */
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font );
-    p_vout->p_sys_destroy( p_vout );
+    p_vout->pf_destroy( p_vout );
 
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->subpicture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
                 
+    /* Release the module */
+    module_Unneed( p_main->p_bank, p_vout->p_module );
+
     /* Free structure */
     free( p_vout );
     *pi_status = i_status;
@@ -2076,7 +2074,7 @@ static int Manage( vout_thread_t *p_vout )
     /* Detect unauthorized changes */
     if( p_vout->i_changes )
     {
-        /* Some changes were not acknowledged by p_vout->p_sys_manage or this
+        /* Some changes were not acknowledged by p_vout->pf_manage or this
          * function, it means they should not be authorized */
         intf_ErrMsg( "vout error: unauthorized changes in the vout thread" );
         return( 1 );

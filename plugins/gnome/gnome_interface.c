@@ -13,9 +13,9 @@
 
 #include <gnome.h>
 
-#include "intf_gnome_callbacks.h"
-#include "intf_gnome_interface.h"
-#include "intf_gnome_support.h"
+#include "gnome_callbacks.h"
+#include "gnome_interface.h"
+#include "gnome_support.h"
 
 static GnomeUIInfo file_menu_menu_uiinfo[] =
 {

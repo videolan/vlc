@@ -43,11 +43,6 @@
  * This structe describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
-typedef int   ( intf_sys_create_t )   ( p_intf_thread_t p_intf );
-typedef void  ( intf_sys_destroy_t )  ( p_intf_thread_t p_intf );
-typedef void  ( intf_sys_manage_t )   ( p_intf_thread_t p_intf );
-
-
 typedef struct _keyparam
 {
     int key;
@@ -72,10 +67,14 @@ typedef struct intf_thread_s
     p_intf_sys_t        p_sys;                           /* system interface */
     p_intf_key          p_keys;
     
-    /* Plugin */
-    intf_sys_create_t *     p_sys_create;         /* create interface thread */
-    intf_sys_manage_t *     p_sys_manage;                       /* main loop */
-    intf_sys_destroy_t *    p_sys_destroy;              /* destroy interface */
+    /* Plugin used and shortcuts to access its capabilities */
+    struct module_s *   p_module;
+    int              ( *pf_open )   ( struct intf_thread_s * );
+    void             ( *pf_close )  ( struct intf_thread_s * );
+    void             ( *pf_run )    ( struct intf_thread_s * );
+
+    /* Interface callback */
+    void             ( *pf_manage ) ( struct intf_thread_s * );
 
     /* XXX: Channels array - new API */
   //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
@@ -84,24 +83,24 @@ typedef struct intf_thread_s
     p_intf_channel_t    p_channel;                /* description of channels */
 
     /* Main threads - NULL if not active */
-    p_vout_thread_t     p_vout;
     p_input_thread_t    p_input;
 
     /* Specific functions */
     keyparm (*p_intf_get_key)(struct intf_thread_s *p_intf, int r_key) ;
+
+    /* XXX: new message passing stuff will go here */
+    vlc_mutex_t         change_lock;
+    boolean_t           b_menu_change;
+    boolean_t           b_menu;
     
-    /* Warning messages level */
-    int                 i_warning_level;
 } intf_thread_t;
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
 intf_thread_t * intf_Create             ( void );
-void            intf_Run                ( intf_thread_t * p_intf );
 void            intf_Destroy            ( intf_thread_t * p_intf );
 
-int             intf_SelectChannel      ( intf_thread_t * p_intf, int i_channel );
 int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
 
 void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param);

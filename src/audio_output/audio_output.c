@@ -46,7 +46,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
-#include "plugins.h"
 #include "modules.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
@@ -112,7 +111,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Choose the best module */
-    p_aout->p_module = module_Need( p_main->p_module_bank,
+    p_aout->p_module = module_Need( p_main->p_bank,
                                     MODULE_CAPABILITY_AOUT, NULL );
 
     if( p_aout->p_module == NULL )
@@ -135,7 +134,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
      */
     if ( p_aout->pf_open( p_aout ) )
     {
-        module_Unneed( p_main->p_module_bank, p_aout->p_module );
+        module_Unneed( p_main->p_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -146,7 +145,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if ( p_aout->pf_setformat( p_aout ) )
     {
         p_aout->pf_close( p_aout );
-        module_Unneed( p_main->p_module_bank, p_aout->p_module );
+        module_Unneed( p_main->p_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -160,7 +159,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if( aout_SpawnThread( p_aout ) )
     {
         p_aout->pf_close( p_aout );
-        module_Unneed( p_main->p_module_bank, p_aout->p_module );
+        module_Unneed( p_main->p_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -338,7 +337,7 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     p_aout->pf_close( p_aout );
 
     /* Release the aout module */
-    module_Unneed( p_main->p_module_bank, p_aout->p_module );
+    module_Unneed( p_main->p_bank, p_aout->p_module );
 
     /* Free structure */
     free( p_aout );

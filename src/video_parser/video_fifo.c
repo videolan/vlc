@@ -2,7 +2,7 @@
  * video_fifo.c : video FIFO management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_fifo.c,v 1.28 2001/01/18 05:13:23 sam Exp $
+ * $Id: video_fifo.c,v 1.29 2001/02/11 01:15:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -30,7 +30,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "intf_msg.h"
 

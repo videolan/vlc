@@ -39,7 +39,9 @@ typedef struct
     char **                ppsz_argv;              /* command line arguments */
     char **                ppsz_env;                /* environment variables */
     char *                 psz_arg0;         /* program name (whithout path) */
+
     int                    i_cpu_capabilities;             /* CPU extensions */
+    int                    i_warning_level;        /* warning messages level */
 
     /* Generic settings */
     boolean_t              b_audio;             /* is audio output allowed ? */
@@ -48,13 +50,13 @@ typedef struct
     boolean_t              b_dvd;                              /* DVD mode ? */
 
     /* Unique threads */
+    p_vout_thread_t        p_vout;                    /* video output thread */
     p_aout_thread_t        p_aout;                    /* audio output thread */
     p_intf_thread_t        p_intf;                  /* main interface thread */
 
     /* Shared data - these structures are accessed directly from p_main by
      * several modules */
-    struct module_bank_s * p_module_bank;                     /* module bank */
-    p_plugin_bank_t        p_bank;                            /* plugin bank */
+    struct module_bank_s * p_bank;                            /* module bank */
     p_playlist_t           p_playlist;                           /* playlist */
     p_intf_msg_t           p_msg;                 /* messages interface data */
     p_input_vlan_t         p_vlan;                      /* vlan library data */

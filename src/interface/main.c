@@ -44,8 +44,8 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"                                              /* TestCPU() */
-#include "plugins.h"
 #include "modules.h"
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
@@ -54,6 +54,9 @@
 #include "interface.h"
 
 #include "audio_output.h"
+
+#include "video.h"
+#include "video_output.h"
 
 #ifdef SYS_BEOS
 #include "beos_specific.h"
@@ -167,6 +170,7 @@ main_t *p_main;
 static void SetDefaultConfiguration ( void );
 static int  GetConfiguration        ( int i_argc, char *ppsz_argv[],
                                       char *ppsz_env[] );
+static int  GetFilenames            ( int i_argc, char *ppsz_argv[] );
 static void Usage                   ( int i_fashion );
 static void Version                 ( void );
 
@@ -198,15 +202,15 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #endif
 
     p_main->i_cpu_capabilities = CPUCapabilities();
-
+    
     /*
      * Test if our code is likely to run on this CPU 
      */
 #if defined( __pentium__ ) || defined( __pentiumpro__ )
     if( ! TestCPU( CPU_CAPABILITY_586 ) )
     {
-        fprintf( stderr, "Sorry, this program needs a Pentium CPU.\n"
-                         "Please try a version without Pentium support.\n" );
+        fprintf( stderr, "error: this program needs a Pentium CPU,\n"
+                         "please try a version without Pentium support\n" );
         return( 1 );
     }
 #endif
@@ -214,8 +218,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #ifdef HAVE_MMX
     if( ! TestCPU( CPU_CAPABILITY_MMX ) )
     {
-        fprintf( stderr, "Sorry, this program needs MMX extensions.\n"
-                         "Please try a version without MMX support.\n" );
+        fprintf( stderr, "error: this program needs MMX extensions,\n"
+                         "please try a version without MMX support\n" );
         return( 1 );
     }
 #endif
@@ -234,6 +238,18 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_MsgImm( COPYRIGHT_MESSAGE );
 
     /*
+     * Read configuration
+     */
+    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
+    {
+        intf_MsgDestroy();
+        return( errno );
+    }
+
+    p_main->i_warning_level = main_GetIntVariable( INTF_WARNING_VAR,
+                                                   INTF_WARNING_DEFAULT );
+
+    /*
      * Initialize playlist and get commandline files
      */
     p_main->p_playlist = intf_PlstCreate( );
@@ -246,40 +262,22 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     intf_PlstInit( p_main->p_playlist );
 
     /*
-     * Read configuration
+     * Get input filenames given as commandline arguments
      */
-    if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
-    {
-        intf_MsgDestroy();
-        return( errno );
-    }
-
-    /*
-     * Initialize plugin bank
-     */
-    p_main->p_bank = bank_Create( );
-    if( !p_main->p_bank )
-    {
-        intf_ErrMsg( "plugin error: plugin bank initialization failed" );
-        intf_PlstDestroy( p_main->p_playlist );
-        intf_MsgDestroy();
-        return( errno );
-    }
-    bank_Init( p_main->p_bank );
+    GetFilenames( i_argc, ppsz_argv );
 
     /*
      * Initialize module bank
      */
-    p_main->p_module_bank = module_CreateBank( );
-    if( !p_main->p_module_bank )
+    p_main->p_bank = module_CreateBank( );
+    if( !p_main->p_bank )
     {
         intf_ErrMsg( "module error: module bank initialization failed" );
-        bank_Destroy( p_main->p_bank );
         intf_PlstDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
     }
-    module_InitBank( p_main->p_module_bank );
+    module_InitBank( p_main->p_bank );
 
     /*
      * Initialize shared resources and libraries
@@ -299,43 +297,74 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * Run interface
      */
     p_main->p_intf = intf_Create();
-
-    if( p_main->p_intf != NULL )
+    if( !p_main->p_intf )
     {
-        /*
-         * Set signal handling policy for all threads
-         */
-        InitSignalHandler();
+        intf_ErrMsg( "intf error: interface initialization failed" );
+        module_DestroyBank( p_main->p_bank );
+        intf_PlstDestroy( p_main->p_playlist );
+        intf_MsgDestroy();
+        return( errno );
+    }
 
-        /*
-         * Open audio device and start aout thread
-         */
-        if( p_main->b_audio )
+    /*
+     * Set signal handling policy for all threads
+     */
+    InitSignalHandler();
+
+    /*
+     * Open audio device and start aout thread
+     */
+    if( p_main->b_audio )
+    {
+        p_main->p_aout = aout_CreateThread( NULL );
+        if( p_main->p_aout == NULL )
         {
-            p_main->p_aout = aout_CreateThread( NULL );
-            if( p_main->p_aout == NULL )
-            {
-                /* On error during audio initialization, switch off audio */
-                intf_ErrMsg( "aout error: audio initialization failed,"
-                             " audio is deactivated" );
-                p_main->b_audio = 0;
-            }
+            /* On error during audio initialization, switch off audio */
+            intf_ErrMsg( "aout error: audio initialization failed,"
+                         " audio is deactivated" );
+            p_main->b_audio = 0;
         }
+    }
 
-        /*
-         * This is the main loop
-         */
-        intf_Run( p_main->p_intf );
-
-        intf_Destroy( p_main->p_intf );
-
-        /*
-         * Close audio device
-         */
-        if( p_main->b_audio )
+    /*
+     * Open video device and start aout thread
+     */
+    if( p_main->b_video )
+    {
+        p_main->p_vout = vout_CreateThread( NULL );
+        if( p_main->p_vout == NULL )
         {
-            aout_DestroyThread( p_main->p_aout, NULL );
+            /* On error during video initialization, switch off audio */
+            intf_ErrMsg( "vout error: video initialization failed,"
+                         " video is deactivated" );
+            p_main->b_video = 0;
         }
+    }
+
+    /* Flush messages before entering the main loop */
+    intf_FlushMsg();
+
+    /*
+     * This is the main loop
+     */
+    p_main->p_intf->pf_run( p_main->p_intf );
+
+    intf_Destroy( p_main->p_intf );
+
+    /*
+     * Close video device
+     */
+    if( p_main->b_video )
+    {
+        vout_DestroyThread( p_main->p_vout, NULL );
+    }
+
+    /*
+     * Close audio device
+     */
+    if( p_main->b_audio )
+    {
+        aout_DestroyThread( p_main->p_aout, NULL );
     }
 
     /*
@@ -352,12 +381,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free module bank
      */
-    module_DestroyBank( p_main->p_module_bank );
-
-    /*
-     * Free plugin bank
-     */
-    bank_Destroy( p_main->p_bank );
+    module_DestroyBank( p_main->p_bank );
 
     /*
      * Free playlist
@@ -374,7 +398,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Terminate messages interface and program
      */
-    intf_Msg( "intf: program terminated." );
+    intf_Msg( "intf: program terminated" );
     intf_MsgDestroy();
 
     return( 0 );
@@ -493,7 +517,7 @@ static void SetDefaultConfiguration( void )
  *****************************************************************************/
 static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
-    int c, i_opt;
+    int c;
     char * p_pointer;
 
     /* Set default configuration and copy arguments */
@@ -644,6 +668,17 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         }
     }
 #endif
+    return( 0 );
+}
+
+/*****************************************************************************
+ * GetFilenames: parse command line options which are not flags
+ *****************************************************************************
+ * Parse command line for input files.
+ *****************************************************************************/
+static int GetFilenames( int i_argc, char *ppsz_argv[] )
+{
+    int i_opt;
 
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
@@ -798,7 +833,7 @@ static void InitSignalHandler( void )
 static void SimpleSignalHandler( int i_signal )
 {
     /* Acknowledge the signal received */
-    intf_WarnMsg(0, "intf: ignoring signal %d", i_signal );
+    intf_WarnMsg( 0, "intf: ignoring signal %d", i_signal );
 }
 
 
@@ -810,15 +845,15 @@ static void SimpleSignalHandler( int i_signal )
  *****************************************************************************/
 static void FatalSignalHandler( int i_signal )
 {
-    /* Once a signal has been trapped, the termination sequence will be armed and
-     * following signals will be ignored to avoid sending messages to an interface
-     * having been destroyed */
+    /* Once a signal has been trapped, the termination sequence will be
+     * armed and following signals will be ignored to avoid sending messages
+     * to an interface having been destroyed */
     signal( SIGHUP,  SIG_IGN );
     signal( SIGINT,  SIG_IGN );
     signal( SIGQUIT, SIG_IGN );
 
     /* Acknowledge the signal received */
-    intf_ErrMsgImm("intf error: signal %d received, exiting", i_signal );
+    intf_ErrMsgImm( "intf error: signal %d received, exiting", i_signal );
 
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */

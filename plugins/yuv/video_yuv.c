@@ -227,7 +227,7 @@ static void SetYUV( vout_thread_t *p_vout )
                     transp[ i_index ] = 0;
                 }
                 /* the colors have been allocated, we can set the palette */
-                p_vout->p_set_palette( p_vout, bright, bright, bright, transp );
+                p_vout->pf_setpalette( p_vout, bright, bright, bright, transp );
                 p_vout->i_white_pixel = 0xff;
                 p_vout->i_black_pixel = 0x00;
                 p_vout->i_gray_pixel = 0x44;
@@ -325,7 +325,7 @@ static void SetYUV( vout_thread_t *p_vout )
                 /* the colors have been allocated, we can set the palette */
                 /* there will eventually be a way to know which colors
                  * couldn't be allocated and try to find a replacement */
-                p_vout->p_set_palette( p_vout, red, green, blue, transp );
+                p_vout->pf_setpalette( p_vout, red, green, blue, transp );
 
                 p_vout->i_white_pixel = 0xff;
                 p_vout->i_black_pixel = 0x00;

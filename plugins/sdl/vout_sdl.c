@@ -35,13 +35,33 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
+#include "modules.h"
+
+/* FIXME: it's up to the _interface_ to do this, not the video output */
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "intf_msg.h"
+#include "interface.h"
+/* FIXME: get rid of this */
+#include "keystrokes.h"
 #include "main.h"
+
+/*****************************************************************************
+ * FIXME: this file is ...                                                   *
+ *                                                                           *
+ *    XXX     XXX         XXX XXX     XXX             XXX     XXX     XXX    *
+ *    XXX     XXX     XXX             XXX             XXX     XXX     XXX    *
+ *    XXX     XXX     XXX             XXX                 XXX         XXX    *
+ *    XXX     XXX     XXX     XXX     XXX                 XXX         XXX    *
+ *    XXX     XXX     XXX     XXX     XXX                 XXX                *
+ *        XXX             XXX XXX         XXX XXX         XXX         XXX    *
+ *                                                                           *
+ *****************************************************************************/
 
 /*****************************************************************************
  * vout_sys_t: video output SDL method descriptor
@@ -49,7 +69,6 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
-/* FIXME: SOME CLUELESS MORON DEFINED THIS STRUCTURE IN INTF_SDL.C AS WELL   */
 typedef struct vout_sys_s
 {
     int i_width;
@@ -65,39 +84,73 @@ typedef struct vout_sys_s
 }   vout_sys_t;
 
 /*****************************************************************************
- * Local prototypes
+ * Local prototypes.
  *****************************************************************************/
-static int     SDLOpenDisplay       ( vout_thread_t *p_vout );
-static void    SDLCloseDisplay      ( vout_thread_t *p_vout );
-static void    SDLToggleFullScreen  ( vout_thread_t *p_vout );
-static void    SDLTogglePointer     ( vout_thread_t *p_vout );
+static int  vout_Probe     ( probedata_t *p_data );
+static int  vout_Create    ( struct vout_thread_s * );
+static int  vout_Init      ( struct vout_thread_s * );
+static void vout_End       ( struct vout_thread_s * );
+static void vout_Destroy   ( struct vout_thread_s * );
+static int  vout_Manage    ( struct vout_thread_s * );
+static void vout_Display   ( struct vout_thread_s * );
+
+static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
+static void SDLCloseDisplay     ( vout_thread_t *p_vout );
+
 /*****************************************************************************
- * vout_SDLCreate: allocate SDL video thread output method
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void vout_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = vout_Probe;
+    p_function_list->functions.vout.pf_create     = vout_Create;
+    p_function_list->functions.vout.pf_init       = vout_Init;
+    p_function_list->functions.vout.pf_end        = vout_End;
+    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
+    p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_display    = vout_Display;
+    p_function_list->functions.vout.pf_setpalette = NULL;
+}
+
+/*****************************************************************************
+ * intf_Probe: probe the video driver and return a score
+ *****************************************************************************
+ * This function tries to initialize SDL and returns a score to the
+ * plugin manager so that it can select the best plugin.
+ *****************************************************************************/
+static int vout_Probe( probedata_t *p_data )
+{
+    if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
+    {
+        return( 999 );
+    }
+
+    return( 40 );
+}
+
+/*****************************************************************************
+ * vout_Create: allocate SDL video thread output method
  *****************************************************************************
  * This function allocate and initialize a SDL vout method. It uses some of the
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
-                    int i_root_window, void *p_data )
+int vout_Create( vout_thread_t *p_vout )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
+        intf_ErrMsg( "vout error: can't create p_sys (%s)", strerror(ENOMEM) );
         return( 1 );
     }
-
-    p_vout->p_sys->p_display = NULL;
-    p_vout->p_sys->p_overlay = NULL;
 
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE)
             < 0 )
     {
-        intf_ErrMsg( "error: can't initialize SDL library: %s",
-                     SDL_GetError() );
+        intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -105,8 +158,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     /* Force the software yuv even if it is not used */
     /* If we don't do this, p_vout is not correctly initialized
        and it's impossible to switch between soft/hard yuv */
+    /* FIXME: this is a broken way to do !! fix this !! */
     p_vout->b_need_render = 1;
 
+    p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
     p_vout->p_sys->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                 VOUT_FULLSCREEN_DEFAULT );
     p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
@@ -116,70 +171,221 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
                                 VOUT_HEIGHT_DEFAULT );
 
-    p_vout->p_sys->b_cursor = 0 ;   // TODO should be done with a main_GetInt..
-    
+    p_vout->p_sys->p_display = NULL;
+    p_vout->p_sys->p_overlay = NULL;
+
     if( SDLOpenDisplay(p_vout) )
     {
-      intf_ErrMsg( "error: can't initialize SDL library: %s",
-                   SDL_GetError() );
-      free( p_vout->p_sys );
-      return( 1 );
+        intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
+        free( p_vout->p_sys );
+        return( 1 );
     }
+
+    /* FIXME: get rid of this ASAP, it's FUCKING UGLY */
+    { intf_thread_t * p_intf = p_main->p_intf;
+    /* p_intf->p_intf_getKey = intf_getKey; */
+    intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, 0);
+    intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, 0);
+    /* intf_AssignKey(p_intf,3,'Q'); */
+    intf_AssignKey(p_intf, SDLK_0,      INTF_KEY_SET_CHANNEL,0);
+    intf_AssignKey(p_intf, SDLK_1,      INTF_KEY_SET_CHANNEL,1);
+    intf_AssignKey(p_intf, SDLK_2,      INTF_KEY_SET_CHANNEL,2);
+    intf_AssignKey(p_intf, SDLK_3,      INTF_KEY_SET_CHANNEL,3);
+    intf_AssignKey(p_intf, SDLK_4,      INTF_KEY_SET_CHANNEL,4);
+    intf_AssignKey(p_intf, SDLK_5,      INTF_KEY_SET_CHANNEL,5);
+    intf_AssignKey(p_intf, SDLK_6,      INTF_KEY_SET_CHANNEL,6);
+    intf_AssignKey(p_intf, SDLK_7,      INTF_KEY_SET_CHANNEL,7);
+    intf_AssignKey(p_intf, SDLK_8,      INTF_KEY_SET_CHANNEL,8);
+    intf_AssignKey(p_intf, SDLK_9,      INTF_KEY_SET_CHANNEL,9);
+    intf_AssignKey(p_intf, SDLK_PLUS,   INTF_KEY_INC_VOLUME, 0);
+    intf_AssignKey(p_intf, SDLK_MINUS,  INTF_KEY_DEC_VOLUME, 0);
+    intf_AssignKey(p_intf, SDLK_m,      INTF_KEY_TOGGLE_VOLUME, 0);
+    /* intf_AssignKey(p_intf,'M','M'); */
+    intf_AssignKey(p_intf, SDLK_g,      INTF_KEY_DEC_GAMMA, 0);
+    /* intf_AssignKey(p_intf,'G','G'); */
+    intf_AssignKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, 0);
+    intf_AssignKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, 0);
+    intf_AssignKey(p_intf, SDLK_i,      INTF_KEY_TOGGLE_INFO, 0);
+    intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0); }
 
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SDLInit: initialize SDL video thread output method
+ * vout_Init: initialize SDL video thread output method
  *****************************************************************************
  * This function initialize the SDL display device.
  *****************************************************************************/
-int vout_SDLInit( vout_thread_t *p_vout )
+int vout_Init( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SDLEnd: terminate Sys video thread output method
+ * vout_End: terminate Sys video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-void vout_SDLEnd( vout_thread_t *p_vout )
+void vout_End( vout_thread_t *p_vout )
 {
     SDLCloseDisplay( p_vout );
     SDL_Quit();
 }
 
 /*****************************************************************************
- * vout_SDLDestroy: destroy Sys video thread output method
+ * vout_Destroy: destroy Sys video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-void vout_SDLDestroy( vout_thread_t *p_vout )
+void vout_Destroy( vout_thread_t *p_vout )
 {
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_SDLManage: handle Sys events
+ * vout_Manage: handle Sys events
  *****************************************************************************
  * This function should be called regularly by video output thread. It returns
  * a non null value if an error occured.
  *****************************************************************************/
-int vout_SDLManage( vout_thread_t *p_vout )
+int vout_Manage( vout_thread_t *p_vout )
 {
+    SDL_Event event;                                            /* SDL event */
+    Uint8   i_key;
+    int     i_rate;
+
+    /* FIXME: do this nicely */
+    input_thread_t * p_input = p_main->p_intf->p_input;
+
+    /* Process events */
+    while( SDL_PollEvent(&event) )
+    {
+        switch( event.type )
+        {
+        case SDL_VIDEORESIZE:                          /* Resizing of window */
+            p_vout->i_width = event.resize.w;
+            p_vout->i_height = event.resize.h;
+            p_vout->i_changes |= VOUT_SIZE_CHANGE;
+            break;
+
+        case SDL_MOUSEBUTTONDOWN:
+            switch( event.button.button )
+            {
+            case SDL_BUTTON_MIDDLE:
+                p_vout->i_changes |= VOUT_CURSOR_CHANGE;
+                break;
+
+            case SDL_BUTTON_RIGHT:
+                p_main->p_intf->b_menu_change = 1;
+                break;
+            }
+            break;
+
+        case SDL_QUIT:
+            intf_ProcessKey( p_main->p_intf, SDLK_q );
+            break;
+
+        case SDL_KEYDOWN:                             /* if a key is pressed */
+            i_key = event.key.keysym.sym;
+
+            switch( i_key )
+            {
+            case SDLK_f:                             /* switch to fullscreen */
+                p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                break;
+
+            case SDLK_y:                               /* switch to hard YUV */
+                p_vout->i_changes |= VOUT_YUV_CHANGE;
+                break;
+
+            case SDLK_c:                                 /* toggle grayscale */
+                p_vout->b_grayscale = ! p_vout->b_grayscale;
+               	p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                break;
+
+            case SDLK_i:                                      /* toggle info */
+                p_vout->b_info = ! p_vout->b_info;
+               	p_vout->i_changes |= VOUT_INFO_CHANGE;
+                break;
+
+	    case SDLK_s:                                   /* toggle scaling */
+                p_vout->b_scale = ! p_vout->b_scale;
+               	p_vout->i_changes |= VOUT_SCALE_CHANGE;
+                break;
+
+	    case SDLK_SPACE:                             /* toggle interface */
+                p_vout->b_interface = ! p_vout->b_interface;
+               	p_vout->i_changes |= VOUT_INTF_CHANGE;
+                break;
+
+            /* FIXME : this is temporary */
+            case SDLK_p:
+                if( p_input->stream.control.i_status == PLAYING_S )
+                {
+                    input_Pause( p_input );
+                }
+                else
+                {
+                    input_Play( p_input );
+                }
+                break;
+
+            case SDLK_a:
+                i_rate = p_input->stream.control.i_rate/2;
+                if ( i_rate >= MINIMAL_RATE )
+                {
+                    input_Forward( p_input, i_rate );
+                }
+                break;
+
+            case SDLK_z:
+                i_rate = p_input->stream.control.i_rate*2;
+                if ( i_rate <= MAXIMAL_RATE )
+                {
+                    /* Compensation of int truncature */
+                    if ( i_rate > 500 && i_rate < 1000 )
+                        i_rate = 1000;
+                    input_Forward( p_input, i_rate );
+                }
+                break;
+
+            case SDLK_j:
+                /* Jump forwards */
+                input_Seek( p_input, p_input->stream.i_tell
+                             + p_input->stream.i_size / 20 );
+                                                           /* gabuzomeu */
+                break;
+
+            case SDLK_b:
+                /* Jump backwards */
+                input_Seek( p_input, p_input->stream.i_tell
+                             - p_input->stream.i_size / 20 );
+                break;
+
+            default:
+                if( intf_ProcessKey( p_main->p_intf, (char )i_key ) )
+                {
+                   intf_DbgMsg( "unhandled key '%c' (%i)", (char)i_key, i_key );                }
+                break;
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
 
     /*
      * Size Change 
      */
-    if ( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
         p_vout->p_sys->i_width = p_vout->i_width;
         p_vout->p_sys->i_height = p_vout->i_height;
 
         /* Need to reopen display */
         SDLCloseDisplay( p_vout );
-        if ( SDLOpenDisplay( p_vout ) )
+        if( SDLOpenDisplay( p_vout ) )
         {
           intf_ErrMsg( "error: can't open DISPLAY default display" );
           return( 1 );
@@ -190,52 +396,74 @@ int vout_SDLManage( vout_thread_t *p_vout )
     /*
      * YUV Change 
      */
-    if ( p_vout->i_changes & VOUT_YUV_CHANGE )
+    if( p_vout->i_changes & VOUT_YUV_CHANGE )
     {
-        p_vout->b_need_render = 1 - p_vout->b_need_render;
+        p_vout->b_need_render = ! p_vout->b_need_render;
         
         /* Need to reopen display */
         SDLCloseDisplay( p_vout );
-        if ( SDLOpenDisplay( p_vout ) )
+        if( SDLOpenDisplay( p_vout ) )
         {
           intf_ErrMsg( "error: can't open DISPLAY default display" );
           return( 1 );
         }
         p_vout->i_changes &= ~VOUT_YUV_CHANGE;
     }
-    
+
     /*
      * Fullscreen change
      */
-    if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
+    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        p_vout->p_sys->b_fullscreen = 1 - p_vout->p_sys->b_fullscreen;
-        SDLToggleFullScreen( p_vout );
+        p_vout->p_sys->b_fullscreen = ! p_vout->p_sys->b_fullscreen;
+
+        if( p_vout->p_sys->b_fullscreen )
+        {
+            p_vout->p_sys->b_fullscreen = 0;
+            p_vout->p_sys->b_cursor = 1;
+            SDL_ShowCursor( 1 );
+        }
+        else
+        {
+            p_vout->p_sys->b_fullscreen = 1;
+            p_vout->p_sys->b_cursor = 0;
+            SDL_ShowCursor( 0 );
+        }
+
+        SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
+
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
-
-    
 
     /*
      * Pointer change
      */
-    if ( p_vout->i_changes & VOUT_CURSOR_CHANGE )
+    if( p_vout->i_changes & VOUT_CURSOR_CHANGE )
     {
-        p_vout->p_sys->b_cursor = 1 - p_vout->p_sys->b_cursor;
-        SDLTogglePointer( p_vout );
+        if( p_vout->p_sys->b_cursor )
+        {
+            SDL_ShowCursor( 0 );
+            p_vout->p_sys->b_cursor = 0;
+        }
+        else
+        {
+            SDL_ShowCursor( 1 );
+            p_vout->p_sys->b_cursor = 1;
+        }
+        p_vout->i_changes &= ~VOUT_CURSOR_CHANGE;
     }
     
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_SDLSetPalette: sets an 8 bpp palette
+ * vout_SetPalette: sets an 8 bpp palette
  *****************************************************************************
  * This function sets the palette given as an argument. It does not return
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-void vout_SDLSetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
+void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
                          u16 *blue, u16 *transp)
 {
      /* Create a display surface with a grayscale palette */
@@ -251,25 +479,25 @@ void vout_SDLSetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
     }
     
     /* Set palette */
-    if( SDL_SetColors(p_vout->p_sys->p_display, colors, 0, 256) == 0 )
+    if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
     {
-        intf_ErrMsg( "vout error: failed setting palette\n" );
+        intf_ErrMsg( "vout error: failed setting palette" );
     }
 
 }
 
 /*****************************************************************************
- * vout_SDLDisplay: displays previously rendered output
+ * vout_Display: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to the display, wait until
  * it is displayed and switch the two rendering buffer, preparing next frame.
  *****************************************************************************/
-void vout_SDLDisplay( vout_thread_t *p_vout )
+void vout_Display( vout_thread_t *p_vout )
 {
     SDL_Rect    disp;
     if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)
     {
-        if(p_vout->b_need_render)
+        if( p_vout->b_need_render )
         {  
             /* Change display frame */
             SDL_Flip( p_vout->p_sys->p_display );
@@ -383,8 +611,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         SDL_ShowCursor( 1 );
 
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
-    SDL_EventState(SDL_KEYUP , SDL_IGNORE);                 /* ignore keys up */
+    SDL_EventState(SDL_KEYUP , SDL_IGNORE);                /* ignore keys up */
     SDL_EventState(SDL_MOUSEBUTTONUP, SDL_IGNORE);          
+
     if( p_vout->b_need_render )
     {
         p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
@@ -449,51 +678,13 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
     {
         if( p_vout->p_sys->p_overlay != NULL )
         {            
-            SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
+            SDL_FreeYUVOverlay( p_vout->p_sys->p_overlay );
             p_vout->p_sys->p_overlay = NULL;
         }
+
         SDL_UnlockSurface ( p_vout->p_sys->p_display );
         SDL_FreeSurface( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
 }
 
-/*****************************************************************************
- * SDLToggleFullScreen: toggle fullscreen
- *****************************************************************************
- * This function toggles the fullscreen state of the surface.
- * And  - hide the pointer if switching to fullscreen
- *      - show the pointer if leaving fullscreen state
- *****************************************************************************/
-static void SDLToggleFullScreen( vout_thread_t *p_vout )
-{
-    SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
-
-    if( p_vout->p_sys->b_fullscreen )
-    {
-        p_vout->p_sys->b_cursor=1;
-    }
-    else
-    {
-        p_vout->p_sys->b_cursor=0;
-    }
-    
-    SDLTogglePointer( p_vout );
-}
-
-/*****************************************************************************
- * SDLTogglePointer: Hide/Show mouse pointer
- *****************************************************************************
- * This function hides/shows the mouse pointer inside the main window.
- *****************************************************************************/
-static void SDLTogglePointer( vout_thread_t *p_vout )
-{
-    if( p_vout->p_sys->b_cursor==1 )
-    {
-        SDL_ShowCursor( 0 );
-    }
-    else
-    {
-        SDL_ShowCursor( 1 );
-    }
-}

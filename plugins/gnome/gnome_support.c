@@ -13,7 +13,7 @@
 
 #include <gnome.h>
 
-#include "intf_gnome_support.h"
+#include "gnome_support.h"
 
 /* This is an internally used function to create pixmaps. */
 static GtkWidget* create_dummy_pixmap  (GtkWidget       *widget,

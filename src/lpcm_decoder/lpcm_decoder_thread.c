@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.9 2001/01/05 18:46:44 massiot Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.10 2001/02/11 01:15:11 sam Exp $
  *
  * Authors:
  *
@@ -35,7 +35,6 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 

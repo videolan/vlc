@@ -85,7 +85,7 @@ void intf_PlstInit ( playlist_t * p_playlist )
     /* The playlist is empty */
     p_playlist->p_item = NULL;
 
-    intf_Msg("intf: playlist initialized");
+    intf_WarnMsg( 1, "intf: playlist initialized" );
 }
 
 /*****************************************************************************
@@ -235,7 +235,7 @@ void intf_PlstDestroy( playlist_t * p_playlist )
 
     free( p_playlist );
 
-    intf_Msg("intf: playlist destroyed");
+    intf_WarnMsg( 1, "intf: playlist destroyed" );
 }
 
 /*****************************************************************************

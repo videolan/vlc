@@ -185,6 +185,7 @@ INTERFACE =	src/interface/main.o \
 		src/interface/intf_cmd.o \
 		src/interface/intf_ctrl.o \
 		src/interface/intf_plst.o \
+		src/interface/intf_channels.o \
 		src/interface/intf_console.o
 
 INPUT =		src/input/input_ext-dec.o \
@@ -238,8 +239,7 @@ MISC =		src/misc/mtime.o \
 		src/misc/tests.o \
 		src/misc/rsc_files.o \
 		src/misc/modules.o \
-		src/misc/netutils.o \
-		src/misc/plugins.o
+		src/misc/netutils.o
 
 
 C_OBJ =		$(INTERFACE) \
@@ -314,7 +314,6 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 		plugins/ggi/vout_ggi.o
 
 PLUGIN_SDL =	plugins/sdl/sdl.o \
-		plugins/sdl/intf_sdl.o \
 		plugins/sdl/vout_sdl.o \
 		plugins/sdl/aout_sdl.o 
 
@@ -324,10 +323,9 @@ PLUGIN_GLIDE =	plugins/glide/glide.o \
 
 PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/intf_gnome.o \
-		plugins/gnome/intf_gnome_callbacks.o \
-		plugins/gnome/intf_gnome_interface.o \
-		plugins/gnome/intf_gnome_support.o \
-		plugins/gnome/vout_gnome.o
+		plugins/gnome/gnome_callbacks.o \
+		plugins/gnome/gnome_interface.o \
+		plugins/gnome/gnome_support.o
 
 PLUGIN_MGA =	plugins/mga/mga.o \
 		plugins/mga/intf_mga.o \

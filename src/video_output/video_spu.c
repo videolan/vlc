@@ -32,8 +32,8 @@
 #include "config.h"
 #include "common.h"
 #include "threads.h"
-#include "plugins.h"
 #include "mtime.h"
+
 #include "video.h"
 #include "video_output.h"
 #include "video_spu.h"

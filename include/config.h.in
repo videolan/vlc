@@ -128,6 +128,9 @@
  * Interface configuration
  *****************************************************************************/
 
+/* Environment variable containing the display method */
+#define INTF_METHOD_VAR                 "vlc_intf"
+
 /* Environment variable used to store startup script name and default value */
 #define INTF_INIT_SCRIPT_VAR            "vlcrc"
 #define INTF_INIT_SCRIPT_DEFAULT        ".vlcrc"

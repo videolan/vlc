@@ -54,7 +54,6 @@
 #include "threads.h"
 #include "mtime.h"
 #include "debug.h"
-#include "plugins.h"
 #include "intf_msg.h"
 
 #include "stream_control.h"
