@@ -1101,7 +1101,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     int i_packet_count = p_chain_ts->i_depth;
     int i;
 
-    if ( i_pcr_length > 0 )
+    if ( i_pcr_length / 1000 > 0 )
     {
         int i_bitrate = ((uint64_t)i_packet_count * 188 * 8000)
                           / (uint64_t)(i_pcr_length / 1000);
