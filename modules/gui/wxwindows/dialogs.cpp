@@ -39,6 +39,59 @@
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
 
+/* Dialogs Provider */
+class DialogsProvider: public wxFrame
+{
+public:
+    /* Constructor */
+    DialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~DialogsProvider();
+
+private:
+    void Open( int i_access_method, int i_arg );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnExit( wxCommandEvent& event );
+    void OnPlaylist( wxCommandEvent& event );
+    void OnMessages( wxCommandEvent& event );
+    void OnFileInfo( wxCommandEvent& event );
+    void OnPreferences( wxCommandEvent& event );
+    void OnStreamWizardDialog( wxCommandEvent& event );
+    void OnWizardDialog( wxCommandEvent& event );
+    void OnBookmarks( wxCommandEvent& event );
+
+    void OnOpenFileGeneric( wxCommandEvent& event );
+    void OnOpenFileSimple( wxCommandEvent& event );
+    void OnOpenFile( wxCommandEvent& event );
+    void OnOpenDisc( wxCommandEvent& event );
+    void OnOpenNet( wxCommandEvent& event );
+    void OnOpenCapture( wxCommandEvent& event );
+    void OnOpenSat( wxCommandEvent& event );
+
+    void OnPopupMenu( wxCommandEvent& event );
+
+    void OnIdle( wxIdleEvent& event );
+
+    void OnExitThread( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+
+public:
+    /* Secondary windows */
+    OpenDialog          *p_open_dialog;
+    wxFileDialog        *p_file_dialog;
+    Playlist            *p_playlist_dialog;
+    Messages            *p_messages_dialog;
+    FileInfo            *p_fileinfo_dialog;
+    StreamDialog        *p_streamwizard_dialog;
+    WizardDialog        *p_wizard_dialog;
+    wxFrame             *p_prefs_dialog;
+    wxWindow            *p_bookmarks_dialog;
+    wxFileDialog        *p_file_generic_dialog;
+};
+
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_DIALOG );
 
 BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
@@ -49,6 +102,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
     EVT_COMMAND(INTF_DIALOG_FILE, wxEVT_DIALOG, DialogsProvider::OnOpenFile)
     EVT_COMMAND(INTF_DIALOG_DISC, wxEVT_DIALOG, DialogsProvider::OnOpenDisc)
     EVT_COMMAND(INTF_DIALOG_NET, wxEVT_DIALOG, DialogsProvider::OnOpenNet)
+    EVT_COMMAND(INTF_DIALOG_CAPTURE, wxEVT_DIALOG,
+                DialogsProvider::OnOpenCapture)
     EVT_COMMAND(INTF_DIALOG_FILE_SIMPLE, wxEVT_DIALOG,
                 DialogsProvider::OnOpenFileSimple)
     EVT_COMMAND(INTF_DIALOG_FILE_GENERIC, wxEVT_DIALOG,
@@ -73,6 +128,11 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
     EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
                 DialogsProvider::OnExitThread)
 END_EVENT_TABLE()
+
+wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent )
+{
+    return new DialogsProvider( p_intf, p_parent );
+}
 
 /*****************************************************************************
  * Constructor.
@@ -353,6 +413,11 @@ void DialogsProvider::OnOpenDisc( wxCommandEvent& event )
 void DialogsProvider::OnOpenNet( wxCommandEvent& event )
 {
     Open( NET_ACCESS, event.GetInt() );
+}
+
+void DialogsProvider::OnOpenCapture( wxCommandEvent& event )
+{
+    Open( CAPTURE_ACCESS, event.GetInt() );
 }
 
 void DialogsProvider::Open( int i_access_method, int i_arg )

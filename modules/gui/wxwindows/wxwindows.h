@@ -92,6 +92,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 #define MODE_AUTHOR 2
 #define MODE_TITLE 3
 
+class DialogsProvider;
 class PrefsTreeCtrl;
 class AutoBuiltPanel;
 class VideoWindow;
@@ -139,6 +140,7 @@ struct intf_sys_t
 wxArrayString SeparateEntries( wxString );
 wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
 wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
 
 namespace wxvlc
 {
@@ -267,60 +269,6 @@ private:
     wxMenu *p_audio_menu;
     wxMenu *p_video_menu;
     wxMenu *p_navig_menu;
-};
-
-/*class BookmarksDialog;
-*/
-/* Dialogs Provider */
-class DialogsProvider: public wxFrame
-{
-public:
-    /* Constructor */
-    DialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
-    virtual ~DialogsProvider();
-
-private:
-    void Open( int i_access_method, int i_arg );
-
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnExit( wxCommandEvent& event );
-    void OnPlaylist( wxCommandEvent& event );
-    void OnMessages( wxCommandEvent& event );
-    void OnFileInfo( wxCommandEvent& event );
-    void OnPreferences( wxCommandEvent& event );
-    void OnStreamWizardDialog( wxCommandEvent& event );
-    void OnWizardDialog( wxCommandEvent& event );
-    void OnBookmarks( wxCommandEvent& event );
-
-    void OnOpenFileGeneric( wxCommandEvent& event );
-    void OnOpenFileSimple( wxCommandEvent& event );
-    void OnOpenFile( wxCommandEvent& event );
-    void OnOpenDisc( wxCommandEvent& event );
-    void OnOpenNet( wxCommandEvent& event );
-    void OnOpenSat( wxCommandEvent& event );
-
-    void OnPopupMenu( wxCommandEvent& event );
-
-    void OnIdle( wxIdleEvent& event );
-
-    void OnExitThread( wxCommandEvent& event );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-
-public:
-    /* Secondary windows */
-    OpenDialog          *p_open_dialog;
-    wxFileDialog        *p_file_dialog;
-    Playlist            *p_playlist_dialog;
-    Messages            *p_messages_dialog;
-    FileInfo            *p_fileinfo_dialog;
-    StreamDialog        *p_streamwizard_dialog;
-    WizardDialog        *p_wizard_dialog;
-    wxFrame             *p_prefs_dialog;
-    wxWindow            *p_bookmarks_dialog;
-    wxFileDialog        *p_file_generic_dialog;
 };
 
 /* Open Dialog */
@@ -453,12 +401,11 @@ enum
     FILE_ACCESS = 0,
     DISC_ACCESS,
     NET_ACCESS,
-#ifndef WIN32
-    V4L_ACCESS,
-#endif
-    MAX_ACCESS,
-    FILE_SIMPLE_ACCESS
+
+    /* Auto-built panels */
+    CAPTURE_ACCESS
 };
+#define MAX_ACCESS CAPTURE_ACCESS
 
 /* V4L Dialog */
 class V4LDialog: public wxDialog

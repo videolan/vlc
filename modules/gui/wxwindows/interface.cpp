@@ -113,6 +113,7 @@ enum
     OpenFile_Event,
     OpenDisc_Event,
     OpenNet_Event,
+    OpenCapture_Event,
     OpenSat_Event,
     OpenOther_Event,
     EjectDisc_Event,
@@ -183,6 +184,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OpenFile_Event, Interface::OnShowDialog)
     EVT_MENU(OpenDisc_Event, Interface::OnShowDialog)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenCapture_Event, Interface::OnShowDialog)
     EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
     EVT_MENU(StreamWizard_Event, Interface::OnShowDialog)
     EVT_MENU(Wizard_Event, Interface::OnShowDialog)
@@ -316,61 +318,32 @@ void Interface::OnControlEvent( wxCommandEvent& event )
  *****************************************************************************/
 void Interface::CreateOurMenuBar()
 {
-#define HELP_SIMPLE N_("Quick file open")
-#define HELP_ADV   N_("Advanced open")
-#define HELP_FILE  N_("Open a file")
-#define HELP_DISC  N_("Open Disc Media")
-#define HELP_NET   N_("Open a network stream")
-#define HELP_SAT   N_("Open a satellite stream")
-#define HELP_EJECT N_("Eject the DVD/CD")
-#define HELP_EXIT  N_("Exit this program")
-
-#define HELP_STREAMWIZARD N_("Open the streaming wizard")
-
-#define HELP_PLAYLIST   N_("Open the playlist")
-#define HELP_LOGS       N_("Show the program logs")
-#define HELP_FILEINFO   N_("Show information about the file being played")
-
-#define HELP_PREFS     N_("Go to the preferences menu")
-#define HELP_EXTENDED  N_("Shows the extended GUI")
-#define HELP_BOOKMARKS N_("Shows the bookmarks window")
-
-#define HELP_ABOUT N_("About this program")
-
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
     file_menu->Append( OpenFileSimple_Event,
-                       wxU(_("Quick &Open File...\tCtrl-O")),
-                       wxU(_(HELP_SIMPLE)) );
+                       wxU(_("Quick &Open File...\tCtrl-O")) );
 
     file_menu->AppendSeparator();
-    file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")),
-                       wxU(_(HELP_FILE)));
-    file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")),
-                       wxU(_(HELP_DISC)));
+    file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")) );
+    file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")) );
     file_menu->Append( OpenNet_Event,
-                       wxU(_("Open &Network Stream...\tCtrl-N")),
-                       wxU(_(HELP_NET)));
+                       wxU(_("Open &Network Stream...\tCtrl-N")) );
+    file_menu->Append( OpenCapture_Event,
+                       wxU(_("Open &Capture Device...\tCtrl-C")) );
 
     file_menu->AppendSeparator();
     file_menu->Append( StreamWizard_Event,
-                       wxU(_("Streaming &Wizard...\tCtrl-W")),
-                       wxU(_(HELP_STREAMWIZARD)) );
-    file_menu->Append( Wizard_Event, wxU(_("New Wizard...")),
-                       wxU(_(HELP_STREAMWIZARD)) );
+                       wxU(_("Streaming &Wizard...\tCtrl-W")) );
+    file_menu->Append( Wizard_Event, wxU(_("New Wizard...")) );
     file_menu->AppendSeparator();
-    file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")),
-                       wxU(_(HELP_EXIT)) );
+    file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")) );
 
     /* Create the "View" menu */
     wxMenu *view_menu = new wxMenu;
-    view_menu->Append( Playlist_Event, wxU(_("&Playlist...\tCtrl-P")),
-                       wxU(_(HELP_PLAYLIST)) );
-    view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")),
-                       wxU(_(HELP_LOGS)) );
+    view_menu->Append( Playlist_Event, wxU(_("&Playlist...\tCtrl-P")) );
+    view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")) );
     view_menu->Append( FileInfo_Event,
-                       wxU(_("Stream and Media &info...\tCtrl-I")),
-                       wxU(_(HELP_FILEINFO)) );
+                       wxU(_("Stream and Media &info...\tCtrl-I")) );
 
     /* Create the "Auto-generated" menus */
     p_settings_menu = SettingsMenu( p_intf, this );
@@ -380,8 +353,7 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append( About_Event, wxU(_("About VLC media player")),
-                       wxU(_(HELP_ABOUT)) );
+    help_menu->Append( About_Event, wxU(_("About VLC media player")) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
@@ -439,7 +411,6 @@ void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
 void Interface::CreateOurToolBar()
 {
 #define HELP_STOP N_("Stop")
-
 #define HELP_PLAY N_("Play")
 #define HELP_PAUSE N_("Pause")
 #define HELP_PLO N_("Playlist")
@@ -771,11 +742,10 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 
         /* Add static items */
         p_settings_menu->AppendCheckItem( Extended_Event,
-            wxU(_("&Extended GUI") ), wxU(_(HELP_EXTENDED)) );
+            wxU(_("&Extended GUI") ) );
         p_settings_menu->AppendCheckItem( Bookmarks_Event,
-            wxU(_("&Bookmarks...") ), wxU(_(HELP_BOOKMARKS)) );
-        p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
-            wxU(_(HELP_PREFS)) );
+            wxU(_("&Bookmarks...") ) );
+        p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")) );
     }
 
     else if( event.GetEventObject() == p_audio_menu )
@@ -859,6 +829,9 @@ void Interface::OnShowDialog( wxCommandEvent& event )
             break;
         case OpenNet_Event:
             i_id = INTF_DIALOG_NET;
+            break;
+        case OpenCapture_Event:
+            i_id = INTF_DIALOG_CAPTURE;
             break;
         case OpenSat_Event:
             i_id = INTF_DIALOG_SAT;

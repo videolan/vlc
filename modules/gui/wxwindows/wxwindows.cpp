@@ -298,8 +298,8 @@ bool Instance::OnInit()
 
     /* Creates the dialogs provider */
     p_intf->p_sys->p_wxwindow =
-        new DialogsProvider( p_intf, p_intf->pf_show_dialog ?
-                             NULL : p_intf->p_sys->p_wxwindow );
+        CreateDialogsProvider( p_intf, p_intf->pf_show_dialog ?
+                               NULL : p_intf->p_sys->p_wxwindow );
 
     p_intf->p_sys->pf_show_dialog = ShowDialog;
 

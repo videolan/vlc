@@ -313,7 +313,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                        i_access_method == NET_ACCESS );
 #ifndef WIN32
     notebook->AddPage( V4LPanel( notebook ), wxU(_("Video for Linux")),
-                       i_access_method == V4L_ACCESS );
+                       i_access_method == CAPTURE_ACCESS );
 #endif
 
     module_t *p_module = config_FindModule( VLC_OBJECT(p_intf), "dshow" );
@@ -322,7 +322,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_longname ) );
+        notebook->AddPage( autopanel, wxU( p_module->psz_longname ),
+                           i_access_method == CAPTURE_ACCESS );
     }
 
     /* Update Disc panel */
@@ -812,7 +813,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
         break;
 
 #ifndef WIN32
-    case V4L_ACCESS:
+    case CAPTURE_ACCESS:
         mrltemp = ( video_type->GetSelection() == 0 ? wxT("v4l") :
                     video_type->GetSelection() == 1 ? wxT("v4l") :
                     video_type->GetSelection() == 2 ? wxT("pvr") :
@@ -1164,7 +1165,7 @@ void OpenDialog::OnNetTypeChange( wxCommandEvent& event )
  *****************************************************************************/
 void OpenDialog::OnV4LPanelChange( wxCommandEvent& WXUNUSED(event) )
 {
-    UpdateMRL( V4L_ACCESS );
+    UpdateMRL( CAPTURE_ACCESS );
 }
 
 void OpenDialog::OnV4LTypeChange( wxCommandEvent& WXUNUSED(event) )
@@ -1187,7 +1188,7 @@ void OpenDialog::OnV4LTypeChange( wxCommandEvent& WXUNUSED(event) )
             break;
     }
 
-    UpdateMRL( V4L_ACCESS );
+    UpdateMRL( CAPTURE_ACCESS );
 }
 
 void OpenDialog::OnV4LSettingsChange( wxCommandEvent& WXUNUSED(event) )
@@ -1201,7 +1202,7 @@ void OpenDialog::OnV4LSettingsChange( wxCommandEvent& WXUNUSED(event) )
         v4l_mrl = v4l_dialog->GetOptions();
     }
 
-    UpdateMRL( V4L_ACCESS );
+    UpdateMRL( CAPTURE_ACCESS );
 }
 #endif
 
