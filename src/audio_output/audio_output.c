@@ -62,7 +62,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
 aout_thread_t *aout_CreateThread( int *pi_status )
 {
     aout_thread_t * p_aout;                               /* thread descriptor */
-    int             i_status;                                 /* thread status */
+//    int             i_status;                                 /* thread status */
    
     /* Allocate descriptor */
     p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );

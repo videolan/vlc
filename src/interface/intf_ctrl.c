@@ -303,7 +303,7 @@ fprintf( stderr, "maxx debug: blih\n" );
  ******************************************************************************/
 static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 {
-    char *psz_file;                       /* name of the audio raw file (s16) */
+    char * psz_file = NULL;               /* name of the audio raw file (s16) */
     int i_fd;       /* file descriptor of the audio file that is to be loaded */
     aout_fifo_t fifo;          /* fifo stores the informations about the file */
     struct stat stat_buffer;       /* needed to find out the size of psz_file */
