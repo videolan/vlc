@@ -846,6 +846,7 @@ private:
     playlist_item_t *p_popup_parent;
     void OnPopup( wxContextMenuEvent& event );
     void OnPopupPlay( wxMenuEvent& event );
+    void OnPopupPreparse( wxMenuEvent& event );
     void OnPopupSort( wxMenuEvent& event );
     void OnPopupDel( wxMenuEvent& event );
     void OnPopupEna( wxMenuEvent& event );

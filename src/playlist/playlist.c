@@ -43,6 +43,7 @@
  * Local prototypes
  *****************************************************************************/
 static void RunThread ( playlist_t * );
+static void RunPreparse( playlist_preparse_t * );
 static playlist_item_t * NextItem  ( playlist_t * );
 static int PlayItem  ( playlist_t *, playlist_item_t * );
 
@@ -147,6 +148,31 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         return NULL;
     }
 
+    /* Preparsing stuff */
+    p_playlist->p_preparse = vlc_object_create( p_playlist,
+                                                sizeof( playlist_preparse_t ) );
+    if( !p_playlist->p_preparse )
+    {
+        msg_Err( p_playlist, "unable to create preparser" );
+        vlc_object_destroy( p_playlist );
+        return NULL;
+    }
+
+    p_playlist->p_preparse->i_waiting = 0;
+    p_playlist->p_preparse->pp_waiting = NULL;
+    vlc_mutex_init( p_playlist->p_preparse,
+                    &p_playlist->p_preparse->object_lock );
+
+    vlc_object_attach( p_playlist->p_preparse, p_playlist );
+    if( vlc_thread_create( p_playlist->p_preparse, "preparser",
+                           RunPreparse, VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
+    {
+        msg_Err( p_playlist, "cannot spawn preparse thread" );
+        vlc_object_detach( p_playlist->p_preparse );
+        vlc_object_destroy( p_playlist->p_preparse );
+        return NULL;
+    }
+
     /* The object has been initialized, now attach it */
     vlc_object_attach( p_playlist, p_parent );
 
@@ -171,7 +197,12 @@ int playlist_Destroy( playlist_t * p_playlist )
                                           p_playlist->pp_sds[i]->psz_module );
     }
 
+    vlc_thread_join( p_playlist->p_preparse );
     vlc_thread_join( p_playlist );
+
+    vlc_object_detach( p_playlist->p_preparse );
+
+    vlc_mutex_destroy( &p_playlist->p_preparse->object_lock );
 
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
@@ -195,6 +226,7 @@ int playlist_Destroy( playlist_t * p_playlist )
         free( p_view );
     }
 
+    vlc_object_destroy( p_playlist->p_preparse );
     vlc_object_destroy( p_playlist );
 
     return VLC_SUCCESS;
@@ -365,6 +397,18 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
+    return VLC_SUCCESS;
+}
+
+int playlist_PreparseEnqueue( playlist_t *p_playlist,
+                              input_item_t *p_item )
+{
+    vlc_mutex_lock( &p_playlist->p_preparse->object_lock );
+    INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
+                 p_playlist->p_preparse->i_waiting,
+                 p_playlist->p_preparse->i_waiting,
+                 p_item );
+    vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
     return VLC_SUCCESS;
 }
 
@@ -641,6 +685,37 @@ static void RunThread ( playlist_t *p_playlist )
     }
 }
 
+/* Queue for items to preparse */
+static void RunPreparse ( playlist_preparse_t *p_obj )
+{
+    playlist_t *p_playlist = p_obj->p_parent;
+    vlc_bool_t b_sleep;
+
+    /* Tell above that we're ready */
+    vlc_thread_ready( p_obj );
+
+    while( !p_playlist->b_die )
+    {
+        vlc_mutex_lock( &p_obj->object_lock );
+
+        if( p_obj->i_waiting > 0 )
+        {
+            input_Preparse( p_playlist, p_obj->pp_waiting[0] );
+            var_SetInteger( p_playlist, "item-change",
+                            p_obj->pp_waiting[0]->i_id );
+            REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+        }
+        b_sleep = ( p_obj->i_waiting == 0 );
+
+        vlc_mutex_unlock( &p_obj->object_lock );
+
+        if( p_obj->i_waiting == 0 )
+        {
+            msleep( INTF_IDLE_SLEEP );
+        }
+    }
+}
+
 /*****************************************************************************
  * NextItem
  *****************************************************************************
@@ -840,6 +915,10 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             playlist_view_t *p_view =
                     playlist_ViewFind( p_playlist,
                                    p_playlist->status.i_view );
+            fprintf(stderr,"Finding next of %s within %s, view %i\n",
+                           p_playlist->status.p_item ?     p_playlist->status.p_item->input.psz_name : "coincoin",
+                                p_playlist->status.p_node->input.psz_name,
+                                p_playlist->status.i_view) ;
             p_new = playlist_FindNextFromParent( p_playlist,
                             p_playlist->status.i_view,
                             p_view->p_root,

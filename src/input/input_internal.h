@@ -102,7 +102,7 @@ void input_ControlVarTitle( input_thread_t *, int i_title );
 void input_ConfigVarInit ( input_thread_t * );
 
 /* stream.c */
-stream_t *stream_AccessNew( access_t *p_access );
+stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t );
 void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
 void stream_AccessUpdate( stream_t *s );

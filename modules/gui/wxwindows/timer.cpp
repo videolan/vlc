@@ -108,9 +108,14 @@ void Timer::Notify()
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
     {
-        p_intf->p_sys->p_input =
-            (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                               FIND_ANYWHERE );
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist != NULL )
+        {
+            p_intf->p_sys->p_input = p_playlist->p_input;
+            vlc_object_release( p_playlist );
+        }
 
         /* Refresh interface */
         if( p_intf->p_sys->p_input )
@@ -140,7 +145,6 @@ void Timer::Notify()
         p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
         p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
 
-        vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
     }
 

@@ -33,7 +33,7 @@
  *****************************************************************************/
 demux_t *__demux2_New( vlc_object_t *p_obj,
                        char *psz_access, char *psz_demux, char *psz_path,
-                       stream_t *s, es_out_t *out )
+                       stream_t *s, es_out_t *out, vlc_bool_t b_quick )
 {
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
     char *psz_module;
@@ -55,8 +55,11 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         p_demux->psz_demux = var_GetString( p_obj, "demux" );
     }
 
-    msg_Dbg( p_obj, "demux2_New: access='%s' demux='%s' path='%s'",
-             p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
+    if( !b_quick )
+    {
+        msg_Dbg( p_obj, "demux2_New: access='%s' demux='%s' path='%s'",
+                 p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
+    }
 
     p_demux->s          = s;
     p_demux->out        = out;
@@ -79,8 +82,8 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
          *  - no .mp3, .a52, ... (aac is added as it works only by file ext anyway
          *  - wav can't be added 'cause of a52 and dts in them as raw audio
          */
-        static struct { char *ext; char *demux; } exttodemux[] =
-        {
+         static struct { char *ext; char *demux; } exttodemux[] =
+         {
             { "aac",  "aac" },
             { "aiff", "aiff" },
             { "asf",  "asf" }, { "wmv",  "asf" }, { "wma",  "asf" },
@@ -98,17 +101,40 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { "rm",   "rm" },
             { NULL,  NULL },
         };
+        /* Here, we don't mind if it does not work, it must be quick */
+        static struct { char *ext; char *demux; } exttodemux_quick[] = 
+        {
+            { "mp3", "mpga" },
+            { "ogg", "ogg" },
+            { "wma", "asf" },
+            { NULL, NULL }
+        };
 
         char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
         int  i;
 
-        for( i = 0; exttodemux[i].ext != NULL; i++ )
+        if( !b_quick )
         {
-            if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
+            for( i = 0; exttodemux[i].ext != NULL; i++ )
             {
-                psz_module = exttodemux[i].demux;
-                break;
+                if( !strcasecmp( psz_ext, exttodemux[i].ext ) )
+                {
+                    psz_module = exttodemux[i].demux;
+                    break;
+                }
             }
+        }
+        else
+        {
+            for( i = 0; exttodemux_quick[i].ext != NULL; i++ )
+            {
+                if( !strcasecmp( psz_ext, exttodemux_quick[i].ext ) )
+                {
+                    psz_module = exttodemux_quick[i].demux;
+                    break;
+                }
+            }
+
         }
     }
 
@@ -486,7 +512,8 @@ static int DStreamThread( stream_t *s )
     demux_t *p_demux;
 
     /* Create the demuxer */
-    if( !(p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out )) )
+    if( !(p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out,
+                               VLC_FALSE )) )
     {
         return VLC_EGENERIC;
     }

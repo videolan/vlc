@@ -225,6 +225,7 @@ typedef struct playlist_export_t playlist_export_t;
 typedef struct services_discovery_t services_discovery_t;
 typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct playlist_add_t playlist_add_t;
+typedef struct playlist_preparse_t playlist_preparse_t;
 
 /* Modules */
 typedef struct module_bank_t module_bank_t;

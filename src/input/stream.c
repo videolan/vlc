@@ -136,6 +136,9 @@ struct stream_sys_t
         int     i_seek_count;
         int64_t i_seek_time;
     } stat;
+
+    /* Preparse mode ? */
+    vlc_bool_t b_quick;
 };
 
 /* Method 1: */
@@ -157,7 +160,7 @@ static int AStreamControl( stream_t *, int i_query, va_list );
 /****************************************************************************
  * stream_AccessNew: create a stream from a access
  ****************************************************************************/
-stream_t *stream_AccessNew( access_t *p_access )
+stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
 {
     stream_t *s = vlc_object_create( p_access, VLC_OBJECT_STREAM );
     stream_sys_t *p_sys;
@@ -187,6 +190,8 @@ stream_t *stream_AccessNew( access_t *p_access )
     p_sys->stat.i_read_count = 0;
     p_sys->stat.i_seek_count = 0;
     p_sys->stat.i_seek_time = 0;
+
+    p_sys->b_quick = b_quick;
 
     /* Peek */
     p_sys->i_peek = 0;
@@ -1129,8 +1134,9 @@ static void AStreamPrebufferStream( stream_t *s )
 
     int64_t i_first = 0;
     int64_t i_start;
-    int64_t i_prebuffer = (s->p_sys->p_access->info.i_title > 1 ||
-                           s->p_sys->p_access->info.i_seekpoint > 1) ? STREAM_CACHE_PREBUFFER_SIZE : STREAM_CACHE_TRACK_SIZE / 3;
+    int64_t i_prebuffer = p_sys->b_quick ? STREAM_CACHE_TRACK_SIZE /100 :
+                              ((s->p_sys->p_access->info.i_title > 1 ||
+                           s->p_sys->p_access->info.i_seekpoint > 1) ? STREAM_CACHE_PREBUFFER_SIZE : STREAM_CACHE_TRACK_SIZE / 3);
 
     msg_Dbg( s, "pre buffering" );
     i_start = mdate();

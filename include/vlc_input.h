@@ -398,6 +398,8 @@ struct input_thread_t
  *****************************************************************************/
 #define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
 VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
+#define input_Preparse(a,b) __input_Preparse(VLC_OBJECT(a),b)
+VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 

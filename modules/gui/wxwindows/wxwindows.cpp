@@ -175,11 +175,6 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release( p_intf->p_sys->p_input );
-    }
-
     vlc_mutex_lock( &p_intf->object_lock );
     p_intf->b_dead = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->object_lock );

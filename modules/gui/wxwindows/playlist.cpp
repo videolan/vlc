@@ -90,6 +90,7 @@ enum
 
     PopupPlay_Event,
     PopupPlayThis_Event,
+    PopupPreparse_Event,
     PopupSort_Event,
     PopupDel_Event,
     PopupEna_Event,
@@ -150,6 +151,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Popup events */
     EVT_MENU( PopupPlay_Event, Playlist::OnPopupPlay)
     EVT_MENU( PopupPlayThis_Event, Playlist::OnPopupPlay)
+    EVT_MENU( PopupPreparse_Event, Playlist::OnPopupPreparse)
     EVT_MENU( PopupSort_Event, Playlist::OnPopupSort)
     EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
     EVT_MENU( PopupEna_Event, Playlist::OnPopupEna)
@@ -266,6 +268,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     popup_menu = new wxMenu;
     popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
     popup_menu->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
+    popup_menu->Append( PopupPreparse_Event, wxU(_("Preparse")) );
     popup_menu->Append( PopupSort_Event, wxU(_("Sort this branch")) );
     popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
     popup_menu->Append( PopupEna_Event, wxU(_("Enable/Disable")) );
@@ -1139,8 +1142,9 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
     playlist_item_t *p_item,*p_node;
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                     VLC_OBJECT_PLAYLIST,FIND_ANYWHERE );
+
     PlaylistItem *p_wxitem = (PlaylistItem *)treectrl->GetItemData(
-                                                        event.GetItem() );
+                                                            event.GetItem() );
     wxTreeItemId parent = treectrl->GetItemParent( event.GetItem() );
 
     PlaylistItem *p_wxparent = (PlaylistItem *)treectrl->GetItemData( parent );
@@ -1380,9 +1384,6 @@ void Playlist::OnPopup( wxContextMenuEvent& event )
         Playlist::PopupMenu( popup_menu,
                              ScreenToClient( wxGetMousePosition() ) );
     }
-    else
-    {
-    }
 }
 
 void Playlist::OnPopupPlay( wxMenuEvent& event )
@@ -1418,6 +1419,38 @@ void Playlist::OnPopupPlay( wxMenuEvent& event )
                 playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                                   i_current_view, p_popup_parent,
                                   p_popup_item );
+            }
+        }
+    }
+    vlc_object_release( p_playlist );
+}
+
+void Playlist::OnPopupPreparse( wxMenuEvent& event )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+    if( p_popup_item != NULL )
+    {
+        if( p_popup_item->i_children == -1 )
+        {
+            playlist_PreparseEnqueue( p_playlist, &p_popup_item->input );
+        }
+        else
+        {
+            int i = 0;
+            playlist_item_t *p_parent = p_popup_item;
+            for( i = 0; i< p_parent->i_children ; i++ )
+            {
+                wxMenuEvent dummy;
+                i_popup_item = FindItem( treectrl->GetRootItem(),
+                                         p_parent->pp_children[i] );
+                p_popup_item = p_parent->pp_children[i];
+                OnPopupPreparse( dummy );
             }
         }
     }

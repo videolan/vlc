@@ -31,7 +31,8 @@
  * access2_New:
  *****************************************************************************/
 access_t *__access2_New( vlc_object_t *p_obj,
-                         char *psz_access, char *psz_demux, char *psz_path )
+                         char *psz_access, char *psz_demux, char *psz_path,
+                         vlc_bool_t b_quick )
 {
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
@@ -42,12 +43,13 @@ access_t *__access2_New( vlc_object_t *p_obj,
     }
 
     /* Parse URL */
-    p_access->psz_access = strdup( psz_access );
+    p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
     p_access->psz_path   = strdup( psz_path );
     p_access->psz_demux  = strdup( "" );
 
-    msg_Dbg( p_obj, "access2_New: access='%s' path='%s'",
-             p_access->psz_access, p_access->psz_path );
+    if( !b_quick )
+        msg_Dbg( p_obj, "access2_New: access='%s' path='%s'",
+                 p_access->psz_access, p_access->psz_path );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -66,7 +68,8 @@ access_t *__access2_New( vlc_object_t *p_obj,
     vlc_object_attach( p_access, p_obj );
 
     p_access->p_module =
-        module_Need( p_access, "access2", p_access->psz_access, VLC_FALSE );
+        module_Need( p_access, "access2", p_access->psz_access,
+                     b_quick ? VLC_TRUE : VLC_FALSE );
 
     if( p_access->p_module == NULL )
     {

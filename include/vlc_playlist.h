@@ -127,6 +127,14 @@ struct services_discovery_t
     void (*pf_run) ( services_discovery_t *);
 };
 
+struct playlist_preparse_t
+{
+    VLC_COMMON_MEMBERS
+    vlc_mutex_t     lock;
+    int             i_waiting;
+    input_item_t  **pp_waiting;
+};
+
 
 /**
  * Structure containing information about the playlist
@@ -191,8 +199,10 @@ struct playlist_t
         vlc_bool_t          b_request; /**< Set to true by the requester
                                             The playlist sets it back to false
                                             when processing the request */
-        vlc_mutex_t        lock;      /**< Lock to protect request */
+        vlc_mutex_t         lock;      /**< Lock to protect request */
     } request;
+
+    playlist_preparse_t     *p_preparse;
 
     /*@}*/
 };
@@ -238,6 +248,7 @@ VLC_EXPORT( int, playlist_Control, ( playlist_t *, int, ...  ) );
 
 VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 
+VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
 
 /* Services discovery */
 
