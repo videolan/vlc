@@ -183,6 +183,7 @@ int playlist_ViewUpdate( playlist_t *p_playlist, int i_view)
                             SORT_AUTHOR, ORDER_NORMAL );
     }
 
+
     return VLC_SUCCESS;
 }
 
@@ -294,6 +295,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     val.p_address = p_add;
     var_Set( p_playlist, "item-append", val);
 
+    free( p_add );
+
     return p_item;
 }
 
@@ -359,6 +362,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         else if( b_delete_items )
         {
             /* Delete the item here */
+            playlist_Delete( p_playlist, p_root->pp_children[i]->input.i_id );
         }
     }
     /* Delete the node */
@@ -423,7 +427,7 @@ int playlist_NodeInsert( playlist_t *p_playlist,
    if( b_found == VLC_FALSE )
    {
         struct item_parent_t *p_ip = (struct item_parent_t *)
-                                malloc(sizeof(struct item_parent_t) );
+                                     malloc(sizeof(struct item_parent_t) );
         p_ip->i_view = i_view;
         p_ip->p_parent = p_parent;
 

@@ -269,6 +269,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         var_Set( p_playlist, "intf-change", val );
     }
 
+    free( p_add );
+
     return p_item->input.i_id;
 }
 
@@ -320,6 +322,7 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
                 {
                     playlist_ItemDelete( p_item );
                     vlc_mutex_unlock( &p_playlist->object_lock );
+                    free( p_add );
                     return -1;
                 }
             }
@@ -377,6 +380,8 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 
     val.b_bool = VLC_TRUE;
 //    var_Set( p_playlist, "intf-change", val );
+//
+    free( p_add );
 
     return p_item->input.i_id;
 }
@@ -638,9 +643,14 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
 int playlist_Clear( playlist_t * p_playlist )
 {
     int i;
+    playlist_view_t *p_view;
     for( i = p_playlist->i_size; i > 0 ; i-- )
     {
         playlist_Delete( p_playlist, p_playlist->pp_items[0]->input.i_id );
+    }
+    for( i = 0 ; i< p_playlist->i_views; i++ )
+    {
+        playlist_ViewEmpty( p_playlist, i, VLC_TRUE );
     }
     return VLC_SUCCESS;
 }

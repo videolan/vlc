@@ -128,6 +128,13 @@ int playlist_ItemDelete( playlist_item_t *p_item )
         if( p_item->input.i_options == 1 ) free( p_item->input.ppsz_options );
     }
 
+    for( ; p_item->i_parents > 0 ; )
+    {
+        struct item_parent_t *p_parent =  p_item->pp_parents[0];
+        REMOVE_ELEM( p_item->pp_parents, p_item->i_parents, 0 );
+        free( p_parent );
+    }
+
     vlc_mutex_unlock( &p_item->input.lock );
     vlc_mutex_destroy( &p_item->input.lock );
 
