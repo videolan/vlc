@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.10 2003/02/01 22:03:42 babal Exp $
+$Id: NEWS,v 1.11 2003/02/01 23:28:58 sigmunau Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -26,13 +26,14 @@ Input demux:
   * support for ogg encapsulation
   * support for raw DV format
   * support for *.wav format
-  * support for *.mp3 format
   * new demuxdump demux allowing to save a stream to a file
   * raw AAC support
 
 Stream discovery & playlists:
   * support for the SAP/SDP and SLP protocols
   * support for .m3u file format
+  * support for .asx file format
+  * hack to find the streaming sources in html-pages with embedded wmp
 
 Codecs:
   * support for the microdvd, subrip, ssa1, ssa2-4 subtitles file formats
