@@ -1383,10 +1383,10 @@ if test "${enable_mkv}" = "yes"
 then
 AC_LANG_PUSH(C++)
   dnl matroska headers include ebml headers directly... pouah that stinks
-  CPPFLAGS="${CPPFLAGS_save} -I/usr/include/ebml -I/usr/include/matroska"
-  AC_CHECK_HEADERS(EbmlVersion.h KaxVersion.h, [
+  CPPFLAGS="${CPPFLAGS_save} -I/usr/local/include/ebml -I/usr/include/ebml"
+  AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
     AX_ADD_PLUGINS([mkv])
-    AX_ADD_CXXFLAGS([mkv],[-I/usr/include/ebml -I/usr/include/matroska])
+    AX_ADD_CXXFLAGS([mkv],[-I/usr/local/include/ebml -I/usr/include/ebml])
     AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
   ],[
     AC_MSG_ERROR([libebml or libmatroska include files not found])
