@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.2 2002/08/04 20:04:11 sam Exp $
+ * $Id: a52old.c,v 1.3 2002/08/21 09:27:40 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -31,6 +31,8 @@
 #include <vlc/aout.h>
 #include <vlc/decoder.h>
 
+#include "aout_internal.h"
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
 #endif
@@ -39,17 +41,16 @@
 #include "downmix.h"
 #include "adec.h"
 
-#define A52DEC_FRAME_SIZE (2*1536) 
+#define A52DEC_FRAME_SIZE 1536
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder       ( vlc_object_t * );
 static int  RunDecoder        ( decoder_fifo_t * );
-static int  InitThread        ( a52dec_t * p_adec );
-static void EndThread         ( a52dec_t * p_adec );
-static void BitstreamCallback ( bit_stream_t *p_bit_stream,
-                                vlc_bool_t b_new_pes );
+static int  InitThread        ( a52dec_t * );
+static void EndThread         ( a52dec_t * );
+static void BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -94,6 +95,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     void *       p_orig;                          /* pointer before memalign */
     vlc_bool_t   b_sync = 0;
 
+    mtime_t i_pts;
+    aout_buffer_t *p_aout_buffer;
+    audio_sample_format_t output_format;
+
     /* Allocate the memory needed to store the thread's structure */
     p_a52dec = (a52dec_t *)vlc_memalign( &p_orig, 16, sizeof(a52dec_t) );
     memset( p_a52dec, 0, sizeof( a52dec_t ) );
@@ -121,7 +126,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     /* FIXME : do we have enough room to store the decoded frames ?? */
     while ((!p_a52dec->p_fifo->b_die) && (!p_a52dec->p_fifo->b_error))
     {
-        s16 * buffer;
         sync_info_t sync_info;
 
         if( !b_sync )
@@ -154,54 +158,64 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        if( ( p_a52dec->p_aout_fifo != NULL ) &&
-            ( p_a52dec->p_aout_fifo->i_rate != sync_info.sample_rate ) )
+        if( ( p_a52dec->p_aout_input == NULL )||
+            ( output_format.i_rate != sync_info.sample_rate ) )
         {
-            /* Make sure the output thread leaves the NextFrame() function */
-            vlc_mutex_lock (&(p_a52dec->p_aout_fifo->data_lock));
-            aout_DestroyFifo (p_a52dec->p_aout_fifo);
-            vlc_cond_signal (&(p_a52dec->p_aout_fifo->data_wait));
-            vlc_mutex_unlock (&(p_a52dec->p_aout_fifo->data_lock));
-
-            p_a52dec->p_aout_fifo = NULL;
-        }
-
-        /* Creating the audio output fifo if not created yet */
-        if (p_a52dec->p_aout_fifo == NULL ) {
-            p_a52dec->p_aout_fifo =
-                aout_CreateFifo( p_a52dec->p_fifo, AOUT_FIFO_PCM, 2,
-                         sync_info.sample_rate, A52DEC_FRAME_SIZE, NULL  );
-            if ( p_a52dec->p_aout_fifo == NULL )
+            if( p_a52dec->p_aout_input )
             {
-                p_a52dec->p_fifo->b_error = 1;
-                break;
+                /* Delete old output */
+                msg_Warn( p_a52dec->p_fifo, "opening a new aout" );
+                aout_InputDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
             }
+
+            /* Set output configuration */
+            output_format.i_format   = AOUT_FMT_S16_NE;
+            output_format.i_channels = 2; /* FIXME ! */
+            output_format.i_rate     = sync_info.sample_rate;
+            p_a52dec->p_aout_input = aout_InputNew( p_a52dec->p_fifo,
+                                                    &p_a52dec->p_aout,
+                                                    &output_format );
         }
 
-        CurrentPTS( &p_a52dec->bit_stream,
-            &p_a52dec->p_aout_fifo->date[p_a52dec->p_aout_fifo->i_end_frame],
-            NULL );
-        if( !p_a52dec->p_aout_fifo->date[p_a52dec->p_aout_fifo->i_end_frame] )
+        if( p_a52dec->p_aout_input == NULL )
         {
-            p_a52dec->p_aout_fifo->date[
-                p_a52dec->p_aout_fifo->i_end_frame] =
-                LAST_MDATE;
-        }
-    
-        buffer = ((s16 *)p_a52dec->p_aout_fifo->buffer) + 
-            (p_a52dec->p_aout_fifo->i_end_frame * A52DEC_FRAME_SIZE);
-
-        if (decode_frame (p_a52dec, buffer))
-        {
-            b_sync = 0;
+            msg_Err( p_a52dec->p_fifo, "failed to create aout fifo" );
+            p_a52dec->p_fifo->b_error = 1;
             continue;
         }
-        
-        vlc_mutex_lock (&p_a52dec->p_aout_fifo->data_lock);
-        p_a52dec->p_aout_fifo->i_end_frame = 
-            (p_a52dec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
-        vlc_cond_signal (&p_a52dec->p_aout_fifo->data_wait);
-        vlc_mutex_unlock (&p_a52dec->p_aout_fifo->data_lock);
+
+        p_aout_buffer = aout_BufferNew( p_a52dec->p_aout,
+                                        p_a52dec->p_aout_input,
+                                        A52DEC_FRAME_SIZE );
+        if( !p_aout_buffer )
+        {
+            msg_Err( p_a52dec->p_fifo, "cannot get aout buffer" );
+            p_a52dec->p_fifo->b_error = 1;
+            continue;
+        }
+
+        CurrentPTS( &p_a52dec->bit_stream, &i_pts, NULL );
+        if( i_pts > 0 )
+        {
+            p_a52dec->i_pts = i_pts;
+        }
+        p_aout_buffer->start_date = p_a52dec->i_pts;
+        p_a52dec->i_pts += (mtime_t)1000000 * (mtime_t)A52DEC_FRAME_SIZE
+                                            / (mtime_t)output_format.i_rate;
+        p_aout_buffer->end_date = p_a52dec->i_pts;
+
+        if (decode_frame (p_a52dec, (s16*)p_aout_buffer->p_buffer))
+        {
+            b_sync = 0;
+            aout_BufferDelete( p_a52dec->p_aout, p_a52dec->p_aout_input,
+                                                 p_aout_buffer );
+            continue;
+        }
+        else
+        {
+            aout_BufferPlay( p_a52dec->p_aout, p_a52dec->p_aout_input,
+                                               p_aout_buffer );
+        }
 
         RealignBits(&p_a52dec->bit_stream);
     }
@@ -302,7 +316,9 @@ static int InitThread( a52dec_t * p_a52dec )
     /*
      * Initialize the output properties
      */
-    p_a52dec->p_aout_fifo = NULL;
+    p_a52dec->p_aout = NULL;
+    p_a52dec->p_aout_input = NULL;
+    p_a52dec->i_pts = 0;
 
     /*
      * Bit stream
@@ -319,14 +335,9 @@ static int InitThread( a52dec_t * p_a52dec )
 static void EndThread (a52dec_t * p_a52dec)
 {
     /* If the audio output fifo was created, we destroy it */
-    if (p_a52dec->p_aout_fifo != NULL)
+    if( p_a52dec->p_aout_input )
     {
-        aout_DestroyFifo (p_a52dec->p_aout_fifo);
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock (&(p_a52dec->p_aout_fifo->data_lock));
-        vlc_cond_signal (&(p_a52dec->p_aout_fifo->data_wait));
-        vlc_mutex_unlock (&(p_a52dec->p_aout_fifo->data_lock));
+        aout_InputDelete( p_a52dec->p_aout, p_a52dec->p_aout_input );
     }
 
     /* Free allocated structures */

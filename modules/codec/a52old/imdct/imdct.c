@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: imdct.c,v 1.2 2002/08/21 09:27:40 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -60,11 +60,13 @@ vlc_module_begin();
     set_description( _("SSE A52 IMDCT module") );
     set_capability( "imdct", 200 );
     add_shortcut( "sse" );
+    add_requirement( SSE );
 #elif defined( MODULE_NAME_IS_imdct3dn )
     set_description( _("3D Now! A52 IMDCT module") );
     set_capability( "imdct", 200 );
     add_shortcut( "3dn" );
     add_shortcut( "3dnow" );
+    add_requirement( 3DNOW );
 #endif
     set_callbacks( Open, NULL );
 vlc_module_end();

@@ -2,7 +2,7 @@
  * adec.h : A52 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec.h,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: adec.h,v 1.3 2002/08/21 09:27:40 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -399,7 +399,9 @@ struct a52dec_s
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+    aout_instance_t *     p_aout;
+    aout_input_t *        p_aout_input;
+    mtime_t               i_pts;
 
     float *             samples;
     void *              samples_orig;             /* pointer before memalign */

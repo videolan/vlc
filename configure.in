@@ -444,9 +444,10 @@ PLUGINS="${PLUGINS} misc/dummy/dummy misc/null"
 PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file misc/memcpy/memcpy"
 PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts"
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/spdif codec/mpeg_audio/mpeg_audio"
-#PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old codec/lpcm/lpcm"
+PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/a52old/a52old"
+#PLUGINS="${PLUGINS} codec/lpcm/lpcm"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop"
-PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif"
+PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif audio_filter/converter/fixed32tofloat32 audio_filter/converter/fixed32tos16 audio_filter/converter/s16tofloat32"
 PLUGINS="${PLUGINS} audio_filter/resampler/trivial"
 PLUGINS="${PLUGINS} audio_mixer/trivial audio_mixer/spdif"
 PLUGINS="${PLUGINS} audio_output/file"
@@ -1428,6 +1429,17 @@ AC_ARG_ENABLE(mga,
     fi ])
 
 dnl
+dnl  SVGAlib module
+dnl
+AC_ARG_ENABLE(svgalib,
+  [  --enable-svgalib        SVGAlib support (default disabled)])
+if test "x${enable_svgalib}" = "xyes"
+then
+  PLUGINS="${PLUGINS} video_output/svgalib"
+  svgalib_LDFLAGS="${svgalib_LDFLAGS} -lvga -lvgagl"
+fi
+
+dnl
 dnl  GGI module
 dnl
 AC_ARG_ENABLE(ggi,
@@ -2090,6 +2102,7 @@ AC_SUBST(motionaltivec_CFLAGS)
 AC_SUBST(qt_CFLAGS)
 AC_SUBST(qte_CFLAGS)
 AC_SUBST(sdl_CFLAGS)
+AC_SUBST(svgalib_CFLAGS)
 AC_SUBST(x11_CFLAGS)
 AC_SUBST(xvideo_CFLAGS)
 
@@ -2142,6 +2155,7 @@ AC_SUBST(qt_LDFLAGS)
 AC_SUBST(qte_LDFLAGS)
 AC_SUBST(rc_LDFLAGS)
 AC_SUBST(sdl_LDFLAGS)
+AC_SUBST(svgalib_LDFLAGS)
 AC_SUBST(vcd_LDFLAGS)
 AC_SUBST(vorbis_LDFLAGS)
 AC_SUBST(waveout_LDFLAGS)
