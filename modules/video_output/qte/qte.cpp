@@ -1,8 +1,8 @@
 /*****************************************************************************
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.13 2003/02/14 13:48:41 jpsaman Exp $
+ * Copyright (C) 1998-2003 VideoLAN
+ * $Id: qte.cpp,v 1.14 2003/02/16 16:21:37 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -77,22 +77,10 @@ extern "C"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALT_FS_TEXT N_("alternate fullscreen method")
-#define ALT_FS_LONGTEXT N_( \
-    "There are two ways to make a fullscreen window, unfortunately each one " \
-    "has its drawbacks.\n" \
-    "1) Let the window manager handle your fullscreen window (default). But " \
-    "things like taskbars will likely show on top of the video.\n" \
-    "2) Completly bypass the window manager, but then nothing will be able " \
-    "to show on top of the video.")
 #define DISPLAY_TEXT N_("QT Embedded display name")
 #define DISPLAY_LONGTEXT N_( \
     "Specify the Qt Embedded hardware display you want to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
-#define DRAWABLE_TEXT N_("QT Embedded drawable")
-#define DRAWABLE_LONGTEXT N_( \
-    "Specify a QT Embedded drawable to use instead of opening a new window. This " \
-    "option is DANGEROUS, use with care.")
 
 /*****************************************************************************
  * Local prototypes
@@ -125,11 +113,9 @@ extern "C"
 vlc_module_begin();
 //    add_category_hint( N_("QT Embedded"), NULL );
 //    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
-//    add_bool( "qte-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT);
-//    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
-    set_description( _("QT Embedded module") );
+    set_description( _("QT Embedded video module") );
     set_capability( "video output", 70 );
-//    add_shortcut( "qte" );
+    add_shortcut( "qte" );
     set_callbacks( Open, Close);
 vlc_module_end();
 
@@ -158,7 +144,6 @@ static int Open( vlc_object_t *p_this )
         return( 1 );
     }
 
-//    memset(p_vout->p_sys, 0, sizeof( struct vout_sys_t ));
     p_vout->pf_init    = Init;
     p_vout->pf_end     = End;
     p_vout->pf_manage  = NULL; //Manage;
@@ -174,7 +159,12 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    OpenDisplay(p_vout);
+    if (OpenDisplay(p_vout))
+    {
+        msg_Err( p_vout, "Cannot set up qte video output" );
+        Close(p_this);
+        return( -1 );
+    }
     return( 0 );
 }
 
@@ -199,6 +189,7 @@ static void Close ( vlc_object_t *p_this )
         vlc_thread_join( p_vout->p_sys->p_event );
         vlc_object_destroy( p_vout->p_sys->p_event );
     }
+
 #ifdef NEED_QTE_MAIN
     msg_Dbg( p_vout, "Releasing qte_main" );
     module_Unneed( p_vout, p_vout->p_sys->p_qte_main );
@@ -230,12 +221,22 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_gmask  = 0x07e0;
     p_vout->output.i_bmask  = 0x001f;
 
-    /* We may need to convert the chroma, but at least we keep the
-     * aspect ratio */
+    /* All we have is an RGB image with square pixels */
     p_vout->output.i_width  = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-
+    if( !p_vout->b_fullscreen )
+    {
+        p_vout->output.i_aspect = p_vout->output.i_width
+                                   * VOUT_ASPECT_FACTOR
+                                   / p_vout->output.i_height;
+    }
+    else
+    {
+        p_vout->output.i_aspect = p_vout->render.i_aspect;
+    }
+#if 0
+    msg_Dbg( p_vout, "Init (h=%d,w=%d,aspect=%d)",p_vout->output.i_height,p_vout->output.i_width,p_vout->output.i_aspect );
+#endif
     /* Try to initialize MAX_DIRECTBUFFERS direct buffers */
     while( I_OUTPUTPICTURES < QTE_MAX_DIRECTBUFFERS )
     {
@@ -286,18 +287,18 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     unsigned int x, y, w, h;
 
-    vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+    vout_PlacePicture( p_vout, p_vout->output.i_width, p_vout->output.i_height,
                        &x, &y, &w, &h );
-
 #if 0
-    msg_Err(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
-					p_vout->p_sys->i_width, p_vout->p_sys->i_height, x, y, w, h );
+    msg_Dbg(p_vout, "+qte::Display( p_vout, i_width=%d, i_height=%d, x=%u, y=%u, w=%u, h=%u",
+					p_vout->output.i_width, p_vout->output.i_height, x, y, w, h );
 #endif
 
     if(p_vout->p_sys->p_VideoWidget)
     {
 // shameless borrowed from opie mediaplayer....
 #ifndef USE_DIRECT_PAINTER
+        msg_Dbg(p_vout, "Not using direct painter");
         QPainter p(p_vout->p_sys->p_VideoWidget);
 
         /* rotate frame */
@@ -382,12 +383,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int dd = QPixmap::defaultDepth();
 
-#if 0
-    msg_Dbg(p_vout, "Default Depth = %d",dd );
-#endif
-
     p_pic->p_sys = (picture_sys_t*) malloc( sizeof( picture_sys_t ) );
-
     if( p_pic->p_sys == NULL )
     {
         return -1;
@@ -395,8 +391,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Create the display */
     p_pic->p_sys->pQImage = new QImage(p_vout->output.i_width,
-                                       p_vout->output.i_height,
-                                       dd );
+                                       p_vout->output.i_height, dd );
 
     if(p_pic->p_sys->pQImage == NULL)
     {
@@ -428,11 +423,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_pic->i_planes = 1;
 
-#if 0
-    msg_Dbg(p_vout, "-NewPicture: %d %d %d",p_vout->output.i_width,
-                                 p_vout->output.i_height,
-                                 p_vout->output.i_chroma );
-#endif
     return 0;
 }
 
@@ -468,18 +458,25 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
  *****************************************************************************/
 static int OpenDisplay( vout_thread_t *p_vout )
 {
-    msg_Dbg( p_vout, "Creating Qt Window" );
-
     /* for displaying the vout in a qt window we need the QtApplication */
+    p_vout->p_sys->p_QApplication = NULL;
     p_vout->p_sys->p_VideoWidget = NULL;
 
     p_vout->p_sys->p_event = (event_thread_t*) vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
 
     /* Initializations */
-    p_vout->p_sys->i_width  = 320;
-    p_vout->p_sys->i_height = 240;
+#if 1 /* FIXME: I need an event queue to handle video output size changes. */
     p_vout->b_fullscreen = VLC_TRUE;
+#endif
+
+    /* Set main window's size */
+    QWidget *desktop = p_vout->p_sys->p_QApplication->desktop();
+    p_vout->p_sys->i_width = p_vout->b_fullscreen ? desktop->height() :
+                                                    p_vout->i_window_width;
+    p_vout->p_sys->i_height = p_vout->b_fullscreen ? desktop->width() :
+                                                     p_vout->i_window_height;
+    msg_Dbg( p_vout, "OpenDisplay (h=%d,w=%d)",p_vout->p_sys->i_height,p_vout->p_sys->i_width);
 
     /* create thread to exec the qpe application */
     if ( vlc_thread_create( p_vout->p_sys->p_event, "QT Embedded Thread",
@@ -489,13 +486,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot create QT Embedded Thread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
-        goto error;
+        return -1;
     }
 
     if( p_vout->p_sys->p_event->b_error )
     {
         msg_Err( p_vout, "RunQtThread failed" );
-        goto error;
+        return -1;
     }
 
     vlc_object_attach( p_vout->p_sys->p_event, p_vout );
@@ -507,10 +504,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
         msleep(1);
     }
     return VLC_SUCCESS;
-
- error:
-    Close( VLC_OBJECT(p_vout) );
-    return VLC_EGENERIC;
 }
 
 
@@ -574,7 +567,20 @@ static void RunQtThread(event_thread_t *p_event)
 
     if (p_event->p_vout->p_sys->p_QApplication)
     {
-        p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
+        /* Set default window width and heigh to exactly preferred size. */
+    	QWidget *desktop = p_event->p_vout->p_sys->p_QApplication->desktop();
+		p_event->p_vout->p_sys->p_VideoWidget->setMinimumWidth( 10 );
+ 		p_event->p_vout->p_sys->p_VideoWidget->setMinimumHeight( 10 );
+		p_event->p_vout->p_sys->p_VideoWidget->setBaseSize( p_event->p_vout->p_sys->i_width,
+			p_event->p_vout->p_sys->i_height );
+        p_event->p_vout->p_sys->p_VideoWidget->setMaximumWidth( desktop->width() );
+        p_event->p_vout->p_sys->p_VideoWidget->setMaximumHeight( desktop->height() );
+
+        if (p_event->p_vout->b_fullscreen)
+		    p_event->p_vout->p_sys->p_VideoWidget->showFullScreen();
+        else
+			p_event->p_vout->p_sys->p_VideoWidget->showNormal();
+
         p_event->p_vout->p_sys->p_VideoWidget->show();
         p_event->p_vout->p_sys->bRunning = TRUE;
 
