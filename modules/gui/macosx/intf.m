@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.3 2002/10/02 22:56:53 massiot Exp $
+ * $Id: intf.m,v 1.4 2002/11/05 03:57:16 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -33,6 +33,7 @@
 
 #include "intf.h"
 #include "vout.h"
+#include "prefs.h"
 #include "playlist.h"
 #include "asystm.h"
 
@@ -164,6 +165,18 @@ static void Run( intf_thread_t *p_intf )
  *****************************************************************************/
 @implementation VLCMain
 
+- (id)init
+{
+    self = [super init];
+
+    if( self != nil )
+    {
+        o_prefs = nil;
+    }
+
+    return( self ); 
+}
+
 - (void)awakeFromNib
 {
     NSString * pTitle = [NSString
@@ -175,6 +188,7 @@ static void Run( intf_thread_t *p_intf )
     [o_msgs_btn_ok setTitle: _NS("Close")];
 
     [o_mi_about setTitle: _NS("About vlc")];
+    [o_mi_prefs setTitle: _NS("Preferences")];
     [o_mi_hide setTitle: _NS("Hide vlc")];
     [o_mi_hide_others setTitle: _NS("Hide Others")];
     [o_mi_show_all setTitle: _NS("Show All")];
@@ -184,7 +198,6 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_open_file setTitle: _NS("Open File")];
     [o_mi_open_disc setTitle: _NS("Open Disc")];
     [o_mi_open_net setTitle: _NS("Open Network")];
-    [o_mi_open_quickly setTitle: _NS("Open Quickly...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
 
@@ -422,6 +435,12 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         vout_DestroyThread( p_vout );
+    }
+
+    if( o_prefs != nil )
+    {
+        [o_prefs release];
+        o_prefs = nil;
     }
 
     [NSApp stop: nil];
@@ -741,6 +760,16 @@ static void Run( intf_thread_t *p_intf )
 - (void)openRecentItem:(id)sender
 {
     [self application: nil openFile: [sender title]]; 
+}
+
+- (IBAction)viewPreferences:(id)sender
+{
+    if( o_prefs == nil )
+    {
+        o_prefs = [[VLCPrefs alloc] init];
+    }
+
+    [o_prefs createPrefPanel: @"main"];
 }
 
 @end

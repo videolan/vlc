@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.2 2002/10/02 22:56:53 massiot Exp $
+ * $Id: intf.h,v 1.3 2002/11/05 03:57:16 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -82,6 +82,8 @@ struct intf_sys_t
  *****************************************************************************/
 @interface VLCMain : NSObject
 {
+    id o_prefs;                 /* VLCPrefs       */
+
     IBOutlet id o_window;       /* main window    */
 
     IBOutlet id o_controls;     /* VLCControls    */
@@ -94,6 +96,7 @@ struct intf_sys_t
     /* main menu */
 
     IBOutlet id o_mi_about;
+    IBOutlet id o_mi_prefs;
     IBOutlet id o_mi_hide;
     IBOutlet id o_mi_hide_others;
     IBOutlet id o_mi_show_all;
@@ -103,7 +106,6 @@ struct intf_sys_t
     IBOutlet id o_mi_open_file;
     IBOutlet id o_mi_open_disc;
     IBOutlet id o_mi_open_net;
-    IBOutlet id o_mi_open_quickly;
     IBOutlet id o_mi_open_recent;
     IBOutlet id o_mi_open_recent_cm;
 
@@ -165,6 +167,8 @@ struct intf_sys_t
 - (void)openRecentItem:(id)sender;
 
 //- (void)selectAction:(id)sender;
+
+- (IBAction)viewPreferences:(id)sender;
 
 @end
 

@@ -28,7 +28,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {clearRecentItems = id; }; 
+            ACTIONS = {clearRecentItems = id; viewPreferences = id; }; 
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -57,13 +57,13 @@
                 "o_mi_open_disc" = id; 
                 "o_mi_open_file" = id; 
                 "o_mi_open_net" = id; 
-                "o_mi_open_quickly" = id; 
                 "o_mi_open_recent" = id; 
                 "o_mi_open_recent_cm" = id; 
                 "o_mi_paste" = id; 
                 "o_mi_pause" = id; 
                 "o_mi_play" = id; 
                 "o_mi_playlist" = id; 
+                "o_mi_prefs" = id; 
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 
                 "o_mi_quit" = id; 
