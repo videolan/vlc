@@ -813,6 +813,7 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         /* Add static items */
         p_settings_menu->AppendCheckItem( Extended_Event,
             wxU(_("&Extended GUI") ) );
+        if( b_extra ) p_settings_menu->Check( Extended_Event, TRUE );
         p_settings_menu->AppendCheckItem( Bookmarks_Event,
             wxU(_("&Bookmarks...") ) );
         p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")) );
