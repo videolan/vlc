@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.5 2004/02/05 22:56:11 gbazin Exp $
+ * $Id: dts.c,v 1.6 2004/02/06 15:11:39 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -147,7 +147,7 @@ static int Open( vlc_object_t * p_this )
         i_peek + DTS_MAX_HEADER_SIZE )
     {
         /* Stream too short */
-        msg_Err( p_input, "cannot peek()" );
+        msg_Warn( p_input, "cannot peek()" );
         return VLC_EGENERIC;
     }
 
