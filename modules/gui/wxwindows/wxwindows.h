@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.91 2004/02/23 12:17:24 gbazin Exp $
+ * $Id: wxwindows.h,v 1.92 2004/02/24 22:15:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -976,7 +976,7 @@ private:
 
     wxMenu *Menu::CreateDummyMenu();
     void   Menu::CreateMenuItem( wxMenu *, char *, vlc_object_t * );
-    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t * );
+    wxMenu *Menu::CreateChoicesMenu( char *, vlc_object_t *, bool );
 
     DECLARE_EVENT_TABLE();
 

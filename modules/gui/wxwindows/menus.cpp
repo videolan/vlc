@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: menus.cpp,v 1.30 2004/01/25 03:29:01 hartman Exp $
+ * $Id: menus.cpp,v 1.31 2004/02/24 22:15:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -459,6 +459,49 @@ Menu::~Menu()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
+static bool IsMenuEmpty( char *psz_var, vlc_object_t *p_object,
+                         bool b_root = TRUE )
+{
+    vlc_value_t val, val_list;
+    int i_type, i_result, i;
+
+    /* Check the type of the object variable */
+    i_type = var_Type( p_object, psz_var );
+
+    /* Check if we want to display the variable */
+    if( !(i_type & VLC_VAR_HASCHOICE) ) return FALSE;
+
+    var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    if( val.i_int == 0 ) return TRUE;
+
+    if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE )
+    {
+        if( val.i_int == 1 && b_root ) return TRUE;
+        else return FALSE;
+    }
+
+    /* Check children variables in case of VLC_VAR_VARIABLE */
+    if( var_Change( p_object, psz_var, VLC_VAR_GETLIST, &val_list, NULL ) < 0 )
+    {
+        return TRUE;
+    }
+
+    for( i = 0, i_result = TRUE; i < val_list.p_list->i_count; i++ )
+    {
+        if( !IsMenuEmpty( val_list.p_list->p_values[i].psz_string,
+                          p_object, FALSE ) )
+        {
+            i_result = FALSE;
+            break;
+        }
+    }
+
+    /* clean up everything */
+    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, NULL );
+
+    return i_result;
+}
+
 void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
                            vlc_object_t *p_object )
 {
@@ -483,13 +526,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     }
 
     /* Make sure we want to display the variable */
-    if( i_type & VLC_VAR_HASCHOICE )
-    {
-        var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 ) return;
-        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
-            return;
-    }
+    if( IsMenuEmpty( psz_var, p_object ) ) return;
 
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
@@ -500,7 +537,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     {
         menu->Append( MenuDummy_Event,
                       wxU(text.psz_string ? text.psz_string : psz_var),
-                      CreateChoicesMenu( psz_var, p_object ),
+                      CreateChoicesMenu( psz_var, p_object, TRUE ),
                       wxT("")/* Nothing for now (maybe use a GETLONGTEXT) */ );
 
         if( text.psz_string ) free( text.psz_string );
@@ -539,7 +576,8 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     if( text.psz_string ) free( text.psz_string );
 }
 
-wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
+wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object,
+                                 bool b_root )
 {
     vlc_value_t val, val_list, text_list;
     int i_type, i;
@@ -548,17 +586,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
     i_type = var_Type( p_object, psz_var );
 
     /* Make sure we want to display the variable */
-    if( i_type & VLC_VAR_HASCHOICE )
-    {
-        var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int == 0 ) return NULL;
-        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
-            return NULL;
-    }
-    else
-    {
-        return NULL;
-    }
+    if( IsMenuEmpty( psz_var, p_object, b_root ) ) return NULL;
 
     switch( i_type & VLC_VAR_TYPE )
     {
@@ -600,7 +628,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
                         val_list.p_list->p_values[i].psz_string),
                         CreateChoicesMenu(
                             val_list.p_list->p_values[i].psz_string,
-                            p_object ), wxT("") );
+                            p_object, FALSE ), wxT("") );
           break;
 
         case VLC_VAR_STRING:
