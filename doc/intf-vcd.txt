@@ -1,6 +1,6 @@
 This file documents the ``Extended'' VLC Video CD Plugin
 
-Copyright (C) 2003 Rocky Bernstein (rocky@panix.com)
+Copyright (C) 2003, 2004 Rocky Bernstein (rocky@panix.com)
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -154,18 +154,21 @@ as a time gaps when hardware players go between tracks - something
 that doesn't have to happen switching between entries because there in
 fact is no gap.
 
-Another unit we use is a called a "segment." These are used in menus
-an still frames. A menu doesn't have to have a still-frame associated
-with it; A menu might be implimented as a short looped movie clip.
-However Video CD specifications allow still frames to have higher
-resolution than motion clips. And several segments can reside in track
-0.
+Another unit we use is a called a "segment." These are just the
+playable units in track 0. Segments come in fixed-length units so
+several may be combined to form a single logical playable unit.  Still
+frames for menus are segments. A menu doesn't have to have a
+still-frame associated with it; a menu might be implemented as a short
+looped movie clip.  But all still frames are segments. Also, Video CD
+specifications allow still frames to have higher resolution than
+motion clips. All segments reside in track 0.
 
-A "playback list item" (also called a "list id or LID) combines
-"entries" and "segments" and "tracks" together with some navigation
-logic. "Playback Control" is simply starting playback at a particular
-playback list item, and unless otherwise specified you'd start with
-the first playback item which we call P1.
+A "list ID" (also called a LID and and is one greater than a Play
+Sequence descripter or "PSD" number) combines "entries" and "segments"
+and "tracks" together with some navigation logic. "Playback Control"
+(acronym PBC) is simply starting playback at a particular LID, and
+unless otherwise specified you'd start with the first playback item
+which we call P1.
 
 Below we will refer to an "item" as combination of a unit name (track,
 entry, segment, playback) and a whole number.
@@ -242,9 +245,9 @@ vcdx:///dev/cdrom2@T1     - Play Track 1 from /dev/cdrom2
 vcdx:///dev/cdrom@S1      - Play segment 1 from /dev/cdrom. This
                             assumes there *is* a segment 1. Check
                             the MRL list to see if that is the case.
-vcdx://@P1                - Play Playlist item 1 from default device
+vcdx://@P1                - Play LID item 1 from default device
                             If there is no playback control, MRL will
-			    get converted into vcdx:/:E0. Again
+			    get converted into vcdx://@E0. Again
                             check the MRL list to see if there is a P1.
 vcdx://@P1*               - probably same as above.
 vcdx:///dev/cdrom@E1      - Play Entry id 1 from default device
@@ -472,4 +475,4 @@ http://www.vcdhelp.com/
 http://www.vcdimager.org/
 http://www.vcdimager.org/guides/#guides
 
-$Id: intf-vcd.txt,v 1.2 2003/12/01 04:05:42 rocky Exp $
+$Id: intf-vcd.txt,v 1.3 2004/01/25 14:18:40 rocky Exp $
