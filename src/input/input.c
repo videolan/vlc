@@ -2521,8 +2521,7 @@ int vlc_input_item_AddInfo( input_item_t *p_i,
     }
     if( !p_cat )
     {
-        if( ( p_cat = (info_category_t *)malloc(
-                                     sizeof( info_category_t ) ) )  == NULL )
+        if( !(p_cat = (info_category_t *)malloc( sizeof(info_category_t) )) )
         {
             vlc_mutex_unlock( &p_i->lock );
             return VLC_EGENERIC;

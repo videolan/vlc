@@ -662,10 +662,13 @@ static int AStreamPeekBlock( stream_t *s, uint8_t **pp_peek, int i_read )
     /* We need to create a local copy */
     if( p_sys->i_peek < i_read )
     {
-        if( p_sys->p_peek )
-            free( p_sys->p_peek );
+        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        if( !p_sys->p_peek )
+        {
+            p_sys->i_peek = 0;
+            return 0;
+        }
         p_sys->i_peek = i_read;
-        p_sys->p_peek = malloc( p_sys->i_peek );
     }
 
     /* Fill enough data */
@@ -674,12 +677,10 @@ static int AStreamPeekBlock( stream_t *s, uint8_t **pp_peek, int i_read )
     {
         block_t **pp_last = p_sys->block.pp_last;
 
-        if( AStreamRefillBlock( s ) )
-            break;
+        if( AStreamRefillBlock( s ) ) break;
 
         /* Our buffer are probably filled enough, don't try anymore */
-        if( pp_last == p_sys->block.pp_last )
-            break;
+        if( pp_last == p_sys->block.pp_last ) break;
     }
 
     /* Copy what we have */
@@ -1000,10 +1001,10 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
         if( p_sys->stream.i_used <= 1 )
         {
             /* Be sure we will read something */
-            p_sys->stream.i_used += i_read - (tk->i_end - tk->i_start - p_sys->stream.i_offset);
+            p_sys->stream.i_used += i_read -
+                (tk->i_end - tk->i_start - p_sys->stream.i_offset);
         }
-        if( AStreamRefillStream( s ) )
-            break;
+        if( AStreamRefillStream( s ) ) break;
     }
 
     if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
@@ -1019,9 +1020,13 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
 
     if( p_sys->i_peek < i_read )
     {
-        if( p_sys->p_peek ) free( p_sys->p_peek );
+        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        if( !p_sys->p_peek )
+        {
+            p_sys->i_peek = 0;
+            return 0;
+        }
         p_sys->i_peek = i_read;
-        p_sys->p_peek = malloc( i_read );
     }
 
     memcpy( p_sys->p_peek, &tk->p_buffer[i_off],
