@@ -118,6 +118,7 @@ static int Demux( demux_t *p_demux )
     int            i_item = -1;
     int            i_new_item = 0;
     int            i_key_length;
+    playlist_item_t *p_parent;
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
@@ -126,9 +127,15 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "can't find playlist" );
         return -1;
     }
+    p_parent = p_playlist->status.p_item;
+    p_parent->input.i_type = ITEM_TYPE_PLAYLIST;
 
-    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-    i_position = p_playlist->i_index + 1;
+//    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+    /* Change the item to a node */	
+    if( p_parent->i_children == -1)	
+    {	
+        playlist_ItemToNode( p_playlist,p_parent );	
+    }    
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) )
@@ -184,8 +191,15 @@ static int Demux( demux_t *p_demux )
         {
             if( psz_mrl )
             {
-                playlist_Add( p_playlist, psz_mrl, psz_name,
-                              PLAYLIST_INSERT, i_position );
+                playlist_item_t *p_item = playlist_ItemNew( p_playlist, psz_mrl,
+                                                            psz_name );
+                
+                playlist_NodeAddItem( p_playlist,p_item,	
+                                      p_parent->pp_parents[0]->i_view,	
+                                      p_parent,	
+                                      PLAYLIST_APPEND, PLAYLIST_END );	
+ 	 	
+                playlist_CopyParents( p_parent, p_item );
                 if( i_duration != -1 )
                 {
                     //playlist_SetDuration( p_playlist, i_position, i_duration );
@@ -232,13 +246,19 @@ static int Demux( demux_t *p_demux )
     /* Add last object */
     if( psz_mrl )
     {
-        playlist_Add( p_playlist, psz_mrl, psz_name,
-                      PLAYLIST_INSERT, i_position );
+        playlist_item_t *p_item = playlist_ItemNew( p_playlist, psz_mrl,
+                                                    psz_name );
+        
+        playlist_NodeAddItem( p_playlist,p_item,	
+                              p_parent->pp_parents[0]->i_view,	
+                              p_parent,	
+                              PLAYLIST_APPEND, PLAYLIST_END );	
+ 	 	
+        playlist_CopyParents( p_parent, p_item );
         if( i_duration != -1 )
         {
             //playlist_SetDuration( p_playlist, i_position, i_duration );
         }
-        i_position++;
         free( psz_mrl );
         psz_mrl = NULL;
     }
