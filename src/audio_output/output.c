@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.33 2003/01/23 17:13:28 massiot Exp $
+ * $Id: output.c,v 1.34 2003/01/27 22:50:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -211,14 +211,18 @@ int aout_OutputNew( aout_instance_t * p_aout,
  *****************************************************************************/
 void aout_OutputDelete( aout_instance_t * p_aout )
 {
-    if ( p_aout->output.b_error ) return 0;
+    if ( p_aout->output.b_error )
+    {
+        return;
+    }
+
     module_Unneed( p_aout, p_aout->output.p_module );
 
     aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );
     aout_FifoDestroy( p_aout, &p_aout->output.fifo );
 
-    p_aout->output.b_error = 1;
+    p_aout->output.b_error = VLC_TRUE;
 }
 
 /*****************************************************************************
