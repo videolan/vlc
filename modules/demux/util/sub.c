@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.21 2003/08/23 19:20:29 hartman Exp $
+ * $Id: sub.c,v 1.22 2003/08/23 22:02:45 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -294,25 +294,31 @@ char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
             int i_found = 0;
 
 	    while(( p_dir_afile = readdir( p_dir_handle ))) {
-		for (i = 0; ppsz_sub_exts[i]; i++) {
-                    if( strcmp( ppsz_sub_exts[i], 1 + strrchr( p_dir_afile->d_name, '.' ) ) == 0 ) {
-			i_found = 1;
-			break;
-		    }
-		}
-                if( i_found )
+                char* psz_afile_ext = strrchr( p_dir_afile->d_name, '.' );
+                
+                if( psz_afile_ext )
                 {
-                    msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
-                    if( psz_dir )
-                    {
-                        psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
-                        strncpy( psz_result, psz_dir, i_dirlen );
-                        char *psz_append = psz_result + i_dirlen;
-                        strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
-                        psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
-                        return psz_result;
+                    ++psz_afile_ext;
+                    for (i = 0; ppsz_sub_exts[i]; i++) {
+                        if( strcmp( ppsz_sub_exts[i], psz_afile_ext ) == 0 ) {
+                            i_found = 1;
+                            break;
+                        }
                     }
-                    else return strdup( p_dir_afile->d_name );
+                    if( i_found )
+                    {
+                        msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
+                        if( psz_dir )
+                        {
+                            psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
+                            strncpy( psz_result, psz_dir, i_dirlen );
+                            char *psz_append = psz_result + i_dirlen;
+                            strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
+                            psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
+                            return psz_result;
+                        }
+                        else return strdup( p_dir_afile->d_name );
+                    }
                 }
             }
             closedir( p_dir_handle );
@@ -346,16 +352,14 @@ static int  sub_open ( subtitle_demux_t *p_sub,
 
     if( !psz_name || !*psz_name)
     {
-        msg_Dbg( p_sub, "variable psz_name empty" );
         var_Get( p_sub, "sub-file", &val );
         if( !val.psz_string || !*val.psz_string )
         {
-            msg_Dbg( p_sub, "variable sub-file empty too" );
             var_Get( p_sub, "sub-autodetect-file", &val );
             if( val.b_bool )
             {
-                msg_Dbg( p_sub, "lets try autodetect" );
                 psz_name = strdup( sub_detect( p_sub, p_input->psz_source));
+                if( !psz_name || !*psz_name ) return VLC_EGENERIC;
             }
             else
             {
