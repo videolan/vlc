@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.25 2003/05/11 13:45:21 gbazin Exp $
+ * $Id: interface.cpp,v 1.26 2003/05/11 15:55:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -414,6 +414,25 @@ void Interface::Open( int i_access_method )
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
+/* Work-around helper for buggy wxGTK */
+void RecursiveDestroy( wxMenu *menu )
+{
+    wxMenuItemList::Node *node = menu->GetMenuItems().GetFirst();
+    for( ; node; )
+    {
+        wxMenuItem *item = node->GetData();
+	node = node->GetNext();
+
+	/* Delete the submenus */
+	wxMenu *submenu = item->GetSubMenu();
+	if( submenu )
+	{
+	    RecursiveDestroy( submenu );
+	}
+	menu->Delete( item );
+    }
+}
+
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
 #if !defined( __WXMSW__ )
@@ -422,7 +441,13 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         if( b_audio_menu )
         {
             p_audio_menu = AudioMenu( p_intf, this );
-            wxMenu *menu =
+
+            /* Work-around for buggy wxGTK */
+            wxMenu *menu = GetMenuBar()->GetMenu( 3 );
+            RecursiveDestroy( menu );
+            /* End work-around */
+
+            menu =
                 GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
             if( menu ) delete menu;
 
@@ -435,7 +460,13 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         if( b_video_menu )
         {
             p_video_menu = VideoMenu( p_intf, this );
-            wxMenu *menu =
+
+            /* Work-around for buggy wxGTK */
+            wxMenu *menu = GetMenuBar()->GetMenu( 4 );
+            RecursiveDestroy( menu );
+            /* End work-around */
+
+            menu =
                 GetMenuBar()->Replace( 4, p_video_menu, wxU(_("&Video")) );
             if( menu ) delete menu;
 
