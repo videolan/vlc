@@ -62,6 +62,6 @@ modules/gui/kde/info.moc.cpp: modules/gui/kde/info.h
 modules/gui/kde/languagemenu.moc.cpp: modules/gui/kde/languagemenu.h
 	$(MOC) $< -o $@
 
-kdedatadir = $(datadir)\vlc
+kdedatadir = $(datadir)/vlc
 
 dist_kdedata_DATA = modules/gui/kde/ui.rc
