@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.85 2001/04/12 01:52:45 sam Exp $
+ * $Id: main.c,v 1.86 2001/04/14 07:41:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -542,8 +542,8 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
      * is the PSN - process serial number (a unique PID-ish thingie)
      * still ok for real Darwin & when run from command line */
-    if ( strncmp( ppsz_argv[ 1 ] , "-psn" , 4) == 0 )
-                                  /* for example -psn_0_9306113 */
+    if ( (*pi_argc > 1) && (strncmp( ppsz_argv[ 1 ] , "-psn" , 4 ) == 0) )
+                                        /* for example -psn_0_9306113 */
     {
         /* GDMF!... I can't do this or else the MacOSX window server will
          * not pick up the PSN and not register the app and we crash...

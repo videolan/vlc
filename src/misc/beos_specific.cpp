@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: beos_specific.cpp,v 1.8 2001/04/12 08:24:30 sam Exp $
+ * $Id: beos_specific.cpp,v 1.9 2001/04/14 07:41:20 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -26,7 +26,8 @@
 #include <Roster.h>
 #include <Path.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <string.h> /* strdup() */
+#include <malloc.h>   /* free() */
 
 extern "C"
 {
@@ -36,55 +37,126 @@ extern "C"
 }
 #include "beos_specific.h"
 
+/*****************************************************************************
+ * The VlcApplication class
+ *****************************************************************************/
+class VlcApplication : public BApplication
+{
+public:
+    VlcApplication(char* );
+    ~VlcApplication();
 
+    void ReadyToRun();
+};
 
 /*****************************************************************************
  * Static vars
  *****************************************************************************/
-static vlc_thread_t beos_app_thread;
-static char * psz_program_path;
-
+static vlc_thread_t app_thread;
+static vlc_mutex_t  app_lock;
+static vlc_cond_t   app_wait;
+static char        *psz_program_path;
 
 extern "C"
 {
 
-void system_AppThread( void * args )
-{
-    BApplication * BeApp = new BApplication("application/x-VLC");
-    BeApp->Run();
-    delete BeApp;
-}
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+static void system_AppThread( void * args );
 
+/*****************************************************************************
+ * system_Create: create a BApplication object and fill in program path.
+ *****************************************************************************/
 void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
-    int i_lenght;
-    BPath path;
-    app_info info; 
-    
-    be_app = NULL;
-    vlc_thread_create( &beos_app_thread, "app thread", (vlc_thread_func_t)system_AppThread, 0 );
-    while( be_app == NULL )
-        msleep( 5000 );
-    
-    be_app->GetAppInfo(&info); 
-    BEntry entry(&info.ref); 
-    entry.GetPath(&path); 
-    path.GetParent(&path);
-    i_lenght = strlen( path.Path() );
-    psz_program_path = (char*) malloc( i_lenght+1 ); /* XXX */
-    strcpy( psz_program_path, path.Path() );
+    /* Prepare the lock/wait before launching the BApplication thread */
+    vlc_mutex_init( &app_lock );
+    vlc_cond_init( &app_wait );
+    vlc_mutex_lock( &app_lock );
+
+    /* Create the BApplication thread */
+    vlc_thread_create( &app_thread, "app thread",
+                       (vlc_thread_func_t)system_AppThread, 0 );
+
+    /* Wait for the application to be initialized */
+    vlc_cond_wait( &app_wait, &app_lock );
+    vlc_mutex_unlock( &app_lock );
+
+    /* Destroy the locks */
+    vlc_mutex_destroy( &app_lock );
+    vlc_cond_destroy( &app_wait );
 }
 
+/*****************************************************************************
+ * system_Destroy: destroy the BApplication object.
+ *****************************************************************************/
 void system_Destroy( void )
 {
-    free( psz_program_path ); /* XXX */
+    free( psz_program_path );
+
+    /* Tell the BApplication to die */
     be_app->PostMessage( B_QUIT_REQUESTED );
-    vlc_thread_join( beos_app_thread );
+    vlc_thread_join( app_thread );
 }
 
+/*****************************************************************************
+ * system_GetProgramPath: get the full path to the program.
+ *****************************************************************************/
 char * system_GetProgramPath( void )
 {
     return( psz_program_path );
 }
 
+/* following functions are local */
+
+/*****************************************************************************
+ * system_AppThread: the BApplication thread.
+ *****************************************************************************/
+static void system_AppThread( void * args )
+{
+    VlcApplication *BeApp = new VlcApplication("application/x-vnd.Ink-vlc");
+    BeApp->Run();
+    delete BeApp;
+}
+
 } /* extern "C" */
+
+/*****************************************************************************
+ * VlcApplication: application constructor
+ *****************************************************************************/
+VlcApplication::VlcApplication( char * psz_mimetype )
+               :BApplication( psz_mimetype )
+{
+    /* Nothing to do, we use the default constructor */
+}
+
+/*****************************************************************************
+ * ~VlcApplication: application destructor
+ *****************************************************************************/
+VlcApplication::~VlcApplication( )
+{
+    /* Nothing to do, we use the default destructor */
+}
+
+/*****************************************************************************
+ * ~ReadyToRun: called when the BApplication is initialized
+ *****************************************************************************/
+void VlcApplication::ReadyToRun( )
+{
+    BPath path;
+    app_info info; 
+
+    /* Get the program path */
+    be_app->GetAppInfo( &info ); 
+    BEntry entry( &info.ref ); 
+    entry.GetPath( &path ); 
+    path.GetParent( &path );
+    psz_program_path = strdup( path.Path() );
+
+    /* Tell the main thread we are finished initializing the BApplication */
+    vlc_mutex_lock( &app_lock );
+    vlc_cond_signal( &app_wait );
+    vlc_mutex_unlock( &app_lock );
+}
+

@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.2 2001/04/13 14:33:22 sam Exp $
+ * $Id: darwin_specific.c,v 1.3 2001/04/14 07:41:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,6 +36,9 @@
  *****************************************************************************/
 static char * psz_program_path;
 
+/*****************************************************************************
+ * system_Create: fill in program path.
+ *****************************************************************************/
 void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     char i_dummy;
@@ -48,23 +51,29 @@ void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     for( ; *p_char ; )
     {
         if( *p_char == '/' )
-	{
+        {
             *p_oldchar = '/';
-	    *p_char = '\0';
-	    p_oldchar = p_char;
-	}
+            *p_char = '\0';
+            p_oldchar = p_char;
+        }
 
-	p_char++;
+        p_char++;
     }
     
     return;
 }
 
+/*****************************************************************************
+ * system_Destroy: free the program path.
+ *****************************************************************************/
 void system_Destroy( void )
 {
     free( psz_program_path );
 }
 
+/*****************************************************************************
+ * system_GetProgramPath: get the full path to the program.
+ *****************************************************************************/
 char * system_GetProgramPath( void )
 {
     return( psz_program_path );

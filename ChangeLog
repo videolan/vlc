@@ -1,8 +1,11 @@
-# ChangeLog for vlc
-# =================
+#===================#
+# ChangeLog for vlc #
+#===================#
 
 HEAD
 
+  * Got rid of the sleep() hack in beos_specific.cpp
+  * Fixed a segfault when launched without argument under Darwin.
   * Fix for Darwin program path handling.
 
 0.2.71
@@ -883,7 +886,7 @@ Tue, 22 Aug 2000 01:31:58 +0200
   * temporarily got rid of vlc.channels.
   * added notice in debian/control about unencrypted DVDs.
   * fixed PowerPC .deb build.
- 
+
 0.1.99g
 Wed, 16 Aug 2000 01:07:14 +0200
 
