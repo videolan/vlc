@@ -57,6 +57,8 @@ vlc_module_begin();
     add_shortcut( "dts" );
     add_shortcut( "mod" );
     add_shortcut( "flac" );
+    add_shortcut( "m3u" );
+    add_shortcut( "playlist" );
 vlc_module_end();
 
 /*****************************************************************************

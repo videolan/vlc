@@ -580,11 +580,13 @@ static void PlayItem( playlist_t *p_playlist )
     p_item = p_playlist->pp_items[p_playlist->i_index];
 
     p_item->i_nb_played++;
-
     p_playlist->p_input = input_CreateThread( p_playlist, p_item->psz_uri,
                                               p_item->ppsz_options,
                                               p_item->i_options );
 
     val.i_int = p_playlist->i_index;
+    /* unlock the playlist to set the var...mmm */
+    vlc_mutex_unlock( &p_playlist->object_lock);
     var_Set( p_playlist, "playlist-current", val);
+    vlc_mutex_lock( &p_playlist->object_lock);
 }

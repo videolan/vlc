@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: loadsave.c,v 1.11 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,14 +60,15 @@ int playlist_Import( playlist_t * p_playlist, const char *psz_filename )
     psz_uri = (char *)malloc(sizeof(char)*strlen(psz_filename) + 17 );
     sprintf( psz_uri, "file/playlist://%s", psz_filename);
 
-    vlc_mutex_lock( &p_playlist->object_lock );
     i_id = playlist_Add( p_playlist, psz_uri, psz_uri,
-                  PLAYLIST_INSERT | PLAYLIST_GO , PLAYLIST_END);
+                  PLAYLIST_INSERT  , PLAYLIST_END);
 
+    vlc_mutex_lock( &p_playlist->object_lock );
     p_item = playlist_ItemGetById( p_playlist, i_id );
     p_item->b_autodeletion = VLC_TRUE;
-
     vlc_mutex_unlock( &p_playlist->object_lock );
+
+    playlist_Play(p_playlist);
 
     return VLC_SUCCESS;
 }
