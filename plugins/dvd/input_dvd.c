@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.7 2001/02/12 07:52:40 sam Exp $
+ * $Id: input_dvd.c,v 1.8 2001/02/12 09:58:06 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -183,6 +183,12 @@ static void DVDInit( input_thread_t * p_input )
         int   i;
 
         p_method->css = CSSInit( p_input->i_handle );
+        if( ( p_input->b_error = p_method->css.b_error ) )
+        {
+            fprintf( stderr, " boaruf \n" );
+            return;
+        }
+
         p_method->css.i_title_nb = p_method->ifo.vmg.mat.i_tts_nb;
         if( (p_method->css.p_title_key =
             malloc( p_method->css.i_title_nb *sizeof(title_key_t) ) ) == NULL )
