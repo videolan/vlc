@@ -302,7 +302,7 @@ static int Open( vlc_object_t *p_this )
     snd_pcm_sw_params_t *p_sw;
 
     int i_snd_rc = -1;
-    int i_old_rate;
+    unsigned int i_old_rate;
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -910,8 +910,6 @@ static void GetDevicesForCard(module_config_t *p_item, int i_card)
         asprintf( &psz_descr, "%s: %s (%s)", psz_card_name,
                   snd_pcm_info_get_name(p_pcm_info), psz_device );
 
-        printf( "Adding device: %s\n", psz_descr );
-        
         p_item->ppsz_list =
             (char **)realloc( p_item->ppsz_list,
                               (p_item->i_list + 2) * sizeof(char *) );
