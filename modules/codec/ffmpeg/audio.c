@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.28 2004/02/25 17:48:52 fenrir Exp $
+ * $Id: audio.c,v 1.29 2004/02/26 17:07:37 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -168,7 +168,7 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
                                    (int16_t*)p_sys->p_output, &i_output,
                                    p_block->p_buffer, p_block->i_buffer );
 
-    if( i_used < 0 )//|| i_output == 0 )
+    if( i_used < 0 || i_output < 0 )
     {
         if( i_used < 0 )
             msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
