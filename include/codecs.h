@@ -146,6 +146,7 @@ typedef struct
 #define WAVE_FORMAT_WMA1                0x0160
 #define WAVE_FORMAT_WMA2                0x0161
 #define WAVE_FORMAT_WMA3                0x0162
+#define WAVE_FORMAT_DIVIO_AAC           0x4143
 
 /* Need to check these */
 #define WAVE_FORMAT_DK3                 0x0061
@@ -200,6 +201,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DK4,      VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
     { WAVE_FORMAT_DTS,      VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DTS_MS,   VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
+    { WAVE_FORMAT_DIVIO_AAC,VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_UNKNOWN,  VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
