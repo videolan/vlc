@@ -98,8 +98,8 @@ void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
 #else
 
 /* Non-DEBUG mode */
-#define intf_DbgMsg( format, args... )      ;
-#define intf_DbgMsgImm( format, args...)    ;
+#define intf_DbgMsg( format, args... )      
+#define intf_DbgMsgImm( format, args...)    
 
 #endif
 
