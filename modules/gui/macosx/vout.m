@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.2 2002/08/07 21:36:56 massiot Exp $
+ * $Id: vout.m,v 1.3 2002/10/04 14:02:20 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -80,6 +80,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 {   
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     OSErr err;
+    int i_timeout;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -90,21 +91,35 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    p_vout->p_sys->p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF, 
-                                             FIND_ANYWHERE );
-    if( p_vout->p_sys->p_intf == NULL )
+    /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
+    for( i_timeout = 20 ; i_timeout-- ; )
     {
-        msg_Err( p_vout, "no interface present" );
-        free( p_vout->p_sys );
-        return( 1 );
+        vlc_list_t * p_list = vlc_list_find( p_vout, VLC_OBJECT_INTF,
+                                                     FIND_ANYWHERE );
+        intf_thread_t ** pp_intf = (intf_thread_t **)p_list->pp_objects;
+
+        /* Parse the list of interfaces to see if one suits us */
+        for( ; *pp_intf ; pp_intf++ )
+        {
+            if( (*pp_intf)->p_module &&
+              !strcmp( (*pp_intf)->p_module->psz_object_name, MODULE_STRING ) )
+            {
+                vlc_object_yield( *pp_intf );
+                p_vout->p_sys->p_intf = *pp_intf;
+                break;
+            }
+        }
+        vlc_list_release( p_list );
+
+        if( p_vout->p_sys->p_intf == NULL )
+        {
+            msleep( INTF_IDLE_SLEEP );
+        }
     }
 
-    if( p_vout->p_sys->p_intf->p_module == NULL || 
-        strcmp( p_vout->p_sys->p_intf->p_module->psz_object_name, 
-                MODULE_STRING ) != 0 )
+    if( p_vout->p_sys->p_intf == NULL )
     {
-        msg_Err( p_vout, "MacOS X interface module required" );
-        vlc_object_release( p_vout->p_sys->p_intf );
+        msg_Err( p_vout, "no MacOS X interface present" );
         free( p_vout->p_sys );
         return( 1 );
     }
