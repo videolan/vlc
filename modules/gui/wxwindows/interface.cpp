@@ -275,7 +275,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     frame_sizer->Layout();
     frame_sizer->Fit(this);
 
-#if !defined(__WXX11__)
+#if !defined(__WXX11__) && !defined(__WXMOTIF__)
     /* Associate drop targets with the main interface */
     SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
@@ -390,7 +390,7 @@ void Interface::CreateOurMenuBar()
     /* Intercept all menu events in our custom event handler */
     PushEventHandler( new MenuEvtHandler( p_intf, this ) );
 
-#if !defined(__WXX11__)
+#if !defined(__WXX11__) && !defined(__WXMOTIF__)
     /* Associate drop targets with the menubar */
     menubar->SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
@@ -478,7 +478,7 @@ void Interface::CreateOurToolBar()
 
     toolbar->Realize();
 
-#if !defined(__WXX11__)
+#if !defined(__WXX11__) && !defined(__WXMOTIF__)
     /* Associate drop targets with the toolbar */
     toolbar->SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
@@ -1310,7 +1310,7 @@ void Interface::TogglePlayButton( int i_playing_status )
     i_old_playing_status = i_playing_status;
 }
 
-#if !defined(__WXX11__)
+#if !defined(__WXX11__) && !defined(__WXMOTIF__)
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
