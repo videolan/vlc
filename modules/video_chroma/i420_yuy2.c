@@ -262,17 +262,21 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         p_y1 = p_y2;
         p_y2 += p_source->p[Y_PLANE].i_pitch;
 
+#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
+        for( i_x = p_vout->render.i_width / 2 ; i_x-- ; )
+        {
+            C_YUV420_YUYV( );
+        }
+#else
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
-#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-#else
             MMX_CALL( MMX_YUV420_YUYV );
-#endif
         }
+        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        {
+            C_YUV420_YUYV( );
+        }
+#endif
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
