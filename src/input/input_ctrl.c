@@ -92,7 +92,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
             /* Don't decode PSI streams ! */
             if( p_input->p_es[i_es_loop].b_psi )
             {
-                intf_ErrMsg("input_error: trying to decode PID %d which is the one of a PSI\n");
+                intf_ErrMsg("input_error: trying to decode PID %d which is the one of a PSI\n", i_current_id);
                 vlc_mutex_unlock( &p_input->es_lock );
                 return( -1 );
             }
@@ -139,7 +139,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     default:
                         /* That should never happen. */
-                        intf_DbgMsg("input error: unknown stream type (%d)\n",
+                        intf_DbgMsg("input error: unknown stream type (0x%.2x)\n",
                                     p_input->p_es[i_es_loop].i_type);
                         vlc_mutex_unlock( &p_input->es_lock );
                         return( -1 );
