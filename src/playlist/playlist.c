@@ -914,6 +914,9 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     p_item->i_nb_played++;
     p_playlist->status.p_item = p_item;
 
+    p_playlist->i_index = playlist_GetPositionById( p_playlist,
+                                                    p_item->input.i_id );
+
 #ifdef PLAYLIST_PROFILE
     if( p_playlist->request_date != 0 )
     {
