@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.29 2003/02/18 00:17:06 massiot Exp $
+ * $Id: intf.h,v 1.30 2003/03/04 17:31:45 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -50,6 +50,10 @@
 @end
 
 #define _NS(s) [NSApp localizedString: _(s)]
+/* Get an alternate version of the string.
+ * This string is stored as '1:string' but when displayed it only displays
+ * the translated string. the translation should be '1:translatedstring' though */
+#define _ANS(s) [[NSApp localizedString: _(s)] substringFromIndex:2]
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
 

@@ -185,7 +185,7 @@ else
   ])
 fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
-XGETTEXT="${XGETTEXT} --keyword=_NS"
+XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
 
 AC_MSG_CHECKING(for suffix of libraries)
 AC_MSG_RESULT(${LIBEXT})

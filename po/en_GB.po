@@ -17,7 +17,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-27 12:59+0000\n"
+"POT-Creation-Date: 2003-03-04 18:18+0100\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
@@ -25,10 +25,12 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:255
 msgid "C"
 msgstr "en_GB"
 
+#. Usage
 #: src/libvlc.c:298 src/libvlc.c:1308
 #, c-format
 msgid ""
@@ -78,6 +80,12 @@ msgstr ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team at École Centrale, Paris.\n"
 
+#. ****************************************************************************
+#. * Configuration options for the main program. Each module will also separatly
+#. * define its own configuration options.
+#. * Look into configuration.h if you need to know more about the following
+#. * macros.
+#. ****************************************************************************
 #: src/libvlc.h:37
 msgid "interface module"
 msgstr ""
@@ -795,26 +803,31 @@ msgid ""
 "  vlc:quit                       quit VLC\n"
 msgstr ""
 
+#. Interface options
 #: src/libvlc.h:443 modules/misc/dummy/dummy.c:59
 msgid "Interface"
 msgstr ""
 
+#. Audio options
 #: src/libvlc.h:457 modules/audio_output/file.c:108
 #: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
-#: modules/gui/macosx/intf.m:338
+#: modules/gui/macosx/intf.m:339
 msgid "Audio"
 msgstr ""
 
+#. Video options
 #: src/libvlc.h:475 modules/gui/gtk/gnome_interface.c:1140
-#: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:345
-#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:109
+#: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:346
+#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr ""
 
+#. Input options
 #: src/libvlc.h:495 modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr ""
 
+#. Decoder options
 #: src/libvlc.h:529
 msgid "Decoders"
 msgstr ""
@@ -823,30 +836,34 @@ msgstr ""
 msgid "Encoders"
 msgstr ""
 
+#. Stream output options
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/macosx/open.m:204 modules/gui/win32/strings.cpp:221
 msgid "Stream output"
 msgstr ""
 
+#. CPU options
 #: src/libvlc.h:550
 msgid "CPU"
 msgstr ""
 
+#. Playlist options
 #: src/libvlc.h:562 modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:281
-#: modules/gui/macosx/intf.m:357 modules/gui/win32/strings.cpp:120
+#: modules/gui/macosx/intf.m:358 modules/gui/win32/strings.cpp:120
 #: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:283
 msgid "Playlist"
 msgstr ""
 
+#. Misc options
 #: src/libvlc.h:569 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
 #: modules/demux/mpeg/ts.c:118 modules/gui/familiar/familiar.c:70
-#: modules/gui/win32/win32.cpp:308 modules/misc/logger/logger.c:85
+#: modules/gui/win32/win32.cpp:312 modules/misc/logger/logger.c:85
 #: modules/video_filter/motionblur.c:58 modules/video_filter/transform.c:63
 #: modules/video_filter/wall.c:66 modules/video_output/ggi.c:62
 #: modules/video_output/mga/xmga.c:104
@@ -887,8 +904,8 @@ msgstr ""
 
 #: src/audio_output/output.c:77 src/audio_output/output.c:103
 #: src/audio_output/output.c:132 modules/audio_output/alsa.c:161
-#: modules/audio_output/alsa.c:327 modules/audio_output/directx.c:406
-#: modules/audio_output/directx.c:443 modules/audio_output/oss.c:195
+#: modules/audio_output/alsa.c:327 modules/audio_output/directx.c:425
+#: modules/audio_output/directx.c:462 modules/audio_output/oss.c:195
 #: modules/audio_output/oss.c:325 modules/audio_output/sdl.c:114
 #: modules/audio_output/sdl.c:177 modules/audio_output/sdl.c:188
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:359
@@ -917,6 +934,9 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I win32\"\n"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/access/dvd/dvd.c:65
 msgid "method to use by libdvdcss for key decryption"
 msgstr ""
@@ -973,7 +993,10 @@ msgstr ""
 msgid "Video4Linux input module"
 msgstr ""
 
-#: modules/access/file.c:63 modules/access/http.c:84 modules/access/udp.c:75
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/access/file.c:63 modules/access/http.c:81 modules/access/udp.c:72
 msgid "caching value in ms"
 msgstr ""
 
@@ -991,45 +1014,51 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: modules/access/http.c:78
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/access/http.c:75
 msgid "specify an HTTP proxy"
 msgstr ""
 
-#: modules/access/http.c:80
+#: modules/access/http.c:77
 msgid ""
 "Specify an HTTP proxy to use. It must be in the form http://myproxy.mydomain:"
 "myport. If none is specified, the HTTP_PROXY environment variable will be "
 "tried."
 msgstr ""
 
-#: modules/access/http.c:86
+#: modules/access/http.c:83
 msgid ""
 "Allows you to modify the default caching value for http streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/http.c:90
+#: modules/access/http.c:87
 msgid "http"
 msgstr ""
 
-#: modules/access/http.c:93
+#: modules/access/http.c:90
 msgid "HTTP access module"
 msgstr ""
 
-#: modules/access/udp.c:77
+#: modules/access/udp.c:74
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/udp.c:81
+#: modules/access/udp.c:78
 msgid "raw UDP access module"
 msgstr ""
 
-#: modules/access/udp.c:82
+#: modules/access/udp.c:79
 msgid "udp"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/access/satellite/satellite.c:41
 msgid "satellite default transponder frequency"
 msgstr ""
@@ -1070,7 +1099,7 @@ msgstr ""
 msgid "File stream ouput"
 msgstr ""
 
-#: modules/access_output/dummy.c:58
+#: modules/access_output/dummy.c:56
 msgid "Dummy stream ouput"
 msgstr ""
 
@@ -1078,7 +1107,7 @@ msgstr ""
 msgid "HTTP stream ouput"
 msgstr ""
 
-#: modules/access_output/udp.c:75
+#: modules/access_output/udp.c:73
 msgid "UDP stream ouput"
 msgstr ""
 
@@ -1118,6 +1147,9 @@ msgstr ""
 msgid "audio filter for s16->float32 conversion"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_filter/converter/a52tofloat32.c:76
 msgid "A/52 dynamic range compression"
 msgstr ""
@@ -1179,7 +1211,7 @@ msgid "ALSA audio module"
 msgstr ""
 
 #: modules/audio_output/alsa.c:156 modules/audio_output/alsa.c:333
-#: modules/audio_output/directx.c:417 modules/audio_output/directx.c:438
+#: modules/audio_output/directx.c:436 modules/audio_output/directx.c:457
 #: modules/audio_output/oss.c:214 modules/audio_output/oss.c:331
 #: modules/audio_output/sdl.c:119 modules/audio_output/sdl.c:178
 #: modules/audio_output/sdl.c:190 modules/audio_output/sdl.c:198
@@ -1187,22 +1219,23 @@ msgstr ""
 msgid "Mono"
 msgstr ""
 
+#. Open the device
 #: modules/audio_output/alsa.c:194 modules/audio_output/alsa.c:308
-#: modules/audio_output/directx.c:264 modules/audio_output/directx.c:459
+#: modules/audio_output/directx.c:283 modules/audio_output/directx.c:478
 #: modules/audio_output/oss.c:237 modules/audio_output/oss.c:306
 #: modules/audio_output/waveout.c:207 modules/audio_output/waveout.c:387
 msgid "A/52 over S/PDIF"
 msgstr ""
 
-#: modules/audio_output/alsa.c:312 modules/audio_output/directx.c:292
-#: modules/audio_output/directx.c:378 modules/audio_output/directx.c:432
+#: modules/audio_output/alsa.c:312 modules/audio_output/directx.c:311
+#: modules/audio_output/directx.c:397 modules/audio_output/directx.c:451
 #: modules/audio_output/oss.c:164 modules/audio_output/oss.c:310
 #: modules/audio_output/waveout.c:234 modules/audio_output/waveout.c:329
 msgid "5.1"
 msgstr ""
 
-#: modules/audio_output/alsa.c:320 modules/audio_output/directx.c:299
-#: modules/audio_output/directx.c:394 modules/audio_output/directx.c:435
+#: modules/audio_output/alsa.c:320 modules/audio_output/directx.c:318
+#: modules/audio_output/directx.c:413 modules/audio_output/directx.c:454
 #: modules/audio_output/oss.c:173 modules/audio_output/oss.c:318
 #: modules/audio_output/waveout.c:241 modules/audio_output/waveout.c:346
 msgid "2 Front 2 Rear"
@@ -1212,7 +1245,7 @@ msgstr ""
 msgid "aRts audio module"
 msgstr ""
 
-#: modules/audio_output/directx.c:196
+#: modules/audio_output/directx.c:215
 msgid "DirectX audio module"
 msgstr ""
 
@@ -1220,6 +1253,9 @@ msgstr ""
 msgid "EsounD audio module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_output/file.c:82
 msgid "output format"
 msgstr ""
@@ -1250,6 +1286,9 @@ msgstr ""
 msgid "file audio output module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_output/oss.c:102
 msgid "try to work around buggy OSS drivers"
 msgstr ""
@@ -1369,7 +1408,7 @@ msgstr ""
 msgid "libmpeg2 decoder module"
 msgstr ""
 
-#: modules/codec/lpcm.c:98
+#: modules/codec/lpcm.c:90
 msgid "linear PCM audio parser"
 msgstr ""
 
@@ -1377,6 +1416,9 @@ msgstr ""
 msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/codec/mpeg_video/idct/idct.c:41
 #: modules/codec/mpeg_video/parser.c:59
 msgid "IDCT module"
@@ -1463,6 +1505,9 @@ msgstr ""
 msgid "MPEG I/II video decoder module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor.
+#. ****************************************************************************
 #: modules/codec/spudec/spudec.c:48
 msgid "font used by the text subtitler"
 msgstr ""
@@ -1497,6 +1542,9 @@ msgstr ""
 msgid "Xvid video decoder"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/control/gestures.c:77
 msgid "Motion threshold"
 msgstr ""
@@ -1525,6 +1573,9 @@ msgstr ""
 msgid "infrared remote control module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/control/rc/rc.c:77
 msgid "show stream position"
 msgstr ""
@@ -1610,6 +1661,9 @@ msgstr "ISO 13818-1 MPEG Programme Stream input"
 msgid "generic ISO 13818-1 MPEG demultiplexing"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/demux/mpeg/ts.c:97
 msgid "compatibility with pre-0.4 VLS"
 msgstr ""
@@ -1671,6 +1725,9 @@ msgstr ""
 msgid "BeOS standard API module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/gui/familiar/familiar.c:62
 msgid "autoplay selected file"
 msgstr ""
@@ -1683,6 +1740,9 @@ msgstr ""
 msgid "Familiar Linux Gtk+ interface module"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/mainframe.dfm:
+#.
 #: modules/gui/familiar/interface.c:66 modules/gui/familiar/interface.c:448
 #: modules/gui/gtk/gnome_interface.c:279 modules/gui/gtk/gtk_interface.c:126
 #: modules/gui/gtk/gtk_interface.c:1636 modules/gui/win32/strings.cpp:8
@@ -1700,6 +1760,9 @@ msgstr ""
 msgid "Open file"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/preferences.dfm:
+#.
 #: modules/gui/familiar/interface.c:103 modules/gui/familiar/interface.c:104
 #: modules/gui/macosx/intf.m:288 modules/gui/macosx/prefs.m:191
 #: modules/gui/win32/strings.cpp:211
@@ -1716,8 +1779,8 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:131 modules/gui/gtk/gnome_interface.c:607
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
-#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:857
-#: modules/gui/macosx/intf.m:858 modules/gui/macosx/intf.m:859
+#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:858
+#: modules/gui/macosx/intf.m:859 modules/gui/macosx/intf.m:860
 #: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:591
 msgid "Pause"
 msgstr ""
@@ -1726,11 +1789,12 @@ msgstr ""
 msgid "Pause stream"
 msgstr ""
 
+#. dock menu
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:1054 modules/gui/gtk/gtk_interface.c:703
-#: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:323
-#: modules/gui/macosx/intf.m:370 modules/gui/macosx/intf.m:864
-#: modules/gui/macosx/intf.m:865 modules/gui/macosx/intf.m:866
+#: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:324
+#: modules/gui/macosx/intf.m:371 modules/gui/macosx/intf.m:865
+#: modules/gui/macosx/intf.m:866 modules/gui/macosx/intf.m:867
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
 #: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:280
 #: modules/gui/wxwindows/interface.cpp:596
@@ -1744,7 +1808,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:157 modules/gui/gtk/gnome_interface.c:571
 #: modules/gui/gtk/gnome_interface.c:1068 modules/gui/gtk/gtk_interface.c:681
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:285
-#: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:371
+#: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:372
 #: modules/gui/macosx/controls.m:695 modules/gui/win32/strings.cpp:104
 #: modules/gui/wxwindows/interface.cpp:278
 msgid "Stop"
@@ -1762,6 +1826,10 @@ msgstr ""
 msgid "Forward stream"
 msgstr ""
 
+#. Automatically generated by 'toolbox --update-po', please don't compile
+#.
+#. * from modules/gui/win32/about.dfm:
+#.
 #: modules/gui/familiar/interface.c:185 modules/gui/familiar/interface.c:186
 #: modules/gui/familiar/interface.c:459 modules/gui/gtk/gtk_interface.c:1621
 #: modules/gui/win32/strings.cpp:7
@@ -1855,6 +1923,9 @@ msgstr ""
 msgid "Error loading pixmap file: %s"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 msgid "show tooltips"
 msgstr ""
@@ -1930,7 +2001,8 @@ msgid "_Eject Disc"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:42 modules/gui/gtk/gnome_interface.c:584
-#: modules/gui/gtk/gtk_interface.c:231 modules/gui/win32/strings.cpp:107
+#: modules/gui/gtk/gtk_interface.c:231 modules/gui/win32/strings.cpp:106
+#: modules/gui/win32/strings.cpp:107
 msgid "Eject disc"
 msgstr ""
 
@@ -2003,31 +2075,31 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:126 modules/gui/gtk/gnome_interface.c:950
 #: modules/gui/gtk/gtk_interface.c:457 modules/gui/gtk/gtk_interface.c:1294
-#: modules/gui/macosx/intf.m:339
+#: modules/gui/macosx/intf.m:340
 msgid "Volume Up"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:957
 #: modules/gui/gtk/gtk_interface.c:464 modules/gui/gtk/gtk_interface.c:1301
-#: modules/gui/macosx/intf.m:340
+#: modules/gui/macosx/intf.m:341
 msgid "Volume Down"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
-#: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:742
+#: modules/gui/macosx/intf.m:342 modules/gui/macosx/controls.m:742
 msgid "Mute"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:972
 #: modules/gui/gtk/gtk_interface.c:486 modules/gui/gtk/gtk_interface.c:1323
-#: modules/gui/macosx/intf.m:342 modules/gui/win32/strings.cpp:81
+#: modules/gui/macosx/intf.m:343 modules/gui/win32/strings.cpp:81
 msgid "Channels"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:155 modules/gui/gtk/gnome_interface.c:979
 #: modules/gui/gtk/gtk_interface.c:493 modules/gui/gtk/gtk_interface.c:1330
-#: modules/gui/macosx/intf.m:343 modules/gui/win32/strings.cpp:80
+#: modules/gui/macosx/intf.m:344 modules/gui/win32/strings.cpp:80
 msgid "Device"
 msgstr ""
 
@@ -2048,7 +2120,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:1007 modules/gui/gtk/gtk_interface.c:558
-#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:351
+#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:352
 #: modules/gui/macosx/controls.m:766
 #: modules/video_filter/deinterlace/deinterlace.c:81
 msgid "Deinterlace"
@@ -2056,7 +2128,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:190
 #: modules/gui/gtk/gnome_interface.c:1014 modules/gui/gtk/gtk_interface.c:565
-#: modules/gui/gtk/gtk_interface.c:1397 modules/gui/macosx/intf.m:350
+#: modules/gui/gtk/gtk_interface.c:1397 modules/gui/macosx/intf.m:351
 #: modules/gui/macosx/vout.m:194 modules/gui/win32/strings.cpp:83
 msgid "Screen"
 msgstr ""
@@ -2075,11 +2147,11 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2963 modules/gui/gtk/gtk_interface.c:623
 #: modules/gui/gtk/gtk_interface.c:1932 modules/gui/gtk/gtk_interface.c:2849
 #: modules/gui/gtk/gtk_interface.c:2966 modules/gui/gtk/gtk_interface.c:3218
-#: modules/gui/macosx/intf.m:307 modules/gui/macosx/open.m:172
-#: modules/gui/macosx/open.m:206 modules/gui/macosx/open.m:313
-#: modules/gui/macosx/open.m:732 modules/gui/macosx/open.m:766
-#: modules/gui/win32/strings.cpp:93 modules/gui/win32/strings.cpp:226
-#: modules/gui/wxwindows/interface.cpp:267 modules/gui/wxwindows/open.cpp:160
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:206
+#: modules/gui/macosx/open.m:313 modules/gui/macosx/open.m:732
+#: modules/gui/macosx/open.m:766 modules/gui/win32/strings.cpp:93
+#: modules/gui/win32/strings.cpp:226 modules/gui/wxwindows/interface.cpp:267
+#: modules/gui/wxwindows/open.cpp:160
 msgid "File"
 msgstr ""
 
@@ -2123,7 +2195,6 @@ msgid "Stop Stream"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:583 modules/gui/gtk/gtk_interface.c:692
-#: modules/gui/win32/strings.cpp:106
 msgid "Eject"
 msgstr ""
 
@@ -2177,7 +2248,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1097 modules/gui/gtk/gtk_interface.c:774
 #: modules/gui/gtk/gtk_interface.c:857 modules/gui/gtk/gtk_interface.c:901
 #: modules/gui/gtk/gtk_interface.c:1207 modules/gui/macosx/intf.m:287
-#: modules/gui/macosx/intf.m:328 modules/gui/macosx/intf.m:372
+#: modules/gui/macosx/intf.m:329 modules/gui/macosx/intf.m:373
 #: modules/gui/macosx/controls.m:703 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
 #: modules/gui/wxwindows/interface.cpp:287
@@ -2237,7 +2308,7 @@ msgid "Got directly so specified point"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1119 modules/gui/gtk/gtk_interface.c:1240
-#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:332
+#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:333
 #: modules/gui/win32/strings.cpp:85
 msgid "Program"
 msgstr "Programme"
@@ -2324,14 +2395,14 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1688 modules/gui/gtk/gtk_interface.c:1994
 #: modules/gui/gtk/menu.c:1007 modules/gui/gtk/menu.c:1375
-#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:334
+#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:335
 #: modules/gui/macosx/open.m:184 modules/gui/wxwindows/open.cpp:258
 msgid "Chapter"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1698 modules/gui/gtk/gtk_interface.c:2004
 #: modules/gui/gtk/menu.c:1345 modules/gui/gtk/menu.c:1366
-#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:333
+#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:334
 #: modules/gui/macosx/open.m:183 modules/gui/wxwindows/open.cpp:252
 msgid "Title"
 msgstr ""
@@ -2521,9 +2592,12 @@ msgstr ""
 msgid "h:"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/messages.dfm:
+#.
 #: modules/gui/gtk/gnome_interface.c:2808 modules/gui/gtk/gtk_interface.c:3063
 #: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:294
-#: modules/gui/macosx/intf.m:359 modules/gui/win32/strings.cpp:153
+#: modules/gui/macosx/intf.m:360 modules/gui/win32/strings.cpp:153
 msgid "Messages"
 msgstr ""
 
@@ -2658,6 +2732,7 @@ msgstr ""
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr ""
 
+#. Create the buttons
 #: modules/gui/gtk/gtk_interface.c:1702 modules/gui/gtk/gtk_interface.c:2503
 #: modules/gui/gtk/gtk_interface.c:2754 modules/gui/gtk/gtk_interface.c:2985
 #: modules/gui/gtk/gtk_interface.c:3092 modules/gui/gtk/gtk_interface.c:3366
@@ -2728,6 +2803,7 @@ msgstr ""
 msgid "_Select"
 msgstr ""
 
+#. special case for "off" item
 #: modules/gui/gtk/menu.c:725 modules/gui/macosx/prefs.m:399
 #: modules/gui/macosx/prefs.m:428 modules/gui/macosx/prefs.m:670
 #: modules/gui/macosx/prefs.m:699
@@ -2753,6 +2829,7 @@ msgstr ""
 msgid "Configure"
 msgstr ""
 
+#. add new label
 #: modules/gui/gtk/preferences.c:394 modules/gui/kde/pluginsbox.cpp:53
 msgid "Selected:"
 msgstr ""
@@ -2761,7 +2838,7 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
-#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:336
+#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:337
 #: modules/gui/win32/strings.cpp:87
 msgid "Subtitles"
 msgstr ""
@@ -2790,17 +2867,17 @@ msgstr ""
 msgid "VLC - Controller"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:282 modules/gui/macosx/intf.m:327
-#: modules/gui/macosx/intf.m:373 modules/gui/macosx/controls.m:702
+#: modules/gui/macosx/intf.m:282 modules/gui/macosx/intf.m:328
+#: modules/gui/macosx/intf.m:374 modules/gui/macosx/controls.m:702
 msgid "Previous"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:283 modules/gui/macosx/intf.m:326
+#: modules/gui/macosx/intf.m:283 modules/gui/macosx/intf.m:327
 #: modules/gui/macosx/controls.m:682
 msgid "Slower"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:286 modules/gui/macosx/intf.m:325
+#: modules/gui/macosx/intf.m:286 modules/gui/macosx/intf.m:326
 #: modules/gui/macosx/controls.m:681
 msgid "Faster"
 msgstr ""
@@ -2821,6 +2898,7 @@ msgstr ""
 msgid "Open CrashLog"
 msgstr ""
 
+#. main menu
 #: modules/gui/macosx/intf.m:300
 msgid "About VLC media player"
 msgstr ""
@@ -2845,170 +2923,176 @@ msgstr ""
 msgid "Quit VLC"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:308
+#: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:308
+msgid "1:File"
+msgstr ""
+
+#: modules/gui/macosx/intf.m:309
 msgid "Open..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:309 modules/gui/win32/strings.cpp:90
+#: modules/gui/macosx/intf.m:310 modules/gui/win32/strings.cpp:90
 msgid "Open File..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:310 modules/gui/win32/strings.cpp:91
+#: modules/gui/macosx/intf.m:311 modules/gui/win32/strings.cpp:91
 msgid "Open Disc..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:311
+#: modules/gui/macosx/intf.m:312
 msgid "Open Network..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:312
+#: modules/gui/macosx/intf.m:313
 msgid "Open Recent"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:313 modules/gui/macosx/intf.m:1504
+#. Recent Items Menu
+#: modules/gui/macosx/intf.m:314 modules/gui/macosx/intf.m:1505
 msgid "Clear Menu"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:315
+#: modules/gui/macosx/intf.m:316
 msgid "Edit"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:316
+#: modules/gui/macosx/intf.m:317
 msgid "Cut"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:317
+#: modules/gui/macosx/intf.m:318
 msgid "Copy"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:318
+#: modules/gui/macosx/intf.m:319
 msgid "Paste"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:319
+#: modules/gui/macosx/intf.m:320
 msgid "Clear"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:320 modules/gui/macosx/playlist.m:124
+#: modules/gui/macosx/intf.m:321 modules/gui/macosx/playlist.m:124
 msgid "Select All"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:322 modules/gui/win32/strings.cpp:77
+#: modules/gui/macosx/intf.m:323 modules/gui/win32/strings.cpp:77
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:329 modules/gui/macosx/controls.m:721
+#: modules/gui/macosx/intf.m:330 modules/gui/macosx/controls.m:721
 msgid "Loop"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:330 modules/gui/macosx/controls.m:728
+#: modules/gui/macosx/intf.m:331 modules/gui/macosx/controls.m:728
 msgid "Step Forward"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:331 modules/gui/macosx/controls.m:729
+#: modules/gui/macosx/intf.m:332 modules/gui/macosx/controls.m:729
 #, fuzzy
 msgid "Step Backward"
 msgstr "Go Backwards"
 
-#: modules/gui/macosx/intf.m:335 modules/gui/win32/strings.cpp:86
+#: modules/gui/macosx/intf.m:336 modules/gui/win32/strings.cpp:86
 msgid "Language"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:346 modules/gui/macosx/controls.m:747
+#: modules/gui/macosx/intf.m:347 modules/gui/macosx/controls.m:747
 msgid "Half Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:347 modules/gui/macosx/controls.m:748
+#: modules/gui/macosx/intf.m:348 modules/gui/macosx/controls.m:748
 msgid "Normal Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:348 modules/gui/macosx/controls.m:749
+#: modules/gui/macosx/intf.m:349 modules/gui/macosx/controls.m:749
 msgid "Double Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:349 modules/gui/macosx/controls.m:746
+#: modules/gui/macosx/intf.m:350 modules/gui/macosx/controls.m:746
 msgid "Fullscreen"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:353
+#: modules/gui/macosx/intf.m:354
 msgid "Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:354
+#: modules/gui/macosx/intf.m:355
 msgid "Minimize Window"
 msgstr "Minimise Window"
 
-#: modules/gui/macosx/intf.m:355
+#: modules/gui/macosx/intf.m:356
 msgid "Close Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:356
+#: modules/gui/macosx/intf.m:357
 msgid "Controller"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:358 modules/gui/macosx/intf.m:382
+#: modules/gui/macosx/intf.m:359 modules/gui/macosx/intf.m:383
 msgid "Info"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:361
+#: modules/gui/macosx/intf.m:362
 msgid "Bring All to Front"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:363
+#: modules/gui/macosx/intf.m:364
 msgid "Help"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:364
+#: modules/gui/macosx/intf.m:365
 msgid "ReadMe..."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:365
+#: modules/gui/macosx/intf.m:366
 msgid "Report a Bug"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:366
+#: modules/gui/macosx/intf.m:367
 msgid "VideoLAN Website"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:367
+#: modules/gui/macosx/intf.m:368
 msgid "License"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:376
+#. error panel
+#: modules/gui/macosx/intf.m:377
 msgid "Error"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:377
+#: modules/gui/macosx/intf.m:378
 msgid ""
 "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:378
+#: modules/gui/macosx/intf.m:379
 msgid "If you believe that it is a bug, please follow the instructions at:"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:379
+#: modules/gui/macosx/intf.m:380
 msgid "Open Messages Window"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:380
+#: modules/gui/macosx/intf.m:381
 msgid "Dismiss"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1235
+#: modules/gui/macosx/intf.m:1236
 msgid "Load from file.."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1262
+#: modules/gui/macosx/intf.m:1263
 #, c-format
 msgid "Language 0x%x"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1467
+#: modules/gui/macosx/intf.m:1468
 msgid "No CrashLog found"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1467
+#: modules/gui/macosx/intf.m:1468
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
@@ -3089,7 +3173,19 @@ msgstr ""
 msgid " Enter -1 if you want to keep all messages."
 msgstr ""
 
-#: modules/gui/win32/win32.cpp:310
+#: modules/gui/win32/win32.cpp:306
+msgid "display text under images in the toolbar"
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:308
+msgid "Check this option if you want to display the caption of the buttons in "
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:309
+msgid "the toolbar. Beware, the display may be messed up"
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:317
 msgid "Native Windows interface module"
 msgstr ""
 
@@ -3097,6 +3193,9 @@ msgstr ""
 msgid "Version x.y.z"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/disc.dfm:
+#.
 #: modules/gui/win32/strings.cpp:19
 msgid "Open Disc"
 msgstr ""
@@ -3345,6 +3444,9 @@ msgstr ""
 msgid "&Copy text"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/network.dfm:
+#.
 #: modules/gui/win32/strings.cpp:161
 msgid "Open network"
 msgstr ""
@@ -3439,6 +3541,9 @@ msgstr ""
 msgid "239.239.0.1"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/subtitles.dfm:
+#.
 #: modules/gui/win32/strings.cpp:240
 msgid "Add subtitles"
 msgstr ""
@@ -3630,6 +3735,7 @@ msgstr ""
 msgid "%d"
 msgstr ""
 
+#. Audio menu
 #: modules/gui/wxwindows/popup.cpp:88
 msgid "Audio menu"
 msgstr ""
@@ -3666,10 +3772,14 @@ msgstr ""
 msgid "&Manage"
 msgstr ""
 
+#. FIXME: we should try to find the actual duration...
 #: modules/gui/wxwindows/playlist.cpp:192
 msgid "no info"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/misc/dummy/dummy.c:37
 msgid "dummy image chroma format"
 msgstr ""
@@ -3703,7 +3813,7 @@ msgstr ""
 msgid "Gtk+ helper module"
 msgstr ""
 
-#: modules/misc/httpd.c:91
+#: modules/misc/httpd.c:95
 msgid "HTTP 1.0 daemon"
 msgstr ""
 
@@ -3752,7 +3862,7 @@ msgstr ""
 msgid "AltiVec memcpy module"
 msgstr ""
 
-#: modules/misc/network/ipv4.c:87
+#: modules/misc/network/ipv4.c:84
 msgid "IPv4 network abstraction layer"
 msgstr ""
 
@@ -3784,23 +3894,23 @@ msgstr ""
 msgid "Miscellaneous stress tests"
 msgstr ""
 
-#: modules/mux/avi.c:96
+#: modules/mux/avi.c:94
 msgid "Avi muxer"
 msgstr ""
 
-#: modules/mux/dummy.c:62
+#: modules/mux/dummy.c:60
 msgid "Dummy muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ps.c:79
+#: modules/mux/mpeg/ps.c:77
 msgid "PS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:140
+#: modules/mux/mpeg/ts.c:138
 msgid "TS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:145
+#: modules/mux/mpeg/ts.c:143
 msgid "TS muxer (libdvbpsi)"
 msgstr ""
 
@@ -3856,6 +3966,9 @@ msgstr ""
 msgid "MMX conversions from "
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/clone.c:53
 msgid "number of clones"
 msgstr ""
@@ -3872,6 +3985,9 @@ msgstr ""
 msgid "image clone video module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/crop.c:54
 msgid "crop geometry"
 msgstr ""
@@ -3892,6 +4008,9 @@ msgstr ""
 msgid "image crop video module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/deinterlace/deinterlace.c:75
 msgid "deinterlace mode"
 msgstr ""
@@ -3904,6 +4023,9 @@ msgstr ""
 msgid "deinterlacing module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/distort.c:59
 msgid "distort mode"
 msgstr ""
@@ -3924,6 +4046,9 @@ msgstr ""
 msgid "invert video module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
 msgid "blur factor"
 msgstr ""
@@ -3936,6 +4061,9 @@ msgstr ""
 msgid "Motion blur filter"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/transform.c:57
 msgid "transform type"
 msgstr ""
@@ -3948,6 +4076,9 @@ msgstr ""
 msgid "image transformation module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/wall.c:53
 msgid "number of columns"
 msgstr ""
@@ -3981,29 +4112,32 @@ msgstr ""
 msgid "ASCII-art video output module"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:95
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/video_output/directx/directx.c:93
 msgid "always on top"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:96
+#: modules/video_output/directx/directx.c:94
 msgid "place the directx window on top of other windows"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:97
+#: modules/video_output/directx/directx.c:95
 msgid "use hardware YUV->RGB conversions"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:99
+#: modules/video_output/directx/directx.c:97
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
 
-#: modules/video_output/directx/directx.c:101
+#: modules/video_output/directx/directx.c:99
 msgid "use video buffers in system memory"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:103
+#: modules/video_output/directx/directx.c:101
 msgid ""
 "Create video buffers in system memory instead of video memory. This isn't "
 "recommended as usually using video memory allows to benefit from more "
@@ -4011,7 +4145,7 @@ msgid ""
 "doesn't have any effect when using overlays."
 msgstr ""
 
-#: modules/video_output/directx/directx.c:113
+#: modules/video_output/directx/directx.c:111
 msgid "DirectX video module"
 msgstr ""
 
@@ -4027,6 +4161,9 @@ msgstr ""
 msgid "Linux console framebuffer module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:98
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
@@ -4046,6 +4183,9 @@ msgstr ""
 msgid "Matrox Graphic Array video module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/mga/xmga.c:89 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
 msgid "alternate fullscreen method"
@@ -4073,6 +4213,9 @@ msgstr ""
 msgid "X11 MGA module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/qte/qte.cpp:80
 msgid "QT Embedded display name"
 msgstr ""
@@ -4083,6 +4226,8 @@ msgid ""
 "will use the value of the DISPLAY environment variable."
 msgstr ""
 
+#.    add_category_hint( N_("QT Embedded"), NULL );
+#.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
 #: modules/video_output/qte/qte.cpp:116
 msgid "QT Embedded video module"
 msgstr ""
@@ -4115,6 +4260,9 @@ msgstr ""
 msgid "X11 module"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
 msgstr ""
@@ -4147,6 +4295,9 @@ msgstr ""
 msgid "scope effect"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/visualization/xosd/xosd.c:61
 msgid "flip vertical position"
 msgstr ""

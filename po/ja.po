@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-27 12:59+0000\n"
+"POT-Creation-Date: 2003-03-04 18:18+0100\n"
 "PO-Revision-Date: 2003-01-09 02:37+0900\n"
 "Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -12,10 +12,12 @@ msgstr ""
 "Content-Type: text/plain; charset=euc-jp\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:255
 msgid "C"
 msgstr "ja"
 
+#. Usage
 #: src/libvlc.c:298 src/libvlc.c:1308
 #, c-format
 msgid ""
@@ -67,6 +69,12 @@ msgstr ""
 "COPYINGファイルに詳細が書かれていますので、参照してください。\n"
 "Written by the VideoLAN team at Ecole Centrale, Paris.\n"
 
+#. ****************************************************************************
+#. * Configuration options for the main program. Each module will also separatly
+#. * define its own configuration options.
+#. * Look into configuration.h if you need to know more about the following
+#. * macros.
+#. ****************************************************************************
 #: src/libvlc.h:37
 msgid "interface module"
 msgstr "インタフェース・モジュール"
@@ -75,9 +83,7 @@ msgstr "インタフェース・モジュール"
 msgid ""
 "This option allows you to select the interface used by VLC. The default "
 "behavior is to automatically select the best module available."
-msgstr ""
-"使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが"
-"選択されます。"
+msgstr "使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが選択されます。"
 
 #: src/libvlc.h:43
 #, fuzzy
@@ -90,9 +96,7 @@ msgid ""
 "This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
 "a comma separated list of interface modules."
-msgstr ""
-"使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが"
-"選択されます。"
+msgstr "使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが選択されます。"
 
 #: src/libvlc.h:49
 msgid "verbosity (0,1,2)"
@@ -102,8 +106,7 @@ msgstr "冗長 (0,1,2)"
 msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
-msgstr ""
-"冗長レベルを指定します (0=エラーと標準メッセージのみ、1=警告、2=デバッグ)"
+msgstr "冗長レベルを指定します (0=エラーと標準メッセージのみ、1=警告、2=デバッグ)"
 
 #: src/libvlc.h:54
 msgid "be quiet"
@@ -121,9 +124,7 @@ msgstr "カラー・メッセージ"
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
-msgstr ""
-"このオプションを設定すると、コンソールに送信されるメッセージはカラー化されま"
-"す。この動作は端末がLinuxカラーをサポートしている必要があります。"
+msgstr "このオプションを設定すると、コンソールに送信されるメッセージはカラー化されます。この動作は端末がLinuxカラーをサポートしている必要があります。"
 
 #: src/libvlc.h:63
 msgid "show advanced options"
@@ -143,9 +144,7 @@ msgstr "インタフェースの既定の検索パス"
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr ""
-"ファイルを見つけるときにオープンされるインタフェースの既定のパスを設定しま"
-"す。"
+msgstr "ファイルを見つけるときにオープンされるインタフェースの既定のパスを設定します。"
 
 #: src/libvlc.h:73
 msgid "plugin search path"
@@ -166,9 +165,7 @@ msgstr "オーディオ出力モジュール"
 msgid ""
 "This option allows you to select the audio output method used by VLC. The "
 "default behavior is to automatically select the best method available."
-msgstr ""
-"オーディオ出力方法が選択可能です。デフォルトで自動的に最適な方法が選択されま"
-"す。"
+msgstr "オーディオ出力方法が選択可能です。デフォルトで自動的に最適な方法が選択されます。"
 
 #: src/libvlc.h:84
 msgid "enable audio"
@@ -178,9 +175,7 @@ msgstr "オーディオを有効にする"
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
-msgstr ""
-"オーディオ出力を完全に無効にします。オーディオはデコードされません。これによ"
-"り、いくらかの処理パワーをセーブすることができます。"
+msgstr "オーディオ出力を完全に無効にします。オーディオはデコードされません。これにより、いくらかの処理パワーをセーブすることができます。"
 
 #: src/libvlc.h:89
 msgid "force mono audio"
@@ -228,9 +223,7 @@ msgstr "補償する音声のズレ(時間:ms)"
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr ""
-"オーディオ出力の遅れを設定します。ビデオと音声のズレがある場合には、適切な値"
-"を設定できます。"
+msgstr "オーディオ出力の遅れを設定します。ビデオと音声のズレがある場合には、適切な値を設定できます。"
 
 #: src/libvlc.h:111
 msgid "use the S/PDIF audio output when available"
@@ -241,9 +234,7 @@ msgstr ""
 msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
-msgstr ""
-"オーディオ出力方法が選択可能です。デフォルトで自動的に最適な方法が選択されま"
-"す。"
+msgstr "オーディオ出力方法が選択可能です。デフォルトで自動的に最適な方法が選択されます。"
 
 #: src/libvlc.h:116
 msgid "headphone virtual spatialization effect"
@@ -257,11 +248,8 @@ msgid ""
 "tiring when listening to music for long periods of time.\n"
 "It works with any source format from mono to 5.1."
 msgstr ""
-"このオプションは完全な5.1チャンネル・スピーカが設定された部屋で聞いているかの"
-"ような効果をヘッドホーンの音声に与えより臨場感を持たせます。また、長時間のリ"
-"スニングでも安心して聞いていられます。\n"
-"この機能は、モノラルから5.1チャンネルまでのすべてのソース・フォーマットで動作"
-"します。"
+"このオプションは完全な5.1チャンネル・スピーカが設定された部屋で聞いているかのような効果をヘッドホーンの音声に与えより臨場感を持たせます。また、長時間のリスニングでも安心して聞いていられます。\n"
+"この機能は、モノラルから5.1チャンネルまでのすべてのソース・フォーマットで動作します。"
 
 #: src/libvlc.h:125
 msgid "characteristic dimension"
@@ -271,9 +259,7 @@ msgstr "空間の特性"
 msgid ""
 "Headphone virtual spatialization effect parameter: distance between front "
 "left speaker and listener in meters."
-msgstr ""
-"ヘッドホーンの仮想的な音の広がり効果：フロント左側スピーカとリスナーの間の距"
-"離をメートルで指定します。"
+msgstr "ヘッドホーンの仮想的な音の広がり効果：フロント左側スピーカとリスナーの間の距離をメートルで指定します。"
 
 #: src/libvlc.h:130
 msgid "video output module"
@@ -283,9 +269,7 @@ msgstr "ビデオ出力モジュール"
 msgid ""
 "This option allows you to select the video output method used by VLC. The "
 "default behavior is to automatically select the best method available."
-msgstr ""
-"このオプションは使用するビデオ出力方法が選択できます。デフォルトで自動的に最"
-"適な方法が選択されます。"
+msgstr "このオプションは使用するビデオ出力方法が選択できます。デフォルトで自動的に最適な方法が選択されます。"
 
 #: src/libvlc.h:136
 msgid "enable video"
@@ -295,9 +279,7 @@ msgstr "ビデオを有効にする"
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
-msgstr ""
-"ビデオ出力を完全に無効化します。ビデオはデコードされません。これにより、いく"
-"らかの処理パワーをセーブすることができます。"
+msgstr "ビデオ出力を完全に無効化します。ビデオはデコードされません。これにより、いくらかの処理パワーをセーブすることができます。"
 
 #: src/libvlc.h:141
 msgid "display identifier"
@@ -307,9 +289,7 @@ msgstr "ディスプレイ名"
 msgid ""
 "This is the local display port that will be used for X11 drawing. For "
 "instance :0.1."
-msgstr ""
-"X11が描画するローカルのディスプレイ・ポートを指定します。インスタンスは、:0.1"
-"です。"
+msgstr "X11が描画するローカルのディスプレイ・ポートを指定します。インスタンスは、:0.1です。"
 
 #: src/libvlc.h:146
 msgid "video width"
@@ -351,9 +331,7 @@ msgstr "グレースケール"
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
-msgstr ""
-"このオプションを使用すると、VLCはカラー情報をデコードしません。(これにより、"
-"いくらかの処理パワーをセーブすることができます。)"
+msgstr "このオプションを使用すると、VLCはカラー情報をデコードしません。(これにより、いくらかの処理パワーをセーブすることができます。)"
 
 #: src/libvlc.h:165
 msgid "fullscreen video output"
@@ -362,8 +340,7 @@ msgstr "フルスクリーン出力"
 #: src/libvlc.h:167
 msgid ""
 "If this option is enabled, VLC will always start a video in fullscreen mode."
-msgstr ""
-"このオプションを指定すると、VLCは常にビデオをフルスクリーン・モードにします。"
+msgstr "このオプションを指定すると、VLCは常にビデオをフルスクリーン・モードにします。"
 
 #: src/libvlc.h:170
 msgid "overlay video output"
@@ -383,9 +360,7 @@ msgstr "サブタイトルの位置"
 msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
-msgstr ""
-"このオプションは映像中のサブタイトルの位置を指定できます。いくつかの位置を試"
-"してみてください。"
+msgstr "このオプションは映像中のサブタイトルの位置を指定できます。いくつかの位置を試してみてください。"
 
 #: src/libvlc.h:180
 msgid "video filter module"
@@ -395,9 +370,7 @@ msgstr "ビデオ・フィルター・モジュール"
 msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
-msgstr ""
-"ノンインタレースのインスタンスまたは、クローン、湾曲化されたビデオ・ウィンド"
-"ウの映像クォリティに効果を加えるフィルターを指定できます。"
+msgstr "ノンインタレースのインスタンスまたは、クローン、湾曲化されたビデオ・ウィンドウの映像クォリティに効果を加えるフィルターを指定できます。"
 
 #: src/libvlc.h:186
 msgid "source aspect ratio"
@@ -410,12 +383,7 @@ msgid ""
 "when a movie does not have aspect ratio information. Accepted formats are x:"
 "y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
-msgstr ""
-"このオプションはソースに対して、強制的に設定します。インスタンスでは、いくつ"
-"かのDVDは、4:3のものでも16:9に設定します。これは、アスペクト・レシオ情報を持"
-"たないムービーのヒントとして使用する事も可能です。指定できるフォーマットは、"
-"x:y (4:3, 16:9, etc.)の形式でアスペクトを指定するか、浮動小数点値 (1.25, "
-"1.3333, etc.)の形式でピクセルの矩形を指定します。"
+msgstr "このオプションはソースに対して、強制的に設定します。インスタンスでは、いくつかのDVDは、4:3のものでも16:9に設定します。これは、アスペクト・レシオ情報を持たないムービーのヒントとして使用する事も可能です。指定できるフォーマットは、x:y (4:3, 16:9, etc.)の形式でアスペクトを指定するか、浮動小数点値 (1.25, 1.3333, etc.)の形式でピクセルの矩形を指定します。"
 
 #: src/libvlc.h:196
 msgid "destination aspect ratio"
@@ -428,12 +396,7 @@ msgid ""
 "may be used when you output VLC's signal to another device such as a TV set. "
 "Accepted format is a float value (1, 1.25, 1.3333, etc.) expressing pixel "
 "squareness."
-msgstr ""
-"強制的に送信先のピクセル・サイズを指定します。VLCのデフォルトでは使用している"
-"ハードウェアが別の方法を持っていない限り、ピクセルは矩形を示す情報として扱わ"
-"れます。このオプションは、TVのようにVLC信号が他のデバイスに送信されないように"
-"するために使用される可能性があります。指定できるフォーマットは、浮動小数点値 "
-"(1, 1.25, 1.3333など)です。"
+msgstr "強制的に送信先のピクセル・サイズを指定します。VLCのデフォルトでは使用しているハードウェアが別の方法を持っていない限り、ピクセルは矩形を示す情報として扱われます。このオプションは、TVのようにVLC信号が他のデバイスに送信されないようにするために使用される可能性があります。指定できるフォーマットは、浮動小数点値 (1, 1.25, 1.3333など)です。"
 
 #: src/libvlc.h:205
 msgid "server port"
@@ -451,9 +414,7 @@ msgstr "ネットワーク・インタフェースのMTU"
 msgid ""
 "This is the typical size of UDP packets that we expect. On Ethernet it is "
 "usually 1500."
-msgstr ""
-"期待する典型的なUDPパケットのサイズです。イーサネットでは、その値は、通常1500"
-"です。"
+msgstr "期待する典型的なUDPパケットのサイズです。イーサネットでは、その値は、通常1500です。"
 
 #: src/libvlc.h:214
 msgid "enable network channel mode"
@@ -461,9 +422,7 @@ msgstr "ネットワーク・チャンネルモードを有効にする"
 
 #: src/libvlc.h:216
 msgid "Activate this option if you want to use the VideoLAN Channel Server."
-msgstr ""
-"VideoLANのチャンネル・サーバーを使用する場合には、このオプションを有効にしま"
-"す。"
+msgstr "VideoLANのチャンネル・サーバーを使用する場合には、このオプションを有効にします。"
 
 #: src/libvlc.h:218
 msgid "channel server address"
@@ -489,9 +448,7 @@ msgstr "ネットワーク・インタフェース"
 msgid ""
 "If you have several interfaces on your Linux machine and use the VLAN "
 "solution, you may indicate here which interface to use."
-msgstr ""
-"Linuxマシン上に複数のネットワーク・インタフェースがあり、VLANソリューションを"
-"使用する場合には、使用するインタフェースを指定します。"
+msgstr "Linuxマシン上に複数のネットワーク・インタフェースがあり、VLANソリューションを使用する場合には、使用するインタフェースを指定します。"
 
 #: src/libvlc.h:231
 msgid "network interface address"
@@ -502,10 +459,7 @@ msgid ""
 "If you have several interfaces on your machine and use the multicast "
 "solution, you will probably have to indicate the IP address of your "
 "multicasting interface here."
-msgstr ""
-"Linuxマシン上に複数のネットワーク・インタフェースがあり、マルチキャスト・ソ"
-"リューションを使用する場合には、おそらく、IPアドレスかマルチキャストを行って"
-"いるインタフェースを指定しなければなりません。"
+msgstr "Linuxマシン上に複数のネットワーク・インタフェースがあり、マルチキャスト・ソリューションを使用する場合には、おそらく、IPアドレスかマルチキャストを行っているインタフェースを指定しなければなりません。"
 
 #: src/libvlc.h:237
 msgid "time to live"
@@ -541,8 +495,7 @@ msgstr "チャンネルの選択"
 msgid ""
 "Give the stream number of the audio channel you want to use in a DVD (from 1 "
 "to n)."
-msgstr ""
-"DVDの中で使用したいオーディオのチャンネル番号を指定します。(1からnまで)"
+msgstr "DVDの中で使用したいオーディオのチャンネル番号を指定します。(1からnまで)"
 
 #: src/libvlc.h:255
 msgid "choose subtitles"
@@ -562,9 +515,7 @@ msgstr "DVDデバイス"
 msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (eg D:)"
-msgstr ""
-"使用する既定のDVDドライブ(またはファイル)です。ドライブ文字の後にコロンを付加"
-"することを忘れないでください。(例 D:)"
+msgstr "使用する既定のDVDドライブ(またはファイル)です。ドライブ文字の後にコロンを付加することを忘れないでください。(例 D:)"
 
 #: src/libvlc.h:267
 msgid "This is the default DVD device to use."
@@ -586,9 +537,7 @@ msgstr "IPv6の使用"
 msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
-msgstr ""
-"このチェックボックスをオンにすると、IPv6がすべてのUDPとHTTPの接続で既定値とし"
-"て使用されます。"
+msgstr "このチェックボックスをオンにすると、IPv6がすべてのUDPとHTTPの接続で既定値として使用されます。"
 
 #: src/libvlc.h:279
 msgid "force IPv4"
@@ -598,9 +547,7 @@ msgstr "IPv4の使用"
 msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
-msgstr ""
-"このチェックボックスをオンにすると、IPv4がすべてのUDPとHTTPの接続で既定値とし"
-"て使用されます。"
+msgstr "このチェックボックスをオンにすると、IPv4がすべてのUDPとHTTPの接続で既定値として使用されます。"
 
 #: src/libvlc.h:284
 msgid "choose preferred codec list"
@@ -613,12 +560,7 @@ msgid ""
 "Please be aware that VLC does not make any difference between audio or video "
 "codecs, so you should always specify 'any' at the end of the list to make "
 "sure there is a fallback for the types you didn't specify."
-msgstr ""
-"VLCが使用するコーデックの順序を選択することができます。'a52old,a52,any'はより"
-"新しいコーデックよりも、古いa52コーデックの使用を優先的に試みます。VLCはオー"
-"ディオとビデオのコーデックでいかなる差も持たないことに注意してください。タイ"
-"プが指定されなかった場合のフォールバックのために、リストの最後に常に'any'を指"
-"定しなければなりません。"
+msgstr "VLCが使用するコーデックの順序を選択することができます。'a52old,a52,any'はより新しいコーデックよりも、古いa52コーデックの使用を優先的に試みます。VLCはオーディオとビデオのコーデックでいかなる差も持たないことに注意してください。タイプが指定されなかった場合のフォールバックのために、リストの最後に常に'any'を指定しなければなりません。"
 
 #: src/libvlc.h:293
 #, fuzzy
@@ -652,9 +594,7 @@ msgstr "ビデオ・ストリームの出力を有効にする"
 msgid ""
 "This allows you to choose if the video stream should be redirected to the "
 "stream output facility when this last one is enabled."
-msgstr ""
-"ビデオ・ストリーム出力機構の最後のものが有効になっているとビデオ・ストリーム"
-"が出力機構にリダイレクトされるべき場合、選択可能です。"
+msgstr "ビデオ・ストリーム出力機構の最後のものが有効になっているとビデオ・ストリームが出力機構にリダイレクトされるべき場合、選択可能です。"
 
 #: src/libvlc.h:311
 #, fuzzy
@@ -711,9 +651,7 @@ msgstr "CPUのMMXサポートを無効にする"
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"プロセッサがMMXの機能セットをサポートしている場合には、VLCはそのアドバンテー"
-"ジを利用できます。"
+msgstr "プロセッサがMMXの機能セットをサポートしている場合には、VLCはそのアドバンテージを利用できます。"
 
 #: src/libvlc.h:343
 msgid "enable CPU 3D Now! support"
@@ -723,9 +661,7 @@ msgstr "CPUの3D Now!サポートを無効にする"
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"プロセッサが3D Now!機能をサポートしている場合には、VLCはそのアドバンテージを"
-"利用できます。"
+msgstr "プロセッサが3D Now!機能をサポートしている場合には、VLCはそのアドバンテージを利用できます。"
 
 #: src/libvlc.h:348
 msgid "enable CPU MMX EXT support"
@@ -735,9 +671,7 @@ msgstr "CPUのMMX拡張機能サポートを無効にする"
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"プロセッサがMMXの拡張機能セットをサポートしている場合には、VLCはそのアドバン"
-"テージを利用することができます。"
+msgstr "プロセッサがMMXの拡張機能セットをサポートしている場合には、VLCはそのアドバンテージを利用することができます。"
 
 #: src/libvlc.h:353
 msgid "enable CPU SSE support"
@@ -747,9 +681,7 @@ msgstr "CPUのSSEサポートを無効にする"
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
-msgstr ""
-"プロセッサがSSEの機能セットをサポートしている場合には、VLCはそのアドバンテー"
-"ジを利用することができます。"
+msgstr "プロセッサがSSEの機能セットをサポートしている場合には、VLCはそのアドバンテージを利用することができます。"
 
 #: src/libvlc.h:358
 msgid "enable CPU AltiVec support"
@@ -759,9 +691,7 @@ msgstr "CPUのAltiVecサポートを無効にする"
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
-msgstr ""
-"プロセッサがAltiVecの機能セットをサポートしている場合には、そのアドバンテージ"
-"を利用することができます。"
+msgstr "プロセッサがAltiVecの機能セットをサポートしている場合には、そのアドバンテージを利用することができます。"
 
 #: src/libvlc.h:363
 msgid "play files randomly forever"
@@ -771,9 +701,7 @@ msgstr "ファイルをランダムに再生"
 msgid ""
 "When selected, VLC will randomly play files in the playlist until "
 "interrupted."
-msgstr ""
-"このオプションが選択されるとVLCはプレイリストのファイルをランダムに再生しま"
-"す。"
+msgstr "このオプションが選択されるとVLCはプレイリストのファイルをランダムに再生します。"
 
 #: src/libvlc.h:368
 msgid "launch playlist on startup"
@@ -781,8 +709,7 @@ msgstr "起動時にプレイリストを開く"
 
 #: src/libvlc.h:370
 msgid "If you want VLC to start playing on startup, then enable this option."
-msgstr ""
-"VLCの起動時にプレイリストを起動したい場合には、このオプションを選択します。"
+msgstr "VLCの起動時にプレイリストを起動したい場合には、このオプションを選択します。"
 
 #: src/libvlc.h:372
 msgid "enqueue items in playlist"
@@ -792,9 +719,7 @@ msgstr "デフォルトでプレイリストに追加"
 msgid ""
 "If you want VLC to add items to the playlist as you open them, then enable "
 "this option."
-msgstr ""
-"プレイリストにオープンしている項目を追加したい場合には、このオプションを選択"
-"します。"
+msgstr "プレイリストにオープンしている項目を追加したい場合には、このオプションを選択します。"
 
 #: src/libvlc.h:377
 msgid "loop playlist on end"
@@ -804,8 +729,7 @@ msgstr "プレイリストの最後でループ"
 msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
-msgstr ""
-"プレイリストの再生を繰り返して行いたい場合には、このオプションを選択します。"
+msgstr "プレイリストの再生を繰り返して行いたい場合には、このオプションを選択します。"
 
 #: src/libvlc.h:382
 msgid "memory copy module"
@@ -815,9 +739,7 @@ msgstr "メモリー・コピー・モジュール"
 msgid ""
 "You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
-msgstr ""
-"使用したいメモリー・コピー・モジュールを選択します。VLCはデフォルトでハード"
-"ウェアがサポートしている最も速いものを選択します。"
+msgstr "使用したいメモリー・コピー・モジュールを選択します。VLCはデフォルトでハードウェアがサポートしている最も速いものを選択します。"
 
 #: src/libvlc.h:387
 msgid "access module"
@@ -844,10 +766,7 @@ msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
-msgstr ""
-"Windows NT/2K/XPにおいて遅くても正確に実装されているmutexを使用します。しか"
-"し、より速いmutexの実装を使用することも可能です。その場合、問題が発生する可能"
-"性があります。"
+msgstr "Windows NT/2K/XPにおいて遅くても正確に実装されているmutexを使用します。しかし、より速いmutexの実装を使用することも可能です。その場合、問題が発生する可能性があります。"
 
 #: src/libvlc.h:402
 msgid "Condition variables implementation for Win9x (developers only)"
@@ -860,10 +779,7 @@ msgid ""
 "to happen). However it is possible to use slower alternatives which should "
 "be more robust. Currently you can choose between implementation 0 (which is "
 "the default and the fastest), 1 and 2."
-msgstr ""
-"Windows 9x/Me上で高速ですが、正しくない条件値の実装(より正確には競合が発生す"
-"る可能性があります)を使用します。しかし、代替えとなる遅くても安定した実装を選"
-"択することも可能です。現時点では、0(既定値の最速のもの), 1, 2が選択可能です。"
+msgstr "Windows 9x/Me上で高速ですが、正しくない条件値の実装(より正確には競合が発生する可能性があります)を使用します。しかし、代替えとなる遅くても安定した実装を選択することも可能です。現時点では、0(既定値の最速のもの), 1, 2が選択可能です。"
 
 #: src/libvlc.h:413
 msgid ""
@@ -891,26 +807,31 @@ msgstr ""
 "  vlc:pause                      プレイリストの項目の再生停止\n"
 "  vlc:quit                       VLCを終了\n"
 
+#. Interface options
 #: src/libvlc.h:443 modules/misc/dummy/dummy.c:59
 msgid "Interface"
 msgstr "インタフェース"
 
+#. Audio options
 #: src/libvlc.h:457 modules/audio_output/file.c:108
 #: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
-#: modules/gui/macosx/intf.m:338
+#: modules/gui/macosx/intf.m:339
 msgid "Audio"
 msgstr "オーディオ"
 
+#. Video options
 #: src/libvlc.h:475 modules/gui/gtk/gnome_interface.c:1140
-#: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:345
-#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:109
+#: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:346
+#: modules/misc/dummy/dummy.c:77 modules/video_output/directx/directx.c:107
 msgid "Video"
 msgstr "ビデオ"
 
+#. Input options
 #: src/libvlc.h:495 modules/access/satellite/satellite.c:66
 msgid "Input"
 msgstr "入力"
 
+#. Decoder options
 #: src/libvlc.h:529
 msgid "Decoders"
 msgstr "デコーダ"
@@ -920,30 +841,34 @@ msgstr "デコーダ"
 msgid "Encoders"
 msgstr "エンコーダ"
 
+#. Stream output options
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/macosx/open.m:204 modules/gui/win32/strings.cpp:221
 msgid "Stream output"
 msgstr "ストリーム出力"
 
+#. CPU options
 #: src/libvlc.h:550
 msgid "CPU"
 msgstr ""
 
+#. Playlist options
 #: src/libvlc.h:562 modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:281
-#: modules/gui/macosx/intf.m:357 modules/gui/win32/strings.cpp:120
+#: modules/gui/macosx/intf.m:358 modules/gui/win32/strings.cpp:120
 #: modules/gui/win32/strings.cpp:180 modules/gui/wxwindows/interface.cpp:283
 msgid "Playlist"
 msgstr "リスト"
 
+#. Misc options
 #: src/libvlc.h:569 modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
 #: modules/demux/mpeg/ts.c:118 modules/gui/familiar/familiar.c:70
-#: modules/gui/win32/win32.cpp:308 modules/misc/logger/logger.c:85
+#: modules/gui/win32/win32.cpp:312 modules/misc/logger/logger.c:85
 #: modules/video_filter/motionblur.c:58 modules/video_filter/transform.c:63
 #: modules/video_filter/wall.c:66 modules/video_output/ggi.c:62
 #: modules/video_output/mga/xmga.c:104
@@ -984,8 +909,8 @@ msgstr ""
 
 #: src/audio_output/output.c:77 src/audio_output/output.c:103
 #: src/audio_output/output.c:132 modules/audio_output/alsa.c:161
-#: modules/audio_output/alsa.c:327 modules/audio_output/directx.c:406
-#: modules/audio_output/directx.c:443 modules/audio_output/oss.c:195
+#: modules/audio_output/alsa.c:327 modules/audio_output/directx.c:425
+#: modules/audio_output/directx.c:462 modules/audio_output/oss.c:195
 #: modules/audio_output/oss.c:325 modules/audio_output/sdl.c:114
 #: modules/audio_output/sdl.c:177 modules/audio_output/sdl.c:188
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:359
@@ -1014,10 +939,11 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I win32\"\n"
 msgstr ""
 "\n"
-"警告：もし、GUIがアクセスできないなら、DOSのコマンド・プロンプトを開いて、VLC"
-"がインストールされているディレクトリに移動し、\"vlc -I win32\"を実行してくだ"
-"さい。\n"
+"警告：もし、GUIがアクセスできないなら、DOSのコマンド・プロンプトを開いて、VLCがインストールされているディレクトリに移動し、\"vlc -I win32\"を実行してください。\n"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/access/dvd/dvd.c:65
 msgid "method to use by libdvdcss for key decryption"
 msgstr "libdvdcssを鍵の複合化に使用"
@@ -1038,16 +964,9 @@ msgid ""
 "The default method is: key."
 msgstr ""
 "鍵の複合化にlibdvdcssによって使用されるメソッドを設定します。\n"
-"title: 複合化されたタイトル・キーはストリーム中の暗号化されたセクターから推測"
-"されます。したがって、よく知られているDVDデバイスでは動作します。しかし、時々"
-"失敗したり、タイトル・キーの複合化に時間を要したりするかも知れません。このメ"
-"ソッドによって鍵はタイトルの開始時にのみチェックされます。タイトルの途中で鍵"
-"が変更されるような場合には、動作しないでしょう。\n"
-"disc: ディスク・キーが最初にチェックされます。そしてすべてのタイトル・キーが"
-"即時に複合化できます。\n"
-"key: 翻訳時にプレイヤー・キーを持つファイルがない場合、\"disc:\"と同じです。"
-"ディスク・キーの複合化を使用する場合、この方法が一番速いでしょう。libcssに"
-"よって使用されるものの一つです。\n"
+"title: 複合化されたタイトル・キーはストリーム中の暗号化されたセクターから推測されます。したがって、よく知られているDVDデバイスでは動作します。しかし、時々失敗したり、タイトル・キーの複合化に時間を要したりするかも知れません。このメソッドによって鍵はタイトルの開始時にのみチェックされます。タイトルの途中で鍵が変更されるような場合には、動作しないでしょう。\n"
+"disc: ディスク・キーが最初にチェックされます。そしてすべてのタイトル・キーが即時に複合化できます。\n"
+"key: 翻訳時にプレイヤー・キーを持つファイルがない場合、\"disc:\"と同じです。ディスク・キーの複合化を使用する場合、この方法が一番速いでしょう。libcssによって使用されるものの一つです。\n"
 "既定値は\"key:\"です。"
 
 #: modules/access/dvd/dvd.c:86
@@ -1088,7 +1007,10 @@ msgstr "VCD入力モジュール"
 msgid "Video4Linux input module"
 msgstr "Video4Linux入力モジュール"
 
-#: modules/access/file.c:63 modules/access/http.c:84 modules/access/udp.c:75
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/access/file.c:63 modules/access/http.c:81 modules/access/udp.c:72
 msgid "caching value in ms"
 msgstr "キャッシング値 (ms)"
 
@@ -1106,52 +1028,52 @@ msgstr "標準的なファイルシステムのファイルを読む"
 msgid "file"
 msgstr "ファイル"
 
-#: modules/access/http.c:78
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/access/http.c:75
 msgid "specify an HTTP proxy"
 msgstr "HTTPプロキシを指定"
 
-#: modules/access/http.c:80
+#: modules/access/http.c:77
 #, fuzzy
 msgid ""
 "Specify an HTTP proxy to use. It must be in the form http://myproxy.mydomain:"
 "myport. If none is specified, the HTTP_PROXY environment variable will be "
 "tried."
-msgstr ""
-"使用するHTTPプロキシを http://myproxy.mydomain:myport の形式で指定してくださ"
-"い。none が指定された場合には、HTTP_PROXYenvironment変数が試みられます。"
+msgstr "使用するHTTPプロキシを http://myproxy.mydomain:myport の形式で指定してください。none が指定された場合には、HTTP_PROXYenvironment変数が試みられます。"
 
-#: modules/access/http.c:86
+#: modules/access/http.c:83
 msgid ""
 "Allows you to modify the default caching value for http streams. This value "
 "should be set in miliseconds units."
-msgstr ""
-"httpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で"
-"指定します。"
+msgstr "httpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指定します。"
 
-#: modules/access/http.c:90
+#: modules/access/http.c:87
 msgid "http"
 msgstr ""
 
-#: modules/access/http.c:93
+#: modules/access/http.c:90
 msgid "HTTP access module"
 msgstr "HTTPアクセス・モジュール"
 
-#: modules/access/udp.c:77
+#: modules/access/udp.c:74
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
-msgstr ""
-"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
-"定します。"
+msgstr "udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指定します。"
 
-#: modules/access/udp.c:81
+#: modules/access/udp.c:78
 msgid "raw UDP access module"
 msgstr "UDPアクセス・モジュール"
 
-#: modules/access/udp.c:82
+#: modules/access/udp.c:79
 msgid "udp"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/access/satellite/satellite.c:41
 msgid "satellite default transponder frequency"
 msgstr "衛星 既定転送周波数"
@@ -1193,7 +1115,7 @@ msgstr "衛星入力モジュール"
 msgid "File stream ouput"
 msgstr "ストリームの出力先の選択"
 
-#: modules/access_output/dummy.c:58
+#: modules/access_output/dummy.c:56
 #, fuzzy
 msgid "Dummy stream ouput"
 msgstr "ストリームの出力先の選択"
@@ -1203,7 +1125,7 @@ msgstr "ストリームの出力先の選択"
 msgid "HTTP stream ouput"
 msgstr "ストリームの出力先の選択"
 
-#: modules/access_output/udp.c:75
+#: modules/access_output/udp.c:73
 #, fuzzy
 msgid "UDP stream ouput"
 msgstr "ストリームの出力先の選択"
@@ -1244,6 +1166,9 @@ msgstr "float32->u8変換のためのオーディオ・フィルター"
 msgid "audio filter for s16->float32 conversion"
 msgstr "s16->float32変換のためのオーディオ・フィルター"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_filter/converter/a52tofloat32.c:76
 msgid "A/52 dynamic range compression"
 msgstr "A/52 ダイナミック・レンジ圧縮"
@@ -1255,11 +1180,8 @@ msgid ""
 "without disturbing anyone. If you disable the dynamic range compression the "
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
-"ダイナミック・レンジ圧縮は大きな音量を小さくし、小さな音量を大きくします。こ"
-"れによって雑音の多い環境で他の人に迷惑をかけることなく聞き取りやすくなりま"
-"す。\n"
-"このオプションを無効にして再生すれば、映画館やリスニング・ルームなどでの再生"
-"により適切になります。"
+"ダイナミック・レンジ圧縮は大きな音量を小さくし、小さな音量を大きくします。これによって雑音の多い環境で他の人に迷惑をかけることなく聞き取りやすくなります。\n"
+"このオプションを無効にして再生すれば、映画館やリスニング・ルームなどでの再生により適切になります。"
 
 #: modules/audio_filter/converter/a52tofloat32.c:87
 msgid "ATSC A/52 aka AC-3 audio decoder module"
@@ -1312,7 +1234,7 @@ msgid "ALSA audio module"
 msgstr "ALSAオーディオ・モジュール"
 
 #: modules/audio_output/alsa.c:156 modules/audio_output/alsa.c:333
-#: modules/audio_output/directx.c:417 modules/audio_output/directx.c:438
+#: modules/audio_output/directx.c:436 modules/audio_output/directx.c:457
 #: modules/audio_output/oss.c:214 modules/audio_output/oss.c:331
 #: modules/audio_output/sdl.c:119 modules/audio_output/sdl.c:178
 #: modules/audio_output/sdl.c:190 modules/audio_output/sdl.c:198
@@ -1320,22 +1242,23 @@ msgstr "ALSAオーディオ・モジュール"
 msgid "Mono"
 msgstr "モノラル"
 
+#. Open the device
 #: modules/audio_output/alsa.c:194 modules/audio_output/alsa.c:308
-#: modules/audio_output/directx.c:264 modules/audio_output/directx.c:459
+#: modules/audio_output/directx.c:283 modules/audio_output/directx.c:478
 #: modules/audio_output/oss.c:237 modules/audio_output/oss.c:306
 #: modules/audio_output/waveout.c:207 modules/audio_output/waveout.c:387
 msgid "A/52 over S/PDIF"
 msgstr ""
 
-#: modules/audio_output/alsa.c:312 modules/audio_output/directx.c:292
-#: modules/audio_output/directx.c:378 modules/audio_output/directx.c:432
+#: modules/audio_output/alsa.c:312 modules/audio_output/directx.c:311
+#: modules/audio_output/directx.c:397 modules/audio_output/directx.c:451
 #: modules/audio_output/oss.c:164 modules/audio_output/oss.c:310
 #: modules/audio_output/waveout.c:234 modules/audio_output/waveout.c:329
 msgid "5.1"
 msgstr ""
 
-#: modules/audio_output/alsa.c:320 modules/audio_output/directx.c:299
-#: modules/audio_output/directx.c:394 modules/audio_output/directx.c:435
+#: modules/audio_output/alsa.c:320 modules/audio_output/directx.c:318
+#: modules/audio_output/directx.c:413 modules/audio_output/directx.c:454
 #: modules/audio_output/oss.c:173 modules/audio_output/oss.c:318
 #: modules/audio_output/waveout.c:241 modules/audio_output/waveout.c:346
 msgid "2 Front 2 Rear"
@@ -1345,7 +1268,7 @@ msgstr "フロント 2, リア 2"
 msgid "aRts audio module"
 msgstr "aRtsオーディオ・モジュール"
 
-#: modules/audio_output/directx.c:196
+#: modules/audio_output/directx.c:215
 msgid "DirectX audio module"
 msgstr "DirectXオーディオ・モジュール"
 
@@ -1353,6 +1276,9 @@ msgstr "DirectXオーディオ・モジュール"
 msgid "EsounD audio module"
 msgstr "EsounDオーディオ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_output/file.c:82
 msgid "output format"
 msgstr "出力フォーマット"
@@ -1383,6 +1309,9 @@ msgstr "デフォルト samples.raw"
 msgid "file audio output module"
 msgstr "ファイル・オーディオ出力モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/audio_output/oss.c:102
 #, fuzzy
 msgid "try to work around buggy OSS drivers"
@@ -1393,10 +1322,7 @@ msgid ""
 "Some buggy OSS drivers just don't like when their internal buffers are "
 "completely filled (the sound gets heavily hashed). If you have one of these "
 "drivers, then you need to enable this option."
-msgstr ""
-"いくつかの不安定なOSSドライバは内部バッファを完全に使い果たします。(サウンド"
-"はかなり途切れて聞こえます)　もし、このようなドライバを使用している場合、この"
-"オプションを有効にする必要があります。"
+msgstr "いくつかの不安定なOSSドライバは内部バッファを完全に使い果たします。(サウンドはかなり途切れて聞こえます)　もし、このようなドライバを使用している場合、このオプションを有効にする必要があります。"
 
 #: modules/audio_output/oss.c:109
 msgid "OSS"
@@ -1510,7 +1436,7 @@ msgstr "MMXエクステンション後処理モジュール"
 msgid "libmpeg2 decoder module"
 msgstr "字幕・デコーダ・モジュール"
 
-#: modules/codec/lpcm.c:98
+#: modules/codec/lpcm.c:90
 msgid "linear PCM audio parser"
 msgstr "リニアPCMオーディオ・デコーダ"
 
@@ -1518,6 +1444,9 @@ msgstr "リニアPCMオーディオ・デコーダ"
 msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/codec/mpeg_video/idct/idct.c:41
 #: modules/codec/mpeg_video/parser.c:59
 msgid "IDCT module"
@@ -1564,18 +1493,14 @@ msgstr "MMXエクステンション・モーション補正モジュール"
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
-msgstr ""
-"ビデオ・デコーダによって使用されるIDCTモジュールを選択可能にします。デフォル"
-"トで自動的に最適なモジュールが使用されます。"
+msgstr "ビデオ・デコーダによって使用されるIDCTモジュールを選択可能にします。デフォルトで自動的に最適なモジュールが使用されます。"
 
 #: modules/codec/mpeg_video/parser.c:67
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
-msgstr ""
-"ビデオ・デコーダによって使用されるモーション補正モジュールを選択可能にしま"
-"す。デフォルトで自動的に最適なモジュールが使用されます。"
+msgstr "ビデオ・デコーダによって使用されるモーション補正モジュールを選択可能にします。デフォルトで自動的に最適なモジュールが使用されます。"
 
 #: modules/codec/mpeg_video/parser.c:71
 msgid "use additional processors"
@@ -1585,9 +1510,7 @@ msgstr "追加プロセッサの使用"
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
-msgstr ""
-"マルチ・プロセッサ・システムにおいて効果があります。搭載しているプロセッサ数"
-"を指定してください。"
+msgstr "マルチ・プロセッサ・システムにおいて効果があります。搭載しているプロセッサ数を指定してください。"
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -1599,15 +1522,15 @@ msgid ""
 "types of picture you want to decode. Please bear in mind that if you select "
 "more pictures than what your CPU is capable to decode, you won't get "
 "anything."
-msgstr ""
-"同期アルゴリズムを強制的に指定します。直接選択することによって使用したいデ"
-"コードの画像タイプが指定できます。CPUのデコード能力を超えて使用することはでき"
-"ません。"
+msgstr "同期アルゴリズムを強制的に指定します。直接選択することによって使用したいデコードの画像タイプが指定できます。CPUのデコード能力を超えて使用することはできません。"
 
 #: modules/codec/mpeg_video/parser.c:92
 msgid "MPEG I/II video decoder module"
 msgstr "MPEG 1/2ビデオ・デコーダ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor.
+#. ****************************************************************************
 #: modules/codec/spudec/spudec.c:48
 #, fuzzy
 msgid "font used by the text subtitler"
@@ -1617,9 +1540,7 @@ msgstr "文字字幕で使用されるフォント"
 msgid ""
 "When the subtitles are coded in text form then, you can choose which font "
 "will be used to display them."
-msgstr ""
-"字幕がテキスト・フォームでコード化されている時、表示するためのフォントを選択"
-"可能です。"
+msgstr "字幕がテキスト・フォームでコード化されている時、表示するためのフォントを選択可能です。"
 
 #: modules/codec/spudec/spudec.c:56
 msgid "subtitles"
@@ -1649,6 +1570,9 @@ msgstr "字幕・デコーダ・モジュール"
 msgid "Xvid video decoder"
 msgstr "DVビデオ・デコーダ"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/control/gestures.c:77
 msgid "Motion threshold"
 msgstr ""
@@ -1678,6 +1602,9 @@ msgstr "赤外線リモート・コントロール・モジュール"
 msgid "infrared remote control module"
 msgstr "赤外線リモート・コントロール・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/control/rc/rc.c:77
 msgid "show stream position"
 msgstr "サブ・ストリームの位置"
@@ -1765,6 +1692,9 @@ msgstr "ISO 13818-1 MPEGプログラム・ストリーム入力"
 msgid "generic ISO 13818-1 MPEG demultiplexing"
 msgstr "一般的なISO 13818-1 MPEG多重送信"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/demux/mpeg/ts.c:97
 msgid "compatibility with pre-0.4 VLS"
 msgstr "0.4以前のVLSとの互換"
@@ -1774,10 +1704,7 @@ msgid ""
 "The protocol for transmitting A/52 audio streams changed between VLC 0.3.x "
 "and 0.4. By default VLC assumes you have the latest VLS. In case you're "
 "using an old version, select this option."
-msgstr ""
-"A/52オーディオ・ストリームのプロトコルは、vls 0.3.xと0.4の間で変更になりまし"
-"た。デフォルトでは、VLCは最新のvlsを想定します。もし、古いバージョンのvlsを使"
-"用している場合には、このオプションを選択します。"
+msgstr "A/52オーディオ・ストリームのプロトコルは、vls 0.3.xと0.4の間で変更になりました。デフォルトでは、VLCは最新のvlsを想定します。もし、古いバージョンのvlsを使用している場合には、このオプションを選択します。"
 
 #: modules/demux/mpeg/ts.c:103
 msgid "buggy PSI"
@@ -1831,6 +1758,9 @@ msgstr "DVビデオ・デコーダ"
 msgid "BeOS standard API module"
 msgstr "BeOS標準APIモジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/gui/familiar/familiar.c:62
 msgid "autoplay selected file"
 msgstr "選択されたファイルを自動再生"
@@ -1843,6 +1773,9 @@ msgstr "選択リストで選択されたファイルを自動的に再生します。"
 msgid "Familiar Linux Gtk+ interface module"
 msgstr "Gtk+インタフェース・モジュール"
 
+#.
+#. * from modules/gui/win32/mainframe.dfm:
+#.
 #: modules/gui/familiar/interface.c:66 modules/gui/familiar/interface.c:448
 #: modules/gui/gtk/gnome_interface.c:279 modules/gui/gtk/gtk_interface.c:126
 #: modules/gui/gtk/gtk_interface.c:1636 modules/gui/win32/strings.cpp:8
@@ -1860,6 +1793,9 @@ msgstr "開く"
 msgid "Open file"
 msgstr "ファイルを開く"
 
+#.
+#. * from modules/gui/win32/preferences.dfm:
+#.
 #: modules/gui/familiar/interface.c:103 modules/gui/familiar/interface.c:104
 #: modules/gui/macosx/intf.m:288 modules/gui/macosx/prefs.m:191
 #: modules/gui/win32/strings.cpp:211
@@ -1876,8 +1812,8 @@ msgstr "ストリームを開く"
 
 #: modules/gui/familiar/interface.c:131 modules/gui/gtk/gnome_interface.c:607
 #: modules/gui/gtk/gnome_interface.c:1061 modules/gui/gtk/gtk_interface.c:714
-#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:857
-#: modules/gui/macosx/intf.m:858 modules/gui/macosx/intf.m:859
+#: modules/gui/gtk/gtk_interface.c:1160 modules/gui/macosx/intf.m:858
+#: modules/gui/macosx/intf.m:859 modules/gui/macosx/intf.m:860
 #: modules/gui/win32/strings.cpp:102 modules/gui/wxwindows/interface.cpp:591
 msgid "Pause"
 msgstr "一時停止"
@@ -1886,11 +1822,12 @@ msgstr "一時停止"
 msgid "Pause stream"
 msgstr "ストリームの一時停止"
 
+#. dock menu
 #: modules/gui/familiar/interface.c:144 modules/gui/gtk/gnome_interface.c:595
 #: modules/gui/gtk/gnome_interface.c:1054 modules/gui/gtk/gtk_interface.c:703
-#: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:323
-#: modules/gui/macosx/intf.m:370 modules/gui/macosx/intf.m:864
-#: modules/gui/macosx/intf.m:865 modules/gui/macosx/intf.m:866
+#: modules/gui/macosx/intf.m:284 modules/gui/macosx/intf.m:324
+#: modules/gui/macosx/intf.m:371 modules/gui/macosx/intf.m:865
+#: modules/gui/macosx/intf.m:866 modules/gui/macosx/intf.m:867
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
 #: modules/gui/win32/strings.cpp:204 modules/gui/wxwindows/interface.cpp:280
 #: modules/gui/wxwindows/interface.cpp:596
@@ -1904,7 +1841,7 @@ msgstr "ストリームの再生"
 #: modules/gui/familiar/interface.c:157 modules/gui/gtk/gnome_interface.c:571
 #: modules/gui/gtk/gnome_interface.c:1068 modules/gui/gtk/gtk_interface.c:681
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:285
-#: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:371
+#: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:372
 #: modules/gui/macosx/controls.m:695 modules/gui/win32/strings.cpp:104
 #: modules/gui/wxwindows/interface.cpp:278
 msgid "Stop"
@@ -1922,6 +1859,10 @@ msgstr "転送"
 msgid "Forward stream"
 msgstr "ストリームの転送"
 
+#. Automatically generated by 'toolbox --update-po', please don't compile
+#.
+#. * from modules/gui/win32/about.dfm:
+#.
 #: modules/gui/familiar/interface.c:185 modules/gui/familiar/interface.c:186
 #: modules/gui/familiar/interface.c:459 modules/gui/gtk/gtk_interface.c:1621
 #: modules/gui/win32/strings.cpp:7
@@ -2002,9 +1943,7 @@ msgstr ""
 msgid ""
 "The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input "
 "from local or network sources."
-msgstr ""
-"VideoLAN Clientは、MPEG, MPEG 2, MP3 DivXをローカルおよび、ネットワーク上の"
-"ソースから再生できるプレイヤーです。"
+msgstr "VideoLAN Clientは、MPEG, MPEG 2, MP3 DivXをローカルおよび、ネットワーク上のソースから再生できるプレイヤーです。"
 
 #: modules/gui/familiar/support.c:121 modules/gui/gtk/gnome_support.c:100
 #: modules/gui/gtk/gnome_support.c:138 modules/gui/gtk/gtk_support.c:121
@@ -2017,6 +1956,9 @@ msgstr "ピックスマップ・ファイル %s が見つかりません。"
 msgid "Error loading pixmap file: %s"
 msgstr "ピックスマップ・ファイル %s のロードでエラーが発生しました。"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/gui/gtk/gnome.c:55 modules/gui/gtk/gtk.c:57
 msgid "show tooltips"
 msgstr "ツールチップを表示"
@@ -2041,9 +1983,7 @@ msgstr "コンフィグレーション・ウィンドウの高さの最大値"
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
-msgstr ""
-"設定メニューのコンフィグレーション・ウィンドウが占める高さの最大値を設定でき"
-"ます。"
+msgstr "設定メニューのコンフィグレーション・ウィンドウが占める高さの最大値を設定できます。"
 
 #: modules/gui/gtk/gnome.c:72
 msgid "GNOME"
@@ -2096,7 +2036,8 @@ msgid "_Eject Disc"
 msgstr "ディスクの取出し(_E)"
 
 #: modules/gui/gtk/gnome_interface.c:42 modules/gui/gtk/gnome_interface.c:584
-#: modules/gui/gtk/gtk_interface.c:231 modules/gui/win32/strings.cpp:107
+#: modules/gui/gtk/gtk_interface.c:231 modules/gui/win32/strings.cpp:106
+#: modules/gui/win32/strings.cpp:107
 msgid "Eject disc"
 msgstr "ディスクの取出し"
 
@@ -2170,31 +2111,31 @@ msgstr "オーディオ・チャンネルの選択"
 
 #: modules/gui/gtk/gnome_interface.c:126 modules/gui/gtk/gnome_interface.c:950
 #: modules/gui/gtk/gtk_interface.c:457 modules/gui/gtk/gtk_interface.c:1294
-#: modules/gui/macosx/intf.m:339
+#: modules/gui/macosx/intf.m:340
 msgid "Volume Up"
 msgstr "ボリュームを上げる"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:957
 #: modules/gui/gtk/gtk_interface.c:464 modules/gui/gtk/gtk_interface.c:1301
-#: modules/gui/macosx/intf.m:340
+#: modules/gui/macosx/intf.m:341
 msgid "Volume Down"
 msgstr "ボリュームを下げる"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
-#: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:742
+#: modules/gui/macosx/intf.m:342 modules/gui/macosx/controls.m:742
 msgid "Mute"
 msgstr "ミュートする"
 
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:972
 #: modules/gui/gtk/gtk_interface.c:486 modules/gui/gtk/gtk_interface.c:1323
-#: modules/gui/macosx/intf.m:342 modules/gui/win32/strings.cpp:81
+#: modules/gui/macosx/intf.m:343 modules/gui/win32/strings.cpp:81
 msgid "Channels"
 msgstr "チャンネル"
 
 #: modules/gui/gtk/gnome_interface.c:155 modules/gui/gtk/gnome_interface.c:979
 #: modules/gui/gtk/gtk_interface.c:493 modules/gui/gtk/gtk_interface.c:1330
-#: modules/gui/macosx/intf.m:343 modules/gui/win32/strings.cpp:80
+#: modules/gui/macosx/intf.m:344 modules/gui/win32/strings.cpp:80
 msgid "Device"
 msgstr "DVDデバイス"
 
@@ -2215,7 +2156,7 @@ msgstr "全画面化(_F)"
 
 #: modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:1007 modules/gui/gtk/gtk_interface.c:558
-#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:351
+#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:352
 #: modules/gui/macosx/controls.m:766
 #: modules/video_filter/deinterlace/deinterlace.c:81
 msgid "Deinterlace"
@@ -2223,7 +2164,7 @@ msgstr "ノンインタレース化"
 
 #: modules/gui/gtk/gnome_interface.c:190
 #: modules/gui/gtk/gnome_interface.c:1014 modules/gui/gtk/gtk_interface.c:565
-#: modules/gui/gtk/gtk_interface.c:1397 modules/gui/macosx/intf.m:350
+#: modules/gui/gtk/gtk_interface.c:1397 modules/gui/macosx/intf.m:351
 #: modules/gui/macosx/vout.m:194 modules/gui/win32/strings.cpp:83
 msgid "Screen"
 msgstr "スクリーン"
@@ -2243,11 +2184,11 @@ msgstr "ビデオ"
 #: modules/gui/gtk/gnome_interface.c:2963 modules/gui/gtk/gtk_interface.c:623
 #: modules/gui/gtk/gtk_interface.c:1932 modules/gui/gtk/gtk_interface.c:2849
 #: modules/gui/gtk/gtk_interface.c:2966 modules/gui/gtk/gtk_interface.c:3218
-#: modules/gui/macosx/intf.m:307 modules/gui/macosx/open.m:172
-#: modules/gui/macosx/open.m:206 modules/gui/macosx/open.m:313
-#: modules/gui/macosx/open.m:732 modules/gui/macosx/open.m:766
-#: modules/gui/win32/strings.cpp:93 modules/gui/win32/strings.cpp:226
-#: modules/gui/wxwindows/interface.cpp:267 modules/gui/wxwindows/open.cpp:160
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:206
+#: modules/gui/macosx/open.m:313 modules/gui/macosx/open.m:732
+#: modules/gui/macosx/open.m:766 modules/gui/win32/strings.cpp:93
+#: modules/gui/win32/strings.cpp:226 modules/gui/wxwindows/interface.cpp:267
+#: modules/gui/wxwindows/open.cpp:160
 msgid "File"
 msgstr "ファイル"
 
@@ -2291,7 +2232,6 @@ msgid "Stop Stream"
 msgstr "ストリームの停止"
 
 #: modules/gui/gtk/gnome_interface.c:583 modules/gui/gtk/gtk_interface.c:692
-#: modules/gui/win32/strings.cpp:106
 msgid "Eject"
 msgstr "取出し"
 
@@ -2346,7 +2286,7 @@ msgstr "前のファイル"
 #: modules/gui/gtk/gnome_interface.c:1097 modules/gui/gtk/gtk_interface.c:774
 #: modules/gui/gtk/gtk_interface.c:857 modules/gui/gtk/gtk_interface.c:901
 #: modules/gui/gtk/gtk_interface.c:1207 modules/gui/macosx/intf.m:287
-#: modules/gui/macosx/intf.m:328 modules/gui/macosx/intf.m:372
+#: modules/gui/macosx/intf.m:329 modules/gui/macosx/intf.m:373
 #: modules/gui/macosx/controls.m:703 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
 #: modules/gui/wxwindows/interface.cpp:287
@@ -2406,7 +2346,7 @@ msgid "Got directly so specified point"
 msgstr "特定位置を直接指定"
 
 #: modules/gui/gtk/gnome_interface.c:1119 modules/gui/gtk/gtk_interface.c:1240
-#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:332
+#: modules/gui/kde/interface.cpp:143 modules/gui/macosx/intf.m:333
 #: modules/gui/win32/strings.cpp:85
 msgid "Program"
 msgstr "プログラム"
@@ -2461,9 +2401,7 @@ msgstr "ターゲットを開く"
 msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
-msgstr ""
-"別の方法として、あらかじめ以下に定義されたターゲットの一つを使ってMRLを構成で"
-"きます。:"
+msgstr "別の方法として、あらかじめ以下に定義されたターゲットの一つを使ってMRLを構成できます。:"
 
 #: modules/gui/gtk/gnome_interface.c:1610
 #: modules/gui/gtk/gnome_interface.c:2105 modules/gui/gtk/gtk_interface.c:1925
@@ -2498,14 +2436,14 @@ msgstr "デバイス名"
 
 #: modules/gui/gtk/gnome_interface.c:1688 modules/gui/gtk/gtk_interface.c:1994
 #: modules/gui/gtk/menu.c:1007 modules/gui/gtk/menu.c:1375
-#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:334
+#: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:335
 #: modules/gui/macosx/open.m:184 modules/gui/wxwindows/open.cpp:258
 msgid "Chapter"
 msgstr "チャプター"
 
 #: modules/gui/gtk/gnome_interface.c:1698 modules/gui/gtk/gtk_interface.c:2004
 #: modules/gui/gtk/menu.c:1345 modules/gui/gtk/menu.c:1366
-#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:333
+#: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:334
 #: modules/gui/macosx/open.m:183 modules/gui/wxwindows/open.cpp:252
 msgid "Title"
 msgstr "タイトル"
@@ -2633,9 +2571,7 @@ msgstr "モジュール"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"すみませんが、このモジュール・マネージャーはまだ機能しません。新しいバージョ"
-"ンで試してみてください。"
+msgstr "すみませんが、このモジュール・マネージャーはまだ機能しません。新しいバージョンで試してみてください。"
 
 #: modules/gui/gtk/gnome_interface.c:2404
 #: modules/gui/gtk/gnome_interface.c:2545 modules/gui/gtk/gtk_interface.c:2863
@@ -2700,9 +2636,12 @@ msgstr "分"
 msgid "h:"
 msgstr "時"
 
+#.
+#. * from modules/gui/win32/messages.dfm:
+#.
 #: modules/gui/gtk/gnome_interface.c:2808 modules/gui/gtk/gtk_interface.c:3063
 #: modules/gui/kde/messages.cpp:8 modules/gui/macosx/intf.m:294
-#: modules/gui/macosx/intf.m:359 modules/gui/win32/strings.cpp:153
+#: modules/gui/macosx/intf.m:360 modules/gui/win32/strings.cpp:153
 msgid "Messages"
 msgstr "メッセージ"
 
@@ -2841,6 +2780,7 @@ msgstr "作成者"
 msgid "the VideoLAN team <videolan@videolan.org>"
 msgstr ""
 
+#. Create the buttons
 #: modules/gui/gtk/gtk_interface.c:1702 modules/gui/gtk/gtk_interface.c:2503
 #: modules/gui/gtk/gtk_interface.c:2754 modules/gui/gtk/gtk_interface.c:2985
 #: modules/gui/gtk/gtk_interface.c:3092 modules/gui/gtk/gtk_interface.c:3366
@@ -2915,6 +2855,7 @@ msgstr "逆転"
 msgid "_Select"
 msgstr "選択(_S)"
 
+#. special case for "off" item
 #: modules/gui/gtk/menu.c:725 modules/gui/macosx/prefs.m:399
 #: modules/gui/macosx/prefs.m:428 modules/gui/macosx/prefs.m:670
 #: modules/gui/macosx/prefs.m:699
@@ -2940,6 +2881,7 @@ msgstr "説明"
 msgid "Configure"
 msgstr "設定"
 
+#. add new label
 #: modules/gui/gtk/preferences.c:394 modules/gui/kde/pluginsbox.cpp:53
 msgid "Selected:"
 msgstr "選択済み:"
@@ -2948,7 +2890,7 @@ msgstr "選択済み:"
 msgid "Languages"
 msgstr "言語"
 
-#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:336
+#: modules/gui/kde/interface.cpp:94 modules/gui/macosx/intf.m:337
 #: modules/gui/win32/strings.cpp:87
 msgid "Subtitles"
 msgstr "字幕"
@@ -2979,17 +2921,17 @@ msgstr "メッセージ:"
 msgid "VLC - Controller"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:282 modules/gui/macosx/intf.m:327
-#: modules/gui/macosx/intf.m:373 modules/gui/macosx/controls.m:702
+#: modules/gui/macosx/intf.m:282 modules/gui/macosx/intf.m:328
+#: modules/gui/macosx/intf.m:374 modules/gui/macosx/controls.m:702
 msgid "Previous"
 msgstr "前のファイル"
 
-#: modules/gui/macosx/intf.m:283 modules/gui/macosx/intf.m:326
+#: modules/gui/macosx/intf.m:283 modules/gui/macosx/intf.m:327
 #: modules/gui/macosx/controls.m:682
 msgid "Slower"
 msgstr "スロー"
 
-#: modules/gui/macosx/intf.m:286 modules/gui/macosx/intf.m:325
+#: modules/gui/macosx/intf.m:286 modules/gui/macosx/intf.m:326
 #: modules/gui/macosx/controls.m:681
 msgid "Faster"
 msgstr "早送り"
@@ -3012,6 +2954,7 @@ msgstr "閉じる"
 msgid "Open CrashLog"
 msgstr ""
 
+#. main menu
 #: modules/gui/macosx/intf.m:300
 #, fuzzy
 msgid "About VLC media player"
@@ -3038,179 +2981,185 @@ msgstr "すべてを表示"
 msgid "Quit VLC"
 msgstr "VLCを終了"
 
-#: modules/gui/macosx/intf.m:308
+#: modules/gui/macosx/intf.m:307 modules/gui/macosx/intf.m:308
+msgid "1:File"
+msgstr "1:ファイル"
+
+#: modules/gui/macosx/intf.m:309
 msgid "Open..."
 msgstr "開く..."
 
-#: modules/gui/macosx/intf.m:309 modules/gui/win32/strings.cpp:90
+#: modules/gui/macosx/intf.m:310 modules/gui/win32/strings.cpp:90
 msgid "Open File..."
 msgstr "ファイルを開く..."
 
-#: modules/gui/macosx/intf.m:310 modules/gui/win32/strings.cpp:91
+#: modules/gui/macosx/intf.m:311 modules/gui/win32/strings.cpp:91
 msgid "Open Disc..."
 msgstr "ディスクを開く..."
 
-#: modules/gui/macosx/intf.m:311
+#: modules/gui/macosx/intf.m:312
 msgid "Open Network..."
 msgstr "ネットワークを開く"
 
-#: modules/gui/macosx/intf.m:312
+#: modules/gui/macosx/intf.m:313
 msgid "Open Recent"
 msgstr "最近使った項目を開く"
 
-#: modules/gui/macosx/intf.m:313 modules/gui/macosx/intf.m:1504
+#. Recent Items Menu
+#: modules/gui/macosx/intf.m:314 modules/gui/macosx/intf.m:1505
 msgid "Clear Menu"
 msgstr "メニューをクリアする"
 
-#: modules/gui/macosx/intf.m:315
+#: modules/gui/macosx/intf.m:316
 msgid "Edit"
 msgstr "編集"
 
-#: modules/gui/macosx/intf.m:316
+#: modules/gui/macosx/intf.m:317
 msgid "Cut"
 msgstr "カット"
 
-#: modules/gui/macosx/intf.m:317
+#: modules/gui/macosx/intf.m:318
 msgid "Copy"
 msgstr "コピー"
 
-#: modules/gui/macosx/intf.m:318
+#: modules/gui/macosx/intf.m:319
 msgid "Paste"
 msgstr "ペースト"
 
-#: modules/gui/macosx/intf.m:319
+#: modules/gui/macosx/intf.m:320
 msgid "Clear"
 msgstr "クリア"
 
-#: modules/gui/macosx/intf.m:320 modules/gui/macosx/playlist.m:124
+#: modules/gui/macosx/intf.m:321 modules/gui/macosx/playlist.m:124
 msgid "Select All"
 msgstr "すべてを選択"
 
-#: modules/gui/macosx/intf.m:322 modules/gui/win32/strings.cpp:77
+#: modules/gui/macosx/intf.m:323 modules/gui/win32/strings.cpp:77
 msgid "Controls"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:329 modules/gui/macosx/controls.m:721
+#: modules/gui/macosx/intf.m:330 modules/gui/macosx/controls.m:721
 msgid "Loop"
 msgstr "ループ"
 
-#: modules/gui/macosx/intf.m:330 modules/gui/macosx/controls.m:728
+#: modules/gui/macosx/intf.m:331 modules/gui/macosx/controls.m:728
 #, fuzzy
 msgid "Step Forward"
 msgstr "転送"
 
-#: modules/gui/macosx/intf.m:331 modules/gui/macosx/controls.m:729
+#: modules/gui/macosx/intf.m:332 modules/gui/macosx/controls.m:729
 #, fuzzy
 msgid "Step Backward"
 msgstr "逆転再生"
 
-#: modules/gui/macosx/intf.m:335 modules/gui/win32/strings.cpp:86
+#: modules/gui/macosx/intf.m:336 modules/gui/win32/strings.cpp:86
 msgid "Language"
 msgstr "言語"
 
-#: modules/gui/macosx/intf.m:346 modules/gui/macosx/controls.m:747
+#: modules/gui/macosx/intf.m:347 modules/gui/macosx/controls.m:747
 #, fuzzy
 msgid "Half Size"
 msgstr "サイズ"
 
-#: modules/gui/macosx/intf.m:347 modules/gui/macosx/controls.m:748
+#: modules/gui/macosx/intf.m:348 modules/gui/macosx/controls.m:748
 msgid "Normal Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:348 modules/gui/macosx/controls.m:749
+#: modules/gui/macosx/intf.m:349 modules/gui/macosx/controls.m:749
 msgid "Double Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:349 modules/gui/macosx/controls.m:746
+#: modules/gui/macosx/intf.m:350 modules/gui/macosx/controls.m:746
 msgid "Fullscreen"
 msgstr "全画面化"
 
-#: modules/gui/macosx/intf.m:353
+#: modules/gui/macosx/intf.m:354
 msgid "Window"
 msgstr "ウィンドウ"
 
-#: modules/gui/macosx/intf.m:354
+#: modules/gui/macosx/intf.m:355
 msgid "Minimize Window"
 msgstr "ウィンドウを最小化"
 
-#: modules/gui/macosx/intf.m:355
+#: modules/gui/macosx/intf.m:356
 msgid "Close Window"
 msgstr "ウィンドウを閉じる"
 
-#: modules/gui/macosx/intf.m:356
+#: modules/gui/macosx/intf.m:357
 #, fuzzy
 msgid "Controller"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:358 modules/gui/macosx/intf.m:382
+#: modules/gui/macosx/intf.m:359 modules/gui/macosx/intf.m:383
 msgid "Info"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:361
+#: modules/gui/macosx/intf.m:362
 msgid "Bring All to Front"
 msgstr "すべてを前に"
 
-#: modules/gui/macosx/intf.m:363
+#: modules/gui/macosx/intf.m:364
 #, fuzzy
 msgid "Help"
 msgstr "ヘルプ"
 
-#: modules/gui/macosx/intf.m:364
+#: modules/gui/macosx/intf.m:365
 #, fuzzy
 msgid "ReadMe..."
 msgstr "メッセージ..."
 
-#: modules/gui/macosx/intf.m:365
+#: modules/gui/macosx/intf.m:366
 msgid "Report a Bug"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:366
+#: modules/gui/macosx/intf.m:367
 #, fuzzy
 msgid "VideoLAN Website"
 msgstr "VideoLANクライアント"
 
-#: modules/gui/macosx/intf.m:367
+#: modules/gui/macosx/intf.m:368
 msgid "License"
 msgstr "ライセンス"
 
-#: modules/gui/macosx/intf.m:376
+#. error panel
+#: modules/gui/macosx/intf.m:377
 msgid "Error"
 msgstr "エラー"
 
-#: modules/gui/macosx/intf.m:377
+#: modules/gui/macosx/intf.m:378
 #, fuzzy
 msgid ""
 "An error has occurred which probably prevented the execution of your request:"
 msgstr "要求された処理の実行でエラーが発生しました :"
 
-#: modules/gui/macosx/intf.m:378
+#: modules/gui/macosx/intf.m:379
 #, fuzzy
 msgid "If you believe that it is a bug, please follow the instructions at:"
 msgstr "もし、バグであると思われるなら、以下の手順にしたがってください :"
 
-#: modules/gui/macosx/intf.m:379
+#: modules/gui/macosx/intf.m:380
 msgid "Open Messages Window"
 msgstr "メッセージウィンドウを表示"
 
-#: modules/gui/macosx/intf.m:380
+#: modules/gui/macosx/intf.m:381
 msgid "Dismiss"
 msgstr "やり直し"
 
-#: modules/gui/macosx/intf.m:1235
+#: modules/gui/macosx/intf.m:1236
 msgid "Load from file.."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1262
+#: modules/gui/macosx/intf.m:1263
 #, c-format
 msgid "Language 0x%x"
 msgstr "言語 0x%x"
 
-#: modules/gui/macosx/intf.m:1467
+#: modules/gui/macosx/intf.m:1468
 #, fuzzy
 msgid "No CrashLog found"
 msgstr "%@s は見つかりません"
 
-#: modules/gui/macosx/intf.m:1467
+#: modules/gui/macosx/intf.m:1468
 msgid ""
 "Either you are running Mac OS X pre 10.2 or you haven't experienced any "
 "heavy crashes yet."
@@ -3290,15 +3239,26 @@ msgstr "ログ・ウィンドウの最大行数"
 #, fuzzy
 msgid ""
 "You can set the maximum number of lines that the log window will display."
-msgstr ""
-"表示されるログ・ウィンドウの最大行数を指定できます。すべてのメッセージを保持"
-"する場合には、-1を指定してください。"
+msgstr "表示されるログ・ウィンドウの最大行数を指定できます。すべてのメッセージを保持する場合には、-1を指定してください。"
 
 #: modules/gui/win32/win32.cpp:305
 msgid " Enter -1 if you want to keep all messages."
 msgstr ""
 
-#: modules/gui/win32/win32.cpp:310
+#: modules/gui/win32/win32.cpp:306
+msgid "display text under images in the toolbar"
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:308
+#, fuzzy
+msgid "Check this option if you want to display the caption of the buttons in "
+msgstr "VideoLANのチャンネル・サーバーを使用する場合には、このオプションを有効にします。"
+
+#: modules/gui/win32/win32.cpp:309
+msgid "the toolbar. Beware, the display may be messed up"
+msgstr ""
+
+#: modules/gui/win32/win32.cpp:317
 msgid "Native Windows interface module"
 msgstr "ネイティブWindowsインタフェース"
 
@@ -3306,6 +3266,9 @@ msgstr "ネイティブWindowsインタフェース"
 msgid "Version x.y.z"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/disc.dfm:
+#.
 #: modules/gui/win32/strings.cpp:19
 #, fuzzy
 msgid "Open Disc"
@@ -3603,6 +3566,9 @@ msgstr "ウィンドウを閉じる"
 msgid "&Copy text"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/network.dfm:
+#.
 #: modules/gui/win32/strings.cpp:161
 #, fuzzy
 msgid "Open network"
@@ -3716,6 +3682,9 @@ msgstr ""
 msgid "239.239.0.1"
 msgstr ""
 
+#.
+#. * from modules/gui/win32/subtitles.dfm:
+#.
 #: modules/gui/win32/strings.cpp:240
 #, fuzzy
 msgid "Add subtitles"
@@ -3935,6 +3904,7 @@ msgstr "デバイス名"
 msgid "%d"
 msgstr ""
 
+#. Audio menu
 #: modules/gui/wxwindows/popup.cpp:88
 #, fuzzy
 msgid "Audio menu"
@@ -3978,10 +3948,14 @@ msgstr "すべてを選択"
 msgid "&Manage"
 msgstr "言語"
 
+#. FIXME: we should try to find the actual duration...
 #: modules/gui/wxwindows/playlist.cpp:192
 msgid "no info"
 msgstr ""
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/misc/dummy/dummy.c:37
 msgid "dummy image chroma format"
 msgstr "ダミーの画像色彩フォーマット"
@@ -3990,10 +3964,7 @@ msgstr "ダミーの画像色彩フォーマット"
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
-msgstr ""
-"最も効果的なものを使用してパフォーマンスを改善するかわりに、特定の色彩フォー"
-"マットを使用してイメージを作成するために、ダミーのビデオ出力を強制的に選択し"
-"ます。"
+msgstr "最も効果的なものを使用してパフォーマンスを改善するかわりに、特定の色彩フォーマットを使用してイメージを作成するために、ダミーのビデオ出力を強制的に選択します。"
 
 #: modules/misc/dummy/dummy.c:44
 msgid "don't open a dos command box interface"
@@ -4018,7 +3989,7 @@ msgstr "ダミーのインタフェース・プラグインを使用します。"
 msgid "Gtk+ helper module"
 msgstr "Gtk+ヘルパー・モジュール"
 
-#: modules/misc/httpd.c:91
+#: modules/misc/httpd.c:95
 msgid "HTTP 1.0 daemon"
 msgstr ""
 
@@ -4037,9 +4008,7 @@ msgstr "ログ・フォーマット"
 #: modules/misc/logger/logger.c:87
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html\""
-msgstr ""
-"ログ・フォーマットを指定します。\"text\" (デフォルト) and \"html\"が選択でき"
-"ます。"
+msgstr "ログ・フォーマットを指定します。\"text\" (デフォルト) and \"html\"が選択できます。"
 
 #: modules/misc/logger/logger.c:88
 msgid "file logging interface module"
@@ -4069,7 +4038,7 @@ msgstr "MMXエクステンションmemcpyモジュール"
 msgid "AltiVec memcpy module"
 msgstr "AltiVec memcpyモジュール"
 
-#: modules/misc/network/ipv4.c:87
+#: modules/misc/network/ipv4.c:84
 msgid "IPv4 network abstraction layer"
 msgstr "IPv4ネットワーク抽象レイヤ"
 
@@ -4104,23 +4073,23 @@ msgstr "Cモジュール(何もしません)"
 msgid "Miscellaneous stress tests"
 msgstr "その他 負荷テスト"
 
-#: modules/mux/avi.c:96
+#: modules/mux/avi.c:94
 msgid "Avi muxer"
 msgstr ""
 
-#: modules/mux/dummy.c:62
+#: modules/mux/dummy.c:60
 msgid "Dummy muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ps.c:79
+#: modules/mux/mpeg/ps.c:77
 msgid "PS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:140
+#: modules/mux/mpeg/ts.c:138
 msgid "TS muxer"
 msgstr ""
 
-#: modules/mux/mpeg/ts.c:145
+#: modules/mux/mpeg/ts.c:143
 msgid "TS muxer (libdvbpsi)"
 msgstr ""
 
@@ -4178,6 +4147,9 @@ msgstr " 先 "
 msgid "MMX conversions from "
 msgstr "MMX 変換元 "
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/clone.c:53
 #, fuzzy
 msgid "number of clones"
@@ -4196,6 +4168,9 @@ msgstr "閉じる"
 msgid "image clone video module"
 msgstr "イメージ・クローン・ビデオ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/crop.c:54
 msgid "crop geometry"
 msgstr "縁取りジオメトリ"
@@ -4216,6 +4191,9 @@ msgstr "黒縁を自動的にアクティブにする"
 msgid "image crop video module"
 msgstr "イメージ縁取りビデオ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/deinterlace/deinterlace.c:75
 msgid "deinterlace mode"
 msgstr "ノンインタレース化モード"
@@ -4228,6 +4206,9 @@ msgstr "\"discard\", \"blend\", \"mean\", \"bob\" または \"linear\"から一つ"
 msgid "deinterlacing module"
 msgstr "ノンインタレース化モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/distort.c:59
 msgid "distort mode"
 msgstr "湾曲モード"
@@ -4249,6 +4230,9 @@ msgstr "その他のビデオ効果モジュール"
 msgid "invert video module"
 msgstr "ビデオ逆転モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/motionblur.c:54
 #, fuzzy
 msgid "blur factor"
@@ -4262,6 +4246,9 @@ msgstr "かすませる割合い(1から127)"
 msgid "Motion blur filter"
 msgstr "モーションをかすませるフィルタ"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/transform.c:57
 msgid "transform type"
 msgstr "変換タイプ"
@@ -4274,6 +4261,9 @@ msgstr "'90', '180', '270', 'hflip', 'vflip'の中から一つ選択する。"
 msgid "image transformation module"
 msgstr "イメージ変換モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_filter/wall.c:53
 msgid "number of columns"
 msgstr "列数"
@@ -4307,43 +4297,40 @@ msgstr "イメージ・ウォール・ビデオ・モジュール"
 msgid "ASCII-art video output module"
 msgstr "ASCIIアート・ビデオ出力モジュール"
 
-#: modules/video_output/directx/directx.c:95
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
+#: modules/video_output/directx/directx.c:93
 msgid "always on top"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:96
+#: modules/video_output/directx/directx.c:94
 msgid "place the directx window on top of other windows"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:97
+#: modules/video_output/directx/directx.c:95
 msgid "use hardware YUV->RGB conversions"
 msgstr "ハードウェアによる YUV->RGB変換を使用"
 
-#: modules/video_output/directx/directx.c:99
+#: modules/video_output/directx/directx.c:97
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
-msgstr ""
-"YUV->RGBのハードウェア・アクセラレーションの使用を試みます。オーバレイを使用"
-"する場合には何の効果もありません。"
+msgstr "YUV->RGBのハードウェア・アクセラレーションの使用を試みます。オーバレイを使用する場合には何の効果もありません。"
 
-#: modules/video_output/directx/directx.c:101
+#: modules/video_output/directx/directx.c:99
 msgid "use video buffers in system memory"
 msgstr "システムメモリ中のビデオバッファを使用する"
 
-#: modules/video_output/directx/directx.c:103
+#: modules/video_output/directx/directx.c:101
 msgid ""
 "Create video buffers in system memory instead of video memory. This isn't "
 "recommended as usually using video memory allows to benefit from more "
 "hardware acceleration (like rescaling or YUV->RGB conversions). This option "
 "doesn't have any effect when using overlays."
-msgstr ""
-"ビデオメモリのかわりにシステムメモリ中にビデオバッファを作成します。ビデオメ"
-"モリを使ったハードウェア・アクセラレーションによる効果を有効にするため、この"
-"オプションは推奨しません。(リスケーリングやYUV->RGB変換)オーバレイを使用する"
-"場合には何の効果もありません。"
+msgstr "ビデオメモリのかわりにシステムメモリ中にビデオバッファを作成します。ビデオメモリを使ったハードウェア・アクセラレーションによる効果を有効にするため、このオプションは推奨しません。(リスケーリングやYUV->RGB変換)オーバレイを使用する場合には何の効果もありません。"
 
-#: modules/video_output/directx/directx.c:113
+#: modules/video_output/directx/directx.c:111
 msgid "DirectX video module"
 msgstr "DirectXビデオ・モジュール"
 
@@ -4359,6 +4346,9 @@ msgstr "フレーム・バッファ・デバイス"
 msgid "Linux console framebuffer module"
 msgstr "Linuxコンソール・フレーム・バッファ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:98
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
@@ -4380,6 +4370,9 @@ msgstr "3dfx Glideモジュール"
 msgid "Matrox Graphic Array video module"
 msgstr "Matroxグラフィック・アレイ・ビデオ・モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/mga/xmga.c:89 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
 msgid "alternate fullscreen method"
@@ -4395,8 +4388,7 @@ msgid ""
 "2) Completly bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
-"フルスクリーン・ウィンドウにするには２つの方法があります。あいにくどれも欠点"
-"があります。\n"
+"フルスクリーン・ウィンドウにするには２つの方法があります。あいにくどれも欠点があります。\n"
 "1) ウィンドウ・マネージャーが制御するフルスクリーン・モード\n"
 "   タスクバーがビデオの上に表示されてしまいます。\n"
 "2) 完全にウィンドウ・マネージャーをバイパスするフルスクリーン・モード\n"
@@ -4415,6 +4407,9 @@ msgstr ""
 msgid "X11 MGA module"
 msgstr "X11 MGAモジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/qte/qte.cpp:80
 msgid "QT Embedded display name"
 msgstr "埋め込みQTのX11ディスプレイ名"
@@ -4427,6 +4422,8 @@ msgstr ""
 "使用したいQtのハードウェア・ディスプレイを指定します。\n"
 "デフォルトではVLCは、DISPLAY環境変数に設定されているものを使用します。"
 
+#.    add_category_hint( N_("QT Embedded"), NULL );
+#.    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
 #: modules/video_output/qte/qte.cpp:116
 #, fuzzy
 msgid "QT Embedded video module"
@@ -4461,6 +4458,9 @@ msgstr ""
 msgid "X11 module"
 msgstr "X11モジュール"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
 msgstr "XVideoアダプタ番号"
@@ -4469,9 +4469,7 @@ msgstr "XVideoアダプタ番号"
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
-msgstr ""
-"グラフィックカードが複数のアダプタを提供している場合、このオプションはどれを"
-"使用するかを選択することができます。(これは変更すべきではありません)"
+msgstr "グラフィックカードが複数のアダプタを提供している場合、このオプションはどれを使用するかを選択することができます。(これは変更すべきではありません)"
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -4481,9 +4479,7 @@ msgstr "XVimage色彩フォーマット"
 msgid ""
 "Force the XVideo renderer to use a specific chroma format instead of trying "
 "to improve performances by using the most efficient one."
-msgstr ""
-"最も効果的なものを使ってパフォーマンスを改善するかわりに、特定の色彩フォー"
-"マットを使用するためのXVideoレンダラを強制的に指定します。"
+msgstr "最も効果的なものを使ってパフォーマンスを改善するかわりに、特定の色彩フォーマットを使用するためのXVideoレンダラを強制的に指定します。"
 
 #: modules/video_output/x11/xvideo.c:73
 msgid "XVideo"
@@ -4497,6 +4493,9 @@ msgstr "XVideoエクステンション・モジュール"
 msgid "scope effect"
 msgstr "スコープ効果"
 
+#. ****************************************************************************
+#. * Module descriptor
+#. ****************************************************************************
 #: modules/visualization/xosd/xosd.c:61
 msgid "flip vertical position"
 msgstr "垂直方向位置"
@@ -4543,9 +4542,7 @@ msgstr "xosdインタフェース・モジュール"
 #~ msgid ""
 #~ "Specify a QT Embedded drawable to use instead of opening a new window. "
 #~ "This option is DANGEROUS, use with care."
-#~ msgstr ""
-#~ "新しいウィンドウを開く代わりに使用される埋め込みQT drawableモジュールを指"
-#~ "定します。このオプションは危険なため注意が必要です。"
+#~ msgstr "新しいウィンドウを開く代わりに使用される埋め込みQT drawableモジュールを指定します。このオプションは危険なため注意が必要です。"
 
 #~ msgid "specify an existing window"
 #~ msgstr "既存のウィンドウを指定"
@@ -4553,9 +4550,7 @@ msgstr "xosdインタフェース・モジュール"
 #~ msgid ""
 #~ "Specify a window to use instead of opening a new one. This option is "
 #~ "DANGEROUS, use with care."
-#~ msgstr ""
-#~ "新しいウィンドウを開く代わりに使用するウィンドウを指定します。このオプショ"
-#~ "ンは危険ですので、注意が必要です。"
+#~ msgstr "新しいウィンドウを開く代わりに使用するウィンドウを指定します。このオプションは危険ですので、注意が必要です。"
 
 #~ msgid "X11 drawable"
 #~ msgstr "X11 drawable"
@@ -4563,9 +4558,7 @@ msgstr "xosdインタフェース・モジュール"
 #~ msgid ""
 #~ "Specify a X11 drawable to use instead of opening a new window. This "
 #~ "option is DANGEROUS, use with care."
-#~ msgstr ""
-#~ "新しいウィンドウを開くかわりに使用するX11 drawableを指定します。このオプ"
-#~ "ションは危険なため、利用には注意が必要です。"
+#~ msgstr "新しいウィンドウを開くかわりに使用するX11 drawableを指定します。このオプションは危険なため、利用には注意が必要です。"
 
 #~ msgid "A_udio"
 #~ msgstr "オーディオ(_u)"

@@ -103,7 +103,7 @@
       Hint = _( "Pause stream" );
       Caption = _( "Stop" );
       Hint = _( "Stop stream" );
-      Caption = _( "Eject" );
+      Caption = _( "Eject disc" );
       Hint = _( "Eject disc" );
       Caption = _( "Slow" );
       Hint = _( "Play slower" );
