@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.37 2001/02/23 12:37:31 massiot Exp $
+ * $Id: input_programs.c,v 1.38 2001/03/02 13:49:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -502,6 +502,19 @@ static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
 
     p_config->pf_init_bit_stream = InitBitstream;
 
+    p_input->stream.i_selected_es_number++;
+    p_input->stream.pp_selected_es = realloc(
+                                       p_input->stream.pp_selected_es,
+                                       p_input->stream.i_selected_es_number
+                                        * sizeof(es_descriptor_t *) );
+    if( p_input->stream.pp_selected_es == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
+        return(-1);
+    }
+    p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
+            = p_es;
+
     return( 0 );
 }
 
@@ -555,6 +568,9 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 
 /*****************************************************************************
  * input_SelectES: selects an ES and spawns the associated decoder
+ *****************************************************************************
+ * Remember we are still supposed to have stream_lock when entering this
+ * function ?
  *****************************************************************************/
 /* FIXME */
 vlc_thread_t adec_CreateThread( void * );
@@ -566,6 +582,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     /* FIXME ! */
     decoder_capabilities_t  decoder;
+    void *                  p_config;
 
 #ifdef DEBUG_INPUT
     intf_DbgMsg( "Selecting ES 0x%x", p_es->i_id );
@@ -584,8 +601,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_audio )
         {
             decoder.pf_create_thread = adec_CreateThread;
-            p_es->thread_id = input_RunDecoder( &decoder,
-                                    (void *)GetAdecConfig( p_input, p_es ) );
+            p_config = (void *)GetAdecConfig( p_input, p_es );
+
+            /* Release the lock, not to block the input thread during
+             * the creation of the thread. */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
@@ -594,8 +616,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_video )
         {
             decoder.pf_create_thread = vpar_CreateThread;
-            p_es->thread_id = input_RunDecoder( &decoder,
-                                    (void *)GetVdecConfig( p_input, p_es ) );
+            p_config = (void *)GetVdecConfig( p_input, p_es );
+
+            /* Release the lock, not to block the input thread during
+             * the creation of the thread. */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
@@ -603,8 +630,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_audio )
         {
             decoder.pf_create_thread = ac3dec_CreateThread;
-            p_es->thread_id = input_RunDecoder( &decoder,
-                                    (void *)GetAdecConfig( p_input, p_es ) );
+            p_config = (void *)GetAdecConfig( p_input, p_es );
+
+            /* Release the lock, not to block the input thread during
+             * the creation of the thread. */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
@@ -612,8 +644,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         if( p_main->b_video )
         {
             decoder.pf_create_thread = spudec_CreateThread;
-            p_es->thread_id = input_RunDecoder( &decoder,
-                                    (void *)GetVdecConfig( p_input, p_es ) );
+            p_config = (void *)GetVdecConfig( p_input, p_es );
+
+            /* Release the lock, not to block the input thread during
+             * the creation of the thread. */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
@@ -628,34 +665,19 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return( -1 );
     }
 
-    if( p_es->p_decoder_fifo != NULL )
-    {
-        p_input->stream.i_selected_es_number++;
-        p_input->stream.pp_selected_es = realloc(
-                                           p_input->stream.pp_selected_es,
-                                           p_input->stream.i_selected_es_number
-                                            * sizeof(es_descriptor_t *) );
-        if( p_input->stream.pp_selected_es == NULL )
-        {
-            intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
-            return(-1);
-        }
-        p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
-                = p_es;
-    }
     return( 0 );
 }
 
 /*****************************************************************************
- * input_UnSelectES: removes an ES from the list of selected ES
+ * input_UnselectES: removes an ES from the list of selected ES
  *****************************************************************************/
-int input_UnSelectES( input_thread_t * p_input, es_descriptor_t * p_es )
+int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
 
     int     i_index = 0;
 
 #ifdef DEBUG_INPUT
-    intf_DbgMsg( "UnSelecting ES 0x%x", p_es->i_id );
+    intf_DbgMsg( "Unselecting ES 0x%x", p_es->i_id );
 #endif
 
     if( p_es->p_decoder_fifo == NULL )
@@ -664,7 +686,10 @@ int input_UnSelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return( -1 );
     }
 
+    /* Release lock, not to block the input thread. */
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
     input_EndDecoder( p_input, p_es );
+    vlc_mutex_lock( &p_input->stream.stream_lock );
 
     if( p_es->p_decoder_fifo == NULL )
     {
@@ -685,7 +710,7 @@ int input_UnSelectES( input_thread_t * p_input, es_descriptor_t * p_es )
                                             * sizeof(es_descriptor_t *) );
         if( p_input->stream.pp_selected_es == NULL )
         {
-            intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
+            intf_ErrMsg( "Unable to realloc memory in input_UnSelectES" );
             return(-1);
         }
     }

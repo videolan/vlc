@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.23 2001/03/02 13:47:01 sam Exp $
+ * $Id: input_dvd.c,v 1.24 2001/03/02 13:49:37 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -599,7 +599,7 @@ static int DVDSetArea( input_thread_t * p_input,
             
             if( p_input->stream.pp_selected_es[i_index] != p_es )
             {
-                input_UnSelectES( p_input,
+                input_UnselectES( p_input,
                                   p_input->stream.pp_selected_es[i_index] );
                 input_SelectES( p_input, p_es );
                 intf_WarnMsg( 1, "DVD: Audio %d selected -> %s (0x%x)",
