@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.36 2001/12/07 18:33:08 sam Exp $
+ * $Id: vout_xvideo.c,v 1.36.2.1 2001/12/10 10:59:14 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -403,6 +403,24 @@ static void vout_Destroy( vout_thread_t *p_vout )
  * XXX  Should "factor-out" common code in this and the "same" fn in the x11
  * XXX  plugin!
  *****************************************************************************/
+static __inline__ void vout_Seek( int i_seek )
+{
+    int i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_tell;
+
+    i_tell += i_seek * 50 * p_main->p_intf->p_input->stream.i_mux_rate;
+
+    if( i_tell < p_main->p_intf->p_input->stream.p_selected_area->i_start )
+    {
+        i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_start;
+    }
+    else if( i_tell > p_main->p_intf->p_input->stream.p_selected_area->i_size )
+    {
+        i_tell = p_main->p_intf->p_input->stream.p_selected_area->i_size;
+    }
+
+    input_Seek( p_main->p_intf->p_input, i_tell );
+}
+
 static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
@@ -461,6 +479,36 @@ static int vout_Manage( vout_thread_t *p_vout )
                  case XK_Menu:
                      p_main->p_intf->b_menu_change = 1;
                      break;
+                 case XK_Left:
+                     vout_Seek( -5 );
+                     break;
+                 case XK_Right:
+                     vout_Seek( 5 );
+                     break;
+                 case XK_Up:
+                     vout_Seek( 60 );
+                     break;
+                 case XK_Down:
+                     vout_Seek( -60 );
+                     break;
+                 case XK_Home:
+                     input_Seek( p_main->p_intf->p_input,
+                     p_main->p_intf->p_input->stream.p_selected_area->i_start );                     break;
+                 case XK_End:
+                     input_Seek( p_main->p_intf->p_input,
+                     p_main->p_intf->p_input->stream.p_selected_area->i_size );
+                     break;
+                 case XK_Page_Up:
+                     vout_Seek( 900 );
+                     break;
+                 case XK_Page_Down:
+                     vout_Seek( -900 );
+                     break;
+                 case XK_space:
+                     input_SetStatus( p_main->p_intf->p_input,
+                                      INPUT_STATUS_PAUSE );
+                     break;
+
                  default:
                      /* "Normal Keys"
                       * The reason why I use this instead of XK_0 is that 
