@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.9 2003/05/03 13:37:21 titer Exp $
+ * $Id: BeOS.cpp,v 1.10 2003/05/07 14:49:19 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,6 +47,9 @@ void E_(CloseVideo)   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    add_bool( "beos-dvdmenus", 0, NULL, "Use DVD Menus", "", VLC_TRUE );
+    add_string( "beos-screenshotpath", "/boot/home/", NULL, "Screenshot Path", "", VLC_TRUE );
+    add_string( "beos-screenshotformat", NULL, NULL, "Screenshot Format", "", VLC_TRUE );
     set_description( _("BeOS standard API interface") );
     add_submodule();
         set_capability( "interface", 100 );

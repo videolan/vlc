@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.17 2003/04/22 16:36:16 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.18 2003/05/07 14:49:19 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -381,10 +381,11 @@ VideoWindow::MessageReceived( BMessage *p_message )
 						dst += dstBpr;
 						src += srcBpr;
 					}
-					char* path = config_GetPsz( p_vout, "beos-screenshot-path" );
+					char* path = config_GetPsz( p_vout, "beos-screenshotpath" );
 					if ( !path )
 						path = strdup( DEFAULT_SCREEN_SHOT_PATH );
-					int32 format = config_GetInt( p_vout, "beos-screenshot-format" );
+					/* config_GetPsz( p_vout, "beos-screenshotformat" ); */
+					int32 format = DEFAULT_SCREEN_SHOT_FORMAT;
 					_SaveScreenShot( temp, path, format );
 				}
 				else
@@ -911,19 +912,8 @@ VideoWindow::_save_screen_shot( void* cookie )
 		BString path( info->path );
 		// create the folder if it doesn't exist
 		BString folder( info->path );
-		int32 pos = folder.FindLast("/");
-		if ( pos > 0 )
-		{
-			pos++; // leave the last '/' in the string
-			if ( pos == path.Length() )
-				path << "vlc screenshot";
-			else
-			{
-				int32 removeChars = folder.Length() - pos;	
-				folder.Remove( pos, removeChars );
-			}
-			create_directory( folder.String(), 0777 );
-		}
+		create_directory( folder.String(), 0777 );
+		path << "/vlc screenshot";
 		BEntry entry( path.String() );
 		int32 appendedNumber = 0;
 		if ( entry.Exists() && !entry.IsSymLink() )

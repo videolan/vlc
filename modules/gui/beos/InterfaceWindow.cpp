@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.36 2003/05/05 13:06:02 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.37 2003/05/07 14:49:19 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -189,9 +189,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 	  fSettings( new BMessage( 'sett' ) ),
 	  p_wrapper( p_intf->p_sys->p_wrapper )
 {
-	// TODO: ?!? what about user settings?
-    p_intf->p_sys->b_dvdmenus = false;
-    
     fPlaylistIsEmpty = !( p_wrapper->PlaylistSize() > 0 );
     
     BScreen screen;
@@ -849,7 +846,8 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
         if ( fSpeedMenu->IsEnabled() != hasFile )
              fSpeedMenu->SetEnabled( hasFile );
         // "goto menu" menu item
-        bool hasMenu = p_intf->p_sys->b_dvdmenus ? hasTitles : false;
+        bool hasMenu = config_GetInt( p_intf, "beos-dvdmenus" ) ?
+                           hasTitles : false;
         if ( fGotoMenuMI->IsEnabled() != hasMenu )
              fGotoMenuMI->SetEnabled( hasMenu );
         Unlock();
