@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.23 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_dsp.c,v 1.24 2002/02/24 22:12:10 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -188,7 +188,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     /* Set the output rate */
     i_rate = p_aout->i_rate;
-    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &l_rate ) < 0 )
+    if( ioctl( p_aout->p_sys->i_fd, SNDCTL_DSP_SPEED, &i_rate ) < 0 )
     {
         intf_ErrMsg( "aout error: can't set audio output rate (%i)",
                      p_aout->i_rate );
