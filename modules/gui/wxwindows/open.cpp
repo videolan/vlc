@@ -221,9 +221,6 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
     if( b_advanced )
     {
-        wxPanel *dummy_panel = new wxPanel( this, -1 );
-        sizer->Add( dummy_panel, 1 );
-
         wxButton *button =
             new wxButton( this, AdvancedOptions_Event,
                           wxU(_("Advanced options...")) );
@@ -279,7 +276,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
         /* Separation */
-        dummy_panel = new wxPanel( p_advanced_dialog, -1 );
+        wxPanel *dummy_panel = new wxPanel( p_advanced_dialog, -1 );
         sizer->Add( dummy_panel, 1 );
         wxStaticLine *static_line =
             new wxStaticLine( p_advanced_dialog, wxID_OK );
