@@ -110,11 +110,15 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
     var_Create( p_this, "logo-file", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "logo-file", &val );
     psz_filename = val.psz_string;
-    if( !psz_filename ) return 0;
+    if( !psz_filename || !*psz_filename )
+    {
+        msg_Err( p_this, "logo file not specified" );
+        return 0;
+    }
 
     if( !(file = fopen( psz_filename , "rb" )) )
     {
-        msg_Err( p_this , "logo file (%s) not found", psz_filename );
+        msg_Err( p_this, "logo file (%s) not found", psz_filename );
         free( psz_filename );
         return 0;
     }
@@ -168,7 +172,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
 
     var_Create(p_this, "logo-transparency", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
     var_Get( p_this, "logo-transparency", &val );
-    i_trans = val.i_int;
+    i_trans = __MAX( __MIN( val.i_int, 255 ), 0 );
 
     for( j = 0; j < (int)i_height ; j++ )
     {
