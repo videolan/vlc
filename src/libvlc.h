@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.56 2003/04/08 08:35:59 massiot Exp $
+ * $Id: libvlc.h,v 1.57 2003/04/16 00:12:36 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -302,6 +302,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
 
+#define SOUT_DISPLAY_TEXT N_("display while streaming")
+#define SOUT_DISPLAY_LONGTEXT N_( \
+    "This allows you to play the stream while streaming it.")
+
 #define SOUT_VIDEO_TEXT N_("enable video stream output")
 #define SOUT_VIDEO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
@@ -311,6 +315,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define SOUT_VCODEC_LONGTEXT N_( \
     "This allows you to force video encoding")
 
+#define SOUT_VBITRATE_TEXT N_("video bitrate encoding (kB/s)" )
+#define SOUT_VBITRATE_LONGTEXT N_( \
+    "This allows you to specify video bitrate in kB/s.")
+
 #define SOUT_AUDIO_TEXT N_("enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
     "This allows you to choose if the video stream should be redirected to " \
@@ -319,6 +327,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define SOUT_ACODEC_TEXT N_("audio encoding codec" )
 #define SOUT_ACODEC_LONGTEXT N_( \
     "This allows you to force audio encoding")
+
+#define SOUT_ABITRATE_TEXT N_("audio bitrate encoding (kB/s)" )
+#define SOUT_ABITRATE_LONGTEXT N_( \
+    "This allows you to specify audio bitrate in kB/s.")
 
 #define PACKETIZER_TEXT N_("choose preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
@@ -536,10 +548,16 @@ vlc_module_begin();
     /* Stream output options */
     add_category_hint( N_("Stream output"), NULL, VLC_TRUE );
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT, SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
+
     add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, SOUT_AUDIO_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT, VLC_TRUE );
     add_string_from_list( "sout-acodec", "", ppsz_sout_acodec, NULL, SOUT_ACODEC_TEXT, SOUT_ACODEC_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-abitrate", 0, NULL, SOUT_ABITRATE_TEXT, SOUT_ABITRATE_LONGTEXT, VLC_TRUE );
+
+    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, SOUT_VIDEO_LONGTEXT, VLC_TRUE );
     add_string_from_list( "sout-vcodec", "", ppsz_sout_vcodec, NULL, SOUT_VCODEC_TEXT, SOUT_VCODEC_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-vbitrate", 0, NULL, SOUT_VBITRATE_TEXT, SOUT_VBITRATE_LONGTEXT, VLC_TRUE );
+
     add_module( "packetizer", "packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
     add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT, VLC_TRUE );

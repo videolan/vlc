@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.12 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.13 2003/04/16 00:12:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -215,6 +215,7 @@ static int CopyUntilNextStartCode( packetizer_t   *p_pack,
 static void PacketizeThread( packetizer_t *p_pack )
 {
     sout_buffer_t *p_sout_buffer = NULL;
+    vlc_bool_t    b_seen_slice = VLC_FALSE;
     int32_t       i_pos;
     int           i_skipped;
     mtime_t       i_duration; /* of the parsed picture */
@@ -338,13 +339,18 @@ static void PacketizeThread( packetizer_t *p_pack )
 
     for( ;; )
     {
-        uint32_t i_code;
+        uint32_t    i_code;
         if( p_pack->p_fifo->b_die || p_pack->p_fifo->b_error )
         {
             break;
         }
 
         i_code = ShowBits( &p_pack->bit_stream, 32 );
+
+        if( b_seen_slice && ( i_code < 0x101 || i_code > 0x1af ) )
+        {
+            break;
+        }
 
         if( i_code == 0x1B8 ) /* GOP */
         {
@@ -358,10 +364,11 @@ static void PacketizeThread( packetizer_t *p_pack )
                i_pos += p_pack->i_sequence_header_length;
                p_pack->i_last_sequence_header = 0;
             }
-
+#if 1
             p_pack->i_last_ref_pts =
                    p_pack->i_last_dts +
                         (mtime_t)( 1000000 / p_pack->d_frame_rate); /* FIXME */
+#endif
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
         else if( i_code == 0x100 ) /* Picture */
@@ -374,7 +381,6 @@ static void PacketizeThread( packetizer_t *p_pack )
             i_temporal_ref = ShowBits( &p_pack->bit_stream, 10 );
 
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
-            break;
         }
         else if( i_code == 0x1b5 )
         {
@@ -402,6 +408,11 @@ static void PacketizeThread( packetizer_t *p_pack )
         }
         else
         {
+            if( i_code >= 0x101 && i_code <= 0x1af )
+            {
+                b_seen_slice = VLC_TRUE;
+            }
+
             if( i_code == 0x1B3 )
             {
                 p_pack->i_last_sequence_header = 0;

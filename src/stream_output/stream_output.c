@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.24 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: stream_output.c,v 1.25 2003/04/16 00:12:36 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,7 +37,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static char *sout_stream_chain_to_str( char * );
+#define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
+static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
+
 /*
  * Generic MRL parser
  *
@@ -87,7 +89,8 @@ sout_instance_t * __sout_NewInstance ( vlc_object_t *p_parent,
     }
     else
     {
-        p_sout->psz_chain = sout_stream_chain_to_str( psz_dest );
+        p_sout->psz_chain = sout_stream_url_to_chain( p_sout, psz_dest );
+        msg_Dbg( p_sout, "using sout chain=`%s'", p_sout->psz_chain );
     }
 
     p_sout->p_stream = sout_stream_new( p_sout, p_sout->psz_chain );
@@ -1138,16 +1141,65 @@ void sout_stream_delete( sout_stream_t *p_stream )
     vlc_object_destroy( p_stream );
 }
 
-static char *sout_stream_chain_to_str( char *psz_url )
+static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
 {
-    mrl_t mrl;
-    char *psz_chain;
+    mrl_t       mrl;
+    char        *psz_chain, *p;
+    char        *psz_vcodec, *psz_acodec;
 
     mrl_Parse( &mrl, psz_url );
+    p = psz_chain = malloc( 500 + strlen( mrl.psz_way ) + strlen( mrl.psz_access ) + strlen( mrl.psz_name ) );
 
-    psz_chain = malloc( 100 + strlen( mrl.psz_way ) + strlen( mrl.psz_access ) + strlen( mrl.psz_name ) );
+    psz_vcodec = config_GetPsz( p_this, "sout-vcodec" );
+    if( psz_vcodec && *psz_vcodec == '\0')
+    {
+        FREE( psz_vcodec );
+    }
+    psz_acodec = config_GetPsz( p_this, "sout-acodec" );
+    if( psz_acodec && *psz_acodec == '\0' )
+    {
+        FREE( psz_acodec );
+    }
+    /* set transcoding */
+    if( psz_vcodec || psz_acodec )
+    {
+        p += sprintf( p, "transcode{" );
+        if( psz_vcodec )
+        {
+            int br;
 
-    sprintf( psz_chain, "std{mux=%s,access=%s,url=\"%s\"", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+            p += sprintf( p, "vcodec=%s,", psz_vcodec );
+
+            if( ( br = config_GetInt( p_this, "sout-vbitrate" ) ) > 0 )
+            {
+                p += sprintf( p, "vb=%d,", br * 1000 );
+            }
+            free( psz_vcodec );
+        }
+        if( psz_acodec )
+        {
+            int br;
+
+            p += sprintf( p, "acodec=%s,", psz_acodec );
+            if( ( br = config_GetInt( p_this, "sout-abitrate" ) ) > 0 )
+            {
+                p += sprintf( p, "ab=%d,", br * 1000 );
+            }
+
+            free( psz_acodec );
+        }
+        p += sprintf( p, "}:" );
+    }
+
+
+    if( config_GetInt( p_this, "sout-display" ) )
+    {
+        p += sprintf( p, "duplicate{dst=display,dst=std{mux=%s,access=%s,url=\"%s\"}}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+    }
+    else
+    {
+        p += sprintf( p, "std{mux=%s,access=%s,url=\"%s\"}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+    }
 
     return( psz_chain );
 }
