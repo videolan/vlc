@@ -28,7 +28,9 @@
 #include <stdlib.h>
 
 #include <errno.h>
-#include <sys/types.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
 #include <ctype.h>
 
 #include <vlc/vlc.h>
