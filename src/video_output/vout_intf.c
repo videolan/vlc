@@ -324,8 +324,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             asprintf( &val.psz_string, "%s/" CONFIG_DIR,
                   p_vout->p_vlc->psz_homedir );
         } else {
-            asprintf( &val.psz_string, p_mypicturesdir,
-                  p_vout->p_vlc->psz_homedir );
+            asprintf( &val.psz_string, p_mypicturesdir );
             free( p_mypicturesdir );
         }
     }
