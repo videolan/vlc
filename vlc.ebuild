@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.4 2003/05/23 00:00:48 hartman Exp $
+# $Id: vlc.ebuild,v 1.5 2003/06/14 21:06:30 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -20,12 +20,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 ###############################################################################
-IUSE="arts qt ncurses dvd gtk nls 3dfx esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib avi slp truetype"
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
-PFFMPEG=ffmpeg-20030517
-PLIBMPEG2=mpeg2dec-20030418
+PFFMPEG=ffmpeg-20030612
+PLIBMPEG2=mpeg2dec-20030612
 
 S=${WORKDIR}/${P}
 SFFMPEG=${WORKDIR}/${PFFMPEG}
@@ -34,21 +34,18 @@ SLIBMPEG2=${WORKDIR}/${PLIBMPEG2}
 DESCRIPTION="VLC media player - A videoplayer that plays DVD,
              VCD, files and networkstreams o.a."
 
-# Use the correct CVS snapshot links. 
-SRC_URI="http://www.videolan.org/pub/testing/${P}/${P}.tar.bz2
-         http://www.videolan.org/pub/testing/contrib/ffmpeg-20030517.tar.bz2
-	 http://www.videolan.org/pub/testing/contrib/mpeg2dec-20030418.tar.bz2"
+SRC_URI="http://www.videolan.org/pub/videolan/${PN}/${PV}/${P}.tar.bz2
+		 http://www.videolan.org/pub/testing/contrib/mpeg2dec-20030612.tar.bz2
+		 http://www.videolan.org/pub/testing/contrib/ffmpeg-20030612.tar.bz2"
 
-#SRC_URI="http://www.videolan.org/pub/videolan/${PN}/${PV}/${P}.tar.bz2
-#		 http://www.videolan.org/pub/videolan/${PN}/${PV}/contrib/libmpeg2.tar.bz2
-#		 http://www.videolan.org/pub/videolan/${PN}/${PV}/contrib/ffmpeg.tar.bz2"
-HOMEPAGE="http://www.videolan.org"
+HOMEPAGE="http://www.videolan.org/vlc"
 
 SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="~x86 ~ppc"
 
 DEPEND="X? ( virtual/x11 )
+	nls? ( sys-devel/gettext )
 	qt? ( x11-libs/qt )
 	dvd? ( >=media-libs/libdvdread-0.9.3
 		>=media-libs/libdvdcss-1.2.6
@@ -65,25 +62,23 @@ DEPEND="X? ( virtual/x11 )
 	             >=media-libs/libogg-1.0 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	aalib? ( >=media-libs/aalib-1.4_rc4-r2 )
-	avi? ( >=media-libs/xvid-0.9.1 )
+	xvid? ( >=media-libs/xvid-0.9.1 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
+	lirc? ( app-misc/lirc )
+	wxwindows? ( >=x11-libs/wxGTK-2.4.0 )
+        >=media-libs/libdvbpsi-0.1.2
 	>=media-sound/mad-0.14.2b
-	>=media-libs/a52dec-0.7.4
-	>=media-libs/faad2-1.1
-	>=media-libs/libdvbpsi-0.1.2"
+	>=media-libs/a52dec-0.7.4"
 # other optional libraries
 #	>=media-libs/flac-1.1.0
+#	>=media-libs/faad2-1.2
 #	>=media-libs/libdv-0.98
-# wxwindows ought to be a USE variable, like all the others
-#	>=x11-libs/wxGTK-2.4.0
 
 # not in gentoo
 #	tarkin
 #	theora
 #	tremor
-
-RDEPEND="nls? ( sys-devel/gettext )"
 
 # get kde and arts paths
 if [ -n "`use kde`" -o -n "`use arts`" ]; then
@@ -96,6 +91,7 @@ src_unpack() {
 	
 	unpack ${A}
 	cd ${S}
+
 	# if qt3 is installed, patch vlc to work with it instead of qt2
 	( use qt || use kde ) && ( \
 	if [ ${QTDIR} = "/usr/qt/3" ]
@@ -152,99 +148,69 @@ src_compile(){
 	# Configure and build VLC
 	cd ${S}
 	myconf=""
-	
-	use X \
-		&& myconf="${myconf} --enable-x11" \
-		|| myconf="${myconf} --disable-x11"
 
-	use xv \
-		&& myconf="${myconf} --enable-xvideo" \
-		|| myconf="${myconf} --diable-xvideo"
-		
-	use qt \
-		&& myconf="${myconf} --enable-qt" \
-		|| myconf="${myconf} --disable-qt"
-	
+	use X || myconf="${myconf} --disable-x11"
+
+	use xv || myconf="${myconf} --disable-xvideo"
+
+	use ggi && myconf="${myconf} --enable-ggi"
+
+        use 3dfx && myconf="${myconf} --enable-glide"
+
+        use matrox && myconf="${myconf} --enable-mga"
+
+        use svga && myconf="${myconf} --enable-svgalib"
+
+	use sdl || myconf="${myconf} --disable-sdl"
+
+        use fbcon || myconf="${myconf} --disable-fb"
+
+        use aalib && myconf="${myconf} --enable-aa"
+
 	use dvd \
-		&& myconf="${myconf} \
-			--enable-dvd \
-			--enable-dvdread \
-			--enable-vcd" \
+		&& myconf="${myconf} --enable-dvdread" \
 		|| myconf="${myconf} \
 			--disable-dvd \
 			--disable-dvdread \
+			--disable-dvdplay \
 			--disable-vcd"
-	
-	use esd \
-		&& myconf="${myconf} --enable-esd" \
-		|| myconf="${myconf} --disable-esd"
 
-	use ggi \
-		&& myconf="${myconf} --enable-ggi" \
-		|| myconf="${myconf} --disable-ggi"
-	
+	use alsa && myconf="${myconf} --enable-alsa"
+
+        use oss || myconf="${myconf} --disable-oss"
+
+	use esd && myconf="${myconf} --enable-esd"
+
+	use arts && myconf="${myconf} --enable-arts"
+
+	use nls || myconf="${myconf} --disable-nls"
+
 	# the current gtk2 and gnome2 are prelimenary frameworks
 	use gtk \
-		&& myconf="${myconf} --enable-gtk --disable-gtk2" \
-		|| myconf="${myconf} --disable-gtki --disable-gtk2"
+		&& myconf="${myconf} --disable-gtk2" \
+		|| myconf="${myconf} --disable-gtk --disable-gtk2"
 
-	use kde \
-		&& myconf="${myconf} --enable-kde" \
-		|| myconf="${myconf} --disable-kde"
+	use gnome && myconf="${myconf} --enable-gnome --disable-gnome2"
 
-	use nls \
-		|| myconf="${myconf} --disable-nls"
-	
-	use 3dfx \
-		&& myconf="${myconf} --enable-glide" \
-		|| myconf="${myconf} --disable-glide"
+	use kde && myconf="${myconf} --enable-kde"
 
-	use arts \
-		&& myconf="${myconf} --enable-arts" \
-		|| myconf="${myconf} --disable-arts"
-	
-	use gnome \
-		&& myconf="${myconf} --enable-gnome --disable-gnome2" \
-		|| myconf="${myconf} --disable-gnome --disable-gnome2"
-	
-	use ncurses \
-		&& myconf="${myconf} --enable-ncurses" \
-		|| myconf="${myconf} --disable-ncurses"
-	
-	use oggvorbis \
-		&& myconf="${myconf} --enable-vorbis --enable-ogg" \
-		|| myconf="${myconf} --disable-vorbis --disable-ogg"
+	use qt && myconf="${myconf} --enable-qt"
 
-	use alsa \
-		&& myconf="${myconf} --enable-alsa" \
-		|| myconf="${myconf} --disable-alsa"
-		
-	use oss \
-		&& myconf="${myconf} --enable-oss" \
-		|| myconf="${myconf} --disable-oss"
+	use ncurses && myconf="${myconf} --enable-ncurses"
 
-	use sdl \
-		&& myconf="${myconf} --enable-sdl" \
-		|| myconf="${myconf} --disable-sdl"
-	
-	use fbcon \
-		&& myconf="${myconf} --enable-fb" \
-		|| myconf="${myconf} --disable-fb"
+	use oggvorbis || myconf="${myconf} --disable-vorbis --disable-ogg"
 
-	use aalib \
-		&& myconf="${myconf} --enable-aa" \
-		|| myconf="${myconf} --disable-aa"
+	use lirc && myconf="${myconf} --enable-lirc"
 
-	# there is no xvid USE variable
-	# it is pretty reasonable that users with the avi USE variable
-	# want xvid too cq. not.
-	use avi \
-		&& myconf="${myconf} --enable-xvid" \
-		|| myconf="${myconf} --disable-xvid"
+	use slp || myconf="${myconf} --disable-slp"
 
-	use slp \
-		&& myconf="${myconf} --enable-slp" \
-		|| myconf="${myconf} --disable-slp"
+	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
+	use xvid && myconf="${myconf} --enable-xvid"
+
+	# v4l is a local USE var, see /usr/portage/profiles/use.local.desc for more details
+	use v4l && myconf="${myconf} --enable-v4l"
+
+	# wxwindows is a local USE var. already enabled by default, but depends on wxGTK
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -253,15 +219,15 @@ src_compile(){
 	export WANT_AUTOCONF_2_5=1
 	export WANT_AUTOMAKE_1_6=1
 
-	econf \
-		--enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
+	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
 		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
-		--with-sdl \
+		--enable-dvbpsi \
 		--enable-release \
 		--enable-mad \
-		--enable-a52 \
-		--enable-dvbpsi \
-		${myconf} || die "configure of VLC failed"
+		--enable-a52"
+
+	ewarn ${myconf}
+	econf ${myconf} || die "configure of VLC failed"
 
 	# parallel make doesn't work with our complicated makefile
 	# this is also the reason as why you shouldn't run autoconf
