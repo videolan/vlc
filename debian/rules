@@ -51,7 +51,7 @@ CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
 CONFIG_FLAGS += --enable-libmpeg2 --with-libmpeg2-tree=extras/mpeg2dec
 
 # Glide is only for x86
-ifeq ($(DEB_BUILD_ARCH),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 CONFIG_FLAGS += --enable-glide
 CONFIG_FLAGS += --enable-svgalib
 else
@@ -127,7 +127,7 @@ build-stamp:
 	# Build only VLC, with the non-PIC libs
 	$(MAKE) vlc
 
-ifneq ($(DEB_BUILD_ARCH),i386)
+ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	# Hackety hackety hack
 	if test ! -d CVS; then \
 		cd extras/ffmpeg/libavcodec \
@@ -276,7 +276,7 @@ install: build
 	ln -s vlc debian/vlc-ggi/usr/share/doc/vlc-ggi
 
 	# Package: vlc-plugin-glide
-ifeq ($(DEB_BUILD_ARCH),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	ln -s vlc debian/vlc-plugin-glide/usr/share/doc/vlc-plugin-glide
 	mv debian/vlc/usr/lib/vlc/video_output/libglide_plugin.so \
 		debian/vlc-plugin-glide/usr/lib/vlc/video_output/
@@ -320,7 +320,7 @@ endif
 	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
 
 	# Package: vlc-plugin-svgalib
-ifeq ($(DEB_BUILD_ARCH),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	ln -s vlc debian/vlc-plugin-svgalib/usr/share/doc/vlc-plugin-svgalib
 	mv debian/vlc/usr/lib/vlc/video_output/libsvgalib_plugin.so \
 		debian/vlc-plugin-svgalib/usr/lib/vlc/video_output

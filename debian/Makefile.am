@@ -4,8 +4,8 @@ EXTRA_DIST = \
 	README.Debian \
 	changelog \
 	control \
+	copyright \
 	rules \
-	vlc.copyright \
 	vlc.dirs \
 	vlc.docs \
 	vlc.menu \

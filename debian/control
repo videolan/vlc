@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
 Build-Depends: debhelper (>=3.0), gettext, fortune-mod, xlibs-dev, xlibs-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev (>=1.2.2-3.1), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>=0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi1-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, dvb-dev, libdv2-dev, libxosd-dev, svgalibg1-dev (>=1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev, libdvdplay0-dev (>=1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>=1.1.0)
 Build-Conflicts: libmpeg2-dev, libmpeg2-0-dev, libmpeg2-1-dev, libmpeg2-2-dev, libmpeg2-3-dev
-Standards-Version: 3.5.9.0
+Standards-Version: 3.5.10
 
 Package: vlc
 Section: graphics
@@ -15,7 +15,7 @@ Suggests: gnome-vlc
 Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Provides: mp3-decoder
-Description: a complete multimedia player
+Description: complete multimedia player
  This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
  MPEG4, DivX, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams
  from various network sources.
@@ -174,7 +174,7 @@ Package: mozilla-plugin-vlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Recommends: mozilla-browser
-Description: a multimedia plugin for Mozilla based on VLC
+Description: multimedia plugin for Mozilla based on VLC
  This plugin adds support for MPEG, MPEG2, DVD, DivX, Ogg/Vorbis and many
  more formats to your Mozilla browser. The decoding process is done by VLC
  and the output window is embedded in a webpage or directly in the browser
