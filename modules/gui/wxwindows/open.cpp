@@ -1322,8 +1322,6 @@ wxArrayString SeparateEntries( wxString entries )
         {
             /* Finished the quotes mode */
             entry.RemoveLast();
-            if( !entry.IsEmpty() ) entries_array.Add( entry );
-            entry.Empty();
             b_quotes_mode = VLC_FALSE;
         }
         else if( !b_quotes_mode && entry.Last() != wxT('\"') )
