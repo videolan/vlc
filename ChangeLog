@@ -9,6 +9,8 @@ HEAD
 0.3.1
 Thu, 18 Apr 2002 06:43:42 +0200
 
+  * ./vlc.spec: fixed build dependencies.
+  * ./configure.in: when -lintl is available, we now also link plugins with it.
   * ./include/threads.h: fixed a segfault under Solaris, thanks to Meuuh.
   * ./plugins/spudec/spu_decoder.c: RGB 24bpp and 32bpp support.
   * ./configure.in: switched version to 0.3.1.

@@ -38,7 +38,8 @@ Buildrequires:	libarts-devel
 Buildrequires:	libggi-devel
 Buildrequires:	aalib-devel
 Buildrequires:	SDL-devel
-Buildrequires:	liba52-devel
+Buildrequires:	liba52dec-devel
+Buildrequires:	libmad-devel
 
 %description
 VideoLAN is a free network-aware MPEG and DVD player.
