@@ -24,7 +24,7 @@ SOURCES_ts_dvbpsi = \
 	ts.c \
 	$(NULL)
 
-SOURCES_audio = \
-	audio.c \
+SOURCES_mpga = \
+	mpga.c \
 	$(NULL)
 
