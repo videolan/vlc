@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.116 2001/10/01 16:18:49 massiot Exp $
+ * $Id: main.c,v 1.117 2001/10/03 15:10:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -304,7 +304,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         return( errno );
     }
 
-    intf_MsgImm( COPYRIGHT_MESSAGE );
+    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
 
     /*
      * Read configuration

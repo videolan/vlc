@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.62 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input_programs.c,v 1.63 2001/10/03 15:10:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -75,6 +75,10 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
             return 1;
         }
         memset( p_input->stream.p_demux_data, 0, i_data_len );
+    }
+    else
+    {
+        p_input->stream.p_demux_data = NULL;
     }
 
     return 0;
@@ -190,6 +194,10 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
         }
         memset( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data, 0,
                 i_data_len );
+    }
+    else
+    {
+        p_input->stream.pp_programs[i_pgrm_index]->p_demux_data = NULL;
     }
 
     return p_input->stream.pp_programs[i_pgrm_index];

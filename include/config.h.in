@@ -45,7 +45,7 @@
                           /* "(" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n" */ \
                             "Copyright 1996-2001 VideoLAN\n"
 #define COPYRIGHT_MESSAGE   "VideoLAN Client - version @VLC_VERSION@" \
-                            " @VLC_CODENAME@ - (C)1996-2001 VideoLAN\n"
+                            " @VLC_CODENAME@ - (C)1996-2001 VideoLAN"
 
 #define VERSION             "@VLC_VERSION@"
 

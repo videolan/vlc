@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.140 2001/10/03 13:14:05 sam Exp $
+ * $Id: input.c,v 1.141 2001/10/03 15:10:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1173,17 +1173,22 @@ static void HTTPOpen( input_thread_t * p_input )
     p_input->stream.b_seekable = 0;
     p_input->stream.b_pace_control = 1; /* TCP/IP... */
 
+#   define HTTP_USERAGENT "User-Agent: " COPYRIGHT_MESSAGE "\r\n"
+#   define HTTP_END       "\r\n"
+
     /* Prepare GET ... */
     if( psz_proxy != NULL )
     {
         snprintf( psz_buffer, sizeof(psz_buffer),
-                  "GET http://%s:%d/%s HTTP/1.0\r\n\r\n", psz_server,
-                  i_port, psz_path );
+                  "GET http://%s:%d/%s HTTP/1.0\r\n"
+                  HTTP_USERAGENT HTTP_END,
+                  psz_server, i_port, psz_path );
     }
     else
     {
         snprintf( psz_buffer, sizeof(psz_buffer),
-                  "GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n",
+                  "GET /%s HTTP/1.0\r\nHost: %s\r\n"
+                  HTTP_USERAGENT HTTP_END,
                   psz_path, psz_server );
     }
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
