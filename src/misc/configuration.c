@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.49 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: configuration.c,v 1.50 2003/01/30 20:59:36 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1224,7 +1224,16 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         /* Internal error: unknown option */
         if( !b_ignore_errors )
         {
-            fprintf( stderr, "unknown option `%s'\n", ppsz_argv[optind-1] );
+            fprintf( stderr, "%s: unknown option ",
+                             p_this->p_vlc->psz_object_name );
+            if( optopt )
+            {
+                fprintf( stderr, "`-%c'\n", optopt );
+            }
+            else
+            {
+                fprintf( stderr, "`%s'\n", ppsz_argv[optind-1] );
+            }
             fprintf( stderr, "Try `%s --help' for more information.\n",
                              p_this->p_vlc->psz_object_name );
 
