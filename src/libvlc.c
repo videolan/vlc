@@ -595,7 +595,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
             close( 2 );
 
             p_vlc->p_libvlc->b_daemon = VLC_TRUE;
-    	    //VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
+	    var_Create( p_vlc, "interface", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+	    var_SetString( p_vlc, "interface", "dummy" );
+    	    VLC_AddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE );
 	}
     }
 
