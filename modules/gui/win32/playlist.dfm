@@ -59,24 +59,6 @@ object PlaylistDlg: TPlaylistDlg
   object MainMenuPlaylist: TMainMenu
     Left = 8
     Top = 8
-    object MenuFile: TMenuItem
-      Caption = '&File'
-      object MenuFileOpen: TMenuItem
-        Caption = '&Open...'
-        OnClick = MenuFileOpenClick
-      end
-      object MenuFileSave: TMenuItem
-        Caption = '&Save...'
-        OnClick = MenuFileSaveClick
-      end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object MenuFileClose: TMenuItem
-        Caption = '&Close'
-        OnClick = MenuFileCloseClick
-      end
-    end
     object MenuAdd: TMenuItem
       Tag = 3
       Caption = '&Add'

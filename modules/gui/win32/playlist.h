@@ -73,11 +73,6 @@ __published:	// IDE-managed Components
     TAction *DeleteSelectionAction;
     TAction *DeleteAllAction;
     TAction *PlayStreamAction;
-    TMenuItem *MenuFile;
-    TMenuItem *MenuFileOpen;
-    TMenuItem *MenuFileSave;
-   TMenuItem *N3;
-    TMenuItem *MenuFileClose;
     TOpenDialog *PlaylistOpenDlg;
     TSaveDialog *PlaylistSaveDlg;
     void __fastcall FormShow( TObject *Sender );

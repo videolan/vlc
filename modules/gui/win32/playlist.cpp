@@ -428,7 +428,7 @@ void __fastcall TPlaylistDlg::MenuFileOpenClick(TObject *Sender)
 {
     if ( PlaylistOpenDlg->Execute() )
     {
-        playlist_LoadFile ( p_playlist , PlaylistOpenDlg->FileName.c_str() );
+//        playlist_LoadFile ( p_playlist , PlaylistOpenDlg->FileName.c_str() );
         UpdateGrid();
     }
 }
@@ -438,7 +438,7 @@ void __fastcall TPlaylistDlg::MenuFileSaveClick(TObject *Sender)
 {
     if ( PlaylistSaveDlg->Execute() )
     {
-        playlist_SaveFile ( p_playlist , PlaylistSaveDlg->FileName.c_str() );
+//        playlist_SaveFile ( p_playlist , PlaylistSaveDlg->FileName.c_str() );
     }
 }
 //---------------------------------------------------------------------------
