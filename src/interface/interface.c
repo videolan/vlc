@@ -105,7 +105,7 @@ int intf_Run( intf_thread_t *p_intf )
 static int StartInterface( intf_thread_t *p_intf )
 {
     int i_thread;                                              /* thread index */
-#ifdef AUTO_SPAWN
+#ifdef INIT_SCRIPT
     int fd;
 #endif
 
@@ -126,13 +126,13 @@ static int StartInterface( intf_thread_t *p_intf )
         return( 1 );
     }
 
-#ifdef AUTO_SPAWN
+#ifdef INIT_SCRIPT
     /* Execute the initialization script (typically spawn an input thread) */
     if ( (fd = open( INIT_SCRIPT, O_RDONLY )) != -1 )
     {
         /* Startup script does exist */
         close( fd );
-        intf_ExecScript( "vlc.init" );
+        intf_ExecScript( INIT_SCRIPT );
     }
 #endif
 
