@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.17 2003/03/11 19:02:31 fenrir Exp $
+ * $Id: stream_output.c,v 1.18 2003/03/11 20:53:28 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -236,7 +236,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     if( p_sout->i_nb_inputs > 0 )
     {
         msg_Err( p_sout, "i_nb_inputs=%d > 0 !!!!!!", p_sout->i_nb_inputs );
-        msg_Err( p_sout, "mmmh I have a bad filling...", p_sout->i_nb_inputs );
+        msg_Err( p_sout, "mmmh I have a bad feeling..." );
     }
     vlc_mutex_destroy( &p_sout->lock );
 
