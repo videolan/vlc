@@ -1,120 +1,24 @@
 README for vlc, the VideoLAN Client
+===================================
 
-
-Introduction
-============
-
-The vlc is part of the VideoLAN project, a full MPEG2 client/server
-solution. The VideoLAN Client can also be used as a standalone program
-to play MPEG2 streams from a hard disk or a DVD.
-
-
-Building, Installing and Running VideoLAN
-=========================================
-
-See the INSTALL file for this.
-
-
-Troubleshooting
-===============
-
-Please check the file FAQ before doing any bug report.
-
-A mailing-list has been set up for support and discussion about the
-vlc. Its address is :
-
-   <vlc@videolan.org>
-
-To subscribe, send a mail to <listar@videolan.org> with the following
-words in the mail body :
-
-   subscribe vlc
-
-To unsubscribe, do the same with the words :
-
-   unsubscribe vlc
-
-
-When reporting bugs, try to be as precise as possible (which OS, which
-distribution, what plugins you were trying, and so on).
-
+ABOUT-NLS          - Notes on the Free Translation Project.
+AUTHORS            - All the people who worked on vlc.
+BUGS               - List of known, unresolved bugs.
+COPYING            - The GPL license.
+ChangeLog          - The vlc ChangeLog.
+FAQ                - Commonly asked questions.
+INSTALL            - Installation instructions.
+INSTALL.libmad     - Installation instructions for the libmad library.
+INSTALL.win32      - Installation instructions for the Win32 version of vlc.
+MODULES            - Short description of all the available modules.
+README             - This file.
+README.MacOSX.rtf  - Information specific to the MacOS X port.
+TODO               - Work needed.
+doc/               - miscellaneous documentation.
 
 Resources
 =========
 
-The VideoLAN web site at http://www.videolan.org/ is a good start for
-information about MPEG and DVD playing. Have a look at the documentation
-section, as well as the bookmarks.
-
-You can also try the OpenDVD site at http://www.opendvd.org/ or the
-the LiViD project at http://www.linuxvideo.org/. They have lots of
-information, too.
-
-
-The team
-========
-
-See the AUTHORS file for a list of the vlc authors and contributors.
-
-The following teachers were involved in the VideoLAN project :
-
-  Pierre Lecoy, teacher-cum-researcher at ECP,
-  Philippe Boutin, head of the LMI (MicroComputing Laboratory).
-
-The following students were members of the VideoLAN team :
-
-1996-1997:
-  Pierre Almeras <almeras@via.ecp.fr>
-  Christophe Arnaud <christophe.arnaud@tps.fr>
-  Antoine Brenner <brenner@via.ecp.fr>
-  Régis Duchesne <regis@via.ecp.fr>
-  Alexandre Francois <francois@via.ecp.fr>
-  Christian Gross <gross@via.ecp.fr>
-  Hugo Haas <hugo@via.ecp.fr>
-  Mikael Journo <mj32@cornell.edu>
-  Michel Lespinasse <walken@zoy.org>
-  Christophe Ulses <mowgli@laotseu.via.ecp.fr>
-  Pierre Vandecasteele <pabv2@hermes.cam.ac.uk>
-  Guillaume Vergnaud <vergnaud@via.ecp.fr>
-
-1997-1998:
-  Olivier Baxa <oli@via.ecp.fr>
-  Patrice Bazerque <patrice.bazerque@via.ecp.fr>
-  Arnaud Bienvenu <arnaud.bienvenu@via.ecp.fr>
-  Régis Clément <clement@via.ecp.fr>
-  Alexandre Duret <alex@via.ecp.fr>
-  Eric Estievenart <eric@via.ecp.fr>
-  Sébastien Kurz <seb@tao.via.ecp.fr>
-  Olivier Pomel <pomel@via.ecp.fr>
-
-1998-1999:
-  Pierre Baillet <octplane@via.ecp.fr>
-  Alban Fonrouge <alban@via.ecp.fr>
-  Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>
-  Andres Krapf <dae@via.ecp.fr>
-  Christophe Massiot <massiot@via.ecp.fr>
-  Mathieu Poumeyrol <kaliban@via.ecp.fr>
-  Etienne Roy <etienne@via.ecp.fr>
-  Vincent Seguin <seguin@via.ecp.fr>
-  Benoit Steiner <benny@via.ecp.fr>
-
-1999-2000:
-  Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
-  Jean-Marc Dressler <polux@via.ecp.fr>
-  Gaël Hendryckx <jimmy@via.ecp.fr>
-  Samuel Hocevar <sam@zoy.org>
-  Brieuc Jeunhomme <bbp@via.ecp.fr>
-  Michel Kaempf <maxx@via.ecp.fr>
-  Florent Rougon <flo@via.ecp.fr>
-
-2000-2001:
-  Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
-  Stéphane Borel <stef@via.ecp.fr>
-  Renaud Dartus <reno@via.ecp.fr>
-  Henri Fallon <henri@via.ecp.fr>
-  Jean-Michel Grimaldi <jm@via.ecp.fr>
-  Samuel Hocevar <sam@zoy.org>
-  Damien Lucas <nitrox@via.ecp.fr>
-  Rémi Peyronnet <remi@via.ecp.fr>
-  Laurent Rossier <gunther@via.ecp.fr>
+The VideoLAN web site : http://www.videolan.org/
+Mailing-lists : http://www.videolan.org/lists.html
 

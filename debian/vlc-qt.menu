@@ -1,3 +1,0 @@
-?package(vlc-qt):command="/usr/bin/qvlc" hotkey="V" needs="X11" \
-                 section="Apps/Viewers" title="Qt VideoLAN Client" \
-                 icon="/usr/share/vlc/qvlc.xpm" hints="Video"

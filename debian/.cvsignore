@@ -1,7 +1,11 @@
 tmp
 vlc
-vlc-*
+vlc-plugin-*
 mozilla-plugin-vlc
+gvlc*
+gnome-vlc*
+qvlc*
+kvlc*
 delete
 files
 *debhelper

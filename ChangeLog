@@ -5,6 +5,119 @@
 0.5.0
 Not released yet
 
+  * ./README: removed much outdated data.
+  * ./debian/*: great package renaming - names should make more sense now.
+  * ./plugins/mad/mad_libmad.c: prevent the MAD decoder from looping endlessly
+    when the audio output fifo could not be created.
+  * ./plugins/gtk/*: new generic "Open Target" window. Please test and
+    comment on usability.
+  * ./debian/rules: the Debian package creation script builds ffmpeg.
+  * ./plugins/mpeg_system/mpeg_audio.c: we skip the ID3 tag at the begining
+    of an MP3, so more files can be read.
+  * ./src/vlc.c: reduced the amount of default simultaneous interfaces.
+  * ./src/libvlc.c: removed calls to vlc_mutex_lock in sighandlers.
+  * ./plugins/qt/intf_qt.cpp: fixed Qt interface termination.
+  * ./FAQ: new entry for RTP.
+  * ./FAQ: minor updates, new sections: uninstall/reinstall,
+    DirectX-blackscreen, device permissions, debug messages,
+    config file, (un)planned ports/features, sources.list.
+  * ./plugins/avi/avi.c: now you can see avi over http (true interleaved
+    file only), and seek is allowed.
+  * ./plugins/win32/about.*: added the version number in the About box.
+  * ./src/misc/darwin_specific.c, ./src/misc/extras.c: moved our custom
+    strndup to a separate file so that Win32 can benefit from it.
+  * ./include/vlc_threads.h: Borland compilation fix.
+  * ./mozilla/*: preliminary Mozilla plugin. Only works under Unix for now.
+  * ./debian/rules: activated the vlc-xosd, vlc-kde and mozilla-plugin-vlc
+    Debian packages.
+  * ./po/*: updated potfiles.
+  * ./src/misc/modules.c: module_Need accepts a comma-separated list of
+    module names. Try for instance: "vlc --intf gnome,gtk,dummy".
+  * ./src/misc/darwin_specific.c: added strndup needed by video_output.c.
+  * ./configure.in: added -lintl to plugins_LDFLAGS.
+  * ./plugins/gnome/gtk.c, ./plugins/gnome/gnome.c: prevent older versions
+    of vlc from crashing when trying to open a recent module.
+  * ./plugins/x11/xcommon.c: to enter fullscreen mode, we create a new window
+    instead of moving the current window, which saves us the hassle of
+    remembering size and position.                                    
+  * ./plugins/x11/x11.c, ./plugins/x11/xvideo.c: added --no-x11-shm and
+    --no-xvideo-shm options.                                           
+  * ./plugins/avi/avi.c: begin to support VOD, but it segfault very quickly
+    (unless you disable audio or video!) and cannot support seeking( will
+    just stop ). Moreover it can't work for all files, only interleaved ones.
+  * ./plugins/lirc/lirc.c: the lirc interface now works again.
+  * ./plugins/qt/*: the Qt interface now works again.
+  * ./plugins/kde/*: the KDE interface now works again.
+  * ./plugins/gtk/gtk_callbacks.c: fixed a segfault when hitting Eject with
+    an emtpy playlist.
+  * ./plugins/avi/avi.c: fix some problems with broken avi.
+  * ./plugins/avi/avi.c: audio seems to be better.
+  * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
+  * ./plugins/spudec/spu_decoder.c: endianness fix for subtitles colour.
+  * ./plugins/spudec/spu_decoder.c: little hack for preventing blank alpha
+    palette.   
+  * ./plugins/spudec/spu_decoder.c: subtitle transparency support.
+  * ./src/misc/modules.c: added the --plugin-path option to give vlc an
+    extra plugin location.
+  * ./plugins/text/rc.c: if stdin/stdout are not connected to a TTY, we
+    don't launch the rc interface.
+  * ./plugins/access/http.c: fixed a compilation warning.
+  * ./src/misc/messages.c: cosmetic enhancements in the message output.
+  * ./plugins/x11/*: added the --x11-drawable and --xvideo-drawable options to
+    tell vlc to draw in an existing drawable instead of creating a new window.
+  * ./plugins/avi/*: I rewrite the way to read, in order to minimize seeking
+    (faster and in prevision of VOD by http, but not yet functionnal ). But
+    sound becomes horrible, I will try to fix it as soon as possible.
+  * ./plugins/macosx/vout_vlc_wrapper.m: arrow-up and arrow-down allow to 
+    control the sound volume.
+  * ./plugins/access/http.c: for streams which are not seekable, we fall
+    back on old HTTP/1.0 behavior; on systems implementing atoll() we
+    can also read files > 2 GB.
+  * ./configure: atoll() detection.
+  * ./plugins/macosx/intf_vlc_wrapper.m: fixed a bug with the language and
+    subtitle menus.
+  * ./README.MacOSX.rtf: more documentation.
+  * ./include/configuration.h: renamed MODULE_CONFIG_* macros into CONFIG_*.
+  * ./include/configuration.h, ./plugins/gtk/gtk_preferences.c,
+    ./plugins/filter/transform.c, ./plugins/filter/distort.c,
+    ./plugins/filter/deinterlace.c: added an ADD_STRING_FROM_LIST()
+    configuration macro.
+  * ./include/modules.h, ./include/video_output.h,
+    ./src/video_output/video_output.c, ./plugins/filters/*: added a
+    VOUT_FILTER capability. Having a clear distinction between VOUTs and
+    VOUT_FILTERs allows us to get rid of ugly hacks. The filters are also
+    stackable now (use --filter=foo:bar:foo etc..).
+  * ./include/configuration.h, ./src/libvlc.h, ./src/libvlc.c: clean-up +
+    added an ADD_USAGE_HINT() configuration macro.
+  * ./FAQ: added QT6 FAQ entry.
+  * ./configure.in: fixed inet_pton detection.
+  * ./plugins/filter/deinterlace.c: the blend mode is now a lot smoother, but
+    also a bit slower, so I also kept the old version, optimized it, and     
+    called it "mean".                                                   
+  * ./plugins/network/ipv6.c: IPv6 multicast support, courtesy of Remco
+    Poortinga <poortinga@telin.nl>.
+  * ./extras/MacOSX/Resources/*: Mac OS X icons and fixes, courtesy of Benjamin
+    Mironer <bmironer@noos.fr>.
+  * ./plugins/filter/deinterlace.c: added two new deinterlacing methods,
+    we now have "discard", "blend", "bob" and "linear".
+  * ./plugins/mad/mad_libmad.c: changed error messages to warning/debug.
+  * ./plugins/macosx/*: additional minor fixes.
+  * ./plugins/macosx/vout_macosx.m, ./plugins/macosx/aout_macosx.m,
+    ./plugins/macosx/intf_vlc_wrapper.m: preliminary OS X compilation fixes.
+  * ./include/vlc_threads.h, ./src/misc/threads.c: improved the cond_wait
+    implementation to avoid races, by using SetEvent instead of PulseEvent.
+  * ./plugins/xosd/xosd.c: a couple more options, better defaults.
+  * ./configure.in: checking for the header should be enough in most cases.
+  * ./plugins/xosd/xosd.c: configuration options.
+  * ./plugins/win32/*: tried to port the Win32 interface to the new API. Seems
+    to be still crashing.
+  * ./plugins/gtk/gtk_callbacks.c: some code cleaning.
+  * ./plugins/text/rc.c: fixed the "a" command.
+  * ./plugins/xosd/*: basic On Screen Display intf-plugin based on libxosd
+  * ./src/misc/netutils.c: network mode works again.
+  * ./plugins/gtk/*: the Gnome/Gtk+ interfaces have all their features back.
+  * ./src/playlist/playlist.c: fixed an off-by-one loop error.
+  * ./plugins/a52_system/.cvsignore: what about a little .cvsignore ?
   * ./plugins/dummy/input_dummy.c: dummy targets such as vlc:nop, vlc:loop
     and vlc:quit work again.
   * ./src/playlist/playlist.c: when a new target is added, for instance through
