@@ -927,7 +927,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
     case VOUT_SET_ZOOM:
-        if( p_vout->p_sys->p_win->owner_window )
+        if( p_vout->p_sys->hparent )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
