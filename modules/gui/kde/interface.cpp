@@ -494,7 +494,10 @@ void KInterface::languageMenus(KActionMenu *root, es_descriptor_t *p_es,
 
 void KInterface::slotSetLanguage( bool on, es_descriptor_t *p_es )
 {
-    input_ToggleES( p_intf->p_sys->p_input, p_es, on );
+    if( p_es )
+        var_SetInteger( p_intf->p_sys->p_input, "audio-es", p_es->i_id );
+    else
+        var_SetInteger( p_intf->p_sys->p_input, "audio-es", -1 );
 }
 
 void KInterface::slotSliderChanged( int position )

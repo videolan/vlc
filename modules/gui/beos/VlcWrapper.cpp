@@ -201,70 +201,18 @@ BList * VlcWrapper::GetChannels( int i_cat )
 
 void VlcWrapper::ToggleLanguage( int i_language )
 {
-    es_descriptor_t * p_es = NULL;
-    es_descriptor_t * p_es_old = NULL;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
-    {
-        if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
-        {
-            p_es_old = p_input->stream.pp_selected_es[i];
-            break;
-        }
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
-    if( i_language != -1 )
-    {
-        p_es = p_input->stream.pp_es[i_language];
-    }
-    if( p_es == p_es_old )
-    {
-        return;
-    }
-    if( p_es_old )
-    {
-        input_ToggleES( p_input, p_es_old, VLC_FALSE );
-    }
-    if( p_es )
-    {
-        input_ToggleES( p_input, p_es, VLC_TRUE );
-    }
+    if( i_language < 0 )
+        var_SetInteger( p_input, "audio-es", -1 );  /* Disable audio */
+    else
+        var_SetInteger( p_input, "audio-es", i_language );
 }
 
 void VlcWrapper::ToggleSubtitle( int i_subtitle )
 {
-    es_descriptor_t * p_es = NULL;
-    es_descriptor_t * p_es_old = NULL;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
-    {
-        if( p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
-        {
-            p_es_old = p_input->stream.pp_selected_es[i];
-            break;
-        }
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
-    if( i_subtitle != -1 )
-    {
-        p_es = p_input->stream.pp_es[i_subtitle];
-    }
-    if( p_es == p_es_old )
-    {
-        return;
-    }
-    if( p_es_old )
-    {
-        input_ToggleES( p_input, p_es_old, VLC_FALSE );
-    }
-    if( p_es )
-    {
-        input_ToggleES( p_input, p_es, VLC_TRUE );
-    }
+    if( i_language < 0 )
+        var_SetInteger( p_input, "spu-es", -1 );  /* Disable SPU */
+    else
+        var_SetInteger( p_input, "spu-es", i_subtitle );
 }
 
 const char * VlcWrapper::GetTimeAsString()
