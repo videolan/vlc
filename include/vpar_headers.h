@@ -16,13 +16,6 @@
  *****************************************************************************/
  
 /*****************************************************************************
- * Function pointers
- *****************************************************************************/
-struct vpar_thread_s;
-
-typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, u32);
-
-/*****************************************************************************
  * quant_matrix_t : Quantization Matrix
  *****************************************************************************/
 typedef struct quant_matrix_s
@@ -44,7 +37,6 @@ typedef struct sequence_s
     boolean_t           b_mpeg2;
     boolean_t           b_progressive;
     unsigned int        i_scalable_mode;
-    f_slice_header_t    pf_slice_header;
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
 
@@ -153,7 +145,6 @@ typedef struct slice_parsing_s
 #define TOP_FIELD               1
 #define BOTTOM_FIELD            2
 #define FRAME_STRUCTURE         3
-
 
 /*****************************************************************************
  * Prototypes

@@ -46,20 +46,12 @@
  * an MMX DCT in the future. */
 
 /*****************************************************************************
- * vdec_DummyIDCT : dummy function that does nothing
- *****************************************************************************/
-void vdec_DummyIDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, 
-                     int i_idontcare )
-{
-}
-
-/*****************************************************************************
- * init_SparseIDCT : initialize datas for vdec_SparceIDCT
+ * vdec_InitIDCT : initialize datas for vdec_SparceIDCT
  * vdec_SparseIDCT : IDCT function for sparse matrices
  *****************************************************************************/
 
 void vdec_InitIDCT (vdec_thread_t * p_vdec) 
-{	  
+{
     int i;
     
     dctelem_t * p_pre = p_vdec->p_pre_idct;
@@ -86,7 +78,7 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block,
     /* If DC Coefficient. */
     if ( i_sparse_pos == 0 ) 
     {
-	    dp=(int *)p_block;
+        dp=(int *)p_block;
         val=RIGHT_SHIFT((*p_block + 4), 3);
         /* Compute int to assign.  This speeds things up a bit */
         v = ((val & 0xffff) | (val << 16));
@@ -372,7 +364,6 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
 
     dataptr = p_block;
 
-    fprintf( stderr, "normal dct" );
     for (rowctr = DCTSIZE-1; rowctr >= 0; rowctr--) 
     {
         /* Due to quantization, we will usually find that many of the input

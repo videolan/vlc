@@ -39,27 +39,17 @@
 #include "video_fifo.h"
 
 /*
+ * Function pointer
+ */
+typedef void    (*f_picture_data_t)( vpar_thread_t*, int );
+
+/*
  * Local prototypes
  */
 static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
 static void SequenceHeader( vpar_thread_t * p_vpar );
 static void GroupHeader( vpar_thread_t * p_vpar );
 static void PictureHeader( vpar_thread_t * p_vpar );
-static void SliceHeader00( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code );
-static void SliceHeader01( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code );
-static void SliceHeader10( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code );
-static void SliceHeader11( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code );
-static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
-                                    int * pi_mb_address, int i_mb_base,
-                                    u32 i_vert_code );
 static void ExtensionAndUserData( vpar_thread_t * p_vpar );
 static void QuantMatrixExtension( vpar_thread_t * p_vpar );
 static void SequenceScalableExtension( vpar_thread_t * p_vpar );
@@ -153,20 +143,6 @@ u8 pi_scan[2][64] =
 /*
  * Local inline functions.
  */
-
-/*****************************************************************************
- * NextStartCode : Find the next start code
- *****************************************************************************/
-static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
-{
-    /* Re-align the buffer on an 8-bit boundary */
-    RealignBits( &p_vpar->bit_stream );
-
-    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
-    {
-        RemoveBits( &p_vpar->bit_stream, 8 );
-    }
-}
 
 /*****************************************************************************
  * ReferenceUpdate : Update the reference pointers when we have a new picture
@@ -430,7 +406,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_size = p_vpar->sequence.i_width
                                         * p_vpar->sequence.i_height;
 
-    /* Update chromatic information */
+    /* Update chromatic information. */
     switch( p_vpar->sequence.i_chroma_format )
     {
     case CHROMA_420:
@@ -454,35 +430,16 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.i_chroma_mb_height = 16;
     }
 
-    /* Slice Header functions */
-    if( p_vpar->sequence.i_height <= 2800 )
-    {
-        if( p_vpar->sequence.i_scalable_mode != SC_DP )
-        {
-            p_vpar->sequence.pf_slice_header = SliceHeader00;
-        }
-        else
-        {
-            p_vpar->sequence.pf_slice_header = SliceHeader01;
-        }
-    }
-    else
-    {
-        if( p_vpar->sequence.i_scalable_mode != SC_DP )
-        {
-            p_vpar->sequence.pf_slice_header = SliceHeader10;
-        }
-        else
-        {
-            p_vpar->sequence.pf_slice_header = SliceHeader11;
-        }
-    }
+    /* Reset scalable_mode. */
+    p_vpar->sequence.i_scalable_mode = SC_NONE;
 
+#if 0
     if(    p_vpar->sequence.i_width != i_width_save
         || p_vpar->sequence.i_height != i_height_save )
     {
          /* What do we do in case of a size change ??? */
     }
+#endif
 
     /* Extension and User data */
     ExtensionAndUserData( p_vpar );
@@ -503,38 +460,47 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    static f_parse_mb_t ppf_parse_mb[4][4][2] =
+    /* Table of optimized PictureData functions. */
+    static f_picture_data_t ppf_picture_data[4][4] =
     {
         {
-            {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
+            NULL, NULL, NULL, NULL
         },
         {
-            /* I_CODING_TYPE */
-            {NULL, NULL},
-            {vpar_ParseMacroblock2I420T0, vpar_ParseMacroblockGENERIC},
-            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2I420B1},
-            {vpar_ParseMacroblock2I420F0, vpar_ParseMacroblock2I420F0}
+            /* TOP_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+            NULL, vpar_PictureData2I420TZ, vpar_PictureData2P420TZ,
+            vpar_PictureData2B420TZ
+#else
+            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+            vpar_PictureDataGENERIC
+#endif
         },
         {
-            /* P_CODING_TYPE */
-            {NULL, NULL},
-            {vpar_ParseMacroblock2P420T0, vpar_ParseMacroblockGENERIC},
-            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2P420B1},
-            {vpar_ParseMacroblock2P420F0, vpar_ParseMacroblock2P420F0}
+            /* BOTTOM_FIELD */
+#if (VPAR_OPTIM_LEVEL > 1)
+            NULL, vpar_PictureData2I420BZ, vpar_PictureData2P420BZ,
+            vpar_PictureData2B420BZ
+#else
+            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+            vpar_PictureDataGENERIC
+#endif
         },
         {
-            /* B_CODING_TYPE */
-            {NULL, NULL},
-            {vpar_ParseMacroblock2B420T0, vpar_ParseMacroblockGENERIC},
-            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2B420B1},
-            {vpar_ParseMacroblock2B420F0, vpar_ParseMacroblock2B420F0}
+            /* FRAME_PICTURE */
+#if (VPAR_OPTIM_LEVEL > 0)
+            NULL, vpar_PictureData2I420F0, vpar_PictureData2P420F0,
+            vpar_PictureData2B420F0
+#else
+            NULL, vpar_PictureDataGENERIC, vpar_PictureDataGENERIC,
+            vpar_PictureDataGENERIC
+#endif
         }
     };
 
     int                 i_structure;
-    int                 i_mb_address, i_mb_base;
+    int                 i_mb_base;
     boolean_t           b_parsable;
-    u32                 i_dummy;
 #ifdef VDEC_SMP
     int                 i_mb;
 #endif
@@ -694,7 +660,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                         p_vpar->sequence.i_height ) )
              == NULL )
         {
-            intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture\n");
+            intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture, delaying\n");
             if( p_vpar->b_die || p_vpar->b_error )
             {
                 return;
@@ -757,44 +723,24 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         i_mb_base = 0;
         p_vpar->mb.i_l_y = p_vpar->mb.i_c_y = 0;
     }
-    i_mb_address = 0;
     p_vpar->mb.i_l_x = p_vpar->mb.i_c_x = 0;
 
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
-    /* Macroblock parsing function. */
+    /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
     if( p_vpar->sequence.i_chroma_format != CHROMA_420
-        || !p_vpar->sequence.b_mpeg2 )
+        || !p_vpar->sequence.b_mpeg2 || p_vpar->sequence.i_height > 2800
+        || p_vpar->sequence.i_scalable_mode == SC_DP )
     {
-        p_vpar->picture.pf_parse_mb = vpar_ParseMacroblockGENERIC;
+        /* Weird stream. Use the slower generic function. */
+        vpar_PictureDataGENERIC( p_vpar, i_mb_base );
     }
     else
     {
-        p_vpar->picture.pf_parse_mb =
-            ppf_parse_mb[p_vpar->picture.i_coding_type]
-                        [p_vpar->picture.i_structure]
-                        [(p_vpar->picture.i_structure !=
-                             p_vpar->picture.i_current_structure)];
-    }
-
-    /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
-    NextStartCode( p_vpar );
-    while( i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
-           && !p_vpar->b_die )
-    {
-        if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
-                 < SLICE_START_CODE_MIN) ||
-            (i_dummy > SLICE_START_CODE_MAX) )
-        {
-            intf_DbgMsg("vpar debug: premature end of picture\n");
-            p_vpar->picture.b_error = 1;
-            break;
-        }
-        RemoveBits32( &p_vpar->bit_stream );
-        
-        /* Decode slice data. */
-        p_vpar->sequence.pf_slice_header( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
+        /* Try to find an optimized function. */
+        ppf_picture_data[p_vpar->picture.i_structure]
+                        [p_vpar->picture.i_coding_type]( p_vpar, i_mb_base );
     }
 
     if( p_vpar->b_die || p_vpar->b_error )
@@ -846,99 +792,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.i_current_structure = 0;
     }
 #undef P_picture
-}
-
-/*****************************************************************************
- * SliceHeader : Parse the next slice structure
- *****************************************************************************/
-static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
-                                    int * pi_mb_address, int i_mb_base,
-                                    u32 i_vert_code )
-{
-    /* DC predictors initialization table */
-    static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
-
-    int                     i_mb_address_save = *pi_mb_address;
-
-    p_vpar->picture.b_error = 0;
-
-    /* slice_vertical_position_extension and priority_breakpoint already done */
-    LoadQuantizerScale( p_vpar );
-
-    if( GetBits( &p_vpar->bit_stream, 1 ) )
-    {
-        /* intra_slice, slice_id */
-        RemoveBits( &p_vpar->bit_stream, 8 );
-        /* extra_information_slice */
-        while( GetBits( &p_vpar->bit_stream, 1 ) )
-        {
-            RemoveBits( &p_vpar->bit_stream, 8 );
-        }
-    }
-    *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
-    
-    /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
-     * does the reference decoder put 0 instead of the normative values ? */
-    p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
-        = p_vpar->slice.pi_dc_dct_pred[2]
-        = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
-
-    /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
-    memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
-
-    do
-    {
-        p_vpar->picture.pf_parse_mb( p_vpar, pi_mb_address,
-                                     i_mb_address_save, i_mb_base,
-                                     p_vpar->sequence.b_mpeg2,
-                                     p_vpar->picture.i_coding_type,
-                                     p_vpar->sequence.i_chroma_format,
-                                     p_vpar->picture.i_structure,
-                                     (p_vpar->picture.i_structure !=
-                                        p_vpar->picture.i_current_structure) );
-        i_mb_address_save = *pi_mb_address;
-    }
-    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->picture.b_error
-            && !p_vpar->b_die );
-    NextStartCode( p_vpar );
-}
-
-/*****************************************************************************
- * SliceHeaderXY : Parse the next slice structure
- *****************************************************************************
- * X = i_height > 2800 ?
- * Y = scalable_mode == SC_DP ?
- *****************************************************************************/
-static void SliceHeader00( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code )
-{
-    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
-}
-
-static void SliceHeader01( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code )
-{
-    RemoveBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
-    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
-}
-
-static void SliceHeader10( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code )
-{
-    i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
-    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
-}
-
-static void SliceHeader11( vpar_thread_t * p_vpar,
-                           int * pi_mb_address, int i_mb_base,
-                           u32 i_vert_code )
-{
-    i_vert_code += GetBits( &p_vpar->bit_stream, 3 ) << 7;
-    RemoveBits( &p_vpar->bit_stream, 7 ); /* priority_breakpoint */
-    SliceHeader( p_vpar, pi_mb_address, i_mb_base, i_vert_code );
 }
 
 /*****************************************************************************

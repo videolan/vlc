@@ -288,6 +288,10 @@
 /* Time to sleep when waiting for a buffer (from vout or the video fifo). */
 #define VPAR_OUTMEM_SLEEP               50000
 
+/* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
+ * that raising this level dramatically lengthens the compilation time. */
+#define VPAR_OPTIM_LEVEL                1
+
 /* The following directives only apply if you define VDEC_SMP below. */
 
 /* Number of macroblock buffers available. It should be always greater than

@@ -150,6 +150,21 @@ void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_stat
 /* Dynamic thread settings */
 /* ?? */
 
+
+/*****************************************************************************
+ * NextStartCode : Find the next start code
+ *****************************************************************************/
+static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
+{
+    /* Re-align the buffer on an 8-bit boundary */
+    RealignBits( &p_vpar->bit_stream );
+
+    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
+    {
+        RemoveBits( &p_vpar->bit_stream, 8 );
+    }
+}
+
 /*****************************************************************************
  * LoadQuantizerScale
  *****************************************************************************
