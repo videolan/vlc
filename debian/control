@@ -3,14 +3,15 @@ Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
 Build-Depends: debhelper (>=2.2.0),
-               xlibs-dev, xlibs-pic
+               xlibs-dev, xlibs-pic,
                libgnome-dev,
                libggi2-dev,
                libglide2-dev [i386],
                libesd0-dev,
                libsdl1.2-dev (>=1.2.2-3.1),
                libqt-dev,
-               libasound2-dev [alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc] (>=0.9.0beta7)
+               libasound2-dev [alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc] (>=0.9.0beta7),
+               libarts-dev
 Standards-Version: 3.5.6
 
 Package: vlc

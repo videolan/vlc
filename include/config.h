@@ -416,7 +416,7 @@
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
-#ifdef RELEASE
+#ifdef HAVE_RELEASE
 #   define VPAR_OPTIM_LEVEL             2
 #else
 #   define VPAR_OPTIM_LEVEL             1

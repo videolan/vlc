@@ -223,7 +223,7 @@ CFLAGS += -D_REENTRANT
 CFLAGS += -D_GNU_SOURCE
 
 ifeq ($(RELEASE),1)
-CFLAGS += -DRELEASE
+CFLAGS += -DHAVE_RELEASE
 endif
 
 # flags needed for clean beos compilation
