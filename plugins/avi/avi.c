@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.29 2002/07/02 17:54:49 fenrir Exp $
+ * $Id: avi.c,v 1.30 2002/07/09 22:18:23 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1034,8 +1034,8 @@ static int __AVI_GetDataInPES( input_thread_t *p_input,
 
     do
     {
-        i_read = input_SplitBuffer(p_input, &p_data, i_size - 
-                                                    (*pp_pes)->i_pes_size );
+        i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size - 
+                                                              (*pp_pes)->i_pes_size, 1024 ) );
         if( i_read < 0 )
         {
             return( (*pp_pes)->i_pes_size );
@@ -1966,6 +1966,54 @@ static int __AVIDemux_ChunkAction( int i_streams_max,
     return( 4 );
 }
 
+static int AVI_NotSeekableRecover( input_thread_t *p_input )
+{
+    byte_t *p_id;
+    u32 i_id;
+    int i_number, i_type;
+    data_packet_t *p_pack;
+
+    for( ; ; )
+    {
+        if( input_Peek( p_input, &p_id, 4 ) < 4 )
+        {
+            return( 0 ); /* Failed */
+        }
+        i_id = GetDWLE( p_id );
+        switch( i_id )
+        {
+            case( FOURCC_idx1 ):
+            case( FOURCC_JUNK ):
+            case( FOURCC_LIST ):
+                return( 1 );
+            default:
+                AVI_ParseStreamHeader( i_id, &i_number, &i_type );
+                if( i_number <= 99 )
+                {
+                    switch( i_type )
+                    {
+                        case( TWOCC_wb ):
+                        case( TWOCC_db ):
+                        case( TWOCC_dc ):
+                        case( TWOCC_pc ):
+                            return( 1 );
+                    }
+                }
+                else
+                {
+
+                }
+        }
+        /* Read 1 byte VERY unoptimised */
+        if( input_SplitBuffer( p_input, &p_pack, 1) < 1 )
+        {
+            return( 0 );
+        }
+        input_DeletePacket( p_input->p_method_data, p_pack);
+    }
+
+}
+
 static int AVIDemux_NotSeekable( input_thread_t *p_input,
                                  AVIStreamInfo_t *p_info_master,
                                  AVIStreamInfo_t *p_info_slave )
@@ -2046,9 +2094,18 @@ static int AVIDemux_NotSeekable( input_thread_t *p_input,
                     return( 0 );
                 case( 4 ): /* Error */
                     RIFF_DeleteChunk( p_input, p_ck );
-                    msg_Err( p_input, "unknown chunk id %4.4s trying to recover", &p_ck->i_id );
-                    msg_Err( p_input, "cannot recover, dying" );
-                    return( -1 );
+                    msg_Warn( p_input, "unknown chunk id 0x%8.8x, trying to recover", p_ck->i_id );
+                    if( !AVI_NotSeekableRecover( p_input ) )
+                    {
+                        msg_Err( p_input, "cannot recover, dying" );
+                        return( -1 );
+                    }
+                    else
+                    {
+                        msg_Warn( p_input, "recovered sucessfully" );
+                    }
+                    b_load = 0;
+                    break;
             }
 
         } while( !b_load );
