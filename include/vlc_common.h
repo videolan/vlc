@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.92 2003/11/30 17:29:03 fenrir Exp $
+ * $Id: vlc_common.h,v 1.93 2003/12/03 21:50:49 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -136,23 +136,23 @@ typedef uint16_t            audio_volume_t;
 typedef int                 socklen_t;
 #endif
 
-/*****************************************************************************
- * mtime_t: high precision date or time interval
- *****************************************************************************
+/**
+ * High precision date or time interval
+ *
  * Store a high precision date or time interval. The maximum precision is the
  * microsecond, and a 64 bits integer is used to avoid overflows (maximum
  * time interval is then 292271 years, which should be long enough for any
  * video). Dates are stored as microseconds since a common date (usually the
  * epoch). Note that date and time intervals can be manipulated using regular
  * arithmetic operators, and that no special functions are required.
- *****************************************************************************/
+ */
 typedef int64_t mtime_t;
 
-/*****************************************************************************
+/**
  * The vlc_fourcc_t type.
- *****************************************************************************
+ *
  * See http://www.webartz.com/fourcc/ for a very detailed list.
- *****************************************************************************/
+ */
 typedef uint32_t vlc_fourcc_t;
 
 #ifdef WORDS_BIGENDIAN

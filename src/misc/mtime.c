@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001, 2003 VideoLAN
- * $Id: mtime.c,v 1.38 2003/12/03 13:27:51 rocky Exp $
+ * $Id: mtime.c,v 1.39 2003/12/03 21:50:50 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -64,15 +64,12 @@ struct timespec
 int nanosleep(struct timespec *, struct timespec *);
 #endif
 
-/*****************************************************************************
- * mstrtime: return a date in a readable format
- *****************************************************************************
+/**
+ * Return a date in a readable format
+ *
  * This function converts a mtime date into a string.
  * psz_buffer should be a buffer long enough to store the formatted
- * date.
- *****************************************************************************/
-/**
- * \brief return a date in a readable format
+ * date. 
  * \param date to be converted
  * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
  * \return psz_buffer is returned so this can be used as printf parameter.
@@ -90,34 +87,31 @@ char *mstrtime( char *psz_buffer, mtime_t date )
     return( psz_buffer );
 }
 
-/*****************************************************************************
- * secstotimestr: convert seconds to a time in the format h:mm:ss 
- *****************************************************************************
+/**
+ * Convert seconds to a time in the format h:mm:ss.
+ *
  * This function is provided for any interface function which need to print a
  * time string in the format h:mm:ss
  * date.
- *****************************************************************************/
-/**
- * \brief convert seconds to a time in the format h:mm:ss 
  * \param secs  the date to be converted
  * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
  * \return psz_buffer is returned so this can be used as printf parameter.
  */
 char *secstotimestr( char *psz_buffer, int i_seconds )
 {
-  snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
-	    (int) (i_seconds / (60 *60)), 
-	    (int) ((i_seconds / 60) % 60), 
-	    (int) (i_seconds % 60) );
-  return( psz_buffer );
+    snprintf( psz_buffer, MSTRTIME_MAX_SIZE, "%d:%2.2d:%2.2d",
+              (int) (i_seconds / (60 *60)), 
+              (int) ((i_seconds / 60) % 60), 
+              (int) (i_seconds % 60) );
+    return( psz_buffer );
 }
 
-/*****************************************************************************
- * mdate: return high precision date
- *****************************************************************************
+/**
+ * Return high precision date
+ *
  * Uses the gettimeofday() function when possible (1 MHz resolution) or the
  * ftime() function (1 kHz resolution).
- *****************************************************************************/
+ */
 mtime_t mdate( void )
 {
 #if defined( HAVE_KERNEL_OS_H )
@@ -176,13 +170,14 @@ mtime_t mdate( void )
 #endif
 }
 
-/*****************************************************************************
- * mwait: wait for a date
- *****************************************************************************
+/**
+ * Wait for a date
+ *
  * This function uses select() and an system date function to wake up at a
  * precise date. It should be used for process synchronization. If current date
  * is posterior to wished date, the function returns immediately.
- *****************************************************************************/
+ * \param date The date to wake up at
+ */
 void mwait( mtime_t date )
 {
 #if defined( HAVE_KERNEL_OS_H )
@@ -255,11 +250,12 @@ void mwait( mtime_t date )
 #endif
 }
 
-/*****************************************************************************
- * msleep: more precise sleep()
- *****************************************************************************
+/**
+ * More precise sleep()
+ *
  * Portable usleep() function.
- *****************************************************************************/
+ * \param delay the amount of time to sleep
+ */
 void msleep( mtime_t delay )
 {
 #if defined( HAVE_KERNEL_OS_H )
