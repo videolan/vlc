@@ -579,9 +579,11 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
             for( i = 0; i < p_cdda->i_titles; i++ )
             {
-                if ( p_cdda->p_title[i] )
+	      if ( p_cdda->p_title[i] ) {
                    (*ppp_title)[i] =
-                          vlc_input_title_Duplicate( p_cdda->p_title[i] );
+		     vlc_input_title_Duplicate( p_cdda->p_title[i] );
+	      }
+	      
             }
             break;
         }

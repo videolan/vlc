@@ -892,8 +892,9 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
         p_cdda->i_titles = 1;
         p_access->info.i_size =
-	  (p_cdda->lsn[p_cdda->i_track]
-	   - p_cdda->lsn[i_first_track+1]) * (int64_t) CDIO_CD_FRAMESIZE_RAW;
+	  (p_cdda->lsn[p_cdda->i_track-1]
+	   - p_cdda->lsn[i_first_track]) * (int64_t) CDIO_CD_FRAMESIZE_RAW;
+	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
 	p_item->input.i_duration = 
 	  (p_cdda->lsn[p_cdda->i_track]
 	   - p_cdda->lsn[i_first_track+1]) / CDIO_CD_FRAMES_PER_SEC;
@@ -921,12 +922,13 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                                i_track, VLC_TRUE );
         }
         p_cdda->i_titles = p_cdda->i_tracks; /* should be +1 */
-        p_access->info.i_size =
-	  (p_cdda->lsn[i_first_track + p_cdda->i_tracks]
-	   - p_cdda->lsn[i_first_track]) * (int64_t) CDIO_CD_FRAMESIZE_RAW;
+        p_access->info.i_size = 
+	  (p_cdda->lsn[p_cdda->i_tracks] 
+	   - p_cdda->lsn[0]) * (int64_t) CDIO_CD_FRAMESIZE_RAW;
+	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
 	p_item->input.i_duration = 
-	  (p_cdda->lsn[i_first_track + p_cdda->i_tracks]
-	   - p_cdda->lsn[i_first_track]) / CDIO_CD_FRAMES_PER_SEC;
+	  (p_cdda->lsn[p_cdda->i_tracks] 
+	   - p_cdda->lsn[0]) / CDIO_CD_FRAMES_PER_SEC;
     }
 
     if( b_play )
