@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.1 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: display.c,v 1.2 2003/04/14 02:26:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -254,6 +254,8 @@ static int     Send     ( sout_stream_t *p_stream, sout_stream_id_t *id, sout_bu
                 msg_Err( p_stream, "cannot allocate new data_packet" );
                 return VLC_EGENERIC;
             }
+            p_data->p_payload_end = p_data->p_payload_start + p_buffer->i_size;
+
             p_pes->i_dts = p_buffer->i_dts + p_sys->i_delay;
             p_pes->i_pts = p_buffer->i_pts + p_sys->i_delay;
             p_pes->p_first = p_pes->p_last = p_data;
