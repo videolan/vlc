@@ -46,11 +46,12 @@ static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
     set_description( _("Vobsub subtitles demux") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux2", 1 );
     
     set_callbacks( Open, Close );
 
     add_shortcut( "vobsub" );
+    add_shortcut( "subtitle" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -113,12 +114,6 @@ static int Open ( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     int i_max;
-
-    if( strcmp( p_demux->psz_demux, "vobsub" ) )
-    {
-        msg_Dbg( p_demux, "vobsub demux discarded" );
-        return VLC_EGENERIC;
-    }
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -427,6 +422,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             return( VLC_EGENERIC );
         }
         
+msg_Dbg( p_demux, "%s", line );
         if( *line == 0 || *line == '\r' || *line == '\n' || *line == '#' ) 
             continue;
         else if( !strncmp( "size:", line, 5 ) )
@@ -449,7 +445,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             es_format_t fmt;
 
             /* Lets start a new track */
-            if( sscanf( line, "id: %s, index: %d",
+            if( sscanf( line, "id: %2s, index: %d",
                         language, &i_track_id ) == 2 )
             {
                 p_sys->i_tracks++;
@@ -494,7 +490,6 @@ static int ParseVobSubIDX( demux_t *p_demux )
                             (mtime_t)s * 1000 +
                             (mtime_t)ms ) * 1000;
                 i_location = loc;
-                break;
             }
         }
     }
