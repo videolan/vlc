@@ -172,6 +172,7 @@
                 "o_mi_reportabug" = id; 
                 "o_mi_screen" = id; 
                 "o_mi_select_all" = id; 
+                "o_mi_services" = id; 
                 "o_mi_show_all" = id; 
                 "o_mi_slower" = id; 
                 "o_mi_stop" = id; 
