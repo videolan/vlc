@@ -2,7 +2,7 @@
  * ac3_bit_allocate.c: ac3 allocation tables
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ac3_bit_allocate.c,v 1.20 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_bit_allocate.c,v 1.21 2001/05/14 15:58:03 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -37,7 +37,7 @@
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
+#include "ac3_internal.h"                                 /* DELTA_BIT_REUSE */
 
 
 static void ba_compute_psd (bit_allocate_t * p_bit, s16 start, s16 end, s16 exps[]);

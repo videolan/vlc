@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.21 2001/05/07 04:42:42 sam Exp $
+ * $Id: ac3_parse.c,v 1.22 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -40,9 +40,9 @@
 
 #include "intf_msg.h"
 #include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
+#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 
-#include "ac3_internal.h"
+#include "ac3_internal.h"                                       /* EXP_REUSE */
 
 /* Misc LUT */
 static const u16 nfchans[] = { 2, 1, 2, 3, 3, 4, 4, 5 };
@@ -97,8 +97,10 @@ static const struct frmsize_s frmsizecod_tbl[] =
 static const int fscod_tbl[] = {48000, 44100, 32000};
 
 /* Some internal functions */
-void parse_bsi_stats (ac3dec_t * p_ac3dec);
-void parse_audblk_stats (ac3dec_t * p_ac3dec);
+#ifdef STATS
+static void parse_bsi_stats (ac3dec_t * p_ac3dec);
+static void parse_audblk_stats (ac3dec_t * p_ac3dec);
+#endif
 
 /* Parse a syncinfo structure */
 int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info) 
@@ -778,7 +780,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     }
     
 #ifdef STATS
-//    parse_audblk_stats(p_ac3dec);
+    parse_audblk_stats(p_ac3dec);
 #endif
     
     return 0;
@@ -806,7 +808,8 @@ void parse_auxdata (ac3dec_t * p_ac3dec)
     RemoveBits (&p_ac3dec->bit_stream,16);
 }
 
-void parse_bsi_stats (ac3dec_t * p_ac3dec) /*Some stats */
+#ifdef STATS
+static void parse_bsi_stats (ac3dec_t * p_ac3dec) /* Some stats */
 {  
     struct mixlev_s
     {
@@ -850,24 +853,25 @@ void parse_bsi_stats (ac3dec_t * p_ac3dec) /*Some stats */
         i = 0;
 }
 
-void parse_audblk_stats (ac3dec_t * p_ac3dec)
+static void parse_audblk_stats (ac3dec_t * p_ac3dec)
 {
     char *exp_strat_tbl[4] = {"R   ","D15 ","D25 ","D45 "};
     u32 i;
 
     intf_ErrMsg ("(ac3dec_parseaudblk) ");
-        intf_ErrMsg ("%s ",p_ac3dec->audblk.cplinu ? "cpl on" : "cpl off");
-        intf_ErrMsg ("%s ",p_ac3dec->audblk.baie? "bai" : " ");
-        intf_ErrMsg ("%s ",p_ac3dec->audblk.snroffste? "snroffst" : " ");
-        intf_ErrMsg ("%s ",p_ac3dec->audblk.deltbaie? "deltba" : " ");
-        intf_ErrMsg ("%s ",p_ac3dec->audblk.phsflginu? "phsflg" : " ");
-        intf_ErrMsg ("(%s %s %s %s %s) ",exp_strat_tbl[p_ac3dec->audblk.chexpstr[0]],
-                exp_strat_tbl[p_ac3dec->audblk.chexpstr[1]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[2]],
-                exp_strat_tbl[p_ac3dec->audblk.chexpstr[3]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[4]]);
-        intf_ErrMsg ("[");
-        for(i=0;i<p_ac3dec->bsi.nfchans;i++)
-                intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
-        intf_ErrMsg ("]");
+    intf_ErrMsg ("%s ",p_ac3dec->audblk.cplinu ? "cpl on" : "cpl off");
+    intf_ErrMsg ("%s ",p_ac3dec->audblk.baie? "bai" : " ");
+    intf_ErrMsg ("%s ",p_ac3dec->audblk.snroffste? "snroffst" : " ");
+    intf_ErrMsg ("%s ",p_ac3dec->audblk.deltbaie? "deltba" : " ");
+    intf_ErrMsg ("%s ",p_ac3dec->audblk.phsflginu? "phsflg" : " ");
+    intf_ErrMsg ("(%s %s %s %s %s) ",exp_strat_tbl[p_ac3dec->audblk.chexpstr[0]],
+           exp_strat_tbl[p_ac3dec->audblk.chexpstr[1]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[2]],
+           exp_strat_tbl[p_ac3dec->audblk.chexpstr[3]],exp_strat_tbl[p_ac3dec->audblk.chexpstr[4]]);
+    intf_ErrMsg ("[");
+    for(i=0;i<p_ac3dec->bsi.nfchans;i++)
+            intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
+    intf_ErrMsg ("]");
 
-        intf_ErrMsg ("\n");
+    intf_ErrMsg ("\n");
 }
+#endif

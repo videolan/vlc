@@ -2,7 +2,7 @@
  * ac3_imdct_c.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_c.c,v 1.2 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_imdct_c.c,v 1.3 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -38,7 +38,7 @@
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
+#include "ac3_imdct_c.h"
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
@@ -46,9 +46,6 @@
 
 void fft_64p_c (complex_t *x);
 void fft_128p_c (complex_t *x);
-void imdct_do_512_c (imdct_t * p_imdct, float data[], float delay[]);
-void imdct_do_512_nol_c (imdct_t * p_imdct, float data[], float delay[]);
-
 
 static float window[] = {
 	0.00014, 0.00024, 0.00037, 0.00051, 0.00067, 0.00086, 0.00107, 0.00130,
@@ -112,7 +109,7 @@ static const int pm64[64] =
 int imdct_init_c (imdct_t * p_imdct)
 {
 	int i;
-	float scale = 255.99609372;
+	float scale = 181.019;
 
 	p_imdct->imdct_do_512 = imdct_do_512_c;
 	p_imdct->imdct_do_512_nol = imdct_do_512_nol_c;

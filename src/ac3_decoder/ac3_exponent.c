@@ -2,7 +2,7 @@
  * ac3_exponent.c: ac3 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_exponent.c,v 1.23 2001/04/20 12:14:34 reno Exp $
+ * $Id: ac3_exponent.c,v 1.24 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -31,15 +31,14 @@
 #include "threads.h"
 #include "mtime.h"
 
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
+
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "audio_output.h"
 
 #include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
-
-#include "intf_msg.h"
 
 #include "ac3_internal.h"
 

@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.27 2001/05/07 03:14:09 stef Exp $
+ * $Id: ac3_mantissa.c,v 1.28 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -38,9 +38,6 @@
 #include "audio_output.h"
 
 #include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
-
-#include "ac3_internal.h"
 
 #include "intf_msg.h"
 
@@ -291,7 +288,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
             p_ac3dec->total_bits_read += 5;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,5)) > 26)
             {
-                intf_WarnMsg ( 3, "ac3dec error: invalid mantissa (1)" );
+                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (1)" );
                 return 0;
             }
     
@@ -312,7 +309,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
             p_ac3dec->total_bits_read += 7;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 124)
             {
-                intf_WarnMsg ( 3, "ac3dec error: invalid mantissa (2)" );
+                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (2)" );
                 return 0;
             }
 
@@ -327,7 +324,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
             p_ac3dec->total_bits_read += 3;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,3)) > 6)
             {
-                intf_WarnMsg ( 3, "ac3dec error: invalid mantissa (3)" );
+                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (3)" );
                 return 0;
             }
 
@@ -343,7 +340,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
             p_ac3dec->total_bits_read += 7;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 120)
             {
-                intf_WarnMsg ( 3, "ac3dec error: invalid mantissa (4)" );
+                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (4)" );
                 return 0;
             }
 
@@ -357,7 +354,7 @@ static __inline__ float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithf
             p_ac3dec->total_bits_read += 4;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,4)) > 14)
             {
-                intf_WarnMsg ( 3, "ac3dec error: invalid mantissa (5)" );
+                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (5)" );
                 return 0;
             }
 

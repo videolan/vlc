@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.7 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_downmix_c.c,v 1.8 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -35,11 +35,8 @@
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
 
-#include "ac3_downmix.h"
-
-void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
+void downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center, *left_sur, *right_sur;
@@ -59,7 +56,7 @@ void __inline__ downmix_3f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
     }
 }
 
-void __inline__ downmix_2f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
+void downmix_2f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *left_sur, *right_sur;
@@ -78,7 +75,7 @@ void __inline__ downmix_2f_2r_to_2ch_c (float *samples, dm_par_t *dm_par)
     }
 }
 
-void __inline__ downmix_3f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
+void downmix_3f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center, *right_sur;
@@ -98,7 +95,7 @@ void __inline__ downmix_3f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 }
 
 
-void __inline__ downmix_2f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
+void downmix_2f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *right_sur;
@@ -117,7 +114,7 @@ void __inline__ downmix_2f_1r_to_2ch_c (float *samples, dm_par_t *dm_par)
 }
 
 
-void __inline__ downmix_3f_0r_to_2ch_c (float *samples, dm_par_t *dm_par)
+void downmix_3f_0r_to_2ch_c (float *samples, dm_par_t *dm_par)
 {
     int i;
     float *left, *right, *center;
@@ -136,7 +133,7 @@ void __inline__ downmix_3f_0r_to_2ch_c (float *samples, dm_par_t *dm_par)
 }
 
 
-void __inline__ stream_sample_2ch_to_s16_c (s16 *out_buf, float *left, float *right)
+void stream_sample_2ch_to_s16_c (s16 *out_buf, float *left, float *right)
 {
     int i;
     for (i=0; i < 256; i++) {
@@ -146,7 +143,7 @@ void __inline__ stream_sample_2ch_to_s16_c (s16 *out_buf, float *left, float *ri
 }
 
 
-void __inline__ stream_sample_1ch_to_s16_c (s16 *out_buf, float *center)
+void stream_sample_1ch_to_s16_c (s16 *out_buf, float *center)
 {
     int i;
     float tmp;

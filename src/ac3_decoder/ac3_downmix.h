@@ -2,7 +2,7 @@
  * ac3_downmix.h: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ac3_downmix.h,v 1.6 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_downmix.h,v 1.7 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -30,13 +30,22 @@ void downmix_3f_0r_to_2ch_c(float *samples, dm_par_t * dm_par);
 void stream_sample_2ch_to_s16_c(s16 *s16_samples, float *left, float *right);
 void stream_sample_1ch_to_s16_c(s16 *s16_samples, float *center); 
 
-#if 0
-/* Kni functions */
-void downmix_3f_2r_to_2ch_kni(float *samples, dm_par_t * dm_par);
-void downmix_3f_1r_to_2ch_kni(float *samples, dm_par_t * dm_par);
-void downmix_2f_2r_to_2ch_kni(float *samples, dm_par_t * dm_par);
-void downmix_2f_1r_to_2ch_kni(float *samples, dm_par_t * dm_par);
-void downmix_3f_0r_to_2ch_kni(float *samples, dm_par_t * dm_par);            
-void stream_sample_2ch_to_s16_kni(s16 *s16_samples, float *left, float *right);
-void stream_sample_1ch_to_s16_kni(s16 *s16_samples, float *center);  
-#endif
+/* SSE functions */
+void downmix_3f_2r_to_2ch_sse(float *samples, dm_par_t * dm_par);
+void downmix_3f_1r_to_2ch_sse(float *samples, dm_par_t * dm_par);
+void downmix_2f_2r_to_2ch_sse(float *samples, dm_par_t * dm_par);
+void downmix_2f_1r_to_2ch_sse(float *samples, dm_par_t * dm_par);
+void downmix_3f_0r_to_2ch_sse(float *samples, dm_par_t * dm_par);            
+void stream_sample_2ch_to_s16_sse(s16 *s16_samples, float *left, float *right);
+void stream_sample_1ch_to_s16_sse(s16 *s16_samples, float *center);  
+
+/* 3DNow! functions */
+void downmix_3f_2r_to_2ch_3dn(float *samples, dm_par_t * dm_par);
+void downmix_3f_1r_to_2ch_3dn(float *samples, dm_par_t * dm_par);
+void downmix_2f_2r_to_2ch_3dn(float *samples, dm_par_t * dm_par);
+void downmix_2f_1r_to_2ch_3dn(float *samples, dm_par_t * dm_par);
+void downmix_3f_0r_to_2ch_3dn(float *samples, dm_par_t * dm_par);            
+void stream_sample_2ch_to_s16_3dn(s16 *s16_samples, float *left, float *right);
+void stream_sample_1ch_to_s16_3dn(s16 *s16_samples, float *center);  
+
+

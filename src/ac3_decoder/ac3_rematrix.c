@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_rematrix.c,v 1.16 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_rematrix.c,v 1.17 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -34,7 +34,6 @@
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
 
 struct rematrix_band_s {
     u32 start;

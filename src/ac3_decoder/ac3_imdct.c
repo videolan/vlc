@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.18 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_imdct.c,v 1.19 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -39,15 +39,11 @@
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
 
-#include "ac3_downmix.h"
-#include "ac3_imdct_c.h"
-#if 0
-#include "ac3_imdct_kni.h"
-#endif
+#include "ac3_imdct_c.h"                                     /* imdct_init_c */
+#include "ac3_imdct_sse.h"                                 /* imdct_init_sse */
 
-#include "tests.h"
+#include "tests.h"                                                /* TestCPU */
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
@@ -57,13 +53,13 @@
 void imdct_init(imdct_t * p_imdct)
 {
 	int i;
-	float scale = 255.99609372;
-
+	float scale = 181.019;
 #if 0
-	if ( TestCPU (CPU_CAPABILITY_MMX) )
+	if ( TestCPU (CPU_CAPABILITY_SSE) )
     {
-        imdct_init_kni (p_imdct);
-    } else 
+        imdct_init_sse (p_imdct);
+    }
+    else
 #endif
     {
         imdct_init_c (p_imdct);

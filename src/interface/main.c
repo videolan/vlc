@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.93 2001/05/07 03:14:09 stef Exp $
+ * $Id: main.c,v 1.94 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -974,6 +974,7 @@ static int CPUCapabilities( void )
     if( i_edx & 0x02000000 )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
+        i_capabilities |= CPU_CAPABILITY_SSE;
     }
     
     /* test for additional capabilities */
@@ -996,7 +997,6 @@ static int CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
-
 #else
     /* default behaviour */
 

@@ -2,7 +2,7 @@
  * ac3_internals.h: needed by the ac3 decoder
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ac3_internal.h,v 1.8 2001/03/21 13:42:34 sam Exp $
+ * $Id: ac3_internal.h,v 1.9 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -37,12 +37,13 @@
 void bit_allocate (ac3dec_t *);
 
 /* ac3_downmix.c */
-int downmix (ac3dec_t *, float *, s16 *);
+void downmix_init (downmix_t * p_downmix);
 
 /* ac3_exponent.c */
 int exponent_unpack (ac3dec_t *);
 
 /* ac3_imdct.c */
+void imdct_init (imdct_t * p_imdct);
 void imdct (ac3dec_t * p_ac3dec, s16 * buffer);
 
 /* ac3_mantissa.c */

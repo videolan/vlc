@@ -2,7 +2,7 @@
  * ac3_downmix.c: ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.c,v 1.22 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_downmix.c,v 1.23 2001/05/14 15:58:03 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -31,29 +31,41 @@
 #include "threads.h"
 #include "mtime.h"
 
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "tests.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "ac3_decoder.h"
-#include "ac3_internal.h"
 #include "ac3_downmix.h"
 
 void downmix_init (downmix_t * p_downmix)
 {
 #if 0
-    if ( TestCPU (CPU_CAPABILITY_MMX) )
+    if ( TestCPU (CPU_CAPABILITY_SSE) )
     {
-		fprintf(stderr,"Using MMX for downmix\n");
-		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_kni;
-		p_downmix->downmix_2f_2r_to_2ch = downmix_2f_2r_to_2ch_kni;
-		p_downmix->downmix_3f_1r_to_2ch = downmix_3f_1r_to_2ch_kni;
-		p_downmix->downmix_2f_1r_to_2ch = downmix_2f_1r_to_2ch_kni;
-		p_downmix->downmix_3f_0r_to_2ch = downmix_3f_0r_to_2ch_kni;
-		p_downmix->stream_sample_2ch_to_s16 = stream_sample_2ch_to_s16_kni;
-    	p_downmix->stream_sample_1ch_to_s16 = stream_sample_1ch_to_s16_kni;
-    } else 
+		intf_WarnMsg (1,"ac3dec: using MMX_SSE for downmix");
+		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_sse;
+		p_downmix->downmix_2f_2r_to_2ch = downmix_2f_2r_to_2ch_sse;
+		p_downmix->downmix_3f_1r_to_2ch = downmix_3f_1r_to_2ch_sse;
+		p_downmix->downmix_2f_1r_to_2ch = downmix_2f_1r_to_2ch_sse;
+		p_downmix->downmix_3f_0r_to_2ch = downmix_3f_0r_to_2ch_sse;
+		p_downmix->stream_sample_2ch_to_s16 = stream_sample_2ch_to_s16_sse;
+    	p_downmix->stream_sample_1ch_to_s16 = stream_sample_1ch_to_s16_sse;
+    } 
+    else if ( TestCPU (CPU_CAPABILITY_3DNOW) )
+    {
+		intf_WarnMsg (1,"ac3dec: using MMX_3DNOW for downmix");
+		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_3dn;
+		p_downmix->downmix_2f_2r_to_2ch = downmix_2f_2r_to_2ch_3dn;
+		p_downmix->downmix_3f_1r_to_2ch = downmix_3f_1r_to_2ch_3dn;
+		p_downmix->downmix_2f_1r_to_2ch = downmix_2f_1r_to_2ch_3dn;
+		p_downmix->downmix_3f_0r_to_2ch = downmix_3f_0r_to_2ch_3dn;
+		p_downmix->stream_sample_2ch_to_s16 = stream_sample_2ch_to_s16_3dn;
+    	p_downmix->stream_sample_1ch_to_s16 = stream_sample_1ch_to_s16_3dn;
+    } 
+    else
 #endif
     {
 		p_downmix->downmix_3f_2r_to_2ch = downmix_3f_2r_to_2ch_c;

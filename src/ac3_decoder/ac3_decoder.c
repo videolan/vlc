@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.c,v 1.32 2001/05/07 03:14:09 stef Exp $
+ * $Id: ac3_decoder.c,v 1.33 2001/05/14 15:58:03 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -40,22 +40,15 @@
 #include "audio_output.h"
 
 #include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
+#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 #include "ac3_internal.h"
 
-#include <stdio.h>
-
-void imdct_init (imdct_t * p_imdct);
-void downmix_init (downmix_t * p_downmix);
-
-static float cmixlev_lut[4] = { 0.707, 0.595, 0.500, 0.707 };
-static float smixlev_lut[4] = { 0.707, 0.500, 0.0  , 0.500 };
+static const float cmixlev_lut[4] = { 0.707, 0.595, 0.500, 0.707 };
+static const float smixlev_lut[4] = { 0.707, 0.500, 0.0  , 0.500 };
 
 int ac3_init (ac3dec_t * p_ac3dec)
 {
-//    p_ac3dec->bit_stream.buffer = 0;
-//    p_ac3dec->bit_stream.i_available = 0;
-    p_ac3dec->mantissa.lfsr_state = 1;       /* dither_gen initialization */
+    p_ac3dec->mantissa.lfsr_state = 1;          /* dither_gen initialization */
     imdct_init(&p_ac3dec->imdct);
     downmix_init(&p_ac3dec->downmix);
     
@@ -69,7 +62,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
     
     if (parse_bsi (p_ac3dec))
     {
-        intf_WarnMsg (3,"Error during ac3parsing");
+        intf_WarnMsg (3,"ac3dec warn: error during parsing");
         parse_auxdata (p_ac3dec);
         return 1;
     }
@@ -102,7 +95,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
  
         if (parse_audblk (p_ac3dec, i))
         {
-            intf_WarnMsg (3,"Error during ac3audioblock");
+            intf_WarnMsg (3,"ac3dec warn: error during audioblock");
             parse_auxdata (p_ac3dec);
             return 1;
         }
@@ -114,7 +107,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 
         if (exponent_unpack (p_ac3dec))
         {
-            intf_WarnMsg (3,"Error during ac3unpack");
+            intf_WarnMsg (3,"ac3dec warn: error during unpack");
             parse_auxdata (p_ac3dec);
             return 1;
         }

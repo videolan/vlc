@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.7 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_decoder.h,v 1.8 2001/05/14 15:58:03 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -372,7 +372,7 @@ typedef struct imdct_s
     float xsin1[N/4];
     float xcos2[N/8];
     float xsin2[N/8];
-    
+   
     /* Twiddle factor LUT */
     complex_t *w[7];
     complex_t w_1[1];

@@ -2,7 +2,7 @@
  * ac3_srfft.c: ac3 FFT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_srfft.c,v 1.3 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_srfft.c,v 1.4 2001/05/14 15:58:04 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -40,9 +40,9 @@
 #include "ac3_decoder.h"
 #include "ac3_srfft.h"
 
-void fft_8 (complex_t *x);
+static void fft_8 (complex_t *x);
 
-void fft_4(complex_t *x)
+static void fft_4(complex_t *x)
 {
   /* delta_p = 1 here */
   /* x[k] = sum_{i=0..3} x[i] * w^{i*k}, w=e^{-2*pi/4} 
@@ -90,7 +90,7 @@ void fft_4(complex_t *x)
 }
 
 
-void fft_8 (complex_t *x)
+static void fft_8 (complex_t *x)
 {
   /* delta_p = diag{1, sqrt(i)} here */
   /* x[k] = sum_{i=0..7} x[i] * w^{i*k}, w=e^{-2*pi/8} 
@@ -205,7 +205,7 @@ void fft_8 (complex_t *x)
 }
 
 
-void fft_asmb(int k, complex_t *x, complex_t *wTB,
+static void fft_asmb(int k, complex_t *x, complex_t *wTB,
 	     const complex_t *d, const complex_t *d_3)
 {
   register complex_t  *x2k, *x3k, *x4k, *wB;
@@ -236,7 +236,7 @@ void fft_asmb(int k, complex_t *x, complex_t *wTB,
  
 }
 
-void fft_asmb16(complex_t *x, complex_t *wTB)
+static void fft_asmb16(complex_t *x, complex_t *wTB)
 {
   register float a_r, a_i, a1_r, a1_i, u_r, u_i, v_r, v_i;
   int k = 2;

@@ -2,7 +2,7 @@
  * tests.h: several test functions needed by the plugins
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: tests.h,v 1.9 2001/03/21 13:42:33 sam Exp $
+ * $Id: tests.h,v 1.10 2001/05/14 15:58:03 reno Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,6 +28,7 @@
 #define CPU_CAPABILITY_MMX     1<<3
 #define CPU_CAPABILITY_3DNOW   1<<4
 #define CPU_CAPABILITY_MMXEXT  1<<5
+#define CPU_CAPABILITY_SSE     1<<6
 #define CPU_CAPABILITY_ALTIVEC 1<<16
 
 /*****************************************************************************
