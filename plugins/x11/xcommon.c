@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.12 2002/01/13 15:07:55 gbazin Exp $
+ * $Id: xcommon.c,v 1.13 2002/01/21 00:52:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1899,10 +1899,13 @@ static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
              i_format < i_num_formats && ( i_selected_port == -1 );
              i_format++ )
         {
+            /* Code removed, we can get this through xvinfo anyway */
+#if 0
             XvEncodingInfo  *p_enc;
             int             i_enc, i_num_encodings;
             XvAttribute     *p_attr;
             int             i_attr, i_num_attributes;
+#endif
 
             /* If this is not the format we want, or at least a
              * similar one, forget it */
@@ -1940,6 +1943,7 @@ static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
                              ( p_formats[ i_format ].format
                                 == XvPacked ) ? "packed" : "planar" );
 
+#if 0
             intf_WarnMsg( 10, " encoding list:" );
 
             if( XvQueryEncodings( dpy, i_selected_port,
@@ -1982,6 +1986,7 @@ static int XVideoGetPort( Display *dpy, u32 i_chroma, u32 *pi_newchroma )
             {
                 XFree( p_attr );
             }
+#endif
         }
 
         if( p_formats != NULL )

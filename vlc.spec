@@ -65,7 +65,7 @@ This package contains no deCSS functionality.
 You need the decss library available from http://www.videolan.org
 
 %package gtk
-Summary: Gtk plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Gtk plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description gtk
@@ -75,7 +75,7 @@ install vlc-gtk.
 
 
 %package gnome
-Summary: Gnome plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Gnome plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description gnome
@@ -84,7 +84,7 @@ If you are going to watch DVD with the Gnome front-end, you should
 install vlc-gnome.
 
 %package qt
-Summary: Qt2 plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Qt2 plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description qt
@@ -93,7 +93,7 @@ If you are going to watch DVD with the Qt2 front-end, you should
 install vlc-qt
 
 %package ncurses
-Summary: Ncurses console-based plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Ncurses console-based plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description ncurses
@@ -102,7 +102,7 @@ If you are going to watch DVD with the ncurses front-end, you should
 install vlc-ncurses
 
 %package sdl
-Summary: Simple DirectMedia Layer plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Simple DirectMedia Layer plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description sdl
@@ -112,7 +112,7 @@ If you are going to watch DVD with the sdl plugin, you should
 install vlc-sdl
 
 %package ggi
-Summary: GGI plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: GGI plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description ggi
@@ -121,7 +121,7 @@ If you are going to watch DVD with the GGI plugin, you should
 install vlc-ggi
 
 %package esd
-Summary: Enlightened Sound Daemon plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Enlightened Sound Daemon plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description esd
@@ -131,22 +131,22 @@ If you are going to watch DVD with the esd plugin, you should
 install vlc-esd
 
 %package alsa
-Summary: Advanced Linux Sound Architecture plug-in for VideoLAN, a DVD and Mpeg-2 player
+Summary: Advanced Linux Sound Architecture plug-in for VideoLAN, a DVD and MPEG2 player
 Group: Video
 Requires: %{name} = %{version}
 %description alsa
 The vlc-alsa packages includes the Advanced Linux Sound Architecture plug-in for the VideoLAN client.
-If you are going to watch DVD with the esd plugin, you should install vlc-alsa
+If you are going to watch DVD with the ALSA plugin, you should install vlc-alsa
 
 %package -n %{css_lib_name}
-Summary:        A library for accessing DVDs like block device usind deCSS if needed.
+Summary:        A library for accessing a DVD like a block device using CSS decryption if needed.
 Version:	%{css_version}
 Release:	%{css_release}
 Group:          System/Libraries
 Provides:       %{css_name} = %{css_version}-%{css_release}
 
 %description -n %{css_lib_name}
-libdvdcss is a simple library designed for accessing DVDs like a block device
+libdvdcss is a simple library designed for accessing a DVD like a block device
 without having to bother about the decryption. The important features are:
  * Portability. Currently supported platforms are GNU/Linux, FreeBSD, BeOS
    and Windows. The MacOS X version is being worked on as well.

@@ -1,5 +1,5 @@
 List of known vlc bugs
-$Id: BUGS,v 1.4 2002/01/09 02:01:14 sam Exp $
+$Id: BUGS,v 1.5 2002/01/21 00:52:06 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -40,6 +40,9 @@ Video output:
 
   * The MGA video output plugin makes the picture stutter when MGA_NUM_FRAMES
     is set to a value higher than 1.
+
+  * The SPU decoder doesn't detect when the video output failed to launch
+    itself, and we segfault.
 
 Chroma transformations:
 

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.145 2002/01/17 23:02:45 gbazin Exp $
+ * $Id: main.c,v 1.146 2002/01/21 00:52:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -106,7 +106,7 @@
 #define OPT_NOOVERLAY           166
 #define OPT_XVADAPTOR           167
 #define OPT_SMP                 168
-#define OPT_FILTER              169
+#define OPT_SPUMARGIN           169
 
 #define OPT_CHANNELS            170
 #define OPT_SERVER              171
@@ -121,8 +121,9 @@
 #define OPT_DOWNMIX             184
 #define OPT_IMDCT               185
 #define OPT_MEMCPY              186
-#define OPT_DVDCSS_METHOD       187
-#define OPT_DVDCSS_VERBOSE      188
+#define OPT_FILTER              187
+#define OPT_DVDCSS_METHOD       188
+#define OPT_DVDCSS_VERBOSE      189
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -185,7 +186,7 @@ static const struct option longopts[] =
     {   "nooverlay",        0,          0,      OPT_NOOVERLAY },
     {   "xvadaptor",        1,          0,      OPT_XVADAPTOR },
     {   "smp",              1,          0,      OPT_SMP },
-    {   "filter",           1,          0,      OPT_FILTER },
+    {   "spumargin",        1,          0,      OPT_SPUMARGIN },
 
     /* DVD options */
     {   "dvdtitle",         1,          0,      't' },
@@ -205,6 +206,7 @@ static const struct option longopts[] =
     /* Misc options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
     {   "memcpy",           1,          0,      OPT_MEMCPY },
+    {   "filter",           1,          0,      OPT_FILTER },
 
     /* Decoder options */
     {   "mpeg_adec",        1,          0,      OPT_MPEG_ADEC },
@@ -795,8 +797,8 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_SMP:                                               /* --smp */
             main_PutIntVariable( VDEC_SMP_VAR, atoi(optarg) );
             break;
-        case OPT_FILTER:                                         /* --filter */
-            main_PutPszVariable( VOUT_FILTER_VAR, optarg );
+        case OPT_SPUMARGIN:                                   /* --spumargin */
+            main_PutIntVariable( VOUT_SPUMARGIN_VAR, atoi(optarg) );
             break;
 
         /* DVD options */
@@ -849,6 +851,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         case OPT_MEMCPY:
             main_PutPszVariable( MEMCPY_METHOD_VAR, optarg );
+            break;
+        case OPT_FILTER:                                         /* --filter */
+            main_PutPszVariable( VOUT_FILTER_VAR, optarg );
             break;
 
         /* Decoder options */
@@ -974,6 +979,7 @@ static void Usage( int i_fashion )
           "\n      --yuv <module>             \tYUV method"
           "\n      --synchro <type>           \tforce synchro algorithm"
           "\n      --smp <number of threads>  \tuse several processors"
+          "\n      --spumargin <m>            \tforce SPU position"
           "\n      --filter <module>          \tvideo filter module"
           "\n"
           "\n  -t, --dvdtitle <num>           \tchoose DVD title"
@@ -1048,7 +1054,8 @@ static void Usage( int i_fashion )
         "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
         "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
         "\n  " VDEC_SMP_VAR "=<number of threads>     \tuse several processors"
-        "\n  " VOUT_FILTER_VAR "=<method name>        \tvideo filter method" );
+        "\n  " VOUT_FILTER_VAR "=<method name>        \tvideo filter method"
+        "\n  " VOUT_SPUMARGIN_VAR "=<margin>          \tforce SPU margin" );
 
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"

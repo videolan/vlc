@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: MODULES,v 1.1 2002/01/04 14:01:34 sam Exp $
+$Id: MODULES,v 1.2 2002/01/21 00:52:06 sam Exp $
 
  * ac3_adec: software AC3 decoder.
 
@@ -25,11 +25,15 @@ $Id: MODULES,v 1.1 2002/01/04 14:01:34 sam Exp $
 
  * directx: audio output and video output module using the DirectX API.
 
+ * downmix: downmix module, used by the AC3 decoder.
+
+ * downmixsse: SSE accelerated version of downmix.
+
+ * downmix3dn: 3D Now! accelerated version of downmix.
+
  * dsp: audio output module using the OSS /dev/dsp interface.
 
  * dummy: dummy audio output, video output, interface and input modules.
-
- * null: a module with no capabilities.
 
  * dvd: input module for accessing DVDs.
 
@@ -57,12 +61,6 @@ $Id: MODULES,v 1.1 2002/01/04 14:01:34 sam Exp $
  * gnome: interface using the GNOME widget set.
 
  * gtk: interface using the Gtk+ widget set.
-
- * downmix: downmix module, used by the AC3 decoder.
-
- * downmixsse: SSE accelerated version of downmix.
-
- * downmix3dn: 3D Now! accelerated version of downmix.
 
  * idct: inverse DCT module, used by the video decoder.
 
@@ -119,15 +117,17 @@ $Id: MODULES,v 1.1 2002/01/04 14:01:34 sam Exp $
 
  * mpeg_vdec: MPEG and MPEG2 video decoder.
 
+ * ncurses: interface module using the ncurses library.
+
+ * null: a module with no capabilities.
+
  * qt: interface module using the Qt widget set.
+
+ * rc: interface module using stdio.
 
  * sdl: audio output and video output module using the SDL library.
 
  * spudec: DVD subtitles decoder.
-
- * ncurses: interface module using the ncurses library.
-
- * rc: interface module using stdio.
 
  * vcd: input module for accessing Video CDs.
 

@@ -182,11 +182,15 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->i_mode == MODE_NORMAL_MEM ||
-        p_vout->p_sys->i_mode == MODE_SHARED_MEM )
-    {
-        /* create images for [shared] memory blit */
+    /* These variables are only used if we are in overlay mode */
+    int i_ret;
+    PgScalerProps_t props;
 
+    switch( p_vout->p_sys->i_mode )
+    {
+    case MODE_NORMAL_MEM:
+    case MODE_SHARED_MEM:
+        /* create images for [shared] memory blit */
         if( !( p_vout->p_sys->p_image[0] = PhCreateImage( NULL,
                     p_vout->p_sys->dim.w, p_vout->p_sys->dim.h,
                     p_vout->p_sys->i_img_type, NULL, 0,
@@ -210,11 +214,10 @@ static int vout_Init( vout_thread_t *p_vout )
         p_vout->i_bytes_per_line = p_vout->p_sys->p_image[0]->bpl;
         p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_image[0]->image,
                                p_vout->p_sys->p_image[1]->image );
-    }
-    else if( p_vout->p_sys->i_mode == MODE_VIDEO_MEM )
-    {
-        /* create offscreen contexts for video memory blit */
+        break;
 
+    case MODE_VIDEO_MEM:
+        /* create offscreen contexts for video memory blit */
         if( ( p_vout->p_sys->p_ctx[0] = PdCreateOffscreenContext( 0,
                         p_vout->p_sys->dim.w, p_vout->p_sys->dim.h,
                         Pg_OSC_MEM_PAGE_ALIGN ) ) == NULL )
@@ -255,12 +258,8 @@ static int vout_Init( vout_thread_t *p_vout )
             p_vout->i_bytes_per_line * p_vout->p_sys->dim.h );
         p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_buf[0],
                                p_vout->p_sys->p_buf[1] );
-    }
-    else if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY )
-    {
-        int i_ret;
-        PgScalerProps_t props;
 
+    case MODE_VIDEO_OVERLAY:
         props.size   = sizeof( props );
         props.format = p_vout->p_sys->i_vc_format; 
         props.flags  = Pg_SCALER_PROP_SCALER_ENABLE |
@@ -346,6 +345,11 @@ static int vout_Init( vout_thread_t *p_vout )
             p_vout->pf_setbuffers( p_vout,
                 p_vout->p_sys->p_vc_y[0], p_vout->p_sys->p_vc_y[1] );
         }
+        break;
+
+    default:
+        /* This shouldn't happen ! */
+        break;
     }
 
     return( 0 );

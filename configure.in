@@ -310,8 +310,8 @@ esac
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
+BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec ac3_adec mpeg_vdec"
+PLUGINS="${PLUGINS} lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
 
 dnl
 dnl  Accelerated modules
@@ -431,8 +431,8 @@ case x"${target_os}" in
   x*mingw32*)
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
-    LIB_MPEG_TS="-lws2_32"
-    LIB_RC="-lws2_32"
+    LIB_MPEG_TS="${LIB_MPEG_TS} -lws2_32"
+    LIB_RC="${LIB_RC} -lws2_32"
     ;;
   x*nto*)
     SYS=nto
@@ -824,10 +824,10 @@ AC_ARG_WITH(mad,
   [  --with-mad[=PATH]       libmad module (default disabled)],
   [ if test "x$with_val" != "xno"; then
       if test -n $with_val; then
-        CFLAGS_MAD="-I$with_val/include"
-        LIB_MAD="-L$with_val/lib -lmad"
+        CFLAGS_MAD="${CFLAGS_MAD} -I$with_val/include"
+        LIB_MAD="${LIB_MAD} -L$with_val/lib -lmad"
       else
-        LIB_MAD="-lmad"
+        LIB_MAD="${LIB_MAD} -lmad"
       fi
       save_CFLAGS=$CFLAGS
       save_LDFLAGS=$LDFLAGS
@@ -881,8 +881,8 @@ AC_ARG_ENABLE(esd,
      if test x${ESD_CONFIG} != xno
      then
        PLUGINS="${PLUGINS} esd"
-       CFLAGS_ESD="`${ESD_CONFIG} --cflags`"
-       LIB_ESD="`${ESD_CONFIG} --libs`"
+       CFLAGS_ESD="${CFLAGS_ESD} `${ESD_CONFIG} --cflags`"
+       LIB_ESD="${LIB_ESD} `${ESD_CONFIG} --libs`"
      fi
    fi])
 
@@ -897,8 +897,8 @@ AC_ARG_ENABLE(arts,
      if test x${ARTS_CONFIG} != xno
      then
        PLUGINS="${PLUGINS} arts"
-       CFLAGS_ARTS="`${ARTS_CONFIG} --cflags`"
-       LIB_ARTS="`${ARTS_CONFIG} --libs `"
+       CFLAGS_ARTS="${CFLAGS_ARTS} `${ARTS_CONFIG} --cflags`"
+       LIB_ARTS="${LIB_ARTS} `${ARTS_CONFIG} --libs `"
      fi
    fi])
 
@@ -910,14 +910,14 @@ AC_ARG_ENABLE(macosx,
   [if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     CFLAGS_MACOSX="-ObjC"
+     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
      LIB="${LIB} -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="-framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     CFLAGS_MACOSX="-ObjC"
+     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
      LIB="${LIB} -ObjC"
    )])
 
@@ -930,7 +930,7 @@ AC_ARG_ENABLE(qnx,
     then
       AC_CHECK_HEADERS(Ph.h, [
         PLUGINS="${PLUGINS} qnx"
-        LIB_QNX="-lasound -lph"
+        LIB_QNX="${LIB_QNX} -lasound -lph"
       ])
     fi
 
@@ -964,9 +964,9 @@ AC_ARG_WITH(ggi,
       PLUGINS="${PLUGINS} ggi"
       if test "x$withval" != "xyes"
       then
-        LIB_GGI="-l"$withval
+        LIB_GGI="${LIB_GGI} -l$withval"
       else
-        LIB_GGI="-lggi"
+        LIB_GGI="${LIB_GGI} -lggi"
       fi
     fi ])
 
@@ -1001,8 +1001,8 @@ then
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    CFLAGS_SDL="`${SDL_CONFIG} --cflags`"
-    LIB_SDL="`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+    CFLAGS_SDL="${CFLAGS_SDL} `${SDL_CONFIG} --cflags`"
+    LIB_SDL="${LIB_SDL} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
     save_CPPFLAGS=$CPPFLAGS
     CPPFLAGS="$CPPFLAGS $CFLAGS_SDL"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
@@ -1041,13 +1041,13 @@ then
     then
       AC_CHECK_HEADERS(directx.h,
       [ PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="-lgdi32" ])
+        LIB_DIRECTX="${LIB_DIRECTX} -lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${withval})
       if test -f ${withval}/include/directx.h
       then
         PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="-L${withval}/lib -lgdi32"
+        LIB_DIRECTX="${LIB_DIRECTX} -L${withval}/lib -lgdi32"
         INCLUDE="${INCLUDE} -I${withval}/include"
         AC_MSG_RESULT(yes)
       else
@@ -1056,6 +1056,16 @@ then
       fi
     fi
   fi
+fi
+
+dnl
+dnl  Windows MFC interface module
+dnl
+AC_ARG_ENABLE(win32,
+  [  --enable-win32          Windows DirectX support (default disabled)])
+if test "x$enableval" = "xyes"
+then
+  PLUGINS="${PLUGINS} win32"
 fi
 
 dnl
@@ -1068,11 +1078,11 @@ AC_ARG_WITH(glide,
       PLUGINS="${PLUGINS} glide"
       if test "x$withval" != "xyes"
       then
-        LIB_GLIDE="-l"$withval" -lm"
+        LIB_GLIDE="${LIB_GLIDE} -l$withval -lm"
       else
-        LIB_GLIDE="-lglide2x -lm"
+        LIB_GLIDE="${LIB_GLIDE} -lglide2x -lm"
       fi
-      CFLAGS_GLIDE="-I/usr/include/glide"
+      CFLAGS_GLIDE="${CFLAGS_GLIDE} -I/usr/include/glide"
     fi ])
 
 dnl
@@ -1082,7 +1092,7 @@ AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],
   [if test x$enable_ncurses = xyes; then
      PLUGINS="${PLUGINS} ncurses"
-     LIB_NCURSES="-lncurses"
+     LIB_NCURSES="${LIB_NCURSES} -lncurses"
    fi])
 
 dnl
@@ -1093,8 +1103,8 @@ AC_ARG_ENABLE(qt,
   [if test x$enable_qt = xyes; then
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
-     LIB_QT="-lqt -L${QTDIR}/lib"
-     CFLAGS_QT="-I/usr/include/qt -I${QTDIR}/include"
+     LIB_QT="${LIB_QT} -lqt -L${QTDIR}/lib"
+     CFLAGS_QT="${CFLAGS_QT} -I/usr/include/qt -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1132,8 +1142,8 @@ AC_ARG_ENABLE(gnome,
     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
     if test -x ${GNOME_CONFIG}
     then
-       CFLAGS_GNOME="`${GNOME_CONFIG} --cflags gtk gnomeui`"
-       LIB_GNOME="`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
+       CFLAGS_GNOME="${CFLAGS_GNOME} `${GNOME_CONFIG} --cflags gtk gnomeui`"
+       LIB_GNOME="${LIB_GNOME} `${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
     fi
     # now look for the gnome.h header
     saved_CPPFLAGS=$CPPFLAGS
@@ -1171,8 +1181,8 @@ then
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
     fi
-    CFLAGS_GTK="`${GTK_CONFIG} --cflags gtk`"
-    LIB_GTK="`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
+    CFLAGS_GTK="${CFLAGS_GTK} `${GTK_CONFIG} --cflags gtk`"
+    LIB_GTK="${LIB_GTK} `${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
   fi
   # now look for the gtk.h header
   saved_CPPFLAGS=$CPPFLAGS
@@ -1231,9 +1241,18 @@ if test x$enable_xvideo != xno &&
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
-    BUILTINS="${BUILTINS} xvideo"
-    LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv"
-    CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes"
+    saved_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -L$x_libraries -lX11 -lXext"
+    AC_CHECK_LIB(Xv_pic,XvSetPortAttribute,
+      # We have Xv_pic, that's good, we can build an xvideo.so plugin !
+      PLUGINS="${PLUGINS} xvideo"
+      LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv_pic"
+      CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes",
+      # We don't have Xv_pic, let's make xvideo.a as builtin
+      BUILTINS="${BUILTINS} xvideo"
+      LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv"
+      CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes")
+    CFLAGS=$saved_CFLAGS
   ]
   CPPFLAGS=$saved_CPPFLAGS)
 fi
@@ -1250,7 +1269,7 @@ AC_ARG_ENABLE(alsa,
      if test x$have_alsa = xtrue
      then
        PLUGINS="${PLUGINS} alsa"
-       LIB_ALSA="-lasound -lm -ldl"
+       LIB_ALSA="${LIB_ALSA} -lasound -lm -ldl"
      fi
    fi])
 
@@ -1355,6 +1374,7 @@ AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_QT)
 AC_SUBST(LIB_RC)
 AC_SUBST(LIB_SDL)
+AC_SUBST(LIB_WIN32)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 
@@ -1374,6 +1394,7 @@ AC_SUBST(CFLAGS_MAD)
 AC_SUBST(CFLAGS_MOTIONALTIVEC)
 AC_SUBST(CFLAGS_QT)
 AC_SUBST(CFLAGS_SDL)
+AC_SUBST(CFLAGS_WIN32)
 AC_SUBST(CFLAGS_X11)
 AC_SUBST(CFLAGS_XVIDEO)
 

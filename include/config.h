@@ -321,6 +321,10 @@
 #define VOUT_DEPTH_VAR                  "vlc_depth"
 #define VOUT_DEPTH_DEFAULT              15
 
+/* Default SPU margin is -1, which means we don't force their position */
+#define VOUT_SPUMARGIN_VAR              "vlc_spumargin"
+#define VOUT_SPUMARGIN_DEFAULT          -1
+
 /* Multiplier value for aspect ratio calculation (2^7 * 3^3 * 5^3) */
 #define VOUT_ASPECT_FACTOR              432000
 

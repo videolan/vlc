@@ -48,6 +48,7 @@ PLUGINS_DIR :=	ac3_adec \
 		spudec \
 		text \
 		vcd \
+		win32 \
 		x11
 
 PLUGINS_TARGETS := ac3_adec/ac3_adec \
@@ -117,6 +118,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		text/ncurses \
 		text/rc \
 		vcd/vcd \
+		win32/win32 \
 		x11/x11 \
 		x11/xvideo
 
@@ -140,6 +142,10 @@ C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 # 
 ifeq ($(NEED_GETOPT),1)
 C_OBJ += extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o 
+endif
+
+ifeq ($(NEED_SYMBOLS),1)
+C_OBJ += src/misc/symbols.o
 endif
 
 ifeq ($(SYS),beos)

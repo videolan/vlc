@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.5 2002/01/04 14:01:35 sam Exp $
+ * $Id: vout_subpictures.c,v 1.6 2002/01/21 00:52:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,15 +59,30 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     char        psz_start[ MSTRTIME_MAX_SIZE ];    /* buffer for date string */
     char        psz_stop[ MSTRTIME_MAX_SIZE ];     /* buffer for date string */
 #endif
+    int         i_margin;
 
 #ifdef DEBUG
     /* Check if status is valid */
     if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_ErrMsg("error: subpicture %p has invalid status #%d", p_subpic,
-                    p_subpic->i_status );
+        intf_ErrMsg( "error: subpicture %p has invalid status #%d",
+                     p_subpic, p_subpic->i_status );
     }
 #endif
+
+    /* If the user requested an SPU margin, we force the position after
+     * having checked that it was a valid value. */
+    i_margin = main_GetIntVariable( VOUT_SPUMARGIN_VAR,
+                                    VOUT_SPUMARGIN_DEFAULT );
+
+    if( i_margin >= 0 )
+    {
+        if( p_subpic->i_height + i_margin <= p_vout->output.i_height )
+        {
+            p_subpic->i_y = p_vout->output.i_height
+                             - i_margin - p_subpic->i_height;
+        }
+    }
 
     /* Remove reservation flag */
     p_subpic->i_status = READY_SUBPICTURE;
