@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.17 2003/07/20 20:54:01 hartman Exp $
+# $Id: vlc.ebuild,v 1.18 2003/07/21 01:38:37 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,7 +25,7 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts qt ncurses dvd gtk nls 3dfx svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
+IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -60,7 +60,6 @@ DEPEND="X? ( virtual/x11 )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
 	gtk? ( =x11-libs/gtk+-1.2* )
 	imlib? ( >=media-libs/imlib2-1.0.6 )
-	kde? ( kde-base/kdelibs )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
@@ -70,7 +69,6 @@ DEPEND="X? ( virtual/x11 )
 	nls? ( sys-devel/gettext )
 	oggvorbis? ( >=media-libs/libvorbis-1.0
 		>=media-libs/libogg-1.0 )
-	qt? ( x11-libs/qt )
 	sdl? ( >=media-libs/libsdl-1.2.5 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
@@ -197,10 +195,6 @@ src_compile(){
 
 	use gnome && myconf="${myconf} --enable-gnome --disable-gnome2"
 
-	use kde && myconf="${myconf} --enable-kde"
-
-	use qt && myconf="${myconf} --enable-qt"
-
 	use ncurses && myconf="${myconf} --enable-ncurses"
 
 	use oggvorbis || myconf="${myconf} --disable-vorbis --disable-ogg"
@@ -209,12 +203,12 @@ src_compile(){
 
 	use slp || myconf="${myconf} --disable-slp"
 
-	use mad && myconf="${myconf} --enable-mad"
+	use mad || myconf="${myconf} --disable-mad"
 
 	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
 	use xvid && myconf="${myconf} --enable-xvid"
 
-	use truetype && myconf="${myconf} --enable-freetype"
+	use truetype || myconf="${myconf} --disable-freetype"
 
 	# v4l is a local USE var, see /usr/portage/profiles/use.local.desc for more details
 	use v4l && myconf="${myconf} --enable-v4l"
@@ -261,7 +255,9 @@ src_compile(){
 		--enable-dvbpsi \
 		--enable-faad \
 		--enable-flac \
-		--enable-a52"
+		--enable-a52 \
+		--disable-kde \
+		--disable-qt"
 
 	ewarn ${myconf}
 	econf ${myconf} || die "configure of VLC failed"

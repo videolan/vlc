@@ -404,8 +404,11 @@ VLC.app: vlc
 	    "$(srcdir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
-	$(INSTALL) -m 644 $(srcdir)/share/*.psf $(srcdir)/share/*.rle \
-	  $(srcdir)/VLC.app/Contents/MacOS/share
+	$(INSTALL) -m 644 $(srcdir)/share/*.rle $(srcdir)/VLC.app/Contents/MacOS/share
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -m 644 $(srcdir)/share/http/*.html $(srcdir)/VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http/admin
+	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html $(srcdir)/VLC.app/Contents/MacOS/share/http/admin
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/locale
 	for i in $(ALL_LINGUAS); do \
 	  mkdir -p $(srcdir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
