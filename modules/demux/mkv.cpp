@@ -362,10 +362,12 @@ public:
     bool                        b_ordered;
 };
 
+class demux_sys_t;
+
 class matroska_segment_t
 {
 public:
-    matroska_segment_t()
+    matroska_segment_t( demux_sys_t *p_demuxer )
         :segment(NULL)
         ,i_timescale(0)
         ,f_duration(0.0)
@@ -386,7 +388,14 @@ public:
         ,psz_date_utc(NULL)
         ,i_current_edition(0)
         ,psz_current_chapter(NULL)
+        ,p_sys(p_demuxer)
+        ,ep(NULL)
     {}
+
+    ~matroska_segment_t()
+    {
+        delete ep;
+    }
 
     KaxSegment              *segment;
 
@@ -406,7 +415,7 @@ public:
     int64_t                 i_tags_position;
 
     KaxCluster              *cluster;
-    KaxSegmentUID           segment_uid;
+    KaxSegmentUID           segment_uid, prev_segment_uid, next_segment_uid;
 
     vlc_bool_t              b_cues;
     int                     i_index;
@@ -425,8 +434,11 @@ public:
     const chapter_item_t           *psz_current_chapter;
 
     std::vector<KaxSegmentFamily>   families;
+    
+    demux_sys_t                      *p_sys;
+    EbmlParser                       *ep;
 
-    chapter_edition_t *Edition()
+    inline chapter_edition_t *Edition()
     {
         if ( i_current_edition != -1 && i_current_edition < editions.size() )
             return &editions[i_current_edition];
@@ -437,38 +449,37 @@ public:
 class matroska_stream_t
 {
 public:
-    matroska_stream_t()
+    matroska_stream_t( demux_sys_t *p_demuxer )
         :in(NULL)
         ,es(NULL)
-        ,ep(NULL)
         ,i_current_segment(-1)
+        ,p_sys(p_demuxer)
     {}
 
     ~matroska_stream_t()
     {
         for ( int i=0; i<segments.size(); i++ )
             delete segments[i];
-        if ( in )
-            delete in;
-        if ( es )
-            delete es;
-        if ( ep )
-            delete ep;
+        delete in;
+        delete es;
     }
 
     vlc_stream_io_callback  *in;
     EbmlStream              *es;
-    EbmlParser              *ep;
 
     std::vector<matroska_segment_t*> segments;
     int                              i_current_segment;
 
-    matroska_segment_t *Segment()
+    demux_sys_t                      *p_sys;
+    
+    inline matroska_segment_t *Segment()
     {
         if ( i_current_segment != -1 && i_current_segment < segments.size() )
             return segments[i_current_segment];
         return NULL;
     }
+    
+    matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
 };
 
 class demux_sys_t
@@ -501,12 +512,14 @@ public:
     std::vector<matroska_stream_t*> streams;
     int                             i_current_stream;
 
-    matroska_stream_t *Stream()
+    inline matroska_stream_t *Stream()
     {
         if ( i_current_stream != -1 && i_current_stream < streams.size() )
             return streams[i_current_stream];
         return NULL;
     }
+
+    matroska_segment_t *FindSegment( KaxSegmentUID & i_uid ) const;
 };
 
 static int  Demux  ( demux_t * );
@@ -557,8 +570,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = new demux_sys_t;
 
-    p_stream = new matroska_stream_t;
-    p_segment = new matroska_segment_t;
+    p_stream = new matroska_stream_t( p_sys );
+    p_segment = new matroska_segment_t( p_sys );
 
     p_sys->streams.push_back( p_stream );
     p_sys->i_current_stream = 0;
@@ -620,9 +633,9 @@ static int Open( vlc_object_t * p_this )
     p_segment->segment = (KaxSegment*)el;
     p_segment->cluster = NULL;
 
-    p_stream->ep = new EbmlParser( p_stream->es, el );
+    p_segment->ep = new EbmlParser( p_stream->es, el );
 
-    while( ( el1 = p_stream->ep->Get() ) != NULL )
+    while( ( el1 = p_segment->ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el1, KaxInfo ) )
         {
@@ -646,7 +659,7 @@ static int Open( vlc_object_t * p_this )
 
             p_segment->cluster = (KaxCluster*)el1;
 
-            p_stream->ep->Down();
+            p_segment->ep->Down();
             /* stop parsing the stream */
             break;
         }
@@ -713,26 +726,29 @@ static int Open( vlc_object_t * p_this )
                         // test wether this file belongs to the our family
                         bool b_keep_file_opened = false;
                         StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
-                        EbmlStream *p_stream = new EbmlStream(*p_file_io);
+                        EbmlStream *p_estream = new EbmlStream(*p_file_io);
                         EbmlElement *p_l0, *p_l1, *p_l2;
 
                         // verify the EBML Header
-                        p_l0 = p_stream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
+                        p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
                         if (p_l0 == NULL)
                         {
-                            delete p_stream;
+                            delete p_estream;
                             delete p_file_io;
                             continue;
                         }
 
-                        p_l0->SkipData(*p_stream, EbmlHead_Context);
+                        matroska_stream_t  *p_stream1 = new matroska_stream_t( p_sys );
+                        p_sys->streams.push_back( p_stream1 );
+
+                        p_l0->SkipData(*p_estream, EbmlHead_Context);
                         delete p_l0;
 
                         // find all segments in this file
-                        p_l0 = p_stream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+                        p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
                         if (p_l0 == NULL)
                         {
-                            delete p_stream;
+                            delete p_estream;
                             delete p_file_io;
                             continue;
                         }
@@ -745,8 +761,13 @@ static int Open( vlc_object_t * p_this )
                             {
                                 EbmlParser  *ep;
                                 KaxSegmentUID *p_uid = NULL;
+                                matroska_segment_t *p_segment1 = new matroska_segment_t( p_sys );
 
-                                ep = new EbmlParser(p_stream, p_l0);
+                                p_stream1->segments.push_back( p_segment1 );
+
+                                ep = new EbmlParser(p_estream, p_l0);
+                                p_segment1->ep = ep;
+
                                 bool b_this_segment_matches = false;
                                 while ((p_l1 = ep->Get()))
                                 {
@@ -755,7 +776,7 @@ static int Open( vlc_object_t * p_this )
                                         // find the families of this segment
                                         KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
 
-                                        p_info->Read(*p_stream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
+                                        p_info->Read(*p_estream, KaxInfo::ClassInfos.Context, i_upper_lvl, p_l2, true);
                                         for( i = 0; i < p_info->ListSize() && !b_this_segment_matches; i++ )
                                         {
                                             EbmlElement *l = (*p_info)[i];
@@ -765,21 +786,24 @@ static int Open( vlc_object_t * p_this )
                                                 p_uid = static_cast<KaxSegmentUID*>(l);
                                                 if (p_segment->segment_uid == *p_uid)
                                                     break;
+                                                p_segment1->segment_uid = *p_uid;
                                             }
                                             else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                                             {
                                                 KaxSegmentFamily *p_fam = static_cast<KaxSegmentFamily*>(l);
                                                 std::vector<KaxSegmentFamily>::iterator iter;
-                                                for( iter = p_segment->families.begin();
+                                                p_segment1->families.push_back( *p_fam );
+/*                                                for( iter = p_segment->families.begin();
                                                      iter != p_segment->families.end();
                                                      iter++ )
                                                 {
                                                     if( *iter == *p_fam )
                                                     {
                                                         b_this_segment_matches = true;
+                                                        p_segment1->families.push_back( *p_fam );
                                                         break;
                                                     }
-                                                }
+                                                }*/
                                             }
                                         }
                                         break;
@@ -792,14 +816,14 @@ static int Open( vlc_object_t * p_this )
                                 }
                             }
 
-                            p_l0->SkipData(*p_stream, EbmlHead_Context);
+                            p_l0->SkipData(*p_estream, EbmlHead_Context);
                             delete p_l0;
-                            p_l0 = p_stream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+                            p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
                         }
 
                         if (!b_keep_file_opened)
                         {
-                            delete p_stream;
+                            delete p_estream;
                             delete p_file_io;
                         }
                     }
@@ -1287,8 +1311,8 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
             return VLC_EGENERIC;
         }
 
-        el = p_stream->ep->Get();
-        i_level = p_stream->ep->GetLevel();
+        el = p_segment->ep->Get();
+        i_level = p_segment->ep->GetLevel();
 
         if( el == NULL && *pp_block != NULL )
         {
@@ -1305,9 +1329,9 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
 
         if( el == NULL )
         {
-            if( p_stream->ep->GetLevel() > 1 )
+            if( p_segment->ep->GetLevel() > 1 )
             {
-                p_stream->ep->Up();
+                p_segment->ep->Up();
                 continue;
             }
             msg_Warn( p_demux, "EOF" );
@@ -1328,7 +1352,7 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
                     IndexAppendCluster( p_demux, p_segment->cluster );
                 }
 
-                p_stream->ep->Down();
+                p_segment->ep->Down();
             }
             else if( MKV_IS_ID( el, KaxCues ) )
             {
@@ -1351,7 +1375,7 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
             }
             else if( MKV_IS_ID( el, KaxBlockGroup ) )
             {
-                p_stream->ep->Down();
+                p_segment->ep->Down();
             }
         }
         else if( i_level == 3 )
@@ -1363,7 +1387,7 @@ static int BlockGet( demux_t *p_demux, KaxBlock **pp_block, int64_t *pi_ref1, in
                 (*pp_block)->ReadData( p_stream->es->I_O() );
                 (*pp_block)->SetParent( *p_segment->cluster );
 
-                p_stream->ep->Keep();
+                p_segment->ep->Keep();
             }
             else if( MKV_IS_ID( el, KaxBlockDuration ) )
             {
@@ -1567,8 +1591,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
         return;
     }
 
-    delete p_stream->ep;
-    p_stream->ep = new EbmlParser( p_stream->es, p_segment->segment );
+    delete p_segment->ep;
+    p_segment->ep = new EbmlParser( p_stream->es, p_segment->segment );
     p_segment->cluster = NULL;
 
     /* seek without index or without date */
