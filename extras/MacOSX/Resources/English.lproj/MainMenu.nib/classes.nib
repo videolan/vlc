@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 fullscreen_toggle = id; 
+                openFile = id; 
                 pause = id; 
                 play = id; 
                 speedslider_update = id; 
@@ -14,11 +15,9 @@
             OUTLETS = {
                 o_currenttime = id; 
                 o_menu_fullscreen = id; 
-                o_outputpanel = id; 
                 o_pause = id; 
                 o_play = id; 
                 o_playlistds = id; 
-                o_qdview = id; 
                 o_stepf = id; 
                 o_stepr = id; 
                 o_stop = id; 
