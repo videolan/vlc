@@ -195,7 +195,7 @@ const intf_command_t control_command[] =
     /* usage: */    "vlan synchro\n" \
     "vlan [intf=<interface>] request\n" \
     "vlan [intf=<interface>] join <vlan>\n" \
-    "vlan [intf=<interface>] leave"
+    "vlan [intf=<interface>] leave",
     /* help: */     "Perform various operations on vlans. 'synchro' resynchronize " \
     "with the server. 'request' ask which is the current vlan (for the default " \
     "interface or for a given one). 'join' and 'leave' try to change vlan." },
@@ -259,17 +259,22 @@ static int Help( int i_argc, intf_arg_t *p_argv )
     /* If called with an argument: look for the command and display it's help */
     if( i_argc == 2 )
     {
+fprintf( stderr, "maxx debug: coin\n" );
         for( i_index = 0; control_command[i_index].psz_name 
                  && strcmp( control_command[i_index].psz_name, p_argv[1].psz_str );
              i_index++ )
         {
             ;
         }
+fprintf( stderr, "maxx debug: meuh\n" );
         /* Command has been found in list */
         if( control_command[i_index].psz_name )
         {
+fprintf( stderr, "maxx debug: meow\n" );
             intf_IntfMsg( control_command[i_index].psz_usage );
+fprintf( stderr, "maxx debug: blah\n" );
             intf_IntfMsg( control_command[i_index].psz_help );
+fprintf( stderr, "maxx debug: blih\n" );
         }
         /* Command is unknown */
         else

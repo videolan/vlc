@@ -506,6 +506,11 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
     l_rate = (long)( ((mtime_t)l_units * 1000000)
         / (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame]) );
 
+    intf_DbgMsg( "aout debug: %li frame(s), %lli µs, %li Hz\n",
+        (p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE,
+        p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame],
+        l_rate );
+
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
 
     p_fifo->l_units = (((l_units - (p_fifo->l_unit -
