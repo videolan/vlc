@@ -820,7 +820,8 @@ static int Init( input_thread_t * p_input )
         vlc_meta_Delete( p_meta_tmp );
     }
 
-    if( access2_Control( p_input->input.p_access, ACCESS_GET_META, &p_meta_tmp))
+    if( !p_input->input.p_access ||
+        access2_Control( p_input->input.p_access, ACCESS_GET_META, &p_meta_tmp))
         p_meta_tmp = NULL;
 
     if( p_meta == NULL )
@@ -852,7 +853,8 @@ static int Init( input_thread_t * p_input )
             }
         }
 
-        if( !access2_Control( p_input->slave[i]->p_access,
+        if( p_input->slave[i]->p_access && 
+            !access2_Control( p_input->slave[i]->p_access,
                               ACCESS_GET_META, &p_meta_slave ) )
         {
             if( p_meta == NULL )
