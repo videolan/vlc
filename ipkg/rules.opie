@@ -1,0 +1,85 @@
+#!/usr/bin/make -f
+# debian/rules for the VideoLAN Client - uses debhelper.
+# based on Joey Hess's one.
+# Kludged for ipkg
+
+# export PATH="$PATH:/usr/local/arm/2.95.3/bin"
+# Compilation options
+export CC=arm-linux-gcc
+export LD=arm-linux-ld
+export AR=arm-linux-ar
+export RANLIB=arm-linux-ranlib
+export STRIP=arm-linux-strip
+export CONFIG_FLAGS="--enable-release --prefix=/usr \
+	--disable-plugins \
+	--disable-gtk \
+	--disable-gnome \
+	--disable-qt \
+	--disable-kde \
+	--enable-qte \
+	--disable-x11 \
+	--enable-fb \
+	--disable-sdl \
+	--disable-alsa \
+	--disable-xvideo \
+	--disable-dvd \
+	--disable-dvdread \
+	--disable-vcd \
+	--disable-maxosx \
+	--enable-mad \
+	--enable-ffmpeg \
+	--disable-familiar \
+	--with-tuning=strongarm1100 \
+	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
+	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
+	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+
+export VIDDIR="usr/share/videolan"
+export PIXDIR="usr/share/pixmaps"
+#export DESTDIR=/tmp/vlc
+export DESTDIR=/usr/local/arm/2.95.3/arm-linux
+export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.4.6
+export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
+
+build: build-stamp
+config:
+	./configure --mandir=$${prefix}/share/man \
+		--infodir=$${prefix}/share/info \
+		--host=arm-linux \
+		--target=arm-linux \
+		$(shell echo $(CONFIG_FLAGS))
+
+build-stamp:
+# This is ugly -- I know
+#	patch -p 0 < ipkg/patch
+
+	$(MAKE)
+
+	touch build-stamp
+
+clean:
+	rm -f build-stamp
+
+	-$(MAKE) distclean
+
+install: build
+	rm -fr ${PKGDIR}/
+	mkdir -p ${PKGDIR}/CONTROL
+	mkdir -p $(PKGDIR)/usr/bin
+	mkdir -p ${PKGDIR}/usr/share/videolan
+	mkdir -p ${PKGDIR}/usr/lib/menu
+	mkdir -p ${PKGDIR}/usr/lib/videolan/vlc
+	mkdir -p ${PKGDIR}/opt/QtPalmtop/bin
+	mkdir -p ${PKGDIR}/opt/QtPalmtop/apps/Applications
+	$(STRIP) vlc
+	cp ipkg/control.opie $(PKGDIR)/CONTROL/control
+	cp ipkg/postinst.opie ${PKGDIR}/CONTROL/postinst
+	cp ipkg/postrm.opie ${PKGDIR}/CONTROL/postrm
+	cp share/vlc48x48.png  ${PKGDIR}/usr/share/videolan
+	cp vlc $(PKGDIR)/usr/bin
+	cp ipkg/vlc.opie ${PKGDIR}/opt/QtPalmtop/bin/opie-vlc
+	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/apps/Applications
+#	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
+
+.PHONY: build clean install
+
