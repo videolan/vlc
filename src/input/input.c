@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.192 2002/04/04 22:51:01 massiot Exp $
+ * $Id: input.c,v 1.193 2002/04/08 14:53:05 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -301,6 +301,9 @@ static int RunThread( input_thread_t *p_input )
             if( p_input->pf_set_program != NULL )
             {
 
+                /* Reinitialize buffer manager. */
+                input_AccessReinit( p_input );
+                
                 p_input->pf_set_program( p_input, 
                         p_input->stream.p_new_program );
 

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.176 2002/04/07 23:08:44 massiot Exp $
+ * $Id: main.c,v 1.177 2002/04/08 14:53:05 jobi Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -210,6 +210,10 @@
 #define IFACE_TEXT "network interface"
 #define IFACE_LONGTEXT NULL
 
+#define INPUT_PROGRAM_TEXT "choose program (SID)"
+#define INPUT_PROGRAM_LONGTEXT "choose the program to select by giving its"\
+                                "Service ID"
+
 #define INPUT_AUDIO_TEXT "choose audio"
 #define INPUT_AUDIO_LONGTEXT NULL
 
@@ -337,6 +341,8 @@ ADD_STRING  ( "channel_server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LON
 ADD_INTEGER ( "channel_port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
 
+ADD_INTEGER ( "input_program", 0, NULL, INPUT_PROGRAM_TEXT,
+        INPUT_PROGRAM_LONGTEXT )
 ADD_INTEGER ( "input_audio", -1, NULL, INPUT_AUDIO_TEXT, INPUT_AUDIO_LONGTEXT )
 ADD_INTEGER ( "input_channel", -1, NULL, INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT )
 ADD_INTEGER ( "input_subtitle", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )

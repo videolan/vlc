@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.88 2002/04/04 22:51:01 massiot Exp $
+ * $Id: mpeg_system.c,v 1.89 2002/04/08 14:53:05 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1586,12 +1586,19 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_stream_data->i_pat_version = p_psi->i_version_number;
 
     }
-#undef p_psi    
+#undef p_psi
 
-    /* FIXME This has nothing to do here */
     if( !p_input->stream.p_selected_program )
     {
-        input_SetProgram( p_input, p_input->stream.pp_programs[0] );
+        pgrm_descriptor_t *     p_pgrm_to_select;
+        u16 i_id = config_GetIntVariable( "input_program" );
+
+        p_pgrm_to_select = input_FindProgram( p_input, i_id );
+
+        if ( p_pgrm_to_select )
+            input_SetProgram( p_input, p_pgrm_to_select );
+        else /* take the first one */
+            input_SetProgram( p_input, p_input->stream.pp_programs[0] );
     }
 }
 

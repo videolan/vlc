@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.2 2002/03/15 04:41:54 sam Exp $
+ * $Id: file.c,v 1.3 2002/04/08 14:53:05 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -81,7 +81,7 @@ static void input_getfunctions( function_list_t * p_function_list )
     input.pf_open             = FileOpen;
     input.pf_read             = input_FDRead;
     input.pf_close            = input_FDClose;
-    input.pf_set_program      = FileSetProgram;
+    input.pf_set_program      = input_SetProgram;
     input.pf_set_area         = NULL;
     input.pf_seek             = input_FDSeek;
 #undef input

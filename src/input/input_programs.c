@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.77 2002/03/28 03:53:15 jobi Exp $
+ * $Id: input_programs.c,v 1.78 2002/04/08 14:53:05 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -293,63 +293,65 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 {
     int i_es_index;
-    
+    int i_required_audio_es;
+    int i_required_spu_es;
+    int i_audio_es = 0;
+    int i_spu_es = 0;
+
     if ( p_input->stream.p_selected_program )
     {
-        for ( i_es_index = 0 ; 
-                i_es_index < p_input->stream.i_selected_es_number; 
+        for ( i_es_index = 1 ; /* 0 should be the PMT */
+                i_es_index < p_input->stream.p_selected_program->
+                i_es_number ;
                 i_es_index ++ )
         {
-            intf_WarnMsg( 4, "Unselecting ES %d", 
-                    p_input->stream.pp_selected_es[i_es_index]->i_id );
-            input_UnselectES( p_input , 
-                    p_input->stream.pp_selected_es[i_es_index] );
+#define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
+            if ( p_es->p_decoder_fifo )
+            {
+                input_UnselectES( p_input , p_es );
+            }
+#undef p_es
         }
+    }
+    /* Get the number of the required audio stream */
+    if( p_main->b_audio )
+    {
+        /* Default is the first one */
+        i_required_audio_es = config_GetIntVariable( "input_channel" );
+        if( i_required_audio_es < 0 )
+        {
+            i_required_audio_es = 1;
+        }
+    }
+    else
+    {
+        i_required_audio_es = 0;
+    }
+
+    /* Same thing for subtitles */
+    if( p_main->b_video )
+    {
+        /* for spu, default is none */
+        i_required_spu_es = config_GetIntVariable( "input_subtitle" );
+        if( i_required_spu_es < 0 )
+        {
+            i_required_spu_es = 0;
+        }
+    }
+    else
+    {
+        i_required_spu_es = 0;
     }
 
     for (i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
-        int i_required_audio_es;
-        int i_required_spu_es;
-        int i_audio_es = 0;
-        int i_spu_es = 0;
-
-        /* Get the number of the required audio stream */
-        if( p_main->b_audio )
-        {
-            /* Default is the first one */
-            i_required_audio_es = config_GetIntVariable( "input_channel" );
-            if( i_required_audio_es < 0 )
-            {
-                i_required_audio_es = 1;
-            }
-        }
-        else
-        {
-            i_required_audio_es = 0;
-        }
-
-        /* Same thing for subtitles */
-        if( p_main->b_video )
-        {
-            /* for spu, default is none */
-            i_required_spu_es = config_GetIntVariable( "input_subtitle" );
-            if( i_required_spu_es < 0 )
-            {
-                i_required_spu_es = 0;
-            }
-        }
-        else
-        {
-            i_required_spu_es = 0;
-        }
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
                     {
-                        case MPEG1_VIDEO_ES:
-                        case MPEG2_VIDEO_ES:
-                            intf_WarnMsg( 4, "Selecting ES %x", 
+                       case MPEG1_VIDEO_ES:
+                       case MPEG2_VIDEO_ES:
+                           intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
-                            input_SelectES( p_input, 
+                            input_SelectES( p_input,
                                    p_new_prg->pp_es[i_es_index] );
                             break;
                         case MPEG1_AUDIO_ES:
@@ -357,9 +359,9 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                             i_audio_es += 1;
                             if( i_audio_es == i_required_audio_es )
                             {
-                                intf_WarnMsg( 4, "Selecting ES %x", 
-                                    p_new_prg->pp_es[i_es_index]->i_id );   
-                                input_SelectES( p_input, 
+                                intf_WarnMsg( 4, "Selecting ES %x",
+                                    p_new_prg->pp_es[i_es_index]->i_id );
+                                input_SelectES( p_input,
                                     p_new_prg->pp_es[i_es_index]);
                             }
                             break;
@@ -368,9 +370,9 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                             i_audio_es += 1;
                             if( i_audio_es == i_required_audio_es )
                             {
-                                intf_WarnMsg( 4, "Selecting ES %x", 
+                                intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
-                                input_SelectES( p_input, 
+                                input_SelectES( p_input,
                                     p_new_prg->pp_es[i_es_index] );
                             }
                             break;
@@ -379,9 +381,9 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                             i_spu_es += 1;
                             if( i_spu_es == i_required_spu_es )
                             {
-                                intf_WarnMsg( 4, "Selecting ES %x", 
+                                intf_WarnMsg( 4, "Selecting ES %x",
                                     p_new_prg->pp_es[i_es_index]->i_id );
-                                input_SelectES( p_input, 
+                                input_SelectES( p_input,
                                     p_new_prg->pp_es[i_es_index] );
                             }
                             break;
@@ -390,7 +392,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                     }
 
     }
-    
+
 
     p_input->stream.p_selected_program = p_new_prg;
 
@@ -692,7 +694,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     input_EndDecoder( p_input, p_es );
-    free( p_es->p_pes );
+    p_es->p_pes = NULL;
 
     if( ( p_es->p_decoder_fifo == NULL ) &&
         ( p_input->stream.i_selected_es_number > 0 ) )
