@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: file.c,v 1.2 2003/01/08 10:40:10 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -130,7 +130,7 @@ static int Write( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
 
     } while( p_buffer );
 
-    msg_Dbg( p_sout, "Write: len:%d", (uint32_t)i_write );
+//    msg_Dbg( p_sout, "Write: len:%d", (uint32_t)i_write );
 
     return( i_write );
 }
