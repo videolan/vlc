@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.42 2003/01/31 02:53:52 jlj Exp $
+ * $Id: intf.m,v 1.43 2003/02/01 23:46:24 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -955,7 +955,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 p_input->stream.pp_programs[i]->i_number );
             psz_title[sizeof(psz_title) - 1] = '\0';
 
-            o_menu_title = [NSString stringWithCString: psz_title];
+            o_menu_title = [NSApp localizedString: psz_title];
 
             o_item = [o_program addItemWithTitle: o_menu_title
                 action: pf_toggle_program keyEquivalent: @""];
@@ -997,7 +997,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 p_input->stream.pp_areas[i]->i_part_nb );
             psz_title[sizeof(psz_title) - 1] = '\0';
 
-            o_menu_title = [NSString stringWithCString: psz_title];
+            o_menu_title = [NSApp localizedString: psz_title];
 
             o_item = [o_title addItemWithTitle: o_menu_title
                 action: pf_toggle_title keyEquivalent: @""];
@@ -1039,7 +1039,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             snprintf( psz_title, sizeof(psz_title), "Chapter %d", i + 1 );
             psz_title[sizeof(psz_title) - 1] = '\0';
 
-            o_menu_title = [NSString stringWithCString: psz_title];
+            o_menu_title = [NSApp localizedString: psz_title];
 
             o_item = [o_chapter addItemWithTitle: o_menu_title
                 action: pf_toggle_chapter keyEquivalent: @""];
@@ -1186,17 +1186,17 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
             if( *ES->psz_desc )
             {
-                o_title = [NSString stringWithCString: ES->psz_desc];
+                o_title = [NSApp localizedString: ES->psz_desc];
             }
             else
             {
                 char psz_title[ 256 ];
 
-                snprintf( psz_title, sizeof(psz_title), "Language 0x%x",
+                snprintf( psz_title, sizeof(psz_title), _("Language 0x%x"),
                           ES->i_id );
                 psz_title[sizeof(psz_title) - 1] = '\0';
 
-                o_title = [NSString stringWithCString: psz_title];
+                o_title = [NSApp localizedString: psz_title];
             }
 
             o_lmi = [o_menu addItemWithTitle: o_title
@@ -1253,8 +1253,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         NSMenuItem * o_lmi;
         NSString * o_title;
 
-        o_title = [NSString stringWithCString: 
-            val.p_list->p_values[i].psz_string];
+        o_title = [NSApp localizedString: val.p_list->p_values[i].psz_string];
         o_lmi = [o_menu addItemWithTitle: o_title
                  action: pf_callback keyEquivalent: @""];
         /* FIXME: this isn't 64-bit clean ! */

@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.17 2003/01/31 02:53:52 jlj Exp $
+ * $Id: open.m,v 1.18 2003/02/01 23:46:24 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -182,7 +182,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
-    [o_disc_videots_btn_browse setStringValue: _NS("Browse...")];
+    [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
     [o_disc_dvd_menus setTitle: _NS("Use DVD menus (EXPERIMENTAL)")];
 
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
@@ -212,7 +212,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [[o_sout_access cellAtRow:1 column:0] setTitle: _NS("UDP")];
     [[o_sout_access cellAtRow:2 column:0] setTitle: _NS("RTP")];
 
-    [o_sout_file_btn_browse setStringValue: _NS("Browse...")];
+    [o_sout_file_btn_browse setTitle: _NS("Browse...")];
     [o_sout_udp_addr_lbl setStringValue: _NS("Address")];
     [o_sout_udp_port_lbl setStringValue: _NS("Port")];
 
