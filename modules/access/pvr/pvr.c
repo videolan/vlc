@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.3 2003/06/23 17:01:36 bigben Exp $
+ * $Id: pvr.c,v 1.4 2003/07/22 13:58:23 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -40,6 +40,7 @@
 /* ivtv specific ioctls */
 #define IVTV_IOC_G_CODEC    0xFFEE7703
 #define IVTV_IOC_S_CODEC    0xFFEE7704
+
 
 /* for use with IVTV_IOC_G_CODEC and IVTV_IOC_S_CODEC */
 struct ivtv_ioctl_codec {
@@ -86,7 +87,6 @@ struct access_sys_t
     int i_fd;
     
     /* options */
-    int i_device;
     int i_standard;
     int i_width;
     int i_height;
@@ -109,6 +109,8 @@ static int Open( vlc_object_t * p_this )
     struct v4l2_frequency vf;
     struct ivtv_ioctl_codec codec;
     
+    //psz_device = calloc( strlen( "/dev/videox" ) + 1, 1 );    
+    
     p_input->pf_read = Read;
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
@@ -119,7 +121,8 @@ static int Open( vlc_object_t * p_this )
     p_input->p_access_data = p_sys;
 
     /* defaults values */
-    p_sys->i_device = 0;
+
+    psz_device = 0;
     p_sys->i_standard = V4L2_STD_SECAM;
     p_sys->i_width = 720;
     p_sys->i_height = 576;
@@ -129,7 +132,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_bitrate_peak = 4000000;
 
     /* parse command line options */
-    /* TODO : _really_ parse all options ;) */
     psz_tofree = strdup( p_input->psz_name );
     psz_parser = psz_tofree;
 
@@ -137,10 +139,42 @@ static int Open( vlc_object_t * p_this )
     {
         for( ;; )
         {
-            if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
+            if ( !strncmp( psz_parser, "norm=", strlen( "norm=" ) ) )
             {
-                p_sys->i_device = strtol( psz_parser + strlen( "device=" ),
-                                          &psz_parser, 0 );
+                char *psz_parser_init;
+                psz_parser += strlen( "norm=" );
+                psz_parser_init = psz_parser;
+                while ( *psz_parser != ':' && *psz_parser != ',' )
+                {
+                    psz_parser++;
+                }
+                
+                if (!strncmp( psz_parser_init, "secam" , 
+                                                psz_parser - psz_parser_init ) )
+                    {
+                    p_sys->i_standard = V4L2_STD_SECAM;
+                    }
+                else if (!strncmp( psz_parser_init, "pal" , 
+                                                psz_parser - psz_parser_init ) )
+                    {
+                    p_sys->i_standard = V4L2_STD_PAL;
+                    }
+                else if (!strncmp( psz_parser_init, "ntsc" , 
+                                                psz_parser - psz_parser_init ) )
+                    {
+                    p_sys->i_standard = V4L2_STD_NTSC;
+                    }
+                else 
+                    {p_sys->i_standard = strtol( psz_parser_init ,
+                                          &psz_parser, 0 );}
+
+            }
+            else if( !strncmp( psz_parser, "device=", strlen( "device=" ) ) )
+            {
+                psz_device = calloc( strlen( "/dev/videox" ) + 1, 1 );
+                sprintf( psz_device, "/dev/video%ld", 
+                            strtol( psz_parser + strlen( "device=" ), 
+                            &psz_parser, 0 ) );
             }
             else if( !strncmp( psz_parser, "frequency=",
                                strlen( "frequency=" ) ) )
@@ -184,6 +218,29 @@ static int Open( vlc_object_t * p_this )
                     strtol( psz_parser + strlen( "maxbitrate=" ),
                             &psz_parser, 0 );
             }
+            else if( !strncmp( psz_parser, "size=",
+                               strlen( "size=" ) ) )
+            {
+                p_sys->i_width =
+                    strtol( psz_parser + strlen( "size=" ),
+                            &psz_parser, 0 );
+                p_sys->i_height =
+                    strtol( psz_parser + 1 ,
+                            &psz_parser, 0 );
+
+            }
+            else 
+            {
+                char *psz_parser_init;
+                psz_parser_init = psz_parser;
+                while ( *psz_parser != ':' && *psz_parser != ',' )
+                {
+                    psz_parser++;
+                }
+                psz_device = calloc( psz_parser - psz_parser_init + 1, 1 );
+                strncpy( psz_device, psz_parser_init, 
+                                    psz_parser - psz_parser_init );
+            }
             if( *psz_parser )
                 psz_parser++;
             else
@@ -191,17 +248,23 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
+    //give a default value to psz_device if none has bee specified
+
+    if (!psz_device)
+    {
+        psz_device = calloc( strlen( "/dev/videox" ) + 1, 1 );
+        strcpy( psz_device, "/dev/video0" );
+    }
+
     free( psz_tofree );
 
-    msg_Dbg( p_input, "device: /dev/video%d, standard: %x, size: %dx%d, "
+    msg_Dbg( p_input, "device: %s, standard: %x, size: %dx%d, "
              "frequency: %d, framerate: %d, bitrate: %d/%d",
-             p_sys->i_device, p_sys->i_standard, p_sys->i_width,
+             psz_device, p_sys->i_standard, p_sys->i_width,
              p_sys->i_height, p_sys->i_frequency, p_sys->i_framerate,
              p_sys->i_bitrate, p_sys->i_bitrate_peak );
 
     /* open the device */
-    psz_device = calloc( strlen( "/dev/videox" ) + 1, 1 );
-    sprintf( psz_device, "/dev/video%d", p_sys->i_device );
     if( ( p_sys->i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_input, "cannot open device (%s)", strerror( errno ) );
