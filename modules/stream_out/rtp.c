@@ -1340,6 +1340,15 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
 
                 rtsp_client_t *rtsp = NULL;
 
+                if( ip == NULL )
+                {
+                    answer->i_status = 400;
+                    answer->psz_status = strdup( "Internal server error" );
+                    answer->i_body = 0;
+                    answer->p_body = NULL;
+                    break;
+                }
+
                 fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
                          ip, i_port );
 
