@@ -263,7 +263,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         i_result = VLC_EGENERIC;
     }
 
-    p_dec->p_sys->i_cat = i_cat;
+    if( i_result == VLC_SUCCESS ) p_dec->p_sys->i_cat = i_cat;
 
     return i_result;
 }

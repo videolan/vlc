@@ -405,6 +405,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     {
         vlc_mutex_unlock( lockval.p_address );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     vlc_mutex_unlock( lockval.p_address );
