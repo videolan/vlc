@@ -1055,6 +1055,10 @@ static int  TrackCreateES   ( demux_t   *p_demux,
                     p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
                     p_soun->i_bytes_per_sample  = 2;
                     break;
+                case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+                case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+                    p_soun->i_samplesize = 8;
+                    break;
                 default:
                     break;
             }
