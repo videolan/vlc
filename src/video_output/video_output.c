@@ -962,7 +962,8 @@ static void RunThread( vout_thread_t *p_vout)
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );        
 #ifdef DEBUG_VIDEO
-        intf_DbgMsg( "picture %p, subpicture %p\n", p_pic, p_subpic );        
+        intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d\n", p_pic, p_subpic,
+                     p_vout->i_buffer_index, b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) );        
 #endif            
         if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
@@ -1255,7 +1256,8 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
     int                 i_area;                                  /* area index */    
     int                 i_data_index;                       /* area data index */    
     int                 i_data_size;     /* area data size, in 256 bytes blocs */
-    u64 *               p_data;                                   /* area data */    
+    u64 *               p_data;                     /* area data, for clearing */    
+    byte_t *            p_data8;             /* area data, for clearing (slow) */
     
     /* Choose buffer and set display dimensions */
     p_buffer =          &p_vout->p_buffer[ p_vout->i_buffer_index ];    
@@ -1357,13 +1359,12 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
     for( i_area = 0; i_area < p_buffer->i_areas; i_area++ )
     {
 #ifdef DEBUG_VIDEO    
-        intf_DbgMsg("clearing picture %p area: %d-%d\n", p_pic, 
-                    p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area]);    
+        intf_DbgMsg("clearing picture %p area in buffer %d: %d-%d\n", p_pic, 
+                    p_vout->i_buffer_index, p_buffer->pi_area_begin[i_area], p_buffer->pi_area_end[i_area] );
 #endif
+        i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) * p_vout->i_bytes_per_line;
         p_data = (u64*) (p_buffer->p_data + p_vout->i_bytes_per_line * p_buffer->pi_area_begin[i_area]);
-        i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) * 
-            p_vout->i_bytes_per_line / 256;
-        for( i_data_index = 0; i_data_index < i_data_size; i_data_index++ )
+        for( i_data_index = i_data_size / 256; i_data_index-- ; )
         {
             /* Clear 256 bytes block */
             *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
@@ -1375,12 +1376,16 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
             *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
             *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;  *p_data++ = 0;
         }
-        i_data_size = (p_buffer->pi_area_end[i_area] - p_buffer->pi_area_begin[i_area] + 1) *
-            p_vout->i_bytes_per_line % 256 / 4;
-        for( i_data_index = 0; i_data_index < i_data_size; i_data_index++ )
+        for( i_data_index = (i_data_size % 256) / 16; i_data_index--; )
         {
-            /* Clear remaining 4 bytes blocks */
-            *p_data++ = 0;
+            /* Clear remaining 16 bytes blocks */
+            *p_data++ = 0;  *p_data++ = 0;            
+        }
+        p_data8 = (byte_t *)p_data;        
+        for( i_data_index = i_data_size % 16; i_data_index--; )
+        {
+            /* Clear remaining bytes */
+            *p_data8++ = 0;            
         }
     }    
 
@@ -1482,8 +1487,9 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 #ifdef DEBUG_VIDEO
     /* Print picture date and rendering time */
-    intf_DbgMsg("picture %p rendered (%ld us), display date: %s\n", p_pic,
-                (long) (mdate() - render_time), mstrtime( psz_date, p_pic->date ));
+    intf_DbgMsg("picture %p rendered in buffer %d (%ld us), display date: %s\n", p_pic,
+                p_vout->i_buffer_index, (long) (mdate() - render_time), 
+                mstrtime( psz_date, p_pic->date ));
 #endif
 }
 

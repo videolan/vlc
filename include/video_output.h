@@ -42,18 +42,13 @@ typedef struct vout_yuv_s
 
     /* Pre-calculated convertion tables */
     void *              p_base;              /* base for all convertion tables */    
-    union 
-    {        
-        struct { u16 *p_red, *p_green, *p_blue; } rgb16;   /* color 15, 16 bpp */
-        struct { u32 *p_red, *p_green, *p_blue; } rgb32;   /* color 24, 32 bpp */
-        struct { u16 *p_gray; }                   gray16;   /* gray 15, 16 bpp */
-        struct { u32 *p_gray; }                   gray32;   /* gray 24, 32 bpp */
-    } yuv;
     union
     {
-        u16 *           p_rgb16;
-        u32 *           p_rgb32;        
-    } yuv2;//??    
+        u16 *           p_gray16;                        /* gray 16 bits table */
+        u32 *           p_gray32;                        /* gray 32 bits table */
+        u16 *           p_rgb16;                          /* RGB 16 bits table */
+        u32 *           p_rgb32;                          /* RGB 32 bits table */
+    } yuv;
 
     /* Temporary convertion buffer and offset array */
     void *              p_buffer;                         /* convertion buffer */    

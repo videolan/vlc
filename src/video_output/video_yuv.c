@@ -41,6 +41,14 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
   {117579, 136230, 16907, 35559}        /* SMPTE 240M (1987) */
 };
 
+/* Margins in convertion tables - these margins are used in case a RGB convertion
+ * would give a value outside the 0-255 range. */
+#define RED_MARGIN      178
+#define GREEN_MARGIN    135
+#define BLUE_MARGIN     224
+#define GRAY_MARGIN     384
+
+//??
 #define SHIFT 20
 #define U_GREEN_COEF ((int)(-0.391 * (1<<SHIFT) / 1.164))
 #define U_BLUE_COEF ((int)(2.018 * (1<<SHIFT) / 1.164))
@@ -178,14 +186,14 @@ int vout_InitYUV( vout_thread_t *p_vout )
     {
     case 15:
     case 16:
-        tables_size = sizeof( u16 ) * (1024 * (p_vout->b_grayscale ? 1 : 3) + 1935);
+        tables_size = sizeof( u16 ) * (p_vout->b_grayscale ? 1034 : 1935);
         break;        
     case 24:        
     case 32:
 #ifndef DEBUG
     default:        
 #endif
-        tables_size = sizeof( u32 ) * (1024 * (p_vout->b_grayscale ? 1 : 3) + 1935);        
+        tables_size = sizeof( u32 ) * (p_vout->b_grayscale ? 1024 : 1935);        
         break;        
 #ifdef DEBUG
     default:
@@ -383,10 +391,10 @@ static void SetYUV( vout_thread_t *p_vout )
         {
         case 15:
         case 16:         
-            p_vout->yuv.yuv.gray16.p_gray =  (u16 *)p_vout->yuv.p_base + 384;
-            for( i_index = -384; i_index < 640; i_index++) 
+            p_vout->yuv.yuv.p_gray16 =  (u16 *)p_vout->yuv.p_base + GRAY_MARGIN;
+            for( i_index = -GRAY_MARGIN; i_index < 256 + GRAY_MARGIN; i_index++) 
             {
-                p_vout->yuv.yuv.gray16.p_gray[ i_index ] = 
+                p_vout->yuv.yuv.p_gray16[ i_index ] = 
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);
@@ -394,10 +402,10 @@ static void SetYUV( vout_thread_t *p_vout )
             break;        
         case 24:
         case 32:        
-            p_vout->yuv.yuv.gray32.p_gray =  (u32 *)p_vout->yuv.p_base + 384;
-            for( i_index = -384; i_index < 640; i_index++) 
+            p_vout->yuv.yuv.p_gray32 =  (u32 *)p_vout->yuv.p_base + GRAY_MARGIN;
+            for( i_index = -GRAY_MARGIN; i_index < 256 + GRAY_MARGIN; i_index++) 
             {
-                p_vout->yuv.yuv.gray32.p_gray[ i_index ] = 
+                p_vout->yuv.yuv.p_gray32[ i_index ] = 
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_red_right)   << i_red_left)   |
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_green_right) << i_green_left) |
                     ((pi_gamma[CLIP_BYTE( i_index )] >> i_blue_right)  << i_blue_left);
@@ -412,51 +420,53 @@ static void SetYUV( vout_thread_t *p_vout )
         {
         case 15:
         case 16:            
-            p_vout->yuv.yuv.rgb16.p_red =    (u16 *)p_vout->yuv.p_base +          384;
-            p_vout->yuv.yuv.rgb16.p_green =  (u16 *)p_vout->yuv.p_base +   1024 + 384;
-            p_vout->yuv.yuv.rgb16.p_blue =   (u16 *)p_vout->yuv.p_base + 2*1024 + 384;
-            p_vout->yuv.yuv2.p_rgb16 =       (u16 *)p_vout->yuv.p_base + 3*1024;
-            for( i_index = -384; i_index < 640; i_index++) 
+            p_vout->yuv.yuv.p_rgb16 = (u16 *)p_vout->yuv.p_base;
+            for( i_index = 0; i_index < RED_MARGIN; i_index++ )
             {
-                p_vout->yuv.yuv.rgb16.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
-                p_vout->yuv.yuv.rgb16.p_green[i_index] = (pi_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
-                p_vout->yuv.yuv.rgb16.p_blue[i_index] =  (pi_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
+                p_vout->yuv.yuv.p_rgb16[1501 - RED_MARGIN + i_index] = (pi_gamma[0]>>i_red_right)<<i_red_left;
+                p_vout->yuv.yuv.p_rgb16[1501 + 256 + i_index] = (pi_gamma[255]>>i_red_right)<<i_red_left;                
             }
-            for( i_index = 0; i_index < 178; i_index++ )
+            for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
             {
-                p_vout->yuv.yuv2.p_rgb16[1501 - 178 + i_index] = (pi_gamma[0]>>i_red_right)<<i_red_left;
-                p_vout->yuv.yuv2.p_rgb16[1501 + 256 + i_index] = (pi_gamma[255]>>i_red_right)<<i_red_left;                
+                p_vout->yuv.yuv.p_rgb16[135 - GREEN_MARGIN + i_index] = (pi_gamma[0]>>i_green_right)<<i_green_left;
+                p_vout->yuv.yuv.p_rgb16[135 + 256 + i_index] = (pi_gamma[255]>>i_green_right)<<i_green_left;
             }
-            for( i_index = 0; i_index < 135; i_index++ )
+            for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
             {
-                p_vout->yuv.yuv2.p_rgb16[135 - 135 + i_index] = (pi_gamma[0]>>i_green_right)<<i_green_left;
-                p_vout->yuv.yuv2.p_rgb16[135 + 256 + i_index] = (pi_gamma[255]>>i_green_right)<<i_green_left;
-            }
-            for( i_index = 0; i_index < 224; i_index++ )
-            {
-                p_vout->yuv.yuv2.p_rgb16[818 - 224 + i_index] = (pi_gamma[0]>>i_blue_right)<<i_blue_left;
-                p_vout->yuv.yuv2.p_rgb16[818 + 256 + i_index] = (pi_gamma[255]>>i_blue_right)<<i_blue_left;                
+                p_vout->yuv.yuv.p_rgb16[818 - BLUE_MARGIN + i_index] = (pi_gamma[0]>>i_blue_right)<<i_blue_left;
+                p_vout->yuv.yuv.p_rgb16[818 + BLUE_MARGIN + i_index] = (pi_gamma[255]>>i_blue_right)<<i_blue_left;                
             }
             for( i_index = 0; i_index < 256; i_index++ )
             {
-                p_vout->yuv.yuv2.p_rgb16[1501 + i_index] = (pi_gamma[i_index]>>i_red_right)<<i_red_left;
-                p_vout->yuv.yuv2.p_rgb16[135 + i_index] = (pi_gamma[i_index]>>i_green_right)<<i_green_left;
-                p_vout->yuv.yuv2.p_rgb16[818 + i_index] = (pi_gamma[i_index]>>i_blue_right)<<i_blue_left;
+                p_vout->yuv.yuv.p_rgb16[1501 + i_index] = (pi_gamma[i_index]>>i_red_right)<<i_red_left;
+                p_vout->yuv.yuv.p_rgb16[135 + i_index] = (pi_gamma[i_index]>>i_green_right)<<i_green_left;
+                p_vout->yuv.yuv.p_rgb16[818 + i_index] = (pi_gamma[i_index]>>i_blue_right)<<i_blue_left;
             }            
             break;        
         case 24:
         case 32:
-            p_vout->yuv.yuv.rgb32.p_red =    (u32 *)p_vout->yuv.p_base +          384;
-            p_vout->yuv.yuv.rgb32.p_green =  (u32 *)p_vout->yuv.p_base +   1024 + 384;
-            p_vout->yuv.yuv.rgb32.p_blue =   (u32 *)p_vout->yuv.p_base + 2*1024 + 384;
-            p_vout->yuv.yuv2.p_rgb32 =       (u32 *)p_vout->yuv.p_base + 3*1024;
-            for( i_index = -384; i_index < 640; i_index++) 
+            p_vout->yuv.yuv.p_rgb32 = (u32 *)p_vout->yuv.p_base;
+            for( i_index = 0; i_index < RED_MARGIN; i_index++ )
             {
-                p_vout->yuv.yuv.rgb32.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
-                p_vout->yuv.yuv.rgb32.p_green[i_index] = (pi_gamma[CLIP_BYTE(i_index)]>>i_green_right)<<i_green_left;
-                p_vout->yuv.yuv.rgb32.p_blue[i_index] =  (pi_gamma[CLIP_BYTE(i_index)]>>i_blue_right)<<i_blue_left;
+                p_vout->yuv.yuv.p_rgb32[1501 - RED_MARGIN + i_index] = (pi_gamma[0]>>i_red_right)<<i_red_left;
+                p_vout->yuv.yuv.p_rgb32[1501 + 256 + i_index] = (pi_gamma[255]>>i_red_right)<<i_red_left;                
             }
-            //?? walken's yuv
+            for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
+            {
+                p_vout->yuv.yuv.p_rgb32[135 - GREEN_MARGIN + i_index] = (pi_gamma[0]>>i_green_right)<<i_green_left;
+                p_vout->yuv.yuv.p_rgb32[135 + 256 + i_index] = (pi_gamma[255]>>i_green_right)<<i_green_left;
+            }
+            for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
+            {
+                p_vout->yuv.yuv.p_rgb32[818 - BLUE_MARGIN + i_index] = (pi_gamma[0]>>i_blue_right)<<i_blue_left;
+                p_vout->yuv.yuv.p_rgb32[818 + BLUE_MARGIN + i_index] = (pi_gamma[255]>>i_blue_right)<<i_blue_left;                
+            }
+            for( i_index = 0; i_index < 256; i_index++ )
+            {
+                p_vout->yuv.yuv.p_rgb32[1501 + i_index] = (pi_gamma[i_index]>>i_red_right)<<i_red_left;
+                p_vout->yuv.yuv.p_rgb32[135 + i_index] = (pi_gamma[i_index]>>i_green_right)<<i_green_left;
+                p_vout->yuv.yuv.p_rgb32[818 + i_index] = (pi_gamma[i_index]>>i_blue_right)<<i_blue_left;
+            }            
             break;        
         }
     }    
@@ -522,7 +532,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
     u16 *       p_gray;                                          /* gray table */    
     int         i_x, i_y;                               /* picture coordinates */
     
-    p_gray = p_vout->yuv.yuv.gray16.p_gray;
+    p_gray = p_vout->yuv.yuv.p_gray16;    
     CONVERT_YUV_GRAY
 }
 
@@ -546,7 +556,7 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
     u32 *       p_gray;                                          /* gray table */    
     int         i_x, i_y;                               /* picture coordinates */
     
-    p_gray = p_vout->yuv.yuv.gray32.p_gray;
+    p_gray = p_vout->yuv.yuv.p_gray32;
     CONVERT_YUV_GRAY
 }
 
@@ -588,7 +598,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
      */
     i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
-    p_yuv =             p_vout->yuv.yuv2.p_rgb16;
+    p_yuv =             p_vout->yuv.yuv.p_rgb16;
    
     /* 
      * Set scalings 
@@ -709,7 +719,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         }
 
         /* If line is odd, rewind U and V samples */
-        if( i_y & 0x1 )
+        if( !(i_y & 0x1) )
         {
             p_u -= i_chroma_width;
             p_v -= i_chroma_width;
@@ -729,7 +739,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
             {                
                 /* Height reduction: skip next source line */
                 p_y += i_width;
-                if( ! (++i_y & 0x1) )
+                if( ++i_y & 0x1 )
                 {
                     p_u += i_chroma_width;
                     p_v += i_chroma_width;
@@ -861,62 +871,6 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
  * array. The respective positions of each component in the array have been
  * calculated to minimize the cache interactions of the 3 tables.
  */
-
-static int rgbTable32 (int table [1935],
-		       int redMask, int greenMask, int blueMask,
-		       unsigned char gamma[256])
-{
-    int redRight;
-    int redLeft;
-    int greenRight;
-    int greenLeft;
-    int blueRight;
-    int blueLeft;
-    int * redTable;
-    int * greenTable;
-    int * blueTable;
-    int i;
-    int y;
-
-    MaskToShift (&redRight, &redLeft, redMask);
-    MaskToShift (&greenRight, &greenLeft, greenMask);
-    MaskToShift (&blueRight, &blueLeft, blueMask);
-    
-
-    /*
-     * green blue red +- 2 just to be sure
-     * green = 0-525 [151-370]
-     * blue = 594-1297 [834-1053] <834-29>
-     * red = 1323-1934 [1517-1736] <493-712>
-     */
-
-    redTable = table + 1501;
-    greenTable = table + 135;
-    blueTable = table + 818;
-
-    for (i = 0; i < 178; i++) {
-	redTable[i-178] = 0;
-	redTable[i+256] = redMask;
-    }
-    for (i = 0; i < 135; i++) {
-	greenTable[i-135] = 0;
-	greenTable[i+256] = greenMask;
-    }
-    for (i = 0; i < 224; i++) {
-	blueTable[i-224] = 0;
-	blueTable[i+256] = blueMask;
-    }
-
-    for (i = 0; i < 256; i++) {
-	y = gamma[i];
-	redTable[i] = ((y >> redRight) << redLeft);
-	greenTable[i] = ((y >> greenRight) << greenLeft);
-	blueTable[i] = ((y >> blueRight) << blueLeft);
-    }
-
-    return 0;
-}
-
 
 static void yuvToRgb24 (unsigned char * Y,
 			unsigned char * U, unsigned char * V,
