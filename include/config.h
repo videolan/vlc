@@ -43,7 +43,7 @@
 #define PROGRAM_OPTIONS                 VIDEO_OPTIONS " " ARCH_OPTIONS
 
 /* Program version and copyright message */
-#define PROGRAM_VERSION		        "DR 2.1"
+#define PROGRAM_VERSION		        "1.0-dev"
 #define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " \
                                         PROGRAM_OPTIONS " - (c)1999 VideoLAN"
 
@@ -296,7 +296,7 @@
 #define VFIFO_SIZE                      4095
 
 /* Maximum number of macroblocks in a picture. */
-#define MAX_MB                          2048
+#define MAX_MB                          32767
 
 /*******************************************************************************
  * Video decoder configuration

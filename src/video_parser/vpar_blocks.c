@@ -607,7 +607,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
 
     //*pi_mb_address += MacroblockAddressIncrement( p_vpar );
     b_stop = i_inc > 1;
-    fprintf( stderr, "inc : %d (%d)\n", *pi_mb_address, i_inc );
+//    fprintf( stderr, "inc : %d (%d)\n", *pi_mb_address, i_inc );
 if( 0  )//i_count > 8 )
 {
     exit(0);

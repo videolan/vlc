@@ -430,7 +430,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_mb_width = (p_vpar->sequence.i_width + 15) / 16;
     p_vpar->sequence.i_mb_height = (p_vpar->sequence.b_progressive) ?
                                    (p_vpar->sequence.i_height + 15) / 16 :
-                                   2 * (p_vpar->sequence.i_height + 31) / 32;
+                                   2 * ((p_vpar->sequence.i_height + 31) / 32);
     p_vpar->sequence.i_mb_size = p_vpar->sequence.i_mb_width
                                         * p_vpar->sequence.i_mb_height;
     p_vpar->sequence.i_width = (p_vpar->sequence.i_mb_width * 16);
@@ -747,7 +747,7 @@ fprintf(stderr, "Image trashee\n");
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
-fprintf(stderr, "Image decodee\n");
+fprintf(stderr, "Image parsee\n");
         /* Frame completely parsed. */
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )

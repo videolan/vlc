@@ -186,7 +186,7 @@ static void RunThread( vdec_thread_t *p_vdec )
         return;
     }
     p_vdec->b_run = 1;
-
+p_vdec->b_error = 1;
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
