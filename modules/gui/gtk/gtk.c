@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.12 2003/01/26 14:49:09 fenrir Exp $
+ * $Id: gtk.c,v 1.13 2003/01/26 22:57:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -446,8 +446,10 @@ static int Manage( intf_thread_t *p_intf )
                                              "value_changed" );
                 }
                 /* Otherwise, send message to the input if the user has
-                 * finished dragging the slider */
-                else if( p_intf->p_sys->b_slider_free )
+                 * finished dragging the slider.
+                 * Beware, the hack below is needed by the dvdplay plugin! */
+                else if( p_intf->p_sys->b_slider_free
+                /* hack -> */ && (p_intf->p_sys->f_adj_oldvalue <= 100.) )
                 {
                     off_t i_seek = ( newvalue * p_area->i_size ) / 100;
 

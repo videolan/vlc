@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.7 2003/01/26 14:49:09 fenrir Exp $
+ * $Id: gnome.c,v 1.8 2003/01/26 22:57:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -428,8 +428,10 @@ static void Manage( intf_thread_t *p_intf )
                                              "value_changed" );
                 }
                 /* Otherwise, send message to the input if the user has
-                 * finished dragging the slider */
-                else if( p_intf->p_sys->b_slider_free )
+                 * finished dragging the slider.
+                 * Beware, the hack below is needed by the dvdplay plugin! */
+                else if( p_intf->p_sys->b_slider_free
+                /* hack -> */ && (p_intf->p_sys->f_adj_oldvalue <= 100.) )
                 {
                     if( newvalue > 0. && newvalue < 100. )
                     {
