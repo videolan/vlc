@@ -62,6 +62,7 @@ vlc_module_begin();
     set_description( _("File stream ouput") );
     set_capability( "sout access", 50 );
     add_shortcut( "file" );
+    add_shortcut( "stream" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -125,6 +126,11 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_seek  = Seek;
 
     msg_Dbg( p_access, "file access output opened (`%s')", p_access->psz_name );
+
+    /* Update pace control flag */
+    if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
+        p_access->p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -143,6 +149,10 @@ static void Close( vlc_object_t * p_this )
         }
     }
     free( p_access->p_sys );
+
+    /* Update pace control flag */
+    if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
+        p_access->p_sout->i_out_pace_nocontrol--;
 
     msg_Dbg( p_access, "file access output closed" );
 }
