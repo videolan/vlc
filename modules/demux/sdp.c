@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.8 2003/09/08 13:09:40 fenrir Exp $
+ * $Id: sdp.c,v 1.9 2003/09/08 13:37:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -47,6 +47,10 @@ vlc_module_begin();
     set_capability( "demux", 100 );
     set_callbacks( SDPOpen, SDPClose );
     add_shortcut( "sdp" );
+    add_category_hint( "RTSP", NULL, VLC_TRUE );
+        add_bool( "rtsp-tcp", 0, NULL,
+                  "Use rtp over rtsp(tcp)",
+                  "Use rtp over rtsp(tcp)", VLC_TRUE );
 
     add_submodule();
         set_description( _("RTSP/RTP describe") );
@@ -106,6 +110,7 @@ static int  DescribeOpen( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
     char           *psz_uri;
+    vlc_value_t     val;
 
     if( p_input->psz_access == NULL ||
         ( strcmp( p_input->psz_access, "rtsp" ) &&
@@ -146,6 +151,9 @@ static int  DescribeOpen( vlc_object_t *p_this )
 
     p_input->i_mtu = 0;
 
+    var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_input, "rtsp-tcp", &val );
+
     /* Set exported functions */
     p_input->pf_read = DescribeRead;
     p_input->pf_seek = NULL;
@@ -155,7 +163,8 @@ static int  DescribeOpen( vlc_object_t *p_this )
 
     /* Finished to set some variable */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.b_pace_control = VLC_FALSE;
+    /* FIXME that's not true but eg over tcp, server send data too fast */
+    p_input->stream.b_pace_control = val.b_bool;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.b_seekable = 0;
     p_input->stream.p_selected_area->i_size = 0;
@@ -211,8 +220,6 @@ static int SDPOpen( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
 
-    int            b_tcp = 0;   /* TODO */
-
     uint8_t        *p_peek;
 
     int            i_sdp;
@@ -224,6 +231,8 @@ static int SDPOpen( vlc_object_t * p_this )
     int               i;
 
     char            *psz_uri;
+    vlc_value_t     val;
+
 
     /* See if it looks like a SDP
        v, o, s fields are mandatory and in this order */
@@ -243,7 +252,9 @@ static int SDPOpen( vlc_object_t * p_this )
     p_input->pf_demux_control = demux_vaControlDefault;
 
     p_sys = p_input->p_demux_data = malloc( sizeof( demux_sys_t ) );
-    p_sys->mc = media_client_create( b_tcp );
+    var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_input, "rtsp-tcp", &val );
+    p_sys->mc = media_client_create( val.b_bool ? 1 : 0 );
     if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
     {
         msg_Err( p_input, "cannot create stream" );
@@ -389,7 +400,7 @@ static int SDPDemux( input_thread_t * p_input )
         {
             msg_Dbg( p_input, "no data" );
             p_sys->i_no_data++;
-            if( p_sys->b_received_data && p_sys->i_no_data > 5 )
+            if( p_sys->b_received_data && p_sys->i_no_data > 10 )
             {
                 return 0;
             }
