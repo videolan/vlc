@@ -35,7 +35,7 @@ static PyObject *vlc_addTarget(PyObject *self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "is", &iVlc, &file))
         return NULL;
-    iRc = VLC_AddTarget(iVlc, file, PLAYLIST_APPEND, PLAYLIST_END);
+    iRc = VLC_AddTarget(iVlc, file, 0, 0, PLAYLIST_APPEND, PLAYLIST_END);
     return Py_BuildValue("i", iRc);
 }
 
