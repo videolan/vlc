@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.8 2002/10/01 22:26:39 massiot Exp $
+ * $Id: main.c,v 1.195.2.9 2002/10/11 09:01:18 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,6 +112,11 @@
 #define INTF_PATH_LONGTEXT N_( \
     "This option allows you to set the default path that the interface will " \
     "open when looking for a file.")
+
+#define PLUGIN_PATH_TEXT N_("plugin search path")
+#define PLUGIN_PATH_LONGTEXT N_( \
+    "This option allows you to specify an additional path for vlc to look " \
+    "for its plugins.")
 
 #define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
@@ -384,6 +389,7 @@ ADD_MODULE_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_T
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
 ADD_BOOL    ( "stats", 0, NULL, STATS_TEXT, STATS_LONGTEXT )
 ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
+ADD_STRING  ( "plugin-path", NULL, NULL, PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)

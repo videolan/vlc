@@ -5,6 +5,12 @@
 0.4.5
 **
 
+  * src/interface/main.c, src/misc/modules.c: added a quick hack for a
+    --plugin-path command line option.
+  * INSTALL.win32: removed note about running in administrator mode to play
+    a DVD.
+  * ./plugins/beos/InterfaceWindow.cpp: user can now drop a DVD disk icon
+    onto the interface or playlist window to open a DVD.
   * ./plugins/x11/xcommon.c: we include Xmd.h before dpms.h (compilation fix
     for Solaris).
   * ALL: many BeOS fixes and enhancements.
@@ -14,7 +20,7 @@
   * ./plugins/qte: Qt/embedded video output.
   * ./plugins/network/ipv4.c: added a --iface-addr option to select which
     interface to use for multicast sockets.
-  * configure.in, configure: user -mms-bitfields instead of -fnative-struct
+  * configure.in, configure: use -mms-bitfields instead of -fnative-struct
     for mingw32 gcc-3.x.
   * include/interface.h, plugins/dummy/intf_dummy.c, plugins/text/logger.c,
     plugins/text/rc.c: display message on Win32 explaining how to get back

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.62 2002/05/22 19:31:33 gbazin Exp $
+ * $Id: modules.c,v 1.62.2.1 2002/10/11 09:01:18 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -569,6 +569,10 @@ static void AllocateAllPlugins( void )
     DIR *           dir;
     struct dirent * file;
 
+    /* If the user provided a plugin path, we add it to the list */
+    path[ sizeof(path)/sizeof(char*) - 2 ] =
+        config_GetPszVariable( "plugin-path" );
+
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
         /* Store strlen(*ppsz_path) for later use. */
@@ -636,6 +640,10 @@ static void AllocateAllPlugins( void )
         }
 #endif
     }
+
+    /* Free plugin-path */
+    free( path[ sizeof(path)/sizeof(char*) - 2 ] );
+    path[ sizeof(path)/sizeof(char*) - 2 ] = NULL;
 }
 
 /*****************************************************************************
