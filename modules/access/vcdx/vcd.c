@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.6 2003/11/20 03:56:22 rocky Exp $
+ * $Id: vcd.c,v 1.7 2003/11/23 14:34:19 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -62,6 +62,11 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
     "still    (80) 128\n" \
     "vcdinfo (100) 256\n" )
 
+#define DEV_TEXT N_("Video device name")
+#define DEV_LONGTEXT N_( \
+    "Specify the name of the video device that will be used by default. " \
+    "If you don't specify anything, we'll scan for a suitable VCD device.")
+
 
 /*****************************************************************************
  * Module descriptor
@@ -77,8 +82,20 @@ vlc_module_begin();
 
     /* Configuration options */
     add_category_hint( N_("VCDX"), NULL, VLC_TRUE );
+
     add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), DEBUG_TEXT, 
                   DEBUG_LONGTEXT, VLC_TRUE );
+
+    add_string( MODULE_STRING "-device", "", NULL, DEV_TEXT, 
+		DEV_LONGTEXT, VLC_TRUE );
+
+    add_bool( MODULE_STRING "-PBC", 0, NULL,
+	      "Use playback control?",
+	      "If VCD is authored with playback control, use it. "
+	      "Otherwise we play by tracks.", 
+	      VLC_TRUE );
+
+
 
 #ifdef FIXED
     add_submodule();

@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.3 2003/10/05 14:51:47 rocky Exp $
+ * $Id: cddax.c,v 1.4 2003/11/23 14:34:19 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -90,6 +90,11 @@ struct demux_sys_t
     "libcdio  (10)  16\n" \
     "seeks    (20)  32\n" )
 
+#define DEV_TEXT N_("CD-ROM device name")
+#define DEV_LONGTEXT N_( \
+    "Specify the name of the CD-ROM device that will be used by default. " \
+    "If you don't specify anything, we'll scan for a suitable CD-ROM device.")
+
 #define INPUT_DEBUG 1
 #if INPUT_DEBUG
 #define dbg_print(mask, s, args...) \
@@ -143,6 +148,8 @@ vlc_module_begin();
     add_category_hint( N_("CDX"), NULL, VLC_TRUE );
     add_integer ( MODULE_STRING "-debug", 0, debug_callback, DEBUG_TEXT, 
                   DEBUG_LONGTEXT, VLC_TRUE );
+    add_string( MODULE_STRING "-device", "", NULL, DEV_TEXT, 
+		DEV_LONGTEXT, VLC_TRUE );
 
     add_submodule();
         set_description( _("CD Audio demux") );
@@ -252,8 +259,8 @@ static int CDDAOpen( vlc_object_t *p_this )
       }
       psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
       
-      if( !psz_source ) {
-        /* Scan for a CD with a CD-DA in it. */
+      if( !psz_source || 0==strlen(psz_source) ) {
+        /* Scan for a CD-ROM drive with a CD-DA in it. */
         char **cd_drives = 
           cdio_get_devices_with_cap(NULL,  CDIO_FS_AUDIO, false);
         if (NULL == cd_drives) return -1;

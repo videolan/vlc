@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.3 2003/11/20 03:56:22 rocky Exp $
+ * $Id: access.c,v 1.4 2003/11/23 14:34:19 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -939,8 +939,13 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
     char *             psz_source;
     char *             psz_next;
 
-    p_itemid->type=VCDINFO_ITEM_TYPE_TRACK;
-    p_itemid->num=1;
+    if ( config_GetInt( p_input, MODULE_STRING "-PBC" ) ) {
+      p_itemid->type=VCDINFO_ITEM_TYPE_LID;
+      p_itemid->num=1;
+    } else {
+      p_itemid->type=VCDINFO_ITEM_TYPE_TRACK;
+      p_itemid->num=1;
+    }
     
 #ifdef WIN32
     /* On Win32 we want the VCD access plugin to be explicitly requested,
@@ -1008,8 +1013,8 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
       
       psz_source = config_GetPsz( p_input, MODULE_STRING "-device" );
 
-      if( !psz_source ) {
-        /* Scan for a CD with a VCD in it. */
+      if( !psz_source || 0==strlen(psz_source) ) {
+        /* Scan for a CD-ROM drive with a VCD in it. */
         char **cd_drives = cdio_get_devices_with_cap(NULL, 
                             (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD
                              |CDIO_FS_ANAL_VIDEOCD|CDIO_FS_UNKNOWN),
