@@ -175,8 +175,10 @@ void intf_MsgDestroy( void )
     }
 #endif
 
+#ifdef INTF_MSG_QUEUE
     /* destroy lock */
     vlc_mutex_destroy( &p_main->p_msg->lock );
+#endif
     
     /* Free structure */
     free( p_main->p_msg );

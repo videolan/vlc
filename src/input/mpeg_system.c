@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.24 2001/01/05 18:46:44 massiot Exp $
+ * $Id: mpeg_system.c,v 1.25 2001/01/08 18:16:33 sam Exp $
  *
  * Authors: 
  *
@@ -818,9 +818,10 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
          i < p_input->stream.pp_programs[0]->i_es_number;
          i++ )
     {
+        /* We remove pp_es[i_new_es_member] and not pp_es[i] because the
+         * list will be emptied starting from the end */
         input_DelES( p_input,
                      p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
-        /* Yes, I wrote *i_new_es_number* */
     }
 
 #ifdef STATS

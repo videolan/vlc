@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.21 2001/01/07 16:17:58 sam Exp $
+ * $Id: input_programs.c,v 1.22 2001/01/08 18:16:33 sam Exp $
  *
  * Authors:
  *
@@ -88,6 +88,7 @@ void input_EndStream( input_thread_t * p_input )
     /* Free standalone ES */
     for( i = 0; i < p_input->stream.i_es_number; i++ )
     {
+        /* Don't put i instead of 0 !! */
         input_DelES( p_input, p_input->stream.pp_es[0] );
     }
 }
@@ -196,7 +197,8 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
     /* Free the structures that describe the es that belongs to that program */
     for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
     {
-        input_DelES( p_input, p_pgrm->pp_es[i_index] );
+        /* Don't put i_index instead of 0 !! */
+        input_DelES( p_input, p_pgrm->pp_es[0] );
     }
 
     /* Free the demux data */

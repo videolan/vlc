@@ -1275,8 +1275,8 @@ static void EndThread( vout_thread_t *p_vout )
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg("vout stats: cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+        intf_Msg( "vout stats: cpu usage (user: %d, system: %d)",
+                  cpu_usage.tms_utime, cpu_usage.tms_stime );
     }
 #endif
 
@@ -1288,6 +1288,7 @@ static void EndThread( vout_thread_t *p_vout )
             free( p_vout->p_picture[i_index].p_data );
         }
     }
+
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
     {
         if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
@@ -1299,6 +1300,9 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy translation tables */
     vout_EndYUV( p_vout );
     p_vout->p_sys_end( p_vout );
+
+    /* Release the change lock */
+    vlc_mutex_unlock( &p_vout->change_lock );
 }
 
 /*****************************************************************************

@@ -283,8 +283,7 @@ void intf_Destroy( intf_thread_t *p_intf )
         p_cur = p_next;
     }
          
-        
-        /* Free structure */
+    /* Free structure */
     free( p_intf );
 }
 
