@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.19 2002/01/04 14:01:34 sam Exp $
+ * $Id: css.c,v 1.20 2002/01/14 22:06:57 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -475,16 +475,22 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
             _dvdcss_error( dvdcss, "ioctl_ReadTitleKey failed" );
             return -1;
         }
-        /* Unencrypt title key using bus key */
-        for( i = 0 ; i < KEY_SIZE ; i++ )
+
+        if( memcmp( p_key, dvdcss->css.p_unenc_key, KEY_SIZE ) )
         {
-            p_key[ i ] ^= dvdcss->css.disc.p_key_check[ 4 - (i % KEY_SIZE) ];
+            memcpy( dvdcss->css.p_unenc_key, p_key, KEY_SIZE );
+            
+            /* Unencrypt title key using bus key */
+            for( i = 0 ; i < KEY_SIZE ; i++ )
+            {
+                p_key[ i ] ^= dvdcss->css.disc.p_key_check[ 4 - (i % KEY_SIZE ) ];
+            }
+
+            /* Title key decryption needs one inversion 0xff */
+            CSSDecryptKey( p_key, dvdcss->css.disc.p_disc_key, 0xff );
+
+            memcpy( dvdcss->css.p_title_key, p_key, KEY_SIZE );
         }
-
-        /* Title key decryption needs one inversion 0xff */
-        CSSDecryptKey( p_key, dvdcss->css.disc.p_disc_key, 0xff );
-
-        memcpy( dvdcss->css.p_title_key, p_key, sizeof(dvd_key_t) );
 
         return 0;
     } // (dvdcss->i_method == DVDCSS_METHOD_TITLE) || (dvdcss->b_ioctls == 0)

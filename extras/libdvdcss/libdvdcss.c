@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.26 2001/12/30 07:09:54 sam Exp $
+ * $Id: libdvdcss.c,v 1.27 2002/01/14 22:06:57 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -184,6 +184,8 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
         }
     }
 
+    memset( dvdcss->css.p_unenc_key, 0, KEY_SIZE );
+
 #ifndef WIN32
     if( psz_raw_device != NULL )
     {
@@ -209,8 +211,25 @@ extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks, int i_flags )
 {
     /* title cracking method is too slow to be used at each seek */
     if( ( ( i_flags & DVDCSS_SEEK_MPEG )
-             && ( dvdcss->i_method != DVDCSS_METHOD_TITLE ) ) 
-       || ( i_flags & DVDCSS_SEEK_KEY ) )
+             && ( dvdcss->i_method != DVDCSS_METHOD_TITLE ) ) )
+    {
+        int     i_ret;
+
+        /* Crack or decrypt CSS title key for current VTS */
+        i_ret = CSSGetTitleKey( dvdcss, i_blocks );
+
+        if( i_ret < 0 )
+        {
+            _dvdcss_error( dvdcss, "fatal error in vts css key" );
+            return i_ret;
+        }
+        else if( i_ret > 0 )
+        {
+            _dvdcss_error( dvdcss, "decryption unavailable" );
+            return -1;
+        }
+    }
+    else if( i_flags & DVDCSS_SEEK_KEY )
     {
         /* check the title key */
         if( dvdcss_title( dvdcss, i_blocks ) ) 
