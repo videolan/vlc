@@ -259,6 +259,51 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 }
 
+- (void)updateRowSelection
+{
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    playlist_item_t * p_item, * p_temp_item;
+    NSMutableArray * o_array = [NSMutableArray array];
+    int i,i_row;
+    unsigned int j;
+
+    if (p_playlist == NULL)
+        return;
+
+    p_item = p_playlist->status.p_item;
+    p_temp_item = p_item;
+
+    while (p_temp_item->i_parents > 0)
+    {
+        [o_array insertObject: [NSValue valueWithPointer: p_temp_item] atIndex: 0];
+        for (i = 0 ; i < p_temp_item->i_parents ; i++)
+        {
+            if (p_temp_item->pp_parents[i]->i_view == VIEW_SIMPLE)
+            {
+                p_temp_item = p_temp_item->pp_parents[i]->p_parent;
+                break;
+            }
+        }
+    }
+
+    for (j = 0 ; j < [o_array count] - 1 ; j++)
+    {
+        [o_outline_view expandItem: [o_outline_dict objectForKey:
+                            [NSString stringWithFormat: @"%p",
+                            [[o_array objectAtIndex:j] pointerValue]]]];
+
+    }
+
+    i_row = [o_outline_view rowForItem:[o_outline_dict
+            objectForKey:[NSString stringWithFormat: @"%p", p_item]]];
+
+    [o_outline_view selectRow: i_row byExtendingSelection: NO];
+    [o_outline_view scrollRowToVisible: i_row];
+
+    vlc_object_release(p_playlist);
+}
+
 - (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,

@@ -76,6 +76,7 @@
 - (void)updateTogglePlaylistState;
 - (void)playlistUpdated;
 - (void)sortNode:(int)i_mode;
+- (void)updateRowSelection;
 
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItem:(id)sender;
