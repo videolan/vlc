@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.7 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: x11_window.cpp,v 1.8 2003/06/01 17:13:04 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -229,6 +229,20 @@ bool X11Window::ProcessOSEvent( Event *evt )
                     RButtonDown = false;
                     MouseUp( (int)( (XButtonEvent *)p2 )->x,
                              (int)( (XButtonEvent *)p2 )->y, 2 );
+                    break; 
+                    
+                case 4:
+                    // Scroll up
+                    MouseScroll( (int)( (XButtonEvent *)p2 )->x,
+                                 (int)( (XButtonEvent *)p2 )->y,
+                                 MOUSE_SCROLL_UP);
+                    break;
+                    
+                case 5:
+                    // Scroll down
+                    MouseScroll( (int)( (XButtonEvent *)p2 )->x,
+                                 (int)( (XButtonEvent *)p2 )->y,
+                                 MOUSE_SCROLL_DOWN);
                     break;
 
                 default:
@@ -247,22 +261,6 @@ bool X11Window::ProcessOSEvent( Event *evt )
 
         case GDK_DROP_START:
             DropObject->HandleDropStart( ( (GdkEventDND *)p2 )->context );
-            return true;
-
-        case GDK_SCROLL:
-            switch( ( (GdkEventScroll *)p2 )->direction )
-            {
-                case GDK_SCROLL_UP:
-                    MouseScroll( ( (GdkEventScroll *)p2 )->x,
-                                 ( (GdkEventScroll *)p2 )->y,
-                                 MOUSE_SCROLL_UP);
-                    break;
-                case GDK_SCROLL_DOWN:
-                    MouseScroll( ( (GdkEventScroll *)p2 )->x,
-                                 ( (GdkEventScroll *)p2 )->y,
-                                 MOUSE_SCROLL_DOWN);
-                    break;
-            }
             return true;
 */
         default:
