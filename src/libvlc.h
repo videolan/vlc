@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.60 2003/05/05 22:23:41 gbazin Exp $
+ * $Id: libvlc.h,v 1.61 2003/05/07 23:13:07 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,7 +156,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define ZOOM_LONGTEXT N_( \
     "You can zoom the video by the specified factor.")
 
-#define GRAYSCALE_TEXT N_("Gayscale video output")
+#define GRAYSCALE_TEXT N_("Grayscale video output")
 #define GRAYSCALE_LONGTEXT N_( \
     "When enabled, the color information from the video won't be decoded " \
     "(this can also allow you to save some processing power).")
