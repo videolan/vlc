@@ -26,11 +26,14 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
-#include <unistd.h>
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#endif
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface
