@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.20 2003/07/01 21:32:32 fenrir Exp $
+ * $Id: httpd.c,v 1.21 2003/07/02 18:44:27 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1154,7 +1154,7 @@ static int _httpd_page_admin_get_success( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
 
     p += sprintf( p, "<p>Success=`%s'</p>", psz_msg );
-    p += sprintf( p, "<a href=\"admin.html\">Retour a la page d'administration</a>\n" );
+    p += sprintf( p, "<a href=\"admin.html\">Back to admin page</a>\n" );
 
     p += sprintf( p, "<hr />\n" );
     p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
@@ -1182,7 +1182,7 @@ static int _httpd_page_admin_get_error( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
 
     p += sprintf( p, "<p>Error=`%s'</p>", psz_error );
-    p += sprintf( p, "<a href=\"admin.html\">Retour a la page d'administration</a>\n" );
+    p += sprintf( p, "<a href=\"admin.html\">Back to admin page</a>\n" );
 
     p += sprintf( p, "<hr />\n" );
     p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );

@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.16 2003/06/25 21:03:16 zorglub Exp $
+ * $Id: sap.c,v 1.17 2003/07/02 18:44:27 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -110,6 +110,8 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
                char **ppsz_port );
 
 static void free_sd( sess_descr_t * );
+
+/* Detect multicast addresses */
 static int  ismult( char * );
 
 /* The struct that contains sdp informations */
@@ -138,25 +140,29 @@ struct media_descr_t {
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define SAP_ADDR_TEXT N_("SAP multicast address")
+#define SAP_ADDR_LONGTEXT N_("SAP multicast address")
+#define SAP_IPV4_TEXT N_("No IPv4-SAP listening")
+#define SAP_IPV4_LONGTEXT N_("Set this if you do not want SAP to listen for IPv4 announces")
+#define SAP_IPV6_TEXT N_("IPv6-SAP listening")
+#define SAP_IPV6_LONGTEXT N_("Set this if you want SAP to listen for IPv6 announces")
+#define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
+#define SAP_SCOPE_LONGTEXT N_("Sets the scope for IPv6 announces (default is 8)")
+
 vlc_module_begin();
     add_category_hint( N_("SAP"), NULL, VLC_TRUE );
         add_string( "sap-addr", NULL, NULL,
-                     "SAP multicast address", "SAP multicast address", VLC_TRUE );
+                     SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
     
         add_bool( "no-sap-ipv4", 0 , NULL,
-                     "NO IPv4-SAP listening",
-                     "Set this if you do not want SAP to listen for IPv4 announces",
-                     VLC_TRUE);
+                     SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE);
 
         add_bool( "sap-ipv6", 0 , NULL,
-                   "IPv6-SAP listening", 
-                   "Set this if you want SAP to listen for IPv6 announces",
-                   VLC_TRUE);
+                   SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE);
 
         add_string( "sap-ipv6-scope", "8" , NULL,
-                    "IPv6-SAP scope",
-                    "Sets the scope for IPv6 announces (default is 8)",
-                    VLC_TRUE);
+                    SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
 
     set_description( _("SAP interface") );
     set_capability( "interface", 0 );
@@ -745,13 +751,21 @@ static int ismult( char *psz_uri )
 
     i_value = strtol( psz_uri, &psz_end, 0 );
 
-    /* FIXME: This is an ugly way to detect IPv6 multicast */
-    if( psz_uri[0] == '[') { return( VLC_TRUE ); } 
+    /* IPv6 */
+    if( psz_uri[0] == '[') 
+    {
+        if( strncasecmp( &psz_uri[1], "FF0" , 3) )
+            return( VLC_TRUE );
+        else
+            return( VLC_FALSE ); 
+    } 
 
     if( *psz_end != '.' ) { return( VLC_FALSE ); }
 
     return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
 }
+
+
 
 /*****************************************************************************
  * Read: read on a file descriptor, checking b_die periodically
