@@ -2,7 +2,7 @@
  * x11_factory.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_factory.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_factory.cpp,v 1.2 2004/01/25 13:59:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -38,7 +38,8 @@
 #include "x11_tooltip.hpp"
 
 
-X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf )
+X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),
+    m_pDisplay( NULL ), m_pTimerLoop( NULL )
 {
     // see init()
 }

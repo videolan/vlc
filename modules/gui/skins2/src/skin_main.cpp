@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: skin_main.cpp,v 1.3 2004/01/25 13:59:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -96,6 +96,11 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_theme = NULL;
 
     // Initialize singletons
+    if( OSFactory::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "Cannot initialize OSFactory" );
+        return VLC_EGENERIC;
+    }
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot initialize AsyncQueue" );
@@ -104,11 +109,6 @@ static int Open( vlc_object_t *p_this )
     if( Interpreter::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot instanciate Interpreter" );
-        return VLC_EGENERIC;
-    }
-    if( OSFactory::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "Cannot initialize OSFactory" );
         return VLC_EGENERIC;
     }
     if( VarManager::instance( p_intf ) == NULL )

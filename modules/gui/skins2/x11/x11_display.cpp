@@ -2,7 +2,7 @@
  * x11_display.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_display.cpp,v 1.2 2004/01/25 13:59:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -50,12 +50,6 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     int screen = DefaultScreen( m_pDisplay );
     int depth = DefaultDepth( m_pDisplay, screen );
     int order = ImageByteOrder( m_pDisplay );
-
-    // Create a graphics context that doesn't generate GraphicsExpose events
-    XGCValues xgcvalues;
-    xgcvalues.graphics_exposures = False;
-    m_gc = XCreateGC( m_pDisplay, DefaultRootWindow( m_pDisplay ),
-                      GCGraphicsExposures, &xgcvalues );
 
     // Template for looking up the XVisualInfo
     XVisualInfo xVInfoTemplate;
@@ -126,6 +120,15 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     if( pVInfo )
     {
         XFree( pVInfo );
+    }
+
+    // Create a graphics context that doesn't generate GraphicsExpose events
+    if( m_pDisplay )
+    {
+        XGCValues xgcvalues;
+        xgcvalues.graphics_exposures = False;
+        m_gc = XCreateGC( m_pDisplay, DefaultRootWindow( m_pDisplay ),
+                          GCGraphicsExposures, &xgcvalues );
     }
 }
 
