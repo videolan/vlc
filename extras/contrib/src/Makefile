@@ -80,6 +80,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
+# mozilla support? add before .aclocal:  .glib .libidl .mozilla
 endif
 
 ifeq ($(HOST),i586-pc-beos)
@@ -1118,6 +1119,60 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 CLEAN_FILE += .daap
 CLEAN_PKG += libopendaap
 DISCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
+
+# ***************************************************************************
+# glib
+# ***************************************************************************
+
+glib-$(GLIB_VERSION).tar.gz:
+	$(WGET) $(GLIB_URL)
+
+glib: glib-$(GLIB_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.glib: glib
+	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
+	touch $@
+
+CLEAN_FILE += .glibl
+CLEAN_PKG += glib
+DISCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
+
+# ***************************************************************************
+# libIDL
+# ***************************************************************************
+
+libIDL-$(LIBIDL_VERSION).tar.gz:
+	$(WGET) $(LIBIDL_URL)
+
+libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.libidl: libIDL
+	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
+	touch $@
+
+CLEAN_FILE += .libidl
+CLEAN_PKG += libIDL
+DISCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
+
+# ***************************************************************************
+# mozilla
+# ***************************************************************************
+
+mozilla-source-$(MOZILLA_VERSION).tar.bz2:
+	$(WGET) $(MOZILLA_URL)
+
+mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.mozilla: mozilla
+	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install )
+	touch $@
+
+CLEAN_FILE += .mozilla
+CLEAN_PKG += mozilla
+DISCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files
