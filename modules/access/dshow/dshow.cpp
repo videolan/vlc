@@ -753,10 +753,30 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
+    // Retreive acceptable media types supported by device
+    AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
+    size_t media_count =
+        EnumDeviceCaps( p_this, p_device_filter, p_sys->i_chroma,
+                        p_sys->i_width, p_sys->i_height,
+                        0, 0, 0, media_types, MAX_MEDIA_TYPES );
+
+    /* Find out if the pin handles MEDIATYPE_Stream, in which case we
+     * won't add a prefered media type as this doesn't seem to work well
+     * -- to investigate. */
+    vlc_bool_t b_stream_type = VLC_FALSE;
+    for( int i = 0; i < media_count; i++ )
+    {
+        if( media_types[i].majortype == MEDIATYPE_Stream )
+        {
+            b_stream_type = VLC_TRUE;
+            break;
+        }
+    }
+
     size_t mt_count = 0;
     AM_MEDIA_TYPE *mt = NULL;
 
-    if( !b_audio )
+    if( !b_stream_type && !b_audio )
     {
         // Insert prefered video media type
         AM_MEDIA_TYPE mtr;
@@ -787,7 +807,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
         CopyMediaType(mt, &mtr);
     }
-    else
+    else if( !b_stream_type )
     {
         // Insert prefered audio media type
         AM_MEDIA_TYPE mtr;
@@ -817,13 +837,6 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
         CopyMediaType(mt, &mtr);
     }
-
-    // Retreive acceptable media types supported by device
-    AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
-    size_t media_count =
-        EnumDeviceCaps( p_this, p_device_filter, p_sys->i_chroma,
-                        p_sys->i_width, p_sys->i_height,
-                        0, 0, 0, media_types, MAX_MEDIA_TYPES );
 
     if( media_count > 0 )
     {
