@@ -1736,6 +1736,19 @@ AC_ARG_ENABLE(dv,
   [  --enable-dv             DV decoder support (default disabled)])
 if test "x${enable_dv}" = "xyes"
 then
+  AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
+    PLUGINS="${PLUGINS} flac flacdec"
+    LDFLAGS_flacdec="${LDFLAGS_flacdec} -lFLAC"
+   ],[])
+fi
+
+dnl
+dnl  DV plugin
+dnl
+AC_ARG_ENABLE(flac,
+  [  --enable-falc         flac decoder support (default disabled)])
+if test "x${enable_flac}" = "xyes"
+then
   AC_CHECK_HEADERS(libdv/dv.h, [
     PLUGINS="${PLUGINS} dv"
     LDFLAGS_dv="${LDFLAGS_dv} -ldv"

@@ -1,4 +1,5 @@
 SOURCES_a52sys = modules/demux/a52sys.c
+SOURCES_flac = modules/demux/flac.c
 SOURCES_ogg = modules/demux/ogg.c
 SOURCES_m3u = modules/demux/m3u.c
 SOURCES_demuxdump = modules/demux/demuxdump.c
