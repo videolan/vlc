@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.6 2003/03/18 00:33:29 sigmunau Exp $
+ * $Id: id3tag.c,v 1.7 2003/05/25 18:32:17 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -73,7 +73,7 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
         i_strings = id3_field_getnstrings( &p_frame->fields[1] );
         while ( i_strings > 0 )
         {
-            psz_temp = id3_ucs4_latin1duplicate( id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
+            psz_temp = id3_ucs4_utf8duplicate( id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
             if ( !strcmp(p_frame->id, ID3_FRAME_GENRE ) )
             {
                 int i_genre;
