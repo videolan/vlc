@@ -474,6 +474,8 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
+        args.p_source = p_mb->p_forward;
+
         args.b_source_field = p_mb->ppi_field_select[0][0];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
