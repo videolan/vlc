@@ -45,6 +45,8 @@ default:
 
 -include $(MAKECMDGOALS)
 
+CFLAGS += -DMAKE_DEP
+
 $(C_DEP): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
 	@echo "regenerating dependencies for $*.c"

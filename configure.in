@@ -100,8 +100,6 @@ EOF
   esac
 fi
 
-AC_CHECK_LIB(mad,mad_version)
-
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
 AC_CHECK_FUNCS(setenv putenv)
