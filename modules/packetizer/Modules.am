@@ -1,5 +1,4 @@
 SOURCES_packetizer_copy = copy.c
-SOURCES_packetizer_mpegaudio = mpegaudio.c
 SOURCES_packetizer_mpegvideo = mpegvideo.c
 SOURCES_packetizer_mpeg4video = mpeg4video.c
 SOURCES_packetizer_mpeg4audio = mpeg4audio.c
