@@ -278,8 +278,9 @@ static void Run( intf_thread_t *p_intf )
             else if( FD_ISSET( cl->fd, &fds_read) )
             {
                 int i_end = 0;
+                int i_recv;
 
-                while( recv( cl->fd, cl->p_buffer_read, 1, 0 ) > 0 &&
+                while( (i_recv=recv( cl->fd, cl->p_buffer_read, 1, 0 )) > 0 &&
                        cl->p_buffer_read - cl->buffer_read < 999 )
                 {
                     switch( cl->i_tel_cmd )
@@ -329,6 +330,14 @@ static void Run( intf_thread_t *p_intf )
                 {
                     Write_message( cl, NULL, "Line too long\r\n",
                                    cl->i_mode + 2 );
+                }
+
+                if (i_recv == 0)
+                {
+                    net_Close( cl->fd );
+                    TAB_REMOVE( p_intf->p_sys->i_clients ,
+                                p_intf->p_sys->clients , cl );
+                    free( cl );
                 }
             }
         }
