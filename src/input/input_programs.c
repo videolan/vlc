@@ -2,9 +2,9 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.29 2001/02/08 04:43:28 sam Exp $
+ * $Id: input_programs.c,v 1.30 2001/02/08 13:52:35 massiot Exp $
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

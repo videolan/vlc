@@ -4,9 +4,9 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.77 2001/02/08 13:08:02 massiot Exp $
+ * $Id: input.c,v 1.78 2001/02/08 13:52:35 massiot Exp $
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -197,14 +197,28 @@ static void RunThread( input_thread_t *p_input )
         p_input->c_loops++;
 #endif
 
-        vlc_mutex_lock( &p_input->stream.control.control_lock );
-        if( p_input->stream.control.i_status == BACKWARD_S
-             && p_input->pf_rewind != NULL )
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        if( p_input->stream.i_seek )
         {
-            p_input->pf_rewind( p_input );
-            /* FIXME: probably don't do it every loop, but when ? */
+            if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
+            {
+                p_input->pf_seek( p_input, p_input->stream.i_seek );
+
+                for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+                {
+                    pgrm_descriptor_t * p_pgrm
+                                            = p_input->stream.pp_programs[i];
+                    /* Escape all decoders for the stream discontinuity they
+                     * will encounter. */
+                    input_EscapeDiscontinuity( p_input, p_pgrm );
+
+                    /* Reinitialize synchro. */
+                    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+                }
+            }
+            p_input->stream.i_seek = 0;
         }
-        vlc_mutex_unlock( &p_input->stream.control.control_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         i_error = p_input->pf_read( p_input, pp_packets );
 

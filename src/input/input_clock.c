@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.5 2001/02/08 13:08:03 massiot Exp $
+ * $Id: input_clock.c,v 1.6 2001/02/08 13:52:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -114,53 +114,15 @@ static mtime_t ClockCurrent( input_thread_t * p_input,
 }
 
 /*****************************************************************************
- * input_ClockNewRef: writes a new clock reference
+ * ClockNewRef: writes a new clock reference
  *****************************************************************************/
-void input_ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
-                        mtime_t i_clock, mtime_t i_sysdate )
+static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
+                         mtime_t i_clock, mtime_t i_sysdate )
 {
     intf_WarnMsg( 1, "Old ref: %lld/%lld, New ref: %lld/%lld", p_pgrm->cr_ref,
               p_pgrm->sysdate_ref, i_clock, i_sysdate );
     p_pgrm->cr_ref = i_clock;
     p_pgrm->sysdate_ref = i_sysdate;
-}
-
-/*****************************************************************************
- * EscapeDiscontinuity: send a NULL packet to the decoders
- *****************************************************************************/
-static void EscapeDiscontinuity( input_thread_t * p_input,
-                                 pgrm_descriptor_t * p_pgrm )
-{
-    int     i_es;
-
-    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
-    {
-        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
-
-        if( p_es->p_decoder_fifo != NULL )
-        {
-            input_NullPacket( p_input, p_es );
-        }
-    }
-}
-
-/*****************************************************************************
- * EscapeAudioDiscontinuity: send a NULL packet to the audio decoders
- *****************************************************************************/
-static void EscapeAudioDiscontinuity( input_thread_t * p_input,
-                                      pgrm_descriptor_t * p_pgrm )
-{
-    int     i_es;
-
-    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
-    {
-        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
-
-        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
-        {
-            input_NullPacket( p_input, p_es );
-        }
-    }
 }
 
 /*****************************************************************************
@@ -185,7 +147,7 @@ void input_ClockManageRef( input_thread_t * p_input,
     if( p_pgrm->i_synchro_state != SYNCHRO_OK )
     {
         /* Feed synchro with a new reference point. */
-        input_ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
+        ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
         p_pgrm->i_synchro_state = SYNCHRO_OK;
     }
     else
@@ -200,7 +162,7 @@ void input_ClockManageRef( input_thread_t * p_input,
             intf_WarnMsg( 3, "Clock gap, unexpected stream discontinuity" );
             input_ClockInit( p_pgrm );
             p_pgrm->i_synchro_state = SYNCHRO_START;
-            EscapeDiscontinuity( p_input, p_pgrm );
+            input_EscapeDiscontinuity( p_input, p_pgrm );
         }
 
         p_pgrm->last_cr = i_clock;
@@ -221,11 +183,11 @@ void input_ClockManageRef( input_thread_t * p_input,
                 {
                     vlc_cond_wait( &p_input->stream.stream_wait,
                                    &p_input->stream.stream_lock );
-                    input_ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
+                    ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
                 }
                 else
                 {
-                    input_ClockNewRef( p_input, p_pgrm, i_clock,
+                    ClockNewRef( p_input, p_pgrm, i_clock,
                                ClockToSysdate( p_input, p_pgrm, i_clock ) );
                 }
 
@@ -240,7 +202,7 @@ void input_ClockManageRef( input_thread_t * p_input,
 
                     /* Feed the audio decoders with a NULL packet to avoid
                      * discontinuities. */
-                    EscapeAudioDiscontinuity( p_input, p_pgrm );
+                    input_EscapeAudioDiscontinuity( p_input, p_pgrm );
                 }
                 else
                 {

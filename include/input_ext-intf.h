@@ -4,9 +4,9 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.16 2001/02/08 13:08:02 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.17 2001/02/08 13:52:34 massiot Exp $
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ typedef struct input_thread_s
     int                  (* pf_rewind)( struct input_thread_s * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
-    int                  (* pf_seek)( struct input_thread_s *, off_t );
+    void                 (* pf_seek)( struct input_thread_s *, off_t );
 
     i_p_config_t            i_p_config;              /* plugin configuration */
     char *                  p_source;
@@ -305,3 +305,4 @@ void input_DestroyThread( struct input_thread_s *, int *pi_status );
 void input_Play   ( struct input_thread_s * );
 void input_Pause  ( struct input_thread_s * );
 void input_Forward( struct input_thread_s *, int );
+void input_Seek   ( struct input_thread_s *, off_t );

@@ -2,9 +2,12 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.32 2001/02/08 04:43:28 sam Exp $
+ * $Id: mpeg_system.c,v 1.33 2001/02/08 13:52:35 massiot Exp $
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Michel Lespinasse <walken@via.ecp.fr>
+ *          Benoît Steiner <benny@via.ecp.fr>
+ *          Samuel Hocevar <sam@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

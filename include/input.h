@@ -2,9 +2,9 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.26 2001/02/08 04:43:27 sam Exp $
+ * $Id: input.h,v 1.27 2001/02/08 13:52:34 massiot Exp $
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@
                                  * packets. Have a nice day and merry Xmas.  */
 #define PADDING_PACKET_SIZE 188 /* Size of the NULL packet inserted in case
                                  * of data loss (this should be < 188).      */
+#define PADDING_PACKET_NUMBER 10 /* Number of padding packets top insert to
+                                  * escape a decoder.                        */
 
 /*****************************************************************************
  * Prototypes from input_ext-dec.c
@@ -69,14 +71,14 @@ int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
 vlc_thread_t input_RunDecoder( struct decoder_capabilities_s *, void * );
 void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
 void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
+void input_EscapeDiscontinuity( struct input_thread_s *,
+                                struct pgrm_descriptor_s * );
+void input_EscapeAudioDiscontinuity( struct input_thread_s *,
+                                     struct pgrm_descriptor_s * );
 
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
-void input_ClockNewRef( struct input_thread_s *,
-                        struct pgrm_descriptor_s *, mtime_t, mtime_t );
-void input_EscapeDiscontinuity( struct input_thread_s *,
-                                struct pgrm_descriptor_s * );
 void input_ClockInit( struct pgrm_descriptor_s * );
 void input_ClockManageRef( struct input_thread_s *,
                            struct pgrm_descriptor_s *, mtime_t );

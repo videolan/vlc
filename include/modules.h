@@ -85,7 +85,7 @@ typedef struct function_list_s
             void ( * pf_delete_pes )     ( void *, struct pes_packet_s * );
 
             int  ( * pf_rewind ) ( struct input_thread_s * );
-            int  ( * pf_seek )   ( struct input_thread_s *, off_t );
+            void ( * pf_seek )   ( struct input_thread_s *, off_t );
         } input;
 
         /* Audio output plugin */

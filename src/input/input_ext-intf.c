@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,8 +84,23 @@ void input_Forward( input_thread_t * p_input, int i_rate )
  *****************************************************************************/
 void input_Pause( input_thread_t * p_input )
 {
+    intf_Msg( "input: paused" );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = PAUSE_S;
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
+
+/*****************************************************************************
+ * input_Seek: changes the stream postion
+ *****************************************************************************/
+void input_Seek( input_thread_t * p_input, off_t i_position )
+{
+    intf_Msg( "input: seeking position %d/%d", i_position,
+                                               p_input->stream.i_size );
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.i_seek = i_position;
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+}
+

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.7 2001/01/15 06:18:23 sam Exp $
+ * $Id: input_dec.c,v 1.8 2001/02/08 13:52:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,7 +59,7 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 
     /* Make sure the thread leaves the NextDataPacket() function by
      * sending it a few null packets. */
-    for( i_dummy = 0; i_dummy < 10; i_dummy++ )
+    for( i_dummy = 0; i_dummy < PADDING_PACKET_NUMBER; i_dummy++ )
     {
         input_NullPacket( p_input, p_es );
     }
@@ -115,3 +115,48 @@ void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
     }
     vlc_mutex_unlock( &p_decoder_fifo->data_lock );
 }
+
+/*****************************************************************************
+ * input_EscapeDiscontinuity: send a NULL packet to the decoders
+ *****************************************************************************/
+void input_EscapeDiscontinuity( input_thread_t * p_input,
+                                pgrm_descriptor_t * p_pgrm )
+{
+    int     i_es, i;
+
+    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+    {
+        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+
+        if( p_es->p_decoder_fifo != NULL )
+        {
+            for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
+            {
+                input_NullPacket( p_input, p_es );
+            }
+        }
+    }
+}
+
+/*****************************************************************************
+ * input_EscapeAudioDiscontinuity: send a NULL packet to the audio decoders
+ *****************************************************************************/
+void input_EscapeAudioDiscontinuity( input_thread_t * p_input,
+                                     pgrm_descriptor_t * p_pgrm )
+{
+    int     i_es, i;
+
+    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+    {
+        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+
+        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
+        {
+            for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
+            {
+                input_NullPacket( p_input, p_es );
+            }
+        }
+    }
+}
+

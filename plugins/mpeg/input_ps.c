@@ -2,9 +2,9 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.2 2001/02/08 07:24:25 sam Exp $
+ * $Id: input_ps.c,v 1.3 2001/02/08 13:52:35 massiot Exp $
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ static int  PSRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
 static void PSInit      ( struct input_thread_s * );
 static void PSEnd       ( struct input_thread_s * );
-static struct pes_packet_s *  NewPES    ( void * p_garbage );
+static void PSSeek      ( struct input_thread_s *, off_t );
+static struct pes_packet_s *  NewPES    ( void * );
 static struct data_packet_s * NewPacket ( void *, size_t );
 static void DeletePacket( void *, struct data_packet_s * );
 static void DeletePES   ( void *, struct pes_packet_s * );
@@ -85,7 +86,7 @@ void input_getfunctions( function_list_t * p_function_list )
     input.pf_delete_packet    = DeletePacket;
     input.pf_delete_pes       = DeletePES;
     input.pf_rewind           = NULL;
-    input.pf_seek             = NULL;
+    input.pf_seek             = PSSeek;
 #undef input
 }
 
@@ -428,6 +429,20 @@ static int PSRead( input_thread_t * p_input,
     return( 0 );
 }
 
+/*****************************************************************************
+ * PSSeek: changes the stream position indicator
+ *****************************************************************************/
+static void PSSeek( input_thread_t * p_input, off_t i_position )
+{
+    thread_ps_data_t *  p_method;
+
+    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
+
+    /* A little bourrin but should work for a while --Meuuh */
+    fseek( p_method->stream, i_position, SEEK_SET );
+
+    p_input->stream.i_tell = i_position;
+}
 
 /*
  * Packet management utilities
