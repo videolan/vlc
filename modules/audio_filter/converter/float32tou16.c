@@ -1,16 +1,16 @@
 /*****************************************************************************
- * float32tos16.c : converter from float32 to signed 16 bits integer
+ * float32tou16.c : converter from float32 to unsigned 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.6 2002/08/13 22:42:23 massiot Exp $
+ * $Id: float32tou16.c,v 1.1 2002/08/13 22:42:23 massiot Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Xavier Maillard <zedek@fxgsproject.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -44,7 +44,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for float32->s16 conversion") );
+    set_description( _("aout filter for float32->u16 conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -59,7 +59,7 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     if ( p_filter->input.i_format != AOUT_FMT_FLOAT32
-          || p_filter->output.i_format != AOUT_FMT_S16_NE )
+          && p_filter->output.i_format != AOUT_FMT_U16_NE )
     {
         return -1;
     }
@@ -69,7 +69,6 @@ static int Create( vlc_object_t *p_this )
     {
         return -1;
     }
-
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 1;
@@ -85,24 +84,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     int i;
     float * p_in = (float *)p_in_buf->p_buffer;
-    s16 * p_out = (s16 *)p_out_buf->p_buffer;
+    u16 * p_out = (u16 *)p_out_buf->p_buffer;
 
-    for ( i = p_in_buf->i_nb_samples * p_filter->input.i_channels ; i-- ; )
+    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
     {
-#if 0
-        /* Slow version */
-        if ( *p_in >= 1.0 ) *p_out = 32767;
-        else if ( *p_in < -1.0 ) *p_out = -32768;
-        else *p_out = *p_in * 32768.0;
-#else
-        /* This is walken's trick based on IEEE float format. */
-        float f_in = *p_in + 384.0;
-        s32 i_in;
-        i_in = *(s32 *)&f_in;
-        if ( i_in > 0x43c07fff ) *p_out = 32767;
-        else if ( i_in < 0x43bf8000 ) *p_out = -32768;
-        else *p_out = i_in - 0x43c00000;
-#endif
+        if ( *p_in >= 1.0 ) *p_out = 65535;
+        else if ( *p_in < -1.0 ) *p_out = 0;
+        else *p_out = (u16)(32768 + *p_in * 32768);
         p_in++; p_out++;
     }
 

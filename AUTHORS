@@ -293,6 +293,11 @@ E: paulus@linuxcare.com.au
 D: AltiVec IDCT and motion
 S: Australia
 
+N: Xavier Maillard
+E: zedek@fxgsproject.org
+D: audio converters
+S: France, Reims
+
 N: Wade Majors
 E: guru@startrek.com
 D: BeOS testing, icon integration, debugging and fixes

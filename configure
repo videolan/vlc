@@ -5670,7 +5670,7 @@ PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec codec/spdif"
 #PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/mpeg_audio/mpeg_audio codec/a52old/a52old codec/lpcm/lpcm"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop"
-PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/a52tospdif"
+PLUGINS="${PLUGINS} audio_filter/converter/float32tos16 audio_filter/converter/float32tos8 audio_filter/converter/float32tou16 audio_filter/converter/float32tou8 audio_filter/converter/a52tospdif"
 PLUGINS="${PLUGINS} audio_filter/resampler/trivial"
 PLUGINS="${PLUGINS} audio_mixer/trivial audio_mixer/spdif"
 PLUGINS="${PLUGINS} audio_output/file"
@@ -8375,7 +8375,7 @@ fi
 
      if test "x${ESD_CONFIG}" != "xno"
      then
-       #PLUGINS="${PLUGINS} audio_output/esd"
+       PLUGINS="${PLUGINS} audio_output/esd"
        esd_CFLAGS="${esd_CFLAGS} `${ESD_CONFIG} --cflags`"
        esd_LDFLAGS="${esd_LDFLAGS} `${ESD_CONFIG} --libs`"
      fi
@@ -8426,7 +8426,7 @@ fi
 
      if test "x${ARTS_CONFIG}" != "xno"
      then
-       #PLUGINS="${PLUGINS} audio_output/arts"
+       PLUGINS="${PLUGINS} audio_output/arts"
        arts_CFLAGS="${arts_CFLAGS} `${ARTS_CONFIG} --cflags`"
        arts_LDFLAGS="${arts_LDFLAGS} `${ARTS_CONFIG} --libs `"
      fi
