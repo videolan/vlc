@@ -35,18 +35,19 @@
 #if !defined( UNDER_CE )
 #   include <io.h>
 #   include <fcntl.h>
-#   include <winsock2.h>
 #endif
+
+#include <winsock2.h>
 
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
 void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
-#if !defined( UNDER_CE )
     WSADATA Data;
 
     /* Get our full path */
+#if !defined( UNDER_CE )
     if( ppsz_argv[0] )
     {
         char psz_path[MAX_PATH];
@@ -65,12 +66,15 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         }
     }
     else
+#endif
     {
         p_this->p_libvlc->psz_vlcpath = strdup( "" );
     }
 
     /* Set the default file-translation mode */
+#if !defined( UNDER_CE )
     _fmode = _O_BINARY;
+#endif
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
 
     /* Call mdate() once to make sure it is initialized properly */
@@ -111,8 +115,6 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     fprintf( stderr, "error: can't initialize WinSocks\n" );
 
     return;
-
-#endif
 }
 
 /*****************************************************************************
@@ -346,7 +348,5 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  *****************************************************************************/
 void system_End( vlc_t *p_this )
 {
-#if !defined( UNDER_CE )
     WSACleanup();
-#endif
 }
