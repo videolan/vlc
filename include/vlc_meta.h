@@ -132,4 +132,20 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     }
 }
 
+static inline char *vlc_meta_GetValue( vlc_meta_t *m, char *name )
+{
+    int i;
+
+    for( i = 0; i < m->i_meta; i++ )
+    {
+        if( !strcmp( m->name[i], name ) )
+        {
+            char *value = NULL;
+            if( m->value[i] ) value = strdup( m->value[i] );
+            return value;
+        }
+    }
+    return NULL;
+}
+
 #endif

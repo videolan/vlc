@@ -2,7 +2,7 @@
  * control.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c 7041 2004-03-11 16:48:27Z gbazin $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -209,6 +209,46 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                     vlc_object_release( p_playlist );
                 }
             }
+        }
+        break;
+
+        case INPUT_GET_INFO:
+        {
+            char *psz_cat = (char *)va_arg( args, char * );
+            char *psz_name = (char *)va_arg( args, char * );
+            char **ppsz_value = (char **)va_arg( args, char ** );
+            int i;
+
+            i_ret = VLC_EGENERIC;
+            *ppsz_value = NULL;
+
+            vlc_mutex_lock( &p_input->p_item->lock );
+            for( i = 0; i < p_input->p_item->i_categories; i++ )
+            {
+                if( !strcmp( p_input->p_item->pp_categories[i]->psz_name,
+                             psz_cat ) )
+                    break;
+            }
+
+            if( i != p_input->p_item->i_categories )
+            {
+                info_category_t *p_cat;
+                p_cat = p_input->p_item->pp_categories[i];
+
+                for( i = 0; i < p_cat->i_infos; i++ )
+                {
+                    if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+                    {
+                        if( p_cat->pp_infos[i]->psz_value )
+                        {
+                            *ppsz_value =strdup(p_cat->pp_infos[i]->psz_value);
+                            i_ret = VLC_SUCCESS;
+                        }
+                        break;
+                    }
+                }
+            }
+            vlc_mutex_unlock( &p_input->p_item->lock );
         }
         break;
 

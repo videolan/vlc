@@ -31,6 +31,10 @@
 #include <ctype.h>                                              /* tolower() */
 #include <string.h>                                            /* strerror() */
 
+#ifndef _WIN32_WINNT
+#   define _WIN32_WINNT 0x0400
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/input.h>
