@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.4 2003/11/30 22:26:48 rocky Exp $
+ * $Id: cdda.c,v 1.5 2003/12/01 01:08:42 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -83,15 +83,17 @@ int  E_(DebugCallback)       ( vlc_object_t *p_this, const char *psz_name,
 "   %G : Genre\n" \
 "   %M : The current MRL\n" \
 "   %m : The CD-DA Media Catalog Number (MCN)\n" \
+"   %p : The artist/performer/composer in the track \n" \
 "   %T : The track number\n" \
+"   %s : Number of seconds in this track \n" \
 "   %t : The name\n" \
 "   %Y : The year 19xx or 20xx\n" \
 "   %% : a %\n")
 
 #ifdef HAVE_LIBCDDB
-#define DEFAULT_TITLE_FORMAT "%T %t",
+#define DEFAULT_TITLE_FORMAT "Track %T. %t - %p %s",
 #else 
-#define DEFAULT_TILTE_FORMAT "%T %M",
+#define DEFAULT_TITLE_FORMAT "%T %M",
 #endif
 
 /*****************************************************************************
