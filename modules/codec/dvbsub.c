@@ -2,7 +2,7 @@
  * dvbsub.c : DVB subtitles decoder thread
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * $Id: dvbsub.c,v 1.1 2003/11/06 16:37:19 nitrox Exp $
+ * $Id: dvbsub.c,v 1.2 2003/11/06 19:35:05 nitrox Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *
@@ -1250,6 +1250,10 @@ static void dvbsub_render( dvbsub_thread_t *p_dec, dvbsub_all_t* dvbsub)
         p_render->i_y = p_region->i_y + p_objectdef->i_yoffset;
         p_render->p_rle_top = p_object->topfield;
         p_render->p_rle_bot = p_object->bottomfield;
+
+        // if we did not recieved the CLUT yet
+        if ( !dvbsub->p_clut[p_region->i_clut] ) return;
+
         /* Compute the color datas according to the appropriate CLUT */
         for(p_c=p_render->p_rle_top->p_codes;p_c->p_next!=NULL; p_c=p_c->p_next)
         {
