@@ -64,16 +64,16 @@ extern "C"
 #define BYTES_PER_PIXEL 2
 
 /*****************************************************************************
- * vout_sys_t: dummy video output method descriptor
+ * vout_sys_t: BeOS video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the dummy specific properties of an output thread.
+ * It describes the BeOS specific properties of an output thread.
  *****************************************************************************/
  
 typedef struct vout_sys_s
 {
     VideoWindow *         p_window;
-    
+
     byte_t *              pp_buffer[2];
     s32                   i_width;
     s32                   i_height;
@@ -298,6 +298,15 @@ void VideoWindow::DirectConnected(direct_buffer_info *info)
 }
 
 /*****************************************************************************
+ * VideoWindow::FrameResized
+ *****************************************************************************/
+
+void VideoWindow::FrameResized( float width, float height )
+{
+    b_resized = 1;
+}
+
+/*****************************************************************************
  * VideoWindow::MessageReceived
  *****************************************************************************/
 
@@ -308,6 +317,7 @@ void VideoWindow::MessageReceived( BMessage * p_message )
     switch( p_message->what )
     {
     case B_KEY_DOWN:
+    case B_SIMPLE_DATA:
         // post the message to the interface window which will handle it
         p_win = beos_GetAppWindow( "interface" );
         if( p_win != NULL )
@@ -328,7 +338,10 @@ void VideoWindow::MessageReceived( BMessage * p_message )
 
 bool VideoWindow::QuitRequested()
 {
-    return( true );
+    /* FIXME: send a message ! */
+    p_main->p_intf->b_die = 1;
+
+    return( false );
 }
 
 extern "C"
@@ -381,9 +394,9 @@ static int vout_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * vout_Create: allocates dummy video thread output method
+ * vout_Create: allocates BeOS video thread output method
  *****************************************************************************
- * This function allocates and initializes a dummy vout method.
+ * This function allocates and initializes a BeOS vout method.
  *****************************************************************************/
 int vout_Create( vout_thread_t *p_vout )
 {
@@ -413,7 +426,7 @@ int vout_Create( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Init: initialize dummy video thread output method
+ * vout_Init: initialize BeOS video thread output method
  *****************************************************************************/
 int vout_Init( vout_thread_t *p_vout )
 {
@@ -448,7 +461,7 @@ int vout_Init( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate dummy video thread output method
+ * vout_End: terminate BeOS video thread output method
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
@@ -464,7 +477,7 @@ void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Destroy: destroy dummy video thread output method
+ * vout_Destroy: destroy BeOS video thread output method
  *****************************************************************************
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
@@ -476,16 +489,22 @@ void vout_Destroy( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_Manage: handle dummy events
+ * vout_Manage: handle BeOS events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
+    if( p_vout->p_sys->p_window->b_resized )
+    {
+        p_vout->p_sys->p_window->b_resized = 0;
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg( "resizing window" );
+        intf_WarnMsg( 1, "resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -508,13 +527,14 @@ int vout_Manage( vout_thread_t *p_vout )
         intf_Msg( "vout: video display resized (%dx%d)",
                   p_vout->i_width, p_vout->i_height );
     }
+
     return( 0 );
 }
 
 /*****************************************************************************
  * vout_Display: displays previously rendered output
  *****************************************************************************
- * This function send the currently rendered image to dummy image, waits until
+ * This function send the currently rendered image to BeOS image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
 void vout_Display( vout_thread_t *p_vout )
@@ -531,7 +551,7 @@ void vout_Display( vout_thread_t *p_vout )
 /* following functions are local */
 
 /*****************************************************************************
- * BeosOpenDisplay: open and initialize dummy device
+ * BeosOpenDisplay: open and initialize BeOS device
  *****************************************************************************
  * XXX?? The framebuffer mode is only provided as a fast and efficient way to
  * display video, providing the card is configured and the mode ok. It is
@@ -543,7 +563,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     /* Create the DirectDraw video window */
     p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), VOUT_TITLE " (BeOS output)", p_vout );
+        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), VOUT_TITLE " (BeOS output) - drop a file here to play it !", p_vout );
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );
@@ -588,7 +608,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * BeosDisplay: close and reset dummy device
+ * BeosDisplay: close and reset BeOS device
  *****************************************************************************
  * Returns all resources allocated by BeosOpenDisplay and restore the original
  * state of the device.

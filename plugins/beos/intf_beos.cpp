@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.8 2001/02/18 03:32:02 polux Exp $
+ * $Id: intf_beos.cpp,v 1.9 2001/02/19 03:46:27 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,12 +29,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
+
 #include <kernel/OS.h>
+#include <storage/Path.h>
 #include <View.h>
 #include <Application.h>
 #include <Message.h>
+#include <NodeInfo.h>
 #include <Locker.h>
 #include <DirectWindow.h>
+
 #include <malloc.h>
 #include <string.h>
 
@@ -48,6 +52,7 @@ extern "C"
 #include "modules.h"
 
 #include "intf_msg.h"
+#include "intf_plst.h"
 #include "interface.h"
 
 #include "main.h"
@@ -68,10 +73,10 @@ typedef struct intf_sys_s
  * InterfaceWindow
  *****************************************************************************/
  
-InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t  *p_intf )
-    : BWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
+InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t  *p_interface )
+    : BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
-    p_interface = p_intf;
+    p_intf = p_interface;
     SetName( "interface" );
     
     BView * p_view;
@@ -98,9 +103,24 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     {
     case B_KEY_DOWN:
         p_message->FindString( "bytes", (const char **)&psz_key );
-        p_interface->p_sys->i_key = psz_key[0];
+        p_intf->p_sys->i_key = psz_key[0];
         break;
         
+    case B_SIMPLE_DATA:
+        {
+            entry_ref ref;
+            if( p_message->FindRef( "refs", &ref ) == B_OK )
+            {
+                BPath path( &ref );
+                char * psz_name = strdup(path.Path());
+                intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'",
+                              psz_name );
+                intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_name );
+            }
+
+        }
+        break;
+
     default:
         BWindow::MessageReceived( p_message );
         break;
@@ -113,9 +133,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
 bool InterfaceWindow::QuitRequested()
 {
+    p_intf->b_die = 1;
+
     return( false );
 }
-
 
 extern "C"
 {

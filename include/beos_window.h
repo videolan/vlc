@@ -31,6 +31,7 @@ public:
 
     // standard window member
     virtual bool    QuitRequested();
+    virtual void    FrameResized(float width, float height);
     virtual void    MessageReceived(BMessage *message);
 
     // this is the hook controling direct screen connection
@@ -54,6 +55,9 @@ public:
     bool            fConnectionDisabled;
     BLocker         *locker;
     thread_id       fDrawThreadID;
+
+    // additional events
+    bool            b_resized;
 };
 
 class InterfaceWindow : public BWindow
@@ -66,7 +70,7 @@ public:
     virtual bool    QuitRequested();
     virtual void    MessageReceived(BMessage *message);
     
-    intf_thread_t  *p_interface;
+    intf_thread_t  *p_intf;
 };
 
 class InterfaceView : public BView
