@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.12 2003/01/04 13:30:02 jpsaman Exp $
+ * $Id: familiar.h,v 1.13 2003/03/13 15:50:17 marcari Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -32,10 +32,13 @@ struct intf_sys_t
     module_t *          p_gtk_main;
 
     /* windows and widgets */
-    GtkWidget *         p_window;                             /* main window */
+    GtkWidget   *       p_window;                             /* main window */
+    GtkEntry    *       p_mrlentry;
     GtkNotebook *       p_notebook;
+    GtkNotebook *       p_mediabook;
     GtkHScale   *       p_slider;
     GtkCList    *       p_clist;
+    GtkCList    *       p_clistplaylist;
 
     /* slider */
     GtkLabel *          p_slider_label;
@@ -58,5 +61,9 @@ struct intf_sys_t
 /*****************************************************************************
  * Useful macro
  ****************************************************************************/
+#define GTK_GET( type, nom ) GTK_##type( gtk_object_get_data( \
+        GTK_OBJECT( p_intf->p_sys->p_window ), nom ) )
+
+            
 #define  GtkGetIntf( widget ) E_(__GtkGetIntf)( GTK_WIDGET( widget ) )
 void * E_(__GtkGetIntf)( GtkWidget * );

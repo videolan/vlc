@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.30 2003/02/26 15:44:22 marcari Exp $
+ * $Id: familiar.c,v 1.31 2003/03/13 15:50:17 marcari Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -174,6 +174,9 @@ static void Run( intf_thread_t *p_intf )
     add_pixmap_directory("/usr/local/share/pixmaps/vlc");
 
 
+    /* Path for pixmaps under linupy */
+    add_pixmap_directory("/usr/local/share/pixmaps/vlc");
+
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
     {
@@ -188,6 +191,8 @@ static void Run( intf_thread_t *p_intf )
 
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
+    p_intf->p_sys->p_mediabook = GTK_NOTEBOOK( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "mediabook" ) );
 
     /* Get the slider object */
     p_intf->p_sys->p_slider = GTK_HSCALE( gtk_object_get_data(
@@ -213,16 +218,27 @@ static void Run( intf_thread_t *p_intf )
     gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 4, FALSE);
     gtk_clist_column_titles_show (GTK_CLIST (p_intf->p_sys->p_clist));
 
+    /* the playlist object */
+    p_intf->p_sys->p_clistplaylist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "clistplaylist" ) );
+    
+    p_intf->p_sys->p_mrlentry = GTK_ENTRY( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "mrl_entry" ) );
+
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
                          "p_intf", p_intf );
-
+    
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
     ReadDirectory(p_intf->p_sys->p_clist, ".");
 
+    /* update the playlist */
+    FamiliarRebuildCList( p_intf->p_sys->p_clistplaylist, 
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ));
+    
 #ifdef NEED_GTK_MAIN
     msg_Dbg( p_intf, "Manage GTK keyboard events using threads" );
     while( !p_intf->b_die )
@@ -330,8 +346,19 @@ static int Manage( intf_thread_t *p_intf )
             /* New input or stream map change */
             if( p_input->stream.b_changed )
             {
+                playlist_t *p_playlist;
+
                 E_(GtkModeManage)( p_intf );
                 p_intf->p_sys->b_playing = 1;
+
+                /* update playlist interface */
+                p_playlist = (playlist_t *) vlc_object_find( 
+                        p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+                if (p_playlist != NULL)
+                {
+                    FamiliarRebuildCList( p_intf->p_sys->p_clistplaylist, 
+                                          p_playlist );
+                }
             }
 
             /* Manage the slider */

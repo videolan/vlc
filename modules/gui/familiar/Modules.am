@@ -7,6 +7,10 @@ SOURCES_familiar = \
 	modules/gui/familiar/support.h \
 	modules/gui/familiar/callbacks.c \
 	modules/gui/familiar/callbacks.h \
+        modules/gui/familiar/network.c \
+        modules/gui/familiar/network.h \
+        modules/gui/familiar/playlist.c \
+        modules/gui/familiar/playlist.h \
 	$(NULL)
 
 EXTRA_DIST += modules/gui/familiar/familiar.glade

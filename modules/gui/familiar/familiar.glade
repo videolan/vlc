@@ -18,8 +18,6 @@
 <widget>
   <class>GtkWindow</class>
   <name>familiar</name>
-  <width>240</width>
-  <height>320</height>
   <signal>
     <name>delete_event</name>
     <handler>on_familiar_delete_event</handler>
@@ -42,8 +40,8 @@
     <widget>
       <class>GtkToolbar</class>
       <name>toolbar</name>
-      <width>112</width>
-      <height>16</height>
+      <width>240</width>
+      <height>12</height>
       <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
       <type>GTK_TOOLBAR_ICONS</type>
       <space_size>5</space_size>
@@ -51,9 +49,9 @@
       <relief>GTK_RELIEF_NORMAL</relief>
       <tooltips>True</tooltips>
       <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
+	<padding>5</padding>
+	<expand>False</expand>
+	<fill>False</fill>
       </child>
 
       <widget>
@@ -66,8 +64,21 @@
 	  <handler>on_toolbar_open_clicked</handler>
 	  <last_modification_time>Wed, 24 Jul 2002 18:28:31 GMT</last_modification_time>
 	</signal>
-	<label>Open</label>
+	<label></label>
 	<icon>familiar-openb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_playlist</name>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_playlist_clicked</handler>
+	  <last_modification_time>Wed, 05 Mar 2003 22:04:46 GMT</last_modification_time>
+	</signal>
+	<label></label>
+	<icon>familiar-playlistb16x16.xpm</icon>
       </widget>
 
       <widget>
@@ -215,8 +226,8 @@
       <page>6.25</page>
       <page_size>0</page_size>
       <child>
-	<padding>0</padding>
-	<expand>True</expand>
+	<padding>4</padding>
+	<expand>False</expand>
 	<fill>False</fill>
       </child>
     </widget>
@@ -236,162 +247,479 @@
 	<padding>0</padding>
 	<expand>True</expand>
 	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
       </child>
 
       <widget>
-	<class>GtkFixed</class>
-	<name>fixedMedia</name>
+	<class>GtkVBox</class>
+	<name>vbox1</name>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>labelUrl</name>
-	  <x>4</x>
-	  <y>8</y>
-	  <width>38</width>
-	  <height>18</height>
-	  <label>URL:</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkScrolledWindow</class>
-	  <name>scrolledwindow1</name>
-	  <x>0</x>
-	  <y>32</y>
-	  <width>240</width>
-	  <height>208</height>
-	  <hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
-	  <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
-	  <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
-	  <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+	  <class>GtkHBox</class>
+	  <name>hbox1</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
 
 	  <widget>
-	    <class>GtkCList</class>
-	    <name>clistmedia</name>
+	    <class>GtkButton</class>
+	    <name>buttonMrlGo</name>
 	    <can_focus>True</can_focus>
 	    <signal>
-	      <name>select_row</name>
-	      <handler>on_clistmedia_select_row</handler>
-	      <last_modification_time>Sun, 18 Aug 2002 19:40:44 GMT</last_modification_time>
+	      <name>clicked</name>
+	      <handler>FamiliarMrlGo</handler>
+	      <last_modification_time>Wed, 05 Mar 2003 21:47:31 GMT</last_modification_time>
 	    </signal>
-	    <signal>
-	      <name>click_column</name>
-	      <handler>on_clistmedia_click_column</handler>
-	      <last_modification_time>Sun, 18 Aug 2002 19:41:06 GMT</last_modification_time>
-	    </signal>
-	    <columns>5</columns>
-	    <column_widths>123,80,80,80,80</column_widths>
-	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
-	    <show_titles>True</show_titles>
-	    <shadow_type>GTK_SHADOW_IN</shadow_type>
+	    <label>Add</label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>labelUrl</name>
+	    <label>MRL :</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>2</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkCombo</class>
+	    <name>mrl_combo</name>
+	    <value_in_list>False</value_in_list>
+	    <ok_if_empty>True</ok_if_empty>
+	    <case_sensitive>False</case_sensitive>
+	    <use_arrows>True</use_arrows>
+	    <use_arrows_always>False</use_arrows_always>
+	    <items>file://
+ftp://
+http://
+udp://@:1234
+udp6://@:1234
+rtp://
+rtp6://
+</items>
+	    <child>
+	      <padding>3</padding>
+	      <expand>True</expand>
+	      <fill>True</fill>
+	    </child>
 
 	    <widget>
-	      <class>GtkLabel</class>
-	      <child_name>CList:title</child_name>
-	      <name>labelname</name>
-	      <label>Name</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
-	      <class>GtkLabel</class>
-	      <child_name>CList:title</child_name>
-	      <name>labeltype</name>
-	      <label>Type</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
-	      <class>GtkLabel</class>
-	      <child_name>CList:title</child_name>
-	      <name>labelsize</name>
-	      <label>Size</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
-	      <class>GtkLabel</class>
-	      <child_name>CList:title</child_name>
-	      <name>labeluid</name>
-	      <label>User</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
-	      <class>GtkLabel</class>
-	      <child_name>CList:title</child_name>
-	      <name>labelgid</name>
-	      <label>Group</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
+	      <class>GtkEntry</class>
+	      <child_name>GtkCombo:entry</child_name>
+	      <name>mrl_entry</name>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>changed</name>
+		<handler>on_comboURL-entry_changed</handler>
+		<last_modification_time>Sun, 09 Feb 2003 13:32:46 GMT</last_modification_time>
+	      </signal>
+	      <editable>True</editable>
+	      <text_visible>True</text_visible>
+	      <text_max_length>0</text_max_length>
+	      <text>file://</text>
 	    </widget>
 	  </widget>
 	</widget>
 
 	<widget>
-	  <class>GtkCombo</class>
-	  <name>comboURL</name>
-	  <x>40</x>
-	  <y>4</y>
-	  <width>185</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items>file://
-ftp://
-http://
-udp://:1234
-udp6://:1234
-rtp://:1234
-rtp6://:1234
-</items>
+	  <class>GtkNotebook</class>
+	  <name>mediabook</name>
+	  <can_focus>True</can_focus>
+	  <show_tabs>True</show_tabs>
+	  <show_border>True</show_border>
+	  <tab_pos>GTK_POS_TOP</tab_pos>
+	  <scrollable>False</scrollable>
+	  <tab_hborder>2</tab_hborder>
+	  <tab_vborder>2</tab_vborder>
+	  <popup_enable>False</popup_enable>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
 
 	  <widget>
-	    <class>GtkEntry</class>
-	    <child_name>GtkCombo:entry</child_name>
-	    <name>comboURL-entry</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>changed</name>
-	      <handler>on_comboURL-entry_changed</handler>
-	      <last_modification_time>Thu, 01 Aug 2002 19:37:06 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>0</text_max_length>
-	    <text>file://</text>
+	    <class>GtkScrolledWindow</class>
+	    <name>scrolledwindow4</name>
+	    <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+	    <vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
+	    <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+	    <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+	    <widget>
+	      <class>GtkViewport</class>
+	      <name>viewport2</name>
+	      <shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	      <widget>
+		<class>GtkCList</class>
+		<name>clistmedia</name>
+		<can_focus>True</can_focus>
+		<signal>
+		  <name>select_row</name>
+		  <handler>on_clistmedia_select_row</handler>
+		  <last_modification_time>Sun, 09 Feb 2003 13:33:18 GMT</last_modification_time>
+		</signal>
+		<signal>
+		  <name>click_column</name>
+		  <handler>on_clistmedia_click_column</handler>
+		  <last_modification_time>Sun, 09 Feb 2003 13:33:22 GMT</last_modification_time>
+		</signal>
+		<columns>2</columns>
+		<column_widths>129,80</column_widths>
+		<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+		<show_titles>True</show_titles>
+		<shadow_type>GTK_SHADOW_IN</shadow_type>
+
+		<widget>
+		  <class>GtkLabel</class>
+		  <child_name>CList:title</child_name>
+		  <name>labelname</name>
+		  <label>Name</label>
+		  <justify>GTK_JUSTIFY_CENTER</justify>
+		  <wrap>False</wrap>
+		  <xalign>0.5</xalign>
+		  <yalign>0.5</yalign>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		</widget>
+
+		<widget>
+		  <class>GtkLabel</class>
+		  <child_name>CList:title</child_name>
+		  <name>labeltype</name>
+		  <label>Type</label>
+		  <justify>GTK_JUSTIFY_CENTER</justify>
+		  <wrap>False</wrap>
+		  <xalign>0.5</xalign>
+		  <yalign>0.5</yalign>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		</widget>
+	      </widget>
+	    </widget>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>label13</name>
+	    <label>File</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkVBox</class>
+	    <name>vbox3</name>
+	    <homogeneous>False</homogeneous>
+	    <spacing>2</spacing>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>network_multicast</name>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>toggled</name>
+		<handler>on_network_multicast_toggled</handler>
+		<last_modification_time>Sat, 01 Mar 2003 21:44:26 GMT</last_modification_time>
+	      </signal>
+	      <label>UDP/RTP (Adress when Multicast)</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	      <group>network</group>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkTable</class>
+	      <name>table1</name>
+	      <rows>2</rows>
+	      <columns>2</columns>
+	      <homogeneous>False</homogeneous>
+	      <row_spacing>0</row_spacing>
+	      <column_spacing>5</column_spacing>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>True</fill>
+	      </child>
+
+	      <widget>
+		<class>GtkLabel</class>
+		<name>label21</name>
+		<label>Address</label>
+		<justify>GTK_JUSTIFY_CENTER</justify>
+		<wrap>False</wrap>
+		<xalign>0</xalign>
+		<yalign>0.5</yalign>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>0</top_attach>
+		  <bottom_attach>1</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkLabel</class>
+		<name>label22</name>
+		<label>Port</label>
+		<justify>GTK_JUSTIFY_CENTER</justify>
+		<wrap>False</wrap>
+		<xalign>0</xalign>
+		<yalign>0.5</yalign>
+		<xpad>0</xpad>
+		<ypad>0</ypad>
+		<child>
+		  <left_attach>0</left_attach>
+		  <right_attach>1</right_attach>
+		  <top_attach>1</top_attach>
+		  <bottom_attach>2</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>False</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkSpinButton</class>
+		<name>network_multicast_port</name>
+		<can_focus>True</can_focus>
+		<signal>
+		  <name>changed</name>
+		  <handler>on_network_multicast_port_changed</handler>
+		  <last_modification_time>Sat, 01 Mar 2003 21:45:26 GMT</last_modification_time>
+		</signal>
+		<climb_rate>1</climb_rate>
+		<digits>0</digits>
+		<numeric>False</numeric>
+		<update_policy>GTK_UPDATE_ALWAYS</update_policy>
+		<snap>False</snap>
+		<wrap>False</wrap>
+		<value>1234</value>
+		<lower>1</lower>
+		<upper>65536</upper>
+		<step>1</step>
+		<page>10</page>
+		<page_size>10</page_size>
+		<child>
+		  <left_attach>1</left_attach>
+		  <right_attach>2</right_attach>
+		  <top_attach>1</top_attach>
+		  <bottom_attach>2</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>True</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkCombo</class>
+		<name>combo2</name>
+		<value_in_list>False</value_in_list>
+		<ok_if_empty>True</ok_if_empty>
+		<case_sensitive>False</case_sensitive>
+		<use_arrows>True</use_arrows>
+		<use_arrows_always>False</use_arrows_always>
+		<items></items>
+		<child>
+		  <left_attach>1</left_attach>
+		  <right_attach>2</right_attach>
+		  <top_attach>0</top_attach>
+		  <bottom_attach>1</bottom_attach>
+		  <xpad>0</xpad>
+		  <ypad>0</ypad>
+		  <xexpand>True</xexpand>
+		  <yexpand>False</yexpand>
+		  <xshrink>False</xshrink>
+		  <yshrink>False</yshrink>
+		  <xfill>True</xfill>
+		  <yfill>False</yfill>
+		</child>
+
+		<widget>
+		  <class>GtkEntry</class>
+		  <child_name>GtkCombo:entry</child_name>
+		  <name>network_multicast_address</name>
+		  <can_focus>True</can_focus>
+		  <signal>
+		    <name>changed</name>
+		    <handler>on_network_multicast_address_changed</handler>
+		    <last_modification_time>Sat, 01 Mar 2003 21:45:32 GMT</last_modification_time>
+		  </signal>
+		  <editable>True</editable>
+		  <text_visible>True</text_visible>
+		  <text_max_length>0</text_max_length>
+		  <text></text>
+		</widget>
+	      </widget>
+	    </widget>
+
+	    <widget>
+	      <class>GtkHSeparator</class>
+	      <name>hseparator10</name>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>True</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkHBox</class>
+	      <name>hbox9</name>
+	      <homogeneous>True</homogeneous>
+	      <spacing>0</spacing>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>True</fill>
+	      </child>
+
+	      <widget>
+		<class>GtkRadioButton</class>
+		<name>network_http</name>
+		<sensitive>False</sensitive>
+		<can_focus>True</can_focus>
+		<signal>
+		  <name>toggled</name>
+		  <handler>on_network_http_toggled</handler>
+		  <last_modification_time>Sat, 01 Mar 2003 21:45:55 GMT</last_modification_time>
+		</signal>
+		<label>HTTP</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<group>network</group>
+		<child>
+		  <padding>0</padding>
+		  <expand>False</expand>
+		  <fill>True</fill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkRadioButton</class>
+		<name>network_ftp</name>
+		<sensitive>False</sensitive>
+		<can_focus>True</can_focus>
+		<signal>
+		  <name>toggled</name>
+		  <handler>on_network_ftp_toggled</handler>
+		  <last_modification_time>Sat, 01 Mar 2003 21:46:07 GMT</last_modification_time>
+		</signal>
+		<label>FTP</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<group>network</group>
+		<child>
+		  <padding>0</padding>
+		  <expand>False</expand>
+		  <fill>True</fill>
+		</child>
+	      </widget>
+
+	      <widget>
+		<class>GtkRadioButton</class>
+		<name>network_mms</name>
+		<sensitive>False</sensitive>
+		<can_focus>True</can_focus>
+		<signal>
+		  <name>toggled</name>
+		  <handler>on_network_mms_toggled</handler>
+		  <last_modification_time>Sat, 01 Mar 2003 21:46:17 GMT</last_modification_time>
+		</signal>
+		<label>MMS</label>
+		<active>False</active>
+		<draw_indicator>True</draw_indicator>
+		<group>network</group>
+		<child>
+		  <padding>0</padding>
+		  <expand>False</expand>
+		  <fill>True</fill>
+		</child>
+	      </widget>
+	    </widget>
+
+	    <widget>
+	      <class>GtkHSeparator</class>
+	      <name>hseparator11</name>
+	      <child>
+		<padding>0</padding>
+		<expand>True</expand>
+		<fill>True</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>Placeholder</class>
+	    </widget>
+
+	    <widget>
+	      <class>Placeholder</class>
+	    </widget>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>Notebook:tab</child_name>
+	    <name>label20</name>
+	    <label>Network</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
 	  </widget>
 	</widget>
       </widget>
@@ -399,7 +727,7 @@ rtp6://:1234
       <widget>
 	<class>GtkLabel</class>
 	<child_name>Notebook:tab</child_name>
-	<name>media</name>
+	<name>media2</name>
 	<label>Media</label>
 	<justify>GTK_JUSTIFY_CENTER</justify>
 	<wrap>False</wrap>
@@ -410,61 +738,236 @@ rtp6://:1234
       </widget>
 
       <widget>
-	<class>GtkFixed</class>
-	<name>fixedPreferences</name>
+	<class>GtkVBox</class>
+	<name>vbox4</name>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
 
 	<widget>
-	  <class>GtkButton</class>
-	  <name>buttonSave</name>
-	  <x>8</x>
-	  <y>216</y>
-	  <width>54</width>
-	  <height>24</height>
-	  <can_focus>True</can_focus>
-	  <label>Save</label>
-	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <class>GtkScrolledWindow</class>
+	  <name>scrolledwindow5</name>
+	  <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+	  <vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
+	  <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+	  <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkCList</class>
+	    <name>clistplaylist</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>event</name>
+	      <handler>FamiliarPlaylistEvent</handler>
+	      <last_modification_time>Tue, 04 Mar 2003 21:47:16 GMT</last_modification_time>
+	    </signal>
+	    <columns>2</columns>
+	    <column_widths>140,80</column_widths>
+	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	    <show_titles>True</show_titles>
+	    <shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>label25</name>
+	      <label>MRL</label>
+	      <justify>GTK_JUSTIFY_LEFT</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <child_name>CList:title</child_name>
+	      <name>label26</name>
+	      <label>Time</label>
+	      <justify>GTK_JUSTIFY_RIGHT</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+	  </widget>
 	</widget>
 
 	<widget>
-	  <class>GtkButton</class>
-	  <name>buttonApply</name>
-	  <x>64</x>
-	  <y>216</y>
-	  <width>54</width>
-	  <height>24</height>
-	  <can_focus>True</can_focus>
-	  <label>Apply</label>
-	  <relief>GTK_RELIEF_NORMAL</relief>
-	</widget>
+	  <class>GtkHBox</class>
+	  <name>hbox11</name>
+	  <homogeneous>True</homogeneous>
+	  <spacing>0</spacing>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	  </child>
 
-	<widget>
-	  <class>GtkButton</class>
-	  <name>buttonCancel</name>
-	  <x>176</x>
-	  <y>216</y>
-	  <width>54</width>
-	  <height>24</height>
-	  <can_focus>True</can_focus>
-	  <label>Cancel</label>
-	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>update_playlist</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>FamiliarPlaylistUpdate</handler>
+	      <last_modification_time>Wed, 05 Mar 2003 16:52:19 GMT</last_modification_time>
+	    </signal>
+	    <label>Update</label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>playlist_del</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>FamiliarPlaylistDel</handler>
+	      <last_modification_time>Wed, 05 Mar 2003 16:44:52 GMT</last_modification_time>
+	    </signal>
+	    <label> Del </label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>5</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>playlist_clear</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>FamiliarPlaylistClear</handler>
+	      <last_modification_time>Wed, 05 Mar 2003 16:26:29 GMT</last_modification_time>
+	    </signal>
+	    <label> Clear </label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>5</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
 	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>playlist</name>
+	<label>Playlist</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>GtkVBox</class>
+	<name>vbox2</name>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
 
 	<widget>
 	  <class>GtkCheckButton</class>
 	  <name>cbautoplay</name>
-	  <x>8</x>
-	  <y>8</y>
-	  <width>216</width>
-	  <height>24</height>
 	  <can_focus>True</can_focus>
 	  <signal>
 	    <name>toggled</name>
 	    <handler>on_cbautoplay_toggled</handler>
-	    <last_modification_time>Sun, 18 Aug 2002 20:00:52 GMT</last_modification_time>
+	    <last_modification_time>Sun, 09 Feb 2003 22:37:17 GMT</last_modification_time>
 	  </signal>
-	  <label>Automatically play file.</label>
+	  <label>Automatically play file</label>
 	  <active>True</active>
 	  <draw_indicator>True</draw_indicator>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>Placeholder</class>
+	</widget>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>hbox2</name>
+	  <homogeneous>True</homogeneous>
+	  <spacing>0</spacing>
+	  <child>
+	    <padding>2</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	    <pack>GTK_PACK_END</pack>
+	  </child>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>buttonSave</name>
+	    <can_focus>True</can_focus>
+	    <label> Save </label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>buttonApply</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>FamiliarPreferencesApply</handler>
+	      <last_modification_time>Thu, 13 Mar 2003 15:03:49 GMT</last_modification_time>
+	    </signal>
+	    <label> Apply </label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>Placeholder</class>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>buttonCancel</name>
+	    <can_focus>True</can_focus>
+	    <label> Cancel </label>
+	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	      <pack>GTK_PACK_END</pack>
+	    </child>
+	  </widget>
 	</widget>
       </widget>
 
@@ -482,86 +985,117 @@ rtp6://:1234
       </widget>
 
       <widget>
-	<class>GtkFixed</class>
-	<name>fixedAbout</name>
+	<class>GtkScrolledWindow</class>
+	<name>scrolledwindow3</name>
+	<hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+	<vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
+	<hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+	<vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
 
 	<widget>
-	  <class>GtkPixmap</class>
-	  <name>logo</name>
-	  <x>8</x>
-	  <y>0</y>
-	  <width>50</width>
-	  <height>50</height>
-	  <filename>vlc32x32.xpm</filename>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	  <build_insensitive>True</build_insensitive>
-	</widget>
+	  <class>GtkViewport</class>
+	  <name>viewport1</name>
+	  <shadow_type>GTK_SHADOW_NONE</shadow_type>
 
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>labelCopyright</name>
-	  <x>16</x>
-	  <y>56</y>
-	  <width>200</width>
-	  <height>18</height>
-	  <label>(c) 1996-2003 the VideoLAN team</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
+	  <widget>
+	    <class>GtkFixed</class>
+	    <name>fixed2</name>
 
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>labelAuthors</name>
-	  <x>16</x>
-	  <y>80</y>
-	  <width>200</width>
-	  <height>40</height>
-	  <label>Authors: The VideoLAN Team, http://www.videolan.org</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>True</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
+	    <widget>
+	      <class>GtkPixmap</class>
+	      <name>pixmap2</name>
+	      <x>8</x>
+	      <y>0</y>
+	      <width>50</width>
+	      <height>50</height>
+	      <filename>vlc32x32.xpm</filename>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	      <build_insensitive>True</build_insensitive>
+	    </widget>
 
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>labelAbout</name>
-	  <x>16</x>
-	  <y>128</y>
-	  <width>200</width>
-	  <height>70</height>
-	  <label>The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources.</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>True</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label8</name>
+	      <x>16</x>
+	      <y>56</y>
+	      <width>200</width>
+	      <height>18</height>
+	      <label>(c) 1996-2003 the VideoLAN team</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
 
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>labelVlc</name>
-	  <x>64</x>
-	  <y>8</y>
-	  <width>120</width>
-	  <height>40</height>
-	  <label>VLC media player</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>True</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label9</name>
+	      <x>16</x>
+	      <y>80</y>
+	      <width>200</width>
+	      <height>40</height>
+	      <label>Authors: The VideoLAN Team, http://www.videolan.org</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>True</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label11</name>
+	      <x>64</x>
+	      <y>8</y>
+	      <width>120</width>
+	      <height>40</height>
+	      <label>VLC media player</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>True</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label27</name>
+	      <x>16</x>
+	      <y>200</y>
+	      <width>208</width>
+	      <height>16</height>
+	      <label>http://www.videolan.org</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label10</name>
+	      <x>16</x>
+	      <y>128</y>
+	      <width>200</width>
+	      <height>70</height>
+	      <label>The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources.</label>
+	      <justify>GTK_JUSTIFY_LEFT</justify>
+	      <wrap>True</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+	  </widget>
 	</widget>
       </widget>
 
