@@ -441,6 +441,22 @@ XP).
 
 </para></answer></qandaentry>
 
+<qandaentry>
+
+<question><para>I have selected a subtitle file, but nothing
+happens!</para></question>
+
+<answer><para>This is a known problem. To correct it, open the
+preferences panel (in the View menu), and in the
+<emphasis>Decoders</emphasis> tab click on <emphasis>subtitles decoder
+module (spudec)</emphasis>, without checking the box. Then, click on
+<emphasis>Configure</emphasis>, and replace the given path with the
+correct path to the font file. It should be something like this:
+<command>C:\vlc\share\font-eutopiabold36.rle</command>. Then save the
+preferences.
+
+</para></answer></qandaentry>
+
 </qandadiv>
 
 <qandadiv><title>Planned ports</title>
