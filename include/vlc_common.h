@@ -110,6 +110,15 @@
 
 typedef uint8_t                 byte_t;
 
+/* Systems that don't have stdint.h may not define INT64_MIN and
+   INT64_MAX */
+#ifndef INT64_MIN
+#define INT64_MIN (-9223372036854775807LL-1)
+#endif
+#ifndef INT64_MAX
+#define INT64_MAX (9223372036854775807LL)
+#endif
+
 /* ptrdiff_t definition */
 #ifdef HAVE_STDDEF_H
 #   include <stddef.h>
