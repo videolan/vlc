@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.23 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: asf.c,v 1.24 2003/03/16 13:11:28 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -773,6 +773,23 @@ static int Demux( input_thread_t *p_input )
     demux_sys_t *p_demux = p_input->p_demux_data;
     vlc_bool_t b_play_audio;
     int i;
+    vlc_bool_t b_stream;
+
+    b_stream = VLC_FALSE;
+    for( i = 0; i < 128; i++ )
+    {
+        if( p_demux->stream[i] &&
+            p_demux->stream[i]->p_es &&
+            p_demux->stream[i]->p_es->p_decoder_fifo )
+        {
+            b_stream = VLC_TRUE;
+        }
+    }
+    if( !b_stream )
+    {
+        msg_Warn( p_input, "no stream selected, exiting..." );
+        return( 0 );
+    }
 
     /* catch seek from user */
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
@@ -832,6 +849,11 @@ static int Demux( input_thread_t *p_input )
         mtime_t i_length;
         mtime_t i_time_begin = GetMoviePTS( p_demux );
         int i_result;
+
+        if( p_input->b_die )
+        {
+            break;
+        }
 
         if( ( i_result = DemuxPacket( p_input, b_play_audio ) ) <= 0 )
         {
