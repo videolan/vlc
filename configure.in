@@ -33,10 +33,8 @@ AC_PROG_RANLIB
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
-dnl Check for endianness if not cross-compiling
-if test x${cross_compiling} != xyes; then
-  AC_C_BIGENDIAN
-fi
+dnl Check for endianness
+AC_C_BIGENDIAN
 
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.130 2001/08/27 16:13:20 massiot Exp $
+ * $Id: input.c,v 1.131 2001/09/24 11:17:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -808,7 +808,7 @@ static void NetworkOpen( input_thread_t * p_input )
     
     if( i_opt < 0x80000 )
     {
-        intf_ErrMsg( "input warning: socket receive buffer size just %d instead of %d bytes.\n",
+        intf_WarnMsg( 1, "input warning: socket receive buffer size just %d instead of %d bytes.",
                      i_opt, 0x80000 );
     }
 

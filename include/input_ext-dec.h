@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.34 2001/08/22 17:21:45 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.35 2001/09/24 11:17:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -255,7 +255,18 @@ static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream,
     }
 
     UnalignedShowBits( p_bit_stream, i_bits );
-    return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
+
+    /* Now that we have filled in the buffers, do it again. Can't call
+     * ShowBits() instead, because the function is inline... */
+    if( p_bit_stream->fifo.i_available >= i_bits )
+    {
+        return( p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits) );
+    }
+
+    return( (p_bit_stream->fifo.buffer |
+                (WORD_AT( p_bit_stream->p_byte )
+                    >> p_bit_stream->fifo.i_available))
+                >> (8 * sizeof(WORD_TYPE) - i_bits) );
 }
 
 /*****************************************************************************

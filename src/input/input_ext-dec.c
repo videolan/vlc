@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.18 2001/08/22 17:21:45 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.19 2001/09/24 11:17:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -216,6 +216,9 @@ void UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                     AlignWord( p_bit_stream );
                 }
             }
+
+            /* We have 32 bits ready for reading, it will be enough. */
+            break;
         }
     }
 }

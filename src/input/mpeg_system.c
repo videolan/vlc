@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.57 2001/09/06 18:21:02 henri Exp $
+ * $Id: mpeg_system.c,v 1.58 2001/09/24 11:17:49 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -149,7 +149,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Get the PES size if defined */
     p_es->i_pes_real_size = U16_AT(p_header + 4);
     if( p_es->i_pes_real_size )
+    {
         p_es->i_pes_real_size += 6;
+    }
 
     /* First read the 6 header bytes common to all PES packets:
      * use them to test the PES validity */
@@ -947,9 +949,9 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
 
-    #define p (p_data->p_buffer)
+#define p (p_data->p_buffer)
     /* Extract flags values from TS common header. */
-    i_pid = U16_AT(&p[1]) & 0x1fff;
+    i_pid = ((p[1] & 0x1F) << 8) | p[2];
     b_unit_start = (p[1] & 0x40);
     b_adaptation = (p[3] & 0x20);
     b_payload = (p[3] & 0x10);
@@ -964,9 +966,13 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
         
         if( p_es_demux->b_psi )
+        {
             b_psi = 1;
+        }
         else
+        {
             p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
+        }
     }
 
     vlc_mutex_lock( &p_input->stream.control.control_lock );
@@ -975,15 +981,18 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
     }
-    else if( p_es->p_decoder_fifo == NULL  && !b_psi )
-      b_trash =1; 
+    else if( p_es->p_decoder_fifo == NULL && !b_psi )
+    {
+        b_trash = 1; 
+    }
 
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 
     /* Don't change the order of the tests : if b_psi then p_pgrm_demux 
-     * may still be null. Who said it was ugly ? */
+     * may still be null. Who said it was ugly ?
+     * I have written worse. --Meuuh */
     if( ( p_es != NULL ) && 
         ((p_es->p_decoder_fifo != NULL) || b_psi 
                                    || (p_pgrm_demux->i_pcr_pid == i_pid) ) )
@@ -1017,7 +1026,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                 if( b_payload ? (p[4] > 182) : (p[4] != 183) )
                 {
                     intf_WarnMsg( 2,
-                        "invalid TS adaptation field (%p)",
+                        "Invalid TS adaptation field (%p)",
                         p_data );
                     p_data->b_discard_payload = 1;
 #ifdef STATS
@@ -1044,7 +1053,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                         p_es->p_pgrm->i_synchro_state = SYNCHRO_REINIT;
     
                         /* There also may be a continuity_counter
-                         * discontinuity: resynchronise our counter with
+                         * discontinuity: resynchronize our counter with
                          * the one of the stream. */
                         p_es_demux->i_continuity_counter = (p[3] & 0x0f) - 1;
                     }
@@ -1052,7 +1061,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                     /* If this is a PCR_PID, and this TS packet contains a
                      * PCR, we pass it along to the PCR decoder. */
 
-                    if( !b_psi && (p_pgrm_demux->i_pcr_pid == i_pid) && (p[5] & 0x10) )
+                    if( !b_psi && (p_pgrm_demux->i_pcr_pid == i_pid)
+                        && (p[5] & 0x10) )
                     {
                         /* There should be a PCR field in the packet, check
                          * if the adaptation field is long enough to carry
@@ -1061,9 +1071,11 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                         {
                             /* Read the PCR. */
                             mtime_t     pcr_time;
-                            pcr_time =
-                                    ( (mtime_t)U32_AT((u32*)&p[6]) << 1 )
-                                      | ( p[10] >> 7 );
+                            pcr_time = ( (mtime_t)p[6] << 25 ) |
+                                       ( (mtime_t)p[7] << 17 ) |
+                                       ( (mtime_t)p[8] << 9 ) |
+                                       ( (mtime_t)p[9] << 1 ) |
+                                       ( (mtime_t)p[10] >> 7 );
                             /* Call the pace control. */
                             input_ClockManageRef( p_input, p_es->p_pgrm,
                                                   pcr_time );
@@ -1093,7 +1105,6 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
             }
             else if( i_dummy <= 0 )
             {
-                /* FIXME: this can never happen, can it ? --Meuuh */
                 /* Duplicate packet: mark it as being to be trashed. */
                 intf_WarnMsg( 3, "Duplicate packet received by TS demux" );
                 b_trash = 1;
@@ -1104,8 +1115,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                  * this ES since the continuity counter ranges between 0 and
                  * 0x0F excepts when it has been initialized by the input:
                  * init the counter to the correct value. */
-                intf_DbgMsg( "First packet for PID %d received by TS demux",
-                             p_es->i_id );
+                intf_WarnMsg( 3, "First packet for PID %d received by TS demux",
+                              p_es->i_id );
                 p_es_demux->i_continuity_counter = (p[3] & 0x0f);
             }
             else
@@ -1181,7 +1192,9 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
             p+=(u8)p[0];
         }
         else
+        {
             p++;
+        }
 
         /* This is the begining of a new section */
 
@@ -1192,7 +1205,7 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
         }
         else 
         {
-            p_psi->i_section_length = U16_AT(p+1) & 0x0fff;
+            p_psi->i_section_length = ((p[1] & 0xF) << 8) | p[2];
             p_psi->b_section_complete = 0;
             p_psi->i_read_in_section = 0;
             p_psi->i_section_number = (u8)p[6];
@@ -1217,7 +1230,8 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                     
                     if( p_psi->i_version_number != (( p[5] >> 1 ) & 0x1f) )
                     {
-                        intf_WarnMsg( 2,"PSI version differs inside same PAT" );
+                        intf_WarnMsg( 2,
+                                      "PSI version differs inside same PAT" );
                         p_psi->b_trash = 1;
                     }
                     if( p_psi->i_section_number + 1 != (u8)p[6] )
@@ -1266,7 +1280,7 @@ void input_DemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                     input_DecodePMT( p_input, p_es );
                     break;
                 default:
-                    intf_WarnMsg(2, "Received unknown PSI in demuxPSI");
+                    intf_WarnMsg(2, "Received unknown PSI in DemuxPSI");
                 }
             }
         }
@@ -1326,13 +1340,17 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         
         do
         {
-            i_section_length = U16_AT(p_current_data+1) & 0x0fff;
+            i_section_length = ((p_current_data[1] & 0xF) << 8) |
+                                 p_current_data[2];
             i_current_section = (u8)p_current_data[6];
     
             for( i_loop = 0; i_loop < (i_section_length-9)/4 ; i_loop++ )
             {
-                i_program_id = U16_AT(p_current_data + i_loop*4 + 8);
-                i_pmt_pid = U16_AT( p_current_data + i_loop*4 + 10) & 0x1fff;
+                i_program_id = ( *(p_current_data + i_loop * 4 + 8) << 8 ) |
+                                 *(p_current_data + i_loop * 4 + 9);
+                i_pmt_pid = ( (*( p_current_data + i_loop * 4 + 10) & 0x1F)
+                                    << 8 ) |
+                               *( p_current_data + i_loop * 4 + 11);
     
                 /* If program = 0, we're having info about NIT not PMT */
                 if( i_program_id )
@@ -1401,12 +1419,13 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
-        
-        p_pgrm_data->i_pcr_pid = U16_AT(p_current_section + 8) & 0x1fff;
-        
+
+        p_pgrm_data->i_pcr_pid = ( (*(p_current_section + 8) & 0x1F) << 8 ) |
+                                    *(p_current_section + 9);
+
         i_audio_es = 0;
         i_spu_es = 0;
-        
+
         /* Lock stream information */
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -1454,21 +1473,24 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         /* Then add what we received in this PMT */
         do
         {
-            
-            i_section_length = U16_AT(p_current_data+1) & 0x0fff;
+            i_section_length = ( (*(p_current_data + 1) & 0xF) << 8 ) |
+                                  *(p_current_data + 2);
             i_current_section = (u8)p_current_data[6];
-            i_prog_info_length = U16_AT(p_current_data+10) & 0x0fff;
+            i_prog_info_length = ( (*(p_current_data + 10) & 0xF) << 8 ) |
+                                    *(p_current_data + 11);
 
             /* For the moment we ignore program descriptors */
-            p_current_data += 12+i_prog_info_length;
+            p_current_data += 12 + i_prog_info_length;
     
             /* The end of the section, before the CRC is at 
              * p_current_section + i_section_length -1 */
             while( p_current_data < p_current_section + i_section_length -1 )
             {
                 i_stream_type = (int)p_current_data[0];
-                i_pid = U16_AT( p_current_data + 1 ) & 0x1fff;
-                i_es_info_length = U16_AT( p_current_data + 3 ) & 0x0fff;
+                i_pid = ( (*(p_current_data + 1) & 0x1F) << 8 ) |
+                           *(p_current_data + 2);
+                i_es_info_length = ( (*(p_current_data + 3) & 0xF) << 8 ) |
+                                      *(p_current_data + 4);
                 
                 /* Add this ES to the program */
                 p_new_es = input_AddES( p_input, p_es->p_pgrm, 
@@ -1501,7 +1523,7 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                         if( i_audio_es == i_required_audio_es )
                             input_SelectES( p_input, p_new_es );
                         break;
-                    /* Not sure this one is fully norm-compliant */
+                    /* Not sure this one is fully specification-compliant */
                     case DVD_SPU_ES :
                         p_new_es->i_cat = SPU_ES;
                         i_spu_es += 1;
@@ -1517,17 +1539,21 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             }
 
             /* Go to the beginning of the next section*/
-            p_current_data += 3+i_section_length;
+            p_current_data += 3 + i_section_length;
            
-            p_current_section+=1;
+            p_current_section++;
             
         } while( i_current_section < p_psi->i_last_section_number );
 
         if( i_required_audio_es > i_audio_es )
-            intf_WarnMsg( 2, "TS input: Non-existing audio es required." );
+        {
+            intf_WarnMsg( 2, "TS input: Non-existing audio ES required." );
+        }
         
         if( i_required_spu_es > i_spu_es )
-            intf_WarnMsg( 2, "TS input: Non-existing subtitles es required." );
+        {
+            intf_WarnMsg( 2, "TS input: Non-existing subtitles ES required." );
+        }
         
         p_pgrm_data->i_pmt_version = p_psi->i_version_number;
 
