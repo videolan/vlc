@@ -191,10 +191,10 @@ HWND Interface::CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_FILE, (LPARAM)&tbbi );
     menu_file = (HMENU)tbbi.lParam;
-    RemoveMenu( hmenu_file, 0, MF_BYPOSITION );
+    RemoveMenu( menu_file, 0, MF_BYPOSITION );
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_VIEW, (LPARAM)&tbbi );
     menu_view = (HMENU)tbbi.lParam;
-    RemoveMenu( hmenu_view, 0, MF_BYPOSITION );
+    RemoveMenu( menu_view, 0, MF_BYPOSITION );
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_SETTINGS, (LPARAM)&tbbi );
     menu_settings = (HMENU)tbbi.lParam;
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_VIDEO, (LPARAM)&tbbi );
