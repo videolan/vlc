@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.24 2003/01/08 13:52:56 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.25 2003/01/08 15:13:32 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,12 +135,15 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
 static void Play( void *aout, void *p_buffer, size_t i_size,
                   const media_raw_audio_format &format )
 {
+    aout_instance_t *p_aout = (aout_instance_t*)aout;
+    aout_sys_t *p_sys = (aout_sys_t*)p_aout->output.p_sys;
     aout_buffer_t * p_aout_buffer;
-    aout_instance_t *p_aout = (aout_instance_t*) aout;
+    mtime_t current_date;
     
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
-    p_aout_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    /* FIXME - I don't know the right way to calculate this */
+    current_date = mdate() + 50000;
+    
+    p_aout_buffer = aout_OutputNextBuffer( p_aout, current_date, VLC_FALSE );
 
     if( p_aout_buffer != NULL )
     {
