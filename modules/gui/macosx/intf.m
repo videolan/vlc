@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.14 2003/01/01 11:14:50 jlj Exp $
+ * $Id: intf.m,v 1.15 2003/01/02 23:09:30 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -225,6 +225,7 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_vol_down setTitle: _NS("Softer")];
     [o_mi_mute setTitle: _NS("Mute")];
     [o_mi_channels setTitle: _NS("Channels")];
+    [o_mi_device setTitle: _NS("Device")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_screen setTitle: _NS("Screen")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
@@ -519,6 +520,7 @@ static void Run( intf_thread_t *p_intf )
         [o_mi_language setEnabled: FALSE];
         [o_mi_subtitle setEnabled: FALSE];
         [o_mi_channels setEnabled: FALSE];
+        [o_mi_device setEnabled: FALSE];
         [o_mi_screen setEnabled: FALSE];
     }
 
@@ -736,6 +738,9 @@ static void Run( intf_thread_t *p_intf )
             [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
                 var: "audio-channels" selector: @selector(toggleVar:)];
 
+            [self setupVarMenu: o_mi_device target: (vlc_object_t *)p_aout
+                var: "audio-device" selector: @selector(toggleVar:)];
+
             vlc_object_release( (vlc_object_t *)p_aout );
         }
 
@@ -911,11 +916,6 @@ static void Run( intf_thread_t *p_intf )
     }
 
     [o_prefs createPrefPanel: @"main"];
-}
-
-- (id)getMIDevice
-{
-    return o_mi_device;
 }
 
 @end

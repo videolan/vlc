@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.7 2003/01/01 11:14:50 jlj Exp $
+ * $Id: intf.h,v 1.8 2003/01/02 23:09:30 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -177,8 +177,6 @@ struct intf_sys_t
 //- (void)selectAction:(id)sender;
 
 - (IBAction)viewPreferences:(id)sender;
-
-- (id)getMIDevice;
 
 @end
 
