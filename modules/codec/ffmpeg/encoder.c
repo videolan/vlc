@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.9 2003/11/26 13:59:16 gbazin Exp $
+ * $Id: encoder.c,v 1.10 2003/11/26 22:12:48 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -194,7 +194,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
         p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
-        p_context->bit_rate    = p_enc->fmt_out.i_bitrate;
         p_context->sample_rate = p_enc->fmt_in.audio.i_rate;
         p_context->channels    = p_enc->fmt_in.audio.i_channels;
         p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
@@ -203,6 +202,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     }
 
     /* Misc parameters */
+    p_context->bit_rate = p_enc->fmt_out.i_bitrate;
     p_context->gop_size = p_enc->i_key_int > 0 ? p_enc->i_key_int : 50;
     p_context->max_b_frames =
         __MIN( p_enc->i_b_frames, FF_MAX_B_FRAMES );

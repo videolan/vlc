@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.60 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.61 2003/11/26 22:12:48 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -99,7 +99,7 @@ vlc_module_begin();
     /* chroma conversion submodule */
     add_submodule();
     set_capability( "chroma", 50 );
-    set_callbacks( E_(OpenChroma), NULL );
+    set_callbacks( E_(OpenChroma), E_(CloseChroma) );
     set_description( _("ffmpeg chroma conversion") );
 
     /* encoder submodule */

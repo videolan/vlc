@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.29 2003/11/23 20:37:04 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.30 2003/11/26 22:12:48 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,6 +52,7 @@ aout_buffer_t *E_( DecodeAudio ) ( decoder_t *, block_t ** );
 
 /* Chroma conversion module */
 int  E_(OpenChroma)( vlc_object_t * );
+void E_(CloseChroma)( vlc_object_t * );
 
 /* Video encoder module */
 int  E_(OpenEncoder) ( vlc_object_t * );
