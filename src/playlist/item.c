@@ -271,12 +271,14 @@ static void GuessType( input_item_t *p_item)
         { "mms", ITEM_TYPE_NET },
         { "rtsp", ITEM_TYPE_NET },
         { "udp", ITEM_TYPE_NET },
+        { "rtp", ITEM_TYPE_NET },
         { "vcd", ITEM_TYPE_DISC },
         { "v4l", ITEM_TYPE_CARD },
         { "dshow", ITEM_TYPE_CARD },
         { "pvr", ITEM_TYPE_CARD },
         { "dvb", ITEM_TYPE_CARD },
         { "qpsk", ITEM_TYPE_CARD },
+        { "sdp", ITEM_TYPE_NET },
         { NULL, 0 }
     };
 

@@ -1253,6 +1253,7 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
     if( event.GetId() < FirstView_Event )
     {
         event.Skip();
+        vlc_object_release( p_playlist );
         return;
     }
     else if( event.GetId() < LastView_Event )
@@ -1332,13 +1333,6 @@ wxMenu * Playlist::ViewMenu()
                            wxU(_("All items, unsorted") ) );
     p_view_menu->Append( FirstView_Event + VIEW_S_AUTHOR,
                            wxU(_("Sorted by author") ) );
-#if 0
-    for( int i = 0; i< p_playlist->i_views; i++ )
-    {
-        p_view_menu->Append( FirstView_Event + p_playlist->pp_views[i]->i_id,
-                             wxU( p_playlist->pp_views[i]->psz_name ) );
-    }
-#endif
 
     vlc_object_release( p_playlist);
 

@@ -54,7 +54,8 @@
 
 /* SAP is always on that port */
 #define SAP_PORT 9875
-#define SAP_V4_ADDRESS "224.2.127.254"
+//#define SAP_V4_ADDRESS "224.2.127.254"
+#define SAP_V4_ADDRESS "0.0.0.0"
 #define ADD_SESSION 1
 
 #define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
@@ -144,6 +145,13 @@ struct  sdp_t
     char *psz_connection;
     char *psz_media;
 
+    /* o field */
+    char *psz_username;
+    char *psz_network_type;
+    char *psz_address_type;
+    char *psz_address;
+    int i_session_id;
+
     /* "computed" URI */
     char *psz_uri;
 
@@ -216,6 +224,7 @@ struct services_discovery_sys_t
     static void CacheSave( services_discovery_t *p_sd );
 /* Helper functions */
    static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
+   static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
    static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
    static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
@@ -625,6 +634,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         psz_sdp++;
     }
 
+
     /* Parse SDP info */
     p_sdp = ParseSDP( VLC_OBJECT(p_sd), psz_sdp );
 
@@ -655,8 +665,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     {
         /* FIXME: slow */
         /* FIXME: we create a new announce each time the sdp changes */
-        if( !strcmp( p_sd->p_sys->pp_announces[i]->p_sdp->psz_sdp,
-                    p_sdp->psz_sdp ) )
+        if( IsSameSession( p_sd->p_sys->pp_announces[i]->p_sdp, p_sdp ) )
         {
             if( b_need_delete )
             {
@@ -937,6 +946,11 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 {
     sdp_t *p_sdp;
 
+    if( psz_sdp == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+
     if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
     {
         msg_Warn( p_obj, "bad SDP packet" );
@@ -958,7 +972,12 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     while( *psz_sdp != '\0'  )
     {
         char *psz_eol;
-        while( *psz_sdp == '\r' || *psz_sdp == '\n' || *psz_sdp == ' ' || *psz_sdp == '\t' )
+        char *psz_eof;
+        char *psz_parse;
+        char *psz_sess_id;
+
+        while( *psz_sdp == '\r' || *psz_sdp == '\n' ||
+               *psz_sdp == ' ' || *psz_sdp == '\t' )
         {
             psz_sdp++;
         }
@@ -995,6 +1014,32 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
                 p_sdp->psz_sessionname = strdup( &psz_sdp[2] );
                 break;
             case ( 'o' ):
+            {
+                /* o field is <username> <session id> <version>
+                 *  <network type> <address type> <address> */
+
+#define GET_FIELD(  store ) \
+                psz_eof = strchr( psz_parse, ' ' ); \
+                if( psz_eof ) { *psz_eof=0; store = strdup( psz_parse ); } \
+                else { store = strdup( psz_parse );}; psz_parse = psz_eof + 1 ;
+
+                psz_parse = &psz_sdp[2];
+                GET_FIELD( p_sdp->psz_username );
+                GET_FIELD( psz_sess_id );
+
+                p_sdp->i_session_id = atoi( psz_sess_id );
+
+                FREE( psz_sess_id );
+
+                GET_FIELD( psz_sess_id );
+                FREE( psz_sess_id );
+
+                GET_FIELD( p_sdp->psz_network_type );
+                GET_FIELD( p_sdp->psz_address_type );
+                GET_FIELD( p_sdp->psz_address );
+
+                break;
+            }
             case( 'i' ):
             case( 'u' ):
             case( 'e' ):
@@ -1206,6 +1251,35 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     free( p_announce );
 
     return VLC_SUCCESS;
+}
+
+static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 )
+{
+    /* A session is identified by
+     * username, session_id, network type, address type and address */
+    if( p_sdp1->psz_username && p_sdp2->psz_username &&
+        p_sdp1->psz_network_type && p_sdp2->psz_network_type &&
+        p_sdp1->psz_address_type && p_sdp2->psz_address_type &&
+        p_sdp1->psz_address &&  p_sdp2->psz_address )
+    {
+        if(
+           !strcmp( p_sdp1->psz_username , p_sdp2->psz_username ) &&
+           !strcmp( p_sdp1->psz_network_type , p_sdp2->psz_network_type ) &&
+           !strcmp( p_sdp1->psz_address_type , p_sdp2->psz_address_type ) &&
+           !strcmp( p_sdp1->psz_address , p_sdp2->psz_address ) &&
+           p_sdp1->i_session_id == p_sdp2->i_session_id )
+        {
+            return VLC_TRUE;
+        }
+        else
+        {
+            return VLC_FALSE;
+        }
+    }
+    else
+    {
+        return VLC_FALSE;
+    }
 }
 
 
