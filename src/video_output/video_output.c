@@ -10,29 +10,49 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include "vlc.h"
-/*
 #include <errno.h> 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef VIDEO_X11
 #include <X11/Xlib.h>
+#endif
 
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
 #include "vlc_thread.h"
-#include "thread.h"
-
 #include "video.h"
-#include "video_graphics.h"
 #include "video_output.h"
-#include "video_x11.h"
-*/
+#include "video_sys.h"
+#include "intf_msg.h"
 
-/*
+/*******************************************************************************
+ * Macros
+ *******************************************************************************/
+#define CLIP_BYTE( i_val ) ( (i_val < 0) ? 0 : ((i_val > 255) ? 255 : i_val) )
+
+/*******************************************************************************
+ * Constants
+ *******************************************************************************/
+
+/* RGB/YUV inversion matrix (ISO/IEC 13818-2 section 6.3.6, table 6.9) */
+int matrix_coefficients[8][4] =
+{
+  {117504, 138453, 13954, 34903},       /* no sequence_display_extension */
+  {117504, 138453, 13954, 34903},       /* ITU-R Rec. 709 (1990) */
+  {104597, 132201, 25675, 53279},       /* unspecified */
+  {104597, 132201, 25675, 53279},       /* reserved */
+  {104448, 132798, 24759, 53109},       /* FCC */
+  {104597, 132201, 25675, 53279},       /* ITU-R Rec. 624-4 System B, G */
+  {104597, 132201, 25675, 53279},       /* SMPTE 170M */
+  {117579, 136230, 16907, 35559}        /* SMPTE 240M (1987) */
+};
+
+/*******************************************************************************
  * Local prototypes
- */
+ *******************************************************************************/
 static int      InitThread          ( vout_thread_t *p_vout );
 static void     RunThread           ( vout_thread_t *p_vout );
 static void     ErrorThread         ( vout_thread_t *p_vout );
@@ -351,6 +371,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 static int InitThread( vout_thread_t *p_vout )
 {
     int     i_index;                                          /* generic index */    
+    int     i_pixel_size;     /* pixel size, in bytes, for translations tables */    
 
     /* Update status */
     *p_vout->pi_status = THREAD_START;    
@@ -378,6 +399,80 @@ static int InitThread( vout_thread_t *p_vout )
         *p_vout->pi_status = THREAD_ERROR;        
         return( 1 );
     } 
+
+    /* Allocate translation tables */
+    switch( p_vout->i_bytes_per_pixel )
+    {
+    case 2:                   /* 15 or 16 bpp, use 16 bits translations tables */        
+        i_pixel_size = sizeof( u16 );        
+        break;                
+    case 3:                   /* 24 or 32 bpp, use 32 bits translations tables */        
+    case 4:
+        i_pixel_size = sizeof( u32 );
+        break;        
+    }
+    p_vout->pi_trans16_red = p_vout->pi_trans32_red =     malloc( 1024 * i_pixel_size );
+    p_vout->pi_trans16_green = p_vout->pi_trans32_green = malloc( 1024 * i_pixel_size );
+    p_vout->pi_trans16_blue = p_vout->pi_trans32_blue =   malloc( 1024 * i_pixel_size );
+    if( (p_vout->pi_trans16_red == NULL) || 
+        (p_vout->pi_trans16_green == NULL ) ||
+        (p_vout->pi_trans16_blue == NULL ) )
+    {
+        if( p_vout->pi_trans16_red != NULL )
+        {
+            free( p_vout->pi_trans16_red );
+        }
+        if( p_vout->pi_trans16_green != NULL )
+        {
+            free( p_vout->pi_trans16_green );
+        }
+        if( p_vout->pi_trans16_blue != NULL )
+        {
+            free( p_vout->pi_trans16_blue );
+        }
+        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM) );
+        *p_vout->pi_status = THREAD_ERROR;        
+        return( 1 );
+    }        
+    
+    /* Translate translation tables */
+    p_vout->pi_trans16_red      += 384;
+    p_vout->pi_trans16_green    += 384;
+    p_vout->pi_trans16_blue     += 384;
+    p_vout->pi_trans32_red      += 384;
+    p_vout->pi_trans32_green    += 384;
+    p_vout->pi_trans32_blue     += 384;
+
+    /* Build translation tables */
+    switch( p_vout->i_screen_depth )
+    {
+    case 15:
+        for( i_index = -384; i_index < 640; i_index++) 
+        {
+            p_vout->pi_trans16_red[i_index]     = (CLIP_BYTE( i_index ) & 0xf8)<<7;
+            p_vout->pi_trans16_green[i_index]   = (CLIP_BYTE( i_index ) & 0xf8)<<2;
+            p_vout->pi_trans16_blue[i_index]    =  CLIP_BYTE( i_index ) >> 3;
+        }
+        break;        
+    case 16:
+        for( i_index = -384; i_index < 640; i_index++) 
+        {
+            p_vout->pi_trans16_red[i_index]     = (CLIP_BYTE( i_index ) & 0xf8)<<8;
+            p_vout->pi_trans16_green[i_index]   = (CLIP_BYTE( i_index ) & 0xf8)<<3;
+            p_vout->pi_trans16_blue[i_index]    =  CLIP_BYTE( i_index ) >> 3;
+        }
+    case 24:
+    case 32:        
+        for( i_index = -384; i_index < 640; i_index++) 
+        {
+            p_vout->pi_trans32_red[i_index]     =  CLIP_BYTE( i_index ) <<16;
+            p_vout->pi_trans32_green[i_index]   =  CLIP_BYTE( i_index ) <<8;
+            p_vout->pi_trans32_blue[i_index]    =  CLIP_BYTE( i_index ) ;
+        }
+        break;        
+    }
+    
+    //????
 
     /* Mark thread as running and return */
     *p_vout->pi_status = THREAD_READY;    
@@ -582,6 +677,11 @@ static void EndThread( vout_thread_t *p_vout )
             free( p_vout->p_picture[i_picture].p_data );
         }
     }
+
+    /* Destroy translation tables - remeber these tables are translated */    
+    free( p_vout->pi_trans16_red - 384 );
+    free( p_vout->pi_trans16_green - 384 );
+    free( p_vout->pi_trans16_blue - 384 );
     
     /* Destroy thread structures allocated by InitThread */
     vout_SysEnd( p_vout );
