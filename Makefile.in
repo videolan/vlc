@@ -342,10 +342,11 @@ distclean: clean
 	rm -rf .dep
 
 install:
+	mkdir -p $(prefix)/bin
 	$(INSTALL) vlc $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
-	mkdir -p $(prefix)/share/videolan
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
+	mkdir -p $(prefix)/share/videolan
 	$(INSTALL) -m 644 share/*.psf $(prefix)/share/videolan
 	$(INSTALL) -m 644 share/*.png $(prefix)/share/videolan
 
