@@ -93,8 +93,8 @@ vlc_module_begin();
                 RECURSIVE_LONGTEXT, VLC_FALSE );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
 #ifdef HAVE_STRSEP
-    add_string( "ignore-filetypes", "m3u,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue", NULL, IGNORE_TEXT,
-                IGNORE_LONGTEXT, VLC_FALSE );
+    add_string( "ignore-filetypes", "m3u,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
+                NULL, IGNORE_TEXT, IGNORE_LONGTEXT, VLC_FALSE );
 #endif
     set_callbacks( Open, Close );
 
@@ -420,32 +420,29 @@ static int ReadDir( playlist_t *p_playlist,
                     char *psz_name , int i_mode, int *pi_position,
                     playlist_item_t *p_parent )
 {
-    struct dirent   *p_dir_content;
     struct dirent   **pp_dir_content;
-    int             i_dir_content, i = 0;
+    int             i_dir_content, i;
     playlist_item_t *p_node;
-    char            *psz_ignore;
-    int             i_extensions = 0;
-    char            **ppsz_extensions;
 
     /* Build array with ignores */
 #ifdef HAVE_STRSEP
-    psz_ignore = var_CreateGetString( p_playlist, "ignore-filetypes" );
+    char **ppsz_extensions = 0;
+    int i_extensions = 0;
+    char *psz_ignore = var_CreateGetString( p_playlist, "ignore-filetypes" );
     if( psz_ignore && *psz_ignore )
     {
         char *psz_backup;
         char *psz_parser = psz_backup = strdup( psz_ignore );
         int a = 0;
 
-        while( strsep( &psz_parser, "," ) )
-        {
-            i_extensions++;
-        }
-        ppsz_extensions = (char **)malloc( sizeof( char * ) * i_extensions );
+        while( strsep( &psz_parser, "," ) ) i_extensions++;
         free( psz_backup );
 
-        psz_parser = psz_backup = strdup( psz_ignore );
-        while( a < i_extensions && ( ppsz_extensions[a++] = strsep( &psz_parser, "," ) ) );
+        ppsz_extensions = (char **)malloc( sizeof( char * ) * i_extensions );
+
+        psz_parser = psz_ignore;
+        while( a < i_extensions &&
+               ( ppsz_extensions[a++] = strsep( &psz_parser, "," ) ) );
     }
 #endif /* HAVE_STRSEP */
 
@@ -467,14 +464,14 @@ static int ReadDir( playlist_t *p_playlist,
         /* directory is empty */
         return VLC_SUCCESS;
     }
-    p_dir_content = pp_dir_content[0];
 
-    /* while we still have entries in the directory */
-    while( i < i_dir_content )
+    /* While we still have entries in the directory */
+    for( i = 0; i < i_dir_content; i++ )
     {
+        struct dirent *p_dir_content = pp_dir_content[i];
         int i_size_entry = strlen( psz_name ) +
                            strlen( p_dir_content->d_name ) + 2;
-        char *psz_uri = (char *)malloc( sizeof(char) * i_size_entry);
+        char *psz_uri = (char *)malloc( sizeof(char) * i_size_entry );
 
         sprintf( psz_uri, "%s/%s", psz_name, p_dir_content->d_name );
 
@@ -495,8 +492,6 @@ static int ReadDir( playlist_t *p_playlist,
                 {
                     msg_Dbg( p_playlist, "Skipping subdirectory %s", psz_uri );
                     free( psz_uri );
-                    i++;
-                    p_dir_content = pp_dir_content[i];
                     continue;
                 }
                 else if( i_mode == MODE_EXPAND )
@@ -534,11 +529,13 @@ static int ReadDir( playlist_t *p_playlist,
             }
             else
             {
+                playlist_item_t *p_item;
+
 #ifdef HAVE_STRSEP
                 if( i_extensions > 0 )
                 {
                     char *psz_dot = strrchr( p_dir_content->d_name, '.' );
-                    if( ++psz_dot && *psz_dot )
+                    if( psz_dot++ && *psz_dot )
                     {
                         int a;
                         for( a = 0; a < i_extensions; a++ )
@@ -550,18 +547,14 @@ static int ReadDir( playlist_t *p_playlist,
                         {
                             msg_Dbg( p_playlist, "Ignoring file %s", psz_uri );
                             free( psz_uri );
-                            i++;
-                            p_dir_content = pp_dir_content[i];
                             continue;
                         }
                     }
                 }
 #endif /* HAVE_STRSEP */
-                playlist_item_t *p_item = playlist_ItemNewWithType(
-                                                p_playlist,
-                                                psz_uri,
-                                                p_dir_content->d_name,
-                                                ITEM_TYPE_VFILE );
+
+                p_item = playlist_ItemNewWithType( p_playlist, psz_uri,
+                             p_dir_content->d_name, ITEM_TYPE_VFILE );
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,
@@ -571,10 +564,13 @@ static int ReadDir( playlist_t *p_playlist,
             }
         }
         free( psz_uri );
-        i++;
-        p_dir_content = pp_dir_content[i];
     }
+
+#ifdef HAVE_STRSEP
     if( ppsz_extensions ) free( ppsz_extensions );
+    if( psz_ignore ) free( psz_ignore );
+#endif /* HAVE_STRSEP */
+
     free( pp_dir_content );
     return VLC_SUCCESS;
 }
