@@ -1,24 +1,19 @@
-Wed Aug 16 01:07:14 CEST 2000
-0.1.99g :
+vlc (0.1.99g) unstable; urgency=low
 
   * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.
   * new --synchro flag which lets you force which images are decoded.
-  * removed an unused variable in the MMX YUVs.
   * fixed 32bpp MMX YUV, made the comments clearer, removed an emms.
   * now scaling is on by default, so that people won't tell that the vlc
     cannot do scaling :-)
-  * fixed a few long lines.
   * fixed 8bpp YUV.
   * fixed the fscked up Bresenham algorithm in all YUV functions.
   * fixed a dumb bug in the Makefile that prevented inclusion of the
     -march=pentium directive. thanks Meuuh, blame sam.
-  * fixed a warning in main.c.
-  * separate Debian packages.
-  * added request for ALSA support in the TODO list.
-  * changed "pentiumpro" to "ppro" in the ./configure, it was misleading.
+  * separate Debian packages
 
-Tue Aug  8 11:24:01 CEST 2000
-0.1.99f :
+ -- Samuel Hocevar <sam@via.ecp.fr>  Wed, 16 Aug 2000 01:07:14 +0200
+
+vlc (0.1.99f) unstable; urgency=low
 
   * plugin detection now works
   * "gvlc", "fbvlc", "ggivlc" aliases now work
@@ -29,27 +24,20 @@ Tue Aug  8 11:24:01 CEST 2000
   * borrowed linuxvideo's MMX motion compensation
   * fixed an undefined symbol in the MMX YUV plugin
 
-Thu Jul 20 15:14:06 CEST 2000
-0.1.99e :
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue,  8 Aug 2000 11:24:01 +0200
+
+vlc (0.1.99e) unstable; urgency=low
 
   * new bitstream syntax and slight performance increase
-  * BeOS build fix
-  * removed the sample code from the reference decoder
 
-Wed Jul 12 01:24:40 CEST 2000
-0.1.99d :
+ -- Samuel Hocevar <sam@via.ecp.fr>  Thu, 20 Jul 2000 15:14:06 +0200
 
-  * fixed RPM build
+vlc (0.1.99d) unstable; urgency=low
+
   * .deb is now more lintian-friendly
-  * fixed vlc.spec to install nicely
-  * PLUGIN_PATH and DATA_PATH now in include/*.h
   * removed a few useless warning messages
-  * removed remaining header stuff related to the old non-free decoder
-  * fixed the MGA build (doesn't work yet, though)
   * new plugin API
-  * updated the INSTALL document
   * plugin auto-detection
-  * fixed a few misspellings in the code
   * removed the default --enable-ppro option because it didn't work on K6-2
   * the framebuffer client now leaves the console in a working state
   * the dithered 8 bpp YUV transformation works again (blame bbp !)
@@ -57,30 +45,39 @@ Wed Jul 12 01:24:40 CEST 2000
   * alternative symlinks like gvlc, fbvlc are now created at compile time
   * borrowed libmpeg2's GPLed MMX YUV transformations (16 and 32 bits)
   * fixed an endianness problem which occured on iMacs
-  * fixed the build for the Mandrake distribution
 
-Sun Jun 18 18:54:48 CEST 2000
-0.1.99c :
+ -- Samuel Hocevar <sam@via.ecp.fr>  Wed, 12 Jul 2000 01:24:40 +0200
 
-  * fixed Makefile.in for debug version
-  * caught Delete Window event in Gnome and X11 modes
-  * fixed man page
+vlc (0.1.99c) unstable; urgency=low
+
+  * Caught Delete Window event in Gnome and X11 modes
+  * Fixed manpage
   * GGI output now works
-  * fixed a segfault on exit for the Gnome plugin
-  * fixed compile problems for BeOS
-  * sound support almost works under BeOS
-  * fixed a warning in ac3_exponent.c
-  * automatic support for .rpm and .deb building
+  * Fixed a segfault on exit for the Gnome plugin
+  * Sound support almost works under BeOS
 
-Sat Jun 17 03:35:02 CEST 2000
-0.1.99b :
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue, 20 Jun 2000 03:01:12 +0200
 
-  * fixed a bug preventing to quit when run with no arguments
-  * new VLAN changing code
-  * created the ChangeLog file :)
+vlc (0.1.99b) unstable; urgency=low
 
-Thu Jun 15 20:48:54 CEST 2000
-0.1.99a :
+  * Added a ChangeLog file
+  * Updated the VLAN code
+  * Fixed a bug preventing to quit
 
-  * first public release
+ -- Samuel Hocevar <sam@via.ecp.fr>  Sat, 17 Jun 2000 03:46:16 +0200
 
+vlc (0.1.99a) unstable; urgency=low
+
+  * Fixed some compile flag errors
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Thu, 15 Jun 2000 20:48:54 +0200
+
+vlc (0.1.99-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Mon, 13 Mar 2000 02:21:45 +0100
+
+Local variables:
+mode: debian-changelog
+End:

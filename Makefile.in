@@ -99,12 +99,12 @@ CCFLAGS += -fomit-frame-pointer
 ifneq (,$(findstring 86,$(ARCH)))
 CCFLAGS += -malign-double
 # Eventual Pentium Pro optimizations
-ifneq (,$(findstring pentiumpro,$(ARCH)))
+ifneq (,$(findstring ppro,$(ARCH)))
 ifneq ($(SYS), BSD)
 CCFLAGS += -march=pentiumpro
+endif
 else
 CCFLAGS += -march=pentium
-endif
 endif
 # Eventual MMX optimizations for x86
 ifneq (,$(findstring mmx,$(ARCH)))
