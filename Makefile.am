@@ -402,35 +402,81 @@ if HAVE_DARWIN
 vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
 VLC.app: vlc
-	cd $(top_builddir)
-	rm -Rf VLC.app
-	mkdir extras || true
-	cp -r $(srcdir)/extras/MacOSX extras || true
-	cd extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
-	cd $(top_builddir)
-	cp -r extras/MacOSX/build/vlc.bundle VLC.app
-	$(INSTALL) -d VLC.app/Contents/MacOS
-	$(INSTALL) vlc VLC.app/Contents/MacOS/VLC
-	$(INSTALL) -d VLC.app/Contents/MacOS/modules
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
-	  if test -n "$$i" ; then $(INSTALL) "$$i$(LIBEXT)" \
-	    "VLC.app/Contents/MacOS/modules" ; \
-	  fi ; done
-	$(INSTALL) -d VLC.app/Contents/MacOS/share
-	$(INSTALL) -d VLC.app/Contents/MacOS/share/http
-	$(INSTALL) -m 644 $(srcdir)/share/http/*.html VLC.app/Contents/MacOS/share/http
-	$(INSTALL) -d VLC.app/Contents/MacOS/share/http/admin
-	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html VLC.app/Contents/MacOS/share/http/admin
-	$(INSTALL) -d VLC.app/Contents/MacOS/locale
-	for i in $(ALL_LINGUAS); do \
-	  mkdir -p VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
-	  cp $(srcdir)/po/$${i}.gmo VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
-	  mkdir -p VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/InfoPlist.strings VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/MainMenu.nib VLC.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/vlc.scriptTerminology VLC.app/Contents/Resources/$${i}.lproj ; \
+	@if test -e "$(top_builddir)/tmp"; then \
+	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
+	  false; \
+	else \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
+	fi
+	rm -Rf $(top_builddir)/VLC.app
+	cp -r $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
+	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
+	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
-	printf "APPLVLC#" >| VLC.app/Contents/PkgInfo
+	mkdir -p $(top_builddir)/tmp/modules/audio_output
+	cp $(srcdir)/modules/audio_output/coreaudio.c \
+	   $(top_builddir)/tmp/modules/audio_output/coreaudio.c
+	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
+	for i in \
+	    about.h \
+	    about.m \
+	    applescript.h \
+	    applescript.m \
+	    controls.h \
+	    controls.m \
+	    info.h \
+	    info.m \
+	    intf.h \
+	    intf.m \
+	    macosx.m \
+	    misc.h \
+	    misc.m \
+	    open.h \
+	    open.m \
+	    output.h \
+	    output.m \
+	    playlist.h \
+	    playlist.m \
+	    prefs.h \
+	    prefs.m \
+	    vout.h \
+	    vout.m; do \
+	  cp "$(srcdir)/modules/gui/macosx/$$i" \
+             $(top_builddir)/tmp/modules/gui/macosx; \
+	done
+	cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
+	cp -r $(top_builddir)/tmp/extras/MacOSX/build/vlc.bundle \
+	      $(top_builddir)/VLC.app
+	rm -Rf $(top_builddir)/tmp
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
+	$(INSTALL) $(top_builddir)/vlc \
+		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	  if test -n "$$i" ; \
+	    then $(INSTALL) "$$i$(LIBEXT)" \
+			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
+	  fi ; done
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -m 644 $(srcdir)/share/http/*.html \
+	    $(top_builddir)/VLC.app/Contents/MacOS/share/http
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin
+	$(INSTALL) -m 644 $(srcdir)/share/http/admin/*.html \
+	    $(top_builddir)/VLC.app/Contents/MacOS/share/http/admin
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
+	for i in $(ALL_LINGUAS); do \
+	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
+	  cp $(srcdir)/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/InfoPlist.strings \
+	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/MainMenu.nib \
+	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+	  ln -sf ../English.lproj/vlc.scriptTerminology \
+	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
+	done
+	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
 endif
 
 if HAVE_WIN32
@@ -563,22 +609,22 @@ package-beos:
 
 package-macosx:
 # Check that tmp isn't in the way
-	@if test -e "$(srcdir)/tmp"; then \
-	  echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
+	@if test -e "$(top_builddir)/tmp"; then \
+	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(srcdir)/tmp"; \
+	  echo "OK."; mkdir -p "$(top_builddir)/tmp"; \
 	fi
 
 # Copy relevant files 
-	cp -R "$(srcdir)/VLC.app" "$(srcdir)/tmp/"
-	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS tmp/
+	cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/tmp/"
+	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/
 
 # Create disk image 
-	$(srcdir)/extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" $(srcdir)/tmp/* 
+	$(srcdir)/extras/MacOSX/macosx-dmg 18 "vlc-${VERSION}" $(top_builddir)/tmp/* 
 
 # Clean up
-	rm -Rf $(srcdir)/tmp
+	rm -Rf $(top_builddir)/tmp
 
 ###############################################################################
 # Stamp rules
