@@ -1,1 +1,2 @@
 SOURCES_mux_dummy = modules/mux/dummy.c
+SOURCES_mux_avi = modules/mux/avi.c

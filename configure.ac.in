@@ -914,7 +914,7 @@ AC_ARG_ENABLE(sout,
 if test "x${enable_sout}" != "xno"
 then
   PLUGINS="${PLUGINS} access_output_dummy access_output_udp access_output_file"
-  PLUGINS="${PLUGINS} mux_ts mux_ps mux_dummy"
+  PLUGINS="${PLUGINS} mux_ts mux_ps mux_avi mux_dummy"
   PLUGINS="${PLUGINS} packetizer_mpegaudio packetizer_mpegvideo packetizer_a52"
   PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_mpeg4audio"
   PLUGINS="${PLUGINS} packetizer_copy"
