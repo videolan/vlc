@@ -203,7 +203,7 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 
     if( src->video.p_palette )
     {
-        dst->video.p_palette = malloc( sizeof( video_palette_t ) );
+        dst->video.p_palette = (video_palette_t*)malloc( sizeof( video_palette_t ) );
         memcpy( dst->video.p_palette, src->video.p_palette, sizeof( video_palette_t ) );
     }
 }
