@@ -39,6 +39,7 @@
 
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
+#include "vlc_tls.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -77,11 +78,23 @@ static void Close( vlc_object_t * );
     "You can set the address and port the http interface will bind to." )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
+#define CERT_TEXT N_( "Certificate file" )
+#define CERT_LONGTEXT N_( "x509 PEM certificates path file" )
+#define KEY_TEXT N_( "Private key file" )
+#define KEY_LONGTEXT N_( "x509 PEM private key file" )
+#define CA_TEXT N_( "Root CA file" )
+#define CA_LONGTEXT N_( "x509 PEM trusted root CA certificates file" )
+#define CRL_TEXT N_( "CRL file" )
+#define CRL_LONGTEXT N_( "Certificates revocation list file" )
 
 vlc_module_begin();
     set_description( _("HTTP remote control interface") );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
+        add_string ( "http-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   VLC_TRUE );
+        add_string ( "http-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  VLC_TRUE );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -190,8 +203,10 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t    *p_sys;
     char          *psz_host;
     char          *psz_address = "";
+    const char    *psz_cert;
     int           i_port       = 0;
     char          *psz_src;
+    tls_server_t  *p_tls;
 
     psz_host = config_GetPsz( p_intf, "http-host" );
     if( psz_host )
@@ -206,12 +221,7 @@ static int Open( vlc_object_t *p_this )
             i_port = atoi( psz_parser );
         }
     }
-    if( i_port <= 0 )
-    {
-        i_port= 8080;
-    }
 
-    msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
     {
@@ -221,10 +231,62 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_intf), psz_address, i_port );
+    /* TODO: avoid possible code duplication in other modules */
+    psz_cert = config_GetPsz( p_intf, "http-cert" );
+    if ( psz_cert != NULL )
+    {
+        const char *psz_pem;
+        msg_Dbg( p_intf, "enablind TLS for HTTP interface (cert file: %s)",
+                 psz_cert );
+        psz_pem = config_GetPsz( p_intf, "http-key" );
+        if ( psz_pem == NULL )
+            psz_pem = psz_cert;
+
+        p_tls = tls_ServerCreate( VLC_OBJECT(p_intf), psz_cert, psz_pem );
+        if ( p_tls == NULL )
+        {
+            msg_Err( p_intf, "TLS initialization error" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
+        psz_pem = config_GetPsz( p_intf, "http-ca" );
+        if ( ( psz_pem != NULL) && tls_ServerAddCA( p_tls, psz_pem ) )
+        {
+            msg_Err( p_intf, "TLS CA error" );
+            tls_ServerDelete( p_tls );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
+        psz_pem = config_GetPsz( p_intf, "http-crl" );
+        if ( ( psz_pem != NULL) && tls_ServerAddCRL( p_tls, psz_pem ) )
+        {
+            msg_Err( p_intf, "TLS CRL error" );
+            tls_ServerDelete( p_tls );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
+        if( i_port <= 0 )
+            i_port = 8443;
+    }
+    else
+    {
+        p_tls = NULL;
+        if( i_port <= 0 )
+            i_port= 8080;
+    }
+
+    msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
+
+    p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_intf), psz_address,
+                                            i_port, p_tls );
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
+        if ( p_tls != NULL )
+            tls_ServerDelete( p_tls );
         free( p_sys );
         return VLC_EGENERIC;
     }
