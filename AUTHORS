@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.96 2003/08/06 12:01:06 jpsaman Exp $
+# $Id: AUTHORS,v 1.97 2003/08/20 19:36:28 babal Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -110,7 +110,7 @@ D: MacOS X sound support
 S: France
 
 N: Boris Dorès
-E: babal@via.ecp.fr
+E: babal(at)via.ecp.fr
 C: babal
 D: Win32 network input
 D: Win32 interface
