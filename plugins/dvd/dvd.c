@@ -20,13 +20,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#ifdef HAVE_CSS
+#define MODULE_NAME dvd-css
+#else /* HAVE_CSS */
+#define MODULE_NAME dvd
+#endif /* HAVE_CSS */
+#include "modules_inner.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
@@ -64,9 +68,9 @@ MODULE_INIT
     p_module->psz_name = MODULE_STRING;
 #ifdef HAVE_CSS
     p_module->psz_longname = "full DVD input module with CSS decryption";
-#else
+#else /* HAVE_CSS */
     p_module->psz_longname = "DVD input module, CSS decryption disabled";
-#endif
+#endif /* HAVE_CSS */
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL

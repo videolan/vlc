@@ -471,6 +471,7 @@ install:
 	mkdir -p $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
+	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
 
 show:
 	@echo CC: $(CC)
@@ -489,15 +490,11 @@ show:
 snapshot:
 	rm -rf /tmp/vlc-@VLC_VERSION@* /tmp/vlc-@VLC_VERSION@nocss*
 	# copy archive in /tmp
-	find -type d | while read i ; \
+	find -type d | grep -v CVS | grep -v '^\.dep' | while read i ; \
 		do mkdir -p /tmp/vlc-@VLC_VERSION@/$$i ; \
 	done
-	find debian -mindepth 1 -maxdepth 1 -type d | grep -v CVS | \
+	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -rf /tmp/vlc-@VLC_VERSION@/$$i ; done
-	# CVS entries
-	find . -type f | grep CVS | while read i ; \
-		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
-	done
 	# .c .h .in .cpp
 	find include src plugins -type f -name '*.[chi]*' | while read i ; \
 		do cp $$i /tmp/vlc-@VLC_VERSION@/$$i ; \
@@ -507,11 +504,13 @@ snapshot:
 		Makefile.in Makefile.dep configure configure.in install-sh \
 		config.sub config.guess todo.pl \
 			/tmp/vlc-@VLC_VERSION@/
-	for file in control vlc-gtk.menu vlc.copyright vlc.docs changelog \
-		rules vlc.1 vlc.dirs vlc.menu ; do \
+	for file in control control-css vlc-gtk.menu vlc.copyright vlc.docs \
+		changelog changelog-css rules rules-css vlc.1 vlc.dirs \
+		vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-@VLC_VERSION@/debian/ ; done
-	for file in default8x16.psf default8x9.psf gvlc.png vlc.png ; do \
-		cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
+	for file in default8x16.psf default8x9.psf gvlc.png vlc.png \
+		gvlc.xpm vlc.xpm ; do \
+			cp share/$$file /tmp/vlc-@VLC_VERSION@/share/ ; done
 
 	# build css-enabled archives
 	(cd /tmp ; tar cf vlc-@VLC_VERSION@.tar vlc-@VLC_VERSION@ ; \
@@ -519,28 +518,6 @@ snapshot:
 			> vlc-@VLC_VERSION@.tar.bz2 ; \
 		gzip -f -9 vlc-@VLC_VERSION@.tar )
 	mv /tmp/vlc-@VLC_VERSION@.tar.gz /tmp/vlc-@VLC_VERSION@.tar.bz2 ..
-
-	# removing CSS stuff
-	for x in plugins/dvd/dvd.c plugins/dvd/dvd_css.c ; do \
-	rm -f /tmp/vlc-@VLC_VERSION@/$$x ; \
-	perl -ne 'if (/^#e(lse|ndif).*HAVE_CSS/) { $$i=0; } \
-			if (/^#if.*HAVE_CSS/) { $$i=1; } \
-			elsif (!$$i && !/^#.*HAVE_CSS/) { print $$_; }' \
-		< $$x >| /tmp/vlc-@VLC_VERSION@/$$x ; \
-	done
-	rm -f /tmp/vlc-@VLC_VERSION@/plugins/dvd/dvd_csstables.c
-	rm -f /tmp/vlc-@VLC_VERSION@/debian/changelog
-	sed 's/\(^vlc ([^-]*\)-/\1nocss-/' < debian/changelog \
-		> /tmp/vlc-@VLC_VERSION@/debian/changelog
-
-	# build nocss archives
-	(cd /tmp ; mv vlc-@VLC_VERSION@ vlc-@VLC_VERSION@nocss ; \
-		tar cf vlc-@VLC_VERSION@nocss.tar vlc-@VLC_VERSION@nocss ; \
-		bzip2 -f -9 < vlc-@VLC_VERSION@nocss.tar \
-			> vlc-@VLC_VERSION@nocss.tar.bz2 ; \
-		gzip -f -9 vlc-@VLC_VERSION@nocss.tar )
-	mv /tmp/vlc-@VLC_VERSION@nocss.tar.gz \
-		/tmp/vlc-@VLC_VERSION@nocss.tar.bz2 ..
 
 	# clean up
 	rm -rf /tmp/vlc-@VLC_VERSION@*

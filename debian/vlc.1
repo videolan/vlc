@@ -16,7 +16,7 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc, fbvlc, gvlc \- The VideoLAN Client
+vlc, gvlc, kvlc \- The VideoLAN Client
 .SH SYNOPSIS
 .B vlc
 .RI [ OPTIONS ]
@@ -34,6 +34,9 @@ A summary of options is included below.
 .TP
 .B \-\-intf <module>
 Specify an interface module: "gnome", "curses", "shell", for instance.
+.TP
+.B \-\-warning <level>
+Select the warning level. 0 is the most verbose, 3 is almost mute.
 .TP
 .B \-\-noaudio
 Disable audio output.
@@ -85,12 +88,14 @@ heuristics based on CPU usage.
 displays I and P images and every second B image, and `IPB' forces
 displaying of all images.
 
-Note that the vlc is certainly going to crash if you ask it to
+Note that vlc is certainly going to crash if you ask it to
 display more images than your CPU can cope with.
 .TP
-.B vlc
-opens /dev/dvd, but this behaviour may be overridden by the vlc_dvd_device
-environment variable (see below).
+.B \-t, \-\-dvdtitle <title>
+Choose the DVD title. Most movies on DVDs start on the first title, but you may want to manually select another title.
+.TP
+.B \-T, \-\-dvdchapter <title>
+Choose the DVD chapter. DVDs are divided into titles, which in turn are divided into chapters.
 .TP
 .B \-a, \-\-dvdaudio [ ac3 | lpcm | mpeg | off ]
 Choose the audio channel type. Most DVDs have AC3 audio channels, but
@@ -105,11 +110,17 @@ audio channel will also depend on the channel type.
 .B \-s, \-\-dvdsubtitle [ 0\-31 ]
 Select the subtitle channel, if there is one in the stream.
 .TP
-.B \-\-novlans
-Disable VLANs support.
+.B \-\-input <method>
+Choose the input method, "dvd", "ps", "ts" for instance.
+.TP
+.B \-\-vlans
+Enable VLANs support. This feature isn't activated yet.
 .TP
 .B \-\-server <host>, \-\-port <port>
 Choose the video server address and port.
+.TP
+.B \-\-broadcast
+Set broadcast mode for network input.
 .TP
 .B \-h, \-\-help
 Print help and exit.
@@ -150,6 +161,8 @@ also accepts a lot of parameters to customize its behaviour.
 .TP
 .B DVD parameters:
  vlc_dvd_device=<device>           DVD device
+ vlc_input_title=<title>           title number
+ vlc_input_chapter=<chapter>       chapter number
  vlc_audio={ac3|lpcm|mpeg|off}     audio type
  vlc_channel=[0-15]                audio channel
  vlc_subtitle=[0-31]               subtitle channel
@@ -166,5 +179,4 @@ also accepts a lot of parameters to customize its behaviour.
 .BR vls (1), vlms (1)
 .br
 .SH AUTHOR
-This manual page was written by the VideoLAN Team <videolan@via.ecp.fr>,
-for the Debian GNU/Linux system (but may be used by others).
+This manual page was written by Samuel Hocevar <sam@zoy.org>, for the Debian GNU/Linux system (but may be used by others).

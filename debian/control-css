@@ -1,0 +1,15 @@
+Source: vlc-css
+Section: non-US/main
+Priority: optional
+Maintainer: Samuel Hocevar <sam@zoy.org>
+Build-Depends: debhelper (>=2.2.0), xlib6g-dev
+Standards-Version: 3.0.1
+
+Package: vlc-css
+Architecture: any
+Depends: ${shlibs:Depends}, vlc
+Description: CSS plugin for the VideoLAN Client
+ VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+ .
+ This plugin adds DVD support with CSS decryption to the VideoLAN Client.
+

@@ -1,3 +1,17 @@
+vlc (0.2.62-2) unstable; urgency=low
+
+  * Removed a few lintian warnings.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat,  3 Mar 2001 10:29:31 +0100
+
+vlc (0.2.62-1) unstable; urgency=low
+
+  * Updated vlc.1 manpage (Closes: #87478).
+  * Fixed debian/control (Closes: #83707).
+  * The framebuffer plugin doesn't hijack ^C anymore (Closes: #87500).
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri,  2 Mar 2001 17:32:24 +0100
+
 vlc (0.2.62-1) unstable; urgency=low
 
   * New release. Glide and GGI packages build again.

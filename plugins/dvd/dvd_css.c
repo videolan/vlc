@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.17 2001/03/03 07:07:01 stef Exp $
+ * $Id: dvd_css.c,v 1.18 2001/03/03 11:01:07 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -103,12 +103,11 @@ int CSSTest( int i_fd )
  *****************************************************************************/
 css_t * CSSInit( int i_fd )
 {
-    css_t *         p_css;
-
 #ifdef HAVE_CSS
     /* structures defined in cdrom.h or dvdio.h */
     dvd_struct      dvd;
     dvd_authinfo    auth_info;
+    css_t *         p_css;
 
     int             i_error = -1;
     int             i;
@@ -323,13 +322,14 @@ css_t * CSSInit( int i_fd )
     case 1:
         return p_css;
     }
+
+    return p_css;
+
 #else /* HAVE_CSS */
     intf_ErrMsg( "css error: CSS decryption is disabled in this module" );
 
-    p_css = NULL;
+    return NULL;
 #endif /* HAVE_CSS */
-
-    return p_css;
 }
 
 /*****************************************************************************
@@ -339,7 +339,9 @@ void CSSEnd( css_t * p_css )
 {
 #ifdef HAVE_CSS
     free( p_css );
-#endif
+#else /* HAVE_CSS */
+    ;
+#endif /* HAVE_CSS */
 }
 
 /*****************************************************************************

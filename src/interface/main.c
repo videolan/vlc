@@ -762,9 +762,9 @@ static void Usage( int i_fashion )
         return;
 
     /* Interface parameters */
-    intf_MsgImm( "\nInterface parameters:\n"
+    intf_MsgImm( "\nInterface parameters:"
         "\n  " INTF_METHOD_VAR "=<method name>          \tinterface method"
-        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script"
+        "\n  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script"
         "\n  " INTF_CHANNELS_VAR "=<filename>            \tchannels list"
         "\n  " INTF_WARNING_VAR "=<level>                \twarning level" );
 
@@ -793,14 +793,14 @@ static void Usage( int i_fashion )
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"
         "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
-        "\n  " INPUT_TITLE_VAR "=<title>                 \ttitle number"
-        "\n  " INPUT_CHAPTER_VAR "=<chapter>             \tchapter number"
-        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off}     \taudio type"
-        "\n  " INPUT_CHANNEL_VAR "=[0-15]                \taudio channel"
-        "\n  " INPUT_SUBTITLE_VAR "=[0-31]               \tsubtitle channel" );
+        "\n  " INPUT_TITLE_VAR "=<title>             \ttitle number"
+        "\n  " INPUT_CHAPTER_VAR "=<chapter>         \tchapter number"
+        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
+        "\n  " INPUT_CHANNEL_VAR "=[0-15]            \taudio channel"
+        "\n  " INPUT_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
 
     /* Input parameters */
-    intf_MsgImm( "\nInput parameters:\n"
+    intf_MsgImm( "\nInput parameters:"
         "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
         "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
         "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"

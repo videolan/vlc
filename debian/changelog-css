@@ -1,0 +1,15 @@
+vlc-css (0.2.62-2) unstable; urgency=low
+
+  * Removed a few lintian warnings.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat,  3 Mar 2001 10:29:31 +0100
+
+vlc-css (0.2.62-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri,  2 Mar 2001 17:58:26 +0100
+
+Local variables:
+mode: debian-changelog
+End:

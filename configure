@@ -3478,24 +3478,30 @@ fi
 # Check whether --with-ggi or --without-ggi was given.
 if test "${with_ggi+set}" = set; then
   withval="$with_ggi"
-   PLUGINS=${PLUGINS}"ggi ";
-    if test "x$withval" != "xyes";
+   if test "x$withval" != "xno";
     then
-      LIB_GGI="-l"$withval
-    else
-      LIB_GGI="-lggi"
+      PLUGINS=${PLUGINS}"ggi ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_GGI="-l"$withval
+      else
+        LIB_GGI="-lggi"
+      fi
     fi 
 fi
 
 # Check whether --with-sdl or --without-sdl was given.
 if test "${with_sdl+set}" = set; then
   withval="$with_sdl"
-   PLUGINS=${PLUGINS}"sdl ";
-    if test "x$withval" != "xyes";
+   if test "x$withval" != "xno";
     then
-      LIB_SDL="L/usr/X11R6/lib -l"$withval
-    else
-      LIB_SDL="-L/usr/X11R6/lib -lSDL"
+      PLUGINS=${PLUGINS}"sdl ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_SDL="L/usr/X11R6/lib -l"$withval
+      else
+        LIB_SDL="-L/usr/X11R6/lib -lSDL"
+      fi
     fi 
 fi
 
@@ -3507,12 +3513,15 @@ fi
 # Check whether --with-glide or --without-glide was given.
 if test "${with_glide+set}" = set; then
   withval="$with_glide"
-   PLUGINS=${PLUGINS}"glide ";
-    if test "x$withval" != "xyes";
+   if test "x$withval" != "xno";
     then
-      LIB_GLIDE="-l"$withval
-    else
-      LIB_GLIDE="-lglide2x"
+      PLUGINS=${PLUGINS}"glide ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_GLIDE="-l"$withval
+      else
+        LIB_GLIDE="-lglide2x"
+      fi
     fi 
 fi
 
@@ -3554,17 +3563,17 @@ if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3558: checking for sys/asoundlib.h" >&5
+echo "configure:3567: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3563 "configure"
+#line 3572 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3568: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3577: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3581,7 +3590,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3585: checking for main in -lasound" >&5
+echo "configure:3594: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3589,14 +3598,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3593 "configure"
+#line 3602 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3600: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3609: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

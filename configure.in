@@ -167,21 +167,27 @@ AC_ARG_ENABLE(fb,
   [if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; fi])
 AC_ARG_WITH(ggi,
   [  --with-ggi[=name]       GGI support (default disabled)],
-  [ PLUGINS=${PLUGINS}"ggi ";
-    if test "x$withval" != "xyes";
+  [ if test "x$withval" != "xno";
     then
-      LIB_GGI="-l"$withval
-    else
-      LIB_GGI="-lggi"
+      PLUGINS=${PLUGINS}"ggi ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_GGI="-l"$withval
+      else
+        LIB_GGI="-lggi"
+      fi
     fi ])
 AC_ARG_WITH(sdl,
   [  --with-sdl[=name]       SDL support (default enabled)],
-  [ PLUGINS=${PLUGINS}"sdl ";
-    if test "x$withval" != "xyes";
+  [ if test "x$withval" != "xno";
     then
-      LIB_SDL="L/usr/X11R6/lib -l"$withval
-    else
-      LIB_SDL="-L/usr/X11R6/lib -lSDL"
+      PLUGINS=${PLUGINS}"sdl ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_SDL="L/usr/X11R6/lib -l"$withval
+      else
+        LIB_SDL="-L/usr/X11R6/lib -lSDL"
+      fi
     fi ])
     if test "x$withval" = "x";
     then
@@ -190,12 +196,15 @@ AC_ARG_WITH(sdl,
     fi
 AC_ARG_WITH(glide,
   [  --with-glide[=name]     Glide (3dfx) support (default disabled)],
-  [ PLUGINS=${PLUGINS}"glide ";
-    if test "x$withval" != "xyes";
+  [ if test "x$withval" != "xno";
     then
-      LIB_GLIDE="-l"$withval
-    else
-      LIB_GLIDE="-lglide2x"
+      PLUGINS=${PLUGINS}"glide ";
+      if test "x$withval" != "xyes";
+      then
+        LIB_GLIDE="-l"$withval
+      else
+        LIB_GLIDE="-lglide2x"
+      fi
     fi ])
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],

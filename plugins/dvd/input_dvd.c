@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.25 2001/03/03 07:07:01 stef Exp $
+ * $Id: input_dvd.c,v 1.26 2001/03/03 11:01:07 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -29,13 +29,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dvd
-#include "modules_inner.h"
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
+
+#ifdef HAVE_CSS
+#define MODULE_NAME dvd-css
+#else /* HAVE_CSS */
+#define MODULE_NAME dvd-nocss
+#endif /* HAVE_CSS */
+#include "modules_inner.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -309,13 +313,21 @@ static int DVDProbe( probedata_t *p_data )
 
     if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
     {
+#ifdef HAVE_CSS
         return( 999 );
+#else /* HAVE_CSS */
+        return( 998 );
+#endif /* HAVE_CSS */
     }
 
     if( ( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 ) )
     {
         /* If the user specified "dvd:" then it's probably a DVD */
+#ifdef HAVE_CSS
         i_score = 100;
+#else /* HAVE_CSS */
+        i_score = 90;
+#endif /* HAVE_CSS */
         psz_name += 4;
     }
 
