@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.146 2004/01/08 00:12:50 gbazin Exp $
+dnl $Id: configure.ac,v 1.147 2004/01/09 15:39:38 hartman Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1103,7 +1103,7 @@ dnl
 dnl  live.com input
 dnl
 AC_ARG_ENABLE(livedotcom,
-[  --enable-livedotcom   live.com input plugin (default disabled)])
+[  --enable-livedotcom     live.com input plugin (default disabled)])
 if test "${enable_livedotcom}" = "yes"
 then
   AC_ARG_WITH(livedotcom-tree,
@@ -1353,7 +1353,7 @@ dnl
 dnl  Windows DirectShow access module
 dnl
 AC_ARG_ENABLE(dshow,
-  [  --enable-dshow       Win32 DirectShow support (default enabled on Win32)])
+  [  --enable-dshow          Win32 DirectShow support (default enabled on Win32)])
 if test "${enable_dshow}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
@@ -1481,13 +1481,13 @@ dnl
 dnl  VCDX and CDDAX modules
 dnl
 AC_ARG_ENABLE(libcdio,
-  [  --enable-libcdio         CDDA support via libcdio (default enabled)])
+  [  --enable-libcdio        CDDA support via libcdio (default enabled)])
 
 AC_ARG_ENABLE(libcddb,
-  [  --enable-libcddb         CDDB support for CDDAX (default enabled)])
+  [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
 
 AC_ARG_ENABLE(vcdx,
-  [  --enable-vcdx            VCD support with Navigation (default enabled)])
+  [  --enable-vcdx           VCD support with Navigation (default enabled)])
 
 if test "${enable_cddax}" != "no"
 then
@@ -2145,7 +2145,7 @@ dnl
 dnl  Speex plugin
 dnl
 AC_ARG_ENABLE(speex,
-  [  --enable-speex         Speex decoder support (default enabled)])
+  [  --enable-speex          Speex decoder support (default enabled)])
 if test "${enable_speex}" != "no"
 then
   AC_CHECK_HEADERS(speex.h, [
@@ -2750,7 +2750,7 @@ dnl
 dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
-  [  --enable-skins2       Skins2 interface module (experimental)])
+  [  --enable-skins2         Skins2 interface module (experimental)])
 if test "${enable_skins2}" != "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
 
@@ -3113,7 +3113,7 @@ dnl
 dnl Visualisation plugin
 dnl
 AC_ARG_ENABLE(visual,
-  [  --enable-visual		visualisation plugin (default enabled)])
+  [  --enable-visual          visualisation plugin (default enabled)])
 if test "${enable_visual}" != "no"
 then
     AX_ADD_PLUGINS([visual])
@@ -3123,7 +3123,7 @@ dnl
 dnl  goom visualization plugin
 dnl
 AC_ARG_ENABLE(goom,
-[  --enable-goom         goom visualisation plugin (default disabled)])
+[  --enable-goom           goom visualisation plugin (default disabled)])
 if test "${enable_goom}" = "yes"
 then
   AC_ARG_WITH(goom-tree,
