@@ -458,7 +458,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                             "c=IN IP4 %s/%d\n"
                             "m=video %d udp %d\n"
                             "a=tool:VLC "VERSION"\n"
-                            "a=type:broadcast",
+                            "a=type:broadcast\n",
                             p_session->psz_name,
                             p_session->psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload );
