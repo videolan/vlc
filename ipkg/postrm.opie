@@ -1,0 +1,4 @@
+#!/bin/sh
+[ -x /opt/QtPalmtop/pics/vlc ] || rm /opt/QtPalmtop/pics/vlc
+exit 0
+
