@@ -35,6 +35,7 @@ DIST_familiar = \
 	familiar-openb16x16.xpm \
 	familiar-pauseb16x16.xpm \
 	familiar-playb16x16.xpm \
+	familiar-playlistb16x16.xpm \
 	familiar-preferencesb16x16.xpm \
 	familiar-rewindb16x16.xpm \
 	familiar-stopb16x16.xpm \
