@@ -80,8 +80,8 @@ struct filter_sys_t
     "with -1 = use freetype-fontsize" )
 
 #define COLOR_TEXT N_("Text Default Color")
-#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal." \
-    "-1 = use freetype-color, #000000 = all colors off, " \
+#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal. " \
+    "#000000 = all colors off, " \
     "0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
 #define POS_TEXT N_("Time position")
 #define POS_LONGTEXT N_( \
@@ -109,9 +109,9 @@ vlc_module_begin();
     add_integer( "time-position", 9, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
     /* 9 sets the default to bottom-left, minimizing jitter */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer_with_range( "time-opacity", 0, 0, 255, NULL,
+    add_integer_with_range( "time-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "time-color", -1, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_integer( "time-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( "time-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
     set_description( _("Time display sub filter") );

@@ -209,7 +209,7 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, "freetype-color",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "freetype-color", &val );
-    p_sys->i_font_color = __MIN( val.i_int, 0xFFFFFF );
+    p_sys->i_font_color = __MAX( __MIN( val.i_int, 0xFFFFFF ), 0 );
 
     /* Look what method was requested */
     var_Get( p_filter, "freetype-font", &val );
@@ -359,8 +359,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][0] = i * i_y / 256;
         fmt.p_palette->palette[i][1] = i_u;
         fmt.p_palette->palette[i][2] = i_v;
+        fmt.p_palette->palette[i][3] = i + (255 - i) / 16;
         fmt.p_palette->palette[i][3] =
-            i + (256 - i) * (256 / (255 - p_line->i_alpha)) / 16;
+            (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
     }
     fmt.p_palette->palette[0][3] = 0;
 
@@ -459,13 +460,13 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
-    i_font_color = 0xFFFFFF;//p_region_in->i_text_color;
+    i_font_color = __MAX( __MIN( p_region_in->i_text_color, 0xFFFFFF ), 0 );
     if( i_font_color == 0xFFFFFF ) i_font_color = p_sys->i_font_color;
 
-    i_font_alpha = p_region_in->i_text_alpha;
+    i_font_alpha = __MAX( __MIN( p_region_in->i_text_alpha, 255 ), 0 );
     if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
 
-    i_font_size  = p_region_in->i_text_size;
+    i_font_size  = __MAX( __MIN( p_region_in->i_text_size, 255 ), 0 );
     if( !i_font_size ) i_font_size  = p_sys->i_font_size;
 
     i_red   = ( i_font_color & 0x00FF0000 ) >> 16;

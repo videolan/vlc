@@ -83,7 +83,7 @@ struct filter_sys_t
 #define TIMEOUT_LONGTEXT N_("Defines the time the marquee must remain " \
                             "displayed, in milliseconds. Default value is " \
                             "0 (remain forever).")
-#define OPACITY_TEXT N_("Opacity, -1..255")
+#define OPACITY_TEXT N_("Opacity, 0..255")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
     "overlay text. 0 = transparent, 255 = totally opaque. " )
 #define SIZE_TEXT N_("Font size, pixels")
@@ -91,8 +91,8 @@ struct filter_sys_t
     "with -1 = use freetype-fontsize" )
 
 #define COLOR_TEXT N_("Text Default Color")
-#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal." \
-    "-1 = use freetype-color, #000000 = all colors off, " \
+#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal. " \
+    "#000000 = all colors off, " \
     "0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
 
 #define POS_TEXT N_("Marquee position")
@@ -123,9 +123,9 @@ vlc_module_begin();
     add_integer( "marq-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
     /* 5 sets the default to top [1] left [4] */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer_with_range( "marq-opacity", 0, 0, 255, NULL,
+    add_integer_with_range( "marq-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-color", -1, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_integer( "marq-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( "marq-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
 
@@ -277,7 +277,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = VLC_TRUE;
     }
     p_spu->p_region->i_text_color = p_sys->i_font_color;
-    p_spu->p_region->i_text_alpha = p_sys->i_font_opacity;
+    p_spu->p_region->i_text_alpha = 255 - p_sys->i_font_opacity;
     p_spu->p_region->i_text_size = p_sys->i_font_size;
     
 
