@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.18 2003/04/25 18:57:41 fenrir Exp $
+ * $Id: audio.c,v 1.19 2003/07/10 01:33:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -115,12 +115,10 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
 
     if( ( p_adec->p_context->extradata_size = p_wf->cbSize ) > 0 )
     {
-        p_adec->p_context->extradata =
-            malloc( p_wf->cbSize );
+        p_adec->p_context->extradata = malloc( p_wf->cbSize + FF_INPUT_BUFFER_PADDING_SIZE );
 
-        memcpy( p_adec->p_context->extradata,
-                &p_wf[1],
-                p_wf->cbSize);
+        memcpy( p_adec->p_context->extradata, &p_wf[1], p_wf->cbSize);
+        memset( &((uint8_t*)p_adec->p_context->extradata)[p_wf->cbSize], 0, FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
     /* ***** Open the codec ***** */
@@ -182,14 +180,14 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
 
         if( i_frame_size > 0 )
         {
-            uint8_t *p_last;
             int     i_need;
 
 
-            i_need = i_frame_size + 16 + p_adec->i_buffer;
+            i_need = i_frame_size + FF_INPUT_BUFFER_PADDING_SIZE + p_adec->i_buffer;
             if( p_adec->i_buffer_size < i_need )
             {
-                p_last = p_adec->p_buffer;
+                uint8_t *p_last = p_adec->p_buffer;
+
                 p_adec->p_buffer = malloc( i_need );
                 p_adec->i_buffer_size = i_need;
                 if( p_adec->i_buffer > 0 )
@@ -203,9 +201,7 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
                                   i_frame_size,
                                   p_pes );
             /* make ffmpeg happier but I'm not sure it's needed for audio */
-            memset( p_adec->p_buffer + p_adec->i_buffer + i_frame_size,
-                    0,
-                    16 );
+            memset( p_adec->p_buffer + p_adec->i_buffer + i_frame_size, 0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
         input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
@@ -242,7 +238,7 @@ usenextdata:
 
     i_frame_size -= i_used;
 
-//    msg_Dbg( p_adec->p_fifo, "frame size:%d buffer used:%d", i_frame_size, i_used );
+    //msg_Dbg( p_adec->p_fifo, "frame size:%d buffer used:%d", i_frame_size, i_used );
     if( i_output_size <= 0 )
     {
          msg_Warn( p_adec->p_fifo, 

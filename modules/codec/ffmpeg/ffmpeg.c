@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.44 2003/06/16 20:23:41 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.45 2003/07/10 01:33:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -178,6 +178,7 @@ vlc_module_begin();
     set_callbacks( E_(OpenChroma), NULL );
     set_description( _("ffmpeg chroma conversion") );
 
+    var_Create( p_module->p_libvlc, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
 
 /*****************************************************************************
@@ -281,10 +282,16 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 static int InitThread( generic_thread_t *p_decoder )
 {
     int i_result;
+    vlc_value_t lockval;
+
+
+    var_Get( p_decoder->p_fifo->p_libvlc, "avcodec", &lockval );
+    vlc_mutex_lock( lockval.p_address );
 
      /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )
     {
+
         avcodec_init();
         avcodec_register_all();
         b_ffmpeginit = 1;
@@ -296,6 +303,7 @@ static int InitThread( generic_thread_t *p_decoder )
     {
         msg_Dbg( p_decoder->p_fifo, "libavcodec already initialized" );
     }
+    vlc_mutex_unlock( lockval.p_address );
 
     /* *** determine codec type *** */
     ffmpeg_GetFfmpegCodec( p_decoder->p_fifo->i_fourcc,

@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.34 2003/06/28 23:56:31 fenrir Exp $
+ * $Id: video.c,v 1.35 2003/07/10 01:33:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -361,10 +361,11 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         else
         {
             p_vdec->p_context->extradata_size = i_size;
-            p_vdec->p_context->extradata      = malloc( i_size );
+            p_vdec->p_context->extradata      = malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
             memcpy( p_vdec->p_context->extradata,
                     &p_vdec->p_format[1],
                     i_size );
+            memset( &((uint8_t*)p_vdec->p_context->extradata)[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
     }
     p_vdec->p_vout = NULL;
@@ -477,7 +478,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
             int i_need;
             /* XXX Don't forget that ffmpeg required a little more bytes
              * that the real frame size */
-            i_need = i_frame_size + 16 + p_vdec->i_buffer;
+            i_need = i_frame_size + FF_INPUT_BUFFER_PADDING_SIZE + p_vdec->i_buffer;
             if( p_vdec->i_buffer_size < i_need)
             {
                 p_last = p_vdec->p_buffer;
@@ -493,9 +494,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
                 E_( GetPESData )( p_vdec->p_buffer + p_vdec->i_buffer,
                                   i_frame_size ,
                                   p_pes );
-            memset( p_vdec->p_buffer + p_vdec->i_buffer + i_frame_size,
-                    0,
-                    16 );
+            memset( p_vdec->p_buffer + p_vdec->i_buffer + i_frame_size, 0, FF_INPUT_BUFFER_PADDING_SIZE );
         }
         input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
