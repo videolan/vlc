@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv8.c: YUV transformation functions for 8bpp
+ * video_yuv8.c: MMX YUV transformation functions for 8bpp
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.

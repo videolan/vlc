@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH VLC 1 "March 13, 2000"
+.TH VLC 1 "July 30, 2000"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -36,7 +36,7 @@ A summary of options is included below.
 Disable audio output.
 .TP
 .B \-\-aout <plugin>
-Specify an audio output plugin.
+Specify an audio output plugin: "dsp", "esd", for instance.
 .TP
 .B \-\-stereo, \-\-mono
 Choose stereo or mono audio output
@@ -45,7 +45,10 @@ Choose stereo or mono audio output
 Disable video output.
 .TP
 .B \-\-vout <plugin>
-Specify a video output plugin.
+Specify a video output plugin: "gnome", "fb", "glide", for instance.
+.TP
+.B \-\-yuv <plugin>
+Specify a YUV plugin: "mmx", "nommx", for instance.
 .TP
 .B \-\-display <display>
 Specify the display name.

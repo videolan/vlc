@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv24.c: YUV transformation functions for 24 bpp
+ * video_yuv24.c: MMX YUV transformation functions for 24 bpp
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.

@@ -73,7 +73,6 @@ int aout_EsdOpen( aout_thread_t *p_aout )
     int i_mode = ESD_STREAM;
     int i_func = ESD_PLAY;
 
-    fprintf(stderr, "aout-esd !!\n");
     /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )

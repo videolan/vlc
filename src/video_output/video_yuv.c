@@ -46,10 +46,10 @@
 #include "main.h"
 
 /*****************************************************************************
- * vout_InitYUV: allocate and initialize translations tables
+ * vout_InitYUV: allocate and initialize translation tables
  *****************************************************************************
  * This function will allocate memory to store translation tables, depending
- * of the screen depth.
+ * on the screen depth.
  *****************************************************************************/
 int vout_InitYUV( vout_thread_t *p_vout )
 {
@@ -76,7 +76,7 @@ int vout_InitYUV( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_ResetYUV: re-initialize translations tables
+ * vout_ResetYUV: re-initialize translation tables
  *****************************************************************************
  * This function will initialize the tables allocated by vout_InitYUV and
  * set functions pointers.
@@ -88,7 +88,7 @@ int vout_ResetYUV( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_EndYUV: destroy translations tables
+ * vout_EndYUV: destroy translation tables
  *****************************************************************************
  * Free memory allocated by vout_InitYUV
  *****************************************************************************/

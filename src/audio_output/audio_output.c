@@ -75,6 +75,25 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long
 static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, mtime_t aout_date );
 
 /*****************************************************************************
+ * InitializeIncrement
+ *****************************************************************************/
+static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long l_numerator, long l_denominator )
+{
+    p_increment->l_remainder = -l_denominator;
+
+    p_increment->l_euclidean_integer = 0;
+    while ( l_numerator >= l_denominator )
+    {
+        p_increment->l_euclidean_integer++;
+        l_numerator -= l_denominator;
+    }
+
+    p_increment->l_euclidean_remainder = l_numerator;
+
+    p_increment->l_euclidean_denominator = l_denominator;
+}
+
+/*****************************************************************************
  * aout_CreateThread: initialize audio thread
  *****************************************************************************/
 aout_thread_t *aout_CreateThread( int *pi_status )
@@ -466,25 +485,6 @@ void aout_DestroyFifo( aout_fifo_t * p_fifo )
     }
 
 /* Following functions are local */
-
-/*****************************************************************************
- * InitializeIncrement
- *****************************************************************************/
-static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long l_numerator, long l_denominator )
-{
-    p_increment->l_remainder = -l_denominator;
-
-    p_increment->l_euclidean_integer = 0;
-    while ( l_numerator >= l_denominator )
-    {
-        p_increment->l_euclidean_integer++;
-        l_numerator -= l_denominator;
-    }
-
-    p_increment->l_euclidean_remainder = l_numerator;
-
-    p_increment->l_euclidean_denominator = l_denominator;
-}
 
 /*****************************************************************************
  * NextFrame

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv_macros.h: YUV transformation macros
+ * video_yuv_macros.h: MMX YUV transformation macros
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *

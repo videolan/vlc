@@ -24,10 +24,10 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * vout_yuv_convert_t: YUV convertion function
+ * vout_yuv_convert_t: YUV conversion function
  *****************************************************************************
- * This is the prototype common to all convertion functions. The type of p_pic
- * will change depending of the screen depth treated.
+ * This is the prototype common to all conversion functions. The type of p_pic
+ * will change depending on the processed screen depth.
  * Parameters:
  *      p_vout                          video output thread
  *      p_pic                           picture address
@@ -45,13 +45,13 @@ typedef void (vout_yuv_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                    int i_matrix_coefficients );
 
 /*****************************************************************************
- * vout_yuv_t: pre-calculated YUV convertion tables
+ * vout_yuv_t: pre-calculated YUV conversion tables
  *****************************************************************************
- * These tables are used by convertion and scaling functions.
+ * These tables are used by conversion and scaling functions.
  *****************************************************************************/
 typedef struct vout_yuv_s
 {
-    /* Convertion functions */
+    /* conversion functions */
     vout_yuv_convert_t *        p_Convert420;         /* YUV 4:2:0 converter */
     vout_yuv_convert_t *        p_Convert422;         /* YUV 4:2:2 converter */
     vout_yuv_convert_t *        p_Convert444;         /* YUV 4:4:4 converter */
@@ -69,21 +69,21 @@ typedef struct vout_yuv_s
     } yuv;
 
     /* Temporary conversion buffer and offset array */
-    void *              p_buffer;                       /* convertion buffer */
+    void *              p_buffer;                       /* conversion buffer */
     int *               p_offset;                            /* offset array */
 } vout_yuv_t;
 
 /*****************************************************************************
  * vout_buffer_t: rendering buffer
  *****************************************************************************
- * This structure store informations about a buffer. Buffers are not completely
+ * This structure stores information about a buffer. Buffers are not completely
  * cleared between displays, and modified areas need to be stored.
  *****************************************************************************/
 typedef struct vout_buffer_s
 {
     /* Picture area */
     int         i_pic_x, i_pic_y;                       /* picture position  */
-    int         i_pic_width, i_pic_height;              /* picture extension */
+    int         i_pic_width, i_pic_height;                   /* picture size */
 
     /* Other areas - only vertical extensions of areas are stored */
     int         i_areas;                                  /* number of areas */
@@ -172,7 +172,7 @@ typedef struct vout_thread_s
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */
-    boolean_t           b_info;            /* print additionnal informations */
+    boolean_t           b_info;              /* print additional information */
     boolean_t           b_interface;                     /* render interface */
     boolean_t           b_scale;                    /* allow picture scaling */
 
@@ -192,7 +192,7 @@ typedef struct vout_thread_s
     int                 i_buffer_index;                      /* buffer index */
     vout_buffer_t       p_buffer[2];                   /* buffers properties */
 
-    /* Videos heap and translation tables */
+    /* Video heap and translation tables */
     picture_t           p_picture[VOUT_MAX_PICTURES];            /* pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
     int                 i_pictures;                     /* current heap size */
@@ -202,7 +202,7 @@ typedef struct vout_thread_s
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
 
-    /* Synchronisation informations - synchro level is updated by the vout
+    /* Synchronization informations - synchro level is updated by the vout
      * thread and read by decoder threads */
     int                 i_synchro_level;                   /* trashing level */
 } vout_thread_t;

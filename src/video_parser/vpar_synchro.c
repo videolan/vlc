@@ -159,7 +159,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 
 #if 1
             if( p_vpar->synchro.b_all_I )
-                intf_ErrMsg( "I: 1/1  " );
+                intf_ErrMsg( " I: 1/1  " );
             if( p_vpar->synchro.b_all_P )
                 intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.i_P_seen,
                                            p_vpar->synchro.i_P_seen );
@@ -172,7 +172,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
             else if( p_vpar->synchro.displayable_b > 0 )
                 intf_ErrMsg( "B: %.2f/%i", p_vpar->synchro.displayable_b,
                                            p_vpar->synchro.i_B_seen );
-            intf_ErrMsg( "\n" );
+            intf_ErrMsg( "                    " );
 #endif
             p_vpar->synchro.i_P_seen = 0;
             p_vpar->synchro.i_B_seen = 0;

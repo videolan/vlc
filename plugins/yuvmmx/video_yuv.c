@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv.c: YUV transformation functions
+ * video_yuv.c: MMX YUV transformation functions
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
@@ -55,31 +55,23 @@ int yuv_MMXInit( vout_thread_t *p_vout )
 {
     size_t      tables_size;                        /* tables size, in bytes */
 
-    /* Computes tables size - 3 Bpp use 32 bits pixel entries in tables */
-    switch( p_vout->i_bytes_per_pixel )
+    /* Computes tables size for 8bbp only */
+    if( p_vout->i_bytes_per_pixel == 1 )
     {
-    case 1:
         tables_size = sizeof( u8 )
                 * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : PALETTE_TABLE_SIZE);
-        break;
-    case 2:
-        tables_size = sizeof( u16 )
-                * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);
-        break;
-    case 3:
-    case 4:
-    default:
-        tables_size = sizeof( u32 )
-                * (p_vout->b_grayscale ? GRAY_TABLE_SIZE : RGB_TABLE_SIZE);
-        break;
-    }
 
-    /* Allocate memory */
-    p_vout->yuv.p_base = malloc( tables_size );
-    if( p_vout->yuv.p_base == NULL )
+        /* Allocate memory */
+        p_vout->yuv.p_base = malloc( tables_size );
+        if( p_vout->yuv.p_base == NULL )
+        {
+            intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+            return( 1 );
+        }
+    }
+    else
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
-        return( 1 );
+        p_vout->yuv.p_base = NULL;
     }
 
     /* Allocate memory for conversion buffer and offset array */
@@ -111,7 +103,11 @@ int yuv_MMXInit( vout_thread_t *p_vout )
  *****************************************************************************/
 void yuv_MMXEnd( vout_thread_t *p_vout )
 {
-    free( p_vout->yuv.p_base );
+    if( p_vout->i_bytes_per_pixel == 1 )
+    {
+        free( p_vout->yuv.p_base );
+    }
+
     free( p_vout->yuv.p_buffer );
     free( p_vout->yuv.p_offset );
 }
@@ -131,25 +127,6 @@ int yuv_MMXReset( vout_thread_t *p_vout )
 /* following functions are local */
 
 /*****************************************************************************
- * SetGammaTable: return intensity table transformed by gamma curve.
- *****************************************************************************
- * pi_table is a table of 256 entries from 0 to 255.
- *****************************************************************************/
-void SetGammaTable( int *pi_table, double f_gamma )
-{
-    int         i_y;                                       /* base intensity */
-
-    /* Use exp(gamma) instead of gamma */
-    f_gamma = exp( f_gamma );
-
-    /* Build gamma table */
-    for( i_y = 0; i_y < 256; i_y++ )
-    {
-        pi_table[ i_y ] = pow( (double)i_y / 256, f_gamma ) * 256;
-    }
- }
-
-/*****************************************************************************
  * SetYUV: compute tables and set function pointers
 + *****************************************************************************/
 void SetYUV( vout_thread_t *p_vout )
@@ -166,136 +143,103 @@ void SetYUV( vout_thread_t *p_vout )
     if( p_vout->b_grayscale )
     {
         /* Grayscale: build gray table */
-        switch( p_vout->i_bytes_per_pixel )
+        if( p_vout->i_bytes_per_pixel == 1 )
         {
-        case 1:
-            {
-                u16 bright[256], transp[256];
+            u16 bright[256], transp[256];
 
-                p_vout->yuv.yuv.p_gray8 =  (u8 *)p_vout->yuv.p_base + GRAY_MARGIN;
-                for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
-                {
-                    p_vout->yuv.yuv.p_gray8[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
-                    p_vout->yuv.yuv.p_gray8[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-                }
-                for( i_index = 0; i_index < 256; i_index++)
-                {
-                    p_vout->yuv.yuv.p_gray8[ i_index ] = pi_gamma[ i_index ];
-                    bright[ i_index ] = i_index << 8;
-                    transp[ i_index ] = 0;
-                }
-                /* the colors have been allocated, we can set the palette */
-                p_vout->p_set_palette( p_vout, bright, bright, bright, transp );
-                p_vout->i_white_pixel = 0xff;
-                p_vout->i_black_pixel = 0x00;
-                p_vout->i_gray_pixel = 0x44;
-                p_vout->i_blue_pixel = 0x3b;
-
-                break;
-            }
-        case 2:
-            p_vout->yuv.yuv.p_gray16 =  (u16 *)p_vout->yuv.p_base + GRAY_MARGIN;
-            for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_gray16[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
-                p_vout->yuv.yuv.p_gray16[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-            }
             for( i_index = 0; i_index < 256; i_index++)
             {
-                p_vout->yuv.yuv.p_gray16[ i_index ] = RGB2PIXEL( p_vout, pi_gamma[i_index], pi_gamma[i_index], pi_gamma[i_index] );
+                bright[ i_index ] = i_index << 8;
+                transp[ i_index ] = 0;
             }
-            break;
-        case 3:
-        case 4:
-            p_vout->yuv.yuv.p_gray32 =  (u32 *)p_vout->yuv.p_base + GRAY_MARGIN;
-            for( i_index = 0; i_index < GRAY_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_gray32[ -i_index ] =      RGB2PIXEL( p_vout, pi_gamma[0], pi_gamma[0], pi_gamma[0] );
-                p_vout->yuv.yuv.p_gray32[ 256 + i_index ] = RGB2PIXEL( p_vout, pi_gamma[255], pi_gamma[255], pi_gamma[255] );
-            }
-            for( i_index = 0; i_index < 256; i_index++)
-            {
-                p_vout->yuv.yuv.p_gray32[ i_index ] = RGB2PIXEL( p_vout, pi_gamma[i_index], pi_gamma[i_index], pi_gamma[i_index] );
-            }
-            break;
-         }
+            /* the colors have been allocated, we can set the palette */
+            p_vout->p_set_palette( p_vout, bright, bright, bright, transp );
+            p_vout->i_white_pixel = 0xff;
+            p_vout->i_black_pixel = 0x00;
+            p_vout->i_gray_pixel = 0x44;
+            p_vout->i_blue_pixel = 0x3b;
+        }
     }
     else
     {
         /* Color: build red, green and blue tables */
-        switch( p_vout->i_bytes_per_pixel )
+        if( p_vout->i_bytes_per_pixel == 1 )
         {
-        case 1:
+            #define RGB_MIN 0
+            #define RGB_MAX 255
+            #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
+            #define SHIFT 20
+            #define U_GREEN_COEF    ((int)(-0.391 * (1<<SHIFT) / 1.164))
+            #define U_BLUE_COEF     ((int)(2.018 * (1<<SHIFT) / 1.164))
+            #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
+            #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
+
+            int y,u,v;
+            int r,g,b;
+            int uvr, uvg, uvb;
+            int i = 0, j = 0;
+            u16 red[256], green[256], blue[256], transp[256];
+            unsigned char lookup[PALETTE_TABLE_SIZE];
+
+            p_vout->yuv.yuv.p_rgb8 = (u8 *)p_vout->yuv.p_base;
+
+            /* this loop calculates the intersection of an YUV box
+             * and the RGB cube. */
+            for ( y = 0; y <= 256; y += 16 )
             {
-                #define RGB_MIN 0
-                #define RGB_MAX 255
-                #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
-
-                int y,u,v;
-                int r,g,b;
-                int uvr, uvg, uvb;
-                int i = 0, j = 0;
-                u16 red[256], green[256], blue[256], transp[256];
-                unsigned char lookup[PALETTE_TABLE_SIZE];
-
-                p_vout->yuv.yuv.p_rgb8 = (u8 *)p_vout->yuv.p_base;
-
-                /* this loop calculates the intersection of an YUV box
-                 * and the RGB cube. */
-                for ( y = 0; y <= 256; y += 16 )
+                for ( u = 0; u <= 256; u += 32 )
+                for ( v = 0; v <= 256; v += 32 )
                 {
-                    for ( u = 0; u <= 256; u += 32 )
-                    for ( v = 0; v <= 256; v += 32 )
+                    uvr = (V_RED_COEF*(v-128)) >> SHIFT;
+                    uvg = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
+                    uvb = (U_BLUE_COEF*(u-128)) >> SHIFT;
+                    r = y + uvr;
+                    g = y + uvg;
+                    b = y + uvb;
+
+                    if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
+                            && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
                     {
-                        uvr = (V_RED_COEF*(v-128)) >> SHIFT;
-                        uvg = (U_GREEN_COEF*(u-128) + V_GREEN_COEF*(v-128)) >> SHIFT;
-                        uvb = (U_BLUE_COEF*(u-128)) >> SHIFT;
-                        r = y + uvr;
-                        g = y + uvg;
-                        b = y + uvb;
+                        /* this one should never happen unless someone fscked up my code */
+                        if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette\n" ); break; }
 
-                        if( r >= RGB_MIN && g >= RGB_MIN && b >= RGB_MIN
-                                && r <= RGB_MAX && g <= RGB_MAX && b <= RGB_MAX )
-                        {
-                            /* this one should never happen unless someone fscked up my code */
-                            if(j == 256) { intf_ErrMsg( "vout error: no colors left to build palette\n" ); break; }
+                        /* clip the colors */
+                        red[j] = CLIP( r );
+                        green[j] = CLIP( g );
+                        blue[j] = CLIP( b );
+                        transp[j] = 0;
 
-                            /* clip the colors */
-                            red[j] = CLIP( r );
-                            green[j] = CLIP( g );
-                            blue[j] = CLIP( b );
-                            transp[j] = 0;
-
-                            /* allocate color */
-                            lookup[i] = 1;
-                            p_vout->yuv.yuv.p_rgb8[i++] = j;
-                            j++;
-                        }
-                        else
-                        {
-                            lookup[i] = 0;
-                            p_vout->yuv.yuv.p_rgb8[i++] = 0;
-                        }
+                        /* allocate color */
+                        lookup[i] = 1;
+                        p_vout->yuv.yuv.p_rgb8[i++] = j;
+                        j++;
                     }
-                    i += 128-81;
+                    else
+                    {
+                        lookup[i] = 0;
+                        p_vout->yuv.yuv.p_rgb8[i++] = 0;
+                    }
                 }
+                i += 128-81;
+            }
 
-                /* the colors have been allocated, we can set the palette */
-                /* there will eventually be a way to know which colors
-                 * couldn't be allocated and try to find a replacement */
-                p_vout->p_set_palette( p_vout, red, green, blue, transp );
+            /* the colors have been allocated, we can set the palette */
+            /* there will eventually be a way to know which colors
+             * couldn't be allocated and try to find a replacement */
+            p_vout->p_set_palette( p_vout, red, green, blue, transp );
 
-                p_vout->i_white_pixel = 0xff;
-                p_vout->i_black_pixel = 0x00;
-                p_vout->i_gray_pixel = 0x44;
-                p_vout->i_blue_pixel = 0x3b;
+            p_vout->i_white_pixel = 0xff;
+            p_vout->i_black_pixel = 0x00;
+            p_vout->i_gray_pixel = 0x44;
+            p_vout->i_blue_pixel = 0x3b;
 
-                i = 0;
-                /* this loop allocates colors that got outside
-                 * the RGB cube */
-                for ( y = 0; y <= 256; y += 16 )
+            i = 0;
+            /* this loop allocates colors that got outside
+             * the RGB cube */
+            for ( y = 0; y <= 256; y += 16 )
+            {
+                for ( u = 0; u <= 256; u += 32 )
                 {
-                    for ( u = 0; u <= 256; u += 32 )
                     for ( v = 0; v <= 256; v += 32 )
                     {
                         int u2, v2;
@@ -331,60 +275,9 @@ void SetYUV( vout_thread_t *p_vout )
                         }
                         i++;
                     }
-                    i += 128-81;
                 }
-
-                break;
+                i += 128-81;
             }
-        case 2:
-            p_vout->yuv.yuv.p_rgb16 = (u16 *)p_vout->yuv.p_base;
-            for( i_index = 0; i_index < RED_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
-                p_vout->yuv.yuv.p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
-            }
-            for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
-                p_vout->yuv.yuv.p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
-            }
-            for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
-                p_vout->yuv.yuv.p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
-            }
-            for( i_index = 0; i_index < 256; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
-                p_vout->yuv.yuv.p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-                p_vout->yuv.yuv.p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
-            }
-            break;
-        case 3:
-        case 4:
-            p_vout->yuv.yuv.p_rgb32 = (u32 *)p_vout->yuv.p_base;
-            for( i_index = 0; i_index < RED_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
-                p_vout->yuv.yuv.p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_vout, pi_gamma[255], 0, 0 );
-            }
-            for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[0], 0 );
-                p_vout->yuv.yuv.p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_vout, 0, pi_gamma[255], 0 );
-            }
-            for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[0] );
-                p_vout->yuv.yuv.p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_vout, 0, 0, pi_gamma[255] );
-            }
-            for( i_index = 0; i_index < 256; i_index++ )
-            {
-                p_vout->yuv.yuv.p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_vout, pi_gamma[ i_index ], 0, 0 );
-                p_vout->yuv.yuv.p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_vout, 0, pi_gamma[ i_index ], 0 );
-                p_vout->yuv.yuv.p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_vout, 0, 0, pi_gamma[ i_index ] );
-            }
-            break;
         }
     }
 

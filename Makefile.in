@@ -79,12 +79,14 @@ endif
 # C compiler flags: compilation
 #
 CCFLAGS += $(DEFINE) $(INCLUDE)
-CCFLAGS += -Wall
+CCFLAGS += -Wall -Winline
 CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # flags needed for clean beos compilation
+ifeq ($(SYS),beos)
 CCFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
+endif
 
 # Optimizations : don't compile debug versions with them
 ifeq ($(DEBUG),0)

@@ -99,7 +99,10 @@ void ConvertYUV420RGB16( YUV_ARGS_16BPP )
             __asm__( MMX_INIT_16
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-            __asm__( ".align 8" MMX_YUV_MUL MMX_YUV_ADD MMX_UNPACK_16
+            __asm__( ".align 8"
+                     MMX_YUV_MUL
+                     MMX_YUV_ADD
+                     MMX_UNPACK_16
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
             p_y += 8;

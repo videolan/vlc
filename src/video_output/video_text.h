@@ -22,11 +22,11 @@
 
 /* Text styles - these are primary text styles, used by the vout_Print function.
  * They may be ignored or interpreted by higher level functions */
-#define WIDE_TEXT                       1         /* interspacing is doubled */
-#define ITALIC_TEXT                     2                          /* italic */
-#define OPAQUE_TEXT                     4            /* text with background */
-#define OUTLINED_TEXT                   8           /* border around letters */
-#define VOID_TEXT                      16                   /* no foreground */
+#define WIDE_TEXT                    1<<0         /* interspacing is doubled */
+#define ITALIC_TEXT                  1<<1                          /* italic */
+#define OPAQUE_TEXT                  1<<2            /* text with background */
+#define OUTLINED_TEXT                1<<3           /* border around letters */
+#define VOID_TEXT                    1<<4                   /* no foreground */
 
 
 /*****************************************************************************

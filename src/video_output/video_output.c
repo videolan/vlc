@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -194,7 +194,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     }
     p_vout->i_pictures = 0;
 
-    /* Initialize synchronization informations */
+    /* Initialize synchronization information */
     p_vout->i_synchro_level     = VOUT_SYNCHRO_LEVEL_START;
 
     /* Create and initialize system-dependant method - this function issues its
@@ -347,7 +347,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     p_subpic->i_status = READY_SUBPICTURE;
 
 #ifdef DEBUG_VIDEO
-    /* Send subpicture informations */
+    /* Send subpicture information */
     intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s\n",
                 p_subpic, p_subpic->i_type,
                 mstrtime( psz_begin_date, p_subpic->begin_date ),
@@ -356,7 +356,7 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 }
 
 /*****************************************************************************
- * vout_CreateSubPicture: allocate an subpicture in the video output heap.
+ * vout_CreateSubPicture: allocate a subpicture in the video output heap.
  *****************************************************************************
  * This function create a reserved subpicture in the video output heap.
  * A null pointer is returned if the function fails. This method provides an
@@ -411,10 +411,10 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         }
     }
 
-    /* If no free subpicture is available, use a destroyed subpicture */
+    /* If no free subpictures are available, use a destroyed subpicture */
     if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
     {
-        /* No free subpicture or matching destroyed subpicture has been
+        /* No free subpicture or matching destroyed subpictures have been
          * found, but a destroyed subpicture is still avalaible */
         free( p_destroyed_subpic->p_data );
         p_free_subpic = p_destroyed_subpic;
@@ -443,7 +443,8 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
         }
 
         if( p_free_subpic->p_data != NULL )
-        {           /* Copy subpicture informations, set some default values */
+        {
+            /* Copy subpicture information, set some default values */
             p_free_subpic->i_type                      = i_type;
             p_free_subpic->i_status                    = RESERVED_SUBPICTURE;
             p_free_subpic->i_size                      = i_size;
@@ -460,7 +461,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
             p_free_subpic->i_type   =  EMPTY_SUBPICTURE;
             p_free_subpic->i_status =  FREE_SUBPICTURE;
             p_free_subpic =            NULL;
-            intf_ErrMsg("warning: %s\n", strerror( ENOMEM ) );
+            intf_ErrMsg("spu warning: %s\n", strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VIDEO
@@ -471,7 +472,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     }
 
     /* No free or destroyed subpicture could be found */
-    intf_DbgMsg( "warning: heap is full\n" );
+    intf_DbgMsg( "warning: subpicture heap is full\n" );
     vlc_mutex_unlock( &p_vout->subpicture_lock );
     return( NULL );
 }
@@ -677,7 +678,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 
         if( p_free_picture->p_data != NULL )
         {
-            /* Copy picture informations, set some default values */
+            /* Copy picture information, set some default values */
             p_free_picture->i_type                      = i_type;
             p_free_picture->i_status                    = RESERVED_PICTURE;
             p_free_picture->i_matrix_coefficients       = 1;
@@ -698,7 +699,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_type   =  EMPTY_PICTURE;
             p_free_picture->i_status =  FREE_PICTURE;
             p_free_picture =            NULL;
-            intf_ErrMsg("warning: %s\n", strerror( ENOMEM ) );
+            intf_ErrMsg("vout warning: %s\n", strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VIDEO
@@ -709,7 +710,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     }
 
     /* No free or destroyed picture could be found */
-    intf_DbgMsg( "warning: heap is full\n" );
+    intf_DbgMsg( "warning: picture heap is full\n" );
     vlc_mutex_unlock( &p_vout->picture_lock );
     return( NULL );
 }
@@ -1075,7 +1076,7 @@ last_display_date = display_date;
                 /* Set picture dimensions and clear buffer */
                 SetBufferPicture( p_vout, p_pic );
 
-                /* Render picture and informations */
+                /* Render picture and information */
                 RenderPicture( p_vout, p_pic );
                 if( p_vout->b_info )
                 {
@@ -1279,7 +1280,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
  * Print: print simple text on a picture
  *****************************************************************************
  * This function will print a simple text on the picture. It is designed to
- * print debugging or general informations.
+ * print debugging or general information.
  *****************************************************************************/
 void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_h_align, int i_v_align, unsigned char *psz_text )
 {
@@ -1358,7 +1359,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
     if( i_area == p_buffer->i_areas )
     {
         /* New area is below all existing ones: just add it at the end of the
-         * array, if possible - else, append it to the last one */
+         * array, if possible - otherwise, append it to the last one */
         if( i_area < VOUT_MAX_AREAS )
         {
             p_buffer->pi_area_begin[i_area] = i_y;
@@ -1368,7 +1369,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
         else
         {
 #ifdef DEBUG_VIDEO
-            intf_DbgMsg("areas overflow\n");
+            intf_DbgMsg("area overflow\n");
 #endif
             p_buffer->pi_area_end[VOUT_MAX_AREAS - 1] = i_h;
         }
@@ -1605,10 +1606,10 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * RenderPicture: render a picture
  *****************************************************************************
- * This function convert a picture from a video heap to a pixel-encoded image
- * and copy it to the current rendering buffer. No lock is required, since the
- * rendered picture has been determined as existant, and will only be destroyed
- * by the vout thread later.
+ * This function converts a picture from a video heap to a pixel-encoded image
+ * and copies it to the current rendering buffer. No lock is required, since
+ * the * rendered picture has been determined as existant, and will only be
+ * destroyed by the vout thread later.
  *****************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -1619,7 +1620,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vout_buffer_t *     p_buffer;                        /* rendering buffer */
     byte_t *            p_pic_data;                /* convertion destination */
 
-    /* Get and set rendering informations */
+    /* Get and set rendering information */
     p_buffer =          &p_vout->p_buffer[ p_vout->i_buffer_index ];
     p_pic_data =        p_buffer->p_data +
                         p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
@@ -1673,10 +1674,10 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * RenderPictureInfo: print additionnal informations on a picture
+ * RenderPictureInfo: print additionnal information on a picture
  *****************************************************************************
- * This function will print informations such as fps and other picture
- * dependant informations.
+ * This function will print information such as fps and other picture
+ * dependant information.
  *****************************************************************************/
 static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -1768,10 +1769,10 @@ static int RenderIdle( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * RenderInfo: render additionnal informations
+ * RenderInfo: render additionnal information
  *****************************************************************************
- * This function render informations which do not depend of the current picture
- * rendered.
+ * This function renders information which do not depend on the current
+ * picture rendered.
  *****************************************************************************/
 static void RenderInfo( vout_thread_t *p_vout )
 {
@@ -1809,7 +1810,7 @@ static void RenderInfo( vout_thread_t *p_vout )
 /*****************************************************************************
  * RenderSubPicture: render a subpicture
  *****************************************************************************
- * This function render a sub picture unit.
+ * This function renders a sub picture unit.
  *****************************************************************************/
 static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
@@ -1881,7 +1882,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 /*****************************************************************************
  * RenderInterface: render the interface
  *****************************************************************************
- * This function render the interface, if any.
+ * This function renders the interface, if any.
  *****************************************************************************/
 static void RenderInterface( vout_thread_t *p_vout )
 {

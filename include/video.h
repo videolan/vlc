@@ -90,13 +90,13 @@ typedef struct picture_s
 #define YUV_444_PICTURE         102                     /* 4:4:4 YUV picture */
 
 /* Pictures status */
-#define FREE_PICTURE            0       /* picture is free and not allocated */
-#define RESERVED_PICTURE        1       /* picture is allocated and reserved */
-#define RESERVED_DATED_PICTURE  2   /* picture is waiting for DisplayPicture */
-#define RESERVED_DISP_PICTURE   3    /* picture is waiting for a DatePixture */
-#define READY_PICTURE           4            /* picture is ready for display */
-#define DISPLAYED_PICTURE       5/* picture has been displayed but is linked */
-#define DESTROYED_PICTURE       6   /* picture is allocated but no more used */
+#define FREE_PICTURE            0                  /* free and not allocated */
+#define RESERVED_PICTURE        1                  /* allocated and reserved */
+#define RESERVED_DATED_PICTURE  2              /* waiting for DisplayPicture */
+#define RESERVED_DISP_PICTURE   3               /* waiting for a DatePicture */
+#define READY_PICTURE           4                       /* ready for display */
+#define DISPLAYED_PICTURE       5            /* been displayed but is linked */
+#define DESTROYED_PICTURE       6              /* allocated but no more used */
 
 /* Aspect ratios (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
@@ -105,9 +105,9 @@ typedef struct picture_s
 #define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
 
 /*****************************************************************************
- * subpicture_t: video sub picture unit
+ * subpicture_t: video subtitle
  *****************************************************************************
- * Any sub picture unit destined to be displayed by a video output thread should
+ * Any subtitle destined to be displayed by a video output thread should
  * be stored in this structure from it's creation to it's effective display.
  * Subtitle type and flags should only be modified by the output thread. Note
  * that an empty subtitle MUST have its flags set to 0.
@@ -118,7 +118,7 @@ typedef struct subpicture_s
     int             i_type;                                          /* type */
     int             i_status;                                       /* flags */
     int             i_size;                                     /* data size */
-    struct subpicture_s *   p_next;              /* next SPU to be displayed */
+    struct subpicture_s *   p_next;         /* next subtitle to be displayed */
 
     /* Other properties */
     mtime_t         begin_date;                 /* beginning of display date */
@@ -126,7 +126,7 @@ typedef struct subpicture_s
 
     /* Display properties - these properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
-     * subpicture type. */
+     * subtitle type. */
     int             i_x;                   /* offset from alignment position */
     int             i_y;                   /* offset from alignment position */
     int             i_width;                                /* picture width */
@@ -160,29 +160,29 @@ typedef struct subpicture_s
 } subpicture_t;
 
 /* Subpicture type */
-#define EMPTY_SUBPICTURE        0    /* subtitle slot is empty and available */
-#define DVD_SUBPICTURE          100                   /* DVD subpicture unit */
-#define TEXT_SUBPICTURE         200                      /* single line text */
+#define EMPTY_SUBPICTURE       0     /* subtitle slot is empty and available */
+#define DVD_SUBPICTURE         100                    /* DVD subpicture unit */
+#define TEXT_SUBPICTURE        200                       /* single line text */
 
 /* Subpicture status */
-#define FREE_SUBPICTURE         0    /* subpicture is free and not allocated */
-#define RESERVED_SUBPICTURE     1    /* subpicture is allocated and reserved */
-#define READY_SUBPICTURE        2         /* subpicture is ready for display */
-#define DESTROYED_SUBPICTURE    3/* subpicture is allocated but no more used */
+#define FREE_SUBPICTURE        0                   /* free and not allocated */
+#define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
+#define READY_SUBPICTURE       2                        /* ready for display */
+#define DESTROYED_SUBPICTURE   3           /* allocated but not used anymore */
 
 /* Alignment types */
-#define RIGHT_ALIGN             10                /* x is absolute for right */
-#define LEFT_ALIGN              11                 /* x is absolute for left */
-#define RIGHT_RALIGN            12     /* x is relative for right from right */
-#define LEFT_RALIGN             13       /* x is relative for left from left */
+#define RIGHT_ALIGN            10                 /* x is absolute for right */
+#define LEFT_ALIGN             11                  /* x is absolute for left */
+#define RIGHT_RALIGN           12      /* x is relative for right from right */
+#define LEFT_RALIGN            13        /* x is relative for left from left */
 
-#define CENTER_ALIGN            20           /* x, y are absolute for center */
-#define CENTER_RALIGN           21 /* x, y are relative for center from center */
+#define CENTER_ALIGN           20            /* x, y are absolute for center */
+#define CENTER_RALIGN          21 /* x,y are relative for center from center */
 
-#define BOTTOM_ALIGN            30               /* y is absolute for bottom */
-#define TOP_ALIGN               31                  /* y is absolute for top */
-#define BOTTOM_RALIGN           32   /* y is relative for bottom from bottom */
-#define TOP_RALIGN              33         /* y is relative for top from top */
-#define SUBTITLE_RALIGN         34 /* y is relative for center from subtitle */
+#define BOTTOM_ALIGN           30                /* y is absolute for bottom */
+#define TOP_ALIGN              31                   /* y is absolute for top */
+#define BOTTOM_RALIGN          32    /* y is relative for bottom from bottom */
+#define TOP_RALIGN             33          /* y is relative for top from top */
+#define SUBTITLE_RALIGN        34  /* y is relative for center from subtitle */
 
 

@@ -8,6 +8,11 @@ A typical way to configure the vlc is :
 
    ./configure --prefix=/usr --enable-mmx --enable-gnome
 
+For a full compilation, you may try :
+
+   ./configure --prefix=/usr --enable-mmx --enable-gnome --enable-fb \
+           --enable-glide --enable-ggi --enable-mga --enable-esd
+
 See `./configure --help' for more information.
 
 Then, run `make', and `make install' to install it.

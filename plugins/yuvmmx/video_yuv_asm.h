@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video_yuv_asm.h: YUV transformation assembly
+ * video_yuv_asm.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -82,7 +82,7 @@ movq      %%mm1, %%mm3          # Copy 4 Cr       00 v3 00 v2 00 v1 00 v0   \n\
 pmulhw    mmx_U_green, %%mm2    # Mul Cb with green coeff -> Cb green       \n\
 pmulhw    mmx_V_green, %%mm3    # Mul Cr with green coeff -> Cr green       \n\
 pmulhw    mmx_U_blue, %%mm0     # Mul Cb -> Cblue 00 b3 00 b2 00 b1 00 b0   \n\
-pmulhw    mmx_V_red, %%mm1      # Mul Cr -> Cred  00 r3 00 r2 00 r1 00      \n\
+pmulhw    mmx_V_red, %%mm1      # Mul Cr -> Cred  00 r3 00 r2 00 r1 00 r0   \n\
 paddsw    %%mm3, %%mm2          # Cb green + Cr green -> Cgreen             \n\
                                                                             \n\
 # convert the luma part                                                     \n\
