@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: vout_pictures.c,v 1.46 2004/02/22 00:15:33 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.47 2004/02/27 14:01:35 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -528,6 +528,7 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             p_format->i_bits_per_pixel = 12;
             break;
         case FOURCC_I410:
+        case FOURCC_YVU9:
             p_format->i_bits_per_pixel = 9;
             break;
         case FOURCC_Y211:
@@ -596,6 +597,7 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_I410:
+        case FOURCC_YVU9:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
             p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
