@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.1 2003/07/03 19:25:51 garf Exp $
+ * $Id: logo.c,v 1.2 2003/07/04 19:00:43 titer Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -132,21 +132,25 @@ static int Init( vout_thread_t *p_vout )
     int i_index;
     picture_t *p_pic;
     char * filename;
-    /*  read png file  */
-    filename = config_GetPsz( p_vout, "logo_file" );
-    FILE *fp = fopen( filename , "rb");
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL , NULL , NULL);
-    png_infop info_ptr = png_create_info_struct(png_ptr);
+    FILE * fp;
     int color_type;
     int interlace_type;
     int compression_type;
     int filter_type;
+    png_structp png_ptr;
     png_bytep * row_pointers;
+    png_infop info_ptr;
     unsigned int i;
     unsigned int j;
     int temp;
     int i_size;
 
+    /*  read png file  */
+    filename = config_GetPsz( p_vout, "logo_file" );
+    fp = fopen( filename , "rb");
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL , NULL , NULL);
+    info_ptr = png_create_info_struct(png_ptr);
+    
     if (fp == NULL)
     {
         p_vout->p_sys->error=1;
