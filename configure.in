@@ -309,7 +309,7 @@ ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));}],
                     ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
 if test x"$ac_cv_mmx_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
@@ -317,7 +317,7 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [ac_cv_mmxext_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));}],
                     ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
 if test x"$ac_cv_mmxext_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
@@ -325,32 +325,35 @@ fi
 
 AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));}],
                     ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
 if test x"$ac_cv_3dnow_inline" != x"no"; then
+  AC_DEFINE(HAVE_3DNOW, 1, Define if \$CC groks 3D Now! inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
 fi
 
 AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [ac_cv_sse_inline],
-    [AC_TRY_COMPILE(,[void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],
+    [AC_TRY_COMPILE(,[void quux(){void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));}],
                     ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
 if test x"$ac_cv_sse_inline" != x"no"; then
+  AC_DEFINE(HAVE_SSE, 1, Define if \$CC groks SSE inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
 
 AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
     [ac_cv_altivec_inline],
-    [AC_TRY_COMPILE(,[void quux(){asm("vperm 0,1,2,3");}],
+    [AC_TRY_COMPILE(,[void quux(){asm volatile("vperm 0,1,2,3");}],
          ac_cv_altivec_inline=yes,
          [save_CFLAGS=$CFLAGS
           CFLAGS="$CFLAGS -Wa,-m7400"
-          AC_TRY_COMPILE(,[void quux(){asm("vperm 0,1,2,3");}],
+          AC_TRY_COMPILE(,[void quux(){asm volatile("vperm 0,1,2,3");}],
             [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
           CFLAGS=$save_CFLAGS
          ])])
 if test x"$ac_cv_altivec_inline" != x"no"; then
+  AC_DEFINE(HAVE_ALTIVEC, 1, Define if \$CC groks ALTIVEC inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
@@ -1024,7 +1027,7 @@ if test x$enable_xvideo != xno; then
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
-    PLUGINS="${PLUGINS} xvideo"
+    BUILTINS="${BUILTINS} xvideo"
     LIB_XVIDEO="-L$x_libraries -lX11 -lXext -lXv"
     CFLAGS_X11="-I$x_includes"
   ]

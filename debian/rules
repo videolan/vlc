@@ -35,11 +35,6 @@ build-stamp:
 		--infodir=$${prefix}/share/info \
 		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(LIBDVDCSS_FLAGS))
 
-	# Fix Makefile
-	sed -e 's/^\(PLUGINS.*\)xvideo/\1/' -e 's/^BUILTINS.*/& xvideo/' \
-		< Makefile.opts > Makefile.opts.tmp
-	mv -f Makefile.opts.tmp Makefile.opts
-
 	$(MAKE)
 
 	touch build-stamp

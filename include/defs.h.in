@@ -202,6 +202,15 @@
 /* Maximum supported data alignment */
 #undef ATTRIBUTE_ALIGNED_MAX
 
+/* Define if $CC groks 3D Now! inline assembly. */
+#undef HAVE_3DNOW
+
+/* Define if $CC groks SSE inline assembly. */
+#undef HAVE_SSE
+
+/* Define if $CC groks ALTIVEC inline assembly. */
+#undef HAVE_ALTIVEC
+
 /* Define if your compiler groks C altivec extensions. */
 #undef HAVE_C_ALTIVEC
 

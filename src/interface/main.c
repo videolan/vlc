@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.119 2001/10/22 00:43:23 jobi Exp $
+ * $Id: main.c,v 1.120 2001/10/22 12:02:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1164,6 +1164,7 @@ static int CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
+#ifdef HAVE_SSE
         /* We test if OS support the SSE instructions */
         i_illegal = 0;
         if( setjmp( env ) == 0 )
@@ -1185,6 +1186,7 @@ static int CPUCapabilities( void )
             fprintf( stderr, "(you will need Linux kernel 2.4.x or later)\n" );
 #endif
         }
+#endif
     }
     
     /* test for additional capabilities */
@@ -1199,6 +1201,7 @@ static int CPUCapabilities( void )
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
+#ifdef HAVE_3DNOW
     if( i_edx & 0x80000000 )
     {
         i_illegal = 0;
@@ -1213,6 +1216,7 @@ static int CPUCapabilities( void )
             i_capabilities |= CPU_CAPABILITY_3DNOW;
         }
     }
+#endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
     {
@@ -1223,9 +1227,11 @@ static int CPUCapabilities( void )
     return( i_capabilities );
 
 #elif defined( __powerpc__ )
+
     /* Test for Altivec */
     signal( SIGILL, InstructionSignalHandler );
 
+#ifdef HAVE_ALTIVEC
     i_illegal = 0;
     if( setjmp( env ) == 0 )
     {
@@ -1236,9 +1242,9 @@ static int CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
+#endif
 
     signal( SIGILL, NULL );     
-
     return( i_capabilities );
 
 #else
