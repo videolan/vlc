@@ -1,2 +1,2 @@
-avi_SOURCES = avi.c
+avi_SOURCES = avi.c libioRIFF.c
 
