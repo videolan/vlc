@@ -11,12 +11,14 @@ to use the command line arguments. You can obtain a list of these command
 line arguments by typing 'vlc --help'.
 It is also sometimes useful to display vlc's debug console. You can do so
 by running 'vlc -v'.
+This feature is at the moment broken. To display vlc's debug messages,
+open the menu 'view', select 'messages'.
 To store a debug log of the current vlc session, you can use
 'vlc -vvv --stdout=debug.txt'.
 
 If you want to play a DVD, run vlc and click on the Disc option in the
 interface. You then have to type your drive letter in the 'Device name'
-box (eg. 'D:' if your dvdrom drive is assigned the letter 'D').
+box including the final '\' (eg. 'D:\' if your dvdrom drive is assigned the letter 'D').
 ( !Warning: you have to be in administrator mode (for now) on Win2k )
 
 
