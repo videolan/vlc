@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.23 2004/01/25 18:20:12 bigben Exp $
+ * $Id: render.c,v 1.24 2004/01/27 03:45:17 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from: 
@@ -522,9 +522,9 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   But we deal with them in special cases above. */
 
 		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 )>>ALPHA_BITS;
-		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V )  >>ALPHA_BITS;
-		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 )>>ALPHA_BITS;
 		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U )  >>ALPHA_BITS;
+		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 )>>ALPHA_BITS;
+		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V )  >>ALPHA_BITS;
 		break;
 	      }
 	    }
@@ -889,6 +889,22 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 #undef  BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 4
 
+static inline void
+put_rgb24_pixel(uint8_t *rgb, uint8_t *p_pixel)
+{
+#ifdef WORDS_BIGENDIAN
+  *p_pixel++;
+  *p_pixel++ = rgb[RED_PIXEL];
+  *p_pixel++ = rgb[GREEN_PIXEL];
+  *p_pixel++ = rgb[BLUE_PIXEL];
+#else 
+  *p_pixel++ = rgb[BLUE_PIXEL];
+  *p_pixel++ = rgb[GREEN_PIXEL];
+  *p_pixel++ = rgb[RED_PIXEL];
+#endif
+}
+
+
 /* 
   RV24 format??? Is this just for X11? Or just not for Win32? Is this
   the same as RV32?
@@ -1033,10 +1049,8 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                     yuv2rgb(p_source, rgb);
 
                     for ( len = i_xlast - i_xdest; len ; len--) {
-                      *p_dest++ = rgb[BLUE_PIXEL];
-                      *p_dest++ = rgb[GREEN_PIXEL];
-                      *p_dest++ = rgb[RED_PIXEL];
-                      *p_dest++;
+                      put_rgb24_pixel(rgb, p_dest);
+                      p_dest += BYTES_PER_PIXEL;
                     }
 
 #ifdef TRANSPARENCY_FINISHED
@@ -1066,10 +1080,8 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                                       ALPHA_SCALEDOWN);
 
                       for ( len = i_xlast - i_xdest; len ; len--) {
-                        *p_dest++ = rgb[BLUE_PIXEL];
-                        *p_dest++ = rgb[GREEN_PIXEL];
-                        *p_dest++ = rgb[RED_PIXEL];
-                        *p_dest++;
+                        put_rgb24_pixel(rgb, p_dest);
+                        p_dest += BYTES_PER_PIXEL;
                       }
                       break;
                     }
@@ -1138,10 +1150,8 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                       uint8_t *p_dest = p_pixel_base + i_ytmp + i_xdest;
                       
                       for ( len = i_xlast - i_xdest; len ; len--) {
-                        *p_dest++ = rgb[BLUE_PIXEL];
-                        *p_dest++ = rgb[GREEN_PIXEL];
-                        *p_dest++ = rgb[RED_PIXEL];
-                        *p_dest++;
+                        put_rgb24_pixel(rgb, p_dest);
+                        p_dest += BYTES_PER_PIXEL;
                       }
                     }
                     break;
@@ -1175,6 +1185,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                       uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
                       rv32_pack_blend(p_dest, rgb, dest_alpha,
                                       ALPHA_SCALEDOWN);
+                      p_dest += BYTES_PER_PIXEL;
                     }
                     break;
 #endif /*TRANSPARENCY_FINISHED*/
