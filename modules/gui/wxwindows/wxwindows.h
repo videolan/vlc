@@ -250,7 +250,7 @@ private:
 #endif
     void OnContextMenu(wxMouseEvent& event);
 
-    void UpdateSizeEvent( wxCommandEvent& event );
+    void OnControlEvent( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
