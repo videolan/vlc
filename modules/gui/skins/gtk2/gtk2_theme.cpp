@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.6 2003/04/14 17:03:42 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.7 2003/04/14 18:05:35 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -269,7 +269,7 @@ void GTK2Theme::OnLoadTheme()
     attr.width = 400;
     attr.height = 150;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
-    attr.wclass = GDK_INPUT_OUTPUT;
+    attr.wclass = GDK_INPUT_ONLY;
     attr.override_redirect = FALSE;
     
     gint mask = GDK_WA_TITLE|GDK_WA_X|GDK_WA_Y|GDK_WA_NOREDIR;
