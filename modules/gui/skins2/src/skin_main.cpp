@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.7 2004/02/27 15:07:04 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.8 2004/02/29 14:05:14 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -134,12 +134,12 @@ static void Close( vlc_object_t *p_this )
 
     // Destroy "singleton" objects
     OSFactory::instance( p_intf )->destroyOSLoop();
-    OSFactory::destroy( p_intf );
     Dialogs::destroy( p_intf );
     Interpreter::destroy( p_intf );
     AsyncQueue::destroy( p_intf );
     VarManager::destroy( p_intf );
     VlcProc::destroy( p_intf );
+    OSFactory::destroy( p_intf );
 
     if( p_intf->p_sys->p_input )
     {
