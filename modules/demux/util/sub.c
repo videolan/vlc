@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.47 2004/01/27 12:22:41 fenrir Exp $
+ * $Id: sub.c,v 1.48 2004/01/27 12:46:46 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -212,7 +212,7 @@ static int  sub_Vplayer     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *
 static int  sub_Sami        ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_VobSub      ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 
-static int  DemuxVobSub     ( subtitle_demux_t *p_sub, uint8_t *pkt, int i_pkt );
+static int  DemuxVobSub     ( subtitle_demux_t *, block_t * );
 
 static struct
 {
@@ -512,78 +512,45 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
         p_sub->i_previously_selected = 0;
         return VLC_SUCCESS;
     }
-    
-    if( p_sub->i_sub_type == SUB_TYPE_VOBSUB )
-    {
-        off_t filepos = (off_t)p_sub->subtitle[p_sub->i_subtitle].i_vobsub_location;
-        if( fseeko( p_sub->p_vobsub_file, filepos, SEEK_SET ) )
-        {
-            msg_Dbg( p_sub, "Could not seek to vobsublocation: %d", (int)filepos);
-        }
-    }
 
-    while( p_sub->i_subtitle < p_sub->i_subtitles &&
-           p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
+    if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
     {
-        block_t *p_block;
-        uint8_t packet[DVD_VIDEO_LB_LEN];
-        int i_len = 0;
-
-        if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
+        while( p_sub->i_subtitle < p_sub->i_subtitles &&
+               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
         {
-            i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
+            block_t *p_block;
+            int i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
+
             if( i_len <= 1 )
             {
                 /* empty subtitle */
                 p_sub->i_subtitle++;
                 continue;
             }
-        }
-        else
-        {
-            int i_err = fread( packet, DVD_VIDEO_LB_LEN, 1, p_sub->p_vobsub_file );
-            if( i_err < 1 )
+
+            if( ( p_block = block_New( p_sub->p_input, i_len ) ) == NULL )
             {
-                msg_Dbg( p_sub, "could not read vobsub at location: %i", p_sub->subtitle[p_sub->i_subtitle].i_vobsub_location);
                 p_sub->i_subtitle++;
                 continue;
             }
-            i_len = ps_pkt_size( packet, DVD_VIDEO_LB_LEN );
-            if( fseeko( p_sub->p_vobsub_file, i_len, SEEK_CUR ) )
-            {
-                msg_Dbg( p_sub, "could not seek to next vobsublocation" );
-            }
-        }
 
-        if( !( p_block = block_New( p_sub->p_input, i_len ) ) )
-        {
-            p_sub->i_subtitle++;
-            continue;
-        }
-
-        p_block->i_pts =
-            input_ClockGetTS( p_sub->p_input,
-                              p_sub->p_input->stream.p_selected_program,
-                              p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
-        if( p_sub->subtitle[p_sub->i_subtitle].i_stop > 0 )
-        {
-            /* FIXME kludge ...
-             * i_dts means end of display...
-             */
-            p_block->i_dts =
+            /* XXX we should convert all demuxers to use es_out_Control to set pcr and
+             * then remove that */
+            p_block->i_pts =
                 input_ClockGetTS( p_sub->p_input,
-                              p_sub->p_input->stream.p_selected_program,
-                              p_sub->subtitle[p_sub->i_subtitle].i_stop *9/100);
-        }
-        else
-        {
+                                  p_sub->p_input->stream.p_selected_program,
+                                  p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
             p_block->i_dts = 0;
-        }
+            if( p_sub->subtitle[p_sub->i_subtitle].i_stop > 0 )
+            {
+                /* FIXME kludge i_dts means end of display... */
+                p_block->i_dts =
+                    input_ClockGetTS( p_sub->p_input,
+                                  p_sub->p_input->stream.p_selected_program,
+                                  p_sub->subtitle[p_sub->i_subtitle].i_stop *9/100);
+            }
 
-        if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
-        {
-            memcpy( p_block->p_buffer,
-                p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
+            memcpy( p_block->p_buffer, p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
 
             if( p_block->i_pts > 0 )
             {
@@ -595,14 +562,56 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             }
             p_sub->i_subtitle++;
         }
-        else if( i_len > 1 )
+    }
+    else
+    {
+        while( p_sub->i_subtitle < p_sub->i_subtitles &&
+               p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
         {
-            memcpy( p_block->p_buffer, packet, i_len );
-            DemuxVobSub( p_sub, packet, i_len );
-        }
-        else
-        {
-            block_Release( p_block );
+            int i_pos = p_sub->subtitle[p_sub->i_subtitle].i_vobsub_location;
+            block_t *p_block;
+            int i_size = 0;
+
+            /* first compute SPU size */
+            if( p_sub->i_subtitle + 1 < p_sub->i_subtitles )
+            {
+                i_size = p_sub->subtitle[p_sub->i_subtitle+1].i_vobsub_location - i_pos;
+            }
+            if( i_size <= 0 ) i_size = 65535;   /* Invalid or EOF */
+
+            /* Seek at the right place (could be avoid if sub_seek is fixed to do his job) */
+            if( fseek( p_sub->p_vobsub_file, i_pos, SEEK_CUR ) )
+            {
+                msg_Warn( p_sub, "cannot seek at right vobsub location %d", i_pos );
+                p_sub->i_subtitle++;
+                continue;
+            }
+
+            /* allocate a packet */
+            if( ( p_block = block_New( p_sub, i_size ) ) == NULL )
+            {
+                p_sub->i_subtitle++;
+                continue;
+            }
+
+            /* read data */
+            p_block->i_buffer = fread( p_block->p_buffer, 1, i_size, p_sub->p_vobsub_file );
+            if( p_block->i_buffer <= 6 )
+            {
+                block_Release( p_block );
+                p_sub->i_subtitle++;
+                continue;
+            }
+
+            /* pts */
+            p_block->i_pts =
+                input_ClockGetTS( p_sub->p_input,
+                                  p_sub->p_input->stream.p_selected_program,
+                                  p_sub->subtitle[p_sub->i_subtitle].i_start*9/100);
+
+            /* demux this block */
+            DemuxVobSub( p_sub, p_block );
+
             p_sub->i_subtitle++;
         }
     }
@@ -1119,16 +1128,17 @@ static int  sub_VobSub( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subt
     return( 0 );
 }
 
-static int DemuxVobSub( subtitle_demux_t *p_demux, uint8_t *pkt, int i_pkt )
+static int  DemuxVobSub( subtitle_demux_t *p_demux, block_t *p_bk )
 {
-    uint8_t     *p = pkt;
+    uint8_t     *p = p_bk->p_buffer;
+    uint8_t     *p_end = &p_bk->p_buffer[p_bk->i_buffer];
 
-    while( p < &pkt[i_pkt] )
+    while( p < p_end )
     {
-        int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
+        int i_size = ps_pkt_size( p, p_end - p );
         block_t *p_pkt;
-        int        i_id;
-        int        i_spu;
+        int      i_id;
+        int      i_spu;
 
         if( i_size <= 0 )
         {
@@ -1164,7 +1174,10 @@ static int DemuxVobSub( subtitle_demux_t *p_demux, uint8_t *pkt, int i_pkt )
 
         if( p_demux->p_es )
         {
+            p_pkt->i_pts = p_bk->i_pts;
             es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
+
+            p_bk->i_pts = 0;    /* only first packet has a pts */
         }
     }
 
