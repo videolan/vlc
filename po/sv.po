@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-01-03 12:56+0100\n"
+"POT-Creation-Date: 2004-01-03 14:16+0100\n"
 "PO-Revision-Date: 2002-07-23 23:00+0200\n"
 "Last-Translator: Joel Arvidsson <dogai@privat.utfors.se>\n"
 "Language-Team: \n"
@@ -2065,7 +2065,7 @@ msgid "CDX"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:120 modules/access/vcdx/vcd.c:102
-#: modules/codec/ogt/cvd.c:60 modules/codec/ogt/ogt.c:62
+#: modules/codec/ogt/cvd.c:51 modules/codec/ogt/ogt.c:51
 msgid "set debug mask for additional debugging."
 msgstr ""
 
@@ -3185,28 +3185,27 @@ msgstr ""
 msgid "MPEG audio layer I/II/III packetizer"
 msgstr ""
 
-#: modules/codec/ogt/cvd.c:40
-msgid ""
-"This integer when viewed in binary is a debugging mask\n"
-"external call          1\n"
-"all calls              2\n"
-"packet assembly info   4\n"
-"image bitmaps          8\n"
-"image transformations 16\n"
-"misc info             32\n"
-msgstr ""
-
-#: modules/codec/ogt/cvd.c:55
+#: modules/codec/ogt/cvd.c:46
 #, fuzzy
 msgid "CVD subtitle decoder"
 msgstr "Undertext"
 
-#: modules/codec/ogt/cvd.c:64
+#: modules/codec/ogt/cvd.c:55
 #, fuzzy
 msgid "Chaoji VCD subtitle packetizer"
 msgstr "Undertext"
 
-#: modules/codec/ogt/ogt.c:40
+#: modules/codec/ogt/ogt.c:46
+#, fuzzy
+msgid "Philips OGT (SVCD subtitle) decoder"
+msgstr "Undertext"
+
+#: modules/codec/ogt/ogt.c:55
+#, fuzzy
+msgid "Philips OGT (SVCD subtitle) packetizer"
+msgstr "Undertext"
+
+#: modules/codec/ogt/subtitle.h:37
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "external call          1\n"
@@ -3215,18 +3214,9 @@ msgid ""
 "image bitmaps          8\n"
 "image transformations 16\n"
 "rendering information 32\n"
-"misc info             64\n"
+"extract subtitles     64\n"
+"misc info            128\n"
 msgstr ""
-
-#: modules/codec/ogt/ogt.c:57
-#, fuzzy
-msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr "Undertext"
-
-#: modules/codec/ogt/ogt.c:66
-#, fuzzy
-msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr "Undertext"
 
 #: modules/codec/quicktime.c:59
 msgid "QuickTime library decoder"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-01-03 12:56+0100\n"
+"POT-Creation-Date: 2004-01-03 14:16+0100\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Sam Hocevar <sam@zoy.org> 2003-12-04\n"
 "Language-Team: \n"
@@ -2321,7 +2321,7 @@ msgid "CDX"
 msgstr "CDX"
 
 #: modules/access/cdda/cdda.c:120 modules/access/vcdx/vcd.c:102
-#: modules/codec/ogt/cvd.c:60 modules/codec/ogt/ogt.c:62
+#: modules/codec/ogt/cvd.c:51 modules/codec/ogt/ogt.c:51
 msgid "set debug mask for additional debugging."
 msgstr "régler le masque de déboggage pour plus de messages"
 
@@ -3541,33 +3541,25 @@ msgstr "Parseur MPEG audio couches I/II/III"
 msgid "MPEG audio layer I/II/III packetizer"
 msgstr "Empaqueteur MPEG audio layer I/II/III"
 
-#: modules/codec/ogt/cvd.c:40
-#, fuzzy
-msgid ""
-"This integer when viewed in binary is a debugging mask\n"
-"external call          1\n"
-"all calls              2\n"
-"packet assembly info   4\n"
-"image bitmaps          8\n"
-"image transformations 16\n"
-"misc info             32\n"
-msgstr ""
-"Cet entier, en binaire, est un masque de déboggage\n"
-"appel externe     1\n"
-"tous les appels   2\n"
-"divers            4\n"
-
-#: modules/codec/ogt/cvd.c:55
+#: modules/codec/ogt/cvd.c:46
 #, fuzzy
 msgid "CVD subtitle decoder"
 msgstr "Décodeur de sous-titres DVD"
 
-#: modules/codec/ogt/cvd.c:64
+#: modules/codec/ogt/cvd.c:55
 #, fuzzy
 msgid "Chaoji VCD subtitle packetizer"
 msgstr "Empaqueteur de sous-titres DVD"
 
-#: modules/codec/ogt/ogt.c:40
+#: modules/codec/ogt/ogt.c:46
+msgid "Philips OGT (SVCD subtitle) decoder"
+msgstr "Décodeur de sous-titres Philips OGT (Sous-titres SVCD)"
+
+#: modules/codec/ogt/ogt.c:55
+msgid "Philips OGT (SVCD subtitle) packetizer"
+msgstr "Empaqueteur de sous-titres Philips OGT (Sous-titres SVCD)"
+
+#: modules/codec/ogt/subtitle.h:37
 #, fuzzy
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
@@ -3577,20 +3569,13 @@ msgid ""
 "image bitmaps          8\n"
 "image transformations 16\n"
 "rendering information 32\n"
-"misc info             64\n"
+"extract subtitles     64\n"
+"misc info            128\n"
 msgstr ""
 "Cet entier, en binaire, est un masque de déboggage\n"
 "appel externe     1\n"
 "tous les appels   2\n"
 "divers            4\n"
-
-#: modules/codec/ogt/ogt.c:57
-msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr "Décodeur de sous-titres Philips OGT (Sous-titres SVCD)"
-
-#: modules/codec/ogt/ogt.c:66
-msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr "Empaqueteur de sous-titres Philips OGT (Sous-titres SVCD)"
 
 #: modules/codec/quicktime.c:59
 msgid "QuickTime library decoder"
@@ -8259,6 +8244,21 @@ msgstr "Module XOSD"
 #: modules/visualization/xosd/xosd.c:82
 msgid "xosd interface"
 msgstr "interface xosd"
+
+#, fuzzy
+#~ msgid ""
+#~ "This integer when viewed in binary is a debugging mask\n"
+#~ "external call          1\n"
+#~ "all calls              2\n"
+#~ "packet assembly info   4\n"
+#~ "image bitmaps          8\n"
+#~ "image transformations 16\n"
+#~ "misc info             32\n"
+#~ msgstr ""
+#~ "Cet entier, en binaire, est un masque de déboggage\n"
+#~ "appel externe     1\n"
+#~ "tous les appels   2\n"
+#~ "divers            4\n"
 
 #~ msgid "(C) 1996-2003 the VideoLAN team"
 #~ msgstr "(C) 1996-2003 l'équipe VideoLAN"
