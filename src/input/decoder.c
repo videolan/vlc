@@ -783,13 +783,18 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
              i_pic++ )
         {
-            if( p_pic->i_status == READY_PICTURE && i_ready_pic++ > 0 ) break;
+            if( p_pic->i_status == READY_PICTURE )
+            {
+                if( i_ready_pic++ > 0 ) break;
+                else continue;
+            }
 
             if( p_pic->i_status != DISPLAYED_PICTURE &&
                 p_pic->i_status != RESERVED_PICTURE &&
                 p_pic->i_status != READY_PICTURE ) break;
 
-            if( !p_pic->i_refcount ) break;
+            if( !p_pic->i_refcount && p_pic->i_status != RESERVED_PICTURE )
+                break;
         }
         if( i_pic == p_dec->p_owner->p_vout->render.i_pictures )
         {
