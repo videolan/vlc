@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.13 2003/01/26 02:22:59 ipkiss Exp $
+ * $Id: win32.cpp,v 1.14 2003/02/01 22:21:44 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -268,7 +268,7 @@ int Win32Manage( intf_thread_t *p_intf )
 
         if( b_need_menus )
         {
-            //p_intf->p_sys->p_menus->SetupMenus();
+            p_intf->p_sys->p_menus->SetupMenus();
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
