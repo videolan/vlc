@@ -446,25 +446,27 @@ SOURCES_mozilla_unix = mozilla/npunix.c
 endif
 
 if BUILD_MOZILLA
-noinst_LIBRARIES_mozilla = mozilla/libvlcplugin.a
+if UNTRUE
+noinst_LIBRARIES_mozilla = mozilla/libplugin.a
+endif
 
-mozilla_libvlcplugin_a_SOURCES = $(SOURCES_mozilla) $(BUILT_SOURCES_mozilla) \
-                                 $(SOURCES_libgetopt)
-mozilla_libvlcplugin_a_CFLAGS = $(CPPFLAGS_pic) $(CFLAGS_pic) \
-                                $(CPPFLAGS_mozilla) $(CFLAGS_mozilla) \
-                                $(CPPFLAGS_mozilla_EXTRA)
-mozilla_libvlcplugin_a_CXXFLAGS = $(CPPFLAGS_pic) $(CXXFLAGS_pic) \
-                                  $(CPPFLAGS_mozilla) $(CXXFLAGS_mozilla) \
-                                  $(CPPFLAGS_mozilla_EXTRA)
-mozilla_libvlcplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic) $(DATA_npvlc_rc)
+mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla) $(BUILT_SOURCES_mozilla) \
+                              $(SOURCES_libgetopt)
+mozilla_libplugin_a_CFLAGS = $(CPPFLAGS_pic) $(CFLAGS_pic) \
+                             $(CPPFLAGS_mozilla) $(CFLAGS_mozilla) \
+                             $(CPPFLAGS_mozilla_EXTRA)
+mozilla_libplugin_a_CXXFLAGS = $(CPPFLAGS_pic) $(CXXFLAGS_pic) \
+                               $(CPPFLAGS_mozilla) $(CXXFLAGS_mozilla) \
+                               $(CPPFLAGS_mozilla_EXTRA)
+mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic) $(DATA_npvlc_rc)
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
 $(SOURCES_mozilla): mozilla/vlcintf.h
 
 mozilla_plugin_DATA = $(LIBRARIES_mozilla)
 mozilla_plugindir = $(libdir)/mozilla/plugins
-$(LIBRARIES_mozilla): mozilla/libvlcplugin.a $(L_builtin_pic)
-	$(CXXLINK) -o $@ $(mozilla_libvlcplugin_a_OBJECTS) $(DATA_npvlc_rc) \
+$(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) $(L_builtin_pic)
+	$(CXXLINK) -o $@ $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
 		lib/libvlc_pic.a $(L_builtin_pic) -shared $(LDFLAGS) \
 		$(LDFLAGS_vlc) $(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)
 

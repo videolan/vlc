@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.19 2002/10/16 15:10:38 sam Exp $
+##  $Id: bootstrap,v 1.20 2002/10/25 09:24:29 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -107,7 +107,9 @@ EOF
 # The ${mod} plugin
 
 if ${mod}_plugin
+if UNTRUE
 L_${mod}_p = ${dir}/lib${mod}_plugin.a
+endif
 D_${mod}_p = ${dir}/lib${mod}_plugin\$(LIBEXT)
 ${NODIST}B_${mod}_p = \$(nodist_SOURCES_${mod})
 endif
@@ -160,6 +162,7 @@ EOF
   done
 done
 
+echo "AM_CONDITIONAL(UNTRUE, false)" >> configure.ac
 sed -n -e '/dnl do not touch this line/,//p' < configure.ac.in >> configure.ac
 
 echo "done."
