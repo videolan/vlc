@@ -45,7 +45,6 @@
 #include <wx/taskbar.h>
 #include "vlc_keys.h"
 
-
 /* Hmmm, work-around for newest wxWin */
 #ifdef wxStaticCastEvent
 #   undef wxStaticCastEvent
@@ -94,7 +93,9 @@ class DialogsProvider;
 class PrefsTreeCtrl;
 class AutoBuiltPanel;
 class VideoWindow;
+#ifdef wxHAS_TASK_BAR_ICON
 class Systray;
+#endif
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
@@ -321,7 +322,9 @@ public:
     vlc_bool_t b_undock;
 
     wxGauge     *volctrl;
+#ifdef wxHAS_TASK_BAR_ICON
     Systray     *p_systray;
+#endif
 
 private:
     void SetupHotkeys();

@@ -50,7 +50,9 @@
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
 /* include a small icon graphic for the systray icon */
+#ifdef wxHAS_TASK_BAR_ICON
 #include "../../../share/vlc16x16.xpm"
+#endif
 
 /*****************************************************************************
  * Local class declarations.
@@ -100,6 +102,7 @@ BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
 END_EVENT_TABLE()
 
 /* Systray integration */
+#ifdef wxHAS_TASK_BAR_ICON
 class Systray: public wxTaskBarIcon
 {
 public:
@@ -117,7 +120,7 @@ private:
     Interface* p_main_interface;
     DECLARE_EVENT_TABLE()
 };
-
+#endif
 
 /*****************************************************************************
  * Event Table.
@@ -225,6 +228,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
 END_EVENT_TABLE()
 
+#ifdef wxHAS_TASK_BAR_ICON
 BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
     /* Mouse events */
     EVT_TASKBAR_LEFT_DOWN(Systray::OnLeftClick)
@@ -236,6 +240,7 @@ BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
     EVT_MENU(PrevStream_Event, Systray::OnPrevStream)
     EVT_MENU(StopStream_Event, Systray::OnStopStream)
 END_EVENT_TABLE()
+#endif
 
 /*****************************************************************************
  * Constructor.
@@ -253,7 +258,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     extra_window = NULL;
 
     /* Give our interface a nice little icon */
-    SetIcon( wxIcon( vlc16x16_xpm ) );
+    SetIcon( wxIcon( vlc_xpm ) );
 
     /* Create a sizer for the main frame */
     frame_sizer = new wxBoxSizer( wxVERTICAL );
@@ -265,17 +270,19 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     p_dummy->SetFocus();
     frame_sizer->Add( p_dummy, 0, 0 );
 
+#ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
     p_systray = NULL;
     if ( config_GetInt( p_intf, "wxwin-systray" ) )
     {
         p_systray = new Systray(this);
-        p_systray->SetIcon( wxIcon( vlc_xpm ), wxT("VLC media player") );
+        p_systray->SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
         if ( (! p_systray->IsOk()) || (! p_systray->IsIconInstalled()) )
         {
             msg_Warn(p_intf, "Cannot set systray icon, weird things may happen");
         }
     }
+#endif
 
     /* Creation of the menu bar */
     CreateOurMenuBar();
@@ -328,10 +335,12 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
 Interface::~Interface()
 {
+#ifdef wxHAS_TASK_BAR_ICON
     if( p_systray )
     {
         delete p_systray;
     }
+#endif
 
     if( p_intf->p_sys->p_wxwindow )
     {
@@ -1299,6 +1308,7 @@ void wxVolCtrl::UpdateVolume()
  * Definition of Systray class.
  *****************************************************************************/
 
+#ifdef wxHAS_TASK_BAR_ICON
 Systray::Systray( Interface *_p_main_interface )
 {
     p_main_interface = _p_main_interface;
@@ -1349,4 +1359,5 @@ wxMenu* Systray::CreatePopupMenu()
     systray_menu->Append( Iconize_Event, wxU(_("Show/Hide interface")) );
     return systray_menu;
 }
+#endif
 

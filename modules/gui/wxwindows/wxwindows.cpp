@@ -117,8 +117,10 @@ vlc_module_begin();
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
+#ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wxwin-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
+#endif
 
     add_submodule();
     set_description( _("wxWindows dialogs provider") );
