@@ -898,7 +898,7 @@ VLC_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-VLC_ADD_PLUGINS([m3u playlist export sgimb])
+VLC_ADD_PLUGINS([m3u id3 playlist export sgimb])
 VLC_ADD_PLUGINS([rawvideo])
 VLC_ADD_PLUGINS([wav araw subtitle adpcm a52sys dtssys au])
 VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
@@ -1702,10 +1702,10 @@ fi
 dnl
 dnl   libid3tag support (FIXME!!! doesn't work with new input)
 dnl
-dnl AC_CHECK_HEADERS(id3tag.h, [
-dnl   AC_CHECK_HEADERS(zlib.h, [
-dnl     VLC_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
-dnl     VLC_ADD_PLUGINS([id3tag])]) ])
+AC_CHECK_HEADERS(id3tag.h, [
+  AC_CHECK_HEADERS(zlib.h, [
+    VLC_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
+    VLC_ADD_PLUGINS([id3tag])]) ])
 
 dnl
 dnl  ffmpeg decoder/demuxer plugin
