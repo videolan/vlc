@@ -17,25 +17,30 @@
     <h2>
      <a href="http://www.videolan.org">VLC Media Player <vlc id="value" param1="version" /></a> (http interface)</h2>
     <div class="sectitle">Control VLC</div>
-    <div class="section">   
+    <div class="section">
      <table class="add">
       <tr>
+       <td colspan="1">Current State: <vlc id="value" param1="stream_state" /></td>
+       <td colspan="0" align="right"><a href="info.html">Information</a> <a href="admin/">Administration</a></td>
+      </tr>
+      <tr><td> </td></tr>
+      <tr>
        <form method="get" action="">
-        <td><input type="submit" name="control" value="stop" /></td>
-        <td><input type="submit" name="control" value="pause" /></td>
-        <td><input type="submit" name="control" value="previous" /></td>
-        <td><input type="submit" name="control" value="next" /></td>
-        <td><input type="submit" name="control" value="fullscreen" /></td>
-        <td><a href="info.html">Information</a></td>
-        <td><a href="admin/">Administration</a></td>
-       </form>
-       <form>
-        <td colspan="0" align="right">Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set"></td>
+        <td colspan="5">
+         <input type="submit" name="control" value="stop" />
+         <input type="submit" name="control" value="pause" />
+         <input type="submit" name="control" value="previous" />
+         <input type="submit" name="control" value="next" />
+         <input type="submit" name="control" value="fullscreen" />
+        </td>
+        <td colspan="0" align="right">
+         Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set">
+        </td>
        </form>
       </tr>
       <tr>
        <form>
-        <td colspan="5">Seek (in percentage): <input type="text" name="percent" size="3">%<input type="submit" name="control" value="seek"></td>
+        <td colspan="8"><input type="submit" name="seek_value" value="-1min"><input type="text" name="seek_value" size="12"><input type="hidden" name="control" value="seek"><input type="submit" name="seek_value" value="+1min"> ( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )</td>
        </form>
       </tr>
      </table>
@@ -46,13 +51,11 @@
       <table class="add">
        <tr>
         <td>Add a MRL (Media Resource Locator) to the playlist</td>
-        <td><input type="text" name="mrl" size="40" /></td>
-        <td><input type="submit" name="control" value="add" /></td>
+        <td><input type="text" name="mrl" size="40" /><input type="submit" name="control" value="add" /></td>
        </tr>
        <tr>
         <td>Stream Output:</td>
-        <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /></td>
-        <td><input type="submit" name="control" value="sout" /></td>
+        <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /><input type="submit" name="control" value="sout" /></td>
        </tr>
       </table>
      </form>
