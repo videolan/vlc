@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.7 2004/01/05 14:50:42 hartman Exp $
+# $Id: packages.mak,v 1.8 2004/01/05 16:22:40 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -23,7 +23,7 @@
 
 GNU=http://ftp.gnu.org/pub/gnu
 SF=http://heanet.dl.sourceforge.net/sourceforge
-VIDEOLAN=http://www.videolan.org/pub/testing/contrib
+VIDEOLAN=http://download.videolan.org/pub/testing/contrib
 AUTOCONF_VERSION=2.58
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.gz
 #LIBTOOL_VERSION=1.5
@@ -49,7 +49,7 @@ LIBID3TAG_URL=ftp://ftp.mars.org/pub/mpeg/libid3tag-$(LIBID3TAG_VERSION).tar.gz
 LIBMAD_VERSION=0.15.0b
 LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/libmad-$(LIBMAD_VERSION).tar.gz
 OGG_VERSION=1.1
-OGG_URL=$(VIDEOLAN)/libogg-$(OGG_VERSION).tar.gz
+OGG_URL=http://www.vorbis.com/files/1.0.1/unix/libogg-$(OGG_VERSION).tar.gz
 OGG_CVSROOT=:pserver:anoncvs@xiph.org:/usr/local/cvsroot
 VORBIS_VERSION=1.0
 VORBIS_URL=http://www.xiph.org/ogg/vorbis/download/libvorbis-$(VORBIS_VERSION).tar.gz
@@ -65,9 +65,9 @@ FAAD2_URL=$(VIDEOLAN)/faad2-$(FAAD2_VERSION).tar.gz
 FAAD2_CVSROOT=:pserver:anonymous@cvs.audiocoding.com:/cvsroot/faac
 LAME_VERSION=3.93.1
 LAME_URL=$(SF)/lame/lame-$(LAME_VERSION).tar.gz
-LIBEBML_VERSION=0.6.2
+LIBEBML_VERSION=0.6.3
 LIBEBML_URL=http://matroska.free.fr/downloads/libebml/libebml-$(LIBEBML_VERSION).tar.gz
-LIBMATROSKA_VERSION=0.6.1
+LIBMATROSKA_VERSION=0.6.2
 LIBMATROSKA_URL=http://matroska.free.fr/downloads/libmatroska/libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 FFMPEG_VERSION=0.4.8
 FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
@@ -75,17 +75,17 @@ FFMPEG_CVSROOT=:pserver:anonymous@mplayerhq.hu:/cvsroot/ffmpeg
 OPENSLP_VERSION=1.0.11
 OPENSLP_URL=$(SF)/openslp/openslp-$(OPENSLP_VERSION).tar.gz
 LIBDVDCSS_VERSION=1.2.8
-LIBDVDCSS_URL=http://www.videolan.org/pub/libdvdcss/$(LIBDVDCSS_VERSION)/libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
+LIBDVDCSS_URL=http://download.videolan.org/pub/libdvdcss/$(LIBDVDCSS_VERSION)/libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 LIBDVDREAD_VERSION=0.9.4
 LIBDVDREAD_URL=http://www.dtek.chalmers.se/groups/dvd/dist/libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 LIBDVDPLAY_VERSION=1.0.1
-LIBDVDPLAY_URL=http://www.videolan.org/pub/libdvdplay/$(LIBDVDPLAY_VERSION)/libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
-LIBDVBPSI_VERSION=0.1.3
-LIBDVBPSI_URL=http://www.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
+LIBDVDPLAY_URL=http://download.videolan.org/pub/libdvdplay/$(LIBDVDPLAY_VERSION)/libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
+LIBDVBPSI_VERSION=0.1.4
+LIBDVBPSI_URL=http://download.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 LIVEDOTCOM_VERSION=2003.11.06
-LIVEDOTCOM_URL=http://www.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
+LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
-LIBCACA_VERSION=0.2
+LIBCACA_VERSION=0.6
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 
 

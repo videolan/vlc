@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.10 2004/01/05 14:50:42 hartman Exp $
+# $Id: Makefile,v 1.11 2004/01/05 16:22:40 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -616,10 +616,10 @@ DISTCLEAN_PKG += libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
 # libdvbpsi
 # ***************************************************************************
 
-libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz:
+libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz:
 	$(WGET) $(LIBDVBPSI_URL)
 
-libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
+libdvbpsi: libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
@@ -677,9 +677,10 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/caca.patch
 
 .caca: libcaca
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-imlib2 && make && make install)
 	touch $@
 
 CLEAN_FILE += .caca
