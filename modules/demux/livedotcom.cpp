@@ -243,12 +243,12 @@ static int  Open ( vlc_object_t *p_this )
         sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
         /* Add kasenna option */
-        if( var_CreateGetBool( p_demux, "rtsp-kasenna" )) msg_Dbg(p_demux, "add kasenna option");
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options )
             delete [] psz_options;
 
-        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url );
+        p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
+                              NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
         if( p_sdp == NULL )
         {
             msg_Err( p_demux, "describeURL failed (%s)", p_sys->env->getResultMsg() );
