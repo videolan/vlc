@@ -93,6 +93,7 @@ typedef struct
     uint16_t v2; /* le */
     uint16_t v3; /* le */
     uint8_t  v4[8];
+
 } guid_t;
 
 typedef struct
@@ -109,6 +110,7 @@ typedef struct
 
     int          i_extra;
     uint8_t     *p_extra;
+
 } asf_track_t;
 
 struct sout_mux_sys_t
@@ -118,6 +120,7 @@ struct sout_mux_sys_t
     int64_t         i_packet_count;
     mtime_t         i_dts_first;
     mtime_t         i_dts_last;
+    mtime_t         i_preroll_time;
     int64_t         i_bitrate;
 
     int             i_track;
@@ -192,6 +195,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pk_frame   = 0;
     p_sys->i_dts_first  = -1;
     p_sys->i_dts_last   = 0;
+    p_sys->i_preroll_time = 2000;
     p_sys->i_bitrate    = 0;
     p_sys->i_seq        = 0;
 
@@ -619,8 +623,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
         }
 
         p_data = block_FifoShow( p_input->p_fifo );
-        if( i_stream == -1 ||
-            p_data->i_dts < i_dts )
+        if( i_stream == -1 || p_data->i_dts < i_dts )
         {
             i_stream = i;
             i_dts    = p_data->i_dts;
@@ -904,7 +907,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     bo_addle_u64( &bo, b_broadcast ? 0xffffffffLL : p_sys->i_packet_count );
     bo_addle_u64( &bo, i_duration * 10 );   /* play duration (100ns) */
     bo_addle_u64( &bo, i_duration * 10 );   /* send duration (100ns) */
-    bo_addle_u64( &bo, 3000 );              /* preroll duration (ms) */
+    bo_addle_u64( &bo, p_sys->i_preroll_time ); /* preroll duration (ms) */
     bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x00);      /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
@@ -1034,7 +1037,8 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
         bo_addle_u32( &bo, i_pos );
         bo_add_u8   ( &bo, 0x08 );  /* flags */
         bo_addle_u32( &bo, i_data );
-        bo_addle_u32( &bo, ( data->i_dts - p_sys->i_dts_first )/ 1000 );
+        bo_addle_u32( &bo, (data->i_dts - p_sys->i_dts_first) / 1000 -
+                      p_sys->i_preroll_time );
         bo_addle_u16( &bo, i_payload );
         bo_add_mem  ( &bo, &p_data[i_pos], i_payload );
         i_pos += i_payload;
@@ -1059,7 +1063,8 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
             bo_add_u8( &bo, 0x11 );
             bo_add_u8( &bo, 0x5d );
             bo_addle_u16( &bo, i_pad );
-            bo_addle_u32( &bo, ( p_sys->i_pk_dts - p_sys->i_dts_first )/1000 );
+            bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 -
+                          p_sys->i_preroll_time );
             bo_addle_u16( &bo, 0 * data->i_length / 1000 );
             bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
 
