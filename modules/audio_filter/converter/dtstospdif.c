@@ -2,7 +2,7 @@
  * dtstospdif.c : encapsulates DTS frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dtstospdif.c,v 1.3 2004/02/04 23:03:36 gbazin Exp $
+ * $Id: dtstospdif.c,v 1.4 2004/02/04 23:28:10 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -46,6 +46,8 @@ struct aout_filter_sys_t
      * send. */
 
     uint8_t *p_buf;
+
+    mtime_t start_date;
 
     int i_frames;
     unsigned int i_frame_size;
@@ -135,6 +137,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     if( p_filter->p_sys->i_frames < 3 )
     {
+        if( !p_filter->p_sys->i_frames )
+            /* We'll need the starting date */
+            p_filter->p_sys->start_date = p_in_buf->start_date;
+
         /* Not enough data */
         p_out_buf->i_nb_samples = 0;
         p_out_buf->i_nb_bytes = 0;
@@ -181,6 +187,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                     i_fz - i_length - 8 );
     }
 
+    p_out_buf->start_date = p_filter->p_sys->start_date;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples * 3;
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples * 4;
 }
