@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.14 2003/12/27 16:14:48 asmax Exp $
+ * $Id: mpga.c,v 1.15 2004/01/03 00:23:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -329,12 +329,14 @@ static int Open( vlc_object_t * p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
+        if( fmt.psz_description ) free( fmt.psz_description );
         goto error;
     }
     p_input->stream.i_mux_rate = p_sys->i_bitrate_avg / 8 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
+    if( fmt.psz_description ) free( fmt.psz_description );
     return VLC_SUCCESS;
 
 error:

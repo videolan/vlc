@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.7 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: stream.c,v 1.8 2004/01/03 00:23:04 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -230,8 +230,12 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
 
         i_count = input_SplitBuffer( s->p_input, &p_packet,
                       __MIN( i_data, (int)s->p_input->i_bufsize ) );
+
         if( i_count <= 0 )
         {
+            if( i_count == 0 )
+                input_DeletePacket( s->p_input->p_method_data, p_packet );
+
             return i_read;
         }
 
