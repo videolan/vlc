@@ -41,9 +41,6 @@
 #define DST_TEXT N_("Destination")
 #define DST_LONGTEXT N_( \
     "Allows you to specify the output URL used for the streaming output." )
-#define NAME_TEXT N_("Session name")
-#define NAME_LONGTEXT N_( \
-    "Allows you to specify the session name used for the streaming output." )
 #define SDP_TEXT N_("SDP")
 #define SDP_LONGTEXT N_( \
     "Allows you to specify the SDP used for the streaming output. " \
@@ -53,14 +50,26 @@
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_( \
     "Allows you to specify the muxer used for the streaming output." )
+
+#define NAME_TEXT N_("Session name")
+#define NAME_LONGTEXT N_( \
+    "Allows you to specify the session name used for the streaming output." )
+#define DESC_TEXT N_("Session description")
+#define DESC_LONGTEXT N_( \
+    "Allows you to give a broader description of the stream." )
+#define URL_TEXT N_("Session URL")
+#define URL_LONGTEXT N_( \
+    "Allows you to specify a URL with additional information on the stream." )
+#define EMAIL_TEXT N_("Session email")
+#define EMAIL_LONGTEXT N_( \
+    "Allows you to specify contact e-mail address for this session." )
+
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
     "Allows you to specify the base port used for the RTP streaming." )
-
 #define PORT_AUDIO_TEXT N_("Audio port")
 #define PORT_AUDIO_LONGTEXT N_( \
     "Allows you to specify the default audio port used for the RTP streaming." )
-
 #define PORT_VIDEO_TEXT N_("Video port")
 #define PORT_VIDEO_LONGTEXT N_( \
     "Allows you to specify the default video port used for the RTP streaming." )
@@ -81,12 +90,19 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
-                NAME_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
                 SDP_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_TRUE );
+    
+    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
+                NAME_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT,
+                DESC_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
+                URL_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT,
+                EMAIL_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "port-audio", 1234, NULL, PORT_AUDIO_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
@@ -105,7 +121,8 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "dst", "name", "port", "port-audio", "port-video", "sdp", "ttl", "mux", NULL
+    "dst", "name", "port", "port-audio", "port-video", "sdp", "ttl", "mux",
+    "description", "url","email", NULL
 };
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
@@ -138,6 +155,9 @@ struct sout_stream_sys_t
     vlc_mutex_t  lock_sdp;
 
     char        *psz_session_name;
+    char        *psz_session_description;
+    char        *psz_session_url;
+    char        *psz_session_email;
 
     /* */
     vlc_bool_t b_export_sdp_file;
@@ -171,7 +191,7 @@ struct sout_stream_sys_t
     uint16_t          i_sequence;
     uint32_t          i_timestamp_start;
     uint8_t           ssrc[4];
-    block_t     *packet;
+    block_t           *packet;
 
     /* */
     vlc_mutex_t      lock_es;
@@ -257,6 +277,15 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
     p_sys->psz_session_name = *val.psz_string ? val.psz_string : NULL;
+    
+    var_Get( p_stream, SOUT_CFG_PREFIX "description", &val );
+    p_sys->psz_session_description = *val.psz_string ? val.psz_string : NULL;
+    
+    var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
+    p_sys->psz_session_url = *val.psz_string ? val.psz_string : NULL;
+    
+    var_Get( p_stream, SOUT_CFG_PREFIX "email", &val );
+    p_sys->psz_session_email = *val.psz_string ? val.psz_string : NULL;
 
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
@@ -409,31 +438,37 @@ static int Open( vlc_object_t *p_this )
            o= time should be hashed with some other value to garantue uniqueness
            o= we need IP6 support?
            o= don't use the localhost address. use fully qualified domain name or IP4 address
-           i= description of session (pass via vars?)
-           u= URI to more information on session (pass via vars?)
-           e= email address (pass via vars?) (multiple formats are supported)
            p= international phone number (pass via vars?)
            c= IP6 support
            c= /ttl should only be added in case of multicast
-           t= missing (required)
-           a= tool param missing (highly recommended)
            a= recvonly (missing)
            a= type:broadcast (missing)
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
         p_sys->psz_sdp =
-            malloc( 200 + 20 + 10 + strlen( p_sys->psz_destination ) +
-                    10 + 10 + 10 + 10 + strlen( psz_rtpmap ) );
+            malloc( 10 + 30 + 10 + strlen( p_sys->psz_session_name ) +
+                    10 + strlen( p_sys->psz_session_description ) + 10 + strlen( p_sys->psz_session_url ) +
+                    10 + strlen( p_sys->psz_session_email ) + 10 + strlen( p_sys->psz_destination ) +
+                    10 + 10 + strlen( PACKAGE_STRING ) +
+                    20 + 10 + 20 + 10 + strlen( psz_rtpmap ) );
         sprintf( p_sys->psz_sdp,
                  "v=0\r\n"
                  "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
                  "s=%s\r\n"
+                 "i=%s\r\n"
+                 "u=%s\r\n"
+                 "e=%s\r\n"
+                 "t=0 0\r\n" /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+                 "a=tool:"PACKAGE_STRING"\r\n"
                  "c=IN IP4 %s/%d\r\n"
                  "m=video %d RTP/AVP %d\r\n"
                  "a=rtpmap:%d %s\r\n",
                  p_sys->i_sdp_id, p_sys->i_sdp_version,
                  p_sys->psz_session_name,
+                 p_sys->psz_session_description,
+                 p_sys->psz_session_url,
+                 p_sys->psz_session_email,
                  p_sys->psz_destination, p_sys->i_ttl,
                  p_sys->i_port, p_sys->i_payload_type,
                  p_sys->i_payload_type, psz_rtpmap );
@@ -548,10 +583,26 @@ static void Close( vlc_object_t * p_this )
         httpd_HostDelete( p_sys->p_rtsp_host );
     }
 #if 0
+    /* why? is this disabled? */
     if( p_sys->psz_session_name )
     {
         free( p_sys->psz_session_name );
         p_sys->psz_session_name = NULL;
+    }
+    if( p_sys->psz_session_description )
+    {
+        free( p_sys->psz_session_description );
+        p_sys->psz_session_description = NULL;
+    }
+    if( p_sys->psz_session_url )
+    {
+        free( p_sys->psz_session_url );
+        p_sys->psz_session_url = NULL;
+    }
+    if( p_sys->psz_session_email )
+    {
+        free( p_sys->psz_session_email );
+        p_sys->psz_session_email = NULL;
     }
 #endif
     if( p_sys->psz_sdp )
@@ -570,14 +621,9 @@ static void Close( vlc_object_t * p_this )
            o= time should be hashed with some other value to garantue uniqueness
            o= we need IP6 support?
            o= don't use the localhost address. use fully qualified domain name or IP4 address
-           i= description of session (pass via vars?)
-           u= URI to more information on session (pass via vars?)
-           e= email address (pass via vars?) (multiple formats are supported)
            p= international phone number (pass via vars?)
            c= IP6 support
            c= /ttl should only be added in case of multicast
-           t= missing (required)
-           a= tool param missing (highly recommended)
            a= recvonly (missing)
            a= type:broadcast (missing)
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
@@ -591,12 +637,15 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     int i;
 
     i_size = strlen( "v=0\r\n" ) +
-             strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) +
-             strlen( "s=\r\n" ) +
-             strlen( "c=IN IP4 */*\r\n" ) +
-             strlen( psz_destination ? psz_destination : "0.0.0.0") +
-             strlen( p_sys->psz_session_name ) +
-             20 + 10 + 10 + 1;
+             strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
+             strlen( "s=*\r\n" ) + strlen( p_sys->psz_session_name ) +
+             strlen( "i=*\r\n" ) + strlen( p_sys->psz_session_description ) +
+             strlen( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
+             strlen( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
+             strlen( "t=0 0\r\n" ) + /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+             strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
+             strlen( "c=IN IP4 */*\r\n" ) + 20 + 10 +
+             strlen( psz_destination ? psz_destination : "0.0.0.0") ;
     for( i = 0; i < p_sys->i_es; i++ )
     {
         sout_stream_id_t *id = p_sys->es[i];
@@ -621,6 +670,21 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version );
     p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
+    if( p_sys->psz_session_description )
+    {
+        p += sprintf( p, "i=%s\r\n", p_sys->psz_session_description );
+    }
+    if( p_sys->psz_session_url )
+    {
+        p += sprintf( p, "u=%s\r\n", p_sys->psz_session_url );
+    }
+    if( p_sys->psz_session_email )
+    {
+        p += sprintf( p, "e=%s\r\n", p_sys->psz_session_email );
+    }
+    p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
+
     p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ? psz_destination : "0.0.0.0",
                   p_sys->i_ttl );
 
