@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.5 2003/04/14 17:03:41 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.6 2003/04/14 17:56:45 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -168,8 +168,8 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
     GdkGC *gc = gdk_gc_new( destImg );
     /*gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,  
             GDK_RGB_DITHER_NONE, 0, 0);*/
-fprintf(stderr, "draw %d %d %d %d\n", x, y, w, h);
-    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, x, y, w, h,
+fprintf(stderr, "draw %d %d %d %d\n", xRef, yRef, w, h);
+    gdk_pixbuf_render_to_drawable( Bmp, destImg, gc, 0, 0, xRef, yRef, w, h,
             GDK_RGB_DITHER_NONE, 0, 0);
 }
 //---------------------------------------------------------------------------
