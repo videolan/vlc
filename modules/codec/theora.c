@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.7 2003/09/02 22:36:55 gbazin Exp $
+ * $Id: theora.c,v 1.8 2003/09/28 21:54:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -465,6 +465,11 @@ static int EndDecoder( decoder_t *p_dec )
 
     if( !p_sys->b_packetizer )
         vout_Request( p_dec, p_sys->p_vout, 0, 0, 0, 0 );
+
+    if( p_sys->p_sout_input != NULL )
+    {
+        sout_InputDelete( p_sys->p_sout_input );
+    }
 
     theora_info_clear( &p_sys->ti );
     theora_comment_clear( &p_sys->tc );

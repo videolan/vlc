@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.11 2003/09/28 19:58:19 gbazin Exp $
+ * $Id: ogg.c,v 1.12 2003/09/28 21:54:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -791,7 +791,8 @@ static int Mux( sout_mux_t *p_mux )
         p_stream = (ogg_stream_t*)p_input->p_sys;
         p_data   = sout_FifoGet( p_input->p_fifo );
 
-        if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
+            p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             sout_BufferReallocFromPreHeader( p_mux->p_sout, p_data, 1 );
             p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
