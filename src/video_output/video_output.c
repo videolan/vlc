@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.241 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: video_output.c,v 1.242 2003/12/11 23:12:46 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1007,6 +1007,31 @@ static void RunThread( vout_thread_t *p_vout)
                     p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
                 p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
             }
+        }
+
+        if( p_vout->i_changes & VOUT_PICTURE_BUFFERS_CHANGE )
+        {
+            /* This happens when the picture buffers need to be recreated.
+             * This is useful on multimonitor displays for instance.
+             *
+             * Warning: This only works when the vout creates only 1 picture
+             * buffer!! */
+            p_vout->i_changes &= ~VOUT_PICTURE_BUFFERS_CHANGE;
+
+            if( !p_vout->b_direct )
+            {
+                module_Unneed( p_vout, p_vout->chroma.p_module );
+            }
+
+            vlc_mutex_lock( &p_vout->picture_lock );
+
+            p_vout->pf_end( p_vout );
+
+            I_OUTPUTPICTURES = I_RENDERPICTURES = 0;
+
+            p_vout->b_error = InitThread( p_vout );
+
+            vlc_mutex_unlock( &p_vout->picture_lock );
         }
     }
 

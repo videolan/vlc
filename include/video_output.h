@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.106 2003/12/09 19:15:03 yoann Exp $
+ * $Id: video_output.h,v 1.107 2003/12/11 23:12:46 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -177,6 +177,8 @@ struct vout_thread_t
 #define VOUT_DEPTH_CHANGE       0x0400
 /** change chroma tables */
 #define VOUT_CHROMA_CHANGE      0x0800
+/** change/recreate picture buffers */
+#define VOUT_PICTURE_BUFFERS_CHANGE 0x1000
 /**@}*/
 
 /* Alignment flags */

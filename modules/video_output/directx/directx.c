@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.26 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: directx.c,v 1.27 2003/12/11 23:12:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,6 +44,9 @@
 
 #include <windows.h>
 #include <ddraw.h>
+
+#include <multimon.h>
+#undef GetSystemMetrics
 
 #include "vout.h"
 
@@ -136,6 +139,7 @@ static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     vlc_value_t val, text;
+    HMODULE huser32;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -159,11 +163,24 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = NULL;
     p_vout->p_sys->hparent = NULL;
     p_vout->p_sys->i_changes = 0;
-    SetRectEmpty( &p_vout->p_sys->rect_display );
-    p_vout->p_sys->b_using_overlay = config_GetInt( p_vout, "overlay" );
-    p_vout->p_sys->b_use_sysmem = config_GetInt( p_vout, "directx-use-sysmem");
-    p_vout->p_sys->b_hw_yuv = config_GetInt( p_vout, "directx-hw-yuv" );
-    p_vout->p_sys->b_3buf_overlay = config_GetInt( p_vout, "directx-3buffering" );
+
+    /* Multimonitor stuff */
+    p_vout->p_sys->hmonitor = NULL;
+    p_vout->p_sys->p_display_driver = NULL;
+    p_vout->p_sys->MonitorFromWindow = NULL;
+    p_vout->p_sys->GetMonitorInfo = NULL;
+    if( (huser32 = GetModuleHandle( "USER32" ) ) )
+    {
+        p_vout->p_sys->MonitorFromWindow =
+            GetProcAddress( huser32, "MonitorFromWindow" );
+        p_vout->p_sys->GetMonitorInfo =
+            GetProcAddress( huser32, "GetMonitorInfoA" );
+    }
+
+    var_Create( p_vout, "overlay", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "directx-use-sysmem", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -183,9 +200,8 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_event =
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
-    if( vlc_thread_create( p_vout->p_sys->p_event,
-                           "DirectX Events Thread", DirectXEventThread,
-                           0, 1 ) )
+    if( vlc_thread_create( p_vout->p_sys->p_event, "DirectX Events Thread",
+                           DirectXEventThread, 0, 1 ) )
     {
         msg_Err( p_vout, "cannot create DirectXEventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
@@ -241,6 +257,35 @@ static int OpenVideo( vlc_object_t *p_this )
 static int Init( vout_thread_t *p_vout )
 {
     int i_chroma_backup;
+    vlc_value_t val;
+
+    /* Get a few default parameters */
+    var_Get( p_vout, "overlay", &val );
+    p_vout->p_sys->b_using_overlay = val.b_bool;
+    var_Get( p_vout, "directx-use-sysmem", &val );
+    p_vout->p_sys->b_use_sysmem = val.b_bool;
+    var_Get( p_vout, "directx-hw-yuv", &val );
+    p_vout->p_sys->b_hw_yuv = val.b_bool;
+    var_Get( p_vout, "directx-3buffering", &val );
+    p_vout->p_sys->b_3buf_overlay = val.b_bool;
+
+    /* Initialise DirectDraw if not already done.
+     * We do this here because on multi-monitor systems we may have to
+     * re-create the directdraw surfaces. */
+    if( !p_vout->p_sys->p_ddobject &&
+        DirectXInitDDraw( p_vout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_vout, "cannot initialize DirectDraw" );
+        return VLC_EGENERIC;
+    }
+
+    /* Create the directx display */
+    if( !p_vout->p_sys->p_display &&
+        DirectXCreateDisplay( p_vout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_vout, "cannot initialize DirectDraw" );
+        return VLC_EGENERIC;
+    }
 
     /* Initialize the output structure.
      * Since DirectDraw can do rescaling for us, stick to the default
@@ -326,6 +371,10 @@ static int Init( vout_thread_t *p_vout )
 static void End( vout_thread_t *p_vout )
 {
     FreePictureVec( p_vout, p_vout->p_picture, I_OUTPUTPICTURES );
+
+    DirectXCloseDisplay( p_vout );
+    DirectXCloseDDraw( p_vout );
+
     return;
 }
 
@@ -360,9 +409,6 @@ static void CloseVideo( vlc_object_t *p_this )
         vlc_object_destroy( p_vout->p_sys->p_event );
     }
 
-    DirectXCloseDisplay( p_vout );
-    DirectXCloseDDraw( p_vout );
-
     if( p_vout->p_sys )
     {
         free( p_vout->p_sys );
@@ -387,36 +433,31 @@ static int Manage( vout_thread_t *p_vout )
         DirectXUpdateRects( p_vout, VLC_FALSE );
     }
 
+    /*
+     * Position Change
+     */
+    if( p_vout->p_sys->i_changes & DX_POSITION_CHANGE )
+    {
+        if( p_vout->p_sys->b_using_overlay )
+            DirectXUpdateOverlay( p_vout );
+
+        /* Check if we are still on the same monitor */
+        if( p_vout->p_sys->MonitorFromWindow &&
+            p_vout->p_sys->hmonitor !=
+                p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
+                                                  MONITOR_DEFAULTTONEAREST ) )
+        {
+            /* This will force the vout core to recreate the picture buffers */
+            p_vout->i_changes |= VOUT_PICTURE_BUFFERS_CHANGE;
+        }
+
+        p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
+    }
+
     /* We used to call the Win32 PeekMessage function here to read the window
      * messages. But since window can stay blocked into this function for a
      * long time (for example when you move your window on the screen), I
      * decided to isolate PeekMessage in another thread. */
-
-    /*
-     * Scale Change
-     */
-    if( p_vout->i_changes & VOUT_SCALE_CHANGE
-         || p_vout->p_sys->i_changes & VOUT_SCALE_CHANGE )
-    {
-        msg_Dbg( p_vout, "scale change" );
-        if( p_vout->p_sys->b_using_overlay )
-            DirectXUpdateOverlay( p_vout );
-        p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
-        p_vout->p_sys->i_changes &= ~VOUT_SCALE_CHANGE;
-    }
-
-    /*
-     * Size Change
-     */
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE
-        || p_vout->p_sys->i_changes & VOUT_SIZE_CHANGE )
-    {
-        msg_Dbg( p_vout, "size change" );
-        if( p_vout->p_sys->b_using_overlay )
-            DirectXUpdateOverlay( p_vout );
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-        p_vout->p_sys->i_changes &= ~VOUT_SIZE_CHANGE;
-    }
 
     /*
      * Fullscreen change
@@ -606,6 +647,14 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
     vout_thread_t *p_vout = (vout_thread_t *)p_context;
     msg_Dbg( p_vout, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername );
 
+    if( hmon && hmon == p_vout->p_sys->hmonitor )
+    {
+        msg_Dbg( p_vout, "selecting %s, %s", psz_desc, psz_drivername );
+        p_vout->p_sys->p_display_driver = malloc( sizeof(GUID) );
+        if( p_vout->p_sys->p_display_driver )
+            memcpy( p_vout->p_sys->p_display_driver, p_guid, sizeof(GUID) );
+    }
+
     return TRUE; /* Keep enumerating */
 }
 
@@ -624,7 +673,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "DirectXInitDDraw" );
 
-    /* load direct draw DLL */
+    /* Load direct draw DLL */
     p_vout->p_sys->hddraw_dll = LoadLibrary("DDRAW.DLL");
     if( p_vout->p_sys->hddraw_dll == NULL )
     {
@@ -644,15 +693,20 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
       (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
                               "DirectDrawEnumerateExA" );
 
-    if( OurDirectDrawEnumerateEx )
+    if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
     {
+        p_vout->p_sys->hmonitor =
+            p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
+                                              MONITOR_DEFAULTTONEAREST );
+
         /* Enumerate displays */
         OurDirectDrawEnumerateEx( DirectXEnumCallback, p_vout, 
                                   DDENUM_ATTACHEDSECONDARYDEVICES );
     }
 
     /* Initialize DirectDraw now */
-    dxresult = OurDirectDrawCreate( NULL, &p_ddobject, NULL );
+    dxresult = OurDirectDrawCreate( p_vout->p_sys->p_display_driver,
+                                    &p_ddobject, NULL );
     if( dxresult != DD_OK )
     {
         msg_Err( p_vout, "DirectXInitDDraw cannot initialize DDraw" );
@@ -679,6 +733,27 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot set direct draw cooperative level" );
         goto error;
     }
+
+    /* Get the size of the current display device */
+    if( p_vout->p_sys->hmonitor && p_vout->p_sys->GetMonitorInfo )
+    {
+        MONITORINFO monitor_info;
+        monitor_info.cbSize = sizeof( MONITORINFO );
+        p_vout->p_sys->GetMonitorInfo( p_vout->p_sys->hmonitor,
+                                       &monitor_info );
+        p_vout->p_sys->rect_display = monitor_info.rcMonitor;
+    }
+    else
+    {
+        p_vout->p_sys->rect_display.left = 0;
+        p_vout->p_sys->rect_display.top = 0;
+        p_vout->p_sys->rect_display.right  = GetSystemMetrics(SM_CXSCREEN);
+        p_vout->p_sys->rect_display.bottom = GetSystemMetrics(SM_CYSCREEN);
+    }
+
+    msg_Dbg( p_vout, "screen dimensions %ix%i",
+                      p_vout->p_sys->rect_display.right,
+                      p_vout->p_sys->rect_display.bottom );
 
     /* Probe the capabilities of the hardware */
     DirectXGetDDrawCaps( p_vout );
@@ -992,6 +1067,14 @@ static void DirectXCloseDDraw( vout_thread_t *p_vout )
         FreeLibrary( p_vout->p_sys->hddraw_dll );
         p_vout->p_sys->hddraw_dll = NULL;
     }
+
+    if( p_vout->p_sys->p_display_driver != NULL )
+    {
+        free( p_vout->p_sys->p_display_driver );
+        p_vout->p_sys->p_display_driver = NULL;
+    }
+
+    p_vout->p_sys->hmonitor = NULL;
 }
 
 /*****************************************************************************
@@ -1148,11 +1231,11 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
              * because a few buggy drivers don't mind creating the surface
              * even if they don't know about the chroma. */
             if( IDirectDraw2_GetFourCCCodes( p_vout->p_sys->p_ddobject,
-                                             &i_codes, NULL ) )
+                                             &i_codes, NULL ) == DD_OK )
             {
                 pi_codes = malloc( i_codes * sizeof(DWORD) );
                 if( pi_codes && IDirectDraw2_GetFourCCCodes(
-                    p_vout->p_sys->p_ddobject, &i_codes, pi_codes ) )
+                    p_vout->p_sys->p_ddobject, &i_codes, pi_codes ) == DD_OK )
                 {
                     for( i = 0; i < (int)i_codes; i++ )
                     {
@@ -1297,6 +1380,8 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             free( p_pic[i].p_sys );
         }
     }
+
+    p_vout->p_sys->p_current_surface = 0;
 }
 
 /*****************************************************************************

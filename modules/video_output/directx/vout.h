@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.9 2003/11/20 17:48:44 gbazin Exp $
+ * $Id: vout.h,v 1.10 2003/12/11 23:12:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,6 +50,12 @@ struct vout_sys_t
     HWND                 hvideownd;        /* Handle of the video sub-window */
     HWND                 hparent;             /* Handle of the parent window */
     WNDPROC              pf_wndproc;             /* Window handling callback */
+
+    /* Multi-monitor support */
+    HMONITOR             hmonitor;          /* handle of the current monitor */
+    GUID                 *p_display_driver;
+    HMONITOR             (WINAPI* MonitorFromWindow)( HWND, DWORD );
+    BOOL                 (WINAPI* GetMonitorInfo)( HMONITOR, LPMONITORINFO );
 
     vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
     vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
@@ -121,3 +127,4 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
 #define WM_VLC_CREATE_VIDEO_WIN WM_APP + 1
 #define WM_VLC_DESTROY_VIDEO_WIN WM_APP + 2
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
+#define DX_POSITION_CHANGE 0x1000

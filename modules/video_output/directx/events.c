@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.31 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: events.c,v 1.32 2003/12/11 23:12:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -269,7 +269,6 @@ void DirectXEventThread( event_thread_t *p_event )
 static int DirectXCreateWindow( vout_thread_t *p_vout )
 {
     HINSTANCE  hInstance;
-    HDC        hdc;
     HMENU      hMenu;
     RECT       rect_window;
 
@@ -279,17 +278,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
-
-    /* Get the current size of the display and its colour depth */
-    hdc = GetDC( NULL );
-    p_vout->p_sys->rect_display.right = GetDeviceCaps( hdc, HORZRES );
-    p_vout->p_sys->rect_display.bottom = GetDeviceCaps( hdc, VERTRES );
-    p_vout->p_sys->i_display_depth = GetDeviceCaps( hdc, BITSPIXEL );
-    msg_Dbg( p_vout, "screen dimensions %ix%i colour depth %i",
-                      p_vout->p_sys->rect_display.right,
-                      p_vout->p_sys->rect_display.bottom,
-                      p_vout->p_sys->i_display_depth );
-    ReleaseDC( NULL, hdc );
 
     /* If an external window was specified, we'll draw in it. */
     var_Get( p_vout->p_vlc, "drawable", &val );
@@ -502,13 +490,16 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_dest.top = point.y + i_y;
     rect_dest.bottom = rect_dest.top + i_height;
 
-
     /* UpdateOverlay directdraw function doesn't automatically clip to the
      * display size so we need to do it otherwise it will fail */
 
     /* Clip the destination window */
-    IntersectRect( &rect_dest_clipped, &rect_dest,
-                   &p_vout->p_sys->rect_display );
+    if( !IntersectRect( &rect_dest_clipped, &rect_dest,
+                        &p_vout->p_sys->rect_display ) )
+    {
+        SetRectEmpty( &rect_src_clipped );
+        return;
+    }
 
 #if 0
     msg_Dbg( p_vout, "DirectXUpdateRects image_dst_clipped coords:"
@@ -550,18 +541,8 @@ void DirectXUpdateRects( vout_thread_t *p_vout, vlc_bool_t b_force )
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
 
-    /* Signal the size change */
-    if( !p_vout->p_sys->p_event->b_die )
-    {
-        if( p_vout->p_sys->b_using_overlay )
-        {
-            DirectXUpdateOverlay( p_vout );
-        }
-        else
-        {
-            p_vout->p_sys->i_changes |= VOUT_SIZE_CHANGE;
-        }
-    }
+    /* Signal the change in size/position */
+    p_vout->p_sys->i_changes |= DX_POSITION_CHANGE;
 
 #undef rect_src
 #undef rect_src_clipped
