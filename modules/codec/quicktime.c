@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.8 2003/06/17 14:43:21 hartman Exp $
+ * $Id: quicktime.c,v 1.9 2003/07/21 17:48:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -47,6 +47,11 @@
 #include "w32dll/loader/qtx/qtxsdk/components.h"
 #include "w32dll/loader/wine/windef.h"
 #include "w32dll/loader/ldt_keeper.h"
+
+HMODULE   WINAPI LoadLibraryA(LPCSTR);
+FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
+int       WINAPI FreeLibrary(HMODULE);
+
 #endif
 
 /*****************************************************************************
@@ -70,15 +75,16 @@ vlc_module_begin();
     var_Create( p_module->p_libvlc, "qt_mutex", VLC_VAR_MUTEX );
 vlc_module_end();
 
-
-
 #define FCC( a, b , c, d ) \
     ((uint32_t)( ((a)<<24)|((b)<<16)|((c)<<8)|(d)))
 
 #ifndef SYS_DARWIN
 typedef struct OpaqueSoundConverter*    SoundConverter;
+typedef long                            OSType;
+typedef int                             OSErr;
 typedef unsigned long                   UnsignedFixed;
-typedef uint8_t                          Byte;
+typedef uint8_t                         Byte;
+
 typedef struct SoundComponentData {
     long                            flags;
     OSType                          format;
@@ -89,6 +95,7 @@ typedef struct SoundComponentData {
     Byte *                          buffer;
     long                            reserved;
 } SoundComponentData;
+
 #endif /* SYS_DARWIN */
 
 typedef struct
@@ -100,20 +107,27 @@ typedef struct
 #ifndef SYS_DARWIN
 #ifdef LOADER
     ldt_fs_t    *ldt_fs;
+
 #endif /* LOADER */
-    HMODULE     qtml;
-    OSErr       (*InitializeQTML)         	( long flags );
+    HMODULE qtml;
+    OSErr (*InitializeQTML)             ( long flags );
+    OSErr (*TerminateQTML)              ( void );
 #endif /* SYS_DARWIN */
-    int         (*SoundConverterOpen)		( const SoundComponentData *,
-                                                    const SoundComponentData *, SoundConverter* );
-    int         (*SoundConverterClose)		( SoundConverter );
-    int         (*SoundConverterSetInfo)	( SoundConverter , OSType ,void * );
-    int         (*SoundConverterGetBufferSizes) ( SoundConverter, unsigned long,
-                                                    unsigned long*, unsigned long*, unsigned long* );
-    int         (*SoundConverterBeginConversion)( SoundConverter );
-    int         (*SoundConverterEndConversion)  ( SoundConverter, void *, unsigned long *, unsigned long *);
-    int         (*SoundConverterConvertBuffer)  ( SoundConverter, const void *, unsigned long, void *,
-                                                    unsigned long *,unsigned long * );
+
+    int (*SoundConverterOpen)           ( const SoundComponentData *,
+                                          const SoundComponentData *,
+                                          SoundConverter* );
+    int (*SoundConverterClose)          ( SoundConverter );
+    int (*SoundConverterSetInfo)        ( SoundConverter , OSType, void * );
+    int (*SoundConverterGetBufferSizes) ( SoundConverter, unsigned long,
+                                          unsigned long*, unsigned long*,
+                                          unsigned long* );
+    int (*SoundConverterBeginConversion)( SoundConverter );
+    int (*SoundConverterEndConversion)  ( SoundConverter, void *,
+                                          unsigned long *, unsigned long *);
+    int (*SoundConverterConvertBuffer)  ( SoundConverter, const void *,
+                                          unsigned long, void *,
+                                          unsigned long *, unsigned long * );
     SoundConverter      myConverter;
     SoundComponentData  InputFormatInfo, OutputFormatInfo;
 
@@ -135,8 +149,10 @@ typedef struct
     uint8_t             *p_buffer;
 
     uint8_t             buffer_out[1000000];    /* FIXME */
+
 } adec_thread_t;
 
+#ifndef WIN32
 typedef struct
 {
     /* Input properties */
@@ -148,27 +164,37 @@ typedef struct
     ldt_fs_t          *ldt_fs;
 #endif /* LOADER */
     HMODULE           qtml;
-    OSErr             (*InitializeQTML)		( long flags );
+    OSErr             (*InitializeQTML)         ( long flags );
+
 #endif /* SYS_DARWIN */
-    Component         (*FindNextComponent)	( Component prev, ComponentDescription* desc );
-    ComponentInstance (*OpenComponent)		( Component c );
-    ComponentResult   (*ImageCodecInitialize)	( ComponentInstance ci, ImageSubCodecDecompressCapabilities * cap);
-    ComponentResult   (*ImageCodecGetCodecInfo)	( ComponentInstance ci,
-                                                    CodecInfo *info );
-    ComponentResult   (*ImageCodecPreDecompress)( ComponentInstance ci,
-                                                    CodecDecompressParams * params );
-    ComponentResult   (*ImageCodecBandDecompress)( ComponentInstance ci,
-                                                    CodecDecompressParams * params );
-    PixMapHandle      (*GetGWorldPixMap)	( GWorldPtr offscreenGWorld );
-    OSErr             (*QTNewGWorldFromPtr)	( GWorldPtr *gw,
-                                                    OSType pixelFormat,
-                                                    const Rect *boundsRect,
-                                                    CTabHandle cTable,
-                                                    /*GDHandle*/ void *aGDevice, /*unused*/
-                                                    GWorldFlags flags,
-                                                    void *baseAddr,
-                                                    long rowBytes );
-    OSErr             (*NewHandleClear)		( Size byteCount );
+    Component         (*FindNextComponent)
+        ( Component prev, ComponentDescription* desc );
+
+    ComponentInstance (*OpenComponent)
+        ( Component c );
+
+    ComponentResult   (*ImageCodecInitialize)
+        ( ComponentInstance ci, ImageSubCodecDecompressCapabilities * cap);
+
+    ComponentResult   (*ImageCodecGetCodecInfo)
+        ( ComponentInstance ci, CodecInfo *info );
+
+    ComponentResult   (*ImageCodecPreDecompress)
+        ( ComponentInstance ci, CodecDecompressParams * params );
+
+    ComponentResult   (*ImageCodecBandDecompress)
+        ( ComponentInstance ci, CodecDecompressParams * params );
+
+    PixMapHandle      (*GetGWorldPixMap)
+        ( GWorldPtr offscreenGWorld );
+
+    OSErr             (*QTNewGWorldFromPtr)
+        ( GWorldPtr *gw, OSType pixelFormat, const Rect *boundsRect,
+          CTabHandle cTable, /*GDHandle*/ void *aGDevice, /*unused*/
+          GWorldFlags flags, void *baseAddr, long rowBytes );
+
+    OSErr             (*NewHandleClear)
+        ( Size byteCount );
 
     ComponentInstance       ci;
     Rect                    OutBufferRect;   /* the dimensions of our GWorld */
@@ -177,7 +203,7 @@ typedef struct
                                                 environment */
     ImageDescriptionHandle  framedescHandle;
 
-    CodecDecompressParams   decpar;          /* for ImageCodecPreDecompress() */
+    CodecDecompressParams   decpar;          /* for ImageCodecPreDecompress()*/
     CodecCapabilities       codeccap;        /* for decpar */
 
 
@@ -191,6 +217,7 @@ typedef struct
     uint8_t             *p_buffer;
 
 } vdec_thread_t;
+#endif
 
 static int pi_channels_maps[6] =
 {
@@ -273,6 +300,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             p_fifo->pf_run = RunDecoderVideo;
             return VLC_SUCCESS;
 
+        case VLC_FOURCC('m','p','4','a'): /* MPEG-4 audio */
         case VLC_FOURCC('Q','D','M','C'): /* QDesign */
         case VLC_FOURCC('Q','D','M','2'): /* QDesign* 2 */
         case VLC_FOURCC('Q','c','l','p'): /* Qualcomm Purevoice Codec */
@@ -289,9 +317,9 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('f','l','6','4'): /* 64-bit Floating Point */
         case VLC_FOURCC('i','n','2','4'): /* 24-bit Interger */
         case VLC_FOURCC('i','n','3','2'): /* 32-bit Integer */
-        case 0x0011:				/* DVI IMA */
-	case 0x6D730002:			/* Microsoft ADPCM-ACM */
-	case 0x6D730011:			/* DVI Intel IMAADPCM-ACM */
+        case 0x0011:                            /* DVI IMA */
+        case 0x6D730002:                        /* Microsoft ADPCM-ACM */
+        case 0x6D730011:                        /* DVI Intel IMAADPCM-ACM */
 
             p_fifo->pf_run = RunDecoderAudio;
             return VLC_SUCCESS;
@@ -300,12 +328,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 }
 
-#ifdef LOADER
-HMODULE   WINAPI LoadLibraryA(LPCSTR);
-FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
-int       WINAPI FreeLibrary(HMODULE);
-#endif
-
 /****************************************************************************
  ****************************************************************************
  **
@@ -313,10 +335,10 @@ int       WINAPI FreeLibrary(HMODULE);
  **
  **************************************************************************** 
  ****************************************************************************/
-
 static int  InitThreadAudio     ( adec_thread_t * );
 static void DecodeThreadAudio   ( adec_thread_t * );
 static void EndThreadAudio      ( adec_thread_t * );
+static int  QTAudioInit         ( adec_thread_t * );
 
 static int RunDecoderAudio( decoder_fifo_t *p_fifo )
 {
@@ -379,43 +401,18 @@ static int InitThreadAudio( adec_thread_t *p_dec )
     /* get lock, avoid segfault */
     var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
+
 #ifdef SYS_DARWIN
     EnterMovies();
-#else
-#ifdef LOADER
-    p_dec->ldt_fs = Setup_LDT_Keeper();
-#endif /* LOADER */
-    msg_Dbg( p_dec->p_fifo, "trying to load `qtmlClient.dll'" );
-    if( !( p_dec->qtml = LoadLibraryA("qtmlClient.dll") ) )
+#endif
+
+    if( QTAudioInit( p_dec ) != VLC_SUCCESS )
     {
-        msg_Err( p_dec->p_fifo, "cannot load qtmlClient.dll");
+        msg_Err( p_dec->p_fifo, "cannot initialize QT");
         goto exit_error;
     }
-
-    msg_Dbg( p_dec->p_fifo, "qtmlClient.dll loaded" );
-
-    /* (void*) to shut up gcc */
-    p_dec->InitializeQTML           = (void*)InitializeQTML;
-#endif /* SYS_DARWIN */
-    p_dec->SoundConverterOpen       = (void*)SoundConverterOpen;
-    p_dec->SoundConverterClose      = (void*)SoundConverterClose;
-    p_dec->SoundConverterSetInfo    = (void*)SoundConverterSetInfo;
-    p_dec->SoundConverterGetBufferSizes = (void*)SoundConverterGetBufferSizes;
-    p_dec->SoundConverterConvertBuffer  = (void*)SoundConverterConvertBuffer;
-    p_dec->SoundConverterBeginConversion= (void*)SoundConverterBeginConversion;
-    p_dec->SoundConverterEndConversion  = (void*)SoundConverterEndConversion;
 
 #ifndef SYS_DARWIN
-    if( !p_dec->InitializeQTML ||
-        !p_dec->SoundConverterOpen || !p_dec->SoundConverterClose ||
-        !p_dec->SoundConverterSetInfo || !p_dec->SoundConverterGetBufferSizes ||
-        !p_dec->SoundConverterConvertBuffer ||
-        !p_dec->SoundConverterBeginConversion || !p_dec->SoundConverterEndConversion )
-    {
-        msg_Err( p_dec->p_fifo, "error getting qtmlClient.dll symbols");
-        goto exit_error;
-    }
-
     if( ( i_error = p_dec->InitializeQTML( 6 + 16 ) ) )
     {
         msg_Dbg( p_dec->p_fifo, "error while InitializeQTML = %d", i_error );
@@ -453,36 +450,51 @@ static int InitThreadAudio( adec_thread_t *p_dec )
                                          &p_dec->myConverter );
     if( i_error )
     {
-        msg_Err( p_dec->p_fifo, "error while SoundConverterOpen = %d", i_error );
+        msg_Err( p_dec->p_fifo,
+                 "error while SoundConverterOpen = %d", i_error );
         goto exit_error;
     }
 
+#if 0
+    /* tell the sound converter we accept VBR formats */
+    i_error = SoundConverterSetInfo( p_dec->myConverter, siClientAcceptsVBR,
+                                     (void *)true );
+#endif
+
     if( p_wf->cbSize > 36 + 8 )
     {
-        i_error = p_dec->SoundConverterSetInfo( p_dec->myConverter,
-                                                FCC( 'w', 'a', 'v', 'e' ),
-                                                ((uint8_t*)&p_wf[1]) + 36 + 8 );
-        msg_Dbg( p_dec->p_fifo, "error while SoundConverterSetInfo = %d", i_error );
+        i_error =
+            p_dec->SoundConverterSetInfo( p_dec->myConverter,
+                                          FCC( 'w', 'a', 'v', 'e' ),
+                                          ((uint8_t*)&p_wf[1]) + 36 + 8 );
+        msg_Dbg( p_dec->p_fifo,
+                 "error while SoundConverterSetInfo = %d", i_error );
     }
 
-    WantedBufferSize   = p_dec->OutputFormatInfo.numChannels * p_dec->OutputFormatInfo.sampleRate * 2;
+    WantedBufferSize = p_dec->OutputFormatInfo.numChannels *
+                         p_dec->OutputFormatInfo.sampleRate * 2;
     p_dec->FramesToGet = 0;
+
     i_error = p_dec->SoundConverterGetBufferSizes( p_dec->myConverter,
-                                                   WantedBufferSize, &p_dec->FramesToGet,
-                                                   &InputBufferSize, &OutputBufferSize );
+                  WantedBufferSize, &p_dec->FramesToGet,
+                  &InputBufferSize, &OutputBufferSize );
 
-    msg_Dbg( p_dec->p_fifo, "WantedBufferSize=%li InputBufferSize=%li OutputBufferSize=%li FramesToGet=%li",
-             WantedBufferSize, InputBufferSize, OutputBufferSize, p_dec->FramesToGet );
+    msg_Dbg( p_dec->p_fifo, "WantedBufferSize=%li InputBufferSize=%li "
+             "OutputBufferSize=%li FramesToGet=%li", WantedBufferSize,
+             InputBufferSize, OutputBufferSize, p_dec->FramesToGet );
 
-    p_dec->InFrameSize  = (InputBufferSize + p_dec->FramesToGet - 1 ) / p_dec->FramesToGet;
+    p_dec->InFrameSize  = (InputBufferSize + p_dec->FramesToGet - 1 ) /
+                            p_dec->FramesToGet;
     p_dec->OutFrameSize = OutputBufferSize / p_dec->FramesToGet;
 
-    msg_Dbg( p_dec->p_fifo, "frame size %d -> %d", p_dec->InFrameSize, p_dec->OutFrameSize );
+    msg_Dbg( p_dec->p_fifo, "frame size %d -> %d",
+             p_dec->InFrameSize, p_dec->OutFrameSize );
 
     i_error = p_dec->SoundConverterBeginConversion( p_dec->myConverter );
     if( i_error )
     {
-        msg_Err( p_dec->p_fifo, "error while SoundConverterBeginConversion = %d", i_error );
+        msg_Err( p_dec->p_fifo,
+                 "error while SoundConverterBeginConversion = %d", i_error );
         goto exit_error;
     }
 
@@ -520,9 +532,9 @@ exit_error:
 #endif
     vlc_mutex_unlock( lockval.p_address );
     return VLC_EGENERIC;
-
 }
-static void DecodeThreadAudio   ( adec_thread_t *p_dec )
+
+static void DecodeThreadAudio( adec_thread_t *p_dec )
 {
     pes_packet_t    *p_pes;
     vlc_value_t     lockval;
@@ -567,13 +579,19 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
                                                           p_dec->p_buffer,
                                                           i_frames,
                                                           p_dec->buffer_out,
-                                                          &i_out_frames, &i_out_bytes );
+                                                          &i_out_frames,
+                                                          &i_out_bytes );
             vlc_mutex_unlock( lockval.p_address );
 
-            /*msg_Dbg( p_dec->p_fifo, "decoded %d frames -> %ld frames (error=%d)",
+            /*
+            msg_Dbg( p_dec->p_fifo,
+                     "decoded %d frames -> %ld frames (error=%d)",
                      i_frames, i_out_frames, i_error );
 
-            msg_Dbg( p_dec->p_fifo, "decoded %ld frames = %ld bytes", i_out_frames, i_out_bytes );*/
+            msg_Dbg( p_dec->p_fifo, "decoded %ld frames = %ld bytes",
+                     i_out_frames, i_out_bytes );
+            */
+
             p_dec->i_buffer -= i_frames * p_dec->InFrameSize;
             if( p_dec->i_buffer > 0 )
             {
@@ -582,7 +600,7 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
                          p_dec->i_buffer );
             }
 
-            if( i_out_frames > 0 )
+            if( !i_error && i_out_frames > 0 )
             {
                 aout_buffer_t   *p_aout_buffer;
                 uint8_t         *p_buff = p_dec->buffer_out;
@@ -590,7 +608,8 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
                 /*msg_Dbg( p_dec->p_fifo, "pts=%lld date=%lld dateget=%lld",
                          p_dec->pts, mdate(), aout_DateGet( &p_dec->date ) );*/
 
-                if( p_dec->pts != 0 && p_dec->pts != aout_DateGet( &p_dec->date ) )
+                if( p_dec->pts != 0 &&
+                    p_dec->pts != aout_DateGet( &p_dec->date ) )
                 {
                     aout_DateSet( &p_dec->date, p_dec->pts );
                 }
@@ -622,12 +641,25 @@ static void DecodeThreadAudio   ( adec_thread_t *p_dec )
                             p_buff,
                             p_aout_buffer->i_nb_bytes );
 
-                    /*msg_Dbg( p_dec->p_fifo, "==> start=%lld end=%lld date=%lld",
-                             p_aout_buffer->start_date, p_aout_buffer->end_date, mdate() );*/
-                    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
-                    /*msg_Dbg( p_dec->p_fifo, "s1=%d s2=%d", i_framesperchannels, p_aout_buffer->i_nb_samples );
+                    /*
+                    msg_Dbg( p_dec->p_fifo,
+                             "==> start=%lld end=%lld date=%lld",
+                             p_aout_buffer->start_date,
+                             p_aout_buffer->end_date, mdate() );
+                    */
 
-                    msg_Dbg( p_dec->p_fifo, "i_nb_bytes=%d i_nb_samples*4=%d", p_aout_buffer->i_nb_bytes, p_aout_buffer->i_nb_samples * 4 );*/
+                    aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input,
+                                  p_aout_buffer );
+
+                    /*
+                    msg_Dbg( p_dec->p_fifo, "s1=%d s2=%d", i_framesperchannels,
+                             p_aout_buffer->i_nb_samples );
+
+                    msg_Dbg( p_dec->p_fifo, "i_nb_bytes=%d i_nb_samples*4=%d",
+                             p_aout_buffer->i_nb_bytes,
+                             p_aout_buffer->i_nb_samples * 4 );
+                    */
+
                     p_buff += i_frames * 4;
                     i_out_frames -= i_frames;
                 }
@@ -651,7 +683,9 @@ static void EndThreadAudio( adec_thread_t *p_dec )
     var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-    i_error = p_dec->SoundConverterEndConversion( p_dec->myConverter, NULL, &ConvertedFrames, &ConvertedBytes );
+    i_error = p_dec->SoundConverterEndConversion( p_dec->myConverter, NULL,
+                                                  &ConvertedFrames,
+                                                  &ConvertedBytes );
     msg_Dbg( p_dec->p_fifo, "SoundConverterEndConversion => %d", i_error );
 
     i_error = p_dec->SoundConverterClose( p_dec->myConverter );
@@ -659,13 +693,13 @@ static void EndThreadAudio( adec_thread_t *p_dec )
 
 #ifndef SYS_DARWIN
     FreeLibrary( p_dec->qtml );
-    msg_Dbg( p_dec->p_fifo, "FreeLibrary ok." ); */
+    msg_Dbg( p_dec->p_fifo, "FreeLibrary ok." );
 #endif
     vlc_mutex_unlock( lockval.p_address );
 
 #ifdef LOADER
     Restore_LDT_Keeper( p_dec->ldt_fs );
-    msg_Dbg( p_dec->p_fifo, "Restore_LDT_Keeper" ); */
+    msg_Dbg( p_dec->p_fifo, "Restore_LDT_Keeper" );
 #endif
 #ifdef SYS_DARWIN
     ExitMovies();
@@ -673,6 +707,115 @@ static void EndThreadAudio( adec_thread_t *p_dec )
     aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
 }
 
+static int QTAudioInit( adec_thread_t *p_dec )
+{
+
+#ifdef SYS_DARWIN
+    p_dec->SoundConverterOpen       = (void*)SoundConverterOpen;
+    p_dec->SoundConverterClose      = (void*)SoundConverterClose;
+    p_dec->SoundConverterSetInfo    = (void*)SoundConverterSetInfo;
+    p_dec->SoundConverterGetBufferSizes = (void*)SoundConverterGetBufferSizes;
+    p_dec->SoundConverterConvertBuffer  = (void*)SoundConverterConvertBuffer;
+    p_dec->SoundConverterBeginConversion= (void*)SoundConverterBeginConversion;
+    p_dec->SoundConverterEndConversion  = (void*)SoundConverterEndConversion;
+#else
+
+#ifdef LOADER
+    p_dec->ldt_fs = Setup_LDT_Keeper();
+#endif /* LOADER */
+
+    p_dec->qtml = LoadLibraryA( "qtmlClient.dll" );
+    if( p_dec->qtml == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo, "failed loading qtmlClient.dll" );
+        return VLC_EGENERIC;
+    }
+
+    p_dec->InitializeQTML =
+        (void *)GetProcAddress( p_dec->qtml, "InitializeQTML" );
+    if( p_dec->InitializeQTML == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo, "failed geting proc address InitializeQTML" );
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterOpen =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterOpen" );
+    if( p_dec->SoundConverterOpen == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterOpen");
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterClose =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterClose" );
+    if( p_dec->SoundConverterClose == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterClose");
+        return VLC_EGENERIC;
+    }
+
+    p_dec->TerminateQTML =
+        (void *)GetProcAddress( p_dec->qtml, "TerminateQTML" );
+    if( p_dec->TerminateQTML == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo, "failed getting proc address TerminateQTML");
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterSetInfo =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterSetInfo" );
+    if( p_dec->SoundConverterSetInfo == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterSetInfo");
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterGetBufferSizes =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterGetBufferSizes" );
+    if( p_dec->SoundConverterGetBufferSizes == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterGetBufferSizes");
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterConvertBuffer =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterConvertBuffer" );
+    if( p_dec->SoundConverterConvertBuffer == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterConvertBuffer" );
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterEndConversion =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterEndConversion" );
+    if( p_dec->SoundConverterEndConversion == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterEndConversion" );
+        return VLC_EGENERIC;
+    }
+
+    p_dec->SoundConverterBeginConversion =
+        (void *)GetProcAddress( p_dec->qtml, "SoundConverterBeginConversion");
+    if( p_dec->SoundConverterBeginConversion == NULL )
+    {
+        msg_Dbg( p_dec->p_fifo,
+                 "failed getting proc address SoundConverterBeginConversion" );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_dec->p_fifo,
+             "Standard init done you may now call supported functions" );
+#endif /* else SYS_DARWIN */
+
+    return VLC_SUCCESS;
+}
 
 /****************************************************************************
  ****************************************************************************
@@ -682,6 +825,10 @@ static void EndThreadAudio( adec_thread_t *p_dec )
  **************************************************************************** 
  ****************************************************************************/
 
+#ifdef WIN32
+static int  RunDecoderVideo( decoder_fifo_t *p_fifo ){ return VLC_EGENERIC; }
+
+#else
 static int  InitThreadVideo     ( vdec_thread_t * );
 static void DecodeThreadVideo   ( vdec_thread_t * );
 static void EndThreadVideo      ( vdec_thread_t * );
@@ -732,14 +879,14 @@ static int  RunDecoderVideo( decoder_fifo_t *p_fifo )
  */
 static int InitThreadVideo( vdec_thread_t *p_dec )
 {
-    vlc_value_t				lockval;
-    long				i_result;
-    ComponentDescription		desc;
-    Component				prev;
-    ComponentResult			cres;
-    ImageSubCodecDecompressCapabilities	icap;	/* for ImageCodecInitialize() */
-    CodecInfo				cinfo;	/* for ImageCodecGetCodecInfo() */
-    ImageDescription			*id;
+    vlc_value_t                         lockval;
+    long                                i_result;
+    ComponentDescription                desc;
+    Component                           prev;
+    ComponentResult                     cres;
+    ImageSubCodecDecompressCapabilities icap;   /* for ImageCodecInitialize() */
+    CodecInfo                           cinfo;  /* for ImageCodecGetCodecInfo() */
+    ImageDescription                    *id;
 
     BITMAPINFOHEADER    *p_bih;
     int                 i_vide;
@@ -759,7 +906,8 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
         return VLC_EGENERIC;
     }
     memcpy( fcc, &p_dec->p_fifo->i_fourcc, 4 );
-    msg_Dbg( p_dec->p_fifo, "quicktime_video %4.4s %dx%d", fcc, p_bih->biWidth, p_bih->biHeight );
+    msg_Dbg( p_dec->p_fifo, "quicktime_video %4.4s %dx%d", fcc,
+             p_bih->biWidth, p_bih->biHeight );
 
     /* get lock, avoid segfault */
     var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
@@ -835,10 +983,12 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
     cres =  p_dec->ImageCodecGetCodecInfo( p_dec->ci, &cinfo );
-    msg_Dbg( p_dec->p_fifo, "Flags: compr: 0x%lx  decomp: 0x%lx format: 0x%lx\n",
-                cinfo.compressFlags, cinfo.decompressFlags, cinfo.formatFlags);
-    msg_Dbg( p_dec->p_fifo, "quicktime_video: Codec name: %.*s\n", ((unsigned char*)&cinfo.typeName)[0],
-                  ((unsigned char*)&cinfo.typeName)+1);
+    msg_Dbg( p_dec->p_fifo,
+             "Flags: compr: 0x%lx  decomp: 0x%lx format: 0x%lx\n",
+             cinfo.compressFlags, cinfo.decompressFlags, cinfo.formatFlags );
+    msg_Dbg( p_dec->p_fifo, "quicktime_video: Codec name: %.*s\n",
+             ((unsigned char*)&cinfo.typeName)[0],
+             ((unsigned char*)&cinfo.typeName)+1 );
 
     /* make a yuy2 gworld */
     p_dec->OutBufferRect.top    = 0;
@@ -871,7 +1021,8 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
         memcpy( ((char*)&id->clutID) + 2, p_vide + 70, i_vide - 70 );
     }
 
-    msg_Dbg( p_dec->p_fifo, "idSize=%ld ver=%d rev=%d vendor=%ld tempQ=%d spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d frameCount=%d clutID=%d",
+    msg_Dbg( p_dec->p_fifo, "idSize=%ld ver=%d rev=%d vendor=%ld tempQ=%d "
+             "spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d frameCount=%d clutID=%d",
              id->idSize, id->version, id->revisionLevel, id->vendor,
              (int)id->temporalQuality, (int)id->spatialQuality,
              id->width, id->height,
@@ -880,19 +1031,24 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
              id->frameCount,
              id->clutID );
 
-    p_dec->framedescHandle = (ImageDescriptionHandle) p_dec->NewHandleClear( id->idSize );
+    p_dec->framedescHandle =
+        (ImageDescriptionHandle) p_dec->NewHandleClear( id->idSize );
     memcpy( *p_dec->framedescHandle, id, id->idSize );
 
     p_dec->plane = malloc( p_bih->biWidth * p_bih->biHeight * 3 );
 
-    i_result =  p_dec->QTNewGWorldFromPtr( &p_dec->OutBufferGWorld,
-                                           kYUVSPixelFormat, /*pixel format of new GWorld==YUY2 */
-                                           &p_dec->OutBufferRect,   /*we should benchmark if yvu9 is faster for svq3, too */
-                                           0, 0, 0,
-                                           p_dec->plane,
-                                           p_bih->biWidth * 2 );
+    i_result = p_dec->QTNewGWorldFromPtr( &p_dec->OutBufferGWorld,
+                                          /*pixel format of new GWorld==YUY2 */
+                                          kYUVSPixelFormat,
+                                          /* we should benchmark if yvu9 is
+                                           * faster for svq3, too */
+                                          &p_dec->OutBufferRect,
+                                          0, 0, 0,
+                                          p_dec->plane,
+                                          p_bih->biWidth * 2 );
 
-    msg_Dbg( p_dec->p_fifo, "NewGWorldFromPtr returned:%ld\n", 65536-( i_result&0xffff ) );
+    msg_Dbg( p_dec->p_fifo, "NewGWorldFromPtr returned:%ld\n",
+             65536 - ( i_result&0xffff ) );
 
     memset( &p_dec->decpar, 0, sizeof( CodecDecompressParams ) );
     p_dec->decpar.imageDescription = p_dec->framedescHandle;
@@ -909,12 +1065,15 @@ static int InitThreadVideo( vdec_thread_t *p_dec )
     p_dec->decpar.dstPixMap        = **p_dec->GetGWorldPixMap( p_dec->OutBufferGWorld );/*destPixmap;  */
 
     cres =  p_dec->ImageCodecPreDecompress( p_dec->ci, &p_dec->decpar );
-    msg_Dbg( p_dec->p_fifo, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n", (int)cres );
+    msg_Dbg( p_dec->p_fifo,
+             "quicktime_video: ImageCodecPreDecompress cres=0x%X\n",
+             (int)cres );
 
     p_dec->p_vout = vout_Request( p_dec->p_fifo, NULL,
                                   p_bih->biWidth, p_bih->biHeight,
                                   VLC_FOURCC( 'Y', 'U', 'Y', '2' ),
-                                  VOUT_ASPECT_FACTOR * p_bih->biWidth / p_bih->biHeight );
+                                  VOUT_ASPECT_FACTOR * p_bih->biWidth /
+                                  p_bih->biHeight );
 
     if( !p_dec->p_vout )
     {
@@ -939,11 +1098,13 @@ exit_error:
 
 static void DecodeThreadVideo( vdec_thread_t *p_dec )
 {
-    BITMAPINFOHEADER    *p_bih = (BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader;
+    BITMAPINFOHEADER *p_bih =
+        (BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader;
+
     pes_packet_t    *p_pes;
     vlc_value_t     lockval;
     picture_t       *p_pic;
-    ComponentResult     cres;
+    ComponentResult cres;
 
     var_Get( p_dec->p_fifo->p_libvlc, "qt_mutex", &lockval );
 
@@ -987,8 +1148,8 @@ static void DecodeThreadVideo( vdec_thread_t *p_dec )
 
         if( cres &0xFFFF )
         {
-            msg_Dbg( p_dec->p_fifo,
-                     "quicktime_video: ImageCodecBandDecompress cres=0x%X (-0x%X) %d :(\n",
+            msg_Dbg( p_dec->p_fifo, "quicktime_video: ImageCodecBandDecompress"
+                     " cres=0x%X (-0x%X) %d :(\n",
                      (int)cres,(int)-cres, (int)cres );
         }
 
@@ -1022,3 +1183,4 @@ static void EndThreadVideo( vdec_thread_t *p_dec )
     ExitMovies();
 #endif
 }
+#endif

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.38 2003/07/20 22:06:02 hartman Exp $
+dnl $Id: configure.ac,v 1.39 2003/07/21 17:48:31 gbazin Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -1695,10 +1695,14 @@ AC_ARG_ENABLE(quicktime,
 if test "${enable_quicktime}" != "no" &&
   (test "${SYS}" = "darwin" || test "${enable_quicktime}" = "yes")
 then
+  if test "${SYS}" = "mingw32"; then
+    AX_ADD_BUILTINS([quicktime])
+  else
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
     [ AX_ADD_BUILTINS([quicktime])
       AX_ADD_LDFLAGS([quicktime],[-framework QuickTime -framework Carbon])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
+  fi
 fi
 
 dnl
