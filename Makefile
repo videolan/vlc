@@ -53,8 +53,8 @@ CCFLAGS += -march=pentiumpro
 
 # MMX support :
 CFLAGS += -DHAVE_MMX
-assembly_obj =                video_decoder_ref/idctmmx.o \
-			video_decoder_ref/yuv12-rgb16.o
+ASM_OBJ =   video_decoder_ref/idctmmx.o \
+		    video_decoder_ref/yuv12-rgb16.o
 
 #Optimizations for PowerPC :
 #CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
@@ -161,7 +161,7 @@ misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
 						misc/netutils.o
 
-OBJ = 	$(interface_obj) \
+C_OBJ = $(interface_obj) \
 		$(input_obj) \
 		$(audio_output_obj) \
 		$(video_output_obj) \
@@ -169,13 +169,12 @@ OBJ = 	$(interface_obj) \
 		$(generic_decoder_obj) \
 		$(video_decoder_obj) \
 		$(vlan_obj) \
-		$(misc_obj)
-
+		$(misc_obj) \
 
 #
 # Other lists of files
 #
-sources := $(OBJ:%.o=%.c)
+sources := $(C_OBJ:%.o=%.c)
 dependancies := $(sources:%.c=dep/%.d)
 
 # All symbols must be exported
@@ -191,7 +190,7 @@ export
 all: vlc
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(C_OBJ) $(ASM_OBJ)
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
@@ -203,8 +202,8 @@ FORCE:
 #
 # Real targets
 #
-vlc: $(OBJ)
-	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(OBJ) $(assembly_obj)
+vlc: $(C_OBJ) $(ASM_OBJ)
+	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(C_OBJ) $(ASM_OBJ)
 
 Documentation/cflow: $(sources)
 	cflow $(FCFLAGS) $(CFLAGS) $(sources) | $(FFILTER) > $@
@@ -215,9 +214,12 @@ Documentation/cflow: $(sources)
 $(dependancies): %.d: FORCE
 	@make -s --no-print-directory -f Makefile.dep $@
 
-$(OBJ): %.o: dep/%.d
-$(OBJ): %.o: %.c
+$(C_OBJ): %.o: dep/%.d
+
+$(C_OBJ): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+$(ASM_OBJ): %.o: %.S
+	$(CC) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies
