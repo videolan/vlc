@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.10 2003/12/02 04:16:21 rocky Exp $
+ * $Id: access.c,v 1.11 2003/12/03 13:49:12 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -618,7 +618,7 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
       break;
 
     case 'T':
-      add_format_num_info(i_track, "%d");
+      add_format_num_info(i_track, "%02d");
       break;
 #ifdef HAVE_LIBCDDB      
     not_special:
