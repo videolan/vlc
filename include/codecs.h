@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2001 VideoLAN
  * $Id$
  *
- * Author: Gildas Bazin <gbazin@netcourrier.com>
+ * Author: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,11 +120,29 @@ typedef struct {
 } BITMAPINFO, *LPBITMAPINFO;
 #endif
 
-/* dvb_spuinfo_t exports the id of the selected track to the decoder */
 typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
-    unsigned int i_id;
-} dvb_spuinfo_t;
+    int left, top, right, bottom;
+} RECT32;
+
+typedef int64_t REFERENCE_TIME;
+
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+{
+    RECT32            rcSource;
+    RECT32            rcTarget;
+    uint32_t          dwBitRate;
+    uint32_t          dwBitErrorRate;
+    REFERENCE_TIME    AvgTimePerFrame;
+    BITMAPINFOHEADER  bmiHeader;
+    //int               reserved[3];
+} VIDEOINFOHEADER;
 
 /* WAVE format wFormatTag IDs */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
@@ -207,25 +225,26 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_UNKNOWN,  VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
-static inline void wf_tag_to_fourcc( uint16_t i_tag,
-                                     vlc_fourcc_t *fcc, char **ppsz_name )
+static inline void wf_tag_to_fourcc( uint16_t i_tag, vlc_fourcc_t *fcc,
+                                     char **ppsz_name )
 {
     int i;
     for( i = 0; wave_format_tag_to_fourcc[i].i_tag != 0; i++ )
     {
-        if( wave_format_tag_to_fourcc[i].i_tag == i_tag )
-        {
-            break;
-        }
+        if( wave_format_tag_to_fourcc[i].i_tag == i_tag ) break;
     }
-    if( fcc )
+    if( fcc ) *fcc = wave_format_tag_to_fourcc[i].i_fourcc;
+    if( ppsz_name ) *ppsz_name = wave_format_tag_to_fourcc[i].psz_name;
+}
+
+static inline void fourcc_to_wf_tag( vlc_fourcc_t fcc, uint16_t *pi_tag )
+{
+    int i;
+    for( i = 0; wave_format_tag_to_fourcc[i].i_tag != 0; i++ )
     {
-        *fcc = wave_format_tag_to_fourcc[i].i_fourcc;
+        if( wave_format_tag_to_fourcc[i].i_fourcc == fcc ) break;
     }
-    if( ppsz_name )
-    {
-        *ppsz_name = wave_format_tag_to_fourcc[i].psz_name;
-    }
+    if( pi_tag ) *pi_tag = wave_format_tag_to_fourcc[i].i_tag;
 }
 
 /**
@@ -252,6 +271,7 @@ typedef struct es_sys_t
     vlc_bool_t          b_forced_subs;
     unsigned int        palette[16];
     unsigned int        colors[4];
+
 } subtitle_data_t;
 
 #endif /* "codecs.h" */

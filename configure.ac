@@ -889,7 +889,7 @@ dnl
 dnl  default modules
 dnl
 VLC_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
-VLC_ADD_PLUGINS([mpgv mpga m4v h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg])
+VLC_ADD_PLUGINS([mpgv mpga m4v h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 VLC_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -921,6 +921,8 @@ if test "${SYS}" != "mingw32"; then
     VLC_ADD_PLUGINS([screensaver])
 else
     VLC_ADD_PLUGINS([ntservice])
+    VLC_ADD_PLUGINS([dmo])
+    VLC_ADD_LDFLAGS([dmo],[-lole32])
 fi
 
 dnl
@@ -1270,6 +1272,12 @@ then
       AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
     fi
   fi
+
+  dnl Temporary hack (yeah, sure ;)
+  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin"; then
+      VLC_ADD_LDFLAGS([dvdread],[-ldvdcss])
+  fi
+
 fi
 
 dnl
@@ -3782,6 +3790,7 @@ AC_CONFIG_FILES([
   modules/audio_output/Makefile
   modules/codec/Makefile
   modules/codec/cmml/Makefile
+  modules/codec/dmo/Makefile
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
   modules/codec/ogt/Makefile
