@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.8 2002/08/28 12:50:13 sam Exp $
+##  $Id: bootstrap,v 1.9 2002/08/28 13:38:14 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -33,7 +33,7 @@ set -x
 rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
 
 # Check for gettext
-if `which gettextize >/dev/null 2>&1`
+if which gettextize >/dev/null 2>&1
 then
 if expr `gettextize --version | sed -e '1s/[^0-9]*//' -e q` \
         '>' 0.11.3 >/dev/null 2>&1
