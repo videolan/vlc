@@ -2,3 +2,4 @@ SOURCES_access_file = modules/access/file.c
 SOURCES_access_udp = modules/access/udp.c
 SOURCES_access_http = modules/access/http.c
 SOURCES_access_ftp = modules/access/ftp.c
+SOURCES_access_slp = modules/access/slp.c
