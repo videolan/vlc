@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.27 2002/04/23 14:16:20 sam Exp $
+ * $Id: aout_dsp.c,v 1.27.2.1 2002/10/28 22:48:45 jobi Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -119,8 +119,8 @@ static int aout_Open( aout_thread_t *p_aout )
     }
 
     /* Open the sound device */
-    if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device, O_WRONLY ))
-        < 0 )
+    if( (p_aout->p_sys->i_fd = open( p_aout->p_sys->psz_device,
+                    O_WRONLY | O_NONBLOCK )) < 0 )
     {
         intf_ErrMsg( "aout error: can't open audio device (%s)",
                      p_aout->p_sys->psz_device );
