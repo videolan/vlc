@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.50 2002/04/01 05:49:00 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.51 2002/04/02 10:44:40 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -232,15 +232,15 @@ void VideoWindow::FrameResized( float width, float height )
 
     if (width_scale <= height_scale)
     {
-        out_width = i_width * width_scale;
-        out_height = i_height * width_scale;
+        out_width = (i_width * width_scale);
+        out_height = (i_height * width_scale);
         out_left = 0; 
         out_top = (height - out_height) / 2;
     }
     else   /* if the height is proportionally smaller */
     {
-        out_width = i_width * height_scale;
-        out_height = i_height * height_scale;
+        out_width = (i_width * height_scale);
+        out_height = (i_height * height_scale);
         out_top = 0;
         out_left = (width - out_width) /2;
     }
@@ -281,14 +281,19 @@ int VideoWindow::SelectDrawingMode(int width, int height)
 {
     int drawingMode = BITMAP;
 
+    int noOverlay = config_GetIntVariable( "nooverlay" );
     for (int i = 0; i < COLOR_COUNT; i++)
     {
+        if (noOverlay) break;
         overlaybitmap = new BBitmap ( BRect( 0, 0, width, height ), 
                                   B_BITMAP_WILL_OVERLAY|B_BITMAP_RESERVE_OVERLAY_CHANNEL,
                                   colspace[i].colspace);
 
         if(overlaybitmap && overlaybitmap->InitCheck() == B_OK) 
         {
+            overlay_restrictions r;
+            overlaybitmap->GetOverlayRestrictions(&r);
+
             drawingMode = OVERLAY;
             colspace_index = i;
             memset(overlaybitmap->Bits(), 0, overlaybitmap->BitsLength());
