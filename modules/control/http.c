@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.46 2004/01/17 15:17:02 gbazin Exp $
+ * $Id: http.c,v 1.47 2004/01/17 16:24:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2381,9 +2381,16 @@ static int  http_get( httpd_file_callback_args_t *p_args,
 static char *uri_extract_value( char *psz_uri, char *psz_name,
                                 char *psz_value, int i_value_max )
 {
-    char *p;
+    char *p = psz_uri;
 
-    p = strstr( psz_uri, psz_name );
+    while( (p = strstr( p, psz_name )) )
+    {
+        /* Verify that we are dealing with a post/get argument */
+        if( p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n' )
+            break;
+        p++;
+    }
+
     if( p )
     {
         int i_len;

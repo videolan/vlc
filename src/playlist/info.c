@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.4 2004/01/15 19:23:14 sigmunau Exp $
+ * $Id: info.c,v 1.5 2004/01/17 16:24:14 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -266,20 +266,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
     }
 
     va_start( args, psz_format );
-
-    /* Convert our message to a string */
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &psz_value, psz_format, args );
-#else
-    psz_value = (char*)malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-    if( psz_value == NULL )
-    {
-       msg_Err( p_playlist, "out of memory" );
-       return VLC_EGENERIC;
-    }
-    vsprintf( psz_value, psz_format, args );
-#endif
-
     va_end( args );
 
     i_ret = playlist_AddItemInfo( p_item , psz_cat , psz_name , psz_value );
@@ -340,20 +327,7 @@ int playlist_AddItemInfo( playlist_item_t *p_item,
     }
 
     va_start( args, psz_format );
-
-    /* Convert our message to a string */
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &p_info->psz_value, psz_format, args );
-#else
-    p_info->psz_value =
-             (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-    if( p_info->psz_value == NULL )
-    {
-        return -1;
-    }
-    vsprintf( p_info->psz_value, psz_format, args );
-#endif
-
     va_end( args );
 
     /* If this is new, insert it */
@@ -418,28 +392,11 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
     p_info->psz_name = strdup( "option" );
 
     va_start( args, psz_format );
-
-    /* Convert our message to a string */
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &p_info->psz_value, psz_format, args );
-#else
-    p_info->psz_value =
-              (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-    if( p_info->psz_value == NULL )
-    {
-       msg_Err( p_playlist, "out of memory" );
-       return -1;
-    }
-    vsprintf( p_info->psz_value, psz_format, args );
-#endif
-
     va_end( args );
 
+    INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
 
-    INSERT_ELEM( p_cat->pp_infos ,
-                 p_cat->i_infos,
-                 p_cat->i_infos,
-                 p_info );
     return 0;
 }
 
@@ -451,7 +408,7 @@ int playlist_AddOption( playlist_t *p_playlist, int i_item,
  * \return 0 on success
 */
 int playlist_AddItemOption( playlist_item_t *p_item,
-                      const char *psz_format, ... )
+                            const char *psz_format, ... )
 {
     va_list args;
     item_info_t *p_info = NULL;
@@ -467,28 +424,14 @@ int playlist_AddItemOption( playlist_item_t *p_item,
     {
         return -1;
     }
+
     p_info->psz_name = strdup( "option" );
 
     va_start( args, psz_format );
-
-    /* Convert our message to a string */
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &p_info->psz_value, psz_format, args );
-#else
-    p_info->psz_value =
-             (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-    if( p_info->psz_value == NULL )
-    {
-        return -1;
-    }
-    vsprintf( p_info->psz_value, psz_format, args );
-#endif
-
     va_end( args );
 
-    INSERT_ELEM( p_cat->pp_infos,
-                     p_cat->i_infos,
-                     p_cat->i_infos,
-                     p_info );
+    INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
+
     return 0;
 }
