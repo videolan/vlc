@@ -446,36 +446,62 @@ static int Demux( demux_t *p_demux )
     }
     else if( tk->fmt.i_cat == AUDIO_ES && b_selected )
     {
-        block_t *p_block = block_New( p_demux, i_size );
-
-        if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+        /* Set PCR */
+        if( p_sys->i_pcr < i_pts )
         {
-            uint8_t *src = p_sys->buffer;
-            uint8_t *dst = p_block->p_buffer;
+            p_sys->i_pcr = i_pts;
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+        }
 
-            /* byte swap data */
-            while( dst < &p_block->p_buffer[i_size- 1])
+        if( tk->fmt.i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
+        {
+            int     i_sub = (p_sys->buffer[1] >> 4)&0x0f;
+            uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
+
+            int i;
+            for( i = 0; i < i_sub; i++ )
             {
-                *dst++ = src[1];
-                *dst++ = src[0];
+                int i_sub_size = GetWBE( &p_sys->buffer[2+i*2]);
+                block_t *p_block = block_New( p_demux, i_sub_size );
+                if( p_block )
+                {
+                    memcpy( p_block->p_buffer, p_sub, i_sub_size );
+                    p_sub += i_sub_size;
 
-                src += 2;
+                    p_block->i_dts =
+                    p_block->i_pts = ( i == 0 ? i_pts : 0 );
+
+                    es_out_Send( p_demux->out, tk->p_es, p_block );
+                }
             }
         }
         else
         {
-            memcpy( p_block->p_buffer, p_sys->buffer, i_size );
-        }
-        p_block->i_dts =
-        p_block->i_pts = i_pts;
+            block_t *p_block = block_New( p_demux, i_size );
 
-        if( p_sys->i_pcr < i_pts )
-        {
-            p_sys->i_pcr = i_pts;
+            if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+            {
+                uint8_t *src = p_sys->buffer;
+                uint8_t *dst = p_block->p_buffer;
 
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+                /* byte swap data */
+                while( dst < &p_block->p_buffer[i_size- 1])
+                {
+                    *dst++ = src[1];
+                    *dst++ = src[0];
+
+                    src += 2;
+                }
+            }
+            else
+            {
+                memcpy( p_block->p_buffer, p_sys->buffer, i_size );
+            }
+            p_block->i_dts =
+            p_block->i_pts = i_pts;
+
+            es_out_Send( p_demux->out, tk->p_es, p_block );
         }
-        es_out_Send( p_demux->out, tk->p_es, p_block );
     }
 
 
@@ -763,7 +789,8 @@ static int HeaderRead( demux_t *p_demux )
                     }
                     else if( !strncmp( p_peek, ".ra\xfd", 4 ) )
                     {
-                        int i_version = GetWBE( &p_peek[4] );
+                        int     i_version = GetWBE( &p_peek[4] );
+                        uint8_t *p_extra = NULL;
                         msg_Dbg( p_demux, "    - audio version=%d", i_version );
 
                         es_format_Init( &fmt, AUDIO_ES, 0 );
@@ -779,6 +806,7 @@ static int HeaderRead( demux_t *p_demux )
                                 {
                                     memcpy( &fmt.i_codec, &p_peek[57 + p_peek[56] + 1], 4 );
                                 }
+                                p_extra = &p_peek[57 + p_peek[56] + 1+ 4 + 3];
                             }
                         }
                         else if( i_version == 5 && stream_Peek( p_demux->s, &p_peek, 70 ) >= 70 )
@@ -786,14 +814,43 @@ static int HeaderRead( demux_t *p_demux )
                             memcpy( &fmt.i_codec, &p_peek[66], 4 );
                             fmt.audio.i_channels = GetWBE( &p_peek[60] );
                             fmt.audio.i_rate = GetWBE( &p_peek[54] );
+
+                            p_extra = &p_peek[66+4+3+1];
                         }
                         msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
                                 (char*)&fmt.i_codec,
                                 fmt.audio.i_channels, fmt.audio.i_rate );
 
-                        if( !strncasecmp( (char*)&fmt.i_codec, "dnet", 4 ) )
+                        if( fmt.i_codec == VLC_FOURCC( 'd', 'n', 'e', 't' ) )
                         {
                             fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+                        }
+                        else if( fmt.i_codec == VLC_FOURCC( 'r', 'a', 'a', 'c' ) ||
+                                 fmt.i_codec == VLC_FOURCC( 'r', 'a', 'c', 'p' ) )
+                        {
+                            int i_peek = p_extra - p_peek;
+                            if( stream_Peek( p_demux->s, &p_peek, i_peek + 4 ) >= i_peek + 4 )
+                            {
+                                int i_extra = GetDWBE( &p_peek[i_peek] );
+
+                                if( i_extra > 1 && i_peek + 4 + i_extra <= i_len &&
+                                    stream_Peek( p_demux->s, &p_peek, i_peek + 4 + i_extra ) >= i_peek + 4 + i_extra )
+                                {
+                                    fmt.i_extra = i_extra - 1;
+                                    fmt.p_extra = malloc ( i_extra - 1 );
+                                    memcpy( fmt.p_extra, &p_peek[i_peek+4+1], i_extra - 1 );
+
+                                    msg_Dbg( p_demux, "        - extra data=%d", i_extra );
+                                    {
+                                        int i;
+                                        for( i = 0; i < fmt.i_extra; i++ )
+                                        {
+                                            msg_Dbg( p_demux, "          data[%d] = 0x%x", i,((uint8_t*)fmt.p_extra)[i] );
+                                        }
+                                    }
+                                }
+                            }
+                            fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
                         }
 
                         if( fmt.i_codec != 0 )
