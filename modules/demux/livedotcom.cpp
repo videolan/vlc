@@ -1,7 +1,7 @@
 /*****************************************************************************
  * live.cpp : live.com support.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003-2004 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -29,7 +29,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include <iostream>
 
 #if defined( WIN32 )
@@ -58,7 +57,7 @@ static void AccessClose( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
-    set_capability( "demux", 50 );
+    set_capability( "demux2", 50 );
     set_callbacks( DemuxOpen, DemuxClose );
     add_shortcut( "live" );
 
@@ -76,7 +75,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /* TODO:
- *  - Support PS/TS (need to rework the TS/PS demuxer a lot).
+ *  - Improve support of PS/TS
  *  - Support X-QT/X-QUICKTIME generic codec for audio.
  *
  *  - Check memory leak, delete/free -> still one when using rtsp-tcp but I'm
@@ -85,7 +84,7 @@ vlc_module_end();
  */
 
 /*****************************************************************************
- * Local prototypes
+ * Local prototypes for access
  *****************************************************************************/
 struct access_sys_t
 {
@@ -95,56 +94,8 @@ struct access_sys_t
     int     i_pos;
 };
 
-typedef struct
-{
-    input_thread_t *p_input;
-
-    vlc_bool_t   b_quicktime;
-    vlc_bool_t   b_muxed;
-
-    es_format_t  fmt;
-    es_out_id_t  *p_es;
-
-    stream_t     *p_out_muxed;    /* for muxed stream */
-
-    RTPSource    *rtpSource;
-    FramedSource *readSource;
-    vlc_bool_t   b_rtcp_sync;
-
-    uint8_t      buffer[65536];
-
-    char         waiting;
-
-    mtime_t      i_pts;
-} live_track_t;
-
-struct demux_sys_t
-{
-    char         *p_sdp;    /* XXX mallocated */
-
-    MediaSession     *ms;
-    TaskScheduler    *scheduler;
-    UsageEnvironment *env ;
-    RTSPClient       *rtsp;
-
-    int              i_track;
-    live_track_t     **track;   /* XXX mallocated */
-    mtime_t          i_pcr;
-    mtime_t          i_pcr_start;
-
-    mtime_t          i_length;
-    mtime_t          i_start;
-
-    char             event;
-};
-
 static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
 static ssize_t MRLRead( input_thread_t *, byte_t *, size_t );
-
-static int     Demux  ( input_thread_t * );
-static int     Control( input_thread_t *, int, va_list );
-
-
 
 /*****************************************************************************
  * AccessOpen:
@@ -233,7 +184,7 @@ static int  AccessOpen( vlc_object_t *p_this )
         p_input->stream.b_pace_control = val.b_bool;
         p_input->stream.p_selected_area->i_tell = 0;
         p_input->stream.b_seekable = 1; /* Hack to display time */
-        p_input->stream.p_selected_area->i_size = 0;
+        p_input->stream.p_selected_area->i_size = p_sys->i_sdp;
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -259,7 +210,7 @@ static int  AccessOpen( vlc_object_t *p_this )
         p_input->stream.b_pace_control = VLC_TRUE;
         p_input->stream.p_selected_area->i_tell = 0;
         p_input->stream.b_seekable = VLC_FALSE;
-        p_input->stream.p_selected_area->i_size = 0;
+        p_input->stream.p_selected_area->i_size = strlen(p_input->psz_name);
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -315,12 +266,61 @@ static ssize_t MRLRead ( input_thread_t *p_input, byte_t *p_buffer, size_t i_len
 
 
 /*****************************************************************************
+ * Local prototypes for demux2
+ *****************************************************************************/
+typedef struct
+{
+    demux_t     *p_demux;
+
+    vlc_bool_t   b_quicktime;
+    vlc_bool_t   b_muxed;
+
+    es_format_t  fmt;
+    es_out_id_t  *p_es;
+
+    stream_t     *p_out_muxed;    /* for muxed stream */
+
+    RTPSource    *rtpSource;
+    FramedSource *readSource;
+    vlc_bool_t   b_rtcp_sync;
+
+    uint8_t      buffer[65536];
+
+    char         waiting;
+
+    mtime_t      i_pts;
+} live_track_t;
+
+struct demux_sys_t
+{
+    char         *p_sdp;    /* XXX mallocated */
+
+    MediaSession     *ms;
+    TaskScheduler    *scheduler;
+    UsageEnvironment *env ;
+    RTSPClient       *rtsp;
+
+    int              i_track;
+    live_track_t     **track;   /* XXX mallocated */
+    mtime_t          i_pcr;
+    mtime_t          i_pcr_start;
+
+    mtime_t          i_length;
+    mtime_t          i_start;
+
+    char             event;
+};
+
+static int Demux  ( demux_t * );
+static int Control( demux_t *, int, va_list );
+
+/*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
 static int  DemuxOpen ( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
     MediaSubsessionIterator *iter;
     MediaSubsession *sub;
@@ -335,22 +335,21 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
     /* See if it looks like a SDP
        v, o, s fields are mandatory and in this order */
-    if( stream_Peek( p_input->s, &p_peek, 7 ) < 7 )
+    if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
     {
-        msg_Err( p_input, "cannot peek" );
+        msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
     if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
-        ( p_input->psz_access == NULL || strcasecmp( p_input->psz_access, "rtsp" ) ||
-          p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
+        ( strcasecmp( p_demux->psz_access, "rtsp" ) || p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
     {
-        msg_Warn( p_input, "SDP module discarded" );
+        msg_Warn( p_demux, "SDP module discarded" );
         return VLC_EGENERIC;
     }
 
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = Control;
-    p_input->p_demux_data = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
+    p_demux->pf_demux  = Demux;
+    p_demux->pf_control= Control;
+    p_demux->p_sys     = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     p_sys->p_sdp = NULL;
     p_sys->scheduler = NULL;
     p_sys->env = NULL;
@@ -364,25 +363,16 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     p_sys->i_start = 0;
 
     /* Gather the complete sdp file */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        goto error;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
     i_sdp = 0;
     i_sdp_max = 1000;
     p_sdp = (uint8_t*)malloc( i_sdp_max );
     for( ;; )
     {
-        int i_read = stream_Read( p_input->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
+        int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
 
         if( i_read < 0 )
         {
-            msg_Err( p_input, "failed to read SDP" );
+            msg_Err( p_demux, "failed to read SDP" );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -404,26 +394,26 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
-        msg_Err( p_input, "BasicTaskScheduler::createNew failed" );
+        msg_Err( p_demux, "BasicTaskScheduler::createNew failed" );
         goto error;
     }
     if( ( p_sys->env = BasicUsageEnvironment::createNew(*p_sys->scheduler) ) == NULL )
     {
-        msg_Err( p_input, "BasicUsageEnvironment::createNew failed" );
+        msg_Err( p_demux, "BasicUsageEnvironment::createNew failed" );
         goto error;
     }
-    if( p_input->psz_access != NULL && !strcasecmp( p_input->psz_access, "rtsp" ) )
+    if( !strcasecmp( p_demux->psz_access, "rtsp" ) )
     {
         char *psz_url;
         char *psz_options;
 
         if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/, "VLC Media Player" ) ) == NULL )
         {
-            msg_Err( p_input, "RTSPClient::createNew failed (%s)", p_sys->env->getResultMsg() );
+            msg_Err( p_demux, "RTSPClient::createNew failed (%s)", p_sys->env->getResultMsg() );
             goto error;
         }
-        psz_url = (char*)malloc( strlen( p_input->psz_name ) + 8 );
-        sprintf( psz_url, "rtsp://%s", p_input->psz_name );
+        psz_url = (char*)malloc( strlen( p_demux->psz_path ) + 8 );
+        sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         /* FIXME psz_options -> delete or free */
@@ -431,12 +421,12 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     }
     if( ( p_sys->ms = MediaSession::createNew(*p_sys->env, p_sys->p_sdp ) ) == NULL )
     {
-        msg_Err( p_input, "MediaSession::createNew failed" );
+        msg_Err( p_demux, "MediaSession::createNew failed" );
         goto error;
     }
 
-    var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_input, "rtsp-tcp", &val );
+    var_Create( p_demux, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "rtsp-tcp", &val );
 
     /* Initialise each media subsession */
     iter = new MediaSubsessionIterator( *p_sys->ms );
@@ -460,13 +450,13 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
         if( !sub->initiate() )
         {
-            msg_Warn( p_input, "RTP subsession '%s/%s' failed(%s)", sub->mediumName(), sub->codecName(), p_sys->env->getResultMsg() );
+            msg_Warn( p_demux, "RTP subsession '%s/%s' failed(%s)", sub->mediumName(), sub->codecName(), p_sys->env->getResultMsg() );
         }
         else
         {
             int fd = sub->rtpSource()->RTPgs()->socketNum();
 
-            msg_Dbg( p_input, "RTP subsession '%s/%s'", sub->mediumName(), sub->codecName() );
+            msg_Dbg( p_demux, "RTP subsession '%s/%s'", sub->mediumName(), sub->codecName() );
 
             /* Increase the buffer size */
             increaseReceiveBufferTo( *p_sys->env, fd, i_buffer );
@@ -483,7 +473,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         /* The PLAY */
         if( !p_sys->rtsp->playMediaSession( *p_sys->ms ) )
         {
-            msg_Err( p_input, "PLAY failed %s", p_sys->env->getResultMsg() );
+            msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
             goto error;
         }
     }
@@ -500,7 +490,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         }
 
         tk = (live_track_t*)malloc( sizeof( live_track_t ) );
-        tk->p_input = p_input;
+        tk->p_demux = p_demux;
         tk->waiting = 0;
         tk->i_pts   = 0;
         tk->b_quicktime = VLC_FALSE;
@@ -619,18 +609,18 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             else if( !strcmp( sub->codecName(), "MP2T" ) )
             {
                 tk->b_muxed = VLC_TRUE;
-                tk->p_out_muxed = stream_DemuxNew( p_input, "ts2", p_input->p_es_out );
+                tk->p_out_muxed = stream_DemuxNew( p_demux, "ts2", p_demux->out );
             }
             else if( !strcmp( sub->codecName(), "MP2P" ) || !strcmp( sub->codecName(), "MP1S" ) )   /* FIXME check MP1S */
             {
                 tk->b_muxed = VLC_TRUE;
-                tk->p_out_muxed = stream_DemuxNew( p_input, "ps2", p_input->p_es_out );
+                tk->p_out_muxed = stream_DemuxNew( p_demux, "ps2", p_demux->out );
             }
         }
 
         if( tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
         {
-            tk->p_es = es_out_Add( p_input->p_es_out, &tk->fmt );
+            tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
         }
 
         if( tk->p_es || tk->b_quicktime || tk->b_muxed )
@@ -657,12 +647,13 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     }
     else if( p_sys->i_length > 0 )
     {
-        p_input->stream.p_selected_area->i_size = 1000; /* needed for now */
+        /* FIXME */
+        /* p_input->stream.p_selected_area->i_size = 1000;*/ /* needed for now */
     }
 
     if( p_sys->i_track <= 0 )
     {
-        msg_Err( p_input, "no codec supported, aborting" );
+        msg_Err( p_demux, "no codec supported, aborting" );
         goto error;
     }
 
@@ -700,8 +691,8 @@ error:
  *****************************************************************************/
 static void DemuxClose( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t *p_demux = (demux_t*)p_this;
+    demux_sys_t    *p_sys = p_demux->p_sys;
     int            i;
 
     for( i = 0; i < p_sys->i_track; i++ )
@@ -754,9 +745,9 @@ static void TaskInterrupt( void *p_private );
 /*****************************************************************************
  * Demux:
  *****************************************************************************/
-static int  Demux   ( input_thread_t *p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_sys_t    *p_sys = p_demux->p_sys;
     TaskToken      task;
 
     mtime_t         i_pcr = 0;
@@ -777,10 +768,9 @@ static int  Demux   ( input_thread_t *p_input )
     }
     if( i_pcr != p_sys->i_pcr && i_pcr > 0 )
     {
-        input_ClockManageRef( p_input,
-                              p_input->stream.p_selected_program,
-                              i_pcr * 9 / 100 );
         p_sys->i_pcr = i_pcr;
+
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr );
         if( p_sys->i_pcr_start <= 0 || p_sys->i_pcr_start > i_pcr )
         {
             p_sys->i_pcr_start = i_pcr;
@@ -802,7 +792,7 @@ static int  Demux   ( input_thread_t *p_input )
         }
     }
     /* Create a task that will be called if we wait more than 300ms */
-    task = p_sys->scheduler->scheduleDelayedTask( 300000, TaskInterrupt, p_input );
+    task = p_sys->scheduler->scheduleDelayedTask( 300000, TaskInterrupt, p_demux );
 
     /* Do the read */
     p_sys->scheduler->doEventLoop( &p_sys->event );
@@ -817,8 +807,9 @@ static int  Demux   ( input_thread_t *p_input )
 
         if( !tk->b_muxed && !tk->b_rtcp_sync && tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
         {
-            msg_Dbg( p_input, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
-            p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
+            msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
+
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             tk->b_rtcp_sync = VLC_TRUE;
 
             /* reset PCR and PCR start, mmh won't work well for multi-stream I fear */
@@ -829,12 +820,15 @@ static int  Demux   ( input_thread_t *p_input )
         }
     }
 
-    return p_input->b_error ? 0 : 1;
+    return p_demux->b_error ? 0 : 1;
 }
 
-static int    Control( input_thread_t *p_input, int i_query, va_list args )
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64;
     double  *pf, f;
 
@@ -894,7 +888,7 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
         }
 
         default:
-            return demux_vaControlDefault( p_input, i_query, args );
+            return VLC_EGENERIC;
     }
 }
 
@@ -904,8 +898,8 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
 static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts )
 {
     live_track_t   *tk = (live_track_t*)p_private;
-    input_thread_t *p_input = tk->p_input;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t        *p_demux = tk->p_demux;
+    demux_sys_t    *p_sys = p_demux->p_sys;
     block_t        *p_block;
 
     mtime_t i_pts = (uint64_t)pts.tv_sec * UI64C(1000000) + (uint64_t)pts.tv_usec;
@@ -934,7 +928,7 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
         tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
         memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
 
-        tk->p_es = es_out_Add( p_input->p_es_out, &tk->fmt );
+        tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
     }
 
 #if 0
@@ -944,20 +938,18 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 #endif
     if( i_size > 65536 )
     {
-        msg_Warn( p_input, "buffer overflow" );
+        msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    p_block = block_New( p_input, i_size );
+    p_block = block_New( p_demux, i_size );
 
     memcpy( p_block->p_buffer, tk->buffer, i_size );
     //p_block->i_rate = p_input->stream.control.i_rate;
 
     if( i_pts != tk->i_pts && !tk->b_muxed )
     {
-        p_block->i_dts =
-        p_block->i_pts = input_ClockGetTS( p_input,
-                                         p_input->stream.p_selected_program,
-                                         i_pts * 9 / 100 );
+        p_block->i_dts = i_pts;
+        p_block->i_pts = i_pts;
     }
     //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
 
@@ -967,7 +959,7 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     }
     else
     {
-        es_out_Send( p_input->p_es_out, tk->p_es, p_block );
+        es_out_Send( p_demux->out, tk->p_es, p_block );
     }
 
     /* warm that's ok */
@@ -988,13 +980,13 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 static void StreamClose( void *p_private )
 {
     live_track_t   *tk = (live_track_t*)p_private;
-    input_thread_t *p_input = tk->p_input;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t        *p_demux = tk->p_demux;
+    demux_sys_t    *p_sys = p_demux->p_sys;
 
     fprintf( stderr, "StreamClose\n" );
 
     p_sys->event = 0xff;
-    p_input->b_error = VLC_TRUE;
+    p_demux->b_error = VLC_TRUE;
 }
 
 
@@ -1003,11 +995,11 @@ static void StreamClose( void *p_private )
  *****************************************************************************/
 static void TaskInterrupt( void *p_private )
 {
-    input_thread_t *p_input = (input_thread_t*)p_private;
+    demux_t *p_demux = (demux_t*)p_private;
 
     fprintf( stderr, "TaskInterrupt\n" );
 
     /* Avoid lock */
-    p_input->p_demux_data->event = 0xff;
+    p_demux->p_sys->event = 0xff;
 }
 
