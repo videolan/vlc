@@ -78,6 +78,7 @@ typedef struct aout_fifo_s
     /* See the fifo types below */
     int                 i_type;
     boolean_t           b_die;
+    int                 i_fifo;      /* Just to keep track of the fifo index */
 
     int                 i_channels;
     boolean_t           b_stereo;
@@ -202,8 +203,11 @@ typedef struct aout_thread_s
  * Prototypes
  *****************************************************************************/
 aout_thread_t * aout_CreateThread       ( int *pi_status );
-void            aout_DestroyThread      ( aout_thread_t *p_aout, int *pi_status );
+void            aout_DestroyThread      ( aout_thread_t *p_aout,
+                                          int *pi_status );
 
-
-aout_fifo_t *   aout_CreateFifo         ( aout_thread_t *p_aout, aout_fifo_t *p_fifo );
+aout_fifo_t *   aout_CreateFifo         ( aout_thread_t *p_aout,
+                                          aout_fifo_t *p_fifo );
 void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );
+void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
+

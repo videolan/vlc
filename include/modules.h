@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 /* Number of tries before we unload an unused module */
-#define MODULE_HIDE_DELAY 20
+#define MODULE_HIDE_DELAY 100
 
 /* The module handle type. */
 #ifdef SYS_BEOS

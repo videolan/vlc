@@ -212,7 +212,12 @@ INPUT =		src/input/input_ext-dec.o \
 		src/input/input.o \
 		src/input/mpeg_system.o
 
-AUDIO_OUTPUT = 	src/audio_output/audio_output.o
+AUDIO_OUTPUT = 	src/audio_output/audio_output.o \
+		src/audio_output/aout_fifo.o \
+		src/audio_output/aout_u8.o \
+		src/audio_output/aout_s8.o \
+		src/audio_output/aout_u16.o \
+		src/audio_output/aout_s16.o
 
 VIDEO_OUTPUT = 	src/video_output/video_output.o \
 		src/video_output/video_text.o \
