@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.25 2003/02/09 01:13:43 massiot Exp $
+ * $Id: rc.c,v 1.26 2003/02/17 16:56:02 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -45,10 +45,6 @@
 #    include <sys/time.h>
 #endif
 #include <sys/types.h>
-
-#if defined( WIN32 )
-#include <winsock2.h>                                            /* select() */
-#endif
 
 #include "error.h"
 
@@ -147,6 +143,12 @@ static void Run( intf_thread_t *p_intf )
     p_input = NULL;
     p_playlist = NULL;
 
+#ifdef WIN32
+    HANDLE hConsoleIn;
+    INPUT_RECORD input_record;
+    DWORD i_dummy2;
+#endif
+
     /* Register commands that will be cleaned up upon object destruction */
     var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "quit", Quit, NULL );
@@ -196,10 +198,11 @@ static void Run( intf_thread_t *p_intf )
 
 #ifdef WIN32
     /* Get the file descriptor of the console input */
-    i_dummy = _open( "CONIN$", 0 );
-    if( i_dummy == -1 )
+    hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
+    if( hConsoleIn == INVALID_HANDLE_VALUE )
     {
-        msg_Err( p_intf, "Couldn't open CONIN$" ); 
+        msg_Err( p_intf, "Couldn't open STD_INPUT_HANDLE" ); 
+        p_intf->b_die = VLC_TRUE;
     }
 #endif
 
@@ -208,33 +211,52 @@ static void Run( intf_thread_t *p_intf )
         vlc_bool_t     b_complete = VLC_FALSE;
 
 #ifndef WIN32
-        /* On Win32, select() only works on socket descriptors */
-
         fd_set         fds;
         struct timeval tv;
 
         /* Check stdin */
         tv.tv_sec = 0;
-        tv.tv_usec = 50000;
+        tv.tv_usec = (long)INTF_IDLE_SLEEP;
         FD_ZERO( &fds );
         FD_SET( STDIN_FILENO, &fds );
 
         i_dummy = select( STDIN_FILENO + 1, &fds, NULL, NULL, &tv );
-        if( i_dummy > 0 )
+#else
+        /* On Win32, select() only works on socket descriptors */
+        i_dummy = ( WaitForSingleObject( hConsoleIn, INTF_IDLE_SLEEP/1000 )
+                    == WAIT_OBJECT_0 );
 #endif
+        if( i_dummy > 0 )
         {
             int i_size = 0;
 
             while( !p_intf->b_die
                     && i_size < MAX_LINE_LENGTH
-#ifdef WIN32
-                    && read( i_dummy, p_buffer + i_size, 1 ) > 0
-#else
+#ifndef WIN32
                     && read( STDIN_FILENO, p_buffer + i_size, 1 ) > 0
+#else
+                    && ReadConsoleInput( hConsoleIn, &input_record, 1,
+                                         &i_dummy2 )
 #endif
-                    && p_buffer[ i_size ] != '\r'
-                    && p_buffer[ i_size ] != '\n' )
+                   )
             {
+#ifdef WIN32
+                if( input_record.EventType != KEY_EVENT ||
+                    !input_record.Event.KeyEvent.bKeyDown )
+                {
+                    /* nothing interesting */
+                    continue;
+                }
+
+                p_buffer[ i_size ] =
+                    input_record.Event.KeyEvent.uChar.AsciiChar;
+#endif
+
+                if( p_buffer[ i_size ] == '\r' || p_buffer[ i_size ] == '\n' )
+                {
+                    break;
+                }
+
                 i_size++;
             }
 
