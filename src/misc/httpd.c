@@ -1293,6 +1293,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     if( cl->fd > 0 )
     {
         SOCKET_CLOSE( cl->fd );
+        cl->fd = -1;
     }
 
     httpd_MsgClean( &cl->answer );
@@ -1301,6 +1302,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     if( cl->p_buffer )
     {
         free( cl->p_buffer );
+        cl->p_buffer = NULL;
     }
 }
 
@@ -1708,7 +1710,12 @@ static void httpd_ClientSend( httpd_client_t *cl )
                 !cl->b_read_waiting )
             {
                 /* catch more body data */
-                int i_msg = cl->query.i_type;
+                int     i_msg = cl->query.i_type;
+                int64_t i_offset = cl->answer.i_body_offset;
+
+                httpd_MsgClean( &cl->answer );
+                cl->answer.i_body_offset = i_offset;
+
                 cl->url->catch[i_msg].cb( cl->url->catch[i_msg].p_sys, cl,
                                           &cl->answer, &cl->query );
             }
@@ -2054,6 +2061,11 @@ static void httpd_HostThread( httpd_host_t *host )
                     httpd_MsgClean( &cl->answer );
 
                     cl->answer.i_body_offset = i_offset;
+                    free( cl->p_buffer );
+                    cl->p_buffer = NULL;
+                    cl->i_buffer = 0;
+                    cl->i_buffer_size = 0;
+
                     cl->i_state = HTTPD_CLIENT_WAITING;
                 }
             }
