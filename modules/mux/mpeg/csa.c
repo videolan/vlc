@@ -2,7 +2,7 @@
  * libcsa.c: CSA scrambler/descrambler
  *****************************************************************************
  * Copyright (C) 2004 Laurent Aimar
- * $Id: csa.c,v 1.1 2004/01/25 02:26:04 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -210,6 +210,12 @@ void csa_Encrypt( csa_t *c, uint8_t *pkt, int b_odd )
     n = (188 - i_hdr) / 8;
     i_residue = (188 - i_hdr) % 8;
 
+    if( n == 0 )
+    {
+        pkt[3] &= 0x3f;
+        return;
+    }
+
     /* */
     for( i = 0; i < 8; i++ )
     {
@@ -227,22 +233,18 @@ void csa_Encrypt( csa_t *c, uint8_t *pkt, int b_odd )
     /* init csa state */
     csa_StreamCypher( c, 1, ck, ib[1], stream );
 
-    if( n > 0 )
+    for( i = 0; i < 8; i++ )
     {
-        for( i = 0; i < 8; i++ )
+        pkt[i_hdr+i] = ib[1][i];
+    }
+    for( i = 2; i < n+1; i++ )
+    {
+        csa_StreamCypher( c, 0, ck, NULL, stream );
+        for( j = 0; j < 8; j++ )
         {
-            pkt[i_hdr+i] = ib[1][i];
-        }
-        for( i = 2; i < n+1; i++ )
-        {
-            csa_StreamCypher( c, 0, ck, NULL, stream );
-            for( j = 0; j < 8; j++ )
-            {
-                pkt[i_hdr+8*(i-1)+j] = ib[i][j] ^ stream[j];
-            }
+            pkt[i_hdr+8*(i-1)+j] = ib[i][j] ^ stream[j];
         }
     }
-    /* FIXME I have no idea if it's correct */
     if( i_residue > 0 )
     {
         csa_StreamCypher( c, 0, ck, NULL, stream );
