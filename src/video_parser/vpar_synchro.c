@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.85 2001/02/12 18:18:18 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.86 2001/02/23 13:22:58 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -370,7 +370,8 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
     else
     {
         /* FIFO full, panic() */
-        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased");
+        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased (%d:%d)",
+                    p_vpar->synchro.i_start, p_vpar->synchro.i_end);
     }
 #ifdef VDEC_SMP
     vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
@@ -389,10 +390,11 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
     vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 #endif
 
+    i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
+
     if( !i_garbage )
     {
         tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
-        i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
 
         /* If duration too high, something happened (pause ?), so don't
          * take it into account. */
@@ -415,6 +417,12 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"), tau);
 #endif
+    }
+    else
+    {
+        intf_DbgMsg("vpar synchro debug: aborting %s",
+                    i_coding_type == B_CODING_TYPE ? "B" :
+                    (i_coding_type == P_CODING_TYPE ? "P" : "I"));
     }
 
     FIFO_INCREMENT( i_start );
