@@ -251,7 +251,6 @@ stream_t *stream_AccessNew( access_t *p_access )
         }
     }
 
-
     return s;
 
 error:
@@ -420,8 +419,7 @@ static void AStreamPrebufferBlock( stream_t *s )
         int64_t i_date = mdate();
         block_t *b;
 
-        if( s->b_die ||
-            p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE ||
+        if( s->b_die || p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE ||
             ( i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date ) )
         {
             int64_t i_byterate;
@@ -430,9 +428,10 @@ static void AStreamPrebufferBlock( stream_t *s )
             p_sys->stat.i_bytes = p_sys->block.i_size;
             p_sys->stat.i_read_time = i_date - i_start;
             i_byterate = ( I64C(1000000) * p_sys->stat.i_bytes ) /
-                         (p_sys->stat.i_read_time+1);
+                         (p_sys->stat.i_read_time + 1);
 
-            msg_Dbg( s, "prebuffering done %lld bytes in %llds - %lld kbytes/s",
+            msg_Dbg( s, "prebuffering done "I64Fd" bytes in "I64Fd"s - "
+                     I64Fd" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),
                      i_byterate / 1024 );
@@ -518,8 +517,7 @@ static int AStreamPeekBlock( stream_t *s, uint8_t **pp_peek, int i_read )
     block_t *b;
     int      i_offset;
 
-    if( p_sys->block.p_current == NULL )
-        return 0; /* EOF */
+    if( p_sys->block.p_current == NULL ) return 0; /* EOF */
 
     /* We can directly give a pointer over our buffer */
     if( i_read <= p_sys->block.p_current->i_buffer - p_sys->block.i_offset )
@@ -627,7 +625,8 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
         if( !b_aseek )
         {
             b_seek = VLC_FALSE;
-            msg_Warn( s, "%lld bytes need to be skipped (access non seekable)",
+            msg_Warn( s, I64Fd" bytes need to be skipped "
+                      "(access non seekable)",
                       i_offset - p_sys->block.i_size );
         }
         else
@@ -645,7 +644,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
             else
                 b_seek = VLC_TRUE;
 
-            msg_Dbg( s, "b_seek=%d th*avg=%d skip=%lld",
+            msg_Dbg( s, "b_seek=%d th*avg=%d skip="I64Fd,
                      b_seek, i_th*i_avg, i_skip );
         }
     }
@@ -783,26 +782,32 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
-    uint8_t *p_data = (uint8_t*)p_read;
+    uint8_t *p_data = (uint8_t *)p_read;
     int      i_data = 0;
 
     if( tk->i_start >= tk->i_end  )
         return 0;   /* EOF */
 
-    /*msg_Dbg( s, "AStreamReadStream: %d pos=%lld tk=%d start=%lld offset=%d end=%lld",
-             i_read,
-             p_sys->i_pos,
-             p_sys->stream.i_tk,
-             tk->i_start, p_sys->stream.i_offset, tk->i_end );*/
+#if 0
+    msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
+             " offset=%d end="I64Fd,
+             i_read, p_sys->i_pos, p_sys->stream.i_tk,
+             tk->i_start, p_sys->stream.i_offset, tk->i_end );
+#endif
 
     while( i_data < i_read )
     {
-        int i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
-        int i_current = __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset, STREAM_CACHE_TRACK_SIZE - i_off );
+        int i_off = (tk->i_start + p_sys->stream.i_offset) %
+                    STREAM_CACHE_TRACK_SIZE;
+        int i_current =
+            __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
+                   STREAM_CACHE_TRACK_SIZE - i_off );
         int i_copy = __MIN( i_current, i_read - i_data );
 
+        if( i_copy <= 0 ) break; /* EOF */
+
         /* Copy data */
-        //msg_Dbg( s, "AStreamReadStream: copy %d", i_copy );
+        /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
         if( p_data )
         {
             memcpy( p_data, &tk->p_buffer[i_off], i_copy );
@@ -821,9 +826,8 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
         {
             if( AStreamRefillStream( s ) )
             {
-                /* Eof */
-                if( tk->i_start >= tk->i_end )
-                    break;
+                /* EOF */
+                if( tk->i_start >= tk->i_end ) break;
             }
         }
     }
@@ -837,14 +841,14 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
     int64_t i_off;
 
-    if( tk->i_start >= tk->i_end  )
-        return 0;   /* EOF */
+    if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
-    /*msg_Dbg( s, "AStreamPeekStream: %d pos=%lld tk=%d start=%lld offset=%d end=%lld",
-             i_read,
-             p_sys->i_pos,
-             p_sys->stream.i_tk,
-             tk->i_start, p_sys->stream.i_offset, tk->i_end );*/
+#if 0
+    msg_Dbg( s, "AStreamPeekStream: %d pos="I64Fd" tk=%d "
+             "start="I64Fd" offset=%d end="I64Fd,
+             i_read, p_sys->i_pos, p_sys->stream.i_tk,
+             tk->i_start, p_sys->stream.i_offset, tk->i_end );
+#endif
 
     /* Avoid problem, but that should *never* happen */
     if( i_read > STREAM_CACHE_TRACK_SIZE / 2 )
@@ -852,8 +856,7 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
 
     while( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
     {
-        if( AStreamRefillStream( s ) )
-            break;
+        if( AStreamRefillStream( s ) ) break;
     }
 
     if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
@@ -874,8 +877,10 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
         p_sys->p_peek = malloc( i_read );
     }
 
-    memcpy( p_sys->p_peek, &tk->p_buffer[i_off], STREAM_CACHE_TRACK_SIZE - i_off );
-    memcpy( &p_sys->p_peek[STREAM_CACHE_TRACK_SIZE - i_off], &tk->p_buffer[0], i_read - (STREAM_CACHE_TRACK_SIZE - i_off) );
+    memcpy( p_sys->p_peek, &tk->p_buffer[i_off],
+            STREAM_CACHE_TRACK_SIZE - i_off );
+    memcpy( &p_sys->p_peek[STREAM_CACHE_TRACK_SIZE - i_off],
+            &tk->p_buffer[0], i_read - (STREAM_CACHE_TRACK_SIZE - i_off) );
 
     *pp_peek = p_sys->p_peek;
     return i_read;
@@ -891,12 +896,14 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     int i_new;
     int i;
 
-    /*
-    msg_Dbg( s, "AStreamSeekStream: to %lld pos=%lld tk=%d start=%lld offset=%d end=%lld",
-             i_pos,
-             p_sys->i_pos,
-             p_sys->stream.i_tk,
-             p_sys->stream.tk[p_sys->stream.i_tk].i_start, p_sys->stream.i_offset, p_sys->stream.tk[p_sys->stream.i_tk].i_end );*/
+#if 0
+    msg_Dbg( s, "AStreamSeekStream: to "I64Fd" pos="I64Fd
+             "tk=%d start="I64Fd" offset=%d end="I64Fd,
+             i_pos, p_sys->i_pos, p_sys->stream.i_tk,
+             p_sys->stream.tk[p_sys->stream.i_tk].i_start,
+             p_sys->stream.i_offset,
+             p_sys->stream.tk[p_sys->stream.i_tk].i_end );
+#endif
 
 
     /* Seek in our current track ? */
@@ -926,9 +933,10 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
 
         if( i_pos >= tk->i_start && i_pos <= tk->i_end )
         {
-            /*msg_Dbg( s, "AStreamSeekStream: reusing %d start=%lld end=%lld",
-                     i,
-                     tk->i_start, tk->i_end );*/
+#if 0
+            msg_Dbg( s, "AStreamSeekStream: reusing %d start="I64Fd
+                     " end="I64Fd, i, tk->i_start, tk->i_end );
+#endif
             /* Seek at the end of the buffer */
             if( p_access->pf_seek( p_access, tk->i_end ) )
                 return VLC_EGENERIC;
@@ -1005,11 +1013,15 @@ static int AStreamRefillStream( stream_t *s )
     stream_sys_t *p_sys = s->p_sys;
     access_t     *p_access = p_sys->p_access;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
-    /* We read but won't increase i_start after initial start+offset */
-    int i_toread = __MIN( p_sys->stream.i_used, STREAM_CACHE_TRACK_SIZE - (tk->i_end - tk->i_start - p_sys->stream.i_offset ) );
+
+    /* We read but won't increase i_start after initial start + offset */
+    int i_toread = __MIN( p_sys->stream.i_used, STREAM_CACHE_TRACK_SIZE -
+                          (tk->i_end - tk->i_start - p_sys->stream.i_offset) );
     int64_t i_start, i_stop;
 
-    //msg_Dbg( s, "AStreamRefillStream: toread=%d", i_toread );
+    if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
+
+    /* msg_Dbg( s, "AStreamRefillStream: toread=%d", i_toread ); */
 
     i_start = mdate();
     while( i_toread > 0 )
@@ -1022,7 +1034,8 @@ static int AStreamRefillStream( stream_t *s )
 
         i_read = __MIN( i_toread, STREAM_CACHE_TRACK_SIZE - i_off );
         i_read = p_access->pf_read( p_access, &tk->p_buffer[i_off], i_read );
-        //msg_Dbg( s, "AStreamRefillStream: read=%d", i_read );
+
+        /* msg_Dbg( s, "AStreamRefillStream: read=%d", i_read ); */
         if( i_read <  0 )
         {
             msleep( STREAM_DATA_WAIT );
@@ -1088,7 +1101,8 @@ static void AStreamPrebufferStream( stream_t *s )
             i_byterate = ( I64C(1000000) * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
 
-            msg_Dbg( s, "prebuffering done %lld bytes in %llds - %lld kbytes/s",
+            msg_Dbg( s, "prebuffering done "I64Fd" bytes in "I64Fd"s - "
+                     I64Fd" kbytes/s",
                      p_sys->stat.i_bytes,
                      p_sys->stat.i_read_time / I64C(1000000),
                      i_byterate / 1024 );
@@ -1096,8 +1110,10 @@ static void AStreamPrebufferStream( stream_t *s )
         }
 
         /* */
-        i_read = __MIN( p_sys->stream.i_read_size, STREAM_CACHE_TRACK_SIZE - tk->i_end );
-        i_read = p_access->pf_read( p_access, &tk->p_buffer[tk->i_end], i_read );
+        i_read = __MIN( p_sys->stream.i_read_size,
+                        STREAM_CACHE_TRACK_SIZE - tk->i_end );
+        i_read = p_access->pf_read( p_access, &tk->p_buffer[tk->i_end],
+                                    i_read );
         if( i_read <  0 )
         {
             msleep( STREAM_DATA_WAIT );

@@ -597,7 +597,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t   *p_m3u = p_demux->p_sys;
 
     char          psz_line[MAX_LINE];
-    char          *p_buf = 0, eol_tok;
+    char          p_buf[MAX_LINE], eol_tok;
     int           i_size, i_bufpos, i_linepos = 0;
     playlist_t    *p_playlist;
     vlc_bool_t    b_discard = VLC_FALSE;
@@ -669,8 +669,6 @@ static int Demux( demux_t *p_demux )
             ProcessLine( p_demux, p_playlist, psz_line, &psz_uri, &psz_name,
                          &i_options, &ppsz_options, &i_position );
         }
-
-        free( p_buf );
     }
 
     if ( i_linepos && b_discard != VLC_TRUE && eol_tok == '\n' )
