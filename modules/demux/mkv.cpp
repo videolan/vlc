@@ -319,7 +319,7 @@ public:
     ,i_user_start_time(-1)
     ,i_user_end_time(-1)
     ,i_seekpoint_num(-1)
-    ,b_display_seekpoint(false)
+    ,b_display_seekpoint(true)
     ,psz_parent(NULL)
     {}
     
