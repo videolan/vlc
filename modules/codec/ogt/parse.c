@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: parse.c,v 1.2 2003/12/27 01:49:59 rocky Exp $
+ * $Id: parse.c,v 1.3 2003/12/28 02:01:11 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -32,6 +32,8 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#include "subtitle.h"
+#include "render.h"
 #include "ogt.h"
 
 /* An image color is a two-bit palette entry: 0..3 */ 
@@ -105,12 +107,13 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   p_sys->i_height = GETINT16(p);
   
   for (i=0; i<4; i++) {
-    p_sys->pi_palette[i].y = *p++;
-    p_sys->pi_palette[i].u = *p++;
-    p_sys->pi_palette[i].v = *p++;
-    /* We have just 4-bit resolution for alpha, but the value for SVCD
-     * has 8 bits so we scale down the values to the acceptable range */
-	p_sys->pi_palette[i].t = (*p++) >> 4;
+    p_sys->pi_palette[i].s.y = *p++;
+    p_sys->pi_palette[i].s.u = *p++;
+    p_sys->pi_palette[i].s.v = *p++;
+    /* Note alpha is 8 bits. DVD's use only 4 bits. Our rendering routine
+       will use an 8-bit transparancy.
+    */
+    p_sys->pi_palette[i].s.t = *p++;
   }
   p_sys->i_cmd = *p++;
       /* We do not really know this, FIXME */
@@ -135,8 +138,8 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
     
     for (i=0; i<4; i++) {
       msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
-	       p_sys->pi_palette[i].t, p_sys->pi_palette[i].y, 
-	       p_sys->pi_palette[i].u, p_sys->pi_palette[i].v );
+	       p_sys->pi_palette[i].s.t, p_sys->pi_palette[i].s.y, 
+	       p_sys->pi_palette[i].s.u, p_sys->pi_palette[i].s.v );
     }
   }
 }
@@ -174,15 +177,15 @@ E_(ParsePacket)( decoder_t *p_dec)
     /* Fill the p_spu structure */
     vlc_mutex_init( p_dec, &p_spu->p_sys->lock );
 
-    p_spu->pf_render = E_(RenderSPU);
+    p_spu->pf_render  = VCDRenderSPU;
     p_spu->pf_destroy = DestroySPU;
     p_spu->p_sys->p_data = (uint8_t*)p_spu->p_sys + sizeof( subpicture_sys_t );
-    p_spu->p_sys->b_palette = VLC_FALSE;
 
     p_spu->p_sys->i_x_end        = p_sys->i_x_start + p_sys->i_width - 1;
     p_spu->p_sys->i_y_end        = p_sys->i_y_start + p_sys->i_height - 1;
 
-    p_spu->i_x        = p_sys->i_x_start / 2;
+    /* FIXME: use aspect ratio for x? */
+    p_spu->i_x        = p_sys->i_x_start * 3 / 4; 
     p_spu->i_y        = p_sys->i_y_start;
     p_spu->i_width    = p_sys->i_width;
     p_spu->i_height   = p_sys->i_height;
@@ -190,7 +193,8 @@ E_(ParsePacket)( decoder_t *p_dec)
     p_spu->i_start    = p_sys->i_pts;
     p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 10);
     
-    p_spu->p_sys->b_crop = VLC_FALSE;
+    p_spu->p_sys->b_crop  = VLC_FALSE;
+    p_spu->p_sys->i_debug = p_sys->i_debug;
 
     /* Get display time now. If we do it later, we may miss the PTS. */
     p_spu->p_sys->i_pts = p_sys->i_pts;
@@ -266,7 +270,7 @@ ScaleX( decoder_t *p_dec, subpicture_t *p_spu,
   for ( i_row=0; i_row <= p_spu->i_height - 1; i_row++ ) {
 
     if (used != 0) {
-      /* Discard the remaining piece of the colum of the previous line*/
+      /* Discard the remaining piece of the column of the previous line*/
       used=0;
       p_src1 = p_src2;
       p_src2 += PIXEL_SIZE;
@@ -299,7 +303,7 @@ ScaleX( decoder_t *p_dec, subpicture_t *p_spu,
     ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;
     for ( i_row=0; i_row < p_spu->i_height - 1; i_row++ ) {
       for ( i_col=0; i_col < p_spu->i_width - 1; i_col++ ) {
-	printf("%1x", p_source->t);
+	printf("%1x", p_source->s.t);
 	p_source++;
       }
       printf("\n");

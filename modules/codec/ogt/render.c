@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.2 2003/12/27 01:49:59 rocky Exp $
+ * $Id: render.c,v 1.3 2003/12/28 02:01:11 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -32,7 +32,15 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#include "ogt.h"
+#include "subtitle.h"
+#include "render.h"
+
+/* We use 8 bits for an alpha value: 0..255. Note: For DVDs; 0.15. */
+#define ALPHA_BITS (8)
+#define MAX_ALPHA  ((1<<ALPHA_BITS) - 1) 
+
+/* Horrible hack to get dbg_print to do the right thing */
+#define p_dec p_vout
 
 /*****************************************************************************
  * Local prototypes
@@ -51,13 +59,13 @@ static void RenderI420( vout_thread_t *, picture_t *, const subpicture_t *,
   routine can be as fast as possible.
 
  *****************************************************************************/
-void E_(RenderSPU)( vout_thread_t *p_vout, picture_t *p_pic,
-                    const subpicture_t *p_spu )
+void VCDRenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
+		   const subpicture_t *p_spu )
 {
-
-    /*
-      printf("+++%x\n", p_vout->output.i_chroma);
-    */
+    struct subpicture_sys_t *p_sys = p_spu->p_sys;
+  
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
+	       "chroma %x", p_vout->output.i_chroma );
   
     switch( p_vout->output.i_chroma )
     {
@@ -99,82 +107,98 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
   uint8_t *p_dest;
   uint8_t *p_destptr;
   ogt_yuvt_t *p_source;
-  
+
+  unsigned int i_plane;
   int i_x, i_y;
   uint16_t i_colprecomp, i_destalpha;
   
   /* Crop-specific */
   int i_x_start, i_y_start, i_x_end, i_y_end;
   /* int i=0; */
-  
-  p_dest = p_pic->Y_PIXELS + p_spu->i_x + p_spu->i_width
-    + p_pic->Y_PITCH * ( p_spu->i_y + p_spu->i_height );
-  
-  i_x_start = p_spu->i_width - p_spu->p_sys->i_x_end;
-  i_y_start = p_pic->Y_PITCH * (p_spu->i_height - p_spu->p_sys->i_y_end );
-  i_x_end   = p_spu->i_width - p_spu->p_sys->i_x_start;
-  i_y_end   = p_pic->Y_PITCH * (p_spu->i_height - p_spu->p_sys->i_y_start );
-  
-  p_source = (ogt_yuvt_t *)p_spu->p_sys->p_data;
 
-  /* printf("+++spu width: %d, height %d\n", p_spu->i_width, 
-     p_spu->i_height); */
+  struct subpicture_sys_t *p_sys = p_spu->p_sys;
   
-  /* Draw until we reach the bottom of the subtitle */
-  for( i_y = p_spu->i_height * p_pic->Y_PITCH ;
-       i_y ;
-       i_y -= p_pic->Y_PITCH )
+  dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
+	     "spu width: %d, height %d, pitch (%d, %d, %d)", 
+	     p_spu->i_width,  p_spu->i_height, 
+	     p_pic->Y_PITCH, p_pic->U_PITCH, p_pic->V_PITCH );
+
+  
+  /*for ( i_plane = 0; i_plane < p_pic->i_planes ; i_plane++ )*/
+  for ( i_plane = 0; i_plane < 1 ; i_plane++ )
     {
-      /* printf("+++begin line: %d,\n", i++); */
-      /* Draw until we reach the end of the line */
-      for( i_x = p_spu->i_width ; i_x ; i_x--, p_source++ )
-        {
-	  
-	  if( b_crop
-	      && ( i_x < i_x_start || i_x > i_x_end
-		   || i_y < i_y_start || i_y > i_y_end ) )
-            {
-	      continue;
-            }
-
-	  /* printf( "t: %x, y: %x, u: %x, v: %x\n", 
-	     p_source->t, p_source->y, p_source->u, p_source->v ); */
-	  
-	  switch( p_source->t )
-            {
-	    case 0x00: 
-	      /* Completely transparent. Don't change underlying pixel */
-	      break;
+      
+      p_dest = p_pic->p[i_plane].p_pixels + p_spu->i_x + p_spu->i_width
+	+ p_pic->p[i_plane].i_pitch * ( p_spu->i_y + p_spu->i_height );
+      
+      i_x_start = p_spu->i_width - p_sys->i_x_end;
+      i_y_start = p_pic->p[i_plane].i_pitch 
+	* (p_spu->i_height - p_sys->i_y_end );
+      
+      i_x_end   = p_spu->i_width - p_sys->i_x_start;
+      i_y_end   = p_pic->p[i_plane].i_pitch 
+	* (p_spu->i_height - p_sys->i_y_start );
+      
+      p_source = (ogt_yuvt_t *)p_sys->p_data;
+      
+      /* Draw until we reach the bottom of the subtitle */
+      for( i_y = p_spu->i_height * p_pic->p[i_plane].i_pitch ;
+	   i_y ;
+	   i_y -= p_pic->p[i_plane].i_pitch )
+	{
+	  /* printf("+++begin line: %d,\n", i++); */
+	  /* Draw until we reach the end of the line */
+	  for( i_x = p_spu->i_width ; i_x ; i_x--, p_source++ )
+	    {
 	      
-	    case 0x0f:
-	      /* Completely opaque. Completely overwrite underlying
-		 pixel with subtitle pixel. */
-
-	      p_destptr = p_dest - i_x - i_y;
-
-	      i_colprecomp = (uint16_t) ( p_source->y * 15 );
-	      *p_destptr = i_colprecomp >> 4;
-
-	      break;
+	      if( b_crop
+		  && ( i_x < i_x_start || i_x > i_x_end
+		       || i_y < i_y_start || i_y > i_y_end ) )
+		{
+		  continue;
+		}
 	      
-	    default:
-	      /* Blend in underlying pixel subtitle pixel. */
-
-	      /* To be able to divide by 16 (>>4) we add 1 to the alpha.
-	       * This means Alpha 0 won't be completely transparent, but
-	       * that's handled in a special case above anyway. */
-
-	      p_destptr = p_dest - i_x - i_y;
-
-	      i_colprecomp = (uint16_t) ( (p_source->y 
-					   * (uint16_t)(p_source->t + 1) ) );
-	      i_destalpha = 15 - p_source->t;
-
-	      *p_destptr = ( i_colprecomp +
-			       (uint16_t)*p_destptr * i_destalpha ) >> 4;
-	      break;
-            }
-        }
-    }
+	      /* printf( "t: %x, y: %x, u: %x, v: %x\n", 
+		 p_source->s.t, p_source->y, p_source->u, p_source->v ); */
+	      
+	      switch( p_source->s.t )
+		{
+		case 0x00: 
+		  /* Completely transparent. Don't change underlying pixel */
+		  break;
+		  
+		case MAX_ALPHA:
+		  /* Completely opaque. Completely overwrite underlying
+		     pixel with subtitle pixel. */
+		  
+		  p_destptr = p_dest - i_x - i_y;
+		  
+		  i_colprecomp = 
+		    (uint16_t) ( p_source->plane[i_plane] * MAX_ALPHA );
+		  *p_destptr = i_colprecomp >> ALPHA_BITS;
+		  
+		  break;
+		  
+		default:
+		  /* Blend in underlying pixel subtitle pixel. */
+		  
+		  /* To be able to ALPHA_BITS, we add 1 to the alpha.
+		   * This means Alpha 0 won't be completely transparent, but
+		   * that's handled in a special case above anyway. */
+		  
+		  p_destptr = p_dest - i_x - i_y;
+		  
+		  i_colprecomp = (uint16_t) (p_source->plane[i_plane] 
+			       * (uint16_t) (p_source->s.t+1) );
+		  i_destalpha = MAX_ALPHA - p_source->s.t;
+		  
+		  *p_destptr = ( i_colprecomp +
+				 (uint16_t)*p_destptr * i_destalpha ) 
+		    >> ALPHA_BITS;
+		  break;
+		}
+	    }
+	}
+  }
 }
 

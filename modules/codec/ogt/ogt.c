@@ -2,7 +2,7 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.c,v 1.4 2003/12/26 02:47:59 rocky Exp $
+ * $Id: ogt.c,v 1.5 2003/12/28 02:01:11 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -32,13 +32,18 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#include "subtitle.h"
 #include "ogt.h"
 
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
-    "external call     1\n" \
-    "all calls         2\n" \
-    "misc              4\n" )
+    "external call          1\n" \
+    "all calls              2\n" \
+    "packet assembly info   4\n" \
+    "image bitmaps          8\n" \
+    "image transformations 16\n" \
+    "rendering information 32\n" \
+    "misc info             64\n" )
 
 
 /*****************************************************************************

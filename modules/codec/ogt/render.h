@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ogt.h : Overlay Graphics Text (SVCD subtitles) decoder thread interface
+ * render.h : Common SVCD and CVD rendering routine(s).
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt.h,v 1.6 2003/12/28 02:01:11 rocky Exp $
+ * $Id: render.h,v 1.1 2003/12/28 02:01:11 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -24,6 +24,5 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void E_(ParseHeader)( decoder_t *, uint8_t *, block_t *  );
-void E_(ParsePacket)( decoder_t * );
+void VCDRenderSPU  ( vout_thread_t *, picture_t *, const subpicture_t * );
 
