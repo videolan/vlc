@@ -32,11 +32,13 @@ static bool m_initialized = false;
 XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
     SkinObject( pIntf )
 {
+    m_pReader = NULL;
+    m_pStream = NULL;
+    
     m_pXML = xml_Create( pIntf );
     if( !m_pXML )
     {
         msg_Err( getIntf(), "Failed to open XML parser" );
-        m_pReader = NULL;
         return;
     }
 
@@ -47,7 +49,14 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
         m_initialized = true;
     }
 
-    m_pReader = xml_ReaderCreate( m_pXML, rFileName.c_str() );
+    m_pStream = stream_UrlNew( pIntf, rFileName.c_str() );
+    if( !m_pStream )
+    {
+        msg_Err( getIntf(), "Failed to open %s for reading",
+                 rFileName.c_str() );
+        return;
+    }
+    m_pReader = xml_ReaderCreate( m_pXML, m_pStream );
     if( !m_pReader )
     {
         msg_Err( getIntf(), "Failed to open %s for parsing",
@@ -61,6 +70,7 @@ XMLParser::~XMLParser()
 {
     if( m_pReader && m_pXML ) xml_ReaderDelete( m_pXML, m_pReader );
     if( m_pXML ) xml_Delete( m_pXML );
+    if( m_pStream ) stream_Delete( m_pStream );
 }
 
 

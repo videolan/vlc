@@ -49,7 +49,7 @@ struct xml_reader_sys_t
     xmlTextReaderPtr p_reader;
 };
 
-static xml_reader_t *ReaderCreate( xml_t *, const char * );
+static xml_reader_t *ReaderCreate( xml_t *, stream_t * );
 static void ReaderDelete( xml_reader_t * );
 static int ReaderRead( xml_reader_t * );
 static int ReaderNodeType( xml_reader_t * );
@@ -59,6 +59,7 @@ static int ReaderNextAttr( xml_reader_t * );
 
 static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
+static int StreamRead( void *p_context, char *p_buffer, int i_buffer );
 
 /*****************************************************************************
  * Module initialization
@@ -111,16 +112,20 @@ static void ReaderErrorHandler( void *p_arg, const char *p_msg,
     msg_Err( p_reader->p_xml, "XML parser error (line %d) : %s", line, p_msg );
 }
 
-static xml_reader_t *ReaderCreate( xml_t *p_xml, const char *psz_filename )
+static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *p_stream )
 {
     xml_reader_t *p_reader;
     xml_reader_sys_t *p_sys;
     xmlTextReaderPtr p_libxml_reader;
+    xmlParserInputBufferPtr p_read_context;
 
-    p_libxml_reader = xmlNewTextReaderFilename( psz_filename );
+    p_read_context = malloc( sizeof( xmlParserInputBuffer ) );
+
+    p_libxml_reader = xmlReaderForIO( StreamRead, NULL, p_stream,
+                                      NULL, NULL, 0 );
     if( !p_libxml_reader )
     {
-        msg_Err( p_xml, "failed to open file %s for parsing", psz_filename );
+        msg_Err( p_xml, "failed to create xml parser" );
         return 0;
     }
 
@@ -213,4 +218,10 @@ static int ReaderNextAttr( xml_reader_t *p_reader )
 {
     return ( xmlTextReaderMoveToNextAttribute( p_reader->p_sys->p_reader )
              == 1 ) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
+{
+    stream_t *s = (stream_t*)p_context;
+    return stream_Read( s, p_buffer, i_buffer );    
 }

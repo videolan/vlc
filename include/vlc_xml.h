@@ -36,7 +36,7 @@ struct xml_t
     module_t  *p_module;
     xml_sys_t *p_sys;
 
-    xml_reader_t * (*pf_reader_create) ( xml_t *, const char * );
+    xml_reader_t * (*pf_reader_create) ( xml_t *, stream_t * );
     void (*pf_reader_delete) ( xml_reader_t * );
 
     void (*pf_catalog_load) ( xml_t *, const char * );

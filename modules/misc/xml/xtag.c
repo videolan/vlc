@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 
 #include "vlc_xml.h"
+#include "vlc_block.h"
+#include "vlc_stream.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -98,7 +100,7 @@ struct xml_reader_sys_t
     vlc_bool_t b_endtag;
 };
 
-static xml_reader_t *ReaderCreate( xml_t *, const char * );
+static xml_reader_t *ReaderCreate( xml_t *, stream_t * );
 static void ReaderDelete( xml_reader_t * );
 static int ReaderRead( xml_reader_t * );
 static int ReaderNodeType( xml_reader_t * );
@@ -158,34 +160,24 @@ static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
 /*****************************************************************************
  * Reader functions
  *****************************************************************************/
-static xml_reader_t *ReaderCreate( xml_t *p_xml, const char *psz_filename )
+static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 {
     xml_reader_t *p_reader;
     xml_reader_sys_t *p_sys;
     char *p_buffer;
     int i_buffer;
-    FILE *file;
     XTag *p_root;
 
     /* Open and read file */
-    file = fopen( psz_filename, "rt" );
-    if( !file )
-    {
-        msg_Warn( p_xml, "could not open file '%s'", psz_filename );
-        return 0;
-    }
 
-    fseek( file, 0L, SEEK_END );
-    i_buffer = ftell( file );
-    fseek( file, 0L, SEEK_SET );
+    i_buffer = stream_Size( s );
     p_buffer = malloc( i_buffer + 1 );
-    i_buffer = fread( p_buffer, 1, i_buffer, file );
-    p_buffer[i_buffer] = 0;
-    fclose( file );
+    i_buffer = stream_Read( s, p_buffer, i_buffer );
+    p_buffer[ i_buffer ] = 0;
 
     if( !i_buffer )
     {
-        msg_Dbg( p_xml, "file '%s' is empty", psz_filename );
+        msg_Dbg( p_xml, "empty xml" );
         free( p_buffer );
         return 0;
     }
@@ -193,7 +185,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, const char *psz_filename )
     p_root = xtag_new_parse( p_buffer, i_buffer );
     if( !p_root )
     {
-        msg_Warn( p_xml, "couldn't parse file '%s'", psz_filename );
+        msg_Warn( p_xml, "couldn't parse xml" );
         free( p_buffer );
         return 0;
     }

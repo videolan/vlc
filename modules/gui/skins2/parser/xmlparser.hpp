@@ -25,6 +25,8 @@
 #define XMLPARSER_HPP
 
 #include "../src/skin_common.hpp"
+#include "vlc_block.h"
+#include "vlc_stream.h"
 #include "vlc_xml.h"
 #include <map>
 
@@ -67,6 +69,7 @@ class XMLParser: public SkinObject
         /// Reader context
         xml_t *m_pXML;
         xml_reader_t *m_pReader;
+        stream_t *m_pStream;
 };
 
 #endif
