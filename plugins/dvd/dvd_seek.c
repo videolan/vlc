@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.5 2002/04/25 21:52:42 sam Exp $
+ * $Id: dvd_seek.c,v 1.6 2002/05/16 16:51:50 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -69,7 +69,7 @@ int CellIsInterleaved( thread_dvd_data_t * p_dvd )
 
 int CellPrg2Map( thread_dvd_data_t * p_dvd )
 {
-    int                 i_cell;
+    int     i_cell;
 
     i_cell = p_dvd->i_map_cell;
 
@@ -78,11 +78,11 @@ int CellPrg2Map( thread_dvd_data_t * p_dvd )
         return -1;
     }
 
-    while( ( ( title.p_cell_pos[p_dvd->i_prg_cell].i_vob_id !=
-                   cell.p_cell_map[i_cell].i_vob_id ) ||
-      ( title.p_cell_pos[p_dvd->i_prg_cell].i_cell_id !=
-                   cell.p_cell_map[i_cell].i_cell_id ) ) &&
-           ( i_cell < cell.i_cell_nb ) )
+    while( ( i_cell < cell.i_cell_nb ) &&
+           ( ( title.p_cell_pos[p_dvd->i_prg_cell].i_vob_id !=
+               cell.p_cell_map[i_cell].i_vob_id ) ||
+             ( title.p_cell_pos[p_dvd->i_prg_cell].i_cell_id !=
+               cell.p_cell_map[i_cell].i_cell_id ) ) )
     {
         i_cell++;
     }
