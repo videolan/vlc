@@ -1439,7 +1439,7 @@ then
       AC_CHECK_HEADERS(dshow.h,
       [ VLC_ADD_PLUGINS([dshow])
         VLC_ADD_CXXFLAGS([dshow],[])
-        VLC_ADD_LDFLAGS([dshow],[-lole32 -loleaut32]) ])
+        VLC_ADD_LDFLAGS([dshow],[-lole32 -loleaut32 -luuid]) ])
   fi
 fi
 
