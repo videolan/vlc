@@ -53,6 +53,8 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
+#define MAX_CHANNELS 6
+
 struct sout_mux_sys_t
 {
     vlc_bool_t b_used;
@@ -68,8 +70,9 @@ struct sout_mux_sys_t
 
     uint32_t i_channel_mask;
     vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
-    int *pi_chan_table;
+    int pi_chan_table[MAX_CHANNELS];
 };
+
 
 static const uint32_t pi_channels_in[] =
     { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
@@ -108,7 +111,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_header = VLC_TRUE;
     p_sys->i_data   = 0;
 
-    p_sys->pi_chan_table  = NULL;
     p_sys->b_chan_reorder = 0;
 
     return VLC_SUCCESS;
@@ -121,8 +123,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-
-    if( p_sys->pi_chan_table ) free( p_sys->pi_chan_table );
     free( p_sys );
 }
 
@@ -313,9 +313,6 @@ static void CheckReordering( sout_mux_t *p_mux, int i_nb_channels )
 
     p_sys->b_chan_reorder = VLC_FALSE;
 
-    p_sys->pi_chan_table = malloc( i_nb_channels * sizeof(int) );
-    if( !p_sys->pi_chan_table ) return;
-
     for( i = 0, j = 0;
          i < (int)(sizeof(pi_channels_out)/sizeof(uint32_t)); i++ )
     {
@@ -351,7 +348,7 @@ static void InterleaveFloat32( float *p_buf, int i_buf, int *pi_chan_table,
                                int i_nb_channels )
 {
     int i, j;
-    float p_tmp[10];
+    float p_tmp[MAX_CHANNELS];
 
     for( i = 0; i < i_buf / i_nb_channels / sizeof(float); i++ )
     {
@@ -369,7 +366,7 @@ static void InterleaveS16( int16_t *p_buf, int i_buf, int *pi_chan_table,
                            int i_nb_channels )
 {
     int i, j;
-    int16_t p_tmp[10];
+    int16_t p_tmp[MAX_CHANNELS];
 
     for( i = 0; i < i_buf / i_nb_channels / sizeof(int16_t); i++ )
     {
