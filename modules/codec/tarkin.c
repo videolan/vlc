@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: tarkin.c,v 1.3 2002/11/28 17:34:59 sam Exp $
+ * $Id: tarkin.c,v 1.4 2002/11/28 21:00:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,7 +86,7 @@ static void CloseDecoder ( dec_thread_t * );
 static void DecodePacket ( dec_thread_t * );
 static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
 
-static void tarkin_CopyPicture( dec_thread_t *, picture_t *, uint8_t * );
+static void tarkin_CopyPicture( dec_thread_t *, picture_t *, uint8_t *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -216,8 +216,7 @@ static void DecodePacket( dec_thread_t *p_dec )
     ogg_packet oggpacket;
     picture_t *p_pic;
     mtime_t i_pts;
-    int i_width, i_height, i_chroma, i_aspect;
-    uint32_t frame = 0;
+    int i_width, i_height, i_chroma, i_stride, i_aspect;
     uint8_t *rgb;
 
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
@@ -237,21 +236,26 @@ static void DecodePacket( dec_thread_t *p_dec )
         switch( p_dec->tarkin_stream->layer->desc.format )
         {
         case TARKIN_RGB24:
+            /*i_chroma = VLC_FOURCC('R','G','B','A');*/
             i_chroma = VLC_FOURCC('R','V','2','4');
+            i_stride = i_width * 3;
             break;
         case TARKIN_RGB32:
             i_chroma = VLC_FOURCC('R','V','3','2');
+            i_stride = i_width * 4;
             break;
         case TARKIN_RGBA:
             i_chroma = VLC_FOURCC('R','G','B','A');
+            i_stride = i_width * 4;
             break;
         default:
             i_chroma = VLC_FOURCC('Y','V','1','2');
+            i_stride = i_width;
             break;
         }
         i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
         p_dec->p_vout = vout_Request( p_dec->p_fifo, p_dec->p_vout,
-                                      i_width, i_height, i_aspect, i_chroma );
+                                      i_width, i_height, i_chroma, i_aspect );
 
         /* Get a new picture */
         while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
@@ -265,7 +269,7 @@ static void DecodePacket( dec_thread_t *p_dec )
         if( !p_pic )
             break;
 
-        tarkin_CopyPicture( p_dec, p_pic, rgb );
+        tarkin_CopyPicture( p_dec, p_pic, rgb, i_stride );
 
         tarkin_synthesis_freeframe( p_dec->tarkin_stream, rgb );
 
@@ -313,7 +317,7 @@ static void CloseDecoder( dec_thread_t * p_dec )
         if( p_dec->p_pes )
             input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
 
-        vout_Request( p_dec, p_dec->p_vout, 0, 0, 0, 0 );
+        vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
 
         if( p_dec->tarkin_stream )
             tarkin_stream_destroy( p_dec->tarkin_stream );
@@ -327,21 +331,23 @@ static void CloseDecoder( dec_thread_t * p_dec )
  *                     picture_t structure.
  *****************************************************************************/
 static void tarkin_CopyPicture( dec_thread_t *p_dec, picture_t *p_pic,
-                                uint8_t *p_src )
+                                uint8_t *p_src, int i_pitch )
 {
-    int i_plane, i_line, i_width, i_dst_stride;
+    int i_plane, i_line, i_src_stride, i_dst_stride;
     u8  *p_dst;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         p_dst = p_pic->p[i_plane].p_pixels;
-        i_width = p_pic->p[i_plane].i_visible_pitch;
         i_dst_stride = p_pic->p[i_plane].i_pitch;
+        i_src_stride = i_pitch;
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            p_dec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_width );
-            p_src += i_width;
+            p_dec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src,
+                                             i_src_stride );
+
+            p_src += i_src_stride;
             p_dst += i_dst_stride;
         }
     }

@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.7 2002/11/21 21:37:46 gbazin Exp $
+ * $Id: vorbis.c,v 1.8 2002/11/28 21:00:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -110,7 +110,11 @@ static void Interleave   ( float *, const float **, int, int );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Vorbis decoder module") );
+#ifdef MODULE_NAME_IS_tremor
+    set_capability( "decoder", 90 );
+#else
     set_capability( "decoder", 100 );
+#endif
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();
 

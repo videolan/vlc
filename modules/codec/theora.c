@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.2 2002/11/28 17:34:59 sam Exp $
+ * $Id: theora.c,v 1.3 2002/11/28 21:00:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -155,7 +155,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
     p_dec->p_vout = vout_Request( p_dec->p_fifo, p_dec->p_vout,
                                   p_dec->ti.width, p_dec->ti.height,
-                                  i_aspect, i_chroma );
+                                  i_chroma, i_aspect );
 
     /* theora decoder thread's main loop */
     while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
