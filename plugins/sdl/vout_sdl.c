@@ -211,14 +211,15 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     {
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 
-            15, 
+            0, 
             SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
-        
+        SDL_ShowCursor( 0 );
     } else {
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 
-            15, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
+            0, 
+            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF  );
+        SDL_ShowCursor( 1 );
     }
 	
     if( p_vout->p_sys->p_display == NULL )
@@ -226,6 +227,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
         intf_ErrMsg( "error: can't open DISPLAY default display\n" );
         return( 1 );
     }
+    SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 
     /* Check buffers properties */	

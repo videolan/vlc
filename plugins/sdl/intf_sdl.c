@@ -189,11 +189,12 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
                 SDL_SetVideoMode(
                                  p_intf->p_vout->i_width,
                                  p_intf->p_vout->i_height,
-                                 15,
+                                 0,
                                  SDL_ANYFORMAT |
                                  SDL_HWSURFACE |
                                  SDL_DOUBLEBUF);
         p_intf->p_sys->b_Fullscreen = 1;
+        SDL_ShowCursor( 1 );
     }
     else
     {
@@ -201,13 +202,15 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
                 SDL_SetVideoMode(
                                  p_intf->p_vout->i_width,
                                  p_intf->p_vout->i_height,
-                                 15,
+                                 0,
                                  SDL_ANYFORMAT |
                                  SDL_HWSURFACE |
                                  SDL_DOUBLEBUF |
                                  SDL_FULLSCREEN );
         p_intf->p_sys->b_Fullscreen = 0;                        
+        SDL_ShowCursor( 0 );
     }
+    SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);
     p_intf->p_vout->p_sys->p_buffer[ 0 ] = p_intf->p_vout->p_sys->p_display->pixels;
     
@@ -270,7 +273,7 @@ void intf_SDL_Keymap(intf_thread_t * p_intf )
     /* intf_AssignKey(p_intf,'G','G'); */
     intf_AssignKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, 0);
     intf_AssignKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, 0);
-    intf_AssignKey(p_intf, 'i',         INTF_KEY_TOGGLE_INFO, 0);
+    intf_AssignKey(p_intf, SDLK_i,         INTF_KEY_TOGGLE_INFO, 0);
     intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0);
 
 }
