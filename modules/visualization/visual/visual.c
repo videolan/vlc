@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.9 2003/09/20 00:37:53 fenrir Exp $
+ * $Id: visual.c,v 1.10 2003/09/24 10:21:32 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -41,12 +41,12 @@
       "Current effects include: dummy, random, scope, spectrum" )
 
 #define WIDTH_TEXT N_( "Video width" )
-#define HEIGHT_LONGTEXT N_( \
-      "The width of the effects video window, in pixels." )
-
-#define HEIGHT_TEXT N_( "Video width" )
 #define WIDTH_LONGTEXT N_( \
       "The width of the effects video window, in pixels." )
+
+#define HEIGHT_TEXT N_( "Video height" )
+#define HEIGHT_LONGTEXT N_( \
+      "The height of the effects video window, in pixels." )
 
 #define NBBANDS_TEXT N_( "Number of bands" )
 #define NBBANDS_LONGTEXT N_( \
