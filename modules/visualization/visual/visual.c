@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.2 2003/08/29 16:56:43 zorglub Exp $
+ * $Id: visual.c,v 1.3 2003/09/02 22:06:51 sigmunau Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -54,15 +54,28 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 #define WIDTH_LONGTEXT N_( \
       "The width of the effects video window, in pixels." )
 
+#define NB_TEXT N_( "Number of bands" )
+#define NB_LONGTEXT N_( \
+      "Number of bands used by spectrum analizer, should be 20 or 80" )
+static char *effect_list[] = { "dummy", "random", "scope", "spectrum", NULL };
+
 vlc_module_begin();
     add_category_hint( N_("visualizer") , NULL , VLC_FALSE);
     set_description( _("visualizer filter") ); 
-    add_string("effect-list", "dummy", NULL,
+    add_string_from_list("effect-list", "dummy", effect_list, NULL,
             ELIST_TEXT, ELIST_LONGTEXT, VLC_TRUE );
     add_integer("effect-width",VOUT_WIDTH,NULL,
              WIDTH_TEXT, WIDTH_LONGTEXT, VLC_FALSE );
     add_integer("effect-height" , VOUT_HEIGHT , NULL,
              HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_FALSE );
+    add_integer("visual-nb", 80, NULL,
+             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+    add_integer("visual-separ", 1, NULL,
+             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+    add_integer("visual-amp", 3, NULL,
+             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
+    add_bool("visual-peaks", VLC_TRUE, NULL,
+             NB_TEXT, NB_LONGTEXT, VLC_FALSE );
     set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");
@@ -313,7 +326,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     {
             if(p_aout->b_die )
                return;
-            msleep( VOUT_OUTMEM_SLEEP );
+            msleep( 2 );
     }
 
     /* Blank the picture */

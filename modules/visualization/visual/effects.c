@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.3 2003/08/31 16:01:14 zorglub Exp $
+ * $Id: effects.c,v 1.4 2003/09/02 22:06:51 sigmunau Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -30,74 +30,6 @@
 #include "fft.h"
 
 #define PEAK_SPEED 1
-/*****************************************************************************
- * Argument list parsers                                                     *
- *****************************************************************************/
-int args_getint(char *psz_parse, char * name,const int defaut)
-{
-    char *psz_eof;
-    int i_value;
-    if( psz_parse != NULL )
-    {
-        while(1)
-        {
-            if(!strncmp( psz_parse, name, strlen(name) ) )
-            {
-                psz_parse += strlen( name );
-                psz_eof = strchr( psz_parse , ',' );
-                if( !psz_eof)
-                    psz_eof = psz_parse + strlen(psz_parse);
-                if( psz_eof )
-                {
-                    *psz_eof = '\0' ;
-                }
-                i_value = atoi(++psz_parse);
-                psz_parse= psz_eof;
-                psz_parse++;
-                return i_value;
-            }
-            if( *psz_parse )
-                psz_parse ++;
-            else
-                break;
-        } 
-    }
-    return defaut;
-}
-
-
-char * args_getpsz(char *psz_parse, char * name,const char * defaut)                 
-{
-    char *psz_eof;
-    char *psz_value;
-    if( psz_parse != NULL )
-    {
-        while(1)
-        {
-            if(!strncmp( psz_parse, name, strlen(name) ) )                            
-            {
-                psz_parse += strlen( name );
-                psz_eof = strchr( psz_parse , ',' );
-                if( !psz_eof)
-                    psz_eof = psz_parse + strlen(psz_parse);
-                if( psz_eof )
-                {
-                    *psz_eof = '\0' ;
-                }
-                psz_value = strdup(++psz_parse);
-                psz_parse= psz_eof;
-                psz_parse++;
-                return psz_value;
-            }
-            if( *psz_parse )
-                psz_parse ++;
-            else
-                break;
-        }
-    }
-    return strdup(defaut);
-}
-
 
 /*****************************************************************************
  * dummy_Run
@@ -162,24 +94,10 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
     
     p_buffs = p_s16_buff;
-    if( p_effect->psz_args )
-    {
-        psz_parse  = strdup( p_effect->psz_args );
-        i_nb_bands = args_getint ( psz_parse , "nb" , 80 );
-        psz_parse  = strdup( p_effect->psz_args );
-        i_separ    = args_getint ( psz_parse , "separ", 1 );
-        psz_parse  = strdup( p_effect->psz_args );
-        i_amp     = args_getint ( psz_parse , "amp", 3 );
-        psz_parse  = strdup( p_effect->psz_args );
-        i_peak     = args_getint ( psz_parse , "peaks", 1 );
-    }
-    else
-    {
-       i_nb_bands = 80;
-       i_separ = 1;
-       i_amp = 3;
-       i_peak = 1;
-    }
+    i_nb_bands = config_GetInt ( p_aout, "visual-nb" );
+    i_separ    = config_GetInt( p_aout, "visual-separ" );
+    i_amp     = config_GetInt ( p_aout, "visual-amp" );
+    i_peak     = config_GetInt ( p_aout, "visual-peaks" );
 
     if( i_nb_bands == 20)
     {
@@ -468,7 +386,7 @@ int random_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     if( p_effect->psz_args )
     {
         psz_parse = strdup( p_effect->psz_args );
-        i_nb_plots = args_getint ( psz_parse , "nb" , 200 );
+        i_nb_plots = config_GetInt ( p_aout, "visual-nb" );
     }
     else
     {
