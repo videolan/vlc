@@ -4,26 +4,60 @@ Changes between 0.7.1 and 0.7.2:
 --------------------------------
 
 Core support:
- * Bookmarks feature
- * Support for video output embedded in interfaces
+ * Bookmarks feature for easier seeking/access inside medias.
+ * Support for video output embedded in interfaces.
+ * Improved http daemon.
 
 Codecs:
+ * New Continuous Media Markup Language (CMML) codec.
+   (http://www.annodex.net/overview.html)
+ * New h261 video decoder using openmash.
+ * Packetizer interfaced between demux and codec when needed
+   (allows using ffmpeg plugin to decode MPEG streams and better aac decoding).
 
 Playlist:
 
 Input:
+ * mmsh streaming fixes.
+ * subviewer and subviewer v2 subtitles support.
+ * Annodex support (http://www.annodex.net).
+ * New "file-cat" option to play truncated movies.
+ * Better handling of meta info (title, author, description, etc...).
+ * New options to pass meta info to the input.
+ * New start-time and stop-time options.
 
 Stream output:
- * Improved session announcement system
+ * Improved session announcement system.
+ * Minimize threads useage by default.
+ * Added faster than realtime stream output (limited by CPU) for file output.
+ * Improved mov/mp4 muxer.
+ * Meta info options used by the muxers.
+ * Better audio channels downmixing when transcoding.
+
+VideoLAN manager:
+ * New videolan (media) manager (vlm): a little manager designed to launch
+   and manage multiple streams from within one instance of VLC.
+ * Telnet interface for vlm.
+ * Http interface for vlm.
 
 Interfaces:
- * Skins
-    - Ability to embed video output
+ * Skins II
+    - Ability to embed video output.
+    - Support for bitmap fonts.
+    - Lots of improvements.
 
  * wxWindows
-    - new design and set of icons
-    - new streaming wizard
-    - Ability to embed video output
+    - New design and set of icons.
+    - New streaming wizard.
+    - Ability to embed video output.
+
+Win32 port:
+ * DirectShow input plugin should work with more devices.
+ * Disable monitor power down when watching movies.
+
+Misc:
+ * Improvements to the GOOM visualisation plugin.
+ * Roku HD1000 audio output.
 
 Changes between 0.7.1 and 0.7.1a:
 ---------------------------------
