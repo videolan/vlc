@@ -2,7 +2,7 @@
  * win32_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
+ * $Id: win32_graphics.cpp,v 1.3 2004/01/27 21:12:42 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,6 +29,7 @@
 #define AC_SRC_ALPHA 1
 #endif
 
+#include "win32_factory.hpp"
 #include "win32_graphics.hpp"
 #include "win32_window.hpp"
 #include "../src/generic_bitmap.hpp"
@@ -179,13 +180,16 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
     bf.AlphaFormat = AC_SRC_ALPHA;
 
     // Blend the image onto the internal DC
-    if( 1/*AlphaBlend*/ &&
-        !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
-                     width, height, bf ) )
+    BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int, HDC, int, int,
+                               int, int, BLENDFUNCTION );
+    AlphaBlend = ((Win32Factory*)OSFactory::instance( getIntf() ))->AlphaBlend;
+    if( AlphaBlend &&
+        AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
+                    width, height, bf ) )
     {
         msg_Err( getIntf(), "AlphaBlend() failed" );
     }
-    else if( 1/*!AlphaBlend*/ )
+    else if( !AlphaBlend )
     {
         // Copy the image onto the internal DC
         BitBlt( m_hDC, xDest, yDest, width, height, hDC, 0, 0, SRCCOPY );
