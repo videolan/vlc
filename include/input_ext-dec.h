@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.11 2001/01/11 15:35:35 sam Exp $
+ * $Id: input_ext-dec.h,v 1.12 2001/01/12 11:36:49 massiot Exp $
  *
  * Authors:
  *
@@ -308,22 +308,15 @@ static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
  *****************************************************************************/
 static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
-#if (WORD_TYPE == u32)
-    /* If we are word aligned, do not touch the buffer */
-    if( p_bit_stream->fifo.i_available == 0 )
+    if( p_bit_stream->fifo.i_available )
     {
-        if( p_bit_stream->p_byte > p_bit_stream->p_end - sizeof(WORD_TYPE) )
-        {
-            p_bit_stream->pf_next_data_packet( p_bit_stream );
-        }
-
-        ((WORD_TYPE *)p_bit_stream->p_byte)++;
-        return;
+        p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
+                            << (32 - p_bit_stream->fifo.i_available);
     }
-#endif
-
-    p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
-                        << (32 - p_bit_stream->fifo.i_available);
+    else
+    {
+        p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+    }
 }
 
 /*****************************************************************************
@@ -360,21 +353,17 @@ static __inline__ WORD_TYPE GetBits32( bit_stream_t * p_bit_stream )
 {
     WORD_TYPE               i_result;
 
-#if (WORD_TYPE == u32)
-    /* If we are word aligned, do not touch the buffer */
-    if( p_bit_stream->fifo.i_available == 0 )
-    {
-        return( GetWord( p_bit_stream ) );
-    }
-#endif
-
     i_result = p_bit_stream->fifo.buffer;
     p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
 
     i_result |= p_bit_stream->fifo.buffer
                              >> (p_bit_stream->fifo.i_available);
-    p_bit_stream->fifo.buffer <<= (8 * sizeof(WORD_TYPE)
+    if( p_bit_stream->fifo.i_available )
+    {
+        p_bit_stream->fifo.buffer <<= (8 * sizeof(WORD_TYPE)
                                     - p_bit_stream->fifo.i_available);
+    }
+    
     return( i_result );
 }
 
