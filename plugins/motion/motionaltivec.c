@@ -2,7 +2,7 @@
  * motionaltivec.c : Altivec motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motionaltivec.c,v 1.6 2001/11/28 15:08:05 massiot Exp $
+ * $Id: motionaltivec.c,v 1.7 2001/12/06 13:46:23 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Paul Mackerras <paulus@linuxcare.com.au>
@@ -95,7 +95,7 @@ static int motion_Probe( probedata_t *p_data )
  * Motion compensation in Altivec
  *****************************************************************************/
 
-#ifndef HAVE_C_ALTIVEC
+#ifndef CAN_COMPILE_C_ALTIVEC
 
 /*
  * The asm code is generated with:
@@ -1129,10 +1129,10 @@ static void MC_avg_xy_8_altivec (uint8_t * dest, uint8_t * ref,
 	 );
 }
 
-#endif  /* !HAVE_C_ALTIVEC */
+#endif  /* !CAN_COMPILE_C_ALTIVEC */
 #endif  /* __BUILD_ALTIVEC_ASM__ */
 
-#if defined(HAVE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
+#if defined(CAN_COMPILE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
 
 #define vector_s16_t vector signed short
 #define vector_u16_t vector unsigned short
@@ -2084,7 +2084,7 @@ void MC_avg_xy_8_altivec (unsigned char * dest, unsigned char * ref,
     vec_ste ((vector_u32_t)tmp, 4, (unsigned int *)dest);
 }
 
-#endif        /* HAVE_C_ALTIVEC || __BUILD_ALTIVEC_ASM__ */
+#endif        /* CAN_COMPILE_C_ALTIVEC || __BUILD_ALTIVEC_ASM__ */
 #ifndef __BUILD_ALTIVEC_ASM__
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.19 2001/11/28 15:08:05 massiot Exp $
+ * $Id: idctaltivec.c,v 1.20 2001/12/06 13:46:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -122,7 +122,7 @@ static void InitIDCT( void ** pp_idct_data )
  * IDCT in Altivec
  *****************************************************************************/
 
-#ifndef HAVE_C_ALTIVEC
+#ifndef CAN_COMPILE_C_ALTIVEC
 
 static int16_t constants[5][8] ATTR_ALIGN(16) = {
     {23170, 13573, 6518, 21895, -23170, -21895, 32, 31},
@@ -558,11 +558,11 @@ void idct_block_add_altivec (int16_t * block, uint8_t * dest, int stride)
 	 );
 }
 
-#endif  /* !HAVE_C_ALTIVEC */
+#endif  /* !CAN_COMPILE_C_ALTIVEC */
 #endif  /* __BUILD_ALTIVEC_ASM__ */
 
 
-#if defined(HAVE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
+#if defined(CAN_COMPILE_C_ALTIVEC) || defined(__BUILD_ALTIVEC_ASM__)
 
 #define vector_s16_t vector signed short
 #define vector_u16_t vector unsigned short
@@ -740,7 +740,7 @@ void idct_block_add_altivec (vector_s16_t * block, unsigned char * dest,
     ADD (dest, vx7, perm1)
 }
 
-#endif	/* __BUILD_ALTIVEC_ASM__ || HAVE_C_ALTIVEC */
+#endif	/* __BUILD_ALTIVEC_ASM__ || CAN_COMPILE_C_ALTIVEC */
 
 #ifndef __BUILD_ALTIVEC_ASM__
 
