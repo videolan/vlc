@@ -1213,14 +1213,12 @@ void Interface::OnMute( wxCommandEvent& WXUNUSED(event) )
         p_tool->SetNormalBitmap( wxBitmap( speaker_xpm ) );
         p_tool->SetLabel( wxU(_("")) );
         p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
-        fprintf( stderr, "sound is on\n");
     }
     else
     {
         p_tool->SetNormalBitmap( wxBitmap( speaker_mute_xpm ) );
         p_tool->SetLabel( wxU(_("")) );
         p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
-        fprintf( stderr, "sound is off\n");
     }
 
     GetToolBar()->Realize();
