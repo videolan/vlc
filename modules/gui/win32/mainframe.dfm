@@ -517,7 +517,6 @@ object MainFrameDlg: TMainFrameDlg
       object MenuAddInterface: TMenuItem
         Tag = 3
         Caption = '&Add interface'
-        Enabled = False
         Hint = 'Spawn a new interface'
       end
     end

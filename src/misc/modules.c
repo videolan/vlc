@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.110 2003/01/19 03:16:24 sam Exp $
+ * $Id: modules.c,v 1.111 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -250,7 +250,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     };
 
     module_list_t *p_list, *p_first, *p_tmp;
-    vlc_list_t all;
+    vlc_list_t *p_all;
 
     int i_which_module, i_index = 0;
     vlc_bool_t b_intf = VLC_FALSE;
@@ -295,17 +295,17 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* Sort the modules and test them */
-    all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    p_list = malloc( all.i_count * sizeof( module_list_t ) );
+    p_all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = malloc( p_all->i_count * sizeof( module_list_t ) );
     p_first = NULL;
 
     /* Parse the module list for capabilities and probe each of them */
-    for( i_which_module = 0; i_which_module < all.i_count; i_which_module++ )
+    for( i_which_module = 0; i_which_module < p_all->i_count; i_which_module++ )
     {
         module_t * p_submodule = NULL;
         int i_shortcut_bonus = 0, i_submodule;
 
-        p_module = (module_t *)all.p_values[i_which_module].p_object;
+        p_module = (module_t *)p_all->p_values[i_which_module].p_object;
 
         /* Test that this module can do what we need */
         if( strcmp( p_module->psz_capability, psz_capability ) )
@@ -385,7 +385,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
              && !strcmp( p_module->psz_program,
                          p_this->p_vlc->psz_object_name ) )
         {
-            if( !b_intf ) 
+            if( !b_intf )
             {
                 /* Remove previous non-matching plugins */
                 i_index = 0;
@@ -448,7 +448,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     /* We can release the list, interesting modules were yielded */
-    vlc_list_release( &all );
+    vlc_list_release( p_all );
 
     /* Parse the linked list and use the first successful module */
     p_tmp = p_first;
@@ -671,7 +671,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
             AllocatePluginFile( p_this, psz_path );
         }
     }
-    while( FindNextFile( handle, &finddata ) ); 
+    while( FindNextFile( handle, &finddata ) );
 
     /* Close the directory */
     FindClose( handle );
@@ -754,7 +754,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     }
 
     /* Now that we have successfully loaded the module, we can
-     * allocate a structure for it */ 
+     * allocate a structure for it */
     p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
     if( p_module == NULL )
     {
@@ -868,7 +868,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     module_t * p_module;
 
     /* Now that we have successfully loaded the module, we can
-     * allocate a structure for it */ 
+     * allocate a structure for it */
     p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
     if( p_module == NULL )
     {
@@ -948,7 +948,7 @@ static int CallEntry( module_t * p_module )
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
-    pf_symbol = (int (*)(module_t *)) module_getsymbol( p_module->handle, 
+    pf_symbol = (int (*)(module_t *)) module_getsymbol( p_module->handle,
                                                         psz_name );
 
     if( pf_symbol == NULL )

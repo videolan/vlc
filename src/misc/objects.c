@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.33 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: objects.c,v 1.34 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -57,7 +57,7 @@ static void           DumpStructure ( vlc_object_t *, int, char * );
 static int            FindIndex     ( vlc_object_t *, vlc_object_t **, int );
 static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
 
-static vlc_list_t     NewList       ( int );
+static vlc_list_t   * NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
 static void           ListAppend    ( vlc_list_t *, vlc_object_t * );
 static int            CountChildren ( vlc_object_t *, int );
@@ -491,9 +491,9 @@ void __vlc_object_detach( vlc_object_t *p_this )
  * This function recursively looks for a given object type. i_mode can be one
  * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
  *****************************************************************************/
-vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
+vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
-    vlc_list_t list;
+    vlc_list_t *p_list;
     vlc_object_t **pp_current, **pp_end;
     int i_count = 0, i_index = 0;
 
@@ -515,7 +515,7 @@ vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
             }
         }
 
-        list = NewList( i_count );
+        p_list = NewList( i_count );
         pp_current = p_this->p_libvlc->pp_objects;
 
         for( ; pp_current < pp_end ; pp_current++ )
@@ -523,7 +523,7 @@ vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
             if( (*pp_current)->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
-                ListReplace( &list, *pp_current, i_index );
+                ListReplace( p_list, *pp_current, i_index );
                 if( i_index < i_count ) i_index++;
             }
         }
@@ -531,29 +531,29 @@ vlc_list_t __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     case FIND_CHILD:
         i_count = CountChildren( p_this, i_type );
-        list = NewList( i_count );
+        p_list = NewList( i_count );
 
         /* Check allocation was successful */
-        if( list.i_count != i_count )
+        if( p_list->i_count != i_count )
         {
             msg_Err( p_this, "list allocation failed!" );
-            list.i_count = 0;
+            p_list->i_count = 0;
             break;
         }
 
-        list.i_count = 0;
-        ListChildren( &list, p_this, i_type );
+        p_list->i_count = 0;
+        ListChildren( p_list, p_this, i_type );
         break;
 
     default:
         msg_Err( p_this, "unimplemented!" );
-        list = NewList( 0 );
+        p_list = NewList( 0 );
         break;
     }
 
     vlc_mutex_unlock( &structure_lock );
 
-    return list;
+    return p_list;
 }
 
 /*****************************************************************************
@@ -595,7 +595,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         if( *newval.psz_string )
         {
             vlc_object_release( p_this );
-	}
+        }
     }
     else if( *psz_cmd == 'l' )
     {
@@ -646,6 +646,7 @@ void vlc_list_release( vlc_list_t *p_list )
     }
 
     free( p_list->p_values );
+    free( p_list );
 }
 
 /* Following functions are local */
@@ -882,26 +883,30 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
     }
 }
 
-static vlc_list_t NewList( int i_count )
+static vlc_list_t * NewList( int i_count )
 {
-    vlc_list_t list;
+    vlc_list_t * p_list = (vlc_list_t *)malloc( sizeof( vlc_list_t ) );
+    if( p_list == NULL )
+    {
+        return NULL;
+    }
 
-    list.i_count = i_count;
+    p_list->i_count = i_count;
 
     if( i_count == 0 )
     {
-        list.p_values = NULL;
-        return list;
+        p_list->p_values = NULL;
+        return p_list;
     }
 
-    list.p_values = malloc( i_count * sizeof( vlc_value_t ) );
-    if( list.p_values == NULL )
+    p_list->p_values = malloc( i_count * sizeof( vlc_value_t ) );
+    if( p_list->p_values == NULL )
     {
-        list.i_count = 0;
-        return list;
+        p_list->i_count = 0;
+        return p_list;
     }
 
-    return list;
+    return p_list;
 }
 
 static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,

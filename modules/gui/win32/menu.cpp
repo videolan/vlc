@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.10 2003/01/26 00:51:43 sam Exp $
+ * $Id: menu.cpp,v 1.11 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -295,9 +295,7 @@ __fastcall TMenusGen::TMenusGen( intf_thread_t *_p_intf ) : TObject()
     MenuAddInterface = p_window->MenuAddInterface;
 
     /* Create the "Add interface" menu */
-#if 0
-    SetupModuleMenu( "inerface", MenuAddInterface, InterfaceModuleClick );
-#endif
+    SetupModuleMenu( "interface", MenuAddInterface, InterfaceModuleClick );
 }
 
 
@@ -679,17 +677,17 @@ void __fastcall TMenusGen::SetupModuleMenu( const char *psz_capability,
         TMenuItem *Root, TNotifyEvent MenuItemClick )
 {
     module_t * p_parser;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     int i_index;
 
     /* remove previous menu */
     Root->Clear();
     Root->Enabled = false;
 
-    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !strcmp( p_parser->psz_capability, psz_capability ) )
         {
@@ -701,7 +699,7 @@ void __fastcall TMenusGen::SetupModuleMenu( const char *psz_capability,
         }
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     /* be sure that menu is enabled, if there is at least one item */
     if( i_index > 0 )

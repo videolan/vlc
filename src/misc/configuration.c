@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.48 2003/01/06 00:37:30 garf Exp $
+ * $Id: configuration.c,v 1.49 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -159,7 +159,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
  * and CONFIG_ITEM_MODULE).
  *****************************************************************************/
-void __config_PutPsz( vlc_object_t *p_this, 
+void __config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
 {
     module_config_t *p_config;
@@ -303,18 +303,18 @@ void __config_PutFloat( vlc_object_t *p_this,
  *****************************************************************************/
 module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 {
-    vlc_list_t list; 
+    vlc_list_t *p_list;
     module_t *p_parser;
     module_config_t *p_item;
     int i_index;
 
     if( !psz_name ) return NULL;
 
-    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !p_parser->i_config_items )
             continue;
@@ -328,13 +328,13 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
                 continue;
             if( !strcmp( psz_name, p_item->psz_name ) )
             {
-                vlc_list_release( &list );
+                vlc_list_release( p_list );
                 return p_item;
             }
         }
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     return NULL;
 }
@@ -507,7 +507,7 @@ void config_UnsetCallbacks( module_config_t *p_new )
  *****************************************************************************/
 int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
-    vlc_list_t list; 
+    vlc_list_t *p_list;
     module_t *p_parser;
     module_config_t *p_item;
     FILE *file;
@@ -546,11 +546,11 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     }
 
     /* Look for the selected module, if NULL then save everything */
-    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name
              && strcmp( psz_module_name, p_parser->psz_object_name ) )
@@ -666,8 +666,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         }
 
     }
-    
-    vlc_list_release( &list );
+
+    vlc_list_release( p_list );
 
     fclose( file );
     free( psz_filename );
@@ -687,7 +687,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
  *
  * When we save we mustn't delete the config options of the modules that
  * haven't been loaded. So we cannot just create a new config file with the
- * config structures we've got in memory. 
+ * config structures we've got in memory.
  * I don't really know how to deal with this nicely, so I will use a completly
  * dumb method ;-)
  * I will load the config file in memory, but skipping all the sections of the
@@ -699,7 +699,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     module_t *p_parser;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     module_config_t *p_item;
     FILE *file;
     char p_line[1024], *p_index2;
@@ -788,7 +788,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     p_bigbuffer[0] = 0;
 
     /* List all available modules */
-    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     /* backup file into memory, we only need to backup the sections we won't
      * save later on */
@@ -799,9 +799,9 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         {
 
             /* we found a section, check if we need to do a backup */
-            for( i_index = 0; i_index < list.i_count; i_index++ )
+            for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
-                p_parser = (module_t *)list.p_values[i_index].p_object ;
+                p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
                 if( ((p_index2 - &p_line[1])
                        == (int)strlen(p_parser->psz_object_name) )
@@ -816,7 +816,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 }
             }
 
-            if( i_index == list.i_count )
+            if( i_index == p_list->i_count )
             {
                 /* we don't have this section in our list so we need to back
                  * it up */
@@ -855,7 +855,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         msg_Warn( p_this, "could not open config file %s for writing",
                           psz_filename );
         free( psz_filename );
-        vlc_list_release( &list );
+        vlc_list_release( p_list );
         vlc_mutex_unlock( &p_this->p_vlc->config_lock );
         return -1;
     }
@@ -863,9 +863,9 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     fprintf( file, "###\n###  " COPYRIGHT_MESSAGE "\n###\n\n" );
 
     /* Look for the selected module, if NULL then save everything */
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
@@ -922,7 +922,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         fprintf( file, "\n" );
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     /*
      * Restore old settings from the config in file
@@ -951,7 +951,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     module_config_t *p_item;
     struct option *p_longopts;
     int i_modules_index;
@@ -987,17 +987,17 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 #endif
 
     /* List all modules */
-    list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
     /*
      * Generate the longopts and shortopts structures used by getopt_long
      */
 
     i_opts = 0;
-    for( i_modules_index = 0; i_modules_index < list.i_count;
+    for( i_modules_index = 0; i_modules_index < p_list->i_count;
          i_modules_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_modules_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_modules_index].p_object ;
 
         /* count the number of exported configuration options (to allocate
          * longopts). We also need to allocate space for too options when
@@ -1010,7 +1010,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     if( p_longopts == NULL )
     {
         msg_Err( p_this, "out of memory" );
-        vlc_list_release( &list );
+        vlc_list_release( p_list );
         return -1;
     }
 
@@ -1019,7 +1019,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     {
         msg_Err( p_this, "out of memory" );
         free( p_longopts );
-        vlc_list_release( &list );
+        vlc_list_release( p_list );
         return -1;
     }
 
@@ -1034,7 +1034,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             msg_Err( p_this, "out of memory" );
             free( psz_shortopts );
             free( p_longopts );
-            vlc_list_release( &list );
+            vlc_list_release( p_list );
             return -1;
         }
         memcpy( ppsz_argv, p_this->p_vlc->ppsz_argv,
@@ -1049,10 +1049,10 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 
     /* Fill the p_longopts and psz_shortopts structures */
     i_index = 0;
-    for( i_modules_index = 0; i_modules_index < list.i_count;
+    for( i_modules_index = 0; i_modules_index < p_list->i_count;
          i_modules_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_modules_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_modules_index].p_object ;
 
         if( !p_parser->i_config_items )
             continue;
@@ -1124,7 +1124,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     }
 
     /* We don't need the module list anymore */
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     /* Close the longopts and shortopts structures */
     memset( &p_longopts[i_index], 0, sizeof(struct option) );

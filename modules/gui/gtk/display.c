@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.7 2003/01/20 20:07:06 fenrir Exp $
+ * $Id: display.c,v 1.8 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -242,14 +242,14 @@ void E_(GtkHideTooltips)( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf;
     int i_index;
-    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                             FIND_ANYWHERE );
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                        FIND_ANYWHERE );
 
     vlc_bool_t b_enable = config_GetInt( p_this, "gnome-tooltips" );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
+        p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
 
         if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
@@ -266,7 +266,7 @@ void E_(GtkHideTooltips)( vlc_object_t *p_this )
         }
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 }
 
 #ifdef MODULE_NAME_IS_gnome
@@ -282,16 +282,16 @@ void GtkHideToolbarText( vlc_object_t *p_this )
     GtkToolbar * p_toolbar;
     intf_thread_t *p_intf;
     int i_index;
-    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                             FIND_ANYWHERE );
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                        FIND_ANYWHERE );
 
     style = config_GetInt( p_this, "gnome-toolbartext" )
             ? GTK_TOOLBAR_BOTH
             : GTK_TOOLBAR_ICONS;
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
+        p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
 
         if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
@@ -303,6 +303,6 @@ void GtkHideToolbarText( vlc_object_t *p_this )
         gtk_toolbar_set_style( p_toolbar, style );
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 }
 #endif

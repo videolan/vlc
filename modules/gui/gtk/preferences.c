@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.7 2003/01/06 00:37:30 garf Exp $
+ * $Id: preferences.c,v 1.8 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -121,7 +121,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                    intf_thread_t *p_intf )
 {
     module_t *p_parser = NULL;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     module_config_t *p_item;
     int i_index;
 
@@ -179,11 +179,11 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
 
     /* Look for the selected module */
-    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name
              && !strcmp( psz_module_name, p_parser->psz_object_name ) )
@@ -192,9 +192,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
         }
     }
 
-    if( !p_parser || i_index == list.i_count )
+    if( !p_parser || i_index == p_list->i_count )
     {
-        vlc_list_release( &list );
+        vlc_list_release( p_list );
         return;
     }
 
@@ -334,9 +334,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             {
                 gchar * entry[2];
 
-                for( i_index = 0; i_index < list.i_count; i_index++ )
+                for( i_index = 0; i_index < p_list->i_count; i_index++ )
                 {
-                    p_parser = (module_t *)list.p_values[i_index].p_object ;
+                    p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
                     if( !strcmp( p_parser->psz_capability,
                                  p_item->psz_type ) )
@@ -560,7 +560,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     }
     while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
 #ifndef MODULE_NAME_IS_gnome
     /* Now let's add the action buttons at the bottom of the page */
@@ -704,7 +704,7 @@ static void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
     intf_thread_t *p_intf;
     GtkWidget *config_button;
     module_t *p_parser;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     char *psz_name;
     int i_index;
 
@@ -717,11 +717,11 @@ static void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
     }
 
     /* look for module 'psz_name' */
-    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !strcmp( p_parser->psz_object_name, psz_name ) )
         {
@@ -738,7 +738,7 @@ static void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
         }
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 }
 
 /****************************************************************************

@@ -2,15 +2,15 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.8 2003/01/27 00:08:31 jlj Exp $
+ * $Id: prefs.m,v 1.9 2003/01/27 17:41:01 ipkiss Exp $
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -37,7 +37,7 @@
 #import "prefs.h"
 
 /*****************************************************************************
- * VLCPrefs implementation 
+ * VLCPrefs implementation
  *****************************************************************************/
 @implementation VLCPrefs
 
@@ -49,7 +49,7 @@
     {
         p_intf = [NSApp getIntf];
 
-        o_pref_panels = [[NSMutableDictionary alloc] init];  
+        o_pref_panels = [[NSMutableDictionary alloc] init];
         o_toolbars = [[NSMutableDictionary alloc] init];
         o_scroll_views = [[NSMutableDictionary alloc] init];
         o_panel_views = [[NSMutableDictionary alloc] init];
@@ -101,28 +101,28 @@
 - (BOOL)hasPrefs:(NSString *)o_module_name
 {
     module_t *p_parser;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     char *psz_module_name;
     int i_index;
 
     psz_module_name = (char *)[o_module_name lossyCString];
 
     /* look for module */
-    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( !strcmp( p_parser->psz_object_name, psz_module_name ) )
         {
             BOOL b_has_prefs = p_parser->i_config_items != 0;
-            vlc_list_release( &list );
+            vlc_list_release( p_list );
             return( b_has_prefs );
         }
     }
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     return( NO );
 }
@@ -133,7 +133,7 @@
     int i_module_tag;
 
     module_t *p_parser = NULL;
-    vlc_list_t list;
+    vlc_list_t *p_list;
     module_config_t *p_item;
     char *psz_module_name;
     int i_index;
@@ -143,7 +143,7 @@
     NSView *o_panel_view;               /* panel view                   */
     NSToolbar *o_toolbar;               /* panel toolbar                */
     NSMutableDictionary *o_tb_items;    /* panel toolbar items          */
-    NSScrollView *o_scroll_view;        /* panel scroll view            */ 
+    NSScrollView *o_scroll_view;        /* panel scroll view            */
     NSRect s_scroll_rc;                 /* panel scroll view rect       */
     NSMutableDictionary *o_views;       /* panel scroll view docviews   */
 
@@ -160,16 +160,16 @@
         [o_panel center];
         [o_panel makeKeyAndOrderFront: nil];
         return;
-    } 
+    }
 
     psz_module_name = (char *)[o_module_name lossyCString];
 
     /* Look for the selected module */
-    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_parser = (module_t *)list.p_values[i_index].p_object ;
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
         if( psz_module_name
             && !strcmp( psz_module_name, p_parser->psz_object_name ) )
@@ -178,9 +178,9 @@
         }
     }
 
-    if( !p_parser || i_index == list.i_count )
+    if( !p_parser || i_index == p_list->i_count )
     {
-        vlc_list_release( &list );
+        vlc_list_release( p_list );
         return;
     }
 
@@ -192,15 +192,15 @@
                                backing: NSBackingStoreBuffered
                                defer: YES];
     o_toolbar = [[NSToolbar alloc] initWithIdentifier: o_module_name];
-    [o_panel setTitle: [NSString stringWithFormat: @"%@ (%@)", 
+    [o_panel setTitle: [NSString stringWithFormat: @"%@ (%@)",
                                  _NS("Preferences"), o_module_name]];
     o_panel_view = [o_panel contentView];
 
-    s_scroll_rc = s_panel_rc; 
+    s_scroll_rc = s_panel_rc;
     s_scroll_rc.size.height -= 55; s_scroll_rc.origin.y += 55;
     o_scroll_view = [[NSScrollView alloc] initWithFrame: s_scroll_rc];
     [o_scroll_views setObject: o_scroll_view forKey: o_module_name];
-    [o_scroll_view setBorderType: NSGrooveBorder]; 
+    [o_scroll_view setBorderType: NSGrooveBorder];
     [o_scroll_view setHasVerticalScroller: YES];
     [o_scroll_view setDrawsBackground: NO];
     [o_scroll_view setRulersVisible: YES];
@@ -220,7 +220,7 @@
     i_module_tag = 3;
 
 #define X_ORIGIN 20
-#define Y_ORIGIN (X_ORIGIN - 10) 
+#define Y_ORIGIN (X_ORIGIN - 10)
 
 #define CHECK_VIEW_HEIGHT \
     { \
@@ -287,14 +287,14 @@
             NSToolbarItem *o_tbi;
 
             o_label = [NSApp localizedString: p_item->psz_text];
-            o_tbi = [[NSToolbarItem alloc] initWithItemIdentifier: o_label]; 
+            o_tbi = [[NSToolbarItem alloc] initWithItemIdentifier: o_label];
             [o_tbi setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
             [o_tbi setLabel: o_label];
             [o_tbi setTarget: self];
             [o_tbi setAction: @selector(selectPrefView:)];
 
             o_key = [NSString stringWithFormat: @"%02d %@",
-                                                i_pos, o_label]; 
+                                                i_pos, o_label];
             [o_tb_items setObject: o_tbi forKey: o_key];
 
             s_vrc = s_scroll_rc; s_vrc.size.height -= 4;
@@ -308,7 +308,7 @@
 
             if( i_pos == 0 )
             {
-                [o_scroll_view setDocumentView: o_view]; 
+                [o_scroll_view setDocumentView: o_view];
             }
 
             i_pos++;
@@ -353,23 +353,23 @@
             [o_box setContentView: [o_cview autorelease]];
             s_crc = [o_cview bounds];
 
-            s_brc = NSMakeRect( 5, 10, 200, 30 ); 
+            s_brc = NSMakeRect( 5, 10, 200, 30 );
             o_modules = [[NSPopUpButton alloc] initWithFrame: s_brc];
             [o_modules setTag: i_module_tag++];
             [o_modules setTarget: self];
             [o_modules setAction: @selector(moduleSelected:)];
             [o_modules setToolTip: [NSApp localizedString: p_item->psz_longtext]];
-            [o_cview addSubview: [o_modules autorelease]]; 
+            [o_cview addSubview: [o_modules autorelease]];
 
-            MODULE_BUTTON( o_btn_configure, _NS("Configure"), 
+            MODULE_BUTTON( o_btn_configure, _NS("Configure"),
                            configureModule: );
 
-            s_brc = NSMakeRect( 8, s_brc.origin.y + s_brc.size.height + 10, 
-                                194, 25 ); 
+            s_brc = NSMakeRect( 8, s_brc.origin.y + s_brc.size.height + 10,
+                                194, 25 );
             o_text_field = [[VLCTextField alloc] initWithFrame: s_brc];
             [o_text_field setTag: i_module_tag++];
             [o_text_field setAlignment: NSLeftTextAlignment];
-            CONTROL_CONFIG( o_text_field, o_module_name, 
+            CONTROL_CONFIG( o_text_field, o_module_name,
                             CONFIG_ITEM_MODULE, p_item->psz_name );
             [[NSNotificationCenter defaultCenter] addObserver: self
                 selector: @selector(configChanged:)
@@ -378,21 +378,21 @@
             [o_cview addSubview: [o_text_field autorelease]];
 
             s_brc.origin.x += 3;
-            MODULE_BUTTON( o_btn_select, _NS("Select"), 
+            MODULE_BUTTON( o_btn_select, _NS("Select"),
                            selectModule: );
 
             [o_modules addItemWithTitle: _NS("None")];
 
             /* build a list of available modules */
             {
-                for( i_index = 0; i_index < list.i_count; i_index++ )
+                for( i_index = 0; i_index < p_list->i_count; i_index++ )
                 {
-                    p_parser = (module_t *)list.p_values[i_index].p_object ;
+                    p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
                     if( !strcmp( p_parser->psz_capability,
                                  p_item->psz_type ) )
                     {
-                        NSString *o_object_name = [NSString 
+                        NSString *o_object_name = [NSString
                             stringWithCString: p_parser->psz_object_name];
                         [o_modules addItemWithTitle: o_object_name];
                     }
@@ -404,9 +404,9 @@
                 NSString *o_value =
                     [NSString stringWithCString: p_item->psz_value];
 
-                [o_text_field setStringValue: o_value]; 
-                [o_modules selectItemWithTitle: o_value]; 
-                [o_btn_configure setEnabled: [self hasPrefs: o_value]]; 
+                [o_text_field setStringValue: o_value];
+                [o_modules selectItemWithTitle: o_value];
+                [o_btn_configure setEnabled: [self hasPrefs: o_value]];
             }
             else
             {
@@ -443,7 +443,7 @@
                 CHECK_VIEW_HEIGHT;
 
                 o_combo_box = [[VLCComboBox alloc] initWithFrame: s_rc];
-                CONTROL_CONFIG( o_combo_box, o_module_name, 
+                CONTROL_CONFIG( o_combo_box, o_module_name,
                                 CONFIG_ITEM_STRING, p_item->psz_name );
                 [o_combo_box setToolTip:
                     [NSApp localizedString: p_item->psz_longtext]];
@@ -454,16 +454,16 @@
                     object: o_combo_box];
                 [[NSNotificationCenter defaultCenter] addObserver: self
                     selector: @selector(configChanged:)
-                    name: NSComboBoxSelectionDidChangeNotification 
+                    name: NSComboBoxSelectionDidChangeNotification
                     object: o_combo_box];
 
                 for( i=0; p_item->ppsz_list[i]; i++ )
                 {
                     [o_combo_box addItemWithObjectValue:
-                        [NSString stringWithCString: p_item->ppsz_list[i]]]; 
+                        [NSString stringWithCString: p_item->ppsz_list[i]]];
                 }
 
-                CONTROL_LABEL( p_item->psz_text ); 
+                CONTROL_LABEL( p_item->psz_text );
 
                 s_rc.origin.y += s_rc.size.height;
                 s_rc.origin.x = X_ORIGIN;
@@ -474,7 +474,7 @@
 
         case CONFIG_ITEM_INTEGER:
         {
-            INPUT_FIELD_INTEGER( p_item->psz_name, p_item->psz_text, 70, 
+            INPUT_FIELD_INTEGER( p_item->psz_name, p_item->psz_text, 70,
                                  p_item->i_value, p_item->psz_longtext );
         }
         break;
@@ -499,14 +499,14 @@
             o_btn_bool = [[VLCButton alloc] initWithFrame: s_rc];
             [o_btn_bool setButtonType: NSSwitchButton];
             [o_btn_bool setIntValue: p_item->i_value];
-            [o_btn_bool setTitle: 
+            [o_btn_bool setTitle:
                 [NSApp localizedString: p_item->psz_text]];
             [o_btn_bool setToolTip:
                 [NSApp localizedString: p_item->psz_longtext]];
             [o_btn_bool setTarget: self];
             [o_btn_bool setAction: @selector(configChanged:)];
-            CONTROL_CONFIG( o_btn_bool, o_module_name, 
-                            CONFIG_ITEM_BOOL, p_item->psz_name ); 
+            CONTROL_CONFIG( o_btn_bool, o_module_name,
+                            CONFIG_ITEM_BOOL, p_item->psz_name );
             [o_view addSubview: [o_btn_bool autorelease]];
 
             s_rc.origin.y += s_rc.size.height;
@@ -526,7 +526,7 @@
     }
     while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 
     [o_toolbars setObject: o_tb_items forKey: o_module_name];
     [o_toolbar setDelegate: self];
@@ -547,7 +547,7 @@
     s_rc.origin.y = s_panel_rc.origin.y + 14;
     s_rc.size.height = 25; s_rc.size.width = 100;
     s_rc.origin.x = s_panel_rc.size.width - s_rc.size.width - 14;
-    DEF_PANEL_BUTTON( 0, _NS("OK"), clickedCancelOK: ); 
+    DEF_PANEL_BUTTON( 0, _NS("OK"), clickedCancelOK: );
     [o_panel setDefaultButtonCell: [o_button cell]];
 
     s_rc.origin.x -= s_rc.size.width;
@@ -626,7 +626,7 @@
     o_view = [o_views objectForKey: [sender label]];
 
     o_scroll_view = [o_scroll_views objectForKey: o_module_name];
-    [o_scroll_view setDocumentView: o_view]; 
+    [o_scroll_view setDocumentView: o_view];
 }
 
 - (void)moduleSelected:(id)sender
@@ -651,7 +651,7 @@
     NSString *o_module_name;
     NSPopUpButton *o_modules;
 
-    o_modules = [[sender superview] viewWithTag: [sender tag] - 1]; 
+    o_modules = [[sender superview] viewWithTag: [sender tag] - 1];
     o_module_name = [o_modules titleOfSelectedItem];
 
     [self createPrefPanel: o_module_name];
@@ -681,14 +681,14 @@
     id o_vlc_config = [o_unknown isKindOfClass: [NSNotification class]] ?
                       [o_unknown object] : o_unknown;
 
-    NSString *o_module_name = [o_vlc_config moduleName]; 
-    NSPanel *o_pref_panel = [o_pref_panels objectForKey: o_module_name]; 
+    NSString *o_module_name = [o_vlc_config moduleName];
+    NSPanel *o_pref_panel = [o_pref_panels objectForKey: o_module_name];
     NSMutableArray *o_prefs = [o_save_prefs objectForKey: o_module_name];
 
     if( [o_prefs indexOfObjectIdenticalTo: o_vlc_config] == NSNotFound )
     {
         NSView *o_pref_view = [o_pref_panel contentView];
-        NSButton *o_btn_apply = [o_pref_view viewWithTag: 2]; 
+        NSButton *o_btn_apply = [o_pref_view viewWithTag: 2];
 
         [o_prefs addObject: o_vlc_config];
         [o_btn_apply setEnabled: YES];
@@ -701,8 +701,8 @@
     NSEnumerator *o_enum;
 
     NSView *o_config_view = [sender superview];
-    NSWindow *o_config_panel = [o_config_view window];    
-    NSButton *o_btn_apply = [o_config_view viewWithTag: 2]; 
+    NSWindow *o_config_panel = [o_config_view window];
+    NSButton *o_btn_apply = [o_config_view viewWithTag: 2];
     NSString *o_module_name = [[o_config_panel toolbar] identifier];
     NSMutableArray *o_prefs = [o_save_prefs objectForKey: o_module_name];
 
@@ -726,7 +726,7 @@
                 o_value = [o_vlc_control stringValue];
                 psz_value = (char *)[o_value lossyCString];
 
-                config_PutPsz( p_intf, psz_name, 
+                config_PutPsz( p_intf, psz_name,
                                *psz_value ? psz_value : NULL );
             }
             break;
@@ -770,7 +770,7 @@
     [o_pref_panel close];
 
     if( [self respondsToSelector: @selector(performSelectorOnMainThread:
-                                            withObject:waitUntilDone:)] ) 
+                                            withObject:waitUntilDone:)] )
     {
         [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
                                            withObject: o_module_name
@@ -788,8 +788,8 @@
 
 @implementation VLCPrefs (NSToolbarDelegate)
 
-- (NSToolbarItem *)toolbar:(NSToolbar *)o_toolbar 
-                   itemForItemIdentifier:(NSString *)o_item_id 
+- (NSToolbarItem *)toolbar:(NSToolbar *)o_toolbar
+                   itemForItemIdentifier:(NSString *)o_item_id
                    willBeInsertedIntoToolbar:(BOOL)b_flag
 {
     NSMutableDictionary *o_toolbar_items;
@@ -819,9 +819,9 @@
     if( o_toolbar_items == nil )
     {
         return( nil );
-    }  
+    }
 
-    o_ids = [[o_toolbar_items allKeys] 
+    o_ids = [[o_toolbar_items allKeys]
         sortedArrayUsingSelector: @selector(compare:)];
 
     return( o_ids );

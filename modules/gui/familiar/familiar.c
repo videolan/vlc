@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.27 2003/01/17 18:19:11 jpsaman Exp $
+ * $Id: familiar.c,v 1.28 2003/01/27 17:41:01 ipkiss Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -261,11 +261,12 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
     GtkWidget *cbautoplay;
     intf_thread_t *p_intf;
     int i_index;
-    vlc_list_t list = vlc_list_find( p_this, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                        FIND_ANYWHERE );
 
-    for( i_index = 0; i_index < list.i_count; i_index++ )
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
+        p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
 
         if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {
@@ -286,7 +287,7 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
                                       p_intf->p_sys->b_autoplayfile );
     }
-    vlc_list_release( &list );
+    vlc_list_release( p_list );
 }
 
 /* following functions are local */
