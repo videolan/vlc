@@ -24,7 +24,7 @@ chapters.
 
     <para>
 The input thread spawns the appropriate decoder modules from <filename>
-src/input/input_dec.c</filename>. The <function>Dec_CreateThread</funcion>
+src/input/input_dec.c</filename>. The <function>Dec_CreateThread</function>
 function selects the more accurate decoder module. Each decoder module 
 looks at decoder_config.i_type and returns a score [ see the modules 
 section ]. It then launches <function> module.pf_run()</function>, 
