@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.43 2002/02/19 00:50:19 sam Exp $
+ * $Id: intf_msg.c,v 1.44 2002/02/19 03:54:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -386,21 +386,9 @@ static void FlushLockedMsg ( void )
     }
 
     /* Free message data */
-    if( msg_bank.i_start <= i_stop )
-    {
-        i_index = msg_bank.i_start;
-    }
-    else
-    {
-        for( i_index = msg_bank.i_start; i_index < INTF_MSG_QSIZE; i_index++ )
-        {
-            free( msg_bank.msg[i_index].psz_msg );
-        }
-
-        i_index = 0;
-    }
-
-    for( ; i_index < i_stop; i_index++ )
+    for( i_index = msg_bank.i_start;
+         i_index != i_stop;
+         i_index = (i_index+1) % INTF_MSG_QSIZE )
     {
         free( msg_bank.msg[i_index].psz_msg );
     }

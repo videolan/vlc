@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.31 2002/01/09 02:01:14 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.32 2002/02/19 03:54:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -468,6 +468,12 @@ void GtkJumpActivate( GtkMenuItem * menuitem, gpointer user_data )
 }
 
 
+void GtkMessagesActivate( GtkMenuItem * menuitem, gpointer user_data )
+{
+    GtkMessagesShow( GTK_WIDGET( menuitem ), NULL, user_data );
+}
+
+
 /****************************************************************************
  * Callbacks for disc ejection
  ****************************************************************************/
@@ -515,7 +521,40 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
 
 void GtkEjectDiscActivate ( GtkMenuItem *menuitem, gpointer user_data )
 {
-  fprintf(stderr, "DEBUG: EJECT called from MENU !\n");
-
   GtkDiscEject( GTK_WIDGET( menuitem ), NULL, user_data );
 }
+
+/****************************************************************************
+ * Messages window
+ ****************************************************************************/
+
+gboolean GtkMessagesShow( GtkWidget       *widget,
+                          GdkEventButton  *event,
+                          gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    gtk_widget_show( p_intf->p_sys->p_messages );
+    gdk_window_raise( p_intf->p_sys->p_messages->window );
+    return TRUE;
+}
+
+
+void
+GtkMessagesOk                          (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
+    gtk_widget_hide( p_intf->p_sys->p_messages );
+}
+
+
+gboolean
+GtkMessagesDelete                      (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    gtk_widget_hide( p_intf->p_sys->p_messages );
+    return TRUE;
+}
+

@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.1 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_common.h,v 1.2 2002/02/19 03:54:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,6 +75,11 @@ typedef struct intf_sys_s
     GtkFrame *          p_slider_frame;
     GtkAdjustment *     p_adj;                   /* slider adjustment object */
     float               f_adj_oldvalue;                    /* previous value */
+
+    /* The messages window */
+    GtkWidget *         p_messages;                       /* messages window */
+    GtkText *           p_messages_text;                   /* messages frame */
+    intf_subscription_t*p_sub;                     /* interface subscription */
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */

@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.16 2002/01/09 02:01:14 sam Exp $
+ * $Id: gtk_callbacks.h,v 1.17 2002/02/19 03:54:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -50,6 +50,7 @@ gboolean GtkSliderPress         ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkWindowDelete        ( GtkWidget * widget, GdkEvent *, gpointer );
 gboolean GtkJumpShow            ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkAboutShow           ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkMessagesShow        ( GtkWidget *, GdkEventButton *, gpointer );
 void     GtkTitlePrev           ( GtkButton * button, gpointer );
 void     GtkTitleNext           ( GtkButton * button, gpointer );
 void     GtkChapterPrev         ( GtkButton *, gpointer );
@@ -78,4 +79,17 @@ GtkEjectDiscActivate                   (GtkMenuItem     *menuitem,
 gboolean
 GtkDiscEject                           (GtkWidget       *widget,
                                         GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+GtkMessagesActivate                    (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+GtkMessagesOk                          (GtkButton       *button,
+                                        gpointer         user_data);
+
+gboolean
+GtkMessagesDelete                      (GtkWidget       *widget,
+                                        GdkEvent        *event,
                                         gpointer         user_data);
