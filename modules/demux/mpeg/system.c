@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.14 2003/05/05 22:23:36 gbazin Exp $
+ * $Id: system.c,v 1.15 2003/07/03 00:11:38 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -781,6 +781,7 @@ static ssize_t ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
             else
             {
                 msg_Err( p_input, "unable to determine stream type" );
+                p_input->p_current_data++;
                 return( -1 );
             }
         }
