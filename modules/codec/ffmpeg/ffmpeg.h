@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ffmpeg_vdec.h: video decoder using ffmpeg library
+ * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.26 2003/10/25 00:49:13 sam Exp $
+ * $Id: ffmpeg.h,v 1.27 2003/10/27 01:04:38 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -23,214 +23,121 @@
 
 #include "codecs.h"                                      /* BITMAPINFOHEADER */
 
-
-#define DECODER_THREAD_COMMON \
-    decoder_fifo_t      *p_fifo; \
-    \
-    int i_cat; /* AUDIO_ES, VIDEO_ES */ \
-    int i_codec_id; \
-    char *psz_namecodec; \
-    \
-    AVCodecContext      *p_context; \
-    AVCodec             *p_codec; \
-    mtime_t input_pts_previous; \
-    mtime_t input_pts; \
-    mtime_t pts; \
-    \
-    /* Private stuff for frame gathering */ \
-    uint8_t *p_buffer;      /* buffer for gather pes */  \
-    int     i_buffer_size;  /* size of allocated p_buffer */ \
-    int     i_buffer;       /* bytes already present in p_buffer */
-
-
-typedef struct generic_thread_s
-{
-    DECODER_THREAD_COMMON
-
-} generic_thread_t;
-
 #if LIBAVCODEC_BUILD >= 4663
 #   define LIBAVCODEC_PP
 #else
 #   undef  LIBAVCODEC_PP
 #endif
 
-#define FREE( p ) if( p ) free( p ); p = NULL
+struct picture_t;
+struct AVFrame;
+struct AVCodecContext;
+struct AVCodec;
 
-int E_( GetPESData )( uint8_t *p_buf, int i_max, pes_packet_t *p_pes );
+void E_(InitLibavcodec)( vlc_object_t * );
+int E_(GetFfmpegCodec)( vlc_fourcc_t, int *, int *, char ** );
+int E_(GetFfmpegChroma)( vlc_fourcc_t );
 
-/*****************************************************************************
- * Video codec fourcc
- *****************************************************************************/
+/* Video decoder module */
+int  E_( InitVideoDec )( decoder_t *, AVCodecContext *, AVCodec *,
+                         int, char * );
+void E_( EndVideoDec ) ( decoder_t * );
+int  E_( DecodeVideo ) ( decoder_t *, block_t * );
 
-/* MPEG 1/2 video */
-#define FOURCC_mpgv         VLC_FOURCC('m','p','g','v')
+/* Audio decoder module */
+int  E_( InitAudioDec )( decoder_t *, AVCodecContext *, AVCodec *,
+                         int, char * );
+void E_( EndAudioDec ) ( decoder_t * );
+int  E_( DecodeAudio ) ( decoder_t *, block_t * );
 
-/* MPEG4 video */
-#define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
-#define FOURCC_divx         VLC_FOURCC('d','i','v','x')
-#define FOURCC_DIV1         VLC_FOURCC('D','I','V','1')
-#define FOURCC_div1         VLC_FOURCC('d','i','v','1')
-#define FOURCC_MP4S         VLC_FOURCC('M','P','4','S')
-#define FOURCC_mp4s         VLC_FOURCC('m','p','4','s')
-#define FOURCC_M4S2         VLC_FOURCC('M','4','S','2')
-#define FOURCC_m4s2         VLC_FOURCC('m','4','s','2')
-#define FOURCC_xvid         VLC_FOURCC('x','v','i','d')
-#define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
-#define FOURCC_XviD         VLC_FOURCC('X','v','i','D')
-#define FOURCC_DX50         VLC_FOURCC('D','X','5','0')
-#define FOURCC_mp4v         VLC_FOURCC('m','p','4','v')
-#define FOURCC_4            VLC_FOURCC( 4,  0,  0,  0 )
-#define FOURCC_m4cc         VLC_FOURCC('m','4','c','c')
-#define FOURCC_M4CC         VLC_FOURCC('M','4','C','C')
+/* Chroma conversion module */
+int  E_(OpenChroma)( vlc_object_t * );
 
-/* MSMPEG4 v2 */
-#define FOURCC_MPG4         VLC_FOURCC('M','P','G','4')
-#define FOURCC_mpg4         VLC_FOURCC('m','p','g','4')
-#define FOURCC_DIV2         VLC_FOURCC('D','I','V','2')
-#define FOURCC_div2         VLC_FOURCC('d','i','v','2')
-#define FOURCC_MP42         VLC_FOURCC('M','P','4','2')
-#define FOURCC_mp42         VLC_FOURCC('m','p','4','2')
+/* Video encoder module */
+int  E_(OpenVideoEncoder) ( vlc_object_t * );
+void E_(CloseVideoEncoder)( vlc_object_t * );
 
-/* MSMPEG4 v3 / M$ mpeg4 v3 */
-#define FOURCC_MPG3         VLC_FOURCC('M','P','G','3')
-#define FOURCC_mpg3         VLC_FOURCC('m','p','g','3')
-#define FOURCC_div3         VLC_FOURCC('d','i','v','3')
-#define FOURCC_MP43         VLC_FOURCC('M','P','4','3')
-#define FOURCC_mp43         VLC_FOURCC('m','p','4','3')
+/* Audio encoder module */
+int  E_(OpenAudioEncoder) ( vlc_object_t * );
+void E_(CloseAudioEncoder)( vlc_object_t * );
 
-/* DivX 3.20 */
-#define FOURCC_DIV3         VLC_FOURCC('D','I','V','3')
-#define FOURCC_DIV4         VLC_FOURCC('D','I','V','4')
-#define FOURCC_div4         VLC_FOURCC('d','i','v','4')
-#define FOURCC_DIV5         VLC_FOURCC('D','I','V','5')
-#define FOURCC_div5         VLC_FOURCC('d','i','v','5')
-#define FOURCC_DIV6         VLC_FOURCC('D','I','V','6')
-#define FOURCC_div6         VLC_FOURCC('d','i','v','6')
-
-/* AngelPotion stuff */
-#define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
-
-/* 3ivx doctered divx files */
-#define FOURCC_3IVD         VLC_FOURCC('3','I','V','D')
-#define FOURCC_3ivd         VLC_FOURCC('3','i','v','d')
-
-/* 3ivx delta 3.5 Unsupported */
-#define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
-#define FOURCC_3iv1         VLC_FOURCC('3','i','v','1')
-
-/* 3ivx delta 4 */
-#define FOURCC_3IV2         VLC_FOURCC('3','I','V','2')
-#define FOURCC_3iv2         VLC_FOURCC('3','i','v','2')
-
-/* who knows? */
-#define FOURCC_3VID         VLC_FOURCC('3','V','I','D')
-#define FOURCC_3vid         VLC_FOURCC('3','v','i','d')
-
-/* H263 and H263i */
-/* H263(+) is also known as Real Video 1.0 */
-#define FOURCC_H263         VLC_FOURCC('H','2','6','3')
-#define FOURCC_h263         VLC_FOURCC('h','2','6','3')
-#define FOURCC_U263         VLC_FOURCC('U','2','6','3')
-#define FOURCC_I263         VLC_FOURCC('I','2','6','3')
-#define FOURCC_i263         VLC_FOURCC('i','2','6','3')
-/* Flash (H263) variant */
-#define FOURCC_FLV1         VLC_FOURCC('F','L','V','1')
-
-
-/* Sorenson v1/3 */
-#define FOURCC_SVQ1         VLC_FOURCC('S','V','Q','1')
-#define FOURCC_SVQ3         VLC_FOURCC('S','V','Q','3')
-
-/* mjpeg */
-#define FOURCC_MJPG         VLC_FOURCC( 'M', 'J', 'P', 'G' )
-#define FOURCC_mjpg         VLC_FOURCC( 'm', 'j', 'p', 'g' )
-    /* for mov file */
-#define FOURCC_mjpa         VLC_FOURCC( 'm', 'j', 'p', 'a' )
-    /* for mov file XXX: untested */
-#define FOURCC_mjpb         VLC_FOURCC( 'm', 'j', 'p', 'b' )
-
-#define FOURCC_jpeg         VLC_FOURCC( 'j', 'p', 'e', 'g' )
-#define FOURCC_JPEG         VLC_FOURCC( 'J', 'P', 'E', 'G' )
-#define FOURCC_JFIF         VLC_FOURCC( 'J', 'F', 'I', 'F' )
-#define FOURCC_JPGL         VLC_FOURCC( 'J', 'P', 'G', 'L' )
-
-/* Microsoft Video 1 */
-#define FOURCC_MSVC         VLC_FOURCC('M','S','V','C')
-#define FOURCC_msvc         VLC_FOURCC('m','s','v','c')
-#define FOURCC_CRAM         VLC_FOURCC('C','R','A','M')
-#define FOURCC_cram         VLC_FOURCC('c','r','a','m')
-#define FOURCC_WHAM         VLC_FOURCC('W','H','A','M')
-#define FOURCC_wham         VLC_FOURCC('w','h','a','m')
-
-/* Windows Screen Video */
-#define FOURCC_MSS1         VLC_FOURCC('M','S','S','1')
-
-/* Microsoft RLE */
-#define FOURCC_mrle         VLC_FOURCC('m','r','l','e')
-#define FOURCC_1000         VLC_FOURCC(0x1,0x0,0x0,0x0)
-
-/* Windows Media Video */
-#define FOURCC_WMV1         VLC_FOURCC('W','M','V','1')
-#define FOURCC_WMV2         VLC_FOURCC('W','M','V','2')
-
-/* DV */
-#define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')
-#define FOURCC_dvsd         VLC_FOURCC('d','v','s','d')
-#define FOURCC_DVSD         VLC_FOURCC('D','V','S','D')
-#define FOURCC_dvhd         VLC_FOURCC('d','v','h','d')
-#define FOURCC_dvc          VLC_FOURCC('d','v','c',' ')
-#define FOURCC_dvp          VLC_FOURCC('d','v','p',' ')
-#define FOURCC_CDVC         VLC_FOURCC('C','D','V','C')
-
-/* Indeo Video Codecs */
-#define FOURCC_IV31         VLC_FOURCC('I','V','3','1')
-#define FOURCC_iv31         VLC_FOURCC('i','v','3','1')
-#define FOURCC_IV32         VLC_FOURCC('I','V','3','2')
-#define FOURCC_iv32         VLC_FOURCC('i','v','3','2')
-
-/* On2 VP3 Video Codecs */
-#define FOURCC_VP31         VLC_FOURCC('V','P','3','1')
-#define FOURCC_vp31         VLC_FOURCC('v','p','3','1')
-
-/* Asus Video */
-#define FOURCC_ASV1         VLC_FOURCC('A','S','V','1')
-#define FOURCC_ASV2         VLC_FOURCC('A','S','V','2')
-
-/* ATI VCR1 */
-#define FOURCC_VCR1         VLC_FOURCC('V','C','R','1')
-
-/* FFMPEG Video 1 (lossless codec) */
-#define FOURCC_FFV1         VLC_FOURCC('F','F','V','1')
-
-/* Cirrus Logic AccuPak */
-#define FOURCC_CLJR         VLC_FOURCC('C','L','J','R')
-
-/* Creative YUV */
-#define FOURCC_CYUV         VLC_FOURCC('C','Y','U','V')
-
-/* Huff YUV */
-#define FOURCC_HFYU         VLC_FOURCC('H','F','Y','U')
-
-/* Apple Video */
-#define FOURCC_rpza         VLC_FOURCC('r','p','z','a')
-
-/* Cinepak */
-#define FOURCC_cvid         VLC_FOURCC('c','v','i','d')
-
+/* Postprocessing module */
+int E_(OpenPostproc)( decoder_t *, void ** );
+int E_(InitPostproc)( decoder_t *, void *, int, int, int );
+int E_(PostprocPict)( decoder_t *, void *, picture_t *, AVFrame * );
+void E_(ClosePostproc)( decoder_t *, void * );
 
 /*****************************************************************************
- * Audio codec fourcc
+ * Module descriptor help strings
  *****************************************************************************/
-#define FOURCC_WMA1         VLC_FOURCC('W','M','A','1')
-#define FOURCC_wma1         VLC_FOURCC('w','m','a','1')
-#define FOURCC_WMA2         VLC_FOURCC('W','M','A','2')
-#define FOURCC_wma2         VLC_FOURCC('w','m','a','2')
-#define FOURCC_dvau         VLC_FOURCC('d','v','a','u')
+#define DR_TEXT N_("Direct rendering")
 
-#define FOURCC_MAC3         VLC_FOURCC('M','A','C','3')
-#define FOURCC_MAC6         VLC_FOURCC('M','A','C','6')
+#define ERROR_TEXT N_("Error resilience")
+#define ERROR_LONGTEXT N_( \
+    "ffmpeg can make errors resiliences.          \n" \
+    "Nevertheless, with a buggy encoder (like ISO MPEG-4 encoder from M$) " \
+    "this will produce a lot of errors.\n" \
+    "Valid range is -1 to 99 (-1 disables all errors resiliences).")
 
-#define FOURCC_RA10         VLC_FOURCC('1','4','_','4')
-#define FOURCC_RA20         VLC_FOURCC('2','8','_','8')
+#define BUGS_TEXT N_("Workaround bugs")
+#define BUGS_LONGTEXT N_( \
+    "Try to fix some bugs\n" \
+    "1  autodetect\n" \
+    "2  old msmpeg4\n" \
+    "4  xvid interlaced\n" \
+    "8  ump4 \n" \
+    "16 no padding\n" \
+    "32 ac vlc\n" \
+    "64 Qpel chroma")
 
+#define HURRYUP_TEXT N_("Hurry up")
+#define HURRYUP_LONGTEXT N_( \
+    "Allow the decoder to partially decode or skip frame(s) " \
+    "when there is not enough time. It's useful with low CPU power " \
+    "but it can produce distorted pictures.")
+
+#define TRUNC_TEXT N_("Truncated stream")
+#define TRUNC_LONGTEXT N_("truncated stream -1:auto,0:disable,:1:enable")
+
+#define PP_Q_TEXT N_("Post processing quality")
+#define PP_Q_LONGTEXT N_( \
+    "Quality of post processing. Valid range is 0 to 6\n" \
+    "Higher levels require considerable more CPU power, but produce " \
+    "better looking pictures." )
+
+#define LIBAVCODEC_PP_TEXT N_("Ffmpeg postproc filter chains")
+/* FIXME (cut/past from ffmpeg */
+#define LIBAVCODEC_PP_LONGTEXT \
+"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
+"long form example:\n" \
+"vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
+"short form example:\n" \
+"vb:a/hb:a/lb de,-vb\n" \
+"more examples:\n" \
+"tn:64:128:256\n" \
+"Filters                        Options\n" \
+"short  long name       short   long option     Description\n" \
+"*      *               a       autoq           cpu power dependant enabler\n" \
+"                       c       chrom           chrominance filtring enabled\n" \
+"                       y       nochrom         chrominance filtring disabled\n" \
+"hb     hdeblock        (2 Threshold)           horizontal deblocking filter\n" \
+"       1. difference factor: default=64, higher -> more deblocking\n" \
+"       2. flatness threshold: default=40, lower -> more deblocking\n" \
+"                       the h & v deblocking filters share these\n" \
+"                       so u cant set different thresholds for h / v\n" \
+"vb     vdeblock        (2 Threshold)           vertical deblocking filter\n" \
+"h1     x1hdeblock                              Experimental h deblock filter 1\n" \
+"v1     x1vdeblock                              Experimental v deblock filter 1\n" \
+"dr     dering                                  Deringing filter\n" \
+"al     autolevels                              automatic brightness / contrast\n" \
+"                       f       fullyrange      stretch luminance to (0..255)\n" \
+"lb     linblenddeint                           linear blend deinterlacer\n" \
+"li     linipoldeint                            linear interpolating deinterlace\n" \
+"ci     cubicipoldeint                          cubic interpolating deinterlacer\n" \
+"md     mediandeint                             median deinterlacer\n" \
+"fd     ffmpegdeint                             ffmpeg deinterlacer\n" \
+"de     default                                 hb:a,vb:a,dr:a,al\n" \
+"fa     fast                                    h1:a,v1:a,dr:a,al\n" \
+"tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n" \
+"                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
+"fq     forceQuant      <quantizer>             Force quantizer\n"

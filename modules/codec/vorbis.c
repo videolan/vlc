@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.19 2003/09/28 16:50:05 gbazin Exp $
+ * $Id: vorbis.c,v 1.20 2003/10/27 01:04:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -37,10 +37,21 @@
 #include <vlc/input.h>
 
 #include <ogg/ogg.h>
+
 #ifdef MODULE_NAME_IS_tremor
 #include <tremor/ivorbiscodec.h>
+
 #else
 #include <vorbis/codec.h>
+
+/* vorbis header */
+#ifdef HAVE_VORBIS_VORBISENC_H
+#   include <vorbis/vorbisenc.h>
+#   ifndef OV_ECTL_RATEMANAGE_AVG
+#       define OV_ECTL_RATEMANAGE_AVG 0x0
+#   endif
+#endif
+
 #endif
 
 /*****************************************************************************
@@ -121,10 +132,18 @@ static void Interleave   ( int32_t *, const int32_t **, int, int );
 static void Interleave   ( float *, const float **, int, int );
 #endif
 
+#ifndef MODULE_NAME_IS_tremor
+static int OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder ( vlc_object_t * );
+static block_t *Headers  ( encoder_t * );
+static block_t *Encode   ( encoder_t *, aout_buffer_t * );
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+
     set_description( _("Vorbis audio decoder") );
 #ifdef MODULE_NAME_IS_tremor
     set_capability( "decoder", 90 );
@@ -137,6 +156,14 @@ vlc_module_begin();
     set_description( _("Vorbis audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, NULL );
+
+#ifndef MODULE_NAME_IS_tremor
+    add_submodule();
+    set_description( _("Vorbis audio encoder") );
+    set_capability( "audio encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
+#endif
+
 vlc_module_end();
 
 /*****************************************************************************
@@ -576,3 +603,229 @@ static int EndDecoder( decoder_t * p_dec )
 
     return VLC_SUCCESS;
 }
+
+
+#if defined(HAVE_VORBIS_VORBISENC_H) && !defined(MODULE_NAME_IS_tremor)
+
+/*****************************************************************************
+ * encoder_sys_t : theora encoder descriptor
+ *****************************************************************************/
+struct encoder_sys_t
+{
+    /*
+     * Input properties
+     */
+    int i_headers;
+
+    /*
+     * Vorbis properties
+     */
+    vorbis_info      vi; /* struct that stores all the static vorbis bitstream
+                            settings */
+    vorbis_comment   vc; /* struct that stores all the bitstream user
+                          * comments */
+    vorbis_dsp_state vd; /* central working state for the packet->PCM
+                          * decoder */
+    vorbis_block     vb; /* local working space for packet->PCM decode */
+
+    int i_last_block_size;
+    int i_samples_delay;
+
+    /*
+     * Packetizer output properties
+     */
+    sout_packetizer_input_t *p_sout_input;
+    sout_format_t           sout_format;
+
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
+};
+
+/*****************************************************************************
+ * OpenEncoder: probe the encoder and return score
+ *****************************************************************************/
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    if( p_enc->i_fourcc != VLC_FOURCC('v','o','r','b') )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_enc, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_enc->p_sys = p_sys;
+
+    p_enc->pf_header = Headers;
+    p_enc->pf_encode_audio = Encode;
+    p_enc->format.audio.i_format = VLC_FOURCC('f','l','3','2');
+
+    /* Initialize vorbis encoder */
+    vorbis_info_init( &p_sys->vi );
+
+    if( vorbis_encode_setup_managed( &p_sys->vi,
+            aout_FormatNbChannels( &p_enc->format.audio ),
+            p_enc->format.audio.i_rate, -1, p_enc->i_bitrate, -1 ) ||
+        vorbis_encode_ctl( &p_sys->vi, OV_ECTL_RATEMANAGE_AVG, NULL ) ||
+        vorbis_encode_setup_init( &p_sys->vi ) ){}
+
+    /* add a comment */
+    vorbis_comment_init( &p_sys->vc);
+    vorbis_comment_add_tag( &p_sys->vc, "ENCODER", "VLC media player");
+
+    /* set up the analysis state and auxiliary encoding storage */
+    vorbis_analysis_init( &p_sys->vd, &p_sys->vi );
+    vorbis_block_init( &p_sys->vd, &p_sys->vb );
+
+    p_sys->i_last_block_size = 0;
+    p_sys->i_samples_delay = 0;
+    p_sys->i_headers = 0;
+    p_sys->i_pts = 0;
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Headers( encoder_t *p_enc )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_block, **pp_block = NULL;
+
+    /* Create theora headers */
+    if( !p_sys->i_headers )
+    {
+        ogg_packet header[3];
+        int i;
+
+        vorbis_analysis_headerout( &p_sys->vd, &p_sys->vc,
+                                   &header[0], &header[1], &header[2]);
+        for( i = 0; i < 3; i++ )
+        {
+            p_block = block_New( p_enc, header[i].bytes );
+            memcpy( p_block->p_buffer, header[i].packet, header[i].bytes );
+
+            p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
+
+            block_ChainAppend( pp_block, p_block );
+        }
+        p_sys->i_headers = 3;
+
+        return *pp_block;
+    }
+
+    return NULL;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    ogg_packet oggpacket;
+    block_t *p_block, *p_chain = NULL;
+    float **buffer;
+    int i_samples;
+
+    p_sys->i_pts = p_aout_buf->start_date -
+                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
+                (mtime_t)p_enc->format.audio.i_rate;
+
+    i_samples = p_aout_buf->i_nb_samples;
+    p_sys->i_samples_delay += i_samples;
+
+    buffer = vorbis_analysis_buffer( &p_sys->vd, i_samples );
+
+#if 0
+    if( id->ff_dec_c->channels != id->ff_enc_c->channels )
+    {
+        int i, j;
+
+        /* dumb downmixing */
+        for( i = 0; i < id->ff_enc_c->frame_size; i++ )
+        {
+            for( j = 0 ; j < id->f_dst.i_channels; j++ )
+            {
+                p_buffer[i*id->f_dst.i_channels+j] =
+                    p_buffer[i*id->f_src.i_channels+j];
+            }
+        }
+    }
+
+    /* convert samples to float and uninterleave */
+    for( i = 0; i < id->f_dst.i_channels; i++ )
+    {
+        for( j = 0 ; j < i_samples ; j++ )
+        {
+            buffer[i][j]= ((float)( ((int16_t *)id->p_buffer)
+                                    [j*id->f_src.i_channels + i ] ))/ 32768.f;
+        }
+    }
+#endif
+
+    vorbis_analysis_wrote( &p_sys->vd, i_samples );
+
+    while( vorbis_analysis_blockout( &p_sys->vd, &p_sys->vb ) == 1 )
+    {
+        vorbis_analysis( &p_sys->vb, NULL );
+        vorbis_bitrate_addblock( &p_sys->vb );
+
+        while( vorbis_bitrate_flushpacket( &p_sys->vd, &oggpacket ) )
+        {
+            int i_block_size;
+            p_block = block_New( p_enc, oggpacket.bytes );
+            memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
+
+            i_block_size = vorbis_packet_blocksize( &p_sys->vi, &oggpacket );
+
+            if( i_block_size < 0 ) i_block_size = 0;
+            i_samples = ( p_sys->i_last_block_size + i_block_size ) >> 2;
+            p_sys->i_last_block_size = i_block_size;
+
+            p_block->i_length = (mtime_t)1000000 *
+                (mtime_t)i_samples / (mtime_t)p_enc->format.audio.i_rate;
+
+            p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+
+            p_sys->i_samples_delay -= i_samples;
+
+            /* Update pts */
+            p_sys->i_pts += p_block->i_length;
+            block_ChainAppend( &p_chain, p_block );
+        }
+    }
+
+    return p_chain;
+}
+
+/*****************************************************************************
+ * CloseEncoder: theora encoder destruction
+ *****************************************************************************/
+static void CloseEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    vorbis_block_clear( &p_sys->vb );
+    vorbis_dsp_clear( &p_sys->vd );
+    vorbis_comment_clear( &p_sys->vc );
+    vorbis_info_clear( &p_sys->vi );  /* must be called last */
+
+    free( p_sys );
+}
+
+#endif /* HAVE_VORBIS_VORBISENC_H && !MODULE_NAME_IS_tremor */

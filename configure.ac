@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.98 2003/10/26 17:11:56 gbazin Exp $
+dnl $Id: configure.ac,v 1.99 2003/10/27 01:04:38 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1706,13 +1706,6 @@ then
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
     fi
   fi
-
-  ac_have_vorbis_headers=yes
-  AC_CHECK_HEADERS(vorbis/vorbisenc.h vorbis/codec.h,,
-      ac_have_vorbis_headers=no)
-  if test "$ac_have_vorbis_headers" = "yes"; then
-    AX_ADD_LDFLAGS([stream_out_transcode],[-lvorbisenc -lvorbis -logg])
-  fi
 fi
 
 dnl
@@ -2020,6 +2013,9 @@ then
   AC_CHECK_HEADERS(vorbis/codec.h, [
     AX_ADD_PLUGINS([vorbis])
     AX_ADD_LDFLAGS([vorbis],[-lvorbis -logg]) ],[])
+
+  AC_CHECK_HEADERS(vorbis/vorbisenc.h, [
+    AX_ADD_LDFLAGS([vorbis],[-lvorbisenc]) ],[])
 fi
 
 dnl

@@ -2,9 +2,9 @@ SOURCES_ffmpeg = \
 	ffmpeg.c \
 	ffmpeg.h \
 	video.c \
-	video.h \
 	audio.c \
-	audio.h \
 	chroma.c \
+	encoder.c \
+	postprocess.c \
 	$(NULL)
 

@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.2 2003/09/26 16:10:24 gbazin Exp $
+ * $Id: chroma.c,v 1.3 2003/10/27 01:04:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -38,7 +38,7 @@
 
 #include "ffmpeg.h"
 
-void E_(ffmpeg_InitLibavcodec) ( vlc_object_t *p_object );
+void E_(InitLibavcodec) ( vlc_object_t *p_object );
 static void ChromaConversion( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
@@ -104,7 +104,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
         case VLC_FOURCC('U','Y','V','Y'):
             i_ffmpeg_chroma[i] = PIX_FMT_YUV422;
             break;
-           
+
         /* Packed RGB formats */
 
         case VLC_FOURCC('R','V','3','2'):
@@ -148,7 +148,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     p_vout->chroma.p_sys->i_dst_ffmpeg_chroma = i_ffmpeg_chroma[1];
 
     /* libavcodec needs to be initialized for some chroma conversions */
-    E_(ffmpeg_InitLibavcodec)(p_this);
+    E_(InitLibavcodec)(p_this);
 
     return VLC_SUCCESS;
 }

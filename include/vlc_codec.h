@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.1 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: vlc_codec.h,v 1.2 2003/10/27 01:04:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -87,6 +87,20 @@ struct encoder_t
     /* Properties of the output of the encoder */
     vlc_fourcc_t i_fourcc;
     int          i_bitrate;
+
+    int          i_extra_data;
+    uint8_t      *p_extra_data;
+
+    /* FIXME: move these to the ffmpeg encoder */
+    int i_frame_rate;
+    int i_frame_rate_base;
+    int i_key_int;
+    int i_b_frames;
+    int i_vtolerance;
+    int i_qmin;
+    int i_qmax;
+    int i_hq;
+
 };
 
 /**

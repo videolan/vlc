@@ -1,10 +1,11 @@
 /*****************************************************************************
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.19 2003/07/10 01:33:41 fenrir Exp $
+ * Copyright (C) 1999-2003 VideoLAN
+ * $Id: audio.c,v 1.20 2003/10/27 01:04:38 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
@@ -36,12 +38,10 @@
 #include <unistd.h>                                              /* getpid() */
 #endif
 
-#include <errno.h>
-#include <string.h>
-
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
 #endif
+
 #include "codecs.h"
 #include "aout_internal.h"
 
@@ -52,304 +52,241 @@
 #   include <avcodec.h>
 #endif
 
-//#include "postprocessing/postprocessing.h"
 #include "ffmpeg.h"
 #include "audio.h"
-
-/*
- * Local prototypes
- */
-int      E_( InitThread_Audio )   ( adec_thread_t * );
-void     E_( EndThread_Audio )    ( adec_thread_t * );
-void     E_( DecodeThread_Audio ) ( adec_thread_t * );
 
 static unsigned int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
     AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
 /*****************************************************************************
- * locales Functions
+ * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-
-/*****************************************************************************
- *
- * Functions that initialize, decode and end the decoding process
- *
- * Functions exported for ffmpeg.c
- *   * E_( InitThread_Audio )
- *   * E_( DecodeThread_Audio )
- *   * E_( EndThread_Video_Audio )
- *****************************************************************************/
-
-/*****************************************************************************
- * InitThread: initialize vdec output thread
- *****************************************************************************
- * This function is called from decoder_Run and performs the second step
- * of the initialization. It returns 0 on success. Note that the thread's
- * flag are not modified inside this function.
- *
- * ffmpeg codec will be open, some memory allocated.
- *****************************************************************************/
-int E_( InitThread_Audio )( adec_thread_t *p_adec )
+struct decoder_sys_t
 {
+    /* Common part between video and audio decoder */
+    int i_cat;
+    int i_codec_id;
+    char *psz_namecodec;
+    AVCodecContext      *p_context;
+    AVCodec             *p_codec;
+
+    /* Temporary buffer for libavcodec */
+    uint8_t *p_output;
+
+    /*
+     * Output properties
+     */
+    aout_instance_t       *p_aout;
+    aout_input_t          *p_aout_input;
+    audio_sample_format_t aout_format;
+    audio_date_t          end_date;
+};
+
+/*****************************************************************************
+ * InitAudioDec: initialize audio decoder
+ *****************************************************************************
+ * The ffmpeg codec will be opened, some memory allocated.
+ *****************************************************************************/
+int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
+                      AVCodec *p_codec, int i_codec_id, char *psz_namecodec )
+{
+    decoder_sys_t *p_sys;
     WAVEFORMATEX wf, *p_wf;
 
-    if( ( p_wf = p_adec->p_fifo->p_waveformatex ) == NULL )
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys = p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
-        msg_Warn( p_adec->p_fifo, "audio informations missing" );
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+
+    p_dec->p_sys->p_context = p_context;
+    p_dec->p_sys->p_codec = p_codec;
+    p_dec->p_sys->i_codec_id = i_codec_id;
+    p_dec->p_sys->psz_namecodec = psz_namecodec;
+
+    if( ( p_wf = p_dec->p_fifo->p_waveformatex ) == NULL )
+    {
+        msg_Warn( p_dec, "audio informations missing" );
         p_wf = &wf;
         memset( p_wf, 0, sizeof( WAVEFORMATEX ) );
     }
 
     /* ***** Fill p_context with init values ***** */
-    p_adec->p_context->sample_rate = p_wf->nSamplesPerSec;
-    p_adec->p_context->channels = p_wf->nChannels;
-    p_adec->p_context->block_align = p_wf->nBlockAlign;
-    p_adec->p_context->bit_rate = p_wf->nAvgBytesPerSec * 8;
+    p_sys->p_context->sample_rate = p_wf->nSamplesPerSec;
+    p_sys->p_context->channels = p_wf->nChannels;
+    p_sys->p_context->block_align = p_wf->nBlockAlign;
+    p_sys->p_context->bit_rate = p_wf->nAvgBytesPerSec * 8;
 
-    if( ( p_adec->p_context->extradata_size = p_wf->cbSize ) > 0 )
+    if( ( p_sys->p_context->extradata_size = p_wf->cbSize ) > 0 )
     {
-        p_adec->p_context->extradata = malloc( p_wf->cbSize + FF_INPUT_BUFFER_PADDING_SIZE );
-
-        memcpy( p_adec->p_context->extradata, &p_wf[1], p_wf->cbSize);
-        memset( &((uint8_t*)p_adec->p_context->extradata)[p_wf->cbSize], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+        p_sys->p_context->extradata =
+            malloc( p_wf->cbSize + FF_INPUT_BUFFER_PADDING_SIZE );
+        memcpy( p_sys->p_context->extradata, &p_wf[1], p_wf->cbSize);
+        memset( &((uint8_t*)p_sys->p_context->extradata)[p_wf->cbSize], 0,
+                FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
     /* ***** Open the codec ***** */
-    if (avcodec_open(p_adec->p_context, p_adec->p_codec) < 0)
+    if (avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0)
     {
-        msg_Err( p_adec->p_fifo,
-                 "cannot open codec (%s)",
-                 p_adec->psz_namecodec );
-        return( -1 );
+        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        return VLC_EGENERIC;
     }
     else
     {
-        msg_Dbg( p_adec->p_fifo,
-                 "ffmpeg codec (%s) started",
-                 p_adec->psz_namecodec );
+        msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
     }
 
-    p_adec->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    p_sys->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
 
+    p_sys->p_aout = NULL;
+    p_sys->p_aout_input = NULL;
 
-    p_adec->output_format.i_format = AOUT_FMT_S16_NE;
-    p_adec->output_format.i_rate = p_wf->nSamplesPerSec;
-    p_adec->output_format.i_physical_channels
-        = p_adec->output_format.i_original_channels
-        = pi_channels_maps[p_wf->nChannels];
+    aout_DateSet( &p_sys->end_date, 0 );
 
-    p_adec->p_aout = NULL;
-    p_adec->p_aout_input = NULL;
-
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
- * DecodeThread: Called for decode one frame
+ * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
+int E_( DecodeAudio )( decoder_t *p_dec, block_t *p_block )
 {
-    pes_packet_t    *p_pes;
-    aout_buffer_t   *p_aout_buffer;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    aout_buffer_t *p_aout_buffer;
+    mtime_t i_pts;
 
-    int     i_samplesperchannel;
-    int     i_output_size;
-    int     i_frame_size;
-    int     i_used;
+    uint8_t *p_buffer, *p_samples;
+    int i_buffer, i_samples;
 
-    uint8_t *p;
-
-    do
+    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
-        input_ExtractPES( p_adec->p_fifo, &p_pes );
-        if( !p_pes )
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( p_block );
+        return VLC_SUCCESS;
+    }
+
+    i_pts = p_block->i_pts;
+    i_buffer = p_block->i_buffer;
+    p_buffer = p_block->p_buffer;
+
+    while( i_buffer )
+    {
+        int i_used, i_output;
+
+        i_used = avcodec_decode_audio( p_sys->p_context,
+                                       (int16_t*)p_sys->p_output, &i_output,
+                                       p_buffer, i_buffer );
+        if( i_used < 0 )
         {
-            p_adec->p_fifo->b_error = 1;
-            return;
+            msg_Warn( p_dec, "cannot decode one frame (%d bytes)", i_buffer );
+            break;
         }
-        p_adec->pts = p_pes->i_pts;
-        i_frame_size = p_pes->i_pes_size;
 
-        if( i_frame_size > 0 )
+        i_buffer -= i_used;
+        p_buffer += i_used;
+
+        if( p_sys->p_context->channels <= 0 || p_sys->p_context->channels > 6 )
         {
-            int     i_need;
+            msg_Warn( p_dec, "invalid channels count %d",
+                      p_sys->p_context->channels );
+            break;
+        }
 
-
-            i_need = i_frame_size + FF_INPUT_BUFFER_PADDING_SIZE + p_adec->i_buffer;
-            if( p_adec->i_buffer_size < i_need )
+        /* **** First check if we have a valid output **** */
+        if( p_sys->p_aout_input == NULL ||
+            p_sys->aout_format.i_original_channels !=
+            pi_channels_maps[p_sys->p_context->channels] )
+        {
+            if( p_sys->p_aout_input != NULL )
             {
-                uint8_t *p_last = p_adec->p_buffer;
-
-                p_adec->p_buffer = malloc( i_need );
-                p_adec->i_buffer_size = i_need;
-                if( p_adec->i_buffer > 0 )
-                {
-                    memcpy( p_adec->p_buffer, p_last, p_adec->i_buffer );
-                }
-                FREE( p_last );
+                /* **** Delete the old **** */
+                aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
             }
-            i_frame_size =
-                E_( GetPESData )( p_adec->p_buffer + p_adec->i_buffer,
-                                  i_frame_size,
-                                  p_pes );
-            /* make ffmpeg happier but I'm not sure it's needed for audio */
-            memset( p_adec->p_buffer + p_adec->i_buffer + i_frame_size, 0, FF_INPUT_BUFFER_PADDING_SIZE );
+
+            /* **** Create a new audio output **** */
+            p_sys->aout_format.i_format = AOUT_FMT_S16_NE;
+            p_sys->aout_format.i_rate = p_sys->p_context->sample_rate;
+            p_sys->aout_format.i_physical_channels =
+                p_sys->aout_format.i_original_channels =
+                    pi_channels_maps[p_sys->p_context->channels];
+
+            aout_DateInit( &p_sys->end_date, p_sys->aout_format.i_rate );
+            p_sys->p_aout_input = aout_DecNew( p_dec, &p_sys->p_aout,
+                                               &p_sys->aout_format );
         }
-        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
-    } while( i_frame_size <= 0 );
 
-
-    i_frame_size += p_adec->i_buffer;
-
-usenextdata:
-    i_used = avcodec_decode_audio( p_adec->p_context,
-                                   (int16_t*)p_adec->p_output,
-                                   &i_output_size,
-                                   p_adec->p_buffer,
-                                   i_frame_size );
-    if( i_used < 0 )
-    {
-        msg_Warn( p_adec->p_fifo,
-                  "cannot decode one frame (%d bytes)",
-                  i_frame_size );
-        p_adec->i_buffer = 0;
-        return;
-    }
-    else if( i_used < i_frame_size )
-    {
-        memmove( p_adec->p_buffer,
-                 p_adec->p_buffer + i_used,
-                 p_adec->i_buffer_size - i_used );
-
-        p_adec->i_buffer = i_frame_size - i_used;
-    }
-    else
-    {
-        p_adec->i_buffer = 0;
-    }
-
-    i_frame_size -= i_used;
-
-    //msg_Dbg( p_adec->p_fifo, "frame size:%d buffer used:%d", i_frame_size, i_used );
-    if( i_output_size <= 0 )
-    {
-         msg_Warn( p_adec->p_fifo, 
-                  "decoded %d samples bytes",
-                  i_output_size );
-    }
-
-    if( p_adec->p_context->channels <= 0 ||
-        p_adec->p_context->channels > 5 )
-    {
-        msg_Warn( p_adec->p_fifo,
-                  "invalid channels count %d",
-                  p_adec->p_context->channels );
-    }
-
-    /* **** First check if we have a valid output **** */
-    if( ( p_adec->p_aout_input == NULL )||
-        ( p_adec->output_format.i_original_channels !=
-                    pi_channels_maps[p_adec->p_context->channels] ) )
-    {
-        if( p_adec->p_aout_input != NULL )
+        if( !p_sys->p_aout_input )
         {
-            /* **** Delete the old **** */
-            aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+            msg_Err( p_dec, "cannot create audio output" );
+            block_Release( p_block );
+            return VLC_EGENERIC;
         }
 
-        /* **** Create a new audio output **** */
-        p_adec->output_format.i_physical_channels =
-            p_adec->output_format.i_original_channels =
-                pi_channels_maps[p_adec->p_context->channels];
-
-        aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
-        p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
-                                            &p_adec->p_aout,
-                                            &p_adec->output_format );
-    }
-
-    if( !p_adec->p_aout_input )
-    {
-        msg_Err( p_adec->p_fifo, "cannot create aout" );
-        return;
-    }
-
-    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
-    {
-        aout_DateSet( &p_adec->date, p_adec->pts );
-    }
-    else if( !aout_DateGet( &p_adec->date ) )
-    {
-        return;
-    }
-
-    /* **** Now we can output these samples **** */
-    i_samplesperchannel = i_output_size / 2
-                           / aout_FormatNbChannels( &p_adec->output_format );
-
-    p = &p_adec->p_output[0];
-    while( i_samplesperchannel > 0 )
-    {
-        int i_samples;
-
-        i_samples = __MIN( 8000, i_samplesperchannel );
-
-        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
-                                           p_adec->p_aout_input,
-                                           i_samples );
-        if( !p_aout_buffer )
+        if( i_pts != 0 && i_pts != aout_DateGet( &p_sys->end_date ) )
         {
-            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-            p_adec->p_fifo->b_error = 1;
-            return;
+            aout_DateSet( &p_sys->end_date, i_pts );
+            i_pts = 0;
         }
 
-        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                      i_samples );
-        memcpy( p_aout_buffer->p_buffer,
-                p,
-                p_aout_buffer->i_nb_bytes );
+        /* **** Now we can output these samples **** */
+        i_samples = i_output / 2 / p_sys->p_context->channels;
 
-        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+        p_samples = p_sys->p_output;
+        while( i_samples > 0 )
+        {
+            int i_smaller_samples;
 
-        p += i_samples * 2 * aout_FormatNbChannels( &p_adec->output_format );
-        i_samplesperchannel -= i_samples;
+            i_smaller_samples = __MIN( 8000, i_samples );
 
+            p_aout_buffer = aout_DecNewBuffer( p_sys->p_aout,
+                                               p_sys->p_aout_input,
+                                               i_smaller_samples );
+            if( !p_aout_buffer )
+            {
+                msg_Err( p_dec, "cannot get aout buffer" );
+                block_Release( p_block );
+                return VLC_EGENERIC;
+            }
+
+            p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
+            p_aout_buffer->end_date = aout_DateIncrement( &p_sys->end_date,
+                                                          i_smaller_samples );
+            memcpy( p_aout_buffer->p_buffer, p_samples,
+                    p_aout_buffer->i_nb_bytes );
+
+            aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, p_aout_buffer );
+
+            p_samples += i_smaller_samples * 2 * p_sys->p_context->channels;
+            i_samples -= i_smaller_samples;
+        }
     }
 
-    if( i_frame_size > 0 )
-    {
-        goto usenextdata;
-    }
-
-    return;
+    block_Release( p_block );
+    return VLC_SUCCESS;
 }
-
 
 /*****************************************************************************
- * EndThread: thread destruction
- *****************************************************************************
- * This function is called when the thread ends after a sucessful
- * initialization.
+ * EndAudioDec: audio decoder destruction
  *****************************************************************************/
-void E_( EndThread_Audio )( adec_thread_t *p_adec )
+void E_(EndAudioDec)( decoder_t *p_dec )
 {
-//    FREE( p_adec->format.p_data );
-    FREE( p_adec->p_output );
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_adec->p_aout_input )
+    if( p_sys->p_output ) free( p_sys->p_output );
+
+    if( p_sys->p_aout_input )
     {
-        aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+        aout_DecDelete( p_sys->p_aout, p_sys->p_aout_input );
     }
-
 }
-
