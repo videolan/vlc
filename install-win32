@@ -83,8 +83,8 @@ Section "Install"
             "UninstallString" '"$INSTDIR\uninstall.exe"'
 	WriteUninstaller "uninstall.exe"
 
-	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Install_Dir" $INSTDIR
-	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "version" "${VERSION}"
+	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "InstallDir" $INSTDIR
+	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Version" "${VERSION}"
 
 	Exec "explorer $SMPROGRAMS\VideoLAN\"
 SectionEnd

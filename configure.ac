@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.77 2003/09/23 16:07:48 gbazin Exp $
+dnl $Id: configure.ac,v 1.78 2003/09/27 10:09:57 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3085,7 +3085,7 @@ then
     if test -f "${real_mozilla_sdk}/mozilla-config.h"; then
       AC_MSG_RESULT(${real_mozilla_sdk}/mozilla-config.h)
       mozilla=:
-      AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
+      AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
       AX_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue -Wl,--kill-at])
       XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl"
     else
