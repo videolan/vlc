@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.40 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: playlist.cpp,v 1.41 2004/02/16 17:14:39 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -176,6 +176,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_title_sorted = 0;
     i_author_sorted = 0;
     i_group_sorted = 0;
+    i_duration_sorted = 0;
 
 
     var_Create( p_intf, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -283,8 +284,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
                                wxLC_REPORT | wxSUNKEN_BORDER );
     listview->InsertColumn( 0, wxU(_("Name")) );
     listview->InsertColumn( 1, wxU(_("Author")) );
-    listview->InsertColumn( 2, wxU(_("Group")) );
-    listview->InsertColumn( 3, wxU(_("Duration")) );
+    listview->InsertColumn( 2, wxU(_("Duration")) );
+    listview->InsertColumn( 3, wxU(_("Group")) );
     listview->SetColumnWidth( 0, 270 );
     listview->SetColumnWidth( 1, 150 );
     listview->SetColumnWidth( 2, 80 );
@@ -424,7 +425,7 @@ void Playlist::UpdateItem( int i )
                                        _("General") , _("Author") ) ) );
     char *psz_group = playlist_FindGroup(p_playlist,
                                          p_item->i_group);
-    listview->SetItem( i, 2,
+    listview->SetItem( i, 3,
              wxL2U( psz_group ? psz_group : _("Normal") ) );
 
     if( p_item->b_enabled == VLC_FALSE )
@@ -439,7 +440,7 @@ void Playlist::UpdateItem( int i )
     mtime_t dur = p_item->i_duration;
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
-    listview->SetItem( i, 3, wxU(psz_duration) );
+    listview->SetItem( i, 2, wxU(psz_duration) );
 
     /* Change the colour for the currenty played stream */
     wxListItem listitem;
@@ -794,6 +795,18 @@ void Playlist::OnColSelect( wxListEvent& event )
             }
             break;
         case 2:
+            if( i_duration_sorted != 1 )
+            {
+                playlist_Sort( p_playlist, SORT_DURATION, ORDER_NORMAL );
+                i_duration_sorted = 1;
+            }
+            else
+            {
+                playlist_Sort( p_playlist, SORT_DURATION, ORDER_REVERSE );
+                i_duration_sorted = -1;
+            }
+            break;
+        case 3:
             if( i_group_sorted != 1 )
             {
                 playlist_SortGroup( p_playlist, ORDER_NORMAL );
@@ -1180,7 +1193,6 @@ int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
-    fprintf(stderr,"Update item: %i\n",new_val.i_int);
     p_playlist_dialog->UpdateItem( new_val.i_int );
     return 0;
 }
