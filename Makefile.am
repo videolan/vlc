@@ -517,12 +517,12 @@ package-win32:
 	fi ; done
 # don't include these two
 #rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
-	for i in dummy tmp/plugins/*.so ; do if test $$i != tmp/plugins/intfwin.so -a $$i != dummy ; then $(STRIP) $$i ; fi ; done
+	for i in dummy tmp/plugins/*$(LIBEXT) ; do if test $$i != tmp/plugins/intfwin.so -a $$i != dummy ; then $(STRIP) $$i ; fi ; done
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
 # Create package 
-	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} /CD tmp/nsi
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} tmp/nsi
 # Clean up
 	rm -Rf tmp
 
@@ -547,7 +547,7 @@ package-beos:
 	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
 		$(INSTALL) $$i tmp/vlc/plugins/ ; \
 	fi ; done
-	for i in dummy tmp/vlc/plugins/*.so ; do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
+	for i in dummy tmp/vlc/plugins/*$(LIBEXT) ; do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
 # Create package 
 	mv tmp/vlc tmp/vlc-${VERSION}
 	(cd tmp ; find vlc-${VERSION} | \
