@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.208 2003/01/28 12:30:44 gbazin Exp $
+ * $Id: video_output.c,v 1.209 2003/01/28 13:07:45 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -134,6 +134,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
                 p_vout->b_filter_change = VLC_FALSE;
             }
 
+            if( psz_filter_chain ) free( psz_filter_chain );
         }
 
         if( ( p_vout->render.i_width != i_width ) ||
@@ -155,8 +156,6 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             vlc_object_attach( p_vout, p_this );
             vlc_object_release( p_vout );
         }
-
-        if( psz_filter_chain ) free( psz_filter_chain );
     }
 
     if( !p_vout )
