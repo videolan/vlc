@@ -191,6 +191,29 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
 }
 
 /*******************************************************************************
+ * CONVERT_YUV_PIXEL, CONVERT_Y_PIXEL: pixel convertion blocks
+ *******************************************************************************
+ * These convertion routines are used by YUV convertion functions.
+ * Convertion are made from p_y, p_u, p_v, which are modified, to p_pic, which
+ * is also modified.
+ *******************************************************************************/
+#define CONVERT_Y_PIXEL                                                         \
+    /* Only Y sample is present */                                              \
+    p_ybase = p_yuv + *(p_y++);                                                 \
+    *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |            \
+        p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |  \
+        p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];                     \
+
+#define CONVERT_YUV_PIXEL                                                       \
+    /* Y, U and V samples are present */                                        \
+    i_uval =    *p_u++;                                                         \
+    i_vval =    *p_v++;                                                         \
+    i_red =     (V_RED_COEF * i_vval) >> SHIFT;                                 \
+    i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;       \
+    i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                                \
+    CONVERT_Y_PIXEL                                                             \
+
+/*******************************************************************************
  * vout_InitYUV: allocate and initialize translations tables
  *******************************************************************************
  * This function will allocate memory to store translation tables, depending
@@ -602,6 +625,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     
     CONVERT_YUV_RGB( 420, i_crv, i_cgv, i_cbu, i_cgu );        
 #else
+    boolean_t   b_inc_width, b_inc_height;       /* width/heidth are increased */
     int         i_x, i_y;                   /* horizontal and vertical indexes */
     int         i_uval, i_vval;                             /* U and V samples */
     int         i_red, i_green, i_blue;            /* U and V modified samples */
@@ -609,15 +633,14 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     int         i_height_count;                       /* height modulo counter */
     u16 *       p_yuv;                                /* base convertion table */
     u16 *       p_ybase;                       /* Y dependant convertion table */   
-    u16 *       p_pic_start;    
+    u16 *       p_pic_start;                  /* beginning of the current line */    
     
     /* Initialize values */
+    b_inc_width =       i_width < i_pic_width;    
+    b_inc_height =      i_height < i_pic_height;
     i_height_count =    i_pic_height;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv2.p_rgb16;
-
-    /*?? temporary kludge to protect from segfault at startup */
-    i_height = MIN( i_height, i_pic_height );    
 
     /*
      * Perform convertion
@@ -631,125 +654,22 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
          * macroblocks */
         for( i_x = i_width / 16; i_x--; )
         {
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-
-            i_uval =    *p_u++;
-            i_vval =    *p_v++;
-            i_red =     (V_RED_COEF * i_vval) >> SHIFT;
-            i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;
-            i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;
-
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];
-            p_ybase = p_yuv + *(p_y++);
-            *(p_pic++) = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |
-                p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |
-                p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];            
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;
+            CONVERT_Y_PIXEL;
         }        
 
         /* If line is odd, rewind U and V samples */
@@ -762,20 +682,41 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         /* End of line: skip picture to reach beginning of next line */
         p_pic += i_pic_line_width - i_pic_width;
  
-        /* Copy line if needed */
-        while( (i_height_count -= i_height) >= 0 )
-        {   
-            for( i_x = i_pic_width / 16; i_x--; )
-            {
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
-                *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
+        /* 
+         * Handle vertical scaling. The current line is copied or next one
+         * is ignored.
+         */
+        if( b_inc_height )
+        {
+            while( (i_height_count -= i_height) > 0 )
+            {                
+                /* Height increment: copy previous picture line */
+                for( i_x = i_pic_width / 16; i_x--; )
+                {
+                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
+                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
+                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
+                    *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
+                }
+                p_pic +=        i_pic_line_width - i_pic_width;
+                p_pic_start +=  i_pic_line_width - i_pic_width;
             }
-            p_pic +=            i_pic_line_width - i_pic_width;            
-            p_pic_start +=      i_pic_line_width - i_pic_width;            
+            i_height_count += i_pic_height; 
         }        
-        i_height_count += i_pic_height;        
+        else
+        {
+            while( (i_height_count -= i_pic_height) >= 0 )
+            {                
+                /* Height reduction: skip next source line */
+                p_y += i_width;
+                if( ! (++i_y & 0x1) )
+                {
+                    p_u += i_chroma_width;
+                    p_v += i_chroma_width;
+                }                
+            }            
+            i_height_count += i_height;            
+        }        
     }    
 #endif
 }

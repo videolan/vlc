@@ -1383,6 +1383,34 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
      * Clear areas array
      */
     p_buffer->i_areas = 0;
+
+#ifdef DEBUG_VIDEO
+    /*
+     * In DEBUG_VIDEO_MODE, draw white pixels at the beginning and the end of
+     * the picture area. These pixels should not be erased by rendering functions,
+     * otherwise segmentation fault is menacing !
+     */
+    if( i_pic_x > 0 )
+    {
+        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * i_pic_y + 
+                p_vout->i_bytes_per_pixel * (i_pic_x - 1)) = 0xffff;
+    }
+    if( i_pic_y > 0 )
+    {
+        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y - 1) + 
+                p_vout->i_bytes_per_pixel * i_pic_x ) = 0xffff;
+    }
+    if( i_pic_x + i_pic_width < p_vout->i_width )
+    {
+        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y + i_pic_height - 1) + 
+                p_vout->i_bytes_per_pixel * (i_pic_x + i_pic_width) ) = 0xffff;
+    }    
+    if( i_pic_y + i_pic_height < p_vout->i_height )
+    {
+        *(u16*)(p_buffer->p_data + p_vout->i_bytes_per_line * (i_pic_y + i_pic_height) + 
+                p_vout->i_bytes_per_pixel * (i_pic_x + i_pic_width - 1) ) = 0xffff;
+    }    
+#endif
 }
 
 /******************************************************************************
