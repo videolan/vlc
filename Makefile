@@ -453,6 +453,7 @@ package-beos:
 	# Copy relevant files
 	cp vlc tmp/vlc/
 	strip tmp/vlc/vlc
+	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
 	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
