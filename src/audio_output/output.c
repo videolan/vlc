@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.7 2002/08/19 21:31:11 massiot Exp $
+ * $Id: output.c,v 1.8 2002/08/19 23:12:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,9 +43,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     int i_channels = config_GetInt( p_aout, "aout-channels" );
 
     /* Prepare FIFO. */
-    vlc_mutex_init( p_aout, &p_aout->output.fifo.lock );
-    p_aout->output.fifo.p_first = NULL;
-    p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
+    aout_FifoInit( p_aout, &p_aout->output.fifo );
 
     p_aout->output.p_module = module_Need( p_aout, "audio output",
                                            psz_name );
@@ -151,6 +149,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                       p_aout->output.i_nb_filters,
                       &p_buffer );
 
+    /* Please remember that we have the mixer_lock in this function. */
     aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 
     p_aout->output.pf_play( p_aout );
@@ -169,7 +168,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
 {
     aout_buffer_t * p_buffer;
 
-    vlc_mutex_lock( &p_aout->output.fifo.lock );
+    vlc_mutex_lock( &p_aout->mixer_lock );
     p_buffer = p_aout->output.fifo.p_first;
 
     while ( p_buffer != NULL && p_buffer->end_date < start_date )
@@ -183,7 +182,9 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     if ( p_buffer == NULL )
     {
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
-        vlc_mutex_unlock( &p_aout->output.fifo.lock );
+        /* Set date to 0, to allow the mixer to send a new buffer ASAP */
+        p_aout->output.fifo.end_date = 0;
+        vlc_mutex_unlock( &p_aout->mixer_lock );
         msg_Dbg( p_aout, "audio output is starving" );
         return NULL;
     }
@@ -193,7 +194,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     if ( p_buffer->start_date > start_date
                          + (p_buffer->end_date - p_buffer->start_date) )
     {
-        vlc_mutex_unlock( &p_aout->output.fifo.lock );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
         msg_Dbg( p_aout, "audio output is starving (%lld)",
                  p_buffer->start_date - start_date );
         return NULL;
@@ -222,6 +223,6 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
     }
 
-    vlc_mutex_unlock( &p_aout->output.fifo.lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
     return p_buffer;
 }

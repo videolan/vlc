@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.97 2002/08/19 21:31:11 massiot Exp $
+ * $Id: audio_output.c,v 1.98 2002/08/19 23:12:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,8 +57,7 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
     p_aout->b_change_requested = 0;
     p_aout->i_nb_inputs = 0;
 
-    vlc_cond_init( p_parent, &p_aout->mixer_signal );
-    p_aout->b_mixer_active = 0;
+    vlc_mutex_init( p_parent, &p_aout->mixer_lock );
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 
@@ -72,7 +71,7 @@ void aout_DeleteInstance( aout_instance_t * p_aout )
 {
     vlc_mutex_destroy( &p_aout->input_lock );
     vlc_cond_destroy( &p_aout->input_signal );
-    vlc_cond_destroy( &p_aout->mixer_signal );
+    vlc_mutex_destroy( &p_aout->mixer_lock );
 
     /* Free structure. */
     vlc_object_destroy( p_aout );

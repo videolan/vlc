@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: input.c,v 1.6 2002/08/19 23:12:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,13 +42,7 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
 
     if ( p_input == NULL ) return NULL;
 
-    vlc_mutex_lock( &p_aout->output.fifo.lock );
-    while ( p_aout->b_mixer_active )
-    {
-        vlc_cond_wait( &p_aout->mixer_signal, &p_aout->output.fifo.lock );
-    }
-    p_aout->b_mixer_active = 1;
-    vlc_mutex_unlock( &p_aout->output.fifo.lock );
+    vlc_mutex_lock( &p_aout->mixer_lock );
 
     if ( p_aout->i_nb_inputs == 0 )
     {
@@ -110,18 +104,12 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
         {
             aout_MixerNew( p_aout );
         }
-        vlc_mutex_lock( &p_aout->output.fifo.lock );
-        p_aout->b_mixer_active = 0;
-        vlc_cond_signal( &p_aout->mixer_signal );
-        vlc_mutex_unlock( &p_aout->output.fifo.lock );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
 
         return NULL;
     }
 
-    vlc_mutex_lock( &p_aout->output.fifo.lock );
-    p_aout->b_mixer_active = 0;
-    vlc_cond_signal( &p_aout->mixer_signal );
-    vlc_mutex_unlock( &p_aout->output.fifo.lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
@@ -177,15 +165,7 @@ void aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 {
     int i_input;
 
-    msg_Dbg( p_aout, "input 0x%x destroyed", p_input );
-
-    vlc_mutex_lock( &p_aout->output.fifo.lock );
-    while ( p_aout->b_mixer_active )
-    {
-        vlc_cond_wait( &p_aout->mixer_signal, &p_aout->output.fifo.lock );
-    }
-    p_aout->b_mixer_active = 1;
-    vlc_mutex_unlock( &p_aout->output.fifo.lock );
+    vlc_mutex_lock( &p_aout->mixer_lock );
 
     for ( i_input = 0; i_input < p_aout->i_nb_inputs; i_input++ )
     {
@@ -206,10 +186,7 @@ void aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
              (AOUT_MAX_INPUTS - i_input - 1) * sizeof(aout_input_t *) );
     p_aout->i_nb_inputs--;
 
-    vlc_mutex_lock( &p_aout->output.fifo.lock );
-    p_aout->b_mixer_active = 0;
-    vlc_cond_signal( &p_aout->mixer_signal );
-    vlc_mutex_unlock( &p_aout->output.fifo.lock );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
                                  p_input->i_nb_filters );
@@ -222,6 +199,8 @@ void aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
         aout_OutputDelete( p_aout );
         aout_MixerDelete( p_aout );
     }
+
+    msg_Dbg( p_aout, "input 0x%x destroyed", p_input );
 }
 
 /*****************************************************************************
@@ -252,7 +231,9 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * happen :). */
         msg_Warn( p_aout, "Computed PTS is out of range (%lld), clearing out",
                   start_date );
+        vlc_mutex_lock( &p_aout->mixer_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
+        vlc_mutex_unlock( &p_aout->mixer_lock );
         start_date = 0;
     } 
 
@@ -314,7 +295,9 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                                          &new_output ) < 0 )
         {
             msg_Err( p_aout, "couldn't set an input pipeline for resampling" );
+            vlc_mutex_lock( &p_aout->mixer_lock );
             aout_FifoSet( p_aout, &p_input->fifo, 0 );
+            vlc_mutex_unlock( &p_aout->mixer_lock );
             aout_BufferFree( p_buffer );
 
             vlc_mutex_lock( &p_aout->input_lock );
@@ -347,7 +330,9 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->start_date = start_date;
     p_buffer->end_date = start_date + duration;
+    vlc_mutex_lock( &p_aout->mixer_lock );
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     vlc_mutex_lock( &p_aout->input_lock );
     p_aout->i_inputs_active--;

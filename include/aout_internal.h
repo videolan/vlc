@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.6 2002/08/19 21:31:11 massiot Exp $
+ * $Id: aout_internal.h,v 1.7 2002/08/19 23:12:57 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -82,7 +82,6 @@ typedef struct aout_alloc_t
  *****************************************************************************/
 typedef struct aout_fifo_t
 {
-    vlc_mutex_t             lock;
     struct aout_buffer_t *  p_first;
     struct aout_buffer_t ** pp_last;
     mtime_t                 end_date;
@@ -91,7 +90,6 @@ typedef struct aout_fifo_t
 static inline void aout_FifoInit( struct aout_instance_t * p_aout,
                                   aout_fifo_t * p_fifo )
 {
-    vlc_mutex_init( (vlc_object_t *)p_aout, &p_fifo->lock );
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     p_fifo->end_date = 0;
@@ -101,7 +99,6 @@ static inline void aout_FifoPush( struct aout_instance_t * p_aout,
                                   aout_fifo_t * p_fifo,
                                   aout_buffer_t * p_buffer )
 {
-    vlc_mutex_lock( &p_fifo->lock );
     *p_fifo->pp_last = p_buffer;
     p_fifo->pp_last = &p_buffer->p_next;
     *p_fifo->pp_last = NULL;
@@ -118,26 +115,31 @@ static inline void aout_FifoPush( struct aout_instance_t * p_aout,
     {
         p_fifo->end_date = p_buffer->end_date;
     }
-    vlc_mutex_unlock( &p_fifo->lock );
 }
 
 static inline mtime_t aout_FifoNextStart( struct aout_instance_t * p_aout,
                                           aout_fifo_t * p_fifo )
 {
-    mtime_t end_date;
-    vlc_mutex_lock( &p_fifo->lock );
-    end_date = p_fifo->end_date;
-    vlc_mutex_unlock( &p_fifo->lock );
-    return end_date;
+    return p_fifo->end_date;
 }
 
 /* Reinit the end_date (for instance after a pause). */
 static inline void aout_FifoSet( struct aout_instance_t * p_aout,
                                  aout_fifo_t * p_fifo, mtime_t date )
 {
-    vlc_mutex_lock( &p_fifo->lock );
+    aout_buffer_t * p_buffer;
     p_fifo->end_date = date;
-    vlc_mutex_unlock( &p_fifo->lock );
+
+    /* Remove all buffers. */
+    p_buffer = p_fifo->p_first;
+    while ( p_buffer != NULL )
+    {
+        aout_buffer_t * p_next = p_buffer->p_next;
+        aout_BufferFree( p_buffer );
+        p_buffer = p_next;
+    }
+    p_fifo->p_first = NULL;
+    p_fifo->pp_last = &p_fifo->p_first;
 }
 
 /* This function supposes there is at least one buffer in p_fifo. */
@@ -145,14 +147,12 @@ static inline aout_buffer_t * aout_FifoPop( struct aout_instance_t * p_aout,
                                             aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
-    vlc_mutex_lock( &p_fifo->lock );
     p_buffer = p_fifo->p_first;
     p_fifo->p_first = p_buffer->p_next;
     if ( p_fifo->p_first == NULL )
     {
         p_fifo->pp_last = &p_fifo->p_first;
     }
-    vlc_mutex_unlock( &p_fifo->lock );
 
     return p_buffer;
 }
@@ -162,7 +162,6 @@ static inline void aout_FifoDestroy( struct aout_instance_t * p_aout,
 {
     aout_buffer_t * p_buffer;
 
-    vlc_mutex_destroy( &p_fifo->lock );
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
@@ -260,9 +259,7 @@ struct aout_instance_t
     int                     i_nb_inputs;
 
     /* Mixer */
-    vlc_cond_t              mixer_signal; /* the associated mutex is
-                                           * p_aout->output.fifo.lock */
-    vlc_bool_t              b_mixer_active;
+    vlc_mutex_t             mixer_lock;
     aout_mixer_t            mixer;
 
     /* Output plug-in */
