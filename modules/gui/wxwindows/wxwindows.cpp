@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.22 2003/07/19 16:33:55 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.23 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -66,7 +66,7 @@ static int  OpenDialogs  ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 static void Init         ( intf_thread_t * );
 
-static void ShowDialog   ( intf_thread_t *, int, int );
+static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
  * Local classes declarations.
@@ -163,6 +163,14 @@ static void Close( vlc_object_t *p_this )
     }
 
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+
+    if( p_intf->pf_show_dialog )
+    {
+        /* We must destroy the dialogs thread */
+        wxCommandEvent event( wxEVT_DIALOG, INTF_DIALOG_EXIT );
+        p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
+        vlc_thread_join( p_intf );
+    }
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -286,10 +294,12 @@ bool Instance::OnInit()
     return TRUE;
 }
 
-static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg )
+static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
+                        intf_dialog_args_t *p_arg )
 {
     wxCommandEvent event( wxEVT_DIALOG, i_dialog_event );
     event.SetInt( i_arg );
+    event.SetClientData( p_arg );
 
     /* Hack to prevent popup events to be enqueued when
      * one is already active */

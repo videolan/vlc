@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.7 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: dialogs.h,v 1.8 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,9 +45,8 @@ class Dialogs
         // Destructor
         virtual ~Dialogs();
 
-        static void ShowDialog( intf_thread_t *, int, int );
         void ShowOpen( bool b_play );
-        void ShowOpenSkin();
+        void ShowOpenSkin( bool b_block );
         void ShowMessages();
         void ShowPrefs();
         void ShowFileInfo();

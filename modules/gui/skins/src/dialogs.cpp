@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.11 2003/07/17 18:58:23 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.12 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -96,45 +96,87 @@ Dialogs::~Dialogs()
     }
 }
 
-void Dialogs::ShowDialog( intf_thread_t *p_intf, int i_dialog_event,
-                          int i_arg )
-{
-}
-
 void Dialogs::ShowOpen( bool b_play )
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILE, b_play );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILE,
+                                    (int)b_play, 0 );
 }
 
-void Dialogs::ShowOpenSkin()
+static void ShowOpenSkinCallback( intf_dialog_args_t *p_arg )
+{
+    if( p_arg->i_results )
+    {
+        intf_thread_t *p_intf = (intf_thread_t *)p_arg->p_arg;
+        p_intf->p_sys->p_new_theme_file = strdup( p_arg->psz_results[0] );
+
+        if( !p_arg->b_blocking )
+        {
+            // Tell vlc to change skin after hiding interface
+            OSAPI_PostMessage( NULL, VLC_HIDE, VLC_LOAD_SKIN, 0 );
+        }
+    }
+}
+
+void Dialogs::ShowOpenSkin( bool b_block )
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILE, 0 );
+    {
+        intf_dialog_args_t *p_arg =
+            (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+        memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+
+        p_arg->b_blocking = b_block;
+        if( b_block )
+        {
+            vlc_mutex_init( p_intf, &p_arg->lock );
+            vlc_cond_init( p_intf, &p_arg->wait );
+        }
+
+        p_arg->psz_title = strdup( _("Open a skin file") );
+        p_arg->psz_extensions =
+            strdup( "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|" );
+
+        p_arg->p_arg = p_intf;
+        p_arg->pf_callback = ShowOpenSkinCallback;
+
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILE_GENERIC,
+                                    0, p_arg );
+
+        if( b_block )
+        {
+            vlc_mutex_lock( &p_arg->lock );
+            if( !p_arg->b_ready )
+            {
+                vlc_cond_wait( &p_arg->wait, &p_arg->lock );
+            }
+            vlc_mutex_unlock( &p_arg->lock );
+        }
+    }
 }
 
 void Dialogs::ShowMessages()
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_MESSAGES, 0 );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_MESSAGES, 0, 0 );
 }
 
 void Dialogs::ShowPrefs()
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_PREFS, 0 );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_PREFS, 0, 0 );
 }
 
 void Dialogs::ShowFileInfo()
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILEINFO, 0 );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILEINFO, 0, 0 );
 }
 
 void Dialogs::ShowPopup()
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_POPUPMENU, 0 );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_POPUPMENU, 0, 0 );
 }
 
 /*****************************************************************************

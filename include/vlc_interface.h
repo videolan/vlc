@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.3 2003/07/17 18:58:23 gbazin Exp $
+ * $Id: vlc_interface.h,v 1.4 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -22,6 +22,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /*****************************************************************************
  * intf_thread_t: describe an interface thread
@@ -45,12 +47,40 @@ struct intf_thread_t
     void      ( *pf_run )    ( intf_thread_t * );
 
     /* Specific for dialogs providers */
-    void      ( *pf_show_dialog ) ( intf_thread_t *, int, int );
+    void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
+                               intf_dialog_args_t * );
 
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
     vlc_bool_t   b_menu_change;
     vlc_bool_t   b_menu;
+};
+
+/*****************************************************************************
+ * intf_dialog_args_t: arguments structure passed to a dialogs provider.
+ *****************************************************************************
+ * This struct describes the arguments passed to the dialogs provider.
+ * For now they are only used with INTF_DIALOG_FILE_GENERIC.
+ *****************************************************************************/
+struct intf_dialog_args_t
+{
+    char *psz_title;
+
+    vlc_bool_t  b_blocking;
+    vlc_bool_t  b_ready;
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
+    char **psz_results;
+    int  i_results;
+
+    void (*pf_callback) ( intf_dialog_args_t * );
+    void *p_arg;
+
+    /* Specifically for INTF_DIALOG_FILE_GENERIC */
+    char *psz_extensions;
+    vlc_bool_t b_save;
+    vlc_bool_t b_multiple;
 };
 
 /*****************************************************************************
@@ -93,3 +123,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_PREFS      13
 
 #define INTF_DIALOG_POPUPMENU  20
+
+#define INTF_DIALOG_FILE_GENERIC 30
+
+#define INTF_DIALOG_EXIT       99

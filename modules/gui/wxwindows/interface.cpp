@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.49 2003/07/19 16:33:55 gbazin Exp $
+ * $Id: interface.cpp,v 1.50 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -239,6 +239,10 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
 Interface::~Interface()
 {
+    if( p_intf->p_sys->p_wxwindow )
+    {
+        delete p_intf->p_sys->p_wxwindow;
+    }
     /* Clean up */
 }
 
@@ -547,13 +551,13 @@ void Interface::OnContextMenu2(wxContextMenuEvent& event)
     }
 
     if( p_intf->p_sys->pf_show_dialog )
-        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0 );
+        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0, 0 );
 }
 #endif
 void Interface::OnContextMenu(wxMouseEvent& event)
 {
     if( p_intf->p_sys->pf_show_dialog )
-        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0 );
+        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0, 0 );
 }
 
 void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
@@ -619,7 +623,7 @@ void Interface::OnShowDialog( wxCommandEvent& event )
 
         }
 
-        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1 );
+        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
     }
 }
 

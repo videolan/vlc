@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.46 2003/07/18 20:06:00 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.47 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,8 +87,6 @@ static int Open ( vlc_object_t *p_this )
     };
 
     p_intf->pf_run = Run;
-    p_intf->p_sys->pf_showdialog = Dialogs::ShowDialog;
-
 
     // Suscribe to messages bank
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
@@ -269,36 +267,16 @@ static void Run( intf_thread_t *p_intf )
         if( !Loader->Load( user_skin ) && !Loader->Load( default_skin ) )
         {
 #endif
-#if 0
-#if !defined(MODULE_NAME_IS_basic_skins)
-            wxMutexGuiEnter();
-            wxFileDialog dialog( NULL,
-                wxU(_("Open a skin file")), wxT(""), wxT(""),
-                wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
-                    "All files|*.*"), wxOPEN );
+            p_intf->p_sys->p_dialogs->ShowOpenSkin( 1 /* block */ );
 
-            if( dialog.ShowModal() == wxID_OK )
+            // try to load selected file
+            if( !p_intf->p_sys->p_new_theme_file ||
+                !Loader->Load( (string)p_intf->p_sys->p_new_theme_file ) )
             {
-                // try to load selected file
-                if( ! Loader->Load( (string)dialog.GetPath().mb_str() ) )
-                {
-                    // He, he, what the hell is he doing ?
-                    delete Loader;
-                    wxMutexGuiLeave();
-                    return;
-                }
-                wxMutexGuiLeave();
-            }
-            else
-#endif
-#endif
-            {
+                // He, he, what the hell is he doing ?
                 delete Loader;
-#if 0
-#if !defined(MODULE_NAME_IS_basic_skins)
-                wxMutexGuiLeave();
-#endif
-#endif
+                delete p_intf->p_sys->p_dialogs;
+                if( skin_last ) free( skin_last );
                 return;
             }
         }
@@ -308,6 +286,7 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_theme->InitTheme();
     p_intf->p_sys->p_theme->ShowTheme();
 
+    if( skin_last ) free( skin_last );
     delete Loader;
 
     msg_Dbg( p_intf, "Load theme time : %i ms", OSAPI_GetTime() - a );

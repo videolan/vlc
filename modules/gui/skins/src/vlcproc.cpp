@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.40 2003/06/24 22:26:01 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.41 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -370,7 +370,7 @@ void VlcProc::LoadSkin()
 {
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
-        p_intf->p_sys->p_dialogs->ShowOpenSkin();
+        p_intf->p_sys->p_dialogs->ShowOpenSkin( 0 /*none blocking*/ );
     }
     else
     {

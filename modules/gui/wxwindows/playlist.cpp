@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.13 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: playlist.cpp,v 1.14 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -363,7 +363,7 @@ void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnAddFile( wxCommandEvent& WXUNUSED(event) )
 {
-    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE, 0 );
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE_SIMPLE, 0, 0 );
 
 #if 0
     Rebuild();
@@ -372,7 +372,7 @@ void Playlist::OnAddFile( wxCommandEvent& WXUNUSED(event) )
 
 void Playlist::OnAddMRL( wxCommandEvent& WXUNUSED(event) )
 {
-    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE, 0 );
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_FILE, 0, 0 );
 
 #if 0
     Rebuild();

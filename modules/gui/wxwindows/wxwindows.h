@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.46 2003/07/19 16:33:55 gbazin Exp $
+ * $Id: wxwindows.h,v 1.47 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -53,7 +53,7 @@ class FileInfo;
 #if wxUSE_UNICODE
 #   define wxU(utf8) wxString(utf8, wxConvUTF8)
 #else
-#   define wxU(ut8 ) wxString(wxConvUTF8.cMB2WC(ut8), *wxConvCurrent)
+#   define wxU(utf8) wxString(wxConvUTF8.cMB2WC(utf8), *wxConvCurrent)
 #endif
 
 #else // ENABLE_NLS && HAVE_GETTEXT && WIN32 && !HAVE_INCLUDED_GETTEXT
@@ -93,7 +93,8 @@ struct intf_sys_t
     int                 i_playing;                 /* playlist selected item */
 
     /* Send an event to show a dialog */
-    void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg );
+    void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg,
+                             intf_dialog_args_t *p_arg );
 
     /* Popup menu */
     wxMenu              *p_popup_menu;
@@ -207,6 +208,7 @@ private:
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
 
+    void OnOpenFileGeneric( wxCommandEvent& event );
     void OnOpenFileSimple( wxCommandEvent& event );
     void OnOpenFile( wxCommandEvent& event );
     void OnOpenDisc( wxCommandEvent& event );
@@ -216,6 +218,8 @@ private:
     void OnPopupMenu( wxCommandEvent& event );
 
     void OnIdle( wxIdleEvent& event );
+
+    void OnExitThread( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -229,6 +233,7 @@ public:
     Messages            *p_messages_dialog;
     FileInfo            *p_fileinfo_dialog;
     wxFrame             *p_prefs_dialog;
+    wxFileDialog        *p_file_generic_dialog;
 };
 
 /* Open Dialog */

@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.3 2003/07/18 11:39:39 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.4 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -63,6 +63,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
     EVT_COMMAND(INTF_DIALOG_NET, wxEVT_DIALOG, DialogsProvider::OnOpenNet)
     EVT_COMMAND(INTF_DIALOG_FILE_SIMPLE, wxEVT_DIALOG,
                 DialogsProvider::OnOpenFileSimple)
+    EVT_COMMAND(INTF_DIALOG_FILE_GENERIC, wxEVT_DIALOG,
+                DialogsProvider::OnOpenFileGeneric)
 
     EVT_COMMAND(INTF_DIALOG_PLAYLIST, wxEVT_DIALOG,
                 DialogsProvider::OnPlaylist)
@@ -74,6 +76,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnFileInfo)
     EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
                 DialogsProvider::OnPopupMenu)
+    EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
+                DialogsProvider::OnExitThread)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -90,6 +94,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_messages_dialog = NULL;
     p_fileinfo_dialog = NULL;
     p_prefs_dialog = NULL;
+    p_file_generic_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -110,6 +115,7 @@ DialogsProvider::~DialogsProvider()
     if( p_playlist_dialog ) delete p_playlist_dialog;
     if( p_messages_dialog ) delete p_messages_dialog;
     if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
+    if( p_file_generic_dialog ) delete p_file_generic_dialog;
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
 }
@@ -175,6 +181,77 @@ void DialogsProvider::OnPreferences( wxCommandEvent& WXUNUSED(event) )
     {
         p_prefs_dialog->Show( !p_prefs_dialog->IsShown() );
     }
+}
+
+void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
+{
+    intf_dialog_args_t *p_arg = (intf_dialog_args_t *)event.GetClientData();
+
+    if( p_arg == NULL )
+    {
+        msg_Dbg( p_intf, "OnOpenFileGeneric() called with NULL arg" );
+        return;
+    }
+
+    if( p_file_generic_dialog == NULL )
+        p_file_generic_dialog = new wxFileDialog( this );
+
+    if( p_file_generic_dialog )
+    {
+        p_file_generic_dialog->SetMessage( wxU(p_arg->psz_title) );
+        p_file_generic_dialog->SetWildcard( wxU(p_arg->psz_extensions) );
+        p_file_generic_dialog->SetStyle( (p_arg->b_save ? wxSAVE : wxOPEN) |
+                                         (p_arg->b_multiple ? wxMULTIPLE:0) );
+    }
+
+    if( p_file_generic_dialog &&
+        p_file_generic_dialog->ShowModal() == wxID_OK )
+    {
+        wxArrayString paths;
+
+        p_file_generic_dialog->GetPaths( paths );
+
+        p_arg->i_results = paths.GetCount();
+        p_arg->psz_results = (char **)malloc( p_arg->i_results *
+                                              sizeof(char *) );
+        for( size_t i = 0; i < paths.GetCount(); i++ )
+        {
+            p_arg->psz_results[i] = strdup( paths[i].mb_str() );
+        }
+    }
+
+    /* Callback */
+    if( p_arg->pf_callback )
+    {
+        p_arg->pf_callback( p_arg );
+    }
+
+    /* Blocking or not ? */
+    if( p_arg->b_blocking )
+    {
+        vlc_mutex_lock( &p_arg->lock );
+        p_arg->b_ready = 1;
+        vlc_cond_signal( &p_arg->wait );
+        vlc_mutex_unlock( &p_arg->lock );
+    }
+
+    /* Clean-up */
+    if( p_arg->b_blocking )
+    {
+        vlc_mutex_destroy( &p_arg->lock );
+        vlc_cond_destroy( &p_arg->wait );
+    }
+    if( p_arg->psz_results )
+    {
+        for( int i = 0; i < p_arg->i_results; i++ )
+        {
+            free( p_arg->psz_results[i] );
+        }
+        free( p_arg->psz_results );
+    }
+    if( p_arg->psz_title ) free( p_arg->psz_title );
+    if( p_arg->psz_extensions ) free( p_arg->psz_extensions );
+    free( p_arg );
 }
 
 void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
@@ -247,4 +324,10 @@ void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
     wxPoint mousepos = ScreenToClient( wxGetMousePosition() );
     ::PopupMenu( p_intf, this, mousepos );
 
+}
+
+void DialogsProvider::OnExitThread( wxCommandEvent& WXUNUSED(event) )
+{
+    delete this;
+    wxTheApp->ExitMainLoop();
 }

@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.16 2003/07/17 17:30:40 gbazin Exp $
+ * $Id: menus.cpp,v 1.17 2003/07/20 10:38:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -585,7 +585,7 @@ void Menu::OnShowDialog( wxCommandEvent& event )
 
         }
 
-        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1 );
+        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
     }
 }
 
@@ -630,7 +630,7 @@ void MenuEvtHandler::OnShowDialog( wxCommandEvent& event )
 
         }
 
-        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1 );
+        p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
     }
 }
 
