@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.9 2003/06/23 16:09:13 gbazin Exp $
+ * $Id: id3tag.c,v 1.10 2003/10/18 22:48:25 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 #include <vlc/input.h>
 
 #include <sys/types.h>
@@ -58,6 +59,7 @@ vlc_module_end();
  *****************************************************************************/
 static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
 {
+    playlist_t * p_playlist;
     struct id3_tag * p_id3_tag;
     struct id3_frame * p_frame;
     input_info_category_t * p_category;
@@ -68,6 +70,7 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
     p_id3_tag = id3_tag_parse( p_data, i_size );
     p_category = input_InfoCategory( p_input, "ID3" );
     i = 0;
+    
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         i_strings = id3_field_getnstrings( &p_frame->fields[1] );
@@ -87,6 +90,26 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
                 {
                     input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
                 }
+            }
+            else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
+            {
+                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                if( p_playlist )
+                {
+                    p_playlist->pp_items[p_playlist->i_index]->psz_name = strdup( psz_temp );
+                    vlc_object_release( p_playlist );
+                }
+                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+            }
+            else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
+            {
+                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                if( p_playlist )
+                {
+                    p_playlist->pp_items[p_playlist->i_index]->psz_author = strdup( psz_temp );
+                    vlc_object_release( p_playlist );
+                }
+                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
             }
             else
             {
