@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.95 2003/12/04 17:15:59 gbazin Exp $
+ * $Id: vlc_common.h,v 1.96 2003/12/06 22:45:53 jpsaman Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -787,7 +787,8 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 
 #if defined( ENABLE_NLS ) && \
      (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
-      defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main))
+      defined(MODULE_NAME_IS_gnome2)||defined(MODULE_NAME_IS_gnome2_main)||\
+      defined(MODULE_NAME_IS_pda))
     /* Declare nothing: gnome.h will do it for us */
 #elif defined( ENABLE_NLS )
 #if defined( HAVE_INCLUDED_GETTEXT )
