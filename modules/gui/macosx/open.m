@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.32 2003/05/08 17:13:22 massiot Exp $
+ * $Id: open.m,v 1.33 2003/05/12 01:17:10 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -235,9 +235,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;
         NSString *subPath = [o_file_sub_path stringValue];
         
-        [o_playlist appendArray: 
-            [NSArray arrayWithObject: o_source] atPos: -1 enqueue:b_enq];
-        
         if (([o_file_sub_ckbox state] == NSOnState) && !([subPath isEqualTo: @""]))
         {
             config_PutPsz( p_intf, "sub-file", strdup( [subPath cString] ) );
@@ -253,6 +250,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             config_PutInt( p_intf, "sub-delay", 0 );
             config_PutFloat( p_intf, "sub-fps", 0.0 );
         }
+        
+        [o_playlist appendArray: 
+            [NSArray arrayWithObject: o_source] atPos: -1 enqueue:b_enq];
     }
 }
 
@@ -623,11 +623,12 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         NSArray *o_values = [[o_open_panel filenames]
                 sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
         
-        [o_playlist appendArray: o_values atPos: -1 enqueue:NO];
         config_PutPsz( p_intf, "sub-file", "" );
         config_PutInt( p_intf, "sub-delay", 0 );
         config_PutFloat( p_intf, "sub-fps", 0.0 );
         config_PutPsz( p_intf, "sout", "" );
+        
+        [o_playlist appendArray: o_values atPos: -1 enqueue:NO];
     }
 }
 

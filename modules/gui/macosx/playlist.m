@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.21 2003/04/29 20:17:12 hartman Exp $
+ * $Id: playlist.m,v 1.22 2003/05/12 01:17:10 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -450,13 +450,14 @@
         {
             o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
                         sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-            [self appendArray: o_values atPos: i_proposed_row enqueue:YES];
-            
+
             config_PutPsz( p_intf, "sub-file", "" );
             config_PutInt( p_intf, "sub-delay", 0 );
             config_PutFloat( p_intf, "sub-fps", 0.0 );
             config_PutPsz( p_intf, "sout", "" );
-            
+
+            [self appendArray: o_values atPos: i_proposed_row enqueue:YES];
+
             return( YES );
         }
         
