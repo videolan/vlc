@@ -3,7 +3,9 @@
  *****************************************************************************/
 typedef struct netlist_s
 {
-    vlc_mutex_t          lock;
+    vlc_mutex_t             lock;
+
+    size_t                  i_buffer_size;
 
     /* Buffers */
     byte_t *                p_buffers;                 /* Big malloc'ed area */
@@ -20,7 +22,6 @@ typedef struct netlist_s
     unsigned int            i_nb_data;
 
     /* Index */
-    
     unsigned int            i_data_start, i_data_end;
     unsigned int            i_pes_start, i_pes_end;
     unsigned int            i_iovec_start, i_iovec_end;
@@ -34,7 +35,7 @@ int                     input_NetlistInit( struct input_thread_s *,
                                            size_t i_buffer_size );
 struct iovec *          input_NetlistGetiovec( void * );
 void                    input_NetlistMviovec( void *, size_t );
-struct data_packet_s *  input_NetlistNewPacket( void * );
+struct data_packet_s *  input_NetlistNewPacket( void *, size_t );
 struct pes_packet_s *   input_NetlistNewPES( void * );
 void            input_NetlistDeletePacket( void *, struct data_packet_s * );
 void            input_NetlistDeletePES( void *, struct pes_packet_s * );

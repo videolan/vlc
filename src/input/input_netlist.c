@@ -147,6 +147,7 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
     
     p_netlist->i_nb_data = i_nb_data;
     p_netlist->i_nb_pes = i_nb_pes;
+    p_netlist->i_buffer_size = i_buffer_size;
 
     return (0); /* Everything went all right */
 }
@@ -179,7 +180,8 @@ void input_NetlistMviovec( void * p_netlist, size_t i_nb_iovec )
 /*****************************************************************************
  * input_NetlistNewPacket: returns a free data_packet_t
  *****************************************************************************/
-struct data_packet_s * input_NetlistNewPacket( void * p_netlist )
+struct data_packet_s * input_NetlistNewPacket( void * p_netlist,
+                                               size_t i_buffer_size )
 {    
     unsigned int i_return;
     netlist_t * pt_netlist; /* for a cast */
@@ -187,6 +189,15 @@ struct data_packet_s * input_NetlistNewPacket( void * p_netlist )
     //netlist_t * p_netlist
     pt_netlist = ( netlist_t * ) p_netlist;
     /* cast p_netlist -> netlist_t */
+
+#ifdef DEBUG
+    if( i_buffer_size > p_netlist->i_buffer_size )
+    {
+        /* This should not happen */
+        intf_ErrMsg( "Netlist packet too small !" );
+        return NULL;
+    }
+#endif
 
     /* lock */
     vlc_mutex_lock ( &pt_netlist->lock );
@@ -205,6 +216,8 @@ struct data_packet_s * input_NetlistNewPacket( void * p_netlist )
 
     /* unlock */
     vlc_mutex_unlock (&pt_netlist->lock);
+
+    //if (i_buffer_size < p_pes->i_buffer_size) => diminuer p_payload_end
     
     //risque de race condition : que se passe-t-il si après avoir rendu
     //le lock un autre thread rend un paquet et écrase
