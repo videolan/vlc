@@ -35,18 +35,6 @@ diff -ru ffmpeg.old/libavcodec/libpostproc/Makefile ffmpeg/libavcodec/libpostpro
  endif
  
  
-diff -ru ffmpeg.old/libavcodec/resample.c ffmpeg/libavcodec/resample.c
---- ffmpeg.old/libavcodec/resample.c	Mon Sep  8 23:05:43 2003
-+++ ffmpeg/libavcodec/resample.c	Sun Nov  2 02:04:09 2003
-@@ -49,7 +49,7 @@
- static void init_mono_resample(ReSampleChannelContext *s, float ratio)
- {
-     ratio = 1.0 / ratio;
--    s->iratio = (int)floorf(ratio);
-+    s->iratio = (int)floor(ratio);
-     if (s->iratio == 0)
-         s->iratio = 1;
-     s->incr = (int)((ratio / s->iratio) * FRAC);
 diff -ru ffmpeg.old/libavformat/rtsp.c ffmpeg/libavformat/rtsp.c
 --- ffmpeg.old/libavformat/rtsp.c	Wed Oct 29 15:25:27 2003
 +++ ffmpeg/libavformat/rtsp.c	Sun Nov  2 02:04:09 2003
