@@ -96,12 +96,20 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
     p_aout->l_rate = AOUT_RATE_DEFAULT;
 
+    /* Allocate structure */
+    p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_aout->p_sys == NULL )
+    {
+        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        return( 1 );
+    }
 
     i_err = arts_init();
     
     if (i_err < 0)
     {
-        fprintf(stderr, "arts_init error: %s\n", arts_error_text(i_err));
+        intf_ErrMsg( "aout error: arts_init (%s)", arts_error_text(i_err) );
+        free( p_aout->p_sys );
         return(-1);
     }
 
@@ -120,7 +128,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*    p_aout->i_latency = esd_get_latency(i_fd);*/
     p_aout->i_latency = 0;
    
-    intf_WarnMsg(2, "aout_arts_latency: %d",p_aout->i_latency);
+    //intf_WarnMsg( 5, "aout_arts_latency: %d",p_aout->i_latency);
 
     return( 0 );
 }
@@ -144,9 +152,9 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 
     int i_err = arts_write( p_aout->p_sys->stream, buffer, i_size );
 
-    if(i_err < 0)
+    if( i_err < 0 )
     {
-        fprintf(stderr, "arts_write error: %s\n", arts_error_text(i_err));
+        intf_ErrMsg( "aout error: arts_write (%s)", arts_error_text(i_err) );
     }
 
 }
@@ -157,5 +165,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 static void aout_Close( aout_thread_t *p_aout )
 {
     arts_close_stream( p_aout->p_sys->stream );
+    free( p_aout->p_sys );
 }
 
