@@ -798,11 +798,10 @@ AM_CONDITIONAL(CPROF, test "${enable_gprof}" = "yes")
 dnl
 dnl  default modules
 dnl
+BUILTINS="${BUILTINS} mpeg_video idct idctclassic motion"
 PLUGINS="${PLUGINS} dummy rc logger gestures access_file memcpy"
 PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts avi asf aac mp4 rawdv"
-PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
-#PLUGINS="${PLUGINS} a52old imdct downmix imdct3dn downmix3dn imdctsse downmixsse"
-PLUGINS="${PLUGINS} lpcm a52 cinepak"
+PLUGINS="${PLUGINS} spudec mpeg_audio lpcm a52 cinepak"
 PLUGINS="${PLUGINS} deinterlace invert adjust wall transform distort clone crop motionblur"
 PLUGINS="${PLUGINS} float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif fixed32tofloat32 fixed32tos16 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32"
 PLUGINS="${PLUGINS} trivial_resampler ugly_resampler linear_resampler bandlimited_resampler"
@@ -956,7 +955,7 @@ dnl
 if test "x${target_cpu}" = "xi686" -o "x${target_cpu}" = "xi586" -o "x${target_cpu}" = "xx86" -o "x${target_cpu}" = "xi386"
 then
     ARCH="${ARCH} mmx"
-    PLUGINS="${PLUGINS} ${ACCEL_MODULES}"
+    BUILTINS="${BUILTINS} ${ACCEL_MODULES}"
 fi
 
 dnl

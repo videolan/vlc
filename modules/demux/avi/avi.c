@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.38 2003/02/28 17:23:35 fenrir Exp $
+ * $Id: avi.c,v 1.39 2003/03/03 23:48:41 massiot Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ vlc_module_begin();
                   N_("force index creation"),
                   N_("force index creation"), VLC_TRUE );
 
-    set_description( _("avi demuxer") );
+    set_description( N_("avi demuxer") );
     set_capability( "demux", 212 );
     set_callbacks( AVIInit, __AVIEnd );
 vlc_module_end();
