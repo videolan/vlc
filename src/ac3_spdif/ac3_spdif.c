@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.10 2001/07/27 01:19:24 bozo Exp $
+ * $Id: ac3_spdif.c,v 1.11 2001/09/29 14:52:01 bozo Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -123,6 +123,8 @@ vlc_thread_t spdif_CreateThread( adec_config_t * p_config )
  ****************************************************************************/
 static int InitThread( ac3_spdif_thread_t * p_spdif )
 {
+    boolean_t b_sync = 0;
+
     p_spdif->p_config->decoder_config.pf_init_bit_stream(
             &p_spdif->bit_stream,
             p_spdif->p_config->decoder_config.p_decoder_fifo,
@@ -140,6 +142,18 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     intf_WarnMsg( 3, "spdif: aout fifo #%d created",
                      p_spdif->p_aout_fifo->i_fifo );
 
+    /* Sync word */
+    p_spdif->p_ac3[0] = 0x0b;
+    p_spdif->p_ac3[1] = 0x77;
+
+    /* Find syncword */
+    while( !b_sync )
+    {
+        while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
+        b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
+    }
+    RemoveBits( &p_spdif->bit_stream, 8 );
+
     /* Check stream properties */
     if( ac3_iec958_parse_syncinfo( p_spdif ) < 0 )
     {
@@ -149,7 +163,6 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
         return -1;
     }
 
-    
     /* Check that we can handle the rate 
      * FIXME: we should check that we have the same rate for all fifos 
      * but all rates should be supported by the decoder (32, 44.1, 48) */
@@ -174,8 +187,14 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
  ****************************************************************************/
 static void RunThread( ac3_spdif_thread_t * p_spdif )
 {
-    mtime_t     m_last_pts = 0;
-    mtime_t     m_frame_time;
+    mtime_t     i_frame_time;
+    boolean_t   b_sync;
+    /* PTS of the current frame */
+    mtime_t     i_current_pts = 0;
+    /* Valid value of p_spdif->i_pts */
+    mtime_t     i_real_pts = 0;
+    /* b_update_pts is used to know when p_spdif->i_pts is valid */
+    boolean_t   b_update_pts = 1;
 
     /* Initializing the spdif decoder thread */
     if( InitThread( p_spdif ) )
@@ -184,27 +203,47 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
     }
 
     /* Compute the theorical duration of an ac3 frame */
-    m_frame_time = 1000000 * AC3_FRAME_SIZE /
+    i_frame_time = 1000000 * AC3_FRAME_SIZE /
                              p_spdif->ac3_info.i_sample_rate;
 
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
-        /* Handle the dates */
-        if( p_spdif->i_pts )
+        /* Synchronous update of the PTS */
+        /* when b_update_pts is set p_spdif->i_pts is non-zero */
+        if( b_update_pts /*&& p_spdif->i_pts */)
         {
-            m_last_pts = p_spdif->i_pts;
+            i_real_pts = p_spdif->i_pts;
             p_spdif->i_pts = 0;
+        }
+
+        /* Handle the dates */
+        if( i_real_pts )
+        {
+            if(i_current_pts + i_frame_time != i_real_pts)
+            {
+                intf_WarnMsg( 2, "spdif warning: date discontinuity (%d)",
+                              i_real_pts - i_current_pts - i_frame_time );
+            }
+            i_current_pts = i_real_pts;
+            i_real_pts = 0;
         }
         else
         {
-            m_last_pts += m_frame_time;
+            i_current_pts += i_frame_time;
+        }
+
+        /* Delayed update of the PTS */
+        if( !b_update_pts && p_spdif->i_pts )
+        {
+            i_real_pts = p_spdif->i_pts;
+            p_spdif->i_pts = 0;
         }
 
         /* if we're late here the output won't have to play the frame */
-        if( m_last_pts > mdate() )
+        if( i_current_pts > mdate() )
         {
             p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
-                m_last_pts;
+                i_current_pts;
     
             /* Write in the first free packet of aout fifo */
             p_spdif->p_iec = ((u8*)(p_spdif->p_aout_fifo->buffer) + 
@@ -220,14 +259,21 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
         }
 
         /* Find syncword again in case of stream discontinuity */
-        while( ShowBits( &p_spdif->bit_stream, 16 ) != 0xb77 ) 
+        /* Here we have p_spdif->i_pts == 0
+         * Therefore a non-zero value after a call to GetBits() means the PES
+         * has changed. */
+        b_sync = 0;
+        while( !b_sync )
         {
-            RemoveBits( &p_spdif->bit_stream, 8 );
+            while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
+            b_update_pts = p_spdif->i_pts;
+            b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
         }
+        RemoveBits( &p_spdif->bit_stream, 8 );
 
         /* Read data from bitstream */
-        GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3,
-                  p_spdif->ac3_info.i_frame_size );
+        GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2,
+                  p_spdif->ac3_info.i_frame_size - 2 );
     }
 
     /* If b_error is set, the ac3 spdif thread enters the error loop */

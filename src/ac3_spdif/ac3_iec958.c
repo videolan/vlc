@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.5 2001/05/31 01:37:08 sam Exp $
+ * $Id: ac3_iec958.c,v 1.6 2001/09/29 14:52:01 bozo Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -151,14 +151,9 @@ int ac3_iec958_parse_syncinfo( ac3_spdif_thread_t *p_spdif )
     int             i_frame_size_code;
     sync_frame_t *  p_sync_frame;
 
-    /* Find sync word */
-    while( ShowBits( &p_spdif->bit_stream, 16 ) != 0xb77 )
-    {
-        RemoveBits( &p_spdif->bit_stream, 8 );
-    }
-
     /* Read sync frame */
-    GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3, sizeof(sync_frame_t) );
+    GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + 2,
+              sizeof(sync_frame_t) - 2 );
     p_sync_frame = (sync_frame_t*)p_spdif->p_ac3;
 
     /* Compute frame rate */
