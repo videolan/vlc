@@ -147,31 +147,28 @@ static void Run( intf_thread_t *p_intf )
 #define MAX_MSG_LENGTH (2 * sizeof(int64_t))
 
     vlc_bool_t b_master = config_GetInt( p_intf, "netsync-master" );
-    char *psz_master = config_GetPsz( p_intf, "netsync-master-ip" );
-    struct sockaddr_in master_addr;
+    char *psz_master;
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
 
-    if( !psz_master || inet_addr( psz_master ) == INADDR_NONE )
+    if( !b_master )
     {
-        if( !b_master )
+        psz_master = config_GetPsz( p_intf, "netsync-master-ip" );
+        if( psz_master == NULL )
         {
-            if( psz_master ) free( psz_master );
-            msg_Err( p_intf, "invalid master address." );
+            msg_Err( p_intf, "master address not specified" );
             return;
         }
-
-        if( !psz_master ) psz_master = strdup("");
     }
 
-    memset( &master_addr, 0, sizeof( struct sockaddr_in ) );
-    master_addr.sin_family = AF_INET;
-    master_addr.sin_port = htons( (uint16_t)NETSYNC_PORT_MASTER );
-    master_addr.sin_addr.s_addr = inet_addr( psz_master );
-    free( psz_master );
+    i_socket = net_OpenUDP( p_intf, NULL,
+                            b_master ? NETSYNC_PORT_MASTER : NETSYNC_PORT_SLAVE,
+                            b_master ? NULL : psz_master,
+                            b_master ? 0 : NETSYNC_PORT_MASTER );
 
-    i_socket = net_OpenUDP( p_intf, NULL, b_master ? NETSYNC_PORT_MASTER :
-                            NETSYNC_PORT_SLAVE, NULL, 0 );
+    if( !b_master )
+        free( psz_master );
+    
     if( i_socket < 0 )
     {
         msg_Err( p_intf, "failed opening UDP socket." );
@@ -218,7 +215,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( b_master )
         {
-            struct sockaddr_in from;
+            struct sockaddr_storage from;
             mtime_t i_date, i_clockref, i_master_clockref;
             int i_struct_size, i_read, i_ret;
 
@@ -233,11 +230,9 @@ static void Run( intf_thread_t *p_intf )
             }
 
             /* We received something */
-            i_struct_size = sizeof(struct sockaddr_in);
+            i_struct_size = sizeof( from );
             i_read = recvfrom( i_socket, p_data, MAX_MSG_LENGTH, 0,
                                (struct sockaddr*)&from, &i_struct_size );
-
-            from.sin_port = htons( (uint16_t)NETSYNC_PORT_SLAVE );
 
             i_clockref = ntoh64(*(int64_t *)p_data);
 
@@ -249,11 +244,13 @@ static void Run( intf_thread_t *p_intf )
 
             /* Reply to the sender */
             sendto( i_socket, p_data, 2 * sizeof(int64_t), 0,
-                    (struct sockaddr *)&from, sizeof(struct sockaddr_in) );
+                    (struct sockaddr *)&from, i_struct_size );
 
             msg_Dbg( p_intf, "Master clockref: "I64Fd" -> "I64Fd", from %s "
-                     "(date: "I64Fd")", i_clockref, i_master_clockref, 
-                     inet_ntoa(from.sin_addr), i_date );
+                     "(date: "I64Fd")", i_clockref, i_master_clockref,
+                     from.ss_family == AF_INET
+                     ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
+                     : "non-IPv4", i_date );
         }
         else
         {
@@ -266,9 +263,7 @@ static void Run( intf_thread_t *p_intf )
             *(int64_t *)p_data = hton64( i_clockref );
             i_send_date = mdate();
 
-            i_sent = sendto( i_socket, p_data, sizeof(int64_t), 0,
-                             (struct sockaddr *)&master_addr,
-                             sizeof(struct sockaddr_in) );
+            i_sent = send( i_socket, p_data, sizeof(int64_t), 0 );
             if( i_sent <= 0 )
             {
                 /* Wait a bit */
