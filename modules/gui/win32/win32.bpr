@@ -3,7 +3,7 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="libwin32_plugin.so"/>
+    <PROJECT value="libwin32_plugin.dll"/>
     <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj preferences.obj about.obj 
       disc.obj control.obj menu.obj messages.obj misc.obj"/>
     <RESFILES value=""/>

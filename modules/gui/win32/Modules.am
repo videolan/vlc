@@ -8,7 +8,7 @@ EXTRA_DIST += $(BORLAND_win32)
 # We have private rules! We do whatever we want! Don't mess with us!
 SOURCES_win32 = PRIVATE
 
-modules/gui/win32/libwin32_plugin$(LIBEXT): $(BORLAND_win32)
+modules/gui/win32/libwin32_plugin.dll: $(BORLAND_win32)
 	cd modules/gui/win32/ && \
 	rm -f win32.mak && \
 	$(BCBUILDER)/Bin/bpr2mak win32.bpr -s | sed -e 's@^LIBPATH = .*@&;$$(RELEASELIBPATH)@' -e 's@^USERDEFINES = .*@& -DMODULE_NAME=win32@' > win32.mak && \
