@@ -113,6 +113,7 @@ HEADERS_include = \
 	include/vlc_threads.h \
 	include/vlc_video.h \
 	include/vlc_vlm.h \
+	include/vlc_vod.h \
 	include/vout_synchro.h \
 	include/win32_specific.h \
 	$(NULL)

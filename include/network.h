@@ -69,7 +69,7 @@ typedef struct
  *****************************************************************************/
 static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
 {
-    char *psz_dup = strdup( psz_url );
+    char *psz_dup = psz_url ? strdup( psz_url ) : 0;
     char *psz_parse = psz_dup;
     char *p;
 
@@ -78,6 +78,8 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
     url->i_port       = 0;
     url->psz_path     = NULL;
     url->psz_option   = NULL;
+
+    if( !psz_url ) return;
 
     if( ( p  = strstr( psz_parse, ":/" ) ) )
     {
