@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.17 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: decoder.c,v 1.18 2003/01/08 10:43:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -282,7 +282,7 @@ static int InitThread( adec_thread_t * p_adec )
     {
         msg_Err( p_adec->p_fifo,
                  "failed to initialize faad" );
-        faacDecClose( p_adec->p_handle );
+        //faacDecClose( p_adec->p_handle );
         return( -1 );
     }
     msg_Dbg( p_adec->p_fifo,
