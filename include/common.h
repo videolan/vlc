@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.108 2002/05/20 22:36:42 sam Exp $
+ * $Id: common.h,v 1.108.2.1 2002/08/10 19:40:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -457,8 +457,12 @@ typedef __int64 off_t;
 #       define O_NONBLOCK 0
 #   endif
 
+    /* These two are not defined in mingw32 (bug?) */
 #   ifndef snprintf
-#       define snprintf _snprintf  /* snprintf not defined in mingw32 (bug?) */
+#       define snprintf _snprintf
+#   endif
+#   ifndef vsnprintf
+#       define vsnprintf _vsnprintf
 #   endif
 
 #endif

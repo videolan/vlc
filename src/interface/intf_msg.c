@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.49 2002/05/17 00:58:13 sam Exp $
+ * $Id: intf_msg.c,v 1.49.2.1 2002/08/10 19:40:04 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -311,6 +311,9 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 #ifdef WIN32
     char *                  psz_temp;
 #endif
+#ifndef HAVE_VASPRINTF
+    int                     i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
+#endif
 
     /*
      * Convert message to string
@@ -318,7 +321,7 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 #ifdef HAVE_VASPRINTF
     vasprintf( &psz_str, psz_format, ap );
 #else
-    psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
+    psz_str = (char*) malloc( i_size * sizeof(char) );
 #endif
 
     if( psz_str == NULL )
@@ -338,11 +341,12 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
         fprintf(stderr, "intf warning: couldn't print message");
         return;
     }
-    vsprintf( psz_str, psz_temp, ap );
+    vsnprintf( psz_str, i_size, psz_temp, ap );
     free( psz_temp );
 #   else
-    vsprintf( psz_str, psz_format, ap );
+    vsnprintf( psz_str, i_size, psz_format, ap );
 #   endif
+    psz_str[ i_size - 1 ] = 0; /* Just in case */
 #endif
 
     /* Put message in queue */
