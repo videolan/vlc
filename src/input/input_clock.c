@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.6 2001/02/08 13:52:35 massiot Exp $
+ * $Id: input_clock.c,v 1.7 2001/02/22 17:00:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -119,8 +119,6 @@ static mtime_t ClockCurrent( input_thread_t * p_input,
 static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
-    intf_WarnMsg( 1, "Old ref: %lld/%lld, New ref: %lld/%lld", p_pgrm->cr_ref,
-              p_pgrm->sysdate_ref, i_clock, i_sysdate );
     p_pgrm->cr_ref = i_clock;
     p_pgrm->sysdate_ref = i_sysdate;
 }

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.35 2001/02/22 16:17:12 massiot Exp $
+ * $Id: input_programs.c,v 1.36 2001/02/22 17:00:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -471,39 +471,6 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
         intf_ErrMsg( "Unable to realloc memory in input_DelES" );
     }
     
-}
-
-/*****************************************************************************
- * input_DumpStream: dumps the contents of a stream descriptor
- *****************************************************************************/
-void input_DumpStream( input_thread_t * p_input )
-{
-    int i, j;
-#define S   p_input->stream
-    intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
-    if( S.b_seekable )
-        intf_Msg( "input info: seekable stream, position: %lld/%lld",
-                  S.p_selected_area->i_tell, S.p_selected_area->i_size );
-    else
-        intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :
-                  "pace un-controlled" );
-#undef S
-    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
-    {
-#define P   p_input->stream.pp_programs[i]
-        intf_Msg( "input info: Dumping program 0x%x, version %d (%s)",
-                  P->i_number, P->i_version,
-                  P->b_is_ok ? "complete" : "partial" );
-#undef P
-        for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
-        {
-#define ES  p_input->stream.pp_programs[i]->pp_es[j]
-            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s",
-                      ES->i_id, ES->i_stream_id, ES->i_type,
-                      ES->p_decoder_fifo != NULL ? "selected" : "not selected");
-#undef ES
-        }
-    }
 }
 
 /*****************************************************************************

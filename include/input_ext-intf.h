@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.25 2001/02/22 16:17:12 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.26 2001/02/22 17:00:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,6 +32,8 @@
 #define REQUESTED_AC3          2
 #define REQUESTED_LPCM         3
 #define REQUESTED_NOAUDIO    255
+
+#define OFFSETTOTIME_MAX_SIZE       10
 
 /*****************************************************************************
  * es_descriptor_t: elementary stream descriptor
@@ -343,4 +345,4 @@ void input_SetStatus( struct input_thread_s *, int );
 void input_SetRate  ( struct input_thread_s *, int );
 void input_Seek     ( struct input_thread_s *, off_t );
 void input_DumpStream( struct input_thread_s * );
-
+char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
