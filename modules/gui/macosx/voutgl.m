@@ -69,6 +69,7 @@ struct vout_sys_t
 static int  Init   ( vout_thread_t * p_vout );
 static void End    ( vout_thread_t * p_vout );
 static int  Manage ( vout_thread_t * p_vout );
+static int  Control( vout_thread_t *, int, va_list );
 static void Swap   ( vout_thread_t * p_vout );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
@@ -77,10 +78,18 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     int i_timeout;
     vlc_value_t val;
 
+
+/* OpenGL interface disabled until
+ * - the video on top var is properly working
+ * - the escape key is working in fullscreen
+ * - the green line is gone
+ * - other problems?????
+ */
+return( 1 );
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
         msg_Warn( p_vout, "no hardware acceleration" );
-        return VLC_EGENERIC;
+        return( 1 );
     }
     msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
 
@@ -112,6 +121,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     p_vout->pf_init   = Init;
     p_vout->pf_end    = End;
     p_vout->pf_manage = Manage;
+    p_vout->pf_control= Control;
     p_vout->pf_swap   = Swap;
 
 
@@ -246,6 +256,27 @@ static int Manage( vout_thread_t * p_vout )
     }
     [p_vout->p_sys->o_window manage];
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    vlc_bool_t b_arg;
+
+    switch( i_query )
+    {
+        case VOUT_SET_STAY_ON_TOP:
+            b_arg = va_arg( args, vlc_bool_t );
+            [p_vout->p_sys->o_window setOnTop: b_arg];
+            return VLC_SUCCESS;
+
+        case VOUT_CLOSE:
+        case VOUT_REPARENT:
+        default:
+            return vout_vaControlDefault( p_vout, i_query, args );
+    }
 }
 
 static void Swap( vout_thread_t * p_vout )
