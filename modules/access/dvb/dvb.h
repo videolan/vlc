@@ -4,8 +4,8 @@
  * Copyright (C) 1998-2003 VideoLAN
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
- *          Jean-Paul Saman <saman@natlab.research.philips.com>
- *          Christopher Ross <ross@natlab.research.philips.com>
+ *          Jean-Paul Saman <jpsaman@saman>
+ *          Christopher Ross <chris@tebibyte.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

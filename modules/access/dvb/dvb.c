@@ -5,8 +5,8 @@
  *
  * Authors: Damien Lucas <nitrox@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
- *          Jean-Paul Saman <saman@natlab.research.philips.com>
- *          Christopher Ross <ross@natlab.research.philips.com>
+ *          Jean-Paul Saman <jpsaman@wxs.nl>
+ *          Christopher Ross <chris@tebibyte.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
     if (hiband)
         fep.frequency -= u_lnb_lof2;
     else
-        fep.frequency -= u_lnb_lof2;
+        fep.frequency -= u_lnb_lof1;
 
     /* Now send it all to the frontend device */
     if ((ret=ioctl(front, FE_SET_FRONTEND, &fep)) < 0)
