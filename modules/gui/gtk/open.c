@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.9 2003/01/21 12:36:11 fenrir Exp $
+ * $Id: open.c,v 1.10 2003/01/21 17:00:41 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -146,10 +146,16 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
     if( togglebutton->active
          && (psz_device = config_GetPsz( p_intf, "dvd" )) )
     {
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ) , TRUE);
+
         gtk_entry_set_text(
             GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                       "disc_name" ) ), psz_device );
         free( psz_device );
+    }
+    else
+    {
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "disc_dvd_use_menu" ) ), FALSE );
     }
 }
 
@@ -175,7 +181,14 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), 
                                           "disc_dvd" ) )->active )
     {
-        g_string_append( p_target, "dvd://" );
+        if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), "disc_dvd_use_menu" ) )->active )
+        {
+            g_string_append( p_target, "dvd://" );
+        }
+        else
+        {
+            g_string_append( p_target, "dvdold://" );
+        }
     }
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_vcd" ) )->active )
@@ -580,7 +593,6 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
         delay = gtk_spin_button_get_value_as_float( GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button), "subtitle_delay" ) ) );
         fps = gtk_spin_button_get_value_as_float( GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button), "subtitle_fps" ) ) );
 
-        msg_Warn( p_intf, "%s - %f, %f", psz_subtitle, delay, fps);
         config_PutPsz( p_intf, "sub-file", psz_subtitle );
         config_PutInt( p_intf, "sub-delay", (int)( delay * 10 ) );
         config_PutFloat( p_intf, "sub-fps", fps );

@@ -1961,6 +1961,25 @@ http://www.videolan.org/
 		<fill>False</fill>
 	      </child>
 	    </widget>
+
+	    <widget>
+	      <class>GtkCheckButton</class>
+	      <name>disc_dvd_use_menu</name>
+	      <can_focus>True</can_focus>
+	      <signal>
+		<name>toggled</name>
+		<handler>GtkOpenChanged</handler>
+		<last_modification_time>Tue, 21 Jan 2003 13:39:20 GMT</last_modification_time>
+	      </signal>
+	      <label>Use DVD menus</label>
+	      <active>True</active>
+	      <draw_indicator>True</draw_indicator>
+	      <child>
+		<padding>0</padding>
+		<expand>False</expand>
+		<fill>False</fill>
+	      </child>
+	    </widget>
 	  </widget>
 
 	  <widget>
@@ -2088,7 +2107,7 @@ http://www.videolan.org/
 	      <handler>GtkNetworkOpenUDP</handler>
 	      <last_modification_time>Thu, 16 May 2002 00:47:18 GMT</last_modification_time>
 	    </signal>
-	    <label>UDP</label>
+	    <label>UDP/RTP</label>
 	    <active>False</active>
 	    <draw_indicator>True</draw_indicator>
 	    <child>
@@ -2116,7 +2135,7 @@ http://www.videolan.org/
 	      <handler>GtkNetworkOpenMulticast</handler>
 	      <last_modification_time>Thu, 16 May 2002 00:47:05 GMT</last_modification_time>
 	    </signal>
-	    <label>UDP Multicast</label>
+	    <label>UDP/RTP Multicast</label>
 	    <active>False</active>
 	    <draw_indicator>True</draw_indicator>
 	    <child>
@@ -2172,7 +2191,7 @@ http://www.videolan.org/
 	      <handler>GtkNetworkOpenHTTP</handler>
 	      <last_modification_time>Thu, 16 May 2002 00:47:42 GMT</last_modification_time>
 	    </signal>
-	    <label>HTTP</label>
+	    <label>HTTP/FTP/MMS</label>
 	    <active>False</active>
 	    <draw_indicator>True</draw_indicator>
 	    <child>

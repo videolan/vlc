@@ -3,6 +3,3 @@
  *****************************************************************************/
 #include "gtk_callbacks.h"
 
-void
-GtkOpenSubtitleShow                    (GtkButton       *button,
-                                        gpointer         user_data);

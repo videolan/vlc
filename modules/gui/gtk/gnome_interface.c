@@ -1374,6 +1374,7 @@ create_intf_open (void)
   GSList *disc_group = NULL;
   GtkWidget *disc_dvd;
   GtkWidget *disc_vcd;
+  GtkWidget *disc_dvd_use_menu;
   GtkWidget *label19;
   GtkObject *disc_title_adj;
   GtkWidget *disc_title;
@@ -1628,6 +1629,14 @@ create_intf_open (void)
   gtk_widget_show (disc_vcd);
   gtk_box_pack_start (GTK_BOX (hbox24), disc_vcd, FALSE, FALSE, 0);
 
+  disc_dvd_use_menu = gtk_check_button_new_with_label (_("Use DVD menus"));
+  gtk_widget_ref (disc_dvd_use_menu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_dvd_use_menu", disc_dvd_use_menu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_dvd_use_menu);
+  gtk_box_pack_start (GTK_BOX (hbox24), disc_dvd_use_menu, FALSE, FALSE, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (disc_dvd_use_menu), TRUE);
+
   label19 = gtk_label_new (_("Device name"));
   gtk_widget_ref (label19);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "label19", label19,
@@ -1674,7 +1683,7 @@ create_intf_open (void)
   gtk_table_set_row_spacings (GTK_TABLE (table4), 5);
   gtk_table_set_col_spacings (GTK_TABLE (table4), 5);
 
-  network_udp = gtk_radio_button_new_with_label (table4_group, _("UDP"));
+  network_udp = gtk_radio_button_new_with_label (table4_group, _("UDP/RTP"));
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_udp));
   gtk_widget_ref (network_udp);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_udp", network_udp,
@@ -1684,7 +1693,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_multicast = gtk_radio_button_new_with_label (table4_group, _("UDP Multicast"));
+  network_multicast = gtk_radio_button_new_with_label (table4_group, _("UDP/RTP Multicast"));
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_multicast));
   gtk_widget_ref (network_multicast);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_multicast", network_multicast,
@@ -1704,7 +1713,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_http = gtk_radio_button_new_with_label (table4_group, _("HTTP"));
+  network_http = gtk_radio_button_new_with_label (table4_group, _("HTTP/FTP/MMS"));
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_http));
   gtk_widget_ref (network_http);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_http", network_http,
@@ -2100,6 +2109,9 @@ create_intf_open (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (disc_vcd), "toggled",
                       GTK_SIGNAL_FUNC (GtkDiscOpenVcd),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (disc_dvd_use_menu), "toggled",
+                      GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (disc_title), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
