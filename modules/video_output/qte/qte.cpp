@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.11 2003/02/12 23:09:23 jpsaman Exp $
+ * $Id: qte.cpp,v 1.12 2003/02/12 23:13:51 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -128,7 +128,7 @@ vlc_module_begin();
 //    add_bool( "qte-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT);
 //    add_integer( "qte-drawable", -1, NULL, NULL, NULL); //DRAWABLE_TEXT, DRAWABLE_LONGTEXT );
     set_description( _("QT Embedded module") );
-    set_capability( "video output", 30 );
+    set_capability( "video output", 70 );
 //    add_shortcut( "qte" );
     set_callbacks( Open, Close);
 vlc_module_end();
