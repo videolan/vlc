@@ -2,7 +2,7 @@
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.3 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: demuxdump.c,v 1.4 2003/02/02 09:17:39 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -98,7 +98,14 @@ static int Activate( vlc_object_t * p_this )
     p_demux = malloc( sizeof( demux_sys_t ) );
     memset( p_demux, 0, sizeof( demux_sys_t ) );
 
-    if( !( p_demux->p_file = fopen( psz_name, "wb" ) ) )
+    if( !strcmp( psz_name, "-" ) )
+    {
+        msg_Info( p_input,
+                  "dumping raw stream to standard output" );
+        p_demux->p_file = stdout;
+        p_demux->psz_name = psz_name;
+    }
+    else if( !( p_demux->p_file = fopen( psz_name, "wb" ) ) )
     {
         msg_Err( p_input,
                  "cannot create `%s' for writing", 
@@ -127,7 +134,8 @@ static int Activate( vlc_object_t * p_this )
 
         if( input_InitStream( p_input, 0 ) == -1 )
         {
-            fclose( p_demux->p_file );
+            if( p_demux->p_file != stdout )
+                fclose( p_demux->p_file );
             free( p_demux );
             return( -1 );
         }
@@ -163,7 +171,8 @@ static void Desactivate ( vlc_object_t *p_this )
 
     if( p_demux->p_file )
     {
-        fclose( p_demux->p_file );
+        if( p_demux->p_file != stdout )
+            fclose( p_demux->p_file );
         p_demux->p_file = NULL;
     }
     if( p_demux->psz_name )
