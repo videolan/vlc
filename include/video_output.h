@@ -85,7 +85,7 @@ typedef struct vout_thread_s
     boolean_t           b_active;                             /* `active' flag */
     vlc_thread_t        thread_id;                 /* id for pthread functions */
     vlc_mutex_t         picture_lock;                     /* picture heap lock */
-    vlc_mutex_t         subtitle_lock;                   /* subtitle heap lock */   
+    vlc_mutex_t         spu_lock;                        /* subtitle heap lock */   
     vlc_mutex_t         change_lock;                     /* thread change lock */    
     int *               pi_status;                    /* temporary status flag */
     p_vout_sys_t        p_sys;                         /* system output method */
@@ -123,7 +123,7 @@ typedef struct vout_thread_s
 
     /* Videos heap and translation tables */
     picture_t           p_picture[VOUT_MAX_PICTURES];              /* pictures */
-    subtitle_t          p_subtitle[VOUT_MAX_PICTURES];            /* subtitles */    
+    spu_t                    p_spu[VOUT_MAX_PICTURES];            /* subtitles */    
     vout_tables_t       tables;                          /* translation tables */
     vout_convert_t *    p_ConvertYUV420;                /* YUV 4:2:0 converter */
     vout_convert_t *    p_ConvertYUV422;                /* YUV 4:2:2 converter */
@@ -158,9 +158,9 @@ void            vout_DisplayPicture     ( vout_thread_t *p_vout, picture_t *p_pi
 void            vout_DatePicture        ( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date );
 void            vout_LinkPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
 void            vout_UnlinkPicture      ( vout_thread_t *p_vout, picture_t *p_pic );
-subtitle_t *    vout_CreateSubtitle     ( vout_thread_t *p_vout, int i_type, int i_size );
-void            vout_DestroySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
-void            vout_DisplaySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
+spu_t *         vout_CreateSubPictureUnit   ( vout_thread_t *p_vout, int i_type, int i_size );
+void            vout_DestroySubPictureUnit  ( vout_thread_t *p_vout, spu_t *p_spu );
+void            vout_DisplaySubPictureUnit  ( vout_thread_t *p_vout, spu_t *p_spu );
 void            vout_ClearBuffer        ( vout_thread_t *p_vout, vout_buffer_t *p_buffer );
 
 

@@ -412,6 +412,10 @@ static void EndThread( input_thread_t * p_input )
         case AC3_AUDIO_ES:
             ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
             break;
+        case DVD_SPU_ES:
+            fprintf(stderr, "input.h : destroying spudec\n");
+            spudec_DestroyThread( (spudec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+            break;
         case 0:
             /* Special streams for the PSI decoder, PID 0 and 1 */
             break;
@@ -1062,6 +1066,13 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     /* we skip 4 bytes at the beginning of the AC3 payload */
                     p_ts->i_payload_start += 4;
                     p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
+                    break;
+
+                case DVD_SPU_ES:
+                    /* we skip 4 bytes at the beginning of the subpicture payload */
+                    p_ts->i_payload_start += 4;
+                    fprintf(stderr, "input.h : launching spudec\n");
+                    p_fifo = &(((spudec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                     break;
 
                 default:

@@ -41,7 +41,7 @@ static void     SetBufferArea           ( vout_thread_t *p_vout, int i_x, int i_
 static void     SetBufferPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderSubtitle          ( vout_thread_t *p_vout, subtitle_t *p_sub );
+static void     RenderSubPictureUnit    ( vout_thread_t *p_vout, spu_t *p_spu );
 static void     RenderInterface         ( vout_thread_t *p_vout );
 static void     RenderIdle              ( vout_thread_t *p_vout );
 static void     RenderInfo              ( vout_thread_t *p_vout );
@@ -112,14 +112,14 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     /* Initialize buffer index */
     p_vout->i_buffer_index      = 0;
 
-    /* Initialize pictures and subtitles - translation tables and functions
+    /* Initialize pictures and spus - translation tables and functions
      * will be initialized later in InitThread */    
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
-        p_vout->p_subtitle[i_index].i_type  = EMPTY_SUBTITLE;
-        p_vout->p_subtitle[i_index].i_status= FREE_SUBTITLE;
+        p_vout->p_spu[i_index].i_type  = EMPTY_SPU;
+        p_vout->p_spu[i_index].i_status= FREE_SPU;
     }
    
     /* Create and initialize system-dependant method - this function issues its
@@ -153,7 +153,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
-    vlc_mutex_init( &p_vout->subtitle_lock );    
+    vlc_mutex_init( &p_vout->spu_lock );    
     vlc_mutex_init( &p_vout->change_lock );    
     vlc_mutex_lock( &p_vout->change_lock );    
     if( vlc_thread_create( &p_vout->thread_id, "video output", (void *) RunThread, (void *) p_vout) )
@@ -217,13 +217,13 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 }
 
 /******************************************************************************
- * vout_DisplaySubtitle: display a subtitle
+ * vout_DisplaySubPictureUnit: display a sub picture unit
  ******************************************************************************
- * Remove the reservation flag of a subtitle, which will cause it to be ready for
+ * Remove the reservation flag of an spu, which will cause it to be ready for
  * display. The picture does not need to be locked, since it is ignored by
  * the output thread if is reserved.
  ******************************************************************************/
-void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+void  vout_DisplaySubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
 {
 #ifdef DEBUG_VIDEO
     char        psz_begin_date[MSTRTIME_MAX_SIZE];  /* buffer for date string */
@@ -232,59 +232,59 @@ void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 
 #ifdef DEBUG
     /* Check if status is valid */
-    if( p_sub->i_status != RESERVED_SUBTITLE )
+    if( p_spu->i_status != RESERVED_SPU )
     {
-        intf_DbgMsg("error: subtitle %p has invalid status %d\n", p_sub, p_sub->i_status );       
+        intf_DbgMsg("error: spu %p has invalid status %d\n", p_spu, p_spu->i_status );       
     }   
 #endif
 
     /* Remove reservation flag */
-    p_sub->i_status = READY_SUBTITLE;
+    p_spu->i_status = READY_SPU;
 
 #ifdef DEBUG_VIDEO
-    /* Send subtitle informations */
-    intf_DbgMsg("subtitle %p: type=%d, begin date=%s, end date=%s\n", p_sub, p_sub->i_type, 
-                mstrtime( psz_begin_date, p_sub->begin_date ), 
-                mstrtime( psz_end_date, p_sub->end_date ) );    
+    /* Send subpicture informations */
+    intf_DbgMsg("spu %p: type=%d, begin date=%s, end date=%s\n", p_spu, p_spu->i_type, 
+                mstrtime( psz_begin_date, p_spu->begin_date ), 
+                mstrtime( psz_end_date, p_spu->end_date ) );    
 #endif
 }
 
 /******************************************************************************
- * vout_CreateSubtitle: allocate a subtitle in the video output heap.
+ * vout_CreateSubPictureUnit: allocate an spu in the video output heap.
  ******************************************************************************
- * This function create a reserved subtitle in the video output heap. 
+ * This function create a reserved spu in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
- * already allocated zone of memory in the subtitle data fields. It needs locking
+ * already allocated zone of memory in the spu data fields. It needs locking
  * since several pictures can be created by several producers threads. 
  ******************************************************************************/
-subtitle_t *vout_CreateSubtitle( vout_thread_t *p_vout, int i_type, 
+spu_t *vout_CreateSubPictureUnit( vout_thread_t *p_vout, int i_type, 
                                  int i_size )
 {
     //??
 }
 
 /******************************************************************************
- * vout_DestroySubtitle: remove a permanent or reserved subtitle from the heap
+ * vout_DestroySubPictureUnit: remove a permanent or reserved spu from the heap
  ******************************************************************************
- * This function frees a previously reserved subtitle.
+ * This function frees a previously reserved spu.
  * It is meant to be used when the construction of a picture aborted.
- * This function does not need locking since reserved subtitles are ignored by
+ * This function does not need locking since reserved spus are ignored by
  * the output thread.
  ******************************************************************************/
-void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+void vout_DestroySubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
 {
 #ifdef DEBUG
-   /* Check if subtitle status is valid */
-   if( p_sub->i_status != RESERVED_SUBTITLE )
+   /* Check if spu status is valid */
+   if( p_spu->i_status != RESERVED_SPU )
    {
-       intf_DbgMsg("error: subtitle %p has invalid status %d\n", p_sub, p_sub->i_status );       
+       intf_DbgMsg("error: spu %p has invalid status %d\n", p_spu, p_spu->i_status );       
    }   
 #endif
 
-    p_sub->i_status = DESTROYED_SUBTITLE;
+    p_spu->i_status = DESTROYED_SPU;
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("subtitle %p\n", p_sub);    
+    intf_DbgMsg("spu %p\n", p_spu);    
 #endif
 }
 
@@ -643,7 +643,7 @@ static void RunThread( vout_thread_t *p_vout)
     mtime_t         display_date;                             /* display date */    
     boolean_t       b_display;                                /* display flag */    
     picture_t *     p_pic;                                 /* picture pointer */
-    subtitle_t *    p_sub;                                /* subtitle pointer */    
+    spu_t *         p_spu;                              /* subpicture pointer */    
      
     /* 
      * Initialize thread
@@ -664,7 +664,7 @@ static void RunThread( vout_thread_t *p_vout)
     {
         /* Initialize loop variables */
         p_pic =         NULL;
-        p_sub =         NULL;
+        p_spu =         NULL;
         display_date =  0;        
         current_date =  mdate();
 
@@ -711,16 +711,16 @@ static void RunThread( vout_thread_t *p_vout)
         }
 
         /*
-         * Find the subtitle to display - this operation does not need lock, since
-         * only READY_SUBTITLEs are handled. If no picture has been selected,
-         * display_date will depend on the subtitle
+         * Find the subpicture to display - this operation does not need lock, since
+         * only READY_SPUs are handled. If no picture has been selected,
+         * display_date will depend on the spu
          */
         //??
 
         /*
          * Perform rendering, sleep and display rendered picture
          */
-        if( p_pic )                            /* picture and perhaps subtitle */
+        if( p_pic )                            /* picture and perhaps spu */
         {
             b_display = p_vout->b_active;            
 
@@ -743,26 +743,26 @@ static void RunThread( vout_thread_t *p_vout)
             p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
             vlc_mutex_unlock( &p_vout->picture_lock );                          
 
-            /* Render interface and subtitles */
+            /* Render interface and spus */
             if( b_display && p_vout->b_interface )
             {
                 RenderInterface( p_vout );                
             }
-            if( p_sub )
+            if( p_spu )
             {
                 if( b_display )
                 {                    
-                    RenderSubtitle( p_vout, p_sub );
+                    RenderSubPictureUnit( p_vout, p_spu );
                 }                
 
-                /* Remove subtitle from heap */
-                vlc_mutex_lock( &p_vout->subtitle_lock );
-                p_sub->i_status = DESTROYED_SUBTITLE;
-                vlc_mutex_unlock( &p_vout->subtitle_lock );                          
+                /* Remove spu from heap */
+                vlc_mutex_lock( &p_vout->spu_lock );
+                p_spu->i_status = DESTROYED_SPU;
+                vlc_mutex_unlock( &p_vout->spu_lock );                          
             }
 
         }
-        else if( p_sub )                                     /* subtitle alone */
+        else if( p_spu )                                     /* spu alone */
         {
             b_display = p_vout->b_active;
 
@@ -771,7 +771,7 @@ static void RunThread( vout_thread_t *p_vout)
                 /* Clear buffer */
                 SetBufferPicture( p_vout, NULL );
 
-                /* Render informations, interface and subtitle */
+                /* Render informations, interface and spu */
                 if( p_vout->b_info )
                 {
                     RenderInfo( p_vout );
@@ -780,13 +780,13 @@ static void RunThread( vout_thread_t *p_vout)
                 {
                     RenderInterface( p_vout );
                 }
-                RenderSubtitle( p_vout, p_sub );            
+                RenderSubPictureUnit( p_vout, p_spu );            
             }            
 
-            /* Remove subtitle from heap */
-            vlc_mutex_lock( &p_vout->subtitle_lock );
-            p_sub->i_status = DESTROYED_SUBTITLE;
-            vlc_mutex_unlock( &p_vout->subtitle_lock );                          
+            /* Remove spu from heap */
+            vlc_mutex_lock( &p_vout->spu_lock );
+            p_spu->i_status = DESTROYED_SPU;
+            vlc_mutex_unlock( &p_vout->spu_lock );                          
         }
         else                                              /* idle screen alone */
         {            
@@ -820,7 +820,7 @@ static void RunThread( vout_thread_t *p_vout)
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );        
 #ifdef DEBUG_VIDEO
-        intf_DbgMsg( "picture %p, subtitle %p\n", p_pic, p_sub );        
+        intf_DbgMsg( "picture %p, spu %p\n", p_pic, p_spu );        
 #endif            
         if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
@@ -886,16 +886,16 @@ static void EndThread( vout_thread_t *p_vout )
     intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_END;    
 
-    /* Destroy all remaining pictures and subtitles */
+    /* Destroy all remaining pictures and spus */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
 	if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
 	{
             free( p_vout->p_picture[i_index].p_data );
         }
-        if( p_vout->p_subtitle[i_index].i_status != FREE_SUBTITLE )
+        if( p_vout->p_spu[i_index].i_status != FREE_SPU )
         {
-            free( p_vout->p_subtitle[i_index].p_data );            
+            free( p_vout->p_spu[i_index].p_data );            
         }        
     }
 
@@ -1445,11 +1445,11 @@ static void RenderInfo( vout_thread_t *p_vout )
 }
 
 /*******************************************************************************
- * RenderSubtitle: render a subtitle
+ * RenderSubPictureUnit: render an spu
  *******************************************************************************
- * This function render a subtitle.
+ * This function render a sub picture unit.
  *******************************************************************************/
-static void RenderSubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
+static void RenderSubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
 {
     //??
 }

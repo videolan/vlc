@@ -148,6 +148,7 @@ typedef struct es_descriptor_t
 #define MPEG1_AUDIO_ES          0x03
 #define MPEG2_AUDIO_ES          0x04
 #define AC3_AUDIO_ES            0x81
+#define DVD_SPU_ES             0x82           /* 0x82 might violate the norm */
 
 /******************************************************************************
  * program_descriptor_t

@@ -87,35 +87,35 @@ typedef struct picture_s
 #define AR_221_1_PICTURE        4                    /* 2.21:1 picture (movie) */
 
 /*******************************************************************************
- * subtitle_t: video subtitle                                            
+ * spu_t: video sub picture unit                                            
  *******************************************************************************
- * Any subtitle destined to be displayed by a video output thread should be 
- * stored in this structure from it's creation to it's effective display.
+ * Any sub picture unit destined to be displayed by a video output thread should
+ * be stored in this structure from it's creation to it's effective display.
  * Subtitle type and flags should only be modified by the output thread. Note
  * that an empty subtitle MUST have its flags set to 0.
  *******************************************************************************/
-typedef struct subtitle_s
+typedef struct spu_s
 {
     /* Type and flags - should NOT be modified except by the vout thread */
-    int             i_type;                                   /* subtitle type */
-    int             i_status;                                /* subtitle flags */
+    int             i_type;                                        /* spu type */
+    int             i_status;                                     /* spu flags */
 
     /* Other properties */
     mtime_t         begin_date;                   /* beginning of display date */
     mtime_t         end_date;                           /* end of display date */
 
-    /* Subtitle data - data can always be freely modified. p_data itself 
+    /* Sub picture unit data - data can always be freely modified. p_data itself 
      * (the pointer) should NEVER be modified. */
-    void *          p_data;                                   /* subtitle data */    
-} subtitle_t;
+    void *          p_data;                                        /* spu data */    
+} spu_t;
 
-/* Subtitle types */
-#define EMPTY_SUBTITLE          0      /* subtitle slot is empty and available */
-#define RLE_SUBTITLE            100                    /* RLE encoded subtitle */
+/* SPU types */
+#define EMPTY_SPU               0      /* subtitle slot is empty and available */
+#define RLE_SPU                 100                    /* RLE encoded subtitle */
 
-/* Subtitle status */
-#define FREE_SUBTITLE           0        /* subtitle is free and not allocated */
-#define RESERVED_SUBTITLE       1        /* subtitle is allocated and reserved */
-#define READY_SUBTITLE          2             /* subtitle is ready for display */
-#define DESTROYED_SUBTITLE      3    /* subtitle is allocated but no more used */
+/* Subpicture status */
+#define FREE_SPU                0        /* subtitle is free and not allocated */
+#define RESERVED_SPU            1        /* subtitle is allocated and reserved */
+#define READY_SPU               2             /* subtitle is ready for display */
+#define DESTROYED_SPU           3    /* subtitle is allocated but no more used */
 

@@ -1,12 +1,12 @@
 /******************************************************************************
- * subtitle_decoder.h : subtitle decoder thread interface
+ * spu_decoder.h : sub picture unit decoder thread interface
  * (c)1999 VideoLAN
  ******************************************************************************/
 
 /******************************************************************************
- * subtdec_thread_t : subtitle decoder thread descriptor
+ * spudec_thread_t : sub picture unit decoder thread descriptor
  ******************************************************************************/
-typedef struct subtdec_thread_s
+typedef struct spudec_thread_s
 {
     /*
      * Thread properties and locks
@@ -30,10 +30,10 @@ typedef struct subtdec_thread_s
     unsigned int        total_bits_read;
     /* ... */
 
-} subtdec_thread_t;
+} spudec_thread_t;
 
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
-subtdec_thread_t *      subtdec_CreateThread( input_thread_t * p_input );
-void                    subtdec_DestroyThread( subtdec_thread_t * p_subtdec );
+spudec_thread_t *       spudec_CreateThread( input_thread_t * p_input );
+void                    spudec_DestroyThread( spudec_thread_t * p_spudec );

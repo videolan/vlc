@@ -112,6 +112,17 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                         }
                         break;
 
+                    case DVD_SPU_ES:
+                        /* Spawn spu thread */
+                        if ( ((spudec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
+                            spudec_CreateThread(p_input)) == NULL )
+                        {
+                            intf_ErrMsg( "Could not start subtitle decoder\n" );
+                            vlc_mutex_unlock( &p_input->es_lock );
+                            return( -1 );
+                        }
+                        break;
+
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
                         /* Spawn audio thread. */
@@ -156,7 +167,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
                 /* Initialise the demux */
                 p_input->p_es[i_es_loop].p_pes_packet = NULL;
-                p_input->p_es[i_es_loop].i_continuity_counter = 0xFF;
+                p_input->p_es[i_es_loop].i_continuity_counter = 0xff;
                 p_input->p_es[i_es_loop].b_random = 0;
 		
                 /* Mark stream to be demultiplexed. */
@@ -215,6 +226,10 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                 {
                     case AC3_AUDIO_ES:
                         ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );
+                        break;
+
+                    case DVD_SPU_ES:
+                        spudec_DestroyThread( (spudec_thread_t *)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );
                         break;
 
                     case MPEG1_AUDIO_ES:

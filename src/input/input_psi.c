@@ -649,6 +649,15 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                               }
                           break;
 
+                      case DVD_SPU_ES:
+                          if ( p_main->b_audio )
+                          {
+                              /* Spawn a spu decoder thread */
+                              input_AddPgrmElem( p_input,
+                                  p_input->p_es[i_es_loop].i_id );
+                              }
+                          break;
+
                       case MPEG1_AUDIO_ES:
                       case MPEG2_AUDIO_ES:
                           if( p_main->b_audio )

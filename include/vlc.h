@@ -68,6 +68,9 @@
 #include "audio_decoder.h"
 #include "ac3_decoder.h"
 
+/* Subtitles */
+#include "spu_decoder.h"
+
 /* Video */
 #include "video.h"
 #include "video_output.h"
