@@ -374,9 +374,9 @@ object NetworkDlg: TNetworkDlg
       Enabled = False
       ItemHeight = 13
       TabOrder = 7
-      Text = '138.195.156.230'
+      Text = 'vlcs'
       Items.Strings = (
-        '138.195.159.230')
+        'vlcs')
     end
     object EditHTTPURL: TEdit
       Left = 184

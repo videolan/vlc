@@ -2,7 +2,7 @@
  * intf_open.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.m,v 1.1 2002/05/12 20:56:33 massiot Exp $
+ * $Id: intf_open.m,v 1.2 2002/05/22 21:08:42 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -144,11 +144,11 @@ static Intf_Open *o_open = nil;
     [o_net_server_addr addItemWithObjectValue: @"vls"];
     [o_net_server_addr selectItemAtIndex: 0];
     
-    [o_net_server_baddr setStringValue: @"138.195.143.255"];
+    [o_net_server_baddr setStringValue: @"138.195.159.255"];
     [o_net_server_port setIntValue: 1234];
     [o_net_server_pstepper setIntValue: [o_net_server_port intValue]];
 
-    [o_net_channel_addr setStringValue: @"138.195.143.120"];
+    [o_net_channel_addr setStringValue: @"vlcs"];
     [o_net_channel_port setIntValue: 6010];
     [o_net_channel_pstepper setIntValue: [o_net_channel_port intValue]];
 }
