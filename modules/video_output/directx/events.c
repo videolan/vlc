@@ -84,6 +84,7 @@ void DirectXEventThread( event_thread_t *p_event )
     POINT old_mouse_pos = {0,0};
     vlc_value_t val;
     int i_width, i_height, i_x, i_y;
+    HMODULE hkernel32;
 
     /* Initialisation */
     p_event->p_vout->pf_control = Control;
@@ -99,6 +100,21 @@ void DirectXEventThread( event_thread_t *p_event )
 
     /* Signal the creation of the window */
     vlc_thread_ready( p_event );
+
+    /* Set power management stuff */
+    if( (hkernel32 = GetModuleHandle( "KERNEL32" ) ) )
+    {
+        ULONG (WINAPI* OurSetThreadExecutionState)( ULONG );
+
+        OurSetThreadExecutionState =
+            GetProcAddress( hkernel32, "SetThreadExecutionState" );
+
+        if( OurSetThreadExecutionState )
+            /* Prevent monitor from powering off */
+            OurSetThreadExecutionState( ES_DISPLAY_REQUIRED );
+        else
+            msg_Dbg( p_event, "no support for SetThreadExecutionState()" );
+    }
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
