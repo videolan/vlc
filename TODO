@@ -111,7 +111,6 @@ Think playlist within playlist, directory structures, SAP section, TV channels l
 50% done.<br />
 Todo:<br />
 - Core support<br />
-   - *** Improve random mode and fix loop<br />
    - *   "Name finder"<br />
    - *   "Protocol rollover" node<br />
    - *** Item moving/copying facilities<br />
@@ -124,10 +123,8 @@ Todo:<br />
    - *   Live directory representation<br /> 
 - *** Implement in MacOS X and Skins 2 interfaces<br />
 - wx implementation :<br />
-   - *** Investigate Win32 crash<br />
    - **  Support item move/copy<br />
    - *   Explorer view<br />
-   - *   Cleverer update using i_serial<br />
    - *   Playlist preferences panel<br />
    - **  Improve iteminfo dialog<br />
 Status: Assigned to zorglub
