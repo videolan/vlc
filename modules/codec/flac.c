@@ -29,10 +29,14 @@
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
 
-#include <FLAC/stream_decoder.h>
-#include <FLAC/stream_encoder.h>
+#ifdef HAVE_FLAC_STREAM_DECODER_H
+#   include <FLAC/stream_decoder.h>
+#   include <FLAC/stream_encoder.h>
+#   define USE_LIBFLAC
+#endif
 
 #include "vlc_block_helper.h"
+#include "vlc_bits.h"
 
 #define MAX_FLAC_HEADER_SIZE 16
 
@@ -57,10 +61,21 @@ struct decoder_sys_t
     /*
      * FLAC properties
      */
+#ifdef USE_LIBFLAC
     FLAC__StreamDecoder *p_flac;
-
-    vlc_bool_t b_stream_info;
     FLAC__StreamMetadata_StreamInfo stream_info;
+#else
+    struct
+    {
+        unsigned min_blocksize, max_blocksize;
+        unsigned min_framesize, max_framesize;
+        unsigned sample_rate;
+        unsigned channels;
+        unsigned bits_per_sample;
+
+    } stream_info;
+#endif
+    vlc_bool_t b_stream_info;
 
     /*
      * Common properties
@@ -101,15 +116,20 @@ static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
+#ifdef USE_LIBFLAC
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
+#endif
 
+#ifdef USE_LIBFLAC
 static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
+#endif
 static block_t *PacketizeBlock( decoder_t *, block_t ** );
 
 static int SyncInfo( decoder_t *, uint8_t *, int *, int *, int *,int * );
 
 
+#ifdef USE_LIBFLAC
 static FLAC__StreamDecoderReadStatus
 DecoderReadCallback( const FLAC__StreamDecoder *decoder,
                      FLAC__byte buffer[], unsigned *bytes, void *client_data );
@@ -133,6 +153,7 @@ static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
 
 static void decoder_state_error( decoder_t *p_dec,
                                  FLAC__StreamDecoderState state );
+#endif
 
 static uint64_t read_utf8( const uint8_t *p_buf, int *pi_read );
 static uint8_t flac_crc8( const uint8_t *data, unsigned len );
@@ -145,19 +166,21 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
 
+#ifdef USE_LIBFLAC
     set_description( _("Flac audio decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
-    set_description( _("Flac audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
-
-    add_submodule();
     set_description( _("Flac audio encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
+
+    add_submodule();
+#endif
+    set_description( _("Flac audio packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, CloseDecoder );
 
     add_shortcut( "flac" );
 vlc_module_end();
@@ -190,6 +213,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->bytestream = block_BytestreamInit( p_dec );
 
+#ifdef USE_LIBFLAC
     /* Take care of flac init */
     if( !(p_sys->p_flac = FLAC__stream_decoder_new()) )
     {
@@ -209,13 +233,16 @@ static int OpenDecoder( vlc_object_t *p_this )
     FLAC__stream_decoder_set_client_data( p_sys->p_flac, p_dec );
 
     FLAC__stream_decoder_init( p_sys->p_flac );
+#endif
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
 
     /* Set callbacks */
+#ifdef USE_LIBFLAC
     p_dec->pf_decode_audio = DecodeBlock;
+#endif
     p_dec->pf_packetize    = PacketizeBlock;
 
     return VLC_SUCCESS;
@@ -240,12 +267,30 @@ static int OpenPacketizer( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * CloseDecoder: flac decoder destruction
+ *****************************************************************************/
+static void CloseDecoder( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+#ifdef USE_LIBFLAC
+    FLAC__stream_decoder_finish( p_sys->p_flac );
+    FLAC__stream_decoder_delete( p_sys->p_flac );
+#endif
+
+    if( p_sys->p_block ) free( p_sys->p_block );
+    free( p_sys );
+}
+
+/*****************************************************************************
  * ProcessHeader: processe Flac header.
  *****************************************************************************/
 static void ProcessHeader( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+#ifdef USE_LIBFLAC
     if( !p_dec->fmt_in.i_extra ) return;
 
     /* Decode STREAMINFO */
@@ -255,6 +300,24 @@ static void ProcessHeader( decoder_t *p_dec )
             p_dec->fmt_in.i_extra );
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );
+
+#else
+    bs_t bs;
+
+    if( !p_dec->fmt_in.i_extra ) return;
+
+    bs_init( &bs, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+
+    p_sys->stream_info.min_blocksize = bs_read( &bs, 16 );
+    p_sys->stream_info.max_blocksize = bs_read( &bs, 16 );
+
+    p_sys->stream_info.min_framesize = bs_read( &bs, 24 );
+    p_sys->stream_info.max_framesize = bs_read( &bs, 24 );
+
+    p_sys->stream_info.sample_rate = bs_read( &bs, 20 );
+    p_sys->stream_info.channels = bs_read( &bs, 3 ) + 1;
+    p_sys->stream_info.bits_per_sample = bs_read( &bs, 5 ) + 1;
+#endif
 
     if( !p_sys->b_stream_info ) return;
 
@@ -431,6 +494,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     return NULL;
 }
 
+#ifdef USE_LIBFLAC
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
@@ -465,20 +529,6 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     return p_sys->p_aout_buffer;
 }
 
-/*****************************************************************************
- * CloseDecoder: flac decoder destruction
- *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    FLAC__stream_decoder_finish( p_sys->p_flac );
-    FLAC__stream_decoder_delete( p_sys->p_flac );
-    if( p_sys->p_block ) free( p_sys->p_block );
-    free( p_sys );
-}
-    
 /*****************************************************************************
  * DecoderReadCallback: called by libflac when it needs more data
  *****************************************************************************/
@@ -697,6 +747,7 @@ static void decoder_state_error( decoder_t *p_dec,
         msg_Err(p_dec, "unknown error" );
     }
 }
+#endif
 
 /*****************************************************************************
  * SyncInfo: parse FLAC sync info
@@ -819,9 +870,9 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     i_temp = (unsigned)(p_buf[3] >> 4);
     if( i_temp & 8 )
     {
+#ifdef USE_LIBFLAC
         int i_channel_assignment; /* ??? */
 
-        *pi_channels = 2;
         switch( i_temp & 7 )
         {
         case 0:
@@ -837,6 +888,9 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
             return 0;
             break;
         }
+#endif
+
+        *pi_channels = 2;
     }
     else
     {
@@ -1043,6 +1097,7 @@ static uint8_t flac_crc8( const uint8_t *data, unsigned len )
     return crc;
 }
 
+#ifdef USE_LIBFLAC
 /*****************************************************************************
  * encoder_sys_t : flac encoder descriptor
  *****************************************************************************/
@@ -1256,3 +1311,4 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
+#endif
