@@ -41,6 +41,7 @@
 #include "bitmaps/eject.xpm"
 #include "bitmaps/slow.xpm"
 #include "bitmaps/fast.xpm"
+#include "bitmaps/playlist.xpm"
 #include "bitmaps/speaker.xpm"
 
 #define TOOLBAR_BMP_WIDTH 16
@@ -435,6 +436,7 @@ void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
 
 void Interface::CreateOurToolBar()
 {
+#define HELP_OPEN N_("Open")
 #define HELP_STOP N_("Stop")
 #define HELP_PLAY N_("Play")
 #define HELP_PAUSE N_("Pause")
@@ -452,6 +454,9 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
+    toolbar->AddTool( OpenFile_Event, wxT(""),
+                      wxBitmap( eject_xpm ), wxU(_(HELP_OPEN)) );
+    toolbar->AddSeparator();
     toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( play_xpm ),
                       wxU(_(HELP_PLAY)) );
 #if 0
@@ -470,12 +475,12 @@ void Interface::CreateOurToolBar()
     toolbar->AddTool( NextStream_Event, wxT(""), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( eject_xpm ),
+    toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
                       wxU(_(HELP_PLO)) );
 
     wxControl *p_dummy_ctrl =
         new wxControl( toolbar, -1, wxDefaultPosition,
-                       wxSize(64, 16 ), wxBORDER_NONE );
+                       wxSize(35, 16 ), wxBORDER_NONE );
 
     toolbar->AddControl( p_dummy_ctrl );
 
@@ -1344,13 +1349,13 @@ void Interface::TogglePlayButton( int i_playing_status )
 
     if( i_playing_status == PLAYING_S )
     {
-        GetToolBar()->InsertTool( 0, PlayStream_Event, wxU(_("Pause")),
+        GetToolBar()->InsertTool( 2, PlayStream_Event, wxU(_("Pause")),
                                   wxBitmap( pause_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PAUSE)) );
     }
     else
     {
-        GetToolBar()->InsertTool( 0, PlayStream_Event, wxU(_("Play")),
+        GetToolBar()->InsertTool( 2, PlayStream_Event, wxU(_("Play")),
                                   wxBitmap( play_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PLAY)) );
     }

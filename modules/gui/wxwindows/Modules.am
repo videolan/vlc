@@ -30,4 +30,5 @@ EXTRA_DIST += \
 	bitmaps/next.xpm \
 	bitmaps/slow.xpm \
 	bitmaps/fast.xpm \
+	bitmaps/playlist.xpm \
 	bitmaps/speaker.xpm
