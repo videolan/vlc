@@ -1785,7 +1785,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     demux_sys_t          *p_sys = p_demux->p_sys;
     dvbpsi_pat_program_t *p_program;
     ts_pid_t             *pat = &p_sys->pid[0];
-    int                  i;
+    int                  i, j;
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
@@ -1831,9 +1831,9 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             ts_pid_t *pid = &p_sys->pid[i];
             if( pid->b_valid && !pid->psi )
             {
-                for( i = 0; i < i_pmt_rm; i++ )
+                for( j = 0; j < i_pmt_rm; j++ )
                 {
-                    if( pid->p_owner->i_pid_pcr == pmt_rm[i]->i_pid && pid->es->id )
+                    if( pid->p_owner->i_pid_pcr == pmt_rm[j]->i_pid && pid->es->id )
                     {
                         /* We only remove es that aren't defined by extra pmt */
                         PIDClean( p_demux->out, pid );
