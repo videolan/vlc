@@ -101,13 +101,12 @@ void Close_B4S( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
-
-    int i_ret;
-
     playlist_item_t *p_item, *p_current;
 
     vlc_bool_t b_play;
+    int i_ret;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -115,7 +114,6 @@ static int Demux( demux_t *p_demux )
     int i_type;
     char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
-    demux_sys_t *p_sys = p_demux->p_sys;
         
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
@@ -132,9 +130,8 @@ static int Demux( demux_t *p_demux )
     playlist_ItemToNode( p_playlist, p_current );
     p_current->input.i_type = ITEM_TYPE_PLAYLIST;
 
-    p_xml = xml_Create( p_demux );
+    p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
-    p_sys->p_xml = p_xml;
 
     stream_ReadLine( p_demux->s );
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
@@ -143,13 +140,18 @@ static int Demux( demux_t *p_demux )
 
     /* xml */
     /* check root node */
-    i_ret = xml_ReaderRead( p_xml_reader );    
-    if( i_ret != 1 ||
-        xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
+    if( xml_ReaderRead( p_xml_reader ) != 1 )
+    {
+        msg_Err( p_demux, "invalid file (no root node)" );
+        return -1;
+    }
+
+    if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
         ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "WinampXML" ) )
     {
-        msg_Err( p_demux, "invalid file %i,%s", xml_ReaderNodeType( p_xml_reader ), psz_elname );
+        msg_Err( p_demux, "invalid root node %i, %s",
+                 xml_ReaderNodeType( p_xml_reader ), psz_elname );
         if( psz_elname ) free( psz_elname );
         return -1;
     }
@@ -157,21 +159,25 @@ static int Demux( demux_t *p_demux )
 
     /* root node should not have any attributes, and should only
      * contain the "playlist node */
-    i_ret = xml_ReaderRead( p_xml_reader );
-    if( i_ret == 1 && xml_ReaderNodeType( p_xml_reader ) == XML_READER_TEXT )
+
+    /* Skip until 1st child node */
+    while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 &&
+           xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
+    if( i_ret != 1 )
     {
-        i_ret = xml_ReaderRead( p_xml_reader );
+        msg_Err( p_demux, "invalid file (no child node)" );
+        return -1;
     }
-    if( i_ret != 1 ||
-        xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
-        ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
+
+    if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "playlist" ) )
     {
-        msg_Err( p_demux, "invalid file %i,%s", xml_ReaderNodeType( p_xml_reader ), psz_elname );
-        msg_Err( p_demux, "invalid file" );
+        msg_Err( p_demux, "invalid child node %s", psz_elname );
         if( psz_elname ) free( psz_elname );
         return -1;
     }
+    free( psz_elname ); psz_elname = 0;
+
     // Read the attributes
     while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
     {
@@ -194,9 +200,8 @@ static int Demux( demux_t *p_demux )
         free( psz_name );
         free( psz_value );
     }
-    
-    i_ret = xml_ReaderRead( p_xml_reader );
-    while( i_ret == 1 )
+
+    while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
     {
         // Get the node type
         i_type = xml_ReaderNodeType( p_xml_reader );
@@ -210,7 +215,7 @@ static int Demux( demux_t *p_demux )
             case XML_READER_STARTELEM:
             {
                 // Read the element name
-                free( psz_elname );
+                if( psz_elname ) free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
                 if( !psz_elname ) return -1;
                 
@@ -344,10 +349,12 @@ static int Demux( demux_t *p_demux )
                 break;
             }
         }
-        i_ret = xml_ReaderRead( p_xml_reader );
     }
-    if( i_ret != 0 ) return -1;
-    /* end */
+
+    if( i_ret != 0 )
+    {
+        msg_Warn( p_demux, "error while parsing data" );
+    }
 
     /* Go back and play the playlist */
     if( b_play )
