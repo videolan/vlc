@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.51 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: playlist.c,v 1.52 2003/09/15 00:01:49 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -371,42 +371,42 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
  */
 int playlist_Sort( playlist_t * p_playlist , int i_type )
 {
-    int i , i_small , i_position; 
+    int i , i_small , i_position;
     playlist_item_t *p_temp;
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    
+
     for( i_position = 0; i_position < p_playlist->i_size -1 ; i_position ++ )
     {
         i_small  = i_position;
         for( i = i_position + 1 ; i<  p_playlist->i_size ; i++)
         {
-                
-           if(  (strcasecmp( p_playlist->pp_items[i]->psz_name, 
-                p_playlist->pp_items[i_small]->psz_name) < 0 
-                                  && i_type == SORT_NORMAL ) || 
-                (strcasecmp( p_playlist->pp_items[i]->psz_name,
-                p_playlist->pp_items[i_small]->psz_name) > 0 
-                                  && i_type == SORT_REVERSE ) )
-               i_small = i;
-         
-           p_temp = p_playlist->pp_items[i_position];
-           p_playlist->pp_items[i_position] = p_playlist->pp_items[i_small];
-           p_playlist->pp_items[i_small] = p_temp;
-           
-        }
-    }    
+            int i_test;
 
-    for( i=0;i< p_playlist->i_size;i++)
-            msg_Dbg(p_playlist,"%s",p_playlist->pp_items[i]->psz_name);
+            i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
+                                 p_playlist->pp_items[i_small]->psz_name );
+
+            if( i_type == SORT_NORMAL  && i_test < 0 ||
+                i_type == SORT_REVERSE && i_test > 0 )
+            {
+                i_small = i;
+            }
+
+            p_temp = p_playlist->pp_items[i_position];
+            p_playlist->pp_items[i_position] = p_playlist->pp_items[i_small];
+            p_playlist->pp_items[i_small] = p_temp;
+        }
+    }
+
+    for( i=0; i < p_playlist->i_size; i++ )
+    {
+        msg_Dbg( p_playlist, "%s", p_playlist->pp_items[i]->psz_name );
+    }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-    
+
     return 0;
-
 }
-
-     
 
 /**
  * Move an item in a playlist
@@ -671,10 +671,8 @@ static void RunThread ( playlist_t *p_playlist )
                 /* Select the next playlist item */
                 SkipItem( p_playlist, 1 );
 
-                /* Release the playlist lock, because we may get stuck
-                 * in input_StopThread() for some time. */
-                vlc_mutex_unlock( &p_playlist->object_lock );
                 input_StopThread( p_playlist->p_input );
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 continue;
             }
             else if( p_playlist->p_input->stream.control.i_status != INIT_S )
@@ -739,8 +737,8 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
         {
-            vlc_mutex_unlock( &p_playlist->object_lock );
             input_StopThread( p_playlist->p_input );
+            vlc_mutex_unlock( &p_playlist->object_lock );
             continue;
         }
         else
