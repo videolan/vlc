@@ -11,6 +11,7 @@ SOURCES_wxwindows = \
 	menus.cpp \
 	preferences.cpp \
 	preferences_widgets.cpp \
+	preferences_widgets.h \
 	timer.cpp \
 	fileinfo.cpp \
 	subtitles.cpp \
