@@ -43,6 +43,13 @@ extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
 }
 
+#if (LIVEMEDIA_LIBRARY_VERSION_INT < 1089936000)
+#define RECLAIM_ENV(env) delete (env)
+#else
+#define RECLAIM_ENV(env) (env)->reclaim()
+#endif
+
+
 using namespace std;
 
 /*****************************************************************************
@@ -445,11 +452,11 @@ static int  Open ( vlc_object_t *p_this )
                      !strcmp( sub->codecName(), "H263-1998" ) ||
                      !strcmp( sub->codecName(), "H263-2000" ) )
             {
-                tk->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
+                tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '3' );
             }
             else if( !strcmp( sub->codecName(), "H261" ) )
             {
-                tk->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '1' );
+                tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '1' );
             }
             else if( !strcmp( sub->codecName(), "JPEG" ) )
             {
@@ -555,7 +562,7 @@ error:
     }
     if( p_sys->env )
     {
-        delete p_sys->env;
+        RECLAIM_ENV(p_sys->env);
     }
     if( p_sys->scheduler )
     {
@@ -613,7 +620,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->env )
     {
-        delete p_sys->env;
+        RECLAIM_ENV(p_sys->env);
     }
     if( p_sys->scheduler )
     {
