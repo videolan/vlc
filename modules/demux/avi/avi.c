@@ -2118,7 +2118,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
         }
         else if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES )
         {
-            avi_chunk_indx_t    ck_sub;
+            avi_chunk_t    ck_sub;
             for( i = 0; i < p_indx->i_entriesinuse; i++ )
             {
                 if( stream_Seek( p_demux->s, p_indx->idx.super[i].i_offset )||
@@ -2126,7 +2126,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
                 {
                     break;
                 }
-                __Parse_indx( p_demux, i_stream, &ck_sub );
+                __Parse_indx( p_demux, i_stream, &ck_sub.indx );
             }
         }
         else
