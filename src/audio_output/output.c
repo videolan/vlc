@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.16 2002/09/30 21:32:33 massiot Exp $
+ * $Id: output.c,v 1.17 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->output.output.i_format
-                     = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
+                     = (p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         VLC_FOURCC('f','l','3','2') :
                         VLC_FOURCC('f','i','3','2');
     }
@@ -93,7 +93,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->mixer.mixer.i_format
-                     = (p_aout->p_vlc->i_cpu & CPU_CAPABILITY_FPU) ?
+                     = (p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU) ?
                         VLC_FOURCC('f','l','3','2') :
                         VLC_FOURCC('f','i','3','2');
         aout_FormatPrepare( &p_aout->mixer.mixer );

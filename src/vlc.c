@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.11 2002/09/29 18:19:53 sam Exp $
+ * $Id: vlc.c,v 1.12 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -50,7 +50,7 @@ int main( int i_argc, char *ppsz_argv[] )
 
     fprintf( stderr, COPYRIGHT_MESSAGE "\n" );
 
-#ifdef SYS_LINUX
+#ifdef HAVE_PUTENV
 #   ifdef DEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
     putenv( "MALLOC_CHECK_=2" );
@@ -58,6 +58,12 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     putenv( "GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
+
+    /* If the user isn't using VLC_VERBOSE, set it to 1 by default */
+    if( getenv( "VLC_VERBOSE" ) == NULL )
+    {
+        putenv( "VLC_VERBOSE=1" );
+    }
 #endif
 
     /* Create a libvlc structure */

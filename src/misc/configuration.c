@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.39 2002/09/29 18:19:53 sam Exp $
+ * $Id: configuration.c,v 1.40 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1043,6 +1043,12 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 {
                     psz_shortopts[i_shortopts] = ':';
                     i_shortopts++;
+
+                    if( p_item->i_short == 'v' )
+                    {
+                        psz_shortopts[i_shortopts] = ':';
+                        i_shortopts++;
+                    }
                 }
             }
         }
@@ -1107,8 +1113,38 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
                 break;
             case CONFIG_ITEM_INTEGER:
-                config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                       atoi(optarg));
+                if( i_cmd == 'v' )
+                {
+                    int i_verbose = 0;
+
+                    if( optarg )
+                    {
+                        if( *optarg == 'v' ) /* eg. -vvvvv */
+                        {
+                            i_verbose++;
+                            while( *optarg == 'v' )
+                            {
+                                i_verbose++;
+                                optarg++;
+                            }
+                        }
+                        else
+                        {
+                            i_verbose += atoi( optarg ); /* eg. -v2 */
+                        }
+                    }
+                    else
+                    {
+                        i_verbose = 1; /* -v */
+                    }
+                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
+                                           i_verbose );
+                }
+                else
+                {
+                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
+                                           atoi(optarg) );
+                }
                 break;
             case CONFIG_ITEM_BOOL:
                 config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name, 1 );

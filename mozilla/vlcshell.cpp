@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.2 2002/09/30 11:05:41 sam Exp $
+ * $Id: vlcshell.cpp,v 1.3 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -165,8 +165,6 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         , "--aout", "dsp"
         , "--intf", "dummy"
         /*, "--noaudio"*/
-        /*, "-q"*/
-        , "-v"
     };
 
     if( instance == NULL )

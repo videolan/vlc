@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.34 2002/10/03 13:21:55 sam Exp $
+ * $Id: libvlc.c,v 1.35 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,12 +156,24 @@ vlc_t * vlc_create_r( void )
     vlc_mutex_lock( &libvlc.global_lock );
     if( !libvlc.b_ready )
     {
+        char *psz_env;
+
         vlc_mutex_init( &libvlc, &libvlc.structure_lock );
         libvlc.p_global_data = NULL;
         libvlc.b_ready = VLC_TRUE;
 
         /* Guess what CPU we have */
         libvlc.i_cpu = CPUCapabilities();
+
+        /* Find verbosity from VLC_VERBOSE environment variable */
+        psz_env = getenv( "VLC_VERBOSE" );
+        libvlc.i_verbose = psz_env ? atoi( psz_env ) : 0;
+
+#ifdef HAVE_ISATTY
+        libvlc.b_color = isatty( 2 ); /* 2 is for stderr */
+#else
+        libvlc.b_color = VLC_FALSE;
+#endif
 
         /* Initialize message queue */
         msg_Create( &libvlc );
@@ -187,9 +199,6 @@ vlc_t * vlc_create_r( void )
     }
 
     p_vlc->psz_object_name = "root";
-
-    p_vlc->b_verbose = VLC_TRUE;
-    p_vlc->b_quiet = VLC_FALSE; /* FIXME: delay message queue output! */
 
     /* Initialize mutexes */
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
@@ -398,35 +407,47 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     system_Configure( p_vlc );
 
     /*
+     * Message queue options
+     */
+    if( config_GetInt( p_vlc, "quiet" ) )
+    {
+        libvlc.i_verbose = 0;
+    }
+    else
+    {
+        int i_tmp = config_GetInt( p_vlc, "verbose" );
+        if( i_tmp >= 0 && i_tmp <= 4 )
+        {
+            libvlc.i_verbose = i_tmp;
+        }
+    }
+    libvlc.b_color = libvlc.b_color || config_GetInt( p_vlc, "color" );
+
+    /*
      * Output messages that may still be in the queue
      */
-    p_vlc->b_verbose = config_GetInt( p_vlc, "verbose" );
-    p_vlc->b_quiet = config_GetInt( p_vlc, "quiet" );
-    p_vlc->b_color = config_GetInt( p_vlc, "color" );
     msg_Flush( p_vlc );
 
     /* p_vlc inititalization. FIXME ? */
     p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
 
-    p_vlc->i_cpu = libvlc.i_cpu;
-
 #if defined( __i386__ )
     if( !config_GetInt( p_vlc, "mmx" ) )
-        p_vlc->i_cpu &= ~CPU_CAPABILITY_MMX;
+        libvlc.i_cpu &= ~CPU_CAPABILITY_MMX;
     if( !config_GetInt( p_vlc, "3dn" ) )
-        p_vlc->i_cpu &= ~CPU_CAPABILITY_3DNOW;
+        libvlc.i_cpu &= ~CPU_CAPABILITY_3DNOW;
     if( !config_GetInt( p_vlc, "mmxext" ) )
-        p_vlc->i_cpu &= ~CPU_CAPABILITY_MMXEXT;
+        libvlc.i_cpu &= ~CPU_CAPABILITY_MMXEXT;
     if( !config_GetInt( p_vlc, "sse" ) )
-        p_vlc->i_cpu &= ~CPU_CAPABILITY_SSE;
+        libvlc.i_cpu &= ~CPU_CAPABILITY_SSE;
 #endif
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
     if( !config_GetInt( p_vlc, "altivec" ) )
-        p_vlc->i_cpu &= ~CPU_CAPABILITY_ALTIVEC;
+        libvlc.i_cpu &= ~CPU_CAPABILITY_ALTIVEC;
 #endif
 
 #define PRINT_CAPABILITY( capability, string )                              \
-    if( p_vlc->i_cpu & capability )                                         \
+    if( libvlc.i_cpu & capability )                                         \
     {                                                                       \
         strncat( p_capabilities, string " ",                                \
                  sizeof(p_capabilities) - strlen(p_capabilities) );         \

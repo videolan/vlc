@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.11 2002/10/03 13:21:55 sam Exp $
+ * $Id: messages.c,v 1.12 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -435,15 +435,20 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     char *psz_object = "private";
     int i_type = p_item->i_type;
 
-    if( /*p_this->p_vlc->b_quiet ||*/ !p_this->p_libvlc->msg_bank.b_configured )
+    switch( i_type )
     {
-        return;
-    }
-
-    if( /*!p_this->p_vlc->b_verbose && */
-         ( (i_type == VLC_MSG_WARN) || (i_type == VLC_MSG_DBG) ) )
-    {
-        return;
+        case VLC_MSG_ERR:
+            if( p_this->p_libvlc->i_verbose < 1 ) return;
+            break;
+        case VLC_MSG_INFO:
+            if( p_this->p_libvlc->i_verbose < 2 ) return;
+            break;
+        case VLC_MSG_WARN:
+            if( p_this->p_libvlc->i_verbose < 3 ) return;
+            break;
+        case VLC_MSG_DBG:
+            if( p_this->p_libvlc->i_verbose < 4 ) return;
+            break;
     }
 
     switch( p_item->i_object_type )
@@ -462,7 +467,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
     /* Send the message to stderr */
-    if( /*p_this->p_vlc->b_color*/1 )
+    if( p_this->p_libvlc->b_color )
     {
         fprintf( stderr, "[" GREEN "%.6x" GRAY "] %s %s%s: %s%s" GRAY "\n",
                          p_item->i_object_id, p_item->psz_module, psz_object,

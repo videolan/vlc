@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.94 2002/10/03 13:21:55 sam Exp $
+ * $Id: modules.c,v 1.95 2002/10/03 18:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -312,7 +312,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         /* Test if we have the required CPU */
-        if( (p_module->i_cpu & p_this->p_vlc->i_cpu) != p_module->i_cpu )
+        if( (p_module->i_cpu & p_this->p_libvlc->i_cpu) != p_module->i_cpu )
         {
             continue;
         }

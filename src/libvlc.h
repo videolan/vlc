@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.16 2002/10/01 22:29:09 massiot Exp $
+ * $Id: libvlc.h,v 1.17 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,9 +37,10 @@
     "The default behavior is to automatically select the best module " \
     "available.")
 
-#define VERBOSE_TEXT N_("be verbose")
+#define VERBOSE_TEXT N_("verbosity (0-4)")
 #define VERBOSE_LONGTEXT N_( \
-    "This options activates the output of information messages.")
+    "This options sets the verbosity level (0=no messages, 1=only errors, " \
+    "4=max.")
 
 #define QUIET_TEXT N_("be quiet")
 #define QUIET_LONGTEXT N_( \
@@ -351,8 +352,8 @@ vlc_module_begin();
     add_category_hint( N_("Interface"), NULL);
     add_module_with_short( "intf", 'I', "interface", NULL, NULL,
                            INTF_TEXT, INTF_LONGTEXT );
-    add_bool_with_short( "verbose", 'v', 0, NULL,
-                         VERBOSE_TEXT, VERBOSE_LONGTEXT );
+    add_integer_with_short( "verbose", 'v', -1, NULL,
+                            VERBOSE_TEXT, VERBOSE_LONGTEXT );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT );
     add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT );

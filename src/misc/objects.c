@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.21 2002/10/03 13:21:55 sam Exp $
+ * $Id: objects.c,v 1.22 2002/10/03 18:56:10 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -447,12 +447,9 @@ void __vlc_liststructure( vlc_object_t *p_this )
         }
         else
         {
-            vlc_object_t *p_me = p_this->p_vlc
-                               ? (vlc_object_t *)p_this->p_vlc
-                               : (vlc_object_t *)p_this->p_libvlc;
-            msg_Info( p_me, "o %.6x %s (not attached)",
-                      (*pp_current)->i_object_id,
-                      (*pp_current)->psz_object_type );
+            printf( " o %.6x %s (not attached)\n",
+                    (*pp_current)->i_object_id,
+                    (*pp_current)->psz_object_type );
         }
     }
 
@@ -649,7 +646,6 @@ static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
     char psz_children[20], psz_refcount[20], psz_thread[20], psz_name[50];
-    vlc_object_t *p_me;
 
     psz_name[0] = '\0';
     if( p_this->psz_object_name )
@@ -688,11 +684,9 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
         psz_thread[19] = '\0';
     }
 
-    p_me = p_this->p_vlc ? (vlc_object_t *)p_this->p_vlc
-                         : (vlc_object_t *)p_this->p_libvlc;
-    msg_Info( p_me, "%so %.6x %s%s%s%s%s", psz_prefix,
-              p_this->i_object_id, p_this->psz_object_type,
-              psz_name, psz_thread, psz_refcount, psz_children );
+    printf( " %so %.6x %s%s%s%s%s\n", psz_prefix,
+            p_this->i_object_id, p_this->psz_object_type,
+            psz_name, psz_thread, psz_refcount, psz_children );
 }
 
 static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )

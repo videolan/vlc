@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.46 2002/10/03 13:21:54 sam Exp $
+ * $Id: main.h,v 1.47 2002/10/03 18:56:09 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -38,6 +38,10 @@ struct libvlc_t
 
     /* CPU extensions */
     u32                    i_cpu;
+
+    /* Generic settings */
+    int                    i_verbose;                       /* info messages */
+    vlc_bool_t             b_color;                       /* color messages? */
 
     /* Object structure data */
     int                    i_counter;                      /* object counter */
@@ -85,13 +89,7 @@ struct vlc_t
     char *                 psz_homedir;             /* user's home directory */
 
     /* Generic settings */
-    vlc_bool_t             b_quiet;                            /* be quiet ? */
-    vlc_bool_t             b_verbose;                     /* info messages ? */
-    vlc_bool_t             b_color;                      /* color messages ? */
     mtime_t                i_desync;   /* relative desync of the audio ouput */
-
-    /* CPU extensions (inherited from libvlc_t) */
-    u32                    i_cpu;
 
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;
