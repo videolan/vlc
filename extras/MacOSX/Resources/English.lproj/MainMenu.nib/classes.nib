@@ -402,43 +402,10 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {
-                deleteItems = id; 
-                disableGroup = id; 
-                enableGroup = id; 
-                handlePopUp = id; 
-                playItem = id; 
-                savePlaylist = id; 
-                searchItem = id; 
-                selectAll = id; 
-                toggleItemsEnabled = id; 
-                toggleWindow = id; 
-            }; 
+            ACTIONS = {}; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_playlist" = id; 
-                "o_ctx_menu" = id; 
-                "o_loop_popup" = id; 
-                "o_mi_delete" = id; 
-                "o_mi_disableGroup" = id; 
-                "o_mi_enableGroup" = id; 
-                "o_mi_info" = id; 
-                "o_mi_play" = id; 
-                "o_mi_save_playlist" = id; 
-                "o_mi_selectall" = id; 
-                "o_mi_toggleItemsEnabled" = id; 
-                "o_random_ckb" = id; 
-                "o_search_button" = id; 
-                "o_search_keyword" = id; 
-                "o_status_field" = id; 
-                "o_table_view" = id; 
-                "o_tc_author" = id; 
-                "o_tc_duration" = id; 
-                "o_tc_id" = id; 
-                "o_tc_name" = id; 
-                "o_window" = id; 
-            }; 
+            OUTLETS = {}; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 

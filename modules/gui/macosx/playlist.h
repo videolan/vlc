@@ -25,7 +25,7 @@
 /*****************************************************************************
  * VLCPlaylistView interface 
  *****************************************************************************/
-@interface VLCPlaylistView : NSTableView
+@interface VLCPlaylistView : NSOutlineView
 {
 }
 
@@ -36,79 +36,12 @@
  *****************************************************************************/
 @interface VLCPlaylist : NSObject
 {
-    int i_moveRow;
-    bool b_isSortDescending;
-
-    IBOutlet id o_window;
     IBOutlet id o_btn_playlist;
-    IBOutlet id o_table_view;
-
-    IBOutlet id o_status_field;
-    IBOutlet id o_tc_id;
-    IBOutlet id o_tc_name;
-    IBOutlet id o_tc_author;
-    IBOutlet id o_tc_duration;
-    IBOutlet id o_tc_sortColumn;
-
-    IBOutlet id o_ctx_menu;
-    IBOutlet id o_mi_save_playlist;
-    IBOutlet id o_mi_info;
-    IBOutlet id o_mi_play;
-    IBOutlet id o_mi_delete;
-    IBOutlet id o_mi_selectall;
-    IBOutlet id o_mi_toggleItemsEnabled;
-    IBOutlet id o_mi_enableGroup;
-    IBOutlet id o_mi_disableGroup;
-
-    IBOutlet id o_random_ckb;
-
-    IBOutlet id o_search_keyword;
-    IBOutlet id o_search_button;
-
-    IBOutlet id o_loop_popup;
-
-/*For playlist info window*/
-
-    IBOutlet id o_info_window;
-    IBOutlet id o_uri_lbl;
-    IBOutlet id o_title_lbl;
-    IBOutlet id o_author_lbl;
-    IBOutlet id o_uri_txt;
-    IBOutlet id o_title_txt;
-    IBOutlet id o_author_txt;
-    IBOutlet id o_btn_info_ok;
-    IBOutlet id o_btn_info_cancel;
-    IBOutlet id o_tbv_info;
-
-    NSImage *o_descendingSortingImage;
-    NSImage *o_ascendingSortingImage;
+    IBOutlet id o_outline_view;
 }
 
 - (void)initStrings;
-- (NSMenu *)menuForEvent:(NSEvent *)o_event;
-
-- (IBAction)toggleWindow:(id)sender;
-- (IBAction)savePlaylist:(id)sender;
-- (IBAction)playItem:(id)sender;
-- (IBAction)deleteItems:(id)sender;
-- (IBAction)toggleItemsEnabled:(id)sender;
-- (IBAction)enableGroup:(id)sender;
-- (IBAction)disableGroup:(id)sender;
-- (IBAction)selectAll:(id)sender;
-- (IBAction)searchItem:(id)sender;
-- (IBAction)handlePopUp:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
-
-- (void)updateRowSelection;
-- (void)playlistUpdated;
-
-/*For playlist info window*/
-
-- (int)selectedPlaylistItem;
-- (void)deleteGroup:(int)i_id;
-- (NSMutableArray *)selectedPlaylistItemsList;
-- (NSColor *)getColor:(int)i_group;
-
 @end
 
