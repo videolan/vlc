@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.11 2003/04/20 12:59:01 massiot Exp $
+ * $Id: libmpeg2.c,v 1.12 2003/04/20 23:42:17 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -247,6 +247,12 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                           p_dec->p_info->sequence->height,
                                           i_chroma, i_aspect );
 
+            msg_Dbg( p_dec->p_fifo, "%dx%d, aspect %d, %u.%03u fps",
+                     p_dec->p_info->sequence->width,
+                     p_dec->p_info->sequence->height, i_aspect,
+                     (u32)((u64)1001000000 * 27 / p_dec->p_info->sequence->frame_period / 1001),
+                     (u32)((u64)1001000000 * 27 / p_dec->p_info->sequence->frame_period % 1001) );
+
             mpeg2_custom_fbuf( p_dec->p_mpeg2dec, 1 );
 
             /* Set the first 2 reference frames */
@@ -254,7 +260,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
 
             p_dec->p_synchro = vout_SynchroInit( p_dec->p_fifo, p_dec->p_vout,
-                1001 * 100 * 27 / p_dec->p_info->sequence->frame_period * 10000 );
+                (u32)((u64)1001000000 * 27 / p_dec->p_info->sequence->frame_period) );
         }
         break;
 
