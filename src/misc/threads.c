@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.22 2002/10/15 08:35:24 sam Exp $
+ * $Id: threads.c,v 1.23 2002/10/16 10:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -58,9 +58,6 @@ struct vlc_namedmutex_t
     int i_usage;
     vlc_namedmutex_t *p_next;
 };
-
-static vlc_namedmutex_t *p_named_list = NULL;
-static vlc_mutex_t named_lock;
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -127,8 +124,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( HAVE_CTHREADS_H )
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #endif
-
-        vlc_mutex_init( p_libvlc, &named_lock );
 
         if( i_ret )
         {

@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.5 2002/10/15 12:30:01 sam Exp $
+ * $Id: variables.c,v 1.6 2002/10/16 10:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -284,12 +284,18 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
         case VLC_VAR_COMMAND:
             if( p_this->p_vars[i_var].b_set )
             {
-                int i_ret = ((int (*) (vlc_object_t *, char *, char *))
-                                p_this->p_vars[i_var].val.p_address) (
-                                    p_this,
-                                    p_this->p_vars[i_var].psz_name,
-                                    p_val->psz_string );
+                /* We need this to avoid deadlocks */
+                int i_ret;
+                int (*pf_command) (vlc_object_t *, char *, char *) =
+                                          p_this->p_vars[i_var].val.p_address;
+                char *psz_cmd = strdup( p_this->p_vars[i_var].psz_name );
+                char *psz_arg = strdup( p_val->psz_string );
+
                 vlc_mutex_unlock( &p_this->var_lock );
+                i_ret = pf_command( p_this, psz_cmd, psz_arg );
+                free( psz_cmd );
+                free( psz_arg );
+
                 return i_ret;
             }
             break;
