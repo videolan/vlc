@@ -1092,11 +1092,11 @@ static void InformationCreate( input_thread_t *p_input  )
 
 #define TITLE_MAX 30
   for( i_track = 1 ; i_track < p_vcd->num_tracks ; i_track++ ) {
-    char track_str[TITLE_MAX];
+    char psz_track[TITLE_MAX];
     unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcd->vcd, 
 							   i_track);
-    snprintf(track_str, TITLE_MAX, "%s%02d", _("Track"), i_track);
-    p_cat = input_InfoCategory( p_input, track_str );
+    snprintf(psz_track, TITLE_MAX, "%s%02d", _("Track "), i_track);
+    p_cat = input_InfoCategory( p_input, psz_track );
 
     if (p_vcd->b_svd) {
       addnum(_("Audio Channels"),  
