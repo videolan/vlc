@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.39 2003/06/13 21:18:53 asmax Exp $
+ * $Id: skin_main.cpp,v 1.40 2003/06/14 18:49:02 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -167,7 +167,7 @@ static int Open ( vlc_object_t *p_this )
         imlib_render_pixmaps_for_whole_image( &p_intf->p_sys->iconPixmap,
                                               &p_intf->p_sys->iconMask );
         imlib_free_image();
-    }                                     
+    }
 
 
 #elif defined WIN32
