@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.129 2004/01/20 15:47:42 sigmunau Exp $
+ * $Id: libvlc.h,v 1.130 2004/01/25 13:50:33 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -83,24 +83,24 @@ static char *ppsz_language_text[] =
 #define ADVANCED_LONGTEXT N_( \
     "When this option is turned on, the preferences and/or interfaces  will " \
     "show all the available options, including those that most users should " \
-    "never touch")
+    "never touch.")
 
 #define INTF_PATH_TEXT N_("Interface default search path")
 #define INTF_PATH_LONGTEXT N_( \
     "This option allows you to set the default path that the interface will " \
     "open when looking for a file.")
 
-#define PLUGIN_PATH_TEXT N_("Plugin search path")
+#define PLUGIN_PATH_TEXT N_("Modules search path")
 #define PLUGIN_PATH_LONGTEXT N_( \
     "This option allows you to specify an additional path for VLC to look " \
-    "for its plugins.")
+    "for its modules.")
 
 #define AOUT_CAT_LONGTEXT N_( \
-    "These options allow you to tune VLC's audio subsystem, " \
-    "and to add audio filters which can be used for " \
+    "These options allow you to modify the behaviour of the audio " \
+    "subsystem, and to add audio filters which can be used for " \
     "postprocessing or visual effects (spectrum analyzer, ...).\n" \
-    "To tune these filters, have a look at the \"audio filter\" " \
-    "plugin options.")
+    "Enable these filters here, and configure them in the \"audio filters\" " \
+    "modules section.")
 
 #define AOUT_TEXT N_("Audio output module")
 #define AOUT_LONGTEXT N_( \
@@ -110,11 +110,11 @@ static char *ppsz_language_text[] =
 
 #define AUDIO_TEXT N_("Enable audio")
 #define AUDIO_LONGTEXT N_( \
-    "You can completely disable the audio output. In this case the audio " \
-    "decoding will not take place, and it will save some processing power.")
+    "You can completely disable the audio output. In this case, the audio " \
+    "decoding stage will not take place, thus saving some processing power.")
 
 #define MONO_TEXT N_("Force mono audio")
-#define MONO_LONGTEXT N_("This will force a mono audio output")
+#define MONO_LONGTEXT N_("This will force a mono audio output.")
 
 #define VOLUME_TEXT N_("Audio output volume")
 #define VOLUME_LONGTEXT N_( \
@@ -133,20 +133,22 @@ static char *ppsz_language_text[] =
 #if !defined( SYS_DARWIN )
 #define AOUT_RESAMP_TEXT N_("High quality audio resampling")
 #define AOUT_RESAMP_LONGTEXT N_( \
-    "High quality audio resampling can be processor intensive so you can " \
+    "This uses a high quality audio resampling algorithm. High quality "\
+    "audio resampling can be processor intensive so you can " \
     "disable it and a cheaper resampling algorithm will be used instead.")
 #endif
 
-#define DESYNC_TEXT N_("Compensate desynchronization of audio (in ms)")
+#define DESYNC_TEXT N_("Audio desynchronization compensation")
 #define DESYNC_LONGTEXT N_( \
-    "This option allows you to delay the audio output. This can be handy if " \
-    "you notice a lag between the video and the audio.")
+    "This option allows you to delay the audio output. You must give a " \
+    "number of milliseconds. This can be handy if you notice a lag " \
+    "between the video and the audio.")
 
-#define MULTICHA_TEXT N_("Choose preferred audio output channels mode")
+#define MULTICHA_TEXT N_("Preferred audio output channels mode")
 #define MULTICHA_LONGTEXT N_( \
     "This option allows you to set the audio output channels mode that will " \
     "be used by default when possible (ie. if your hardware supports it as " \
-    "well as the audio stream being played)")
+    "well as the audio stream being played).")
 
 #define SPDIF_TEXT N_("Use the S/PDIF audio output when available")
 #define SPDIF_LONGTEXT N_( \
@@ -156,22 +158,28 @@ static char *ppsz_language_text[] =
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
     "This allows you to add audio postprocessing filters, to modify " \
-    "the sound.")
+    "the sound, or audio visualization modules (spectrum analyzer, ...).")
 
 #define AUDIO_CHANNEL_MIXER N_("Channel mixer")
+#if 0
 #define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
      "This allows you to choose a specific audio channel mixer. For instance " \
      "the headphone channel mixer will downmix any audio source to a stereo " \
      "output and give the feeling that you are standing in a room with a " \
      "complete 5.1 speaker set when using only a headphone.")
+#endif
+
+#define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
+     "This allows you to choose a specific audio channel mixer. For " \
+     "instance, you can use the \"headphone\" mixer that gives 5.1 feeling " \
+     "with a headphone.")
 
 #define VOUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify options related to " \
-    "the video output subsystem. You can for example enable " \
-    "video filters, like deinterlacing, constrast / hue / " \
-    "saturation adjusting, ...\n" \
-    "Enable these filters here and configure them in the video " \
-    "filters plugins section." )
+    "These options allow you to modify the behaviour of the video output " \
+    "subsytem. You can for example enable video filters (deinterlacing, " \
+    "image adjusting, ...\n ). Enable these filters here and configure " \
+    "them in the \"video filters\" modules section. You can also set many" \
+    "miscellaneous video options." )
 
 #define VOUT_TEXT N_("Video output module")
 #define VOUT_LONGTEXT N_( \
@@ -181,8 +189,8 @@ static char *ppsz_language_text[] =
 
 #define VIDEO_TEXT N_("Enable video")
 #define VIDEO_LONGTEXT N_( \
-    "You can completely disable the video output. In this case the video " \
-    "decoding stage will not take place, which will save some processing power.")
+    "You can completely disable the video output. In this case, the video " \
+    "decoding stage will not take place, thus saving some processing power.")
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
@@ -223,11 +231,11 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define OVERLAY_TEXT N_("Overlay video output")
 #define OVERLAY_LONGTEXT N_( \
     "If enabled, VLC will try to take advantage of the overlay capabilities " \
-    "of your graphics card.")
+    "of your graphics card (hardware acceleration).")
 
 #define VIDEO_ON_TOP_TEXT N_("Always on top")
 #define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
-    "other windows" )
+    "other windows." )
 
 #define SPUMARGIN_TEXT N_("Force SPU position")
 #define SPUMARGIN_LONGTEXT N_( \
@@ -236,7 +244,8 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 
 #define OSD_TEXT N_("On Screen Display")
 #define OSD_LONGTEXT N_( \
-    "You can disable the messages VLC creates in the video.")
+    "VLC can display messages on the video. This is called OSD (On Screen " \
+    "Display). You can disable this feature here.")
 
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
@@ -264,8 +273,8 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #endif
 
 #define INPUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify options related to the input " \
-    "modules, such as the DVD or VCD device, the network interface " \
+    "These options allow you to modify the behaviour of the input " \
+    "subsystem, such as the DVD or VCD device, the network interface " \
     "settings or the subtitle channel.")
 
 #define CR_AVERAGE_TEXT N_("Clock reference average counter")
@@ -377,13 +386,13 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "its codecs (decompression methods). Only advanced users should " \
     "alter this option as it can break playback of all your streams." )
 
-#define CODEC_TEXT N_("Choose preferred codecs list")
+#define CODEC_TEXT N_("Preferred codecs list")
 #define CODEC_LONGTEXT N_( \
     "This allows you to select a list of codecs that VLC will use in " \
     "priority. For instance, 'dummy,a52' will try the dummy and a52 codecs " \
     "before trying the other ones.")
 
-#define ENCODER_TEXT N_("Choose preferred encoders list")
+#define ENCODER_TEXT N_("Preferred encoders list")
 #define ENCODER_LONGTEXT N_( \
     "This allows you to select a list of encoders that VLC will use in " \
     "priority")
@@ -420,7 +429,7 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "multiple playlist item (automatically insert gather stream_out " \
     "if not specified)" )
 
-#define PACKETIZER_TEXT N_("Choose preferred packetizer list")
+#define PACKETIZER_TEXT N_("Preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
     "This allows you to select the order in which VLC will choose its " \
     "packetizers."  )
@@ -476,9 +485,9 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
 
-#define REPEAT_TEXT N_("Repeat the current playlistitem")
+#define REPEAT_TEXT N_("Repeat the current item")
 #define REPEAT_LONGTEXT N_( \
-    "When this is active VLC will keep playing the current playlistitem " \
+    "When this is active, VLC will keep playing the current playlist item " \
     "over and over again.")
 
 #define MISC_CAT_LONGTEXT N_( \
@@ -492,13 +501,13 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 
 #define ACCESS_TEXT N_("Access module")
 #define ACCESS_LONGTEXT N_( \
-    "This is a legacy entry to let you configure access modules")
+    "This is a legacy entry to let you configure access modules.")
 
 #define DEMUX_TEXT N_("Demux module")
 #define DEMUX_LONGTEXT N_( \
-    "This is a legacy entry to let you configure demux modules")
+    "This is a legacy entry to let you configure demux modules.")
 
-#define RT_PRIORITY_TEXT N_("Allow VLC to run with a real-time priority")
+#define RT_PRIORITY_TEXT N_("Allow real-time priority")
 #define RT_PRIORITY_LONGTEXT N_( \
     "Running VLC in real-time priority will allow for much more precise " \
     "scheduling and yield better, especially when streaming content. " \
@@ -506,10 +515,11 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "slow. You should only activate this if you know what you're " \
     "doing.")
 
-#define MINIMIZE_THREADS_TXT N_("Minimize number of threads needed to run VLC")
-#define MINIMIZE_THREADS_LONGTXT N_("Minimize number of threads needed to run VLC")
+#define MINIMIZE_THREADS_TXT N_("Minimize number of threads")
+#define MINIMIZE_THREADS_LONGTXT N_( \
+     "This option minimizes the number of threads needed to run VLC")
 
-#define ONEINSTANCE_TEXT N_("Allow only one running instance of VLC")
+#define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
     "for instance if you associated VLC with some media types and you " \
@@ -522,7 +532,7 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "Increasing the priority of the process will very likely improve your " \
     "playing experience as it allows VLC not to be disturbed by other " \
     "applications that could otherwise take too much processor time.\n" \
-    "However be advise that in certain circumstances (bugs) VLC could take " \
+    "However be advised that in certain circumstances (bugs) VLC could take " \
     "all the processor time and render the whole system unresponsive which " \
     "might require a reboot of your machine.")
 
@@ -548,60 +558,60 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "bindings, known as \"hotkeys\"." )
 
 #define FULLSCREEN_KEY_TEXT N_("Fullscreen")
-#define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state")
+#define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
 #define PLAY_PAUSE_KEY_TEXT N_("Play/Pause")
-#define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state")
+#define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state.")
 #define PAUSE_KEY_TEXT N_("Pause only")
-#define PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to pause")
+#define PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to pause.")
 #define PLAY_KEY_TEXT N_("Play only")
-#define PLAY_KEY_LONGTEXT N_("Select the hotkey to use to play")
+#define PLAY_KEY_LONGTEXT N_("Select the hotkey to use to play.")
 #define FASTER_KEY_TEXT N_("Faster")
-#define FASTER_KEY_LONGTEXT N_("Select the hotkey to use for fast forward playback")
+#define FASTER_KEY_LONGTEXT N_("Select the hotkey to use for fast forward playback.")
 #define SLOWER_KEY_TEXT N_("Slower")
-#define SLOWER_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback")
+#define SLOWER_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback.")
 #define NEXT_KEY_TEXT N_("Next")
-#define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist")
+#define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist.")
 #define PREV_KEY_TEXT N_("Previous")
-#define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist")
+#define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist.")
 #define STOP_KEY_TEXT N_("Stop")
-#define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback")
+#define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback.")
 #define POSITION_KEY_TEXT N_("Position")
-#define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position")
+#define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position.")
 
 #define JB10SEC_KEY_TEXT N_("Jump 10 seconds backwards")
-#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds backwards")
+#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds backwards.")
 
 #define JB1MIN_KEY_TEXT N_("Jump 1 minute backwards")
-#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute backwards")
+#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute backwards.")
 #define JB5MIN_KEY_TEXT N_("Jump 5 minutes backwards")
-#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes backwards")
+#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes backwards.")
 #define JF10SEC_KEY_TEXT N_("Jump 10 seconds forward")
-#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds forward")
+#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds forward.")
 
 #define JF1MIN_KEY_TEXT N_("Jump 1 minute forward")
-#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute forward")
+#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute forward.")
 
 #define JF5MIN_KEY_TEXT N_("Jump 5 minutes forward")
-#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward")
+#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward.")
 
 #define QUIT_KEY_TEXT N_("Quit")
-#define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application")
+#define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the applicatioN.")
 #define NAV_UP_KEY_TEXT N_("Navigate up")
-#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in dvd menus")
+#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in dvd menus.")
 #define NAV_DOWN_KEY_TEXT N_("Navigate down")
-#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in dvd menus")
+#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in dvd menus.")
 #define NAV_LEFT_KEY_TEXT N_("Navigate left")
-#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in dvd menus")
+#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in dvd menus.")
 #define NAV_RIGHT_KEY_TEXT N_("Navigate right")
-#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in dvd menus")
+#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in dvd menus.")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
-#define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in dvd menus")
+#define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in dvd menus.")
 #define VOL_UP_KEY_TEXT N_("Volume up")
-#define VOL_UP_KEY_LONGTEXT N_("Select the key to turn up audio volume")
+#define VOL_UP_KEY_LONGTEXT N_("Select the key to increase audio volume.")
 #define VOL_DOWN_KEY_TEXT N_("Volume down")
-#define VOL_DOWN_KEY_LONGTEXT N_("Select the key to turn down audio volume")
+#define VOL_DOWN_KEY_LONGTEXT N_("Select the key to decrease audio volume.")
 #define VOL_MUTE_KEY_TEXT N_("Mute")
-#define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume")
+#define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume.")
 #define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
 #define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
 #define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
@@ -612,7 +622,7 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define PLAY_BOOKMARK8_KEY_TEXT N_("Play playlist bookmark 8")
 #define PLAY_BOOKMARK9_KEY_TEXT N_("Play playlist bookmark 9")
 #define PLAY_BOOKMARK10_KEY_TEXT N_("Play playlist bookmark 10")
-#define PLAY_BOOKMARK_KEY_LONGTEXT N_("Select the key to play this bookmark")
+#define PLAY_BOOKMARK_KEY_LONGTEXT N_("Select the key to play this bookmark.")
 #define SET_BOOKMARK1_KEY_TEXT N_("Set playlist bookmark 1")
 #define SET_BOOKMARK2_KEY_TEXT N_("Set playlist bookmark 2")
 #define SET_BOOKMARK3_KEY_TEXT N_("Set playlist bookmark 3")
@@ -623,7 +633,7 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define SET_BOOKMARK8_KEY_TEXT N_("Set playlist bookmark 8")
 #define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
 #define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
-#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark")
+#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark.")
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
