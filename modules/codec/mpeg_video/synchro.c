@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: synchro.c,v 1.6 2002/12/31 01:59:46 massiot Exp $
+ * $Id: synchro.c,v 1.7 2003/01/23 21:47:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -408,8 +408,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             {
                 msg_Dbg( p_vpar->p_fifo, "decoded %d/%d pictures",
                          p_vpar->synchro.i_pic
-                           - p_vpar->synchro.i_trashed_pic
-                           - p_vpar->synchro.i_not_chosen_pic,
+                           - p_vpar->synchro.i_trashed_pic,
                          p_vpar->synchro.i_pic );
                 p_vpar->synchro.i_trashed_pic = p_vpar->synchro.i_not_chosen_pic
                     = p_vpar->synchro.i_pic = 0;

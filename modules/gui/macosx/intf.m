@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.30 2003/01/22 02:39:33 hartman Exp $
+ * $Id: intf.m,v 1.31 2003/01/23 21:47:59 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -425,6 +425,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( p_intf->p_sys->p_sub->i_start != i_stop )
         {
+#if 0
             NSColor *o_white = [NSColor whiteColor];
             NSColor *o_red = [NSColor redColor];
             NSColor *o_yellow = [NSColor yellowColor];
@@ -439,16 +440,20 @@ static void Run( intf_thread_t *p_intf )
             [o_messages setEditable: YES];
             [o_messages setSelectedRange: NSMakeRange( ui_length, 0 )];
             [o_messages scrollRangeToVisible: NSMakeRange( ui_length, 0 )];
+#endif
 
             for( i_start = p_intf->p_sys->p_sub->i_start;
                  i_start != i_stop;
                  i_start = (i_start+1) % VLC_MSG_QSIZE )
             {
+#if 0
                 NSString *o_msg;
                 NSDictionary *o_attr;
                 NSAttributedString *o_msg_color;
+#endif
                 int i_type = p_intf->p_sys->p_sub->p_msg[i_start].i_type;
 
+#if 0
                 o_attr = [NSDictionary dictionaryWithObject: o_gray
                     forKey: NSForegroundColorAttributeName];
                 o_msg = [NSString stringWithFormat: @"%s%s",
@@ -467,6 +472,7 @@ static void Run( intf_thread_t *p_intf )
                 [o_messages insertText: o_msg_color];
 
                 [o_messages insertText: @"\n"];
+#endif
 
                 if ( i_type == 1 )
                 {
@@ -486,7 +492,9 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
 
+#if 0
             [o_messages setEditable: NO];
+#endif
 
             vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
             p_intf->p_sys->p_sub->i_start = i_start;

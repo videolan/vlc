@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.12 2003/01/23 11:48:18 massiot Exp $
+ * $Id: open.m,v 1.13 2003/01/23 21:47:59 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -187,7 +187,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
     [o_disc_videots_btn_browse setStringValue: _NS("Browse...")];
-    [o_disc_dvd_menus setTitle: _NS("Use DVD menus")];
+    [o_disc_dvd_menus setTitle: _NS("Use DVD menus (EXPERIMENTAL)")];
 
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
@@ -220,8 +220,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_sout_udp_addr_lbl setStringValue: _NS("Address")];
     [o_sout_udp_port_lbl setStringValue: _NS("Port")];
 
-    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("PS")];
-    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("TS")];
+    [[o_sout_mux cellAtRow:0 column:0] setTitle: _NS("AVI")];
+    [[o_sout_mux cellAtRow:0 column:1] setTitle: _NS("PS")];
+    [[o_sout_mux cellAtRow:0 column:2] setTitle: _NS("TS")];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
@@ -787,10 +788,11 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_sout_udp_port setEnabled: b_net];
     [o_sout_udp_port_stp setEnabled: b_net];
     [[o_sout_mux cellAtRow:0 column: 0] setEnabled: !b_net];
+    [[o_sout_mux cellAtRow:0 column: 1] setEnabled: !b_net];
 
     if ( b_net )
     {
-        [[o_sout_mux cellAtRow: 0 column:1] setState: YES];
+        [[o_sout_mux cellAtRow: 0 column:2] setState: YES];
     }
 
     [self soutInfoChanged: nil];
@@ -806,7 +808,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     o_mode = [[o_sout_access selectedCell] title];
     o_mux = [[o_sout_mux selectedCell] title];
 
-    if ( [o_mux isEqualToString: _NS("PS")] ) o_mux_string = @"ps";
+    if ( [o_mux isEqualToString: _NS("AVI")] ) o_mux_string = @"avi";
+    else if ( [o_mux isEqualToString: _NS("PS")] ) o_mux_string = @"ps";
     else o_mux_string = @"ts";
 
     if ( [o_mode isEqualToString: _NS("File")] )
@@ -840,8 +843,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (IBAction)openFile:(id)sender
 {
-    [self openFilePathChanged: nil];
-    [self openTarget: 0];
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil
+            file: nil types: nil] == NSOKButton )
+    {
+        intf_thread_t * p_intf = [NSApp getIntf];
+        config_PutPsz( p_intf, "sout", NULL );
+        [o_playlist appendArray: [o_open_panel filenames] atPos: -1 enqueue: 0];
+    }
 }
 
 - (IBAction)panelCancel:(id)sender

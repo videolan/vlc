@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.h,v 1.7 2003/01/20 03:45:06 hartman Exp $
+ * $Id: open.h,v 1.8 2003/01/23 21:47:59 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -23,8 +23,8 @@
 
 NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
-#define OPEN_PANEL_FULL_HEIGHT 494
-#define OPEN_PANEL_SHORT_HEIGHT 325
+#define OPEN_PANEL_FULL_HEIGHT 498
+#define OPEN_PANEL_SHORT_HEIGHT 329
 #define WINDOW_TITLE_HEIGHT 21
 
 /*****************************************************************************
