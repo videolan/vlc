@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.83 2002/08/08 00:35:10 sam Exp $
+ * $Id: video_output.h,v 1.84 2002/10/17 16:03:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -49,25 +49,6 @@ typedef struct vout_chroma_t
     module_t * p_module;
 
 } vout_chroma_t;
-
-/*****************************************************************************
- * vout_fifo_t
- *****************************************************************************/
-typedef struct vout_fifo_t
-{
-    /* See the fifo types below */
-    int                 i_type;
-    vlc_bool_t          b_die;
-    int                 i_fifo;      /* Just to keep track of the fifo index */
-
-    vlc_mutex_t         data_lock;
-    vlc_cond_t          data_wait;
-
-} vout_fifo_t;
-
-#define VOUT_EMPTY_FIFO         0
-#define VOUT_YUV_FIFO           1
-#define VOUT_SPU_FIFO           2
 
 /*****************************************************************************
  * vout_thread_t: video output thread descriptor
@@ -133,9 +114,6 @@ struct vout_thread_t
     count_t             c_jitter_samples;  /* number of samples used for the *
                                             * calculation of the jitter      */
 
-    /* Mouse */
-    int                 i_mouse_x, i_mouse_y, i_mouse_button;
-
     /* Filter chain */
     char *psz_filter_chain;
 };
@@ -166,10 +144,6 @@ struct vout_thread_t
 #define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
 VLC_EXPORT( void,              vout_DestroyThread,  ( vout_thread_t * ) );
-
-vout_fifo_t *   vout_CreateFifo     ( void );
-void            vout_DestroyFifo    ( vout_fifo_t * );
-void            vout_FreeFifo       ( vout_fifo_t * );
 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( u32, u32 ) );
 

@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: intf.c,v 1.2 2002/10/17 16:03:18 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -34,9 +34,6 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "video.h"
-#include "video_output.h"
-
 #include "dvd.h"
 
 /*****************************************************************************
@@ -51,12 +48,16 @@ struct intf_sys_t
     vlc_bool_t          b_inf_still;
     mtime_t             m_still_time;
 
+    dvdplay_ctrl_t      control;
+    vlc_bool_t          b_click, b_move;
 };
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static int  InitThread     ( intf_thread_t *p_intf );
+static int  MouseEvent     ( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
 
 /* Exported functions */
 static void RunIntf        ( intf_thread_t *p_intf );
@@ -101,11 +102,10 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
  *****************************************************************************/
 static void RunIntf( intf_thread_t *p_intf )
 {
-    vout_thread_t *     p_vout;
-    dvdplay_ctrl_t      control;
+    vlc_object_t *      p_vout = NULL;
     mtime_t             mtime = 0;
     mtime_t             mlast = 0;
-    
+
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize intf" );
@@ -113,10 +113,6 @@ static void RunIntf( intf_thread_t *p_intf )
     }
     msg_Dbg( p_intf, "intf initialized" );
 
-    p_vout = NULL;
-    control.mouse.i_x = 0;
-    control.mouse.i_y = 0;
-    
     /* Main loop */
     while( !p_intf->b_die )
     {
@@ -173,76 +169,85 @@ static void RunIntf( intf_thread_t *p_intf )
         /* 
          * mouse cursor
          */
-        p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                  VLC_OBJECT_VOUT, FIND_CHILD );
-        if( p_vout != NULL )
+        if( p_vout && ( p_intf->p_sys->b_click || p_intf->p_sys->b_move ) )
         {
-            vlc_mutex_lock( &p_vout->change_lock );
+            vlc_value_t val;
+            int i_activate;
 
-            if( control.mouse.i_x != p_vout->i_mouse_x ||
-                control.mouse.i_y != p_vout->i_mouse_y ||
-                p_vout->i_mouse_button )
+            var_Get( p_vout, "mouse-x", &val );
+            p_intf->p_sys->control.mouse.i_x = val.i_int;
+            var_Get( p_vout, "mouse-y", &val );
+            p_intf->p_sys->control.mouse.i_y = val.i_int;
+
+            if( p_intf->p_sys->b_click )
             {
-                int i_activate = 0;
-                
-                control.mouse.i_x = p_vout->i_mouse_x;
-                control.mouse.i_y = p_vout->i_mouse_y;
-
-                if( p_vout->i_mouse_button )
-                {
-                    control.type = DVDCtrlMouseActivate;
-                    
-                    msg_Dbg( p_intf, "Activate coordinates: %dx%d",
-                                 p_vout->i_mouse_x, p_vout->i_mouse_y );
-                }
-                else
-                {
-                    control.type = DVDCtrlMouseSelect;
-                    
-                    msg_Dbg( p_intf, "Select coordinates: %dx%d",
-                                 p_vout->i_mouse_x, p_vout->i_mouse_y );
-                }
-                p_vout->i_mouse_button = 0;
-                vlc_mutex_unlock( &p_vout->change_lock );
-                
-                msg_Dbg( p_intf, "send button" );
-                
-                /* we can safely interact with libdvdplay
-                 * with the stream lock */
-                vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-                
-                i_activate =
-                    dvdplay_button( p_intf->p_sys->p_dvd->vmg, &control );
-                  
-                vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-                
-
-                if( i_activate && p_intf->p_sys->b_still )
-                {
-                    input_SetStatus( p_intf->p_sys->p_input,
-                                     INPUT_STATUS_PLAY );
-                    p_intf->p_sys->b_still = 0;
-                    p_intf->p_sys->b_inf_still = 0;
-                    p_intf->p_sys->m_still_time = 0;
-                }
+                p_intf->p_sys->control.type = DVDCtrlMouseActivate;
+                p_intf->p_sys->b_click = VLC_FALSE;
             }
             else
             {
-                vlc_mutex_unlock( &p_vout->change_lock );
+                p_intf->p_sys->control.type = DVDCtrlMouseSelect;
+                p_intf->p_sys->b_move = VLC_FALSE;
             }
-            
 
-            vlc_object_release( p_vout );
+            msg_Dbg( p_intf, "send button coordinates: %dx%d",
+                             p_intf->p_sys->control.mouse.i_x,
+                             p_intf->p_sys->control.mouse.i_y );
+
+            /* we can safely interact with libdvdplay
+             * with the stream lock */
+            vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+            i_activate = dvdplay_button( p_intf->p_sys->p_dvd->vmg,
+                                         &p_intf->p_sys->control );
+
+            vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+            if( i_activate && p_intf->p_sys->b_still )
+            {
+                input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+                p_intf->p_sys->b_still = 0;
+                p_intf->p_sys->b_inf_still = 0;
+                p_intf->p_sys->m_still_time = 0;
+            }
         }
-            
+
         vlc_mutex_unlock( &p_intf->change_lock );
-          
+
+        /* 
+         * video output
+         */
+        if( p_vout && p_vout->b_die )
+        {
+            var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+            var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+            vlc_object_release( p_vout );
+            p_vout = NULL;
+        }
+
+        if( p_vout == NULL )
+        {
+            p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                      VLC_OBJECT_VOUT, FIND_CHILD );
+            if( p_vout )
+            {
+                var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+                var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+            }
+        }
+
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }
-    
-    vlc_object_release( p_intf->p_sys->p_input );
 
+    if( p_vout )
+    {
+        var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        vlc_object_release( p_vout );
+    }
+
+    vlc_object_release( p_intf->p_sys->p_input );
 }
 
 /*****************************************************************************
@@ -255,16 +260,19 @@ static int InitThread( intf_thread_t * p_intf )
     {
         input_thread_t * p_input;
         dvd_data_t * p_dvd;
-        
+
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
         p_dvd = (dvd_data_t*)p_input->p_access_data;
 
         p_dvd->p_intf = p_intf;
-                    
+
         vlc_mutex_lock( &p_intf->change_lock );
-    
+
         p_intf->p_sys->p_input = p_input;
         p_intf->p_sys->p_dvd = p_dvd;
+
+        p_intf->p_sys->b_move = VLC_FALSE;
+        p_intf->p_sys->b_click = VLC_FALSE;
 
         vlc_mutex_unlock( &p_intf->change_lock );
 
@@ -277,6 +285,30 @@ static int InitThread( intf_thread_t * p_intf )
 }
 
 /*****************************************************************************
+ * MouseEvent: callback for mouse events
+ *****************************************************************************/
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    if( psz_var[6] == 'c' ) /* "mouse-clicked" */
+    {
+        p_intf->p_sys->b_click = VLC_TRUE;
+    }
+    else if( psz_var[6] == 'm' ) /* "mouse-moved" */
+    {
+        p_intf->p_sys->b_move = VLC_TRUE;
+    }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * dvdIntfStillTime: function provided to demux plugin to request
  * still images
  *****************************************************************************/
@@ -284,7 +316,7 @@ int dvdIntfStillTime( intf_thread_t *p_intf, int i_sec )
 {
     vlc_mutex_lock( &p_intf->change_lock );
 #if 1
-    
+
     if( i_sec == 0xff )
     {
         p_intf->p_sys->b_still = 1;
@@ -307,7 +339,6 @@ int dvdIntfStillTime( intf_thread_t *p_intf, int i_sec )
         {
             p_intf->p_sys->m_still_time = 1000000 * i_sec;
         }
-        
     }
 #endif
     vlc_mutex_unlock( &p_intf->change_lock );

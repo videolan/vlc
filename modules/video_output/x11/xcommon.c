@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.4 2002/09/10 12:15:07 sam Exp $
+ * $Id: xcommon.c,v 1.5 2002/10/17 16:03:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -607,16 +607,21 @@ static int ManageVideo( vout_thread_t *p_vout )
         else if( xevent.type == ButtonPress )
         {
             int i_width, i_height, i_x, i_y;
+            vlc_value_t val;
 
             vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
                                p_vout->p_sys->p_win->i_height,
                                &i_x, &i_y, &i_width, &i_height );
 
-            p_vout->i_mouse_x = ( xevent.xmotion.x - i_x )
-                * p_vout->render.i_width / i_width;
-            p_vout->i_mouse_y = ( xevent.xmotion.y - i_y )
-                * p_vout->render.i_height / i_height;
-            p_vout->i_mouse_button = 1;
+            val.i_int = ( xevent.xmotion.x - i_x )
+                         * p_vout->render.i_width / i_width;
+            var_Set( p_vout, "mouse-x", val );
+            val.i_int = ( xevent.xmotion.y - i_y )
+                         * p_vout->render.i_height / i_height;
+            var_Set( p_vout, "mouse-y", val );
+
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-clicked", val );
 
             switch( ((XButtonEvent *)&xevent)->button )
             {
@@ -667,6 +672,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         else if( xevent.type == MotionNotify )
         {
             int i_width, i_height, i_x, i_y;
+            vlc_value_t val;
 
             /* somewhat different use for vout_PlacePicture:
              * here the values are needed to give to mouse coordinates
@@ -675,11 +681,16 @@ static int ManageVideo( vout_thread_t *p_vout )
                                p_vout->p_sys->p_win->i_height,
                                &i_x, &i_y, &i_width, &i_height );
 
-            p_vout->i_mouse_x = ( xevent.xmotion.x - i_x )
-                * p_vout->render.i_width / i_width;
-            p_vout->i_mouse_y = ( xevent.xmotion.y - i_y )
-                * p_vout->render.i_height / i_height;
- 
+            val.i_int = ( xevent.xmotion.x - i_x )
+                         * p_vout->render.i_width / i_width;
+            var_Set( p_vout, "mouse-x", val );
+            val.i_int = ( xevent.xmotion.y - i_y )
+                         * p_vout->render.i_height / i_height;
+            var_Set( p_vout, "mouse-y", val );
+
+            val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-moved", val );
+
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
             if( ! p_vout->p_sys->b_mouse_pointer_visible )
             {
