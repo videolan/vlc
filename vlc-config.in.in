@@ -80,8 +80,8 @@ fi
 if test "@includedir@" != "/usr/include"; then
   includes="-I@includedir@"
 fi
-if test "${top_srcdir}" != ""; then
-  top_srcdir="${top_srcdir}/"
+if test "${top_builddir}" != ""; then
+  top_builddir="${top_builddir}/"
 fi
 cppflags="${includes}"
 libs="-L@libdir@"
@@ -246,7 +246,7 @@ if test "${echo_target}" = yes; then
     for module in `echo "${plugins}"`; do
       register_targets "${module}"
     done
-    for target in `echo "${list}"`; do printf "${top_srcdir}modules/${target}_plugin "; done
+    for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_plugin "; done
     printf '\n'
   fi
   if test "${echo_builtin}" = yes; then
@@ -254,9 +254,9 @@ if test "${echo_target}" = yes; then
       register_targets "${module}"
     done
     if test "${echo_pic}" = yes; then
-      for target in `echo "${list}"`; do printf "${top_srcdir}modules/${target}_pic.a "; done
+      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_pic.a "; done
     else
-      for target in `echo "${list}"`; do printf "${top_srcdir}modules/${target}.a "; done
+      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
     fi
     printf '\n'
   fi
@@ -288,9 +288,9 @@ if test "${echo_libs}" = yes; then
       register_flags "${module}"
     done
     if test "${echo_pic}" = yes; then
-      for target in `echo "${list}"`; do printf "${top_srcdir}modules/${target}_pic.a "; done
+      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}_pic.a "; done
     else
-      for target in `echo "${list}"`; do printf "${top_srcdir}modules/${target}.a "; done
+      for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
     fi
   fi
   echo "${libs} ${ldflags}"
