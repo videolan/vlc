@@ -2,7 +2,7 @@
  * macosx.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.22 2004/02/26 13:04:55 hartman Exp $
+ * $Id: macosx.m,v 1.23 2004/03/02 13:53:14 kuehne Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -67,7 +67,7 @@ void E_(CloseVideo)   ( vlc_object_t * );
 #define OPENGL_EFFECT_LONGTEXT N_("Use 'None' to display the video " \
         "without any fantasy, 'Cube' to let the video play on " \
         "the faces of a rotating cube, 'Transparent cube' do make this " \
-        "cube transparent" )
+        "cube transparent." )
 
 static char * effect_list[] = { "none", "cube", "transparent-cube" };
 static char * effect_list_text[] = { N_("None"), N_("Cube"),

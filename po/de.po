@@ -1011,7 +1011,6 @@ msgstr ""
 "können Sie den \"headphone\"-Mixer benutzen, der Ihnen ein 5.1-Feeling mit "
 "einem Kopfhörer gibt."
 
-# BUGGY
 #: src/libvlc.h:178
 msgid ""
 "These options allow you to modify the behaviour of the video output "
@@ -1747,7 +1746,6 @@ msgstr ""
 msgid "Adjust VLC priority"
 msgstr "Priorität von VLC anpassen"
 
-# BUGGY
 #: src/libvlc.h:528
 msgid ""
 "This options adds an offset (positive or negative) to VLC default "
@@ -2972,7 +2970,6 @@ msgstr ""
 msgid "HTTP user name"
 msgstr "HTTP-Benutzername"
 
-# BUGGY
 #: modules/access/http.c:54
 msgid ""
 "Allows you to modify the user name that will be used for the connection "
@@ -3010,7 +3007,6 @@ msgstr ""
 msgid "Force selection of all streams"
 msgstr "Auswahl von allen Streams erzwingen"
 
-# BUGGY
 #: modules/access/mms/mms.c:64
 msgid "Selct maximum bitrate stream"
 msgstr "Maximale Datenrate auswählen"
@@ -3721,17 +3717,14 @@ msgstr "DV Bilddekoder"
 msgid "DVB subtitles decoder"
 msgstr "DVB Untertitel Dekoder"
 
-# UNUSED
 #: modules/codec/dvbsub.c:1175
 msgid "unimplemented chroma: RV16"
 msgstr ""
 
-# UNUSED
 #: modules/codec/dvbsub.c:1182
 msgid "unimplemented chroma: RV32"
 msgstr ""
 
-# UNUSED
 #: modules/codec/dvbsub.c:1231
 msgid "internal DvbSub decoder error"
 msgstr ""
@@ -3836,10 +3829,9 @@ msgstr ""
 "Höhere Level benötigen mehr Prozessorleistung, produzieren aber besser "
 "aussehende Bilder."
 
-# BUGGY
 #: modules/codec/ffmpeg/ffmpeg.h:114
 msgid "ffmpeg postproc filter chains"
-msgstr "Ffmpeg Nachbearbeitungsfilterketten"
+msgstr "ffmpeg Nachbearbeitungsfilterketten"
 
 #: modules/codec/ffmpeg/postprocess.c:84
 msgid "Post processing"
@@ -3938,7 +3930,6 @@ msgstr ""
 msgid "Subtitle aspect-ratio correction"
 msgstr "Untertitelbildseitenformatkorrektur"
 
-# BUGGY
 #: modules/codec/ogt/subtitle.h:55
 msgid ""
 "Use this to force the subtitle aspect ratio. If you give a null string the "
@@ -4560,10 +4551,9 @@ msgstr "Matroskastream Demuxer"
 msgid "Seek based on percent not time"
 msgstr "Auf Prozent, nicht auf Zeit, basiert suchen"
 
-# UNUSED
 #: modules/demux/mkv.cpp:2179
 msgid "Matroska"
-msgstr "Matroska"
+msgstr ""
 
 #: modules/demux/mkv.cpp:2193
 msgid "UTC date"
@@ -6619,7 +6609,6 @@ msgstr ""
 msgid "OpenGL effect"
 msgstr "OpenGL Effekt"
 
-# BUGGY
 #: modules/gui/macosx/macosx.m:67
 msgid ""
 "Use 'None' to display the video without any fantasy, 'Cube' to let the video "
@@ -8789,7 +8778,6 @@ msgstr "DirectX Video-Ausgabe"
 msgid "Framebuffer device"
 msgstr "Framepuffer-Device"
 
-# BUGGY
 #: modules/video_output/fb.c:69
 msgid ""
 "You can select here the framebuffer device that will be used for rendering "

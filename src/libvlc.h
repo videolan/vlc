@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.134 2004/02/20 17:20:01 massiot Exp $
+ * $Id: libvlc.h,v 1.135 2004/03/02 13:53:14 kuehne Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -177,8 +177,8 @@ static char *ppsz_language_text[] =
 #define VOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behaviour of the video output " \
     "subsytem. You can for example enable video filters (deinterlacing, " \
-    "image adjusting, ...\n ). Enable these filters here and configure " \
-    "them in the \"video filters\" modules section. You can also set many" \
+    "image adjusting, ...). Enable these filters here and configure " \
+    "them in the \"video filters\" modules section. You can also set many " \
     "miscellaneous video options." )
 
 #define VOUT_TEXT N_("Video output module")

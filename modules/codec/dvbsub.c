@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
  * Copyright (C) 2003 VideoLAN
- * $Id: dvbsub.c,v 1.9 2004/01/25 20:40:59 gbazin Exp $
+ * $Id: dvbsub.c,v 1.10 2004/03/02 13:53:13 kuehne Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1172,14 +1172,14 @@ static void dvbsub_RenderDVBSUB( vout_thread_t *p_vout, picture_t *p_pic,
 
         /* RV16 target, scaling */
         case VLC_FOURCC('R','V','1','6'):
-            msg_Err(p_vout, _("unimplemented chroma: RV16"));
+            msg_Err(p_vout, "unimplemented chroma: RV16");
             /* RenderRV16( p_vout, p_pic, p_spu ); */
             break;
 
         /* RV32 target, scaling */
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','3','2'):
-            msg_Err(p_vout, _("unimplemented chroma: RV32"));
+            msg_Err(p_vout, "unimplemented chroma: RV32");
             /* RenderRV32( p_vout, p_pic, p_spu ); */
             break;
 
@@ -1228,7 +1228,7 @@ static void dvbsub_render( dvbsub_all_t *dvbsub, vout_thread_t *p_vout )
 
             if(p_object==NULL)
             {
-                msg_Err(p_vout, _("internal DvbSub decoder error"));
+                msg_Err(p_vout, "internal DvbSub decoder error");
                 return;
             }
 
