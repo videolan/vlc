@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.84 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input_dec.c,v 1.85 2004/01/18 05:14:39 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -78,6 +78,7 @@ struct decoder_owner_sys_t
 
     /* */
     input_buffers_t *p_method_data;
+    es_descriptor_t *p_es_descriptor;
 };
 
 
@@ -456,6 +457,7 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->p_owner->p_aout_input = NULL;
     p_dec->p_owner->p_vout = NULL;
     p_dec->p_owner->p_sout = NULL;
+    p_dec->p_owner->p_es_descriptor = p_es;
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew( p_dec ) ) == NULL )
     {
@@ -541,6 +543,11 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             if( !p_dec->p_owner->p_sout )
             {
                 es_format_Copy( &p_dec->p_owner->sout, &p_dec->fmt_out );
+                if( p_dec->p_owner->p_es_descriptor->p_pgrm )
+                {
+                    p_dec->p_owner->sout.i_group =
+                        p_dec->p_owner->p_es_descriptor->p_pgrm->i_number;
+                }
 
                 p_dec->p_owner->p_sout =
                     sout_InputNew( p_dec, &p_dec->p_owner->sout );
