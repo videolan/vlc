@@ -78,6 +78,9 @@ subpicture_t * E_(ParsePacket)( decoder_t *p_dec )
     p_spu_data = malloc( sizeof(subpicture_data_t) + 4 * p_sys->i_rle_size );
     p_spu_data->p_data = (uint8_t *)p_spu_data + sizeof(subpicture_data_t);
     p_spu_data->b_palette = VLC_FALSE;
+    p_spu_data->b_auto_crop = VLC_FALSE;
+    p_spu_data->i_y_top_offset = 0;
+    p_spu_data->i_y_bottom_offset = 0;
 
     p_spu_data->pi_alpha[0] = 0x00;
     p_spu_data->pi_alpha[1] = 0x0f;
@@ -249,7 +252,11 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                          ((p_sys->buffer[i_index+4]>>4)&0x0f);
             p_spu->i_height = (((p_sys->buffer[i_index+4]&0x0f)<<8)|
                               p_sys->buffer[i_index+5]) - p_spu->i_y + 1;
-            
+
+            /* Auto crop fullscreen subtitles */
+            if( p_spu->i_height > 250 )
+                p_spu_data->b_auto_crop = VLC_TRUE;
+
             i_index += 6;
             break;
 
@@ -342,6 +349,11 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
     unsigned int  pi_table[ 2 ];
     unsigned int *pi_offset;
 
+    /* Cropping */
+    vlc_bool_t b_empty_top = VLC_TRUE;
+    unsigned int i_skipped_top = 0, i_skipped_bottom = 0;
+    unsigned int i_transparent_code = 0;
+ 
     /* Colormap statistics */
     int i_border = -1;
     int stats[4]; stats[0] = stats[1] = stats[2] = stats[3] = 0;
@@ -403,7 +415,54 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
                 stats[i_border] += i_code >> 2;
             }
 
-            *p_dest++ = i_code;
+            /* Auto crop subtitles (a lot more optimized) */
+            if( p_spu_data->b_auto_crop )
+            {
+                if( !i_y )
+                {
+                    /* We assume that if the first line is transparent, then
+                     * it is using the palette index for the
+                     * (background) transparent color */
+                    if( (i_code >> 2) == i_width &&
+                        p_spu_data->pi_alpha[ i_code & 0x3 ] == 0x00 )
+                    {
+                        i_transparent_code = i_code;
+                    }
+                    else
+                    {
+                        p_spu_data->b_auto_crop = VLC_FALSE;
+                    }
+                }
+
+                if( i_code == i_transparent_code )
+                {
+                    if( b_empty_top )
+                    {
+                        /* This is a blank top line, we skip it */
+                      i_skipped_top++;
+                    }
+                    else
+                    {
+                        /* We can't be sure the current lines will be skipped,
+                         * so we store the code just in case. */
+                      *p_dest++ = i_code;
+                      i_skipped_bottom++;
+                    }
+                }
+                else
+                {
+                    /* We got a valid code, store it */
+                    *p_dest++ = i_code;
+
+                    /* Valid code means no blank line */
+                    b_empty_top = VLC_FALSE;
+                    i_skipped_bottom = 0;
+                }
+            }
+            else
+            {
+                *p_dest++ = i_code;
+            }
         }
 
         /* Check that we didn't go too far */
@@ -443,6 +502,18 @@ static int ParseRLE( decoder_t *p_dec, subpicture_t * p_spu,
     msg_Dbg( p_dec, "valid subtitle, size: %ix%i, position: %i,%i",
              p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
 
+    /* Crop if necessary */
+    if( i_skipped_top || i_skipped_bottom )
+    {
+        int i_y = p_spu->i_y + i_skipped_top;
+        int i_height = p_spu->i_height - (i_skipped_top + i_skipped_bottom);
+
+        p_spu_data->i_y_top_offset = i_skipped_top;
+        p_spu_data->i_y_bottom_offset = i_skipped_bottom;
+        msg_Dbg( p_dec, "cropped to: %ix%i, position: %i,%i",
+                 p_spu->i_width, i_height, p_spu->i_x, i_y );
+    }
+ 
     /* Handle color if no palette was found */
     if( !p_spu_data->b_palette )
     {
@@ -515,7 +586,8 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_width = fmt.i_visible_width = p_spu->i_width;
-    fmt.i_height = fmt.i_visible_height = p_spu->i_height;
+    fmt.i_height = fmt.i_visible_height = p_spu->i_height -
+        p_spu_data->i_y_top_offset - p_spu_data->i_y_bottom_offset;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
     if( !p_spu->p_region )
@@ -524,12 +596,14 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
         return;
     }
 
-    p_spu->p_region->i_x = p_spu->p_region->i_y = 0;
+    p_spu->p_region->i_x = 0;
+    p_spu->p_region->i_y = p_spu_data->i_y_top_offset;
     p_p = p_spu->p_region->picture.p->p_pixels;
     i_pitch = p_spu->p_region->picture.p->i_pitch;
 
     /* Build palette */
-    for( i_x = 0; i_x < 4; i_x++ )
+    fmt.p_palette->i_entries = 4;
+    for( i_x = 0; i_x < fmt.p_palette->i_entries; i_x++ )
     {
         fmt.p_palette->palette[i_x][0] = p_spu_data->pi_yuv[i_x][0];
         fmt.p_palette->palette[i_x][1] = p_spu_data->pi_yuv[i_x][1];
@@ -540,10 +614,10 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     }
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < p_spu->i_height * i_pitch; i_y += i_pitch )
+    for( i_y = 0; i_y < (int)fmt.i_height * i_pitch; i_y += i_pitch )
     {
         /* Draw until we reach the end of the line */
-        for( i_x = 0 ; i_x < p_spu->i_width; i_x += i_len )
+        for( i_x = 0 ; i_x < (int)fmt.i_width; i_x += i_len )
         {
             /* Get the RLE part, then draw the line */
             i_color = *p_source & 0x3;

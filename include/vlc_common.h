@@ -608,7 +608,6 @@ static inline uint64_t GetQWLE( void const * _p )
 #define GetQWBE( p )    U64_AT( p )
 
 /* Helper writer functions */
-
 #define SetWLE( p, v ) _SetWLE( (uint8_t*)p, v)
 static inline void _SetWLE( uint8_t *p, uint16_t i_dw )
 {
@@ -629,6 +628,27 @@ static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
 {
     SetDWLE( p,   i_qw&0xffffffff );
     SetDWLE( p+4, ( i_qw >> 32)&0xffffffff );
+}
+#define SetWBE( p, v ) _SetWBE( (uint8_t*)p, v)
+static inline void _SetWBE( uint8_t *p, uint16_t i_dw )
+{
+    p[0] = ( i_dw >>  8 )&0xff;
+    p[1] = ( i_dw       )&0xff;
+}
+
+#define SetDWBE( p, v ) _SetDWBE( (uint8_t*)p, v)
+static inline void _SetDWBE( uint8_t *p, uint32_t i_dw )
+{
+    p[0] = ( i_dw >> 24 )&0xff;
+    p[1] = ( i_dw >> 16 )&0xff;
+    p[2] = ( i_dw >>  8 )&0xff;
+    p[3] = ( i_dw       )&0xff;
+}
+#define SetQWBE( p, v ) _SetQWBE( (uint8_t*)p, v)
+static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
+{
+    SetDWBE( p+4,   i_qw&0xffffffff );
+    SetDWBE( p, ( i_qw >> 32)&0xffffffff );
 }
 
 #if WORDS_BIGENDIAN

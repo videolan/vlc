@@ -433,14 +433,37 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
             /* Force cropping if requested */
             if( p_vout->b_force_crop )
             {
-                p_vout->p_blend->fmt_in.video.i_x_offset = p_vout->i_crop_x;
-                p_vout->p_blend->fmt_in.video.i_y_offset = p_vout->i_crop_y;
-                p_vout->p_blend->fmt_in.video.i_visible_width =
-                    p_vout->i_crop_width;
-                p_vout->p_blend->fmt_in.video.i_visible_height =
-                    p_vout->i_crop_height;
-                i_x_offset += p_vout->i_crop_x;
-                i_y_offset += p_vout->i_crop_y;
+                video_format_t *p_fmt = &p_vout->p_blend->fmt_in.video;
+
+                /* Find the intersection */
+                if( p_vout->i_crop_x + p_vout->i_crop_width <= i_x_offset ||
+                    i_x_offset + (int)p_fmt->i_visible_width <
+                        p_vout->i_crop_x ||
+                    p_vout->i_crop_y + p_vout->i_crop_height <= i_y_offset ||
+                    i_y_offset + (int)p_fmt->i_visible_height <
+                        p_vout->i_crop_y )
+                {
+                    /* No intersection */
+                    p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
+                }
+                else
+                {
+                    int i_x, i_y, i_x_end, i_y_end;
+                    i_x = __MAX( p_vout->i_crop_x, i_x_offset );
+                    i_y = __MAX( p_vout->i_crop_y, i_y_offset );
+                    i_x_end = __MIN( p_vout->i_crop_x + p_vout->i_crop_width,
+                                   i_x_offset + (int)p_fmt->i_visible_width );
+                    i_y_end = __MIN( p_vout->i_crop_y + p_vout->i_crop_height,
+                                   i_y_offset + (int)p_fmt->i_visible_height );
+
+                    p_fmt->i_x_offset = i_x - i_x_offset;
+                    p_fmt->i_y_offset = i_y - i_y_offset;
+                    p_fmt->i_visible_width = i_x_end - i_x;
+                    p_fmt->i_visible_height = i_y_end - i_y;
+
+                    i_x_offset = i_x;
+                    i_y_offset = i_y;
+                }
             }
 
             /* Force palette if requested */

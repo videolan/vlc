@@ -824,7 +824,7 @@ static void BlendPalRV( filter_t *p_filter, picture_t *p_dst_pic,
 #define rgbpal rgbpalette.palette
 
     /* Convert palette first */
-    for( i_y = 0; //i_y < p_filter->fmt_in.video.p_palette->i_dummy &&
+    for( i_y = 0; i_y < p_filter->fmt_in.video.p_palette->i_entries &&
          i_y < 256; i_y++ )
     {
         yuv_to_rgb( &r, &g, &b, p_pal[i_y][0], p_pal[i_y][1], p_pal[i_y][2] );
