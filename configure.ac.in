@@ -1490,15 +1490,16 @@ then
     if test "x${with_directx}" = "x"
     then
       AC_CHECK_HEADERS(ddraw.h,
-      [ PLUGINS="${PLUGINS} directx"
-        LDFLAGS_directx="${LDFLAGS_directx} -lgdi32" ])
+      [ PLUGINS="${PLUGINS} vout_directx aout_directx"
+        LDFLAGS_vout_directx="${LDFLAGS_directx} -lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
       then
-        PLUGINS="${PLUGINS} directx"
-        LDFLAGS_directx="${LDFLAGS_directx} -lgdi32"
-        CPPFLAGS_directx="${CPPFLAGS_directx} -I${with_directx}"
+        PLUGINS="${PLUGINS} vout_directx aout_directx"
+        LDFLAGS_vout_directx="${LDFLAGS_directx} -lgdi32"
+        CPPFLAGS_vout_directx="${CPPFLAGS_vout_directx} -I${with_directx}"
+        CPPFLAGS_aout_directx="${CPPFLAGS_aout_directx} -I${with_directx}"
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)

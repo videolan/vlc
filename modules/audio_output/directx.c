@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.11 2002/09/30 11:05:40 sam Exp $
+ * $Id: directx.c,v 1.1 2002/10/05 17:29:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -66,7 +66,6 @@ typedef struct notification_thread_t
  * This structure is part of the audio output thread descriptor.
  * It describes the direct sound specific properties of an audio device.
  *****************************************************************************/
-
 struct aout_sys_t
 {
     LPDIRECTSOUND       p_dsobject;              /* main Direct Sound object */
@@ -91,10 +90,10 @@ struct aout_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-int  E_(OpenAudio)  ( vlc_object_t * );
-void E_(CloseAudio) ( vlc_object_t * );
+static int  OpenAudio  ( vlc_object_t * );
+static void CloseAudio ( vlc_object_t * );
 
-static void Play      ( aout_instance_t * );
+static void Play       ( aout_instance_t * );
 
 /* local functions */
 static int  DirectxCreateSecondaryBuffer ( aout_instance_t * );
@@ -103,11 +102,21 @@ static int  DirectxInitDSound            ( aout_instance_t * );
 static void DirectSoundThread            ( notification_thread_t * );
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("DirectX audio module") );
+    set_capability( "audio output", 100 );
+    add_shortcut( "directx" );
+    set_callbacks( OpenAudio, CloseAudio );
+vlc_module_end();
+
+/*****************************************************************************
  * OpenAudio: open the audio device
  *****************************************************************************
  * This function opens and setups Direct Sound.
  *****************************************************************************/
-int E_(OpenAudio) ( vlc_object_t *p_this )
+static int OpenAudio( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     HRESULT dsresult;
@@ -219,7 +228,7 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
     return 0;
 
  error:
-    E_(CloseAudio)( VLC_OBJECT(p_aout) );
+    CloseAudio( VLC_OBJECT(p_aout) );
     return 1;
 }
 
@@ -233,7 +242,7 @@ static void Play( aout_instance_t *p_aout )
 /*****************************************************************************
  * CloseAudio: close the audio device
  *****************************************************************************/
-void E_(CloseAudio) ( vlc_object_t *p_this )
+static void CloseAudio( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 

@@ -1,5 +1,6 @@
 SOURCES_alsa = modules/audio_output/alsa.c
 SOURCES_arts = modules/audio_output/arts.c
+SOURCES_aout_directx = modules/audio_output/directx.c
 SOURCES_esd = modules/audio_output/esd.c
 SOURCES_aout_file = modules/audio_output/file.c
 SOURCES_oss = modules/audio_output/oss.c
