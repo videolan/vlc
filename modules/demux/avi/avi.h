@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.17 2003/11/13 11:49:27 fenrir Exp $
+ * $Id: avi.h,v 1.18 2004/01/04 17:35:02 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,6 +64,9 @@ typedef struct
     unsigned int        i_idxposc;  /* numero of chunk */
     unsigned int        i_idxposb;  /* byte in the current chunk */
 
+    /* For VBR audio only */
+    unsigned int        i_blockno;
+    unsigned int        i_blocksize;
 } avi_track_t;
 
 struct demux_sys_t

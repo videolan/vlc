@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.82 2003/12/22 02:24:52 sam Exp $
+ * $Id: avi.c,v 1.83 2004/01/04 17:35:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -99,6 +99,15 @@ static mtime_t  AVI_MovieGetLength( input_thread_t * );
  *****************************************************************************/
 static int        AVI_TrackSeek  ( input_thread_t *, int, mtime_t );
 static int        AVI_TrackStopFinishedStreams( input_thread_t *);
+
+/* Remarks:
+ - For VBR mp3 stream:
+    count blocks by rounded-up chunksizes instead of chunks
+    we need full emulation of dshow avi demuxer bugs :(
+    fixes silly nandub-style a-v delaying in avi with vbr mp3...
+    (from mplayer 2002/08/02)
+ - to complete....
+ */
 
 /*****************************************************************************
  * Open: check file and initializes AVI structures
@@ -251,6 +260,9 @@ static int Open( vlc_object_t * p_this )
         tk->i_idxposc   = 0;
         tk->i_idxposb   = 0;
 
+        tk->i_blockno   = 0;
+        tk->i_blocksize = 0;
+
         p_auds = (void*)p_vids = (void*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
 
         if( p_strl == NULL || p_strh == NULL || p_auds == NULL || p_vids == NULL )
@@ -271,6 +283,17 @@ static int Open( vlc_object_t * p_this )
                 tk->i_cat   = AUDIO_ES;
                 tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
                                                   p_auds->p_wf->wFormatTag );
+                if( ( tk->i_blocksize = p_auds->p_wf->nBlockAlign ) == 0 )
+                {
+                    if( p_auds->p_wf->wFormatTag == 1 )
+                    {
+                        tk->i_blocksize = p_auds->p_wf->nChannels * (p_auds->p_wf->wBitsPerSample/8);
+                    }
+                    else
+                    {
+                        tk->i_blocksize = 1;
+                    }
+                }
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
@@ -727,8 +750,14 @@ static int Demux_Seekable( input_thread_t *p_input )
         }
         else
         {
-            toread[i_track].i_toread--;
+            int i_length = tk->p_index[tk->i_idxposc].i_length;
+
             tk->i_idxposc++;
+            if( tk->i_cat == AUDIO_ES )
+            {
+                tk->i_blockno += tk->i_blocksize > 0 ? ( i_length + tk->i_blocksize - 1 ) / tk->i_blocksize : 1;
+            }
+            toread[i_track].i_toread--;
         }
 
         if( tk->i_idxposc < tk->i_idxnb)
@@ -908,6 +937,10 @@ static int Demux_UnSeekable( input_thread_t *p_input )
             }
             else
             {
+                if( p_stream->i_cat == AUDIO_ES )
+                {
+                    p_stream->i_blockno += p_stream->i_blocksize > 0 ? ( avi_pk.i_size + p_stream->i_blocksize - 1 ) / p_stream->i_blocksize : 1;
+                }
                 p_stream->i_idxposc++;
             }
 
@@ -1206,7 +1239,14 @@ static mtime_t AVI_GetPTS( avi_track_t *tk )
     }
     else
     {
-        return AVI_GetDPTS( tk, tk->i_idxposc );
+        if( tk->i_cat == AUDIO_ES )
+        {
+            return AVI_GetDPTS( tk, tk->i_blockno );
+        }
+        else
+        {
+            return AVI_GetDPTS( tk, tk->i_idxposc );
+        }
     }
 }
 
@@ -1376,6 +1416,8 @@ static int AVI_TrackSeek( input_thread_t *p_input,
                            mtime_t i_date )
 {
     demux_sys_t  *p_sys = p_input->p_demux_data;
+    avi_track_t  *tk = p_sys->track[i_stream];
+
 #define p_stream    p_sys->track[i_stream]
     mtime_t i_oldpts;
 
@@ -1388,6 +1430,23 @@ static int AVI_TrackSeek( input_thread_t *p_input,
                                 AVI_PTSToChunk( p_stream, i_date ) ) )
         {
             return VLC_EGENERIC;
+        }
+
+        if( p_stream->i_cat == AUDIO_ES )
+        {
+            unsigned int i;
+            tk->i_blockno = 0;
+            for( i = 0; i < tk->i_idxposc; i++ )
+            {
+                if( tk->i_blocksize > 0 )
+                {
+                    tk->i_blockno += ( tk->p_index[i].i_length + tk->i_blocksize - 1 ) / tk->i_blocksize;
+                }
+                else
+                {
+                    tk->i_blockno++;
+                }
+            }
         }
 
         msg_Dbg( p_input,
