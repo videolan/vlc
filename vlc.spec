@@ -1,6 +1,6 @@
 Name: vlc
 Version: 0.2.81
-Release: 2
+Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
@@ -13,7 +13,7 @@ Summary: VideoLAN Client.
 Summary(fr): Client VideoLAN.
 
 %changelog
-* Sat, Jul 28 2001 Samuel Hocevar <sam@zoy.org>
+* Sat Jul 28 2001 Samuel Hocevar <sam@zoy.org>
 New upstream release (0.2.81)
 
 * Tue Jun 5 2001 Samuel Hocevar <sam@zoy.org>

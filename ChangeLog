@@ -3,7 +3,9 @@
 #===================#
 
 HEAD
-  * Nothing yet.
+  * Better gtk-config detection.
+  * Removed duplicate checks in configure.in.
+  * Fixed a typo in vlc.spec.
 
 0.2.81
 Sat, 28 Jul 2001 04:13:57 +0200
