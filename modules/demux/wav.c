@@ -28,8 +28,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc/aout.h>
 
 #include <codecs.h>
+
+#define MAX_CHANNELS 6
 
 /*****************************************************************************
  * Module descriptor
@@ -61,6 +64,10 @@ struct demux_sys_t
     int             i_frame_samples;
 
     date_t          pts;
+
+    uint32_t i_channel_mask;
+    vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
+    int pi_chan_table[MAX_CHANNELS];
 };
 
 #define __EVEN( x ) ( ( (x)%2 != 0 ) ? ((x)+1) : (x) )
@@ -70,6 +77,23 @@ static int ChunkFind( demux_t *, char *, unsigned int * );
 static void FrameInfo_IMA_ADPCM( demux_t *, unsigned int *, int * );
 static void FrameInfo_MS_ADPCM ( demux_t *, unsigned int *, int * );
 static void FrameInfo_PCM      ( demux_t *, unsigned int *, int * );
+
+static const uint32_t pi_channels_in[] =
+    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
+      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY,
+      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT };
+static const uint32_t pi_channels_out[] =
+    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT };
+static const uint32_t pi_channels_ordered[] =
+    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE };
+
+static void CheckReordering( demux_t *, int );
+static void InterleaveS16( int16_t *, int, int *, int );
+static void InterleaveFloat32( float *, int, int *, int );
 
 /*****************************************************************************
  * Open: check file and initializes structures
@@ -101,6 +125,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
+    p_sys->b_chan_reorder = 0;
+    p_sys->i_channel_mask = 0;
 
     /* skip riff header */
     stream_Read( p_demux->s, NULL, 12 );  /* cannot fail as peek succeed */
@@ -144,10 +170,27 @@ static int Open( vlc_object_t * p_this )
     if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
         i_size >= sizeof( WAVEFORMATEXTENSIBLE ) )
     {
+        int i, i_channel_mask;
+
         wf_tag_to_fourcc( GetWLE( &p_wf_ext->SubFormat ),
                           &p_sys->fmt.i_codec, &psz_name );
         i_extended = sizeof( WAVEFORMATEXTENSIBLE ) - sizeof( WAVEFORMATEX );
         p_sys->fmt.i_extra -= i_extended;
+
+        i_channel_mask = GetDWLE( &p_wf_ext->dwChannelMask );
+        if( i_channel_mask )
+        {
+            for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
+            {
+                if( i_channel_mask & pi_channels_in[i] )
+                    p_sys->i_channel_mask |= pi_channels_out[i];
+            }
+            msg_Dbg( p_demux, "channel mask: %x", p_sys->i_channel_mask );
+            CheckReordering( p_demux, p_sys->fmt.audio.i_channels );
+        }
+        p_sys->fmt.audio.i_physical_channels =
+            p_sys->fmt.audio.i_original_channels =
+                p_sys->i_channel_mask;
     }
 
     if( p_sys->fmt.i_extra > 0 )
@@ -260,6 +303,21 @@ static int Demux( demux_t *p_demux )
 
     /* set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+
+    /* Do the channel reordering */
+    if( p_sys->b_chan_reorder )
+    {
+        if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') &&
+            p_sys->fmt.audio.i_bitspersample == 16 )
+            InterleaveS16( (int16_t *)p_block->p_buffer,
+                           p_block->i_buffer, p_sys->pi_chan_table,
+                           p_sys->fmt.audio.i_channels );
+        else if( p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') &&
+                 p_sys->fmt.audio.i_bitspersample == 32 )
+            InterleaveFloat32( (float *)p_block->p_buffer,
+                               p_block->i_buffer, p_sys->pi_chan_table,
+                               p_sys->fmt.audio.i_channels );
+    }
 
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
@@ -377,4 +435,82 @@ static void FrameInfo_IMA_ADPCM( demux_t *p_demux, unsigned int *pi_size,
         4 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
     *pi_size = p_sys->fmt.audio.i_blockalign;
+}
+
+/*****************************************************************************
+ * CheckReordering: Check if we need to do some channel re-ordering
+ *  (our channel order is different from the one chosen by Microsoft).
+ *****************************************************************************/
+static void CheckReordering( demux_t *p_demux, int i_nb_channels )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i, j, k, l;
+
+    p_sys->b_chan_reorder = VLC_FALSE;
+
+    for( i = 0, j = 0;
+         i < (int)(sizeof(pi_channels_out)/sizeof(uint32_t)); i++ )
+    {
+        if( p_sys->i_channel_mask & pi_channels_out[i] )
+        {
+            for( k = 0, l = 0;
+                 pi_channels_out[i] != pi_channels_ordered[k]; k++ )
+            {
+                if( p_sys->i_channel_mask & pi_channels_ordered[k] )
+                {
+                    l++;
+                }
+            }
+
+            p_sys->pi_chan_table[j] = l;
+
+            j++;
+        }
+    }
+
+    for( i = 0; i < i_nb_channels; i++ )
+    {
+        if( p_sys->pi_chan_table[i] != i ) p_sys->b_chan_reorder = VLC_TRUE;
+    }
+
+    if( p_sys->b_chan_reorder ) msg_Dbg( p_demux, "channel reordering needed");
+}
+
+/*****************************************************************************
+ * InterleaveFloat32/S16: change the channel order to the Microsoft one.
+ *****************************************************************************/
+static void InterleaveFloat32( float *p_buf, int i_buf, int *pi_chan_table,
+                               int i_nb_channels )
+{
+    int i, j;
+    float p_tmp[MAX_CHANNELS];
+
+    for( i = 0; i < i_buf / i_nb_channels / sizeof(float); i++ )
+    {
+        for( j = 0; j < i_nb_channels; j++ )
+        {
+            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+        }
+
+        memcpy( &p_buf[i*i_nb_channels], p_tmp,
+                i_nb_channels * sizeof(float) );
+    }
+}
+
+static void InterleaveS16( int16_t *p_buf, int i_buf, int *pi_chan_table,
+                           int i_nb_channels )
+{
+    int i, j;
+    int16_t p_tmp[MAX_CHANNELS];
+
+    for( i = 0; i < i_buf / i_nb_channels / sizeof(int16_t); i++ )
+    {
+        for( j = 0; j < i_nb_channels; j++ )
+        {
+            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+        }
+
+        memcpy( &p_buf[i*i_nb_channels], p_tmp,
+                i_nb_channels * sizeof(int16_t) );
+    }
 }
