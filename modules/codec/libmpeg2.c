@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.24 2003/08/08 17:08:32 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.25 2003/08/18 13:16:43 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -299,7 +299,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                           p_dec->p_info->sequence->width,
                                           p_dec->p_info->sequence->height,
                                           VLC_FOURCC('Y','V','1','2'), i_aspect );
-
+           
+            if(p_dec->p_vout == NULL )
+            {
+                msg_Err( p_dec->p_fifo , "cannot create vout" );
+                return -1;
+            } 
+             
             msg_Dbg( p_dec->p_fifo, "%dx%d, aspect %d, %u.%03u fps",
                      p_dec->p_info->sequence->width,
                      p_dec->p_info->sequence->height, i_aspect,

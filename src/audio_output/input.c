@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.34 2003/04/06 23:44:53 massiot Exp $
+ * $Id: input.c,v 1.35 2003/08/18 13:16:43 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -36,15 +36,34 @@
 #include "audio_output.h"
 #include "aout_internal.h"
 
+typedef struct user_filter_t
+{
+    char *psz_name;
+    aout_filter_t * p_filter;
+    audio_sample_format_t filter_inter_format;
+    struct user_filter_t *p_next;
+} user_filter_t;
+           
+
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    audio_sample_format_t intermediate_format, headphone_intermediate_format;
+    audio_sample_format_t intermediate_format;
+#if 0
+    headphone_intermediate_format;
     aout_filter_t * p_headphone_filter;
     vlc_bool_t b_use_headphone_filter = VLC_FALSE;
-
+#endif
+    
+    vlc_bool_t b_end=VLC_FALSE;
+    
+    user_filter_t* p_first_filter=NULL;
+    user_filter_t* p_current_filter=NULL;
+    
+    char * psz_filters, *psz_eof;
+    
     aout_FormatPrint( p_aout, "input", &p_input->input );
 
     /* Prepare FIFO. */
@@ -56,10 +75,94 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             sizeof(audio_sample_format_t) );
     intermediate_format.i_rate = p_input->input.i_rate;
 
+
+    /* Build the list of user filters */
+    psz_filters = config_GetPsz( p_aout , "audio-filter" );
+        
+    p_first_filter = (user_filter_t *)malloc( sizeof( user_filter_t ) );
+    if( !p_first_filter )
+    {
+        msg_Err( p_aout, "Out of memory" );
+        return -1;
+    } 
+    p_current_filter = p_first_filter;
+    p_current_filter->p_next = NULL;
+    memcpy( &p_current_filter->filter_inter_format,
+                        &p_aout->mixer.mixer,sizeof(audio_sample_format_t));
+    p_current_filter->filter_inter_format.i_rate= p_input->input.i_rate;
+    
+    if(psz_filters != NULL)
+    {
+        msg_Dbg(p_aout,"Building list of user filters"); 
+        while(1)
+        {    
+            psz_eof = strchr( psz_filters , ','  );
+            if( !psz_eof )
+            {
+                b_end = VLC_TRUE;
+                psz_eof = strchr( psz_filters,'\0');
+            }
+            if( psz_eof )
+            {
+                *psz_eof = '\0';
+            }
+            
+            msg_Dbg(p_aout,"Adding user filter: %s",psz_filters);
+
+            /* Append the new filter to the list */
+            p_current_filter->p_next =
+                    (user_filter_t *)malloc(sizeof(user_filter_t));
+            if( !p_current_filter->p_next )
+            {
+                msg_Err( p_aout, "Out of memory" );
+                return -1;
+            }
+            
+            memcpy( &p_current_filter->p_next->filter_inter_format,
+                    &p_current_filter->filter_inter_format,
+                    sizeof(audio_sample_format_t) );
+            
+            p_current_filter->p_next->filter_inter_format.i_rate = 
+                    p_current_filter->filter_inter_format.i_rate;
+            
+            p_current_filter->p_next->
+                    filter_inter_format.i_physical_channels =
+                    p_current_filter->filter_inter_format.i_physical_channels;
+            
+            p_current_filter->p_next->
+                    filter_inter_format.i_original_channels =
+                    p_current_filter->filter_inter_format.i_original_channels;
+
+            p_current_filter->p_next->filter_inter_format.i_bytes_per_frame =
+             p_current_filter->p_next->
+                filter_inter_format.i_bytes_per_frame *
+                aout_FormatNbChannels(&p_current_filter->p_next->
+                                      filter_inter_format) / 
+                aout_FormatNbChannels( &intermediate_format);
+    
+            /* Go to next filter */
+            p_current_filter = p_current_filter->p_next;
+            
+            p_current_filter->p_next=  NULL;
+            
+            p_current_filter->psz_name = strdup(psz_filters);
+            
+            psz_filters = psz_eof;
+            
+            psz_filters++;
+           
+           if(!*psz_filters || b_end == VLC_TRUE)  
+                break;
+        }
+    }
+
+#if 0 
     /* Headphone filter add-ons. */
+
     memcpy( &headphone_intermediate_format, &p_aout->mixer.mixer,
-            sizeof(audio_sample_format_t) );
-    headphone_intermediate_format.i_rate = p_input->input.i_rate;
+           sizeof(audio_sample_format_t) );
+    headphone_intermediate_format.i_rate = 
+                p_input->input.i_rate;
     if ( config_GetInt( p_aout , "headphone-opt" ) )
     {
         /* Do we use heaphone filter ? */
@@ -75,8 +178,10 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     if ( b_use_headphone_filter == VLC_TRUE )
     {
         /* Split the filter pipeline. */
-        headphone_intermediate_format.i_physical_channels = p_input->input.i_physical_channels;
-        headphone_intermediate_format.i_original_channels = p_input->input.i_original_channels;
+        headphone_intermediate_format.i_physical_channels = 
+                p_input->input.i_physical_channels;
+        headphone_intermediate_format.i_original_channels = 
+                  p_input->input.i_original_channels;
         headphone_intermediate_format.i_bytes_per_frame =
                 headphone_intermediate_format.i_bytes_per_frame
                 * aout_FormatNbChannels( &headphone_intermediate_format )
@@ -86,7 +191,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Create filters. */
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                      &p_input->i_nb_filters, &p_input->input,
-                                     &headphone_intermediate_format ) < 0 )
+                                     &intermediate_format ) < 0 )
     {
         msg_Err( p_aout, "couldn't set an input pipeline" );
 
@@ -95,8 +200,80 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
         return -1;
     }
+#endif
+    /* Create filters. */
+    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                     &p_input->i_nb_filters,
+                                     &p_input->input,
+                                     &intermediate_format
+                                     ) < 0 )
+    {
+        msg_Err( p_aout, "couldn't set an input pipeline" );
 
-    /* Headphone filter add-ons. */
+        aout_FifoDestroy( p_aout, &p_input->fifo );
+        p_input->b_error = 1;
+     }
+
+    if( p_first_filter->p_next)   
+    {
+        msg_Dbg(p_aout,"Searching user filters...");
+        p_current_filter = p_first_filter->p_next;
+    
+        /* Ok, we now start to get the filters, from the first one */ 
+        while( p_current_filter )
+        {
+            /* Create a VLC object */
+            p_current_filter->p_filter = vlc_object_create( p_aout,
+                        sizeof(aout_filter_t) );
+            if(p_current_filter->p_filter == NULL )
+            { 
+                msg_Err( p_aout, "couldn't open the requested filter module" );
+                aout_FifoDestroy( p_aout, &p_input->fifo );
+                p_input->b_error = 1;
+                return -1;
+            }
+            vlc_object_attach( p_current_filter->p_filter , p_aout );
+            memcpy(&p_current_filter->p_filter->input,
+                   &p_current_filter->filter_inter_format,
+                   sizeof(audio_sample_format_t) );
+
+           if( p_current_filter->p_next) 
+           {
+                memcpy(&p_current_filter->p_filter->output,
+                       &p_current_filter->p_next->filter_inter_format,
+                       sizeof(audio_sample_format_t) );
+           }
+           else
+           {
+                 memcpy(&p_current_filter->p_filter->output,
+                        &intermediate_format,
+                        sizeof(audio_sample_format_t) );
+           }
+           p_current_filter->p_filter->p_module =
+                     module_Need(p_current_filter->p_filter,"audio filter",
+                                 p_current_filter->psz_name);
+           if(p_current_filter->p_filter->p_module== NULL )
+           {
+                vlc_object_detach( p_current_filter->p_filter);
+                vlc_object_destroy( p_current_filter->p_filter);
+  
+                msg_Err( p_aout, "couldn't open the requested module" );
+                aout_FifoDestroy( p_aout, &p_input->fifo );
+                p_input->b_error = 1;
+                return -1;
+            }
+            /* success */ 
+            p_current_filter->p_filter->b_continuity = VLC_FALSE;
+            p_input->pp_filters[p_input->i_nb_filters++] =
+                                p_current_filter->p_filter;
+
+            /* Go to next */
+            p_current_filter = p_current_filter->p_next;
+        }
+    }
+
+#if 0
+     /* Headphone filter add-ons. */
     if ( b_use_headphone_filter == VLC_TRUE )
     {
         /* create a vlc object */
@@ -133,7 +310,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         p_headphone_filter->b_continuity = VLC_FALSE;
         p_input->pp_filters[p_input->i_nb_filters++] = p_headphone_filter;
     }
-
+#endif
+    
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_input->input_alloc.i_bytes_per_sec = -1;
@@ -272,6 +450,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if ( start_date == 0 ) start_date = p_buffer->start_date;
 
     /* Run pre-filters. */
+
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
                       &p_buffer );
 

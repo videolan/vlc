@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.79 2003/08/17 20:58:45 alexis Exp $
+ * $Id: libvlc.h,v 1.80 2003/08/18 13:16:43 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -139,6 +139,11 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
     "This option allows you to use the S/PDIF audio output by default when " \
     "your hardware supports it as well as the audio stream being played.")
 
+#define AUDIO_FILTER_TEXT N_("Audio filters")
+#define AUDIO_FILTER_LONGTEXT N_( \
+    "This allows you to add audio postprocessing filters, to modify" \
+    "the sound.")
+
 #define HEADPHONE_TEXT N_("Headphone virtual spatialization effect")
 #define HEADPHONE_LONGTEXT N_( \
     "This effect gives you the feeling that you are standing in a room " \
@@ -147,6 +152,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
     "more comfortable and less tiring when listening to music for " \
     "long periods of time.\nIt works with any source format from mono " \
     "to 5.1.")
+
 
 #define VOUT_TEXT N_("Video output module")
 #define VOUT_LONGTEXT N_( \
@@ -524,7 +530,9 @@ vlc_module_begin();
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT, VLC_FALSE );
-
+    add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
+                    AUDIO_FILTER_LONGTEXT,VLC_FALSE);
+    
     /* Video options */
     add_category_hint( N_("Video"), NULL, VLC_FALSE );
     add_module_with_short( "vout", 'V', "video output", NULL, NULL,
