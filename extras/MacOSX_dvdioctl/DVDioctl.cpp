@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.1 2001/04/02 23:30:41 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.2 2001/04/04 02:49:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,6 +29,9 @@
  *   it is still in use
  *****************************************************************************/
 
+//XXX: uncomment to activate the key exchange ioctls - may hang the machine
+//#define ACTIVATE_DANGEROUS_IOCTL 1
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -49,8 +52,9 @@ extern "C"
 
 #include <IOKit/IOLib.h>
 #include <IOKit/IOService.h>
-#include <IOKit/storage/IODVDMedia.h>
 #include <IOKit/storage/IOMedia.h>
+#include <IOKit/storage/IODVDMedia.h>
+#include <IOKit/storage/IODVDBlockStorageDriver.h>
 
 #include "DVDioctl.h"
 
@@ -84,17 +88,17 @@ typedef struct buf buf_t;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DVDClose    ( dev_t, int, int, struct proc * );
-static int  DVDIoctl    ( dev_t, u_long, caddr_t, int, struct proc * );
-static int  DVDOpen     ( dev_t, int, int, struct proc * );
-static int  DVDSize     ( dev_t );
-static void DVDStrategy ( buf_t * );
-static int  DVDReadWrite( dkr_t, dkrtype_t );
+static int  DVDClose        ( dev_t, int, int, struct proc * );
+static int  DVDBlockIoctl   ( dev_t, u_long, caddr_t, int, struct proc * );
+static int  DVDOpen         ( dev_t, int, int, struct proc * );
+static int  DVDSize         ( dev_t );
+static void DVDStrategy     ( buf_t * );
+static int  DVDReadWrite    ( dkr_t, dkrtype_t );
 static void DVDReadWriteCompletion( void *, void *, IOReturn, UInt64 );
 
 static struct bdevsw device_functions =
 {
-    DVDOpen, DVDClose, DVDStrategy, DVDIoctl, eno_dump, DVDSize, D_DISK
+    DVDOpen, DVDClose, DVDStrategy, DVDBlockIoctl, eno_dump, DVDSize, D_DISK
 };
 
 /*****************************************************************************
@@ -106,6 +110,7 @@ static bool b_inuse;
 static int i_major;
 static void *p_node;
 static IODVDMedia *p_dvd;
+static IODVDBlockStorageDriver *p_drive;
 
 /*****************************************************************************
  * DKR_GET_DEV: borrowed from IOMediaBSDClient.cpp
@@ -249,6 +254,7 @@ bool DVDioctl::init( OSDictionary *p_dict = 0 )
 
     p_node  = NULL;
     p_dvd   = NULL;
+    p_drive = NULL;
     i_major = -1;
     b_inuse = false;
 
@@ -341,20 +347,6 @@ void DVDioctl::free( void )
     super::free( );
 }
 
-#if 0
-IOReturn DVDioctl::report( IODVDMedia *DVD, IOMemoryDescriptor *buffer, const DVDKeyClass keyClass, const UInt32 lba, const UInt8 agid, const DVDKeyFormat keyFormat )
-{
-    IOLog( "DVD ioctl: reportkey\n" );
-    return DVD->getProvider()->reportKey( buffer, keyClass, lba, agid, keyFormat );
-}
-
-IOReturn DVDioctl::send( IODVDMedia *DVD, IOMemoryDescriptor *buffer, const DVDKeyClass keyClass, const UInt32 lba, const DVDKeyFormat keyFormat )
-{
-    IOLog( "DVD ioctl: sendkey\n" );
-    return DVD->getProvider()->sendKey( buffer, keyClass, lba, keyFormat );
-}
-#endif
-
 /* following functions are local */
 
 /*****************************************************************************
@@ -363,7 +355,6 @@ IOReturn DVDioctl::send( IODVDMedia *DVD, IOMemoryDescriptor *buffer, const DVDK
 static int DVDOpen( dev_t dev, int flags, int devtype, struct proc * )
 {
     IOStorageAccess level;
-    int i_err;
 
     /* Check that the device hasn't already been opened */
     if( b_inuse )
@@ -408,19 +399,18 @@ static int DVDOpen( dev_t dev, int flags, int devtype, struct proc * )
     level = (flags & FWRITE) ? kIOStorageAccessReaderWriter
                              : kIOStorageAccessReader;
 
-    if( p_dvd->open( p_this, 0, level) )
-    {
-        log( LOG_INFO, "DVD ioctl: IODVDMedia->open()\n" );
-        i_err = 0;
-    }
-    else
+    if( ! p_dvd->open( p_this, 0, level) )
     {
         log( LOG_INFO, "DVD ioctl: IODVDMedia object busy\n" );
         b_inuse = false;
-        i_err = EBUSY;
+        return EBUSY;
     }
 
-    return i_err;
+    p_drive = p_dvd->getProvider();
+
+    log( LOG_INFO, "DVD ioctl: IODVDMedia->open()\n" );
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -430,6 +420,9 @@ static int DVDClose( dev_t dev, int flags, int devtype, struct proc * )
 {
     /* Release the device */
     p_dvd->close( p_this );
+
+    p_dvd   = NULL;
+    p_drive = NULL;
     b_inuse = false;
 
     log( LOG_INFO, "DVD ioctl: IODVDMedia->close()\n" );
@@ -455,27 +448,59 @@ static void DVDStrategy( buf_t * bp )
 }
 
 /*****************************************************************************
- * DVDIoctl: issue an ioctl on the device
+ * DVDBlockIoctl: issue an ioctl on the block device
  *****************************************************************************/
-static int DVDIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
-                     struct proc *p )
+static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
+                          struct proc *p )
 {
+    dvdioctl_data_t * p_data = (dvdioctl_data_t *)addr;
+
     switch( cmd )
     {
         case IODVD_READ_STRUCTURE:
-            //log( LOG_INFO, "DVD ioctl: IODVD_READ_STRUCTURE\n" );
+
+            log( LOG_INFO, "DVD ioctl: IODVD_READ_STRUCTURE\n" );
+
             return 0;
 
         case IODVD_SEND_KEY:
-            //log( LOG_INFO, "DVD ioctl: IODVD_SEND_KEY\n" );
-            return 0;
+
+            log( LOG_INFO, "DVD ioctl: send key to `%s', "
+                 "buf %d, format %d, class %d, agid %d\n",
+                 p_drive->getDeviceTypeName(),
+                 (int)p_data->p_buffer, p_data->i_keyformat,
+                 p_data->i_keyclass, p_data->i_agid );
+
+#ifdef ACTIVATE_DANGEROUS_IOCTL
+            return p_drive->sendKey( (IOMemoryDescriptor *)p_data->p_buffer,
+                                     (DVDKeyClass)p_data->i_keyclass,
+                                     p_data->i_agid,
+                                     (DVDKeyFormat)p_data->i_keyformat );
+#else
+            return -1;
+#endif
 
         case IODVD_REPORT_KEY:
-            //log( LOG_INFO, "DVD ioctl: IODVD_REPORT_KEY\n" );
-            return 0;
+
+            log( LOG_INFO, "DVD ioctl: report key from `%s', "
+                 p_drive->getDeviceTypeName(),
+                 "buf %d, class %d, lba %d, agid %d, format %d\n",
+                 (int)p_data->p_buffer, p_data->i_keyclass, p_data->i_lba,
+                 p_data->i_agid, p_data->i_keyformat );
+
+#ifdef ACTIVATE_DANGEROUS_IOCTL
+            return p_drive->reportKey( (IOMemoryDescriptor *)p_data->p_buffer,
+                                       (DVDKeyClass)p_data->i_keyclass,
+                                       p_data->i_lba, p_data->i_agid,
+                                       (DVDKeyFormat)p_data->i_keyformat );
+#else
+            return -1;
+#endif
 
         default:
-            //log( LOG_INFO, "DVD ioctl: unknown ioctl\n" );
+
+            log( LOG_INFO, "DVD ioctl: unknown ioctl\n" );
+
             return EINVAL;
     }
 }
@@ -591,7 +616,7 @@ static void DVDReadWriteCompletion( void *   target,
 
     if ( status != kIOReturnSuccess )
     {
-        IOLog( "%s: %s.\n", /*p_this->name*/ "DVD ioctl",
+        IOLog( "DVD ioctl: %s (is the disc authenticated ?)\n",
                p_this->stringFromReturn(status) );
     }
 

@@ -2,7 +2,7 @@
  * DVDioctl.h: Linux-like DVD driver for Darwin and MacOS X
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.h,v 1.1 2001/04/02 23:30:41 sam Exp $
+ * $Id: DVDioctl.h,v 1.2 2001/04/04 02:49:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,8 +21,49 @@
  * under the License.
  *****************************************************************************/
 
-struct sum { int a, b, r; };
-#define IODVD_READ_STRUCTURE _IOWR('B', 1, struct sum)
-#define IODVD_SEND_KEY       _IOWR('B', 2, struct sum)
-#define IODVD_REPORT_KEY     _IOWR('B', 3, struct sum)
+#if defined(KERNEL)
+/* Everything has already been defined */
+#else
+enum DVDKeyFormat
+{
+    kCSSAGID        = 0x00,
+    kChallengeKey   = 0x01,
+    kKey1           = 0x02,
+    kKey2           = 0x03,
+    kTitleKey       = 0x04,
+    kASF            = 0x05,
+    kSetRegion      = 0x06,
+    kRPCState       = 0x08,
+    kCSS2AGID       = 0x10,
+    kCPRMAGID       = 0x11,
+    kInvalidateAGID = 0x3f
+};
+
+enum DVDKeyClass
+{
+    kCSS_CSS2_CPRM  = 0x00,
+    kRSSA           = 0x01
+};
+#endif
+
+typedef struct dvdioctl_data
+{
+    void         *p_buffer;
+
+#if defined(KERNEL)
+    UInt32        i_lba;
+    UInt8         i_agid;
+#else
+    u32           i_lba;
+    u8            i_agid;
+#endif
+
+    int           i_keyclass;
+    int           i_keyformat;
+
+} dvdioctl_data_t;
+
+#define IODVD_READ_STRUCTURE _IOWR('B', 1, dvdioctl_data_t)
+#define IODVD_SEND_KEY       _IOWR('B', 2, dvdioctl_data_t)
+#define IODVD_REPORT_KEY     _IOWR('B', 3, dvdioctl_data_t)
 

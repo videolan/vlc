@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.4 2001/04/02 23:30:41 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.5 2001/04/04 02:49:18 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,6 +29,7 @@
 
 #include <sys/types.h>
 #include <netinet/in.h>
+
 #ifdef HAVE_SYS_DVDIO_H
 #   include <sys/ioctl.h>
 #   include <sys/dvdio.h>
@@ -44,11 +45,15 @@
 #endif
 #ifdef SYS_DARWIN1_3
 #   include <sys/ioctl.h>
-#   include <DVDioctl/DVDioctl.h>
 #endif
 
 #include "common.h"
+
 #include "intf_msg.h"
+
+#ifdef SYS_DARWIN1_3
+#   include "DVDioctl/DVDioctl.h"
+#endif
 
 #include "dvd_css.h"
 #include "dvd_ioctl.h"
@@ -57,20 +62,65 @@
  * Local prototypes - BeOS specific
  *****************************************************************************/
 #if defined( SYS_BEOS )
-static void InitCommand ( struct cdrom_generic_command *p_cgc,
-                          void *buf, int i_len, int i_type );
-static int  SendCommand ( int i_fd, struct cdrom_generic_command *p_cgc );
+static void BeInitRDC ( raw_device_command *, void *, int );
 #endif
 
 /*****************************************************************************
- * dvd_ReadKey: 
- *****************************************************************************
- * 
+ * ioctl_ReadCopyright: check whether the disc is encrypted or not
  *****************************************************************************/
-int dvd_ReadKey( css_t *p_css, u8 *p_key )
+int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    dvd_struct dvd;
+
+    dvd.type = DVD_STRUCT_COPYRIGHT;
+    dvd.copyright.layer_num = i_layer;
+
+    i_ret = ioctl( i_fd, DVD_READ_STRUCT, &dvd );
+
+    *pi_copyright = dvd.copyright.cpst;
+
+#elif defined( SYS_BEOS )
+    raw_device_command rdc;
+    u8 p_buffer[ 8 ];
+
+    BeInitRDC( &rdc, p_buffer, 8 );
+
+    rdc.flags        = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ] = GPCMD_READ_DVD_STRUCTURE;
+    rdc.command[ 6 ] = i_layer;
+    rdc.command[ 7 ] = DVD_STRUCT_COPYRIGHT;
+
+    i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    *pi_copyright = p_buffer[ 4 ];
+
+#elif defined( SYS_DARWIN1_3 )
+    intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
+
+    intf_ErrMsg( "css error: assuming disc is unencrypted" );
+    *pi_copyright = 0;
+
+    i_ret = 0;
+
+#else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
+
+#endif
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ioctl_ReadKey: get the disc key
+ *****************************************************************************/
+int ioctl_ReadKey( css_t *p_css, u8 *p_key )
+{
+    int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     dvd_struct dvd;
 
     dvd.type = DVD_STRUCT_DISCKEY;
@@ -86,100 +136,43 @@ int dvd_ReadKey( css_t *p_css, u8 *p_key )
     }
 
     memcpy( p_key, dvd.disckey.value, 2048 );
-    return i_ret;
 
 #elif defined( SYS_BEOS )
-    int i_ret, size;
-    u8 p_buf[ 2048 + 4];
-    struct cdrom_generic_command cgc;
+    raw_device_command rdc;
+    u8 p_buffer[ 2048 + 4 ];
 
-    size = 2048 + 4;
+    BeInitRDC( &rdc, p_buffer, 2048 + 4 );
 
-    InitCommand( &cgc, p_buf, size, CGC_DATA_READ );
-
-    cgc.cmd[0] = GPCMD_READ_DVD_STRUCTURE;
-
-    cgc.cmd[7] = DVD_STRUCT_DISCKEY;
-    cgc.cmd[8] = size >> 8;
-    cgc.cmd[9] = size & 0xff;
-    cgc.cmd[10] = p_css->i_agid << 6;
-
-    i_ret = SendCommand( p_css->i_fd, &cgc );
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_READ_DVD_STRUCTURE;
+    rdc.command[ 7 ]  = DVD_STRUCT_DISCKEY;
+    rdc.command[ 10 ] = p_css->i_agid << 6;
+    
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
     if( i_ret < 0 )
     {
         return i_ret;
     }
 
-    memcpy( p_key, p_buf + 4, 2048 );
-    return i_ret;
+    memcpy( p_key, p_buffer + 4, 2048 );
 
 #else
-    return -1;
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
 
 #endif
+    return i_ret;
 }
 
 /*****************************************************************************
- * dvd_ReadCopyright: 
- *****************************************************************************
- * 
+ * ioctl_LUSendAgid: get AGID from the drive
  *****************************************************************************/
-int dvd_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
+int ioctl_LUSendAgid( css_t *p_css )
 {
+    int i_ret;
+
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    int i_ret;
-    dvd_struct dvd;
-
-    dvd.type = DVD_STRUCT_COPYRIGHT;
-    dvd.copyright.layer_num = i_layer;
-
-    i_ret = ioctl( i_fd, DVD_READ_STRUCT, &dvd );
-
-    *pi_copyright = dvd.copyright.cpst;
-    return i_ret;
-
-#elif defined( SYS_BEOS )
-    int i_ret;
-    u8 p_buf[8];
-    struct cdrom_generic_command cgc;
-
-    InitCommand( &cgc, p_buf, sizeof(p_buf), CGC_DATA_READ );
-
-    cgc.cmd[0] = GPCMD_READ_DVD_STRUCTURE;
-
-    cgc.cmd[6] = i_layer;
-    cgc.cmd[7] = DVD_STRUCT_COPYRIGHT;
-    cgc.cmd[8] = cgc.buflen >> 8;
-    cgc.cmd[9] = cgc.buflen & 0xff;
-
-    i_ret = SendCommand( i_fd, &cgc );
-
-    *pi_copyright = p_buf[4];
-    return i_ret;
-
-#elif defined( SYS_DARWIN1_3 )
-    intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
-    intf_ErrMsg( "css error: assuming disc is unencrypted" );
-
-    *pi_copyright = 0;
-    return 0;
-
-#else
-    return -1;
-
-#endif
-}
-
-/*****************************************************************************
- * dvd_LUSendAgid: 
- *****************************************************************************
- * 
- *****************************************************************************/
-int dvd_LUSendAgid( css_t *p_css )
-{
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    int i_ret;
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_AGID;
@@ -188,43 +181,168 @@ int dvd_LUSendAgid( css_t *p_css )
     i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
 
     p_css->i_agid = auth_info.lsa.agid;
-    return i_ret;
 
 #elif defined( SYS_BEOS )
-    u8 p_buf[8];
-    int i_ret;
-    struct cdrom_generic_command cgc;
+    raw_device_command rdc;
+    u8 p_buffer[ 8 ];
 
-    //memset( p_buf, 0, sizeof( p_buf ) );
+    BeInitRDC( &rdc, p_buffer, 8 );
 
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x00 | (p_css->i_agid << 6);
 
-    cgc.cmd[0] = GPCMD_REPORT_KEY;
-    cgc.cmd[10] = 0x00 | (p_css->i_agid << 6);
-    cgc.buflen = 8;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_READ;
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
-    i_ret = SendCommand( p_css->i_fd, &cgc );
-
-    p_css->i_agid = p_buf[7] >> 6;
-    return i_ret;
+    p_css->i_agid = p_buffer[ 7 ] >> 6;
 
 #else
-    return -1;
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
 
 #endif
+    return i_ret;
 }
 
 /*****************************************************************************
- * dvd_InvalidateAgid: 
- *****************************************************************************
- * 
+ * ioctl_LUSendChallenge: get challenge from the drive
  *****************************************************************************/
-int dvd_InvalidateAgid( css_t *p_css )
+int ioctl_LUSendChallenge( css_t *p_css, u8 *p_challenge )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    dvd_authinfo auth_info;
+
+    auth_info.type = DVD_LU_SEND_CHALLENGE;
+
+    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
+
+    memcpy( p_challenge, auth_info.lsc.chal, sizeof(dvd_challenge) );
+
+#elif defined( SYS_BEOS )
+    raw_device_command rdc;
+    u8 p_buffer[ 16 ];
+
+    BeInitRDC( &rdc, p_buffer, 16 );
+
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x01 | (p_css->i_agid << 6);
+
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    memcpy( p_challenge, p_buffer + 4, sizeof(dvd_challenge) );
+
+#else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
+
+#endif
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ioctl_LUSendASF: get ASF from the drive
+ *****************************************************************************/
+int ioctl_LUSendASF( css_t *p_css, int *pi_asf )
+{
+    int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    dvd_authinfo auth_info;
+
+    auth_info.type = DVD_LU_SEND_ASF;
+    auth_info.lsasf.agid = p_css->i_agid;
+    auth_info.lsasf.asf = *pi_asf;
+
+    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
+
+    *pi_asf = auth_info.lsasf.asf;
+
+#elif defined( SYS_BEOS )
+    raw_device_command rdc;
+    u8 p_buffer[ 8 ];
+
+    BeInitRDC( &rdc, p_buffer, 8 );
+
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x05 | (p_css->i_agid << 6);
+
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    *pi_asf = p_buffer[ 7 ] & 1;
+
+#elif defined( SYS_DARWIN1_3 )
+    dvdioctl_data_t data;
+    u8 p_buffer[ 8 ];
+
+    data.p_buffer = p_buffer;
+    data.i_lba = 0;
+    data.i_agid = p_css->i_agid;
+    data.i_keyclass = kCSS_CSS2_CPRM;
+    data.i_keyformat = kASF;
+
+    i_ret = ioctl( p_css->i_fd, IODVD_REPORT_KEY, &data );
+
+    *pi_asf = p_buffer[ 7 ] & 1;
+
+#else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
+
+#endif
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ioctl_LUSendKey1: get the first key from the drive
+ *****************************************************************************/
+int ioctl_LUSendKey1( css_t *p_css, u8 *p_key )
+{
+    int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+    dvd_authinfo auth_info;
+
+    auth_info.type = DVD_LU_SEND_KEY1;
+    auth_info.lsk.agid = p_css->i_agid;
+
+    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
+
+    memcpy( p_key, auth_info.lsk.key, sizeof(dvd_key) );
+
+#elif defined( SYS_BEOS )
+    raw_device_command rdc;
+    u8 p_buffer[ 12 ];
+
+    BeInitRDC( &rdc, p_buffer, 12 );
+
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x02 | (p_css->i_agid << 6);
+
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
+
+    memcpy( p_key, p_buffer + 4, sizeof(dvd_key) );
+
+#else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
+
+#endif
+    return i_ret;
+}
+
+/*****************************************************************************
+ * ioctl_InvalidateAgid: invalidate the current AGID
+ *****************************************************************************/
+int ioctl_InvalidateAgid( css_t *p_css )
+{
+    int i_ret;
+
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_INVALIDATE_AGID;
@@ -233,35 +351,31 @@ int dvd_InvalidateAgid( css_t *p_css )
     i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
 
     p_css->i_agid = auth_info.lsa.agid;
-    return i_ret;
 
 #elif defined( SYS_BEOS )
-    u8 p_buf[0];
-    struct cdrom_generic_command cgc;
+    raw_device_command rdc;
+    u8 p_buffer[ 0 ];
 
-    //memset( p_buf, 0, sizeof( p_buf ) );
+    BeInitRDC( &rdc, p_buffer, 0 );
 
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
+    rdc.flags         = B_RAW_DEVICE_DATA_IN;
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x3f | (p_css->i_agid << 6);
 
-    cgc.cmd[0] = GPCMD_REPORT_KEY;
-    cgc.cmd[10] = 0x3f | (p_css->i_agid << 6);
-    cgc.cmd[9] = cgc.buflen = 0;
-    cgc.data_direction = CGC_DATA_READ;
-
-    return SendCommand( p_css->i_fd, &cgc );
+    i_ret = ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
 #else
-    return -1;
+    /* DVD ioctls unavailable - do as if the ioctl failed */
+    i_ret = -1;
 
 #endif
+    return i_ret;
 }
 
 /*****************************************************************************
- * dvd_HostSendChallenge: 
- *****************************************************************************
- * 
+ * ioctl_HostSendChallenge: send challenge to the drive
  *****************************************************************************/
-int dvd_HostSendChallenge( css_t *p_css, u8 *p_challenge )
+int ioctl_HostSendChallenge( css_t *p_css, u8 *p_challenge )
 {
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     dvd_authinfo auth_info;
@@ -273,171 +387,30 @@ int dvd_HostSendChallenge( css_t *p_css, u8 *p_challenge )
     return ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
 
 #elif defined( SYS_BEOS )
-    u8 p_buf[16];
-    struct cdrom_generic_command cgc;
+    raw_device_command rdc;
+    u8 p_buffer[ 16 ];
 
-    //memset( p_buf, 0, sizeof( p_buf ) );
+    BeInitRDC( &rdc, p_buffer, 16 );
 
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
+    rdc.command[ 0 ]  = GPCMD_SEND_KEY;
+    rdc.command[ 10 ] = 0x01 | (p_css->i_agid << 6);
 
-    cgc.cmd[0] = GPCMD_SEND_KEY;
-    cgc.cmd[10] = 0x01 | (p_css->i_agid << 6);
-    cgc.buflen = 16;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_WRITE;
+    p_buffer[ 1 ] = 0xe;
+    memcpy( p_buffer + 4, p_challenge, sizeof(dvd_challenge) );
 
-    p_buf[1] = 0xe;
-    memcpy( p_buf + 4, p_challenge, sizeof(dvd_challenge) );
-
-    return SendCommand( p_css->i_fd, &cgc );
+    return ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
 #else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
     return -1;
 
 #endif
 }
 
 /*****************************************************************************
- * dvd_LUSendASF: 
- *****************************************************************************
- * 
+ * ioctl_HostSendKey2: send the second key to the drive
  *****************************************************************************/
-int dvd_LUSendASF( css_t *p_css, int *pi_asf )
-{
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    int i_ret;
-    dvd_authinfo auth_info;
-
-    auth_info.type = DVD_LU_SEND_ASF;
-    auth_info.lsasf.agid = p_css->i_agid;
-    auth_info.lsasf.asf = *pi_asf;
-
-    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
-
-    *pi_asf = auth_info.lsasf.asf;
-    return i_ret;
-
-#elif defined( SYS_BEOS )
-    int i_ret;
-    u8 p_buf[8];
-    struct cdrom_generic_command cgc;
-
-    //memset( p_buf, 0, sizeof( p_buf ) );
-
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
-
-    cgc.cmd[0] = GPCMD_REPORT_KEY;
-    cgc.cmd[10] = 0x05 | (p_css->i_agid << 6);
-    cgc.buflen = 8;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_READ;
-
-    i_ret = SendCommand( p_css->i_fd, &cgc );
-
-    *pi_asf = p_buf[7] & 1;
-    return i_ret;
-
-#else
-    return -1;
-
-#endif
-}
-
-/*****************************************************************************
- * dvd_LUSendChallenge: 
- *****************************************************************************
- * 
- *****************************************************************************/
-int dvd_LUSendChallenge( css_t *p_css, u8 *p_challenge )
-{
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    int i_ret;
-    dvd_authinfo auth_info;
-
-    auth_info.type = DVD_LU_SEND_CHALLENGE;
-
-    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
-
-    memcpy( p_challenge, auth_info.lsc.chal, sizeof(dvd_challenge) );
-    return i_ret;
-
-#elif defined( SYS_BEOS )
-    int i_ret;
-    u8 p_buf[16];
-    struct cdrom_generic_command cgc;
-
-    //memset( p_buf, 0, sizeof( p_buf ) );
-
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
-
-    cgc.cmd[0] = GPCMD_REPORT_KEY;
-    cgc.cmd[10] = 0x01 | (p_css->i_agid << 6);
-    cgc.buflen = 16;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_READ;
-
-    i_ret = SendCommand( p_css->i_fd, &cgc );
-
-    memcpy( p_challenge, p_buf + 4, sizeof(dvd_challenge) );
-    return i_ret;
-
-#else
-    return -1;
-
-#endif
-}
-
-/*****************************************************************************
- * dvd_LUSendKey1: 
- *****************************************************************************
- * 
- *****************************************************************************/
-int dvd_LUSendKey1( css_t *p_css, u8 *p_key )
-{
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
-    int i_ret;
-    dvd_authinfo auth_info;
-
-    auth_info.type = DVD_LU_SEND_KEY1;
-    auth_info.lsk.agid = p_css->i_agid;
-
-    i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
-
-    memcpy( p_key, auth_info.lsk.key, sizeof(dvd_key) );
-    return i_ret;
-
-#elif defined( SYS_BEOS )
-    int i_ret;
-    u8 p_buf[12];
-    struct cdrom_generic_command cgc;
-
-    //memset( p_buf, 0, sizeof( p_buf ) );
-
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
-
-    cgc.cmd[0] = GPCMD_REPORT_KEY;
-    cgc.cmd[10] = 0x02 | (p_css->i_agid << 6);
-    cgc.buflen = 12;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_READ;
-
-    i_ret = SendCommand( p_css->i_fd, &cgc );
-
-    memcpy( p_key, p_buf + 4, sizeof(dvd_key) );
-    return i_ret;
-
-#else
-    return -1;
-
-#endif
-}
-
-/*****************************************************************************
- * dvd_HostSendKey2: 
- *****************************************************************************
- * 
- *****************************************************************************/
-int dvd_HostSendKey2( css_t *p_css, u8 *p_key )
+int ioctl_HostSendKey2( css_t *p_css, u8 *p_key )
 {
 #if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     dvd_authinfo auth_info;
@@ -450,25 +423,21 @@ int dvd_HostSendKey2( css_t *p_css, u8 *p_key )
     return ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
 
 #elif defined( SYS_BEOS )
-    u8 p_buf[12];
-    struct cdrom_generic_command cgc;
+    raw_device_command rdc;
+    u8 p_buffer[ 12 ];
 
-    //memset( p_buf, 0, sizeof( p_buf ) );
+    BeInitRDC( &rdc, p_buffer, 12 );
 
-    InitCommand( &cgc, p_buf, 0, CGC_DATA_READ );
+    rdc.command[ 0 ]  = GPCMD_REPORT_KEY;
+    rdc.command[ 10 ] = 0x3 | (p_css->i_agid << 6);
 
-    cgc.cmd[0] = GPCMD_SEND_KEY;
-    cgc.cmd[10] = 0x3 | (p_css->i_agid << 6);
-    cgc.buflen = 12;
-    cgc.cmd[9] = cgc.buflen;
-    cgc.data_direction = CGC_DATA_WRITE;
+    p_buffer[ 1 ] = 0xa;
+    memcpy( p_buffer + 4, p_key, sizeof(dvd_key) );
 
-    p_buf[1] = 0xa;
-    memcpy( p_buf + 4, p_key, sizeof(dvd_key) );
-
-    return SendCommand( p_css->i_fd, &cgc );
+    return ioctl( p_css->i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
 #else
+    /* DVD ioctls unavailable - do as if the ioctl failed */
     return -1;
 
 #endif
@@ -478,62 +447,28 @@ int dvd_HostSendKey2( css_t *p_css, u8 *p_key )
 
 #if defined( SYS_BEOS )
 /*****************************************************************************
- * InitCommand: initialize a CGC structure
+ * BeInitRDC: initialize a RDC structure for the BeOS kernel
  *****************************************************************************
- * This function initializes a CDRom Generic Command structure for
- * future use, either a read command or a write command.
+ * This function initializes a BeOS raw device command structure for future
+ * use, either a read command or a write command.
  *****************************************************************************/
-static void InitCommand( struct cdrom_generic_command *p_cgc,
-                         void *p_buf, int i_len, int i_type )
+static void BeInitRDC( raw_device_command *p_rdc, void *p_buffer, int i_len )
 {
-    memset( p_cgc, 0, sizeof( struct cdrom_generic_command ) );
+    memset( p_rdc, 0, sizeof( raw_device_command ) );
+    memset( p_buffer, 0, i_len );
 
-    if( p_buf != NULL )
-    {
-        memset( p_buf, 0, i_len );
-    }
+    p_rdc->command[ 8 ]      = (i_len >> 8) & 0xff;
+    p_rdc->command[ 9 ]      =  i_len       & 0xff;
+    p_rdc->command_length    = 12;
 
-    p_cgc->buffer = ( char * )p_buf;
-    p_cgc->buflen = i_len;
-    p_cgc->data_direction = i_type;
-    p_cgc->timeout = 255;
+    p_rdc->data              = (char *)p_buffer;
+    p_rdc->data_length       = i_len;
+
+    p_rdc->sense_data        = NULL;
+    p_rdc->sense_data_length = 0;
+
+    p_rdc->timeout           = 1000000;
 }
 
-/*****************************************************************************
- * SendCommand: send a raw device command to the DVD drive.
- *****************************************************************************
- * This is the most important part of the ioctl emulation, the place where
- * data is really sent to the DVD.
- *****************************************************************************/
-static int SendCommand( int i_fd, struct cdrom_generic_command *p_cgc )
-{
-    int i;
-
-    raw_device_command rdc;
-    memset( &rdc, 0, sizeof( rdc ) );
-
-    /* fill out our raw device command data */
-    rdc.data = p_cgc->buffer;
-    rdc.data_length = p_cgc->buflen;
-    rdc.sense_data = p_cgc->sense;
-    rdc.sense_data_length = 0;
-    rdc.timeout = 1000000;
-
-    if( p_cgc->data_direction == CGC_DATA_READ )
-    {
-        intf_WarnMsg( 2, "css: data_direction == CGC_DATA_READ" );
-        rdc.flags = B_RAW_DEVICE_DATA_IN;
-    }
-
-    rdc.command_length = 12;
-
-    /* FIXME: check if this _really_ should go up to [12] */
-    for( i = 0 ; i < 13 ; i++ )
-    {
-        rdc.command[i] = p_cgc->cmd[i];
-    }
-
-    return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
-}
 #endif
 

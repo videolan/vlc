@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.19 2001/04/02 23:30:41 sam Exp $
+ * $Id: dvd_css.c,v 1.20 2001/04/04 02:49:18 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -71,7 +71,7 @@ int CSSTest( int i_fd )
 {
     int i_ret, i_copyright;
 
-    i_ret = dvd_ReadCopyright( i_fd, 0 /* i_layer */, &i_copyright );
+    i_ret = ioctl_ReadCopyright( i_fd, 0 /* i_layer */, &i_copyright );
 
     if( i_ret < 0 )
     {
@@ -105,10 +105,11 @@ int CSSInit( css_t * p_css )
             return -1;
 
         case 1:
+            intf_WarnMsg( 3, "css info: already authenticated" );
             return 0;
 
         case 0:
-            intf_WarnMsg( 3, "css info: authenticating" );
+            intf_WarnMsg( 3, "css info: need to authenticate" );
     }
 
     /* Init sequence, request AGID */
@@ -116,7 +117,7 @@ int CSSInit( css_t * p_css )
     {
         intf_WarnMsg( 3, "css info: requesting AGID %d", i );
 
-        i_ret = dvd_LUSendAgid( p_css );
+        i_ret = ioctl_LUSendAgid( p_css );
 
         if( i_ret != -1 )
         {
@@ -127,7 +128,7 @@ int CSSInit( css_t * p_css )
         intf_ErrMsg( "css error: AGID N/A, invalidating" );
 
         p_css->i_agid = 0;
-        dvd_InvalidateAgid( p_css );
+        ioctl_InvalidateAgid( p_css );
     }
 
     /* Unable to authenticate without AGID */
@@ -149,14 +150,14 @@ int CSSInit( css_t * p_css )
     }
 
     /* Send challenge to LU */
-    if( dvd_HostSendChallenge( p_css, p_buffer ) < 0 )
+    if( ioctl_HostSendChallenge( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: failed sending challenge to LU" );
         return -1;
     }
 
     /* Get key1 from LU */
-    if( dvd_LUSendKey1( p_css, p_buffer ) < 0)
+    if( ioctl_LUSendKey1( p_css, p_buffer ) < 0)
     {
         intf_ErrMsg( "css error: failed getting key1 from LU" );
         return -1;
@@ -189,7 +190,7 @@ int CSSInit( css_t * p_css )
     }
 
     /* Get challenge from LU */
-    if( dvd_LUSendChallenge( p_css, p_buffer ) < 0 )
+    if( ioctl_LUSendChallenge( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: failed getting challenge from LU" );
         return -1;
@@ -211,7 +212,7 @@ int CSSInit( css_t * p_css )
     }
 
     /* Send key2 to LU */
-    if( dvd_HostSendKey2( p_css, p_buffer ) < 0 )
+    if( ioctl_HostSendKey2( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: failed sending key2 to LU" );
         return -1;
@@ -238,14 +239,15 @@ int CSSInit( css_t * p_css )
             return -1;
 
         case 1:
+            intf_WarnMsg( 3, "css info: already authenticated" );
             return 0;
 
         case 0:
-            intf_WarnMsg( 3, "css info: getting disc key" );
+            intf_WarnMsg( 3, "css info: need to get disc key" );
     }
 
     /* Get encrypted disc key */
-    if( dvd_ReadKey( p_css, p_buffer ) < 0 )
+    if( ioctl_ReadKey( p_css, p_buffer ) < 0 )
     {
         intf_ErrMsg( "css error: could not read Disc Key" );
         return -1;
@@ -262,21 +264,22 @@ int CSSInit( css_t * p_css )
     switch( CSSGetASF( p_css ) )
     {
         case -1:
-        case 0:
             return -1;
 
         case 1:
+            intf_WarnMsg( 3, "css info: successfully authenticated" );
             return 0;
-    }
 
-    return 0;
+        case 0:
+            intf_WarnMsg( 3, "css info: no way to authenticate" );
+    }
 
 #else /* HAVE_CSS */
     intf_ErrMsg( "css error: CSS decryption is disabled in this module" );
 
+#endif /* HAVE_CSS */
     return -1;
 
-#endif /* HAVE_CSS */
 }
 
 /*****************************************************************************
@@ -475,8 +478,10 @@ int CSSGetKey( css_t * p_css )
             p_title_key[i_highest].pi_key, KEY_SIZE );
 
     return 0;
+
 #else /* HAVE_CSS */
     return 1;
+
 #endif /* HAVE_CSS */
 }
 
@@ -522,15 +527,16 @@ int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
     }
 
     return 0;
+
 #else /* HAVE_CSS */
     return 1;
+
 #endif /* HAVE_CSS */
 }
 
 #ifdef HAVE_CSS
-/*
- * Following functions are local
- */
+
+/* Following functions are local */
 
 /*****************************************************************************
  * CSSGetASF : Get Authentification success flag
@@ -546,7 +552,7 @@ static int CSSGetASF( css_t *p_css )
 
     for( p_css->i_agid = 0 ; p_css->i_agid < 4 ; p_css->i_agid++ )
     {
-        if( dvd_LUSendASF( p_css, &i_asf ) == 0 )
+        if( ioctl_LUSendASF( p_css, &i_asf ) == 0 )
         {
             intf_WarnMsg( 3, "css info: %sauthenticated", i_asf ? "":"not " );
 
@@ -898,5 +904,6 @@ static int CSSCracker( int i_start,
 
     return i_exit;
 }
+
 #endif /* HAVE_CSS */
 
