@@ -2,7 +2,7 @@
  * httpd.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.h,v 1.6 2003/07/10 22:24:09 fenrir Exp $
+ * $Id: httpd.h,v 1.7 2003/07/11 09:50:10 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -28,7 +28,8 @@ typedef struct httpd_file_t     httpd_file_t;
 typedef httpd_file_t httpd_stream_t;
 
 typedef struct httpd_file_callback_args_t httpd_file_callback_args_t;
-typedef int (*httpd_file_callback)( httpd_file_callback_args_t *p_args, uint8_t *p_request, int i_request, uint8_t **pp_data, int *pi_data );
+typedef int (*httpd_file_callback)( httpd_file_callback_args_t *p_args,
+    uint8_t *p_request, int i_request, uint8_t **pp_data, int *pi_data );
 
 typedef struct httpd_sys_t httpd_sys_t;
 
@@ -55,6 +56,8 @@ typedef struct
     httpd_val_t *info;
 } httpd_info_t;
 
+
+typedef struct httpd_t httpd_t;
 
 struct httpd_t
 {

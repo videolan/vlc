@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.11 2003/07/10 22:24:09 fenrir Exp $
+ * $Id: http.c,v 1.12 2003/07/11 09:50:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -60,7 +60,8 @@ static int  Activate     ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 
-static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir );
+static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
+                           char *psz_dir );
 
 static int  http_get( httpd_file_callback_args_t *p_args,
                       uint8_t *p_request, int i_request,
@@ -199,19 +200,13 @@ static int Activate( vlc_object_t *p_this )
     p_sys->i_files = 0;
     p_sys->pp_files = malloc( sizeof( httpd_file_callback_args_t *) );
 
-#if defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if defined(SYS_DARWIN) || defined(SYS_BEOS) || \
+        ( defined(WIN32) && !defined(UNDER_CE ) )
     if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
     {
         char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
         sprintf( psz_src, "%s/share/http", psz_vlcpath);
-    }
-#elif defined(WIN32) && !defined(UNDER_CE)
-    if ( (psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
-    {
-        char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
-        psz_src = malloc( strlen(psz_vlcpath) + strlen("\\share\\http") + 1 );
-        sprintf( psz_src, "%s\\share\\", psz_vlcpath);
     }
 #else
     psz_src = config_GetPsz( p_intf, "http-src" );
@@ -342,32 +337,28 @@ static char *FileToUrl( char *name )
     url = p = malloc( strlen( name ) + 1 );
 
 #ifdef WIN32
+    while( *name == '\\' || *name == '/' )
+#else
     while( *name == '\\' )
+#endif
     {
         name++;
     }
 
     *p++ = '/';
+    strcpy( p, name );
+
+#ifdef WIN32
+    /* convert '\\' into '/' */
+    name = p;
     while( *name )
     {
         if( *name == '\\' )
         {
             *p++ = '/';
         }
-        else
-        {
-            *p++ = *name;
-        }
         name++;
     }
-    *p++ = '\0';
-#else
-    while( name[0] == '/' )
-    {
-        name++;
-    }
-    *p++ = '/';
-    strcpy( p, name );
 #endif
 
     /* index.* -> / */
@@ -439,7 +430,8 @@ static char *FileToMime( char *psz_name )
 /****************************************************************************
  * ParseDirectory: parse recursively a directory, adding each file
  ****************************************************************************/
-static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir )
+static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
+                           char *psz_dir )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     char           dir[MAX_DIR_SIZE];
@@ -454,7 +446,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
     char          *password = NULL;
 
 #ifdef HAVE_SYS_STAT_H
-    if( ( stat( psz_dir, &stat_info ) == -1 ) || !S_ISDIR( stat_info.st_mode ) )
+    if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
     {
         return VLC_EGENERIC;
     }
@@ -480,7 +472,8 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
         if( i_size > 0 )
         {
             char *p;
-            while( i_size > 0 && ( line[i_size-1] == '\n' || line[i_size-1] == '\r' ) )
+            while( i_size > 0 && ( line[i_size-1] == '\n' ||
+                   line[i_size-1] == '\r' ) )
             {
                 i_size--;
             }
@@ -495,7 +488,8 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
                 password = strdup( p );
             }
         }
-        msg_Dbg( p_intf, "using user=%s password=%s (read=%d)", user, password, i_size );
+        msg_Dbg( p_intf, "using user=%s password=%s (read=%d)",
+                 user, password, i_size );
 
         fclose( file );
     }
@@ -522,7 +516,8 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
             f->name = FileToUrl( &dir[strlen( psz_root )] );
             f->mime = FileToMime( &dir[strlen( psz_root )] );
 
-            msg_Dbg( p_intf, "file=%s (url=%s mime=%s)", f->file, f->name, f->mime );
+            msg_Dbg( p_intf, "file=%s (url=%s mime=%s)",
+                     f->file, f->name, f->mime );
 
             f->p_file =
                 p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
@@ -533,12 +528,14 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
             if( f->p_file )
             {
                 p_sys->i_files++;
-                p_sys->pp_files = realloc( p_sys->pp_files, (p_sys->i_files+1) * sizeof( httpd_file_callback_args_t ) );
+                p_sys->pp_files = realloc( p_sys->pp_files,
+                  (p_sys->i_files+1) * sizeof( httpd_file_callback_args_t ) );
             }
 #define fold p_sys->pp_files[p_sys->i_files-1]
 
             /* FIXME for rep/ add rep (it would be better to do a redirection) */
-            if( strlen(fold->name) > 1 && fold->name[strlen(fold->name) - 1] == '/' )
+            if( strlen(fold->name) > 1 &&
+                fold->name[strlen(fold->name) - 1] == '/' )
             {
                 f = malloc( sizeof( httpd_file_callback_args_t ) );
                 f->p_intf  = p_intf;
@@ -547,7 +544,8 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
                 f->mime = fold->mime;
 
                 f->name[strlen(f->name) - 1] = '\0';
-                msg_Dbg( p_intf, "file=%s (url=%s mime=%s)", f->file, f->name, f->mime );
+                msg_Dbg( p_intf, "file=%s (url=%s mime=%s)", f->file, f->name,
+                         f->mime );
                 f->p_file =
                     p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
                                                       f->name, f->mime,
@@ -557,7 +555,9 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root, char *psz_dir 
                 if( f->p_file )
                 {
                     p_sys->i_files++;
-                    p_sys->pp_files = realloc( p_sys->pp_files, (p_sys->i_files+1) * sizeof( httpd_file_callback_args_t ) );
+                    p_sys->pp_files =
+                        realloc( p_sys->pp_files, (p_sys->i_files+1) *
+                                 sizeof( httpd_file_callback_args_t ) );
                 }
             }
 #undef fold
