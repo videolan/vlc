@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.53 2003/12/22 02:24:50 sam Exp $
+##  $Id: toolbox,v 1.54 2004/01/04 18:18:45 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -625,7 +625,7 @@ then
   #                  libdvdread3-dev with libdvdread2-dev
   #                  libdvdplay0-dev (>=1.0.1-2) with libdvdplay0-dev
   #                  libxosd-dev (>=2.2.4-1.3) with libxosd-dev
-  #                  ttf-freefonts with ttf-thryomanes
+  #                  ttf-freefont with ttf-thryomanes
   #                  dvb-dev (>= 1.0.1-6) with dvb-dev
   #          remove libwxgtk2.4-dev
   #                 libflac-dev
@@ -633,8 +633,7 @@ then
   #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
   #                 libmatroska-dev
   #                 libspeex-dev
-  #          change Source: vlc with Source: vlc-woody
-  #                 Section: gnome with Section: graphics
+  #          change Section: gnome with Section: graphics
   #                 Section: kde with Section: kde
   #                 Section: libdevel with Section: devel
   sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
@@ -646,7 +645,7 @@ then
       -e 's/libdvdread[0-9]*-dev/libdvdread2-dev/' \
       -e 's/, libdvdplay0-dev[^,]*/, libdvdplay0-dev/' \
       -e 's/, libxosd-dev[^,]*/, libxosd-dev/' \
-      -e 's/, ttf-freefonts[^,]*/, ttf-thryomanes/' \
+      -e 's/, ttf-freefont[^,]*/, ttf-thryomanes/' \
       -e 's/, dvb-dev[^,]*/, dvb-dev/' \
       -e 's/, libwx[^,]*//' \
       -e '/Package: wxvlc/,/^ *$/d' \
@@ -655,7 +654,6 @@ then
       -e 's/, libglib2.0-0[^,]*//' \
       -e 's/, libmatroska-dev[^,]*//' \
       -e 's/, libspeex-dev[^,]*//' \
-      -e 's/Source: vlc/Source: vlc-woody/' \
       -e 's/Section: gnome/Section: graphics/' \
       -e 's/Section: kde/Section: graphics/' \
       -e 's/Section: libdevel/Section: devel/' \
@@ -676,7 +674,7 @@ then
   chmod 0755 "$1/debian/rules"
 
   # modules/misc/freetype.c: replace the default font
-  sed -e 's,FreeSerifBold.ttf,thryomanes/thryb___.ttf,' \
+  sed -e 's,freefont/FreeSerifBold.ttf,thryomanes/thryb___.ttf,' \
       < "$1/modules/misc/freetype.c" > "$1/modules/misc/freetype.c.woody"
   mv "$1/modules/misc/freetype.c.woody" "$1/modules/misc/freetype.c"
 fi
