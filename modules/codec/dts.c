@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.15 2004/02/04 23:55:03 gbazin Exp $
+ * $Id: dts.c,v 1.16 2004/02/06 18:15:44 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -367,8 +367,9 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_buf;
 
-    /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time */
-    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length * 3 );
+    /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time
+     * (plus a few header bytes) */
+    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length * 4 );
     if( p_buf == NULL ) return NULL;
     p_buf->i_nb_samples = p_sys->i_frame_length;
     p_buf->i_nb_bytes = p_sys->i_frame_size;

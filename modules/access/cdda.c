@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: cdda.c,v 1.13 2004/02/05 22:56:12 gbazin Exp $
+ * $Id: cdda.c,v 1.14 2004/02/06 18:15:44 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -236,19 +236,19 @@ static int AccessOpen( vlc_object_t *p_this )
 
     /* Build a WAV header for the output data */
     memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
-    p_sys->waveheader.Format = 1 /*WAVE_FORMAT_PCM*/;
-    p_sys->waveheader.BitsPerSample = 16;
+    SetWLE( &p_sys->waveheader.Format, 1 ); /*WAVE_FORMAT_PCM*/
+    SetWLE( &p_sys->waveheader.BitsPerSample, 16);
     p_sys->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
     p_sys->waveheader.Length = 0;                     /* we just don't know */
     p_sys->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
     p_sys->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
-    p_sys->waveheader.SubChunkLength = 16;
-    p_sys->waveheader.Modus = 2;
-    p_sys->waveheader.SampleFreq = 44100;
-    p_sys->waveheader.BytesPerSample =
-        p_sys->waveheader.Modus * p_sys->waveheader.BitsPerSample / 8;
-    p_sys->waveheader.BytesPerSec =
-        p_sys->waveheader.BytesPerSample * p_sys->waveheader.SampleFreq;
+    SetDWLE( &p_sys->waveheader.SubChunkLength, 16);
+    SetWLE( &p_sys->waveheader.Modus, 2);
+    SetDWLE( &p_sys->waveheader.SampleFreq, 44100);
+    SetWLE( &p_sys->waveheader.BytesPerSample,
+            2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
+    SetDWLE( &p_sys->waveheader.BytesPerSec,
+             16 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
     p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_sys->waveheader.DataLength = 0;                 /* we just don't know */
     p_sys->i_header_pos = 0;

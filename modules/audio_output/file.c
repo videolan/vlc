@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.28 2004/02/03 23:31:46 gbazin Exp $
+ * $Id: file.c,v 1.29 2004/02/06 18:15:44 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -272,6 +272,15 @@ static int Open( vlc_object_t * p_this )
         wh->DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
         wh->DataLength = 0;                /* temp, to be filled in as we go */
 
+        /* Header -> little endian format */
+        SetWLE( &wh->Format, wh->Format );
+        SetWLE( &wh->BitsPerSample, wh->BitsPerSample );
+        SetDWLE( &wh->SubChunkLength, wh->SubChunkLength );
+        SetWLE( &wh->Modus, wh->Modus );
+        SetDWLE( &wh->SampleFreq, wh->SampleFreq );
+        SetWLE( &wh->BytesPerSample, wh->BytesPerSample );
+        SetDWLE( &wh->BytesPerSec, wh->BytesPerSec );
+
         if( fwrite( wh, sizeof(WAVEHEADER), 1,
                     p_aout->output.p_sys->p_file ) != 1 )
         {
@@ -302,6 +311,13 @@ static void Close( vlc_object_t * p_this )
         {
             msg_Err( p_aout, "seek error (%s)", strerror(errno) );
         }
+
+        /* Header -> little endian format */
+        SetDWLE( &p_aout->output.p_sys->waveh.Length,
+                 p_aout->output.p_sys->waveh.Length );
+        SetDWLE( &p_aout->output.p_sys->waveh.DataLength,
+                 p_aout->output.p_sys->waveh.DataLength );
+
         if( fwrite( &p_aout->output.p_sys->waveh, sizeof(WAVEHEADER), 1,
                     p_aout->output.p_sys->p_file ) != 1 )
         {
