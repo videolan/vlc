@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.44 2003/02/02 23:11:17 massiot Exp $
+ * $Id: intf.m,v 1.45 2003/02/05 01:36:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -330,6 +330,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     /* dock menu */
     [o_dmi_play setTitle: _NS("Play")];
     [o_dmi_stop setTitle: _NS("Stop")];
+    [o_dmi_next setTitle: _NS("Next")];
+    [o_dmi_previous setTitle: _NS("Previous")];
 
     /* error panel */
     [o_error setTitle: _NS("Error")];
