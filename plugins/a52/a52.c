@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.12 2002/05/24 12:42:14 gbazin Exp $
+ * $Id: a52.c,v 1.13 2002/05/27 16:01:42 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -367,6 +367,6 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
     if( b_new_pes )
     {
         /* Drop special AC3 header */
-        p_bit_stream->p_byte += 3;
+/*        p_bit_stream->p_byte += 3; */
     }
 }

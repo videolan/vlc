@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.96 2002/05/18 17:47:47 sam Exp $
+ * $Id: mpeg_system.c,v 1.97 2002/05/27 16:01:42 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -340,6 +340,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             i_pes_header_size++;
         }
 
+        if( p_es->i_type == AC3_AUDIO_ES )
+        {
+            /* With ac3 audio, we need to skip first 3 bytes */
+            i_pes_header_size += 3;
+        }
+
         /* Now we've parsed the header, we just have to indicate in some
          * specific data packets where the PES payload begins (renumber
          * p_payload_start), so that the decoders can find the beginning
@@ -372,6 +378,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             return;
         }
         p_data->p_payload_start += i_pes_header_size;
+
 
         /* Now we can eventually put the PES packet in the decoder's
          * PES fifo */

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.30 2002/05/15 19:36:04 sam Exp $
+ * $Id: ac3_adec.c,v 1.31 2002/05/27 16:01:42 fenrir Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -428,7 +428,7 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
     if( b_new_pes )
     {
         /* Drop special AC3 header */
-        p_bit_stream->p_byte += 3;
+/*        p_bit_stream->p_byte += 3; */
     }
 }
 
