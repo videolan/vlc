@@ -469,7 +469,11 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
         msg_Dbg( p_input, "opening file `%s'", psz_name );
 
-        if ( _OpenFile( p_input, psz_name ) != VLC_SUCCESS ) return i_ret;
+        if ( _OpenFile( p_input, psz_name ) != VLC_SUCCESS )
+        {
+            p_access_data->i_index--;
+            return 0;
+        }
 
         close( i_handle );
 
@@ -502,7 +506,6 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
         }
 
         psz_name = p_access_data->p_files[i]->psz_name;
-        p_access_data->i_index = i;
 
         msg_Dbg( p_input, "opening file `%s'", psz_name );
         if ( _OpenFile( p_input, psz_name ) == VLC_SUCCESS )
@@ -512,6 +515,7 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
         }
         else
         {
+            p_access_data->i_index = i;
             p_access_data->_socket.i_handle = i_handle;
         }
     }
