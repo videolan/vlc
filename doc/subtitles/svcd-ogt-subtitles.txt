@@ -1,0 +1,65 @@
+$Id: svcd-ogt-subtitles.txt,v 1.1 2004/01/04 16:25:00 rocky Exp $
+The following information is culled from information from 
+Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
+by Rocky Bernstein. 
+
+SVCD subtitles are transported in private streams with id 0x70 (AC3
+has 0,x80+, CVD subs 0+)
+
+All numbers are in big-endian and the image is interlaced with a
+resolution of 720x480 (ntsc) or 720x576 (pal)
+
+Data packets start with a 4 byte sequence number (Stream number(1),
+Packet number(1*), Subtitle number (2)) (*) this starts at 0, the last
+packet of a subtitle has the 7th bit set (the subtitle can be broken
+up into several packets when it is multiplexed into the mpeg stream)
+
+Subtitle Header (size in bytes):
+
+Packet length (2) (the assembled subtitle, with stripped sequence
+numbers) Option byte (1) normally set to 0x2e, bit 3 indicates that a
+field with the display-time of the subtitle is present.  what the
+other bits does is unknown.
+
+Time to display the sub (4) in 1/90000'th of a second (only present if
+bit 3 above is set)
+Xpos (2)
+Ypos (2)
+Width (2*)
+Height (2*)
+* should be even
+
+This only implies HOW LONG the subtitle will be shown, not when. That
+is given by the PTS in the PES header.
+
+Uknown Byte(1) 
+
+4 Palette Entries formated like:
+Y (1)
+U (1)
+V (1)
+Transparency(1)    (0 = transparent)
+
+Command (1) 
+>>6: 1 shift command, (cmd>>4)&3 is the direction (0=top, 1=left, 2 = right, 3 
+>>= bottom)
+
+Odd-field data offset (2)
+
+Then image data follows, and is formatted like this:
+2 bit codes are used so 01 means 1 pixel of color 1,
+10 means color 2 etc.
+
+Lines are padded to complete bytes, field 0 is padded to an even byte
+length and finally subtitles are padded to a multiple of 4 bytes
+(always atleast 1 zero byte at the end)
+
+Philips SVCD tools can create SVCD subtitles, but it only works under
+NT4, (and not that easy to find anymore.. dvd.da.ru, doom9.net or
+similar perhaps?), it can create good subtitled svcds and just open
+them in your favorite hex editor ^_^
+
+The subs you get from tools like "I-author" are not real SVCD
+subtitles, they are CVD sub and I don't know anything else about them
+except for that they look similar to dvd subs but the RLE encoding and
+command format is different.
