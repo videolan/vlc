@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc_playlist.h>
 
 #include "playlist.h"
 
@@ -101,4 +102,30 @@ char *ProcessMRL( char *psz_mrl, char *psz_prefix )
     /* This a relative path, prepend the prefix */
     asprintf( &psz_mrl, "%s%s", psz_prefix, psz_mrl );
     return psz_mrl;
+}
+
+vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
+                     playlist_item_t **pp_item )
+{
+     vlc_bool_t b_play;
+     if( &p_playlist->status.p_item->input ==
+         ((input_thread_t *)p_demux->p_parent)->input.p_item )
+     {
+         msg_Dbg( p_playlist, "starting playlist playback" );
+         *pp_item = p_playlist->status.p_item;
+         b_play = VLC_TRUE;
+     }
+     else
+     {
+         input_item_t *p_current = ( (input_thread_t*)p_demux->p_parent)->
+                                                        input.p_item;
+         *pp_item = playlist_ItemGetByInput( p_playlist, p_current );
+         if( !*pp_item )
+         {
+             msg_Dbg( p_playlist, "unable to find item in playlist");
+         }
+         msg_Dbg( p_playlist, "not starting playlist playback");
+         b_play = VLC_FALSE;
+     }
+     return b_play;
 }

@@ -88,6 +88,19 @@ static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
     vlc_mutex_init( p_o, &p_i->lock );
 }
 
+static inline void vlc_input_item_CopyOptions( input_item_t *p_parent,
+                                               input_item_t *p_child )
+{
+    int i;
+    for( i = 0 ; i< p_parent->i_options; i++ )
+    {
+        char *psz_option= strdup( p_parent->ppsz_options[i] );
+        INSERT_ELEM( p_child->ppsz_options,
+                     p_child->i_options, p_child->i_options,
+                     psz_option );
+    }
+}
+
 static inline void vlc_input_item_Clean( input_item_t *p_i )
 {
     if( p_i->psz_name ) free( p_i->psz_name );

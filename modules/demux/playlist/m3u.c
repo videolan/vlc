@@ -112,7 +112,9 @@ static int Demux( demux_t *p_demux )
     char **ppsz_options = NULL;
     int i_options = 0, i;
 
-    playlist_item_t *p_item;
+    playlist_item_t *p_item, *p_current;
+
+    vlc_bool_t b_play;
 
     vlc_bool_t b_cleanup = VLC_FALSE;
 
@@ -124,8 +126,12 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    playlist_ItemToNode( p_playlist, p_playlist->status.p_item );
-    p_playlist->status.p_item->input.i_type = ITEM_TYPE_PLAYLIST;
+    fprintf(stderr,"playlist item is %p\n", p_playlist->status.p_item );
+    b_play = FindItem( p_demux, p_playlist, &p_current );
+    fprintf(stderr,"current is %p\n", p_current );
+
+    playlist_ItemToNode( p_playlist, p_current );
+    p_current->input.i_type = ITEM_TYPE_PLAYLIST;
 
     psz_line = stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -196,18 +202,17 @@ static int Demux( demux_t *p_demux )
             p_item->input.i_duration = i_duration;
 
             playlist_NodeAddItem( p_playlist, p_item,
-                           p_playlist->status.p_item->pp_parents[0]->i_view,
-                           p_playlist->status.p_item, PLAYLIST_APPEND,
-                           PLAYLIST_END );
+                                  p_current->pp_parents[0]->i_view,
+                                  p_current, PLAYLIST_APPEND,
+                                  PLAYLIST_END );
 
             /* We need to declare the parents of the node as the
              *                  * same of the parent's ones */
-            for( i= 1 ; i< p_playlist->status.p_item->i_parents; i ++ )
-            {
-                    playlist_ItemAddParent( p_item,
-                              p_playlist->status.p_item->pp_parents[i]->i_view,
-                              p_playlist->status.p_item );
-            }
+            playlist_CopyParents( p_current, p_item );
+
+            vlc_input_item_CopyOptions( &p_current->input,
+                                        &p_item->input );
+
             free( psz_mrl );
         }
 
@@ -233,8 +238,12 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Go back and play the playlist */
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, p_playlist->status.i_view,
-                      p_playlist->status.p_item, NULL );
+    if( b_play )
+    {
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                          p_playlist->status.i_view,
+                          p_playlist->status.p_item, NULL );
+    }
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
