@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.18 2001/03/06 19:52:03 richards Exp $
+ * $Id: intf_beos.cpp,v 1.19 2001/03/07 16:32:59 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -120,13 +120,14 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     menu_bar = new BMenuBar(rect, "main menu");
     AddChild( menu_bar );
 
-	BMenu *m, *cd_menu;
+	BMenu *m; 
+	CDMenu *cd_menu;
 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
 	m->AddItem( new BMenuItem("Open File...", new BMessage(OPEN_FILE), 'O'));
-	cd_menu = new BMenu("Open DVD");
-	GetCD("/dev/disk", cd_menu);
+	cd_menu = new CDMenu("Open DVD");
+	//GetCD("/dev/disk", cd_menu);
 	m->AddItem(cd_menu);
 	m->AddSeparatorItem();
 	m->AddItem( new BMenuItem("About...", new BMessage(B_ABOUT_REQUESTED), 'A'));
@@ -409,8 +410,42 @@ bool InterfaceWindow::QuitRequested()
     return( false );
 }
 
+/*****************************************************************************
+ * CDMenu::CDMenu
+ *****************************************************************************/
 
-int InterfaceWindow::GetCD(const char *directory, BMenu *cd_menu)
+CDMenu::CDMenu(const char *name)
+	: BMenu(name)
+{
+
+}
+/*****************************************************************************
+ * CDMenu::~CDMenu
+ *****************************************************************************/
+
+
+CDMenu::~CDMenu()
+{
+
+}
+/*****************************************************************************
+ * CDMenu::AttachedToWindow
+ *****************************************************************************/
+
+void CDMenu::AttachedToWindow(void)
+{
+int32 items = CountItems();
+for(int32 i = 0; i < items; i++)
+	RemoveItem(i); 
+GetCD("/dev/disk");
+BMenu::AttachedToWindow();
+}
+
+/*****************************************************************************
+ * CDMenu::GetCD
+ *****************************************************************************/
+
+int CDMenu::GetCD(const char *directory)
 { 
 	BDirectory dir; 
 	dir.SetTo(directory); 
@@ -435,7 +470,7 @@ int InterfaceWindow::GetCD(const char *directory, BMenu *cd_menu)
 		if(entry.IsDirectory()) { 
 			if(strcmp(e.name, "floppy") == 0) 
 				continue; // ignore floppy (it is not silent) 
-			int devfd = GetCD(name, cd_menu);
+			int devfd = GetCD(name);
 			if(devfd >= 0)
 				{
 				return devfd;
@@ -443,7 +478,7 @@ int InterfaceWindow::GetCD(const char *directory, BMenu *cd_menu)
 		} 
 		else { 
 			int devfd; 
-			device_geometry g; 
+			device_geometry g;
 			status_t m;
 
 			if(strcmp(e.name, "raw") != 0) 
@@ -464,7 +499,7 @@ int InterfaceWindow::GetCD(const char *directory, BMenu *cd_menu)
 							msg->AddString("device", name);
 							BMenuItem *menu_item;
 							menu_item = new BMenuItem(name, msg);
-							cd_menu->AddItem(menu_item);
+							AddItem(menu_item);
 							continue;
 							}
 				}

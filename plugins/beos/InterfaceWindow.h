@@ -22,6 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+class CDMenu : public BMenu
+{
+public:
+	CDMenu(const char *name);
+	~CDMenu();
+	void AttachedToWindow(void);
+private:
+	int GetCD(const char *directory);
+};
+
 class InterfaceWindow : public BWindow
 {
 public:
@@ -41,8 +51,6 @@ public:
 	bool	fSeeking;
 	BFilePanel *file_panel;
 
-private:
-	int GetCD(const char *directory, BMenu *cd_menu);
 };
 
 class InterfaceView : public BView
