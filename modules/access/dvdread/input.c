@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: input.c,v 1.17 2003/03/11 23:56:53 gbazin Exp $
+ * $Id: input.c,v 1.18 2003/03/24 14:18:28 hartman Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -350,7 +350,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     /* Ifo allocation & initialisation */
     if( ! ( p_dvd->p_vmg_file = ifoOpen( p_dvd->p_dvdread, 0 ) ) )
     {
-        msg_Err( p_input, "cannot open VMG info" );
+        msg_Warn( p_input, "cannot open VMG info" );
         free( p_dvd );
         return VLC_EGENERIC;
     }
