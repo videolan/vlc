@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.10 2003/10/25 00:49:14 sam Exp $
+ * $Id: system.h,v 1.11 2003/11/03 14:02:54 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,6 +49,9 @@
 /* This one is "private PES". It may carry teletext, DVD subtitles, A52
  * We have to check for the presence of a descriptor to have the codec */
 #define PES_PRIVATE_ES      0x06
+
+/* ISO/IEC 13818-7 Audio with ADTS transport syntax */
+#define AAC_ADTS_AUDIO_ES   0x0F
 
 #define MPEG4_VIDEO_ES      0x10
 #define MPEG4_AUDIO_ES      0x11
