@@ -143,7 +143,6 @@ static void    CloseProgram( input_thread_t * p_input );
 vlc_module_begin();
     set_description( N_("DVB input with v4l2 support") );
 
-    add_integer( "dvb-program", 0, NULL, PROGRAM_TEXT, PROGRAM_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                  VLC_FALSE );
@@ -253,7 +252,6 @@ static int Open( vlc_object_t *p_this )
         return( -1 );
     }
 
-    var_Create( p_input, "dvb-program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -445,7 +443,7 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
     {
         int i_program;
         unsigned int i;
-        var_Get( p_input, "dvb-program", &val );
+        var_Get( p_input, "program", &val );
         i_program = val.i_int;
 
         /* FIXME : this is not demux2-compatible */
@@ -454,7 +452,6 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
             /* Only set a filter on the selected program : some boards
              * (read: Dreambox) only have 8 filters, so you don't want to
              * spend them on unwanted PMTs. --Meuuh */
-            msg_Err(p_input, "Meuuh %d %d %d", p_input->stream.pp_programs[i]->i_number, p_input->stream.pp_programs[i]->pp_es[0]->i_id, i_program);
             if ( !i_program
                    || p_input->stream.pp_programs[i]->i_number == i_program )
             {

@@ -91,7 +91,8 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     var_Set( p_input, "intf-change", val );
 
     /* Create a few object variables used for navigation in the interfaces */
-    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
+                                     | VLC_VAR_DOINHERIT );
     text.psz_string = _("Program");
     var_Change( p_input, "program", VLC_VAR_SETTEXT, &text, NULL );
 

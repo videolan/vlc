@@ -70,6 +70,7 @@ vlc_module_begin();
     add_string( "ts-out", NULL, NULL, "fast udp streaming", "send TS to specific ip:port by udp (you must know what you are doing)", VLC_TRUE );
     add_integer( "ts-out-mtu", 1500, NULL, "MTU for out mode", "MTU for out mode", VLC_TRUE );
     add_string( "ts-csa-ck", NULL, NULL, "CSA ck", "CSA ck", VLC_TRUE );
+    add_bool( "ts-silent", 0, NULL, "Silent mode", "do not complain on encrypted PES", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts2" );
@@ -215,6 +216,7 @@ struct demux_sys_t
     /* */
     vlc_bool_t  b_es_id_pid;
     csa_t       *csa;
+    vlc_bool_t  b_silent;
 
     vlc_bool_t  b_udp_out;
     int         fd; /* udp socket */
@@ -481,6 +483,9 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
     }
 
+    var_Create( p_demux, "ts-silent", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "ts-silent", &val );
+    p_sys->b_silent = val.b_bool;
 
     return VLC_SUCCESS;
 }
@@ -811,8 +816,9 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x]",
-                  header[0], header[1],header[2],header[3] );
+        if ( !p_demux->p_sys->b_silent )
+            msg_Warn( p_demux, "invalid header [0x%x:%x:%x:%x]", header[0],
+                      header[1],header[2],header[3] );
         block_ChainRelease( p_pes );
         return;
     }
