@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.9 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.10 2003/04/15 22:16:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -110,6 +110,8 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
         Bmp = NULL;
     }
 
+    Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
+            AColor>>16 );
     Width = gdk_pixbuf_get_width( Bmp );
     Height = gdk_pixbuf_get_height( Bmp );
 }
@@ -158,16 +160,11 @@ GTK2Bitmap::~GTK2Bitmap()
 void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
                               Graphics *dest )
 {
-/*    HDC destDC = ( (GTK2Graphics *)dest )->GetImageHandle();
-
-    // New method, not available in win95
-    TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h, AlphaColor );
-*/
     GdkDrawable *destImg = ( (GTK2Graphics *)dest )->GetImage();
-    GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
+   // GdkGC *destGC = ( (GTK2Graphics *)dest )->GetGC();
 
-    gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
-            w, h, GDK_RGB_DITHER_NONE, 0, 0);
+    gdk_pixbuf_render_to_drawable_alpha( Bmp, destImg, x, y, xRef, yRef, 
+            w, h, GDK_PIXBUF_ALPHA_BILEVEL, 128, GDK_RGB_DITHER_NORMAL, 0, 0);
 }
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)

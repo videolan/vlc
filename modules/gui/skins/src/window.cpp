@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.11 2003/04/15 20:33:58 karibu Exp $
+ * $Id: window.cpp,v 1.12 2003/04/15 22:16:05 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -410,8 +410,6 @@ void Window::Init()
     // Refresh Image buffer
     RefreshImage( 0, 0, Width, Height );
 
-fprintf(stderr, "kludge in window.cpp!\n");
-    RefreshFromImage( 0, 0, Width, Height );
     // Move window as it hasn't been moved yet
     Move( Left, Top );
 }
