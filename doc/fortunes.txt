@@ -96,6 +96,50 @@
 
   -- #videolan
 %
+<henrisson> hehe : Open failed !: Success
+
+  -- #videolan
+%
+<lool> vlc rulez
+<liquidacid> it dont work
+<lool> what doesn't work ?
+<liquidacid> vlc rulez
+
+  -- #videolan
+%
+<ebarra> What time is it (for you)?
+<lool> 6:16 am
+<ebarra> Are you a teacher or an student?
+<lool> I'm a student
+<lool> teacher are in bed right now
+<lool> what are you doing in life ?
+<ebarra> I am a teacher of Computer Science...
+
+  -- #videolan
+%
+<fuckall> and you, do you have some movies in svcd format?
+  [...]
+<walken> je lui ai envoye un cones.svcd
+<walken> c'etait un lien vers /dev/zero
+
+  -- #videolan
+%
+-!- Meuuh [www-data@brahma.via.ecp.fr] has joined #videolan
+<hh> Meuuh!
+<Meuuh> Meuuh.
+
+  -- #videolan
+%
+<gibalou> --filter distort:transform:distort rocks :)
+<gibalou> hey, I don't have enough processing power for --filter 
+          distort:transform:distort:transform:distort :(
+
+  -- #videolan
+%
+<alexis> c'est bon, Jérôme m'a envoyé le truc sans virus cette fois
+
+  -- #videolan
+%
 <sam> anyway, why should we care? as soon as we release libvlc, it'll be in
       the MPlayer CVS :)
 
