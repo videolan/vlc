@@ -121,6 +121,7 @@ case "${target_os}" in
     VLC_ADD_LDFLAGS([vlc ffmpeg],[-all_load])
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
+    VLC_ADD_CFLAGS([vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
     ;;
   *mingw32* | *cygwin*)
