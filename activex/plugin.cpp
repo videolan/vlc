@@ -33,6 +33,7 @@
 #include "connectioncontainer.h"
 #include "objectsafety.h"
 #include "vlccontrol.h"
+#include "viewobject.h"
 
 #include "utils.h"
 
@@ -81,8 +82,10 @@ static LRESULT CALLBACK VLCVideoClassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam
             RECT pr;
             if( GetUpdateRect(hWnd, &pr, FALSE) )
             {
+                RECT bounds;
+                GetClientRect(hWnd, &bounds);
                 BeginPaint(hWnd, &ps);
-                p_instance->onPaint(ps, pr);
+                p_instance->onPaint(ps.hdc, bounds, pr);
                 EndPaint(hWnd, &ps);
             }
             return 0L;
@@ -246,6 +249,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class) :
     vlcConnectionPointContainer = new VLCConnectionPointContainer(this);
     vlcObjectSafety = new VLCObjectSafety(this);
     vlcControl = new VLCControl(this);
+    vlcViewObject = new VLCViewObject(this);
 };
 
 VLCPlugin::~VLCPlugin()
@@ -253,6 +257,7 @@ VLCPlugin::~VLCPlugin()
     vlcOleInPlaceObject->UIDeactivate();
     vlcOleInPlaceObject->InPlaceDeactivate();
 
+    delete vlcViewObject;
     delete vlcControl;
     delete vlcObjectSafety;
     delete vlcConnectionPointContainer;
@@ -370,6 +375,12 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
     {
         AddRef();
         *ppv = reinterpret_cast<LPVOID>(vlcControl);
+        return NOERROR;
+    }
+    else if( IID_IViewObject == riid )
+    {
+        AddRef();
+        *ppv = reinterpret_cast<LPVOID>(vlcViewObject);
         return NOERROR;
     }
 
@@ -702,19 +713,19 @@ BOOL VLCPlugin::hasFocus(void)
     return GetActiveWindow() == _inplacewnd;
 };
 
-void VLCPlugin::onPaint(PAINTSTRUCT &ps, RECT &pr)
+void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &pr)
 {
     /*
     ** if VLC is playing, it may not display any VIDEO content 
     ** hence, draw control logo
     */ 
-    int width = _bounds.right-_bounds.left;
-    int height = _bounds.bottom-_bounds.top;
+    int width = bounds.right-bounds.left;
+    int height = bounds.bottom-bounds.top;
 
     HBITMAP pict = _p_class->getInPlacePict();
     if( NULL != pict )
     {
-        HDC hdcPict = CreateCompatibleDC(ps.hdc);
+        HDC hdcPict = CreateCompatibleDC(hdc);
         if( NULL != hdcPict )
         {
             BITMAP bm;
@@ -728,26 +739,26 @@ void VLCPlugin::onPaint(PAINTSTRUCT &ps, RECT &pr)
                 if( dstHeight > height-4 )
                     dstHeight = height-4;
 
-                int dstX = (width-dstWidth)/2;
-                int dstY = (height-dstHeight)/2;
+                int dstX = bounds.left+(width-dstWidth)/2;
+                int dstY = bounds.top+(height-dstHeight)/2;
 
                 SelectObject(hdcPict, pict);
-                StretchBlt(ps.hdc, dstX, dstY, dstWidth, dstHeight,
+                StretchBlt(hdc, dstX, dstY, dstWidth, dstHeight,
                         hdcPict, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
                 DeleteDC(hdcPict);
-                ExcludeClipRect(ps.hdc, dstX, dstY, dstWidth+dstX, dstHeight+dstY);
+                ExcludeClipRect(hdc, dstX, dstY, dstWidth+dstX, dstHeight+dstY);
             }
         }
     }
 
-    FillRect(ps.hdc, &pr, (HBRUSH)GetStockObject(WHITE_BRUSH));
-    SelectObject(ps.hdc, GetStockObject(BLACK_BRUSH));
+    FillRect(hdc, &pr, (HBRUSH)GetStockObject(WHITE_BRUSH));
+    SelectObject(hdc, GetStockObject(BLACK_BRUSH));
 
-    MoveToEx(ps.hdc, 0, 0, NULL);
-    LineTo(ps.hdc, width-1, 0);
-    LineTo(ps.hdc, width-1, height-1);
-    LineTo(ps.hdc, 0, height-1);
-    LineTo(ps.hdc, 0, 0);
+    MoveToEx(hdc, bounds.left, bounds.top, NULL);
+    LineTo(hdc, bounds.left+width-1, bounds.top);
+    LineTo(hdc, bounds.left+width-1, bounds.top+height-1);
+    LineTo(hdc, bounds.left, bounds.top+height-1);
+    LineTo(hdc, bounds.left, bounds.top);
 };
 
 void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)

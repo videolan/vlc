@@ -118,7 +118,7 @@ public:
 
     // container events
     void onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
-    void onPaint(PAINTSTRUCT &ps, RECT &pr);
+    void onPaint(HDC hdc, const RECT &bounds, const RECT &pr);
 
     // control events
     void firePropChangedEvent(DISPID dispid);
@@ -146,6 +146,7 @@ private:
     class VLCConnectionPointContainer *vlcConnectionPointContainer;
     class VLCObjectSafety *vlcObjectSafety;
     class VLCControl *vlcControl;
+    class VLCViewObject *vlcViewObject;
 
     // in place activated window (Clipping window)
     HWND _inplacewnd;
