@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.5 2003/08/30 13:59:15 gbazin Exp $
+ * $Id: vlc_interface.h,v 1.6 2003/09/18 17:54:02 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -25,12 +25,25 @@
 
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
+/**
+ * \file
+ * This file contains structures and function prototypes for 
+ * interface management in vlc 
+ */
+
+
 /*****************************************************************************
  * intf_thread_t: describe an interface thread
  *****************************************************************************
  * This struct describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
+
+/**
+ * \defgroup vlc_interface Interface
+ * These functions and structures are for interface management
+ * @{
+ */
 struct intf_thread_t
 {
     VLC_COMMON_MEMBERS
@@ -39,14 +52,14 @@ struct intf_thread_t
     vlc_bool_t          b_block;
 
     /* Specific interfaces */
-    intf_console_t *    p_console;                                /* console */
-    intf_sys_t *        p_sys;                           /* system interface */
+    intf_console_t *    p_console;                                /** console */
+    intf_sys_t *        p_sys;                           /** system interface */
 
-    /* Interface module */
+    /** Interface module */
     module_t *   p_module;
-    void      ( *pf_run )    ( intf_thread_t * );
+    void      ( *pf_run )    ( intf_thread_t * ); /** Run function */
 
-    /* Specific for dialogs providers */
+    /** Specific for dialogs providers */
     void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
                                intf_dialog_args_t * );
 
@@ -91,6 +104,8 @@ VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t *, const char * )
 VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
+
+/*@}*/
 
 /*****************************************************************************
  * Macros

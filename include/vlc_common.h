@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.78 2003/09/13 17:42:15 fenrir Exp $
+ * $Id: vlc_common.h,v 1.79 2003/09/18 17:54:02 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -23,6 +23,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/**
+ * \file 
+ * This file is a collection of common definitions and types
+ */
 
 /*****************************************************************************
  * Required vlc headers

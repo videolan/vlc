@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.20 2003/03/24 17:15:30 gbazin Exp $
+ * $Id: intf_eject.c,v 1.21 2003/09/18 17:54:02 zorglub Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -23,6 +23,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/**
+ *  \file
+ *  This file contain functions to eject CD and DVD drives
+ */
 
 #include <vlc/vlc.h>
 
@@ -85,6 +90,13 @@ static int EjectSCSI ( int i_fd );
  * returns 1 on failure
  * returns -1 if not implemented
  *****************************************************************************/
+/**
+ * \brief Ejects the CD /DVD
+ * \ingroup vlc_interface
+ * \param p_this the calling vlc_object_t
+ * \param psz_device the CD/DVD to eject
+ * \return 0 on success, 1 on failure, -1 if not implemented
+ */
 int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     int i_ret = VLC_SUCCESS;
@@ -212,6 +224,13 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 /*****************************************************************************
  * Eject using SCSI commands. Return 0 if successful
  *****************************************************************************/
+/**
+ * \brief Ejects the CD /DVD using SCSI commands
+ * \ingroup vlc_interface
+ * This function is local
+ * \param i_fd a device nummber
+ * \return 0 on success, VLC_EGENERIC on failure
+ */
 static int EjectSCSI( int i_fd )
 {
     int i_status;

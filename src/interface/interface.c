@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.105 2003/06/26 12:19:59 sam Exp $
+ * $Id: interface.c,v 1.106 2003/09/18 17:54:02 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -22,6 +22,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/**
+ *   \file
+ *   This file contains functions related to interface management
+ */
+
 
 /*****************************************************************************
  * Preamble
@@ -53,6 +59,13 @@ static void Manager( intf_thread_t *p_intf );
  * This function opens output devices and creates specific interfaces. It sends
  * its own error messages.
  *****************************************************************************/
+/**
+ * Create the interface, and prepare it for main loop.
+ * 
+ * \param p_this the calling vlc_object_t
+ * \param psz_module a prefered interface module
+ * \return a pointer to the created interface thread, NULL on error
+ */
 intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
     intf_thread_t * p_intf;
@@ -109,6 +122,14 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
  * This function either creates a new thread and runs the interface in it,
  * or runs the interface in the current thread, depending on b_block.
  *****************************************************************************/
+/**
+ * Run the interface thread.
+ *
+ * If b_block is not set, runs the interface in the thread, else, 
+ * creates a new thread and runs the interface.
+ * \param p_intf the interface thread
+ * \return VLC_SUCCESS on success, an error number else
+ */
 int intf_RunThread( intf_thread_t *p_intf )
 {
     if( p_intf->b_block )
@@ -146,6 +167,13 @@ int intf_RunThread( intf_thread_t *p_intf )
  *****************************************************************************
  * This function asks the interface thread to stop.
  *****************************************************************************/
+/**
+ * Stops the interface thread
+ *
+ * This function asks the interface thread to stop
+ * \param p_intf the interface thread
+ * \return nothing
+ */
 void intf_StopThread( intf_thread_t *p_intf )
 {
     /* Tell the interface to die */
@@ -163,6 +191,13 @@ void intf_StopThread( intf_thread_t *p_intf )
  *****************************************************************************
  * This function destroys specific interfaces and close output devices.
  *****************************************************************************/
+/**
+ * \brief Destroy the interface after the main loop endeed.
+ * 
+ * Destroys interfaces and output devices
+ * \param p_intf the interface thread
+ * \return nothing
+ */
 void intf_Destroy( intf_thread_t *p_intf )
 {
     /* Unlock module */
@@ -176,6 +211,8 @@ void intf_Destroy( intf_thread_t *p_intf )
 
 /* Following functions are local */
 
+
+
 /*****************************************************************************
  * Manager: helper thread for blocking interfaces
  *****************************************************************************
@@ -183,6 +220,18 @@ void intf_Destroy( intf_thread_t *p_intf )
  * p_vlc->b_die events because it is only supposed to listen to p_intf->b_die.
  * This thread takes care of the matter.
  *****************************************************************************/
+/**
+ * \brief Helper thread for blocking interfaces.
+ * \ingroup vlc_interface
+ *
+ * This is a local function
+ * If the interface is launched in the main thread, it will not listen to
+ * p_vlc->b_die events because it is only supposed to listen to p_intf->b_die.
+ * This thread takes care of the matter.
+ * \see intf_RunThread
+ * \param p_intf an interface thread
+ * \return nothing
+ */
 static void Manager( intf_thread_t *p_intf )
 {
     while( !p_intf->b_die )

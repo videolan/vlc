@@ -2,7 +2,7 @@
  * vlc_objects.h: vlc_object_t definition.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_objects.h,v 1.17 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: vlc_objects.h,v 1.18 2003/09/18 17:54:02 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,6 +20,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/**
+ * \file
+ * This file defines the vlc_object_t structure and object types
+ */
+
+/** 
+ * \defgroup vlc_object Objects
+ * @{
+ */
 
 /* Object types */
 #define VLC_OBJECT_ROOT       (-1)
@@ -49,6 +59,7 @@
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
  *****************************************************************************/
+/** The main vlc_object_t structure */
 struct vlc_object_t
 {
     VLC_COMMON_MEMBERS
@@ -67,6 +78,8 @@ VLC_EXPORT( void, __vlc_object_yield, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
+
+/*}@*/
 
 #define vlc_object_create(a,b) \
     __vlc_object_create( VLC_OBJECT(a), b )

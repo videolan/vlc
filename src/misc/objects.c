@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.38 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: objects.c,v 1.39 2003/09/18 17:54:02 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,6 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/**
+ * \file
+ * This file contains the functions to handle the vlc_object_t type
+ */
+
 
 /*****************************************************************************
  * Preamble
@@ -76,6 +82,14 @@ static vlc_mutex_t    structure_lock;
  * i_type is not a known value such as VLC_OBJECT_ROOT, VLC_OBJECT_VOUT and
  * so on, vlc_object_create will use its value for the object size.
  *****************************************************************************/
+
+/** 
+ * Initialize a vlc object
+ *
+ * This function allocates memory for a vlc object and initializes it. If
+ * i_type is not a known value such as VLC_OBJECT_ROOT, VLC_OBJECT_VOUT and
+ * so on, vlc_object_create will use its value for the object size.
+ */
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
     vlc_object_t * p_new;
@@ -237,9 +251,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     return p_new;
 }
 
-/*****************************************************************************
- * vlc_object_destroy: destroy a vlc object
- *****************************************************************************
+/**
+ ****************************************************************************
+ * Destroy a vlc object
+ * 
  * This function destroys an object that has been previously allocated with
  * vlc_object_create. The object's refcount must be zero and it must not be
  * attached to other objects in any way.
@@ -325,9 +340,9 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     free( p_this );
 }
 
-/*****************************************************************************
- * vlc_object_get: find an object given its ID
- *****************************************************************************
+/**
+ * find an object given its ID
+ *
  * This function looks for the object whose i_object_id field is i_id. We
  * use a dichotomy so that lookups are in log2(n).
  *****************************************************************************/
@@ -387,8 +402,9 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
     return NULL;
 }
 
-/*****************************************************************************
- * vlc_object_find: find a typed object and increment its refcount
+/**
+ ****************************************************************************
+ * find a typed object and increment its refcount
  *****************************************************************************
  * This function recursively looks for a given object type. i_mode can be one
  * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
@@ -423,8 +439,9 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     return p_found;
 }
 
-/*****************************************************************************
- * vlc_object_yield: increment an object refcount
+/**
+ ****************************************************************************
+ * increment an object refcount
  *****************************************************************************/
 void __vlc_object_yield( vlc_object_t *p_this )
 {
@@ -433,8 +450,9 @@ void __vlc_object_yield( vlc_object_t *p_this )
     vlc_mutex_unlock( &structure_lock );
 }
 
-/*****************************************************************************
- * vlc_object_release: decrement an object refcount
+/**
+ ****************************************************************************
+ * decrement an object refcount
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
@@ -443,8 +461,9 @@ void __vlc_object_release( vlc_object_t *p_this )
     vlc_mutex_unlock( &structure_lock );
 }
 
-/*****************************************************************************
- * vlc_object_attach: attach object to a parent object
+/**
+ ****************************************************************************
+ * attach object to a parent object
  *****************************************************************************
  * This function sets p_this as a child of p_parent, and p_parent as a parent
  * of p_this. This link can be undone using vlc_object_detach.
@@ -469,8 +488,9 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     vlc_mutex_unlock( &structure_lock );
 }
 
-/*****************************************************************************
- * vlc_object_detach: detach object from its parent
+/**
+ ****************************************************************************
+ * detach object from its parent
  *****************************************************************************
  * This function removes all links between an object and its parent.
  *****************************************************************************/
@@ -494,8 +514,9 @@ void __vlc_object_detach( vlc_object_t *p_this )
     vlc_mutex_unlock( &structure_lock );
 }
 
-/*****************************************************************************
- * vlc_list_find: find a list typed objects and increment their refcount
+/**
+ ****************************************************************************
+ * find a list typed objects and increment their refcount
  *****************************************************************************
  * This function recursively looks for a given object type. i_mode can be one
  * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
