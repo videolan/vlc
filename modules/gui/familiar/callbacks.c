@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: callbacks.c,v 1.2 2002/08/06 19:31:18 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -47,6 +47,9 @@
 
 //#include "netutils.h"
 
+static void MediaURLOpenChanged( GtkEditable *editable, gpointer user_data );
+static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data );
+
 /*****************************************************************************
  * Useful function to retrieve p_intf
  ****************************************************************************/
@@ -81,6 +84,50 @@ void * __GtkGetIntf( GtkWidget * widget )
     return p_data;
 }
 
+/*****************************************************************************
+ * Helper functions for URL changes in Media and Preferences notebook pages.
+ ****************************************************************************/
+static void MediaURLOpenChanged( GtkEditable *editable, gpointer user_data )
+{
+    intf_thread_t *p_intf = GtkGetIntf( editable );
+    playlist_t *p_playlist;
+    gchar *       psz_url;
+
+    psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+    g_print( "%s\n",psz_url );
+//    p_url = gtk_editable_get_chars(editable,0,-1);
+
+    // Add p_url to playlist .... but how ?
+    if (p_intf)
+    {
+        p_playlist = (playlist_t *)
+                 vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
+        {
+           playlist_Add( p_playlist, (char*)psz_url,
+                         PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+           vlc_object_release( p_playlist );
+        }
+    }
+}
+
+static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data )
+{
+    gchar *       p_url;
+//    GtkWidget *   item;
+
+    p_url = gtk_entry_get_text(GTK_ENTRY(editable) );
+    g_print( "%s\n",p_url );
+
+//    p_url = gtk_editable_get_chars(editable,0,-1);
+//    item = gtk_list_item_new();
+//    gtk_widget_show (item);
+//    gtk_combo_set_item_string (GTK_COMBO (combo), GTK_ITEM (item), p_url);
+//    /* Now we simply add the item to the combo's list. */
+//    gtk_container_add (GTK_CONTAINER (GTK_COMBO (combo)->list), item);
+}
+
+
 /*
  * Main interface callbacks
  */
@@ -113,7 +160,10 @@ on_toolbar_open_clicked                (GtkButton       *button,
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
     if (p_intf)
+    {
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        gdk_window_raise( p_intf->p_sys->p_window->window );
+    }
 }
 
 
@@ -122,8 +172,10 @@ on_toolbar_preferences_clicked         (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
-    if (p_intf)
+    if (p_intf) {
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        gdk_window_raise( p_intf->p_sys->p_window->window );
+    }
 }
 
 
@@ -168,6 +220,11 @@ on_toolbar_play_clicked                (GtkButton       *button,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
+        if( p_intf )
+        {
+           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+           gdk_window_raise( p_intf->p_sys->p_window->window );
+        }
         // Display open page
     }
 
@@ -178,6 +235,7 @@ on_toolbar_play_clicked                (GtkButton       *button,
         vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Play( p_playlist );
         vlc_object_release( p_playlist );
+        gdk_window_lower( p_intf->p_sys->p_window->window );
     }
     else
     {
@@ -195,10 +253,11 @@ on_toolbar_stop_clicked                (GtkButton       *button,
     intf_thread_t *  p_intf = GtkGetIntf( button );
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
+    if( p_playlist)
     {
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
+        gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
 
@@ -225,11 +284,41 @@ on_toolbar_about_clicked               (GtkButton       *button,
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
     if (p_intf)
-    { // Toggle notebook
+    {// Toggle notebook
+        if (p_intf->p_sys->p_notebook)
+        {
 //        if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
 //           gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
 //        else
            gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+        }
+        gdk_window_raise( p_intf->p_sys->p_window->window );
+    }
+}
+
+
+void
+on_comboURL_entry_changed              (GtkEditable     *editable,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf = GtkGetIntf( editable );
+
+    if (p_intf)
+    {
+        MediaURLOpenChanged( editable, NULL );
+    }
+}
+
+
+void
+on_comboPrefs_entry_changed            (GtkEditable     *editable,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf = GtkGetIntf( editable );
+
+    if (p_intf)
+    {
+        PreferencesURLOpenChanged( editable, NULL );
     }
 }
 
