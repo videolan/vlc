@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.50 2003/09/10 11:37:53 fenrir Exp $
+ * $Id: playlist.c,v 1.51 2003/09/13 17:42:16 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -692,11 +692,10 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status == PLAYLIST_STOPPED )
         {
-            ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                    &b_vout_destroyed, &i_vout_destroyed_date );
-
             ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
                                     &b_sout_destroyed, &i_sout_destroyed_date );
+            ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
+                                    &b_vout_destroyed, &i_vout_destroyed_date );
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -721,11 +720,15 @@ static void RunThread ( playlist_t *p_playlist )
             /* Unlink current input */
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
-            vlc_object_detach( p_input );
             vlc_mutex_unlock( &p_playlist->object_lock );
 
             /* Destroy input */
             input_DestroyThread( p_input );
+            /* Unlink current input (_after_ input_DestroyThread for vout
+             * garbage collector)*/
+            vlc_object_detach( p_input );
+
+            /* Destroy object */
             vlc_object_destroy( p_input );
             continue;
         }
@@ -750,6 +753,14 @@ static void RunThread ( playlist_t *p_playlist )
         msleep( INTF_IDLE_SLEEP );
     }
 
+    /* close all remaining sout */
+    while( ( p_obj = vlc_object_find( p_playlist,
+                                      VLC_OBJECT_SOUT, FIND_CHILD ) ) )
+    {
+        vlc_object_release( p_obj );
+        sout_DeleteInstance( (sout_instance_t*)p_obj );
+    }
+
     /* close all remaining vout */
     while( ( p_obj = vlc_object_find( p_playlist,
                                       VLC_OBJECT_VOUT, FIND_CHILD ) ) )
@@ -757,13 +768,6 @@ static void RunThread ( playlist_t *p_playlist )
         vlc_object_detach( p_obj );
         vlc_object_release( p_obj );
         vout_Destroy( (vout_thread_t *)p_obj );
-    }
-    /* close all remaining sout */
-    while( ( p_obj = vlc_object_find( p_playlist,
-                                      VLC_OBJECT_SOUT, FIND_CHILD ) ) )
-    {
-        vlc_object_release( p_obj );
-        sout_DeleteInstance( (sout_instance_t*)p_obj );
     }
 }
 

@@ -2,7 +2,7 @@
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.5 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: mpga.c,v 1.6 2003/09/13 17:42:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -57,7 +57,9 @@ struct demux_sys_t
     mtime_t         i_time;
 
     int             i_bitrate_avg;  /* extracted from Xing header */
-    es_descriptor_t *p_es;
+    es_out_id_t     *p_es;
+
+    //es_descriptor_t *p_es;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -172,6 +174,8 @@ static int Open( vlc_object_t * p_this )
     uint8_t        *p_peek;
 
     module_t       *p_id3;
+
+    es_format_t    fmt;
 
 
     if( p_input->psz_demux &&
@@ -334,28 +338,11 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
     p_input->stream.i_mux_rate = p_sys->i_bitrate_avg / 8 / 50;
-
-    p_sys->p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program,
-                               1 , AUDIO_ES, NULL, 0 );
-
-    p_sys->p_es->i_stream_id = 1;
-    p_sys->p_es->i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-    input_SelectES( p_input, p_sys->p_es );
-
-    p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
     return VLC_SUCCESS;
 
 error:
@@ -431,14 +418,8 @@ static int Demux( input_thread_t * p_input )
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    if( !p_sys->p_es->p_decoder_fifo )
-    {
-        msg_Err( p_input, "no audio decoder" );
-        input_DeletePES( p_input->p_method_data, p_pes );
-        return( -1 );
-    }
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
 
-    input_DecodePES( p_sys->p_es->p_decoder_fifo, p_pes );
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)mpga_frame_samples( header ) /
                      (mtime_t)MPGA_SAMPLE_RATE( header );

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.37 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: mp4.c,v 1.38 2003/09/13 17:42:16 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -618,7 +618,9 @@ static int   Control  ( input_thread_t *p_input, int i_query, va_list args )
                     (mtime_t)p_sys->i_duration /
                     (mtime_t)p_sys->i_timescale;
             return VLC_SUCCESS;
-
+        case DEMUX_GET_FPS:
+            msg_Warn( p_input, "DEMUX_GET_FPS unimplemented !!" );
+            return VLC_EGENERIC;
         default:
             msg_Err( p_input, "control query unimplemented !!!" );
             return demux_vaControlDefault( p_input, i_query, args );

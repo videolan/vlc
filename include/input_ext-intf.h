@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.95 2003/09/12 18:34:44 fenrir Exp $
+ * $Id: input_ext-intf.h,v 1.96 2003/09/13 17:42:15 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -346,6 +346,9 @@ struct input_thread_t
     char *  psz_name;
 
     count_t c_loops;
+
+    /* private, do not touch it */
+    input_thread_sys_t  *p_sys;
 };
 
 /* Input methods */

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.239 2003/09/12 18:34:45 fenrir Exp $
+ * $Id: input.c,v 1.240 2003/09/13 17:42:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,10 +41,19 @@
 #include "stream_output.h"
 
 #include "vlc_interface.h"
+#include "codecs.h"
+#include "modules/demux/util/sub.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+struct input_thread_sys_t
+{
+    /* subtitles */
+    int              i_sub;
+    subtitle_demux_t **sub;
+};
+
 static  int RunThread       ( input_thread_t *p_input );
 static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
@@ -145,6 +154,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Initialize thread properties */
     p_input->b_eof      = 0;
+    p_input->p_sys      = NULL;
 
     /* Set target */
     p_input->psz_source = strdup( p_item->psz_uri );
@@ -367,6 +377,7 @@ static int RunThread( input_thread_t *p_input )
             if( p_input->stream.p_selected_area->i_size > 0 )
             {
                 unsigned int i;
+                mtime_t      i_time;
                 double f = (double)p_input->stream.p_selected_area->i_seek /
                            (double)p_input->stream.p_selected_area->i_size;
 
@@ -384,6 +395,22 @@ static int RunThread( input_thread_t *p_input )
 
                     /* Reinitialize synchro. */
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+                }
+
+                if( !demux_Control( p_input, DEMUX_GET_TIME, &i_time ) )
+                {
+                    int i;
+                    vlc_value_t val;
+
+                    /* Help in bar display */
+                    val.i_time = i_time;
+                    var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
+
+                    /* Seek subs */
+                    for( i = 0; i < p_input->p_sys->i_sub; i++ )
+                    {
+                        subtitle_Seek( p_input->p_sys->sub[i], i_time );
+                    }
                 }
             }
             p_input->stream.p_selected_area->i_seek = NO_SEEK;
@@ -434,24 +461,35 @@ static int RunThread( input_thread_t *p_input )
 
         if( !p_input->b_error && !p_input->b_eof && i_update_next < mdate() )
         {
-            double d;
+            int i;
+            mtime_t i_time;
+            mtime_t i_length;
+            double  d_pos;
 
             /* update input status variables */
-            if( !demux_Control( p_input, DEMUX_GET_POSITION, &d ) )
+            if( !demux_Control( p_input, DEMUX_GET_POSITION, &d_pos ) )
             {
-                val.f_float = (float)d;
+                val.f_float = (float)d_pos;
                 var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux_Control( p_input, DEMUX_GET_TIME, &val.i_time ) )
+            if( !demux_Control( p_input, DEMUX_GET_TIME, &i_time ) )
             {
+                val.i_time = i_time;
                 var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux_Control( p_input, DEMUX_GET_LENGTH, &val.i_time ) )
+            if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) )
             {
+                val.i_time = i_length;
                 var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
             }
 
-            i_update_next = mdate() + 200000LL;
+            /* update subs */
+            for( i = 0; i < p_input->p_sys->i_sub; i++ )
+            {
+                subtitle_Demux( p_input->p_sys->sub[i], i_time );
+            }
+
+            i_update_next = mdate() + 150000LL;
         }
     }
 
@@ -470,9 +508,12 @@ static int RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
+    float f_fps;
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
     vlc_value_t val;
+    subtitle_demux_t *p_sub;
+    int64_t i_microsecondperframe;
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -663,6 +704,34 @@ static int InitThread( input_thread_t * p_input )
         return VLC_EGENERIC;
     }
 
+    /* Init input_thread_sys_t */
+    p_input->p_sys = malloc( sizeof( input_thread_sys_t ) );
+    p_input->p_sys->i_sub = 0;
+    p_input->p_sys->sub   = NULL;
+
+    /* get fps */
+    if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+    {
+        i_microsecondperframe = 0;
+    }
+    else
+    {
+        i_microsecondperframe = (int64_t)( (double)1000000.0 / (double)f_fps );
+    }
+
+    /* Now add subtitles (for now only one) */
+    if( ( p_sub = subtitle_New( p_input, NULL, i_microsecondperframe ) ) )
+    {
+        TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+
+        /* see if it should be selected */
+        var_Get( p_sub, "sub-file", &val );
+        if( val.psz_string && *val.psz_string )
+        {
+            subtitle_Select( p_sub );
+        }
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -685,6 +754,7 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
+    int i;
 #ifdef HAVE_SYS_TIMES_H
     /* Display statistics */
     struct tms  cpu_usage;
@@ -704,7 +774,8 @@ static void EndThread( input_thread_t * p_input )
     /* Close optional stream output instance */
     if ( p_input->stream.p_sout != NULL )
     {
-        vlc_object_t *p_pl = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        vlc_object_t *p_pl =
+            vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         vlc_value_t keep;
 
         if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
@@ -724,6 +795,19 @@ static void EndThread( input_thread_t * p_input )
             vlc_object_release( p_pl );
         }
     }
+
+    /* Destroy subtitles demuxers */
+    for( i = 0; i < p_input->p_sys->i_sub; i++ )
+    {
+        subtitle_Close( p_input->p_sys->sub[i] );
+    }
+    if( p_input->p_sys->i_sub > 0 )
+    {
+        free( p_input->p_sys->sub );
+    }
+
+    /* Free input_thread_sys_t */
+    free( p_input->p_sys );
 
     /* Free demultiplexer's data */
     module_Unneed( p_input, p_input->p_demux );
@@ -855,6 +939,9 @@ struct es_out_sys_t
 
     int         i_id;
     es_out_id_t **id;
+
+    vlc_bool_t  i_audio;
+    vlc_bool_t  i_video;
 };
 struct es_out_id_t
 {
@@ -879,32 +966,218 @@ static es_out_t *EsOutCreate( input_thread_t *p_input )
     out->p_sys->p_input = p_input;
     out->p_sys->i_id    = 0;
     out->p_sys->id      = NULL;
-
+    out->p_sys->i_audio = -1;
+    out->p_sys->i_video = -1;
     return out;
 }
 static void      EsOutRelease( es_out_t *out )
 {
-    free( out->p_sys );
+    es_out_sys_t *p_sys = out->p_sys;
+    int i;
+
+    for( i = 0; i < p_sys->i_id; i++ )
+    {
+        free( p_sys->id[i] );
+    }
+    if( p_sys->id )
+    {
+        free( p_sys->id );
+    }
+    free( p_sys );
     free( out );
 }
 
 static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 {
-    es_out_id_t *id = malloc( sizeof( es_out_id_t ) );
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    es_out_id_t       *id = malloc( sizeof( es_out_id_t ) );
+    pgrm_descriptor_t *p_prgm = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( fmt->i_group >= 0 )
+    {
+        /* search program */
+        p_prgm = input_FindProgram( p_input, fmt->i_group );
+
+        if( p_prgm == NULL )
+        {
+            /* create it */
+            p_prgm = input_AddProgram( p_input, fmt->i_group, 0 );
+
+            /* Select the first by default */
+            if( p_input->stream.p_selected_program == NULL )
+            {
+                p_input->stream.p_selected_program = p_prgm;
+            }
+        }
+    }
+
+    id->p_es = input_AddES( p_input,
+                            p_prgm,
+                            1 + out->p_sys->i_id,
+                            fmt->i_cat,
+                            fmt->psz_description, 0 );
+    id->p_es->i_stream_id = 1 + out->p_sys->i_id;
+    id->p_es->i_fourcc = fmt->i_codec;
+
+    switch( fmt->i_cat )
+    {
+        case AUDIO_ES:
+        {
+            WAVEFORMATEX *p_wf = malloc( sizeof( WAVEFORMATEX ) + fmt->i_extra);
+
+            p_wf->wFormatTag        = WAVE_FORMAT_UNKNOWN;
+            p_wf->nChannels         = fmt->audio.i_channels;
+            p_wf->nSamplesPerSec    = fmt->audio.i_samplerate;
+            p_wf->nAvgBytesPerSec   = fmt->audio.i_bitrate / 8;
+            p_wf->nBlockAlign       = fmt->audio.i_blockalign;
+            p_wf->wBitsPerSample    = fmt->audio.i_bitspersample;
+            p_wf->cbSize            = fmt->i_extra;
+            if( fmt->i_extra > 0 )
+            {
+                if( fmt->i_extra_type != ES_EXTRA_TYPE_WAVEFORMATEX )
+                {
+                    msg_Warn( p_input, "extra type != WAVEFORMATEX for audio" );
+                }
+                memcpy( &p_wf[1], fmt->p_extra, fmt->i_extra );
+            }
+            id->p_es->p_waveformatex = p_wf;
+            break;
+        }
+        case VIDEO_ES:
+        {
+            BITMAPINFOHEADER *p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
+                                              fmt->i_extra );
+            p_bih->biSize           = sizeof(BITMAPINFOHEADER) + fmt->i_extra;
+            p_bih->biWidth          = fmt->video.i_width;
+            p_bih->biHeight         = fmt->video.i_height;
+            p_bih->biPlanes         = 1;
+            p_bih->biBitCount       = 24;
+            p_bih->biCompression    = fmt->i_codec;
+            p_bih->biSizeImage      = fmt->video.i_width * fmt->video.i_height;
+            p_bih->biXPelsPerMeter  = 0;
+            p_bih->biYPelsPerMeter  = 0;
+            p_bih->biClrUsed        = 0;
+            p_bih->biClrImportant   = 0;
+
+            if( fmt->i_extra > 0 )
+            {
+                if( fmt->i_extra_type != ES_EXTRA_TYPE_BITMAPINFOHEADER )
+                {
+                    msg_Warn( p_input,
+                              "extra type != BITMAPINFOHEADER for video" );
+                }
+                memcpy( &p_bih[1], fmt->p_extra, fmt->i_extra );
+            }
+            id->p_es->p_bitmapinfoheader = p_bih;
+            break;
+        }
+        default:
+            break;
+    }
+
+    if( fmt->i_cat == AUDIO_ES && fmt->i_priority > out->p_sys->i_audio )
+    {
+        if( out->p_sys->i_audio >= 0 )
+        {
+            msg_Err( p_input, "FIXME unselect es in es_out_Add" );
+        }
+        input_SelectES( p_input, id->p_es );
+        if( id->p_es->p_decoder_fifo )
+        {
+            out->p_sys->i_audio = fmt->i_priority;
+        }
+    }
+    else if( fmt->i_cat == VIDEO_ES && fmt->i_priority > out->p_sys->i_video )
+    {
+        if( out->p_sys->i_video >= 0 )
+        {
+            msg_Err( p_input, "FIXME unselect es in es_out_Add" );
+        }
+        input_SelectES( p_input, id->p_es );
+        if( id->p_es->p_decoder_fifo )
+        {
+            out->p_sys->i_video = fmt->i_priority;
+        }
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+
+    TAB_APPEND( out->p_sys->i_id, out->p_sys->id, id );
 
     return id;
 }
 static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
 {
+    if( id->p_es->p_decoder_fifo )
+    {
+        input_DecodePES( id->p_es->p_decoder_fifo, p_pes );
+    }
+    else
+    {
+        input_DeletePES( out->p_sys->p_input->p_method_data, p_pes );
+    }
     return VLC_SUCCESS;
 }
 static void EsOutDel( es_out_t *out, es_out_id_t *id )
 {
+    es_out_sys_t *p_sys = out->p_sys;
+
+    TAB_REMOVE( p_sys->i_id, p_sys->id, id );
+
+    vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
+    if( id->p_es->p_decoder_fifo )
+    {
+        input_UnselectES( p_sys->p_input, id->p_es );
+    }
+    if( id->p_es->p_waveformatex )
+    {
+        free( id->p_es->p_waveformatex );
+        id->p_es->p_waveformatex = NULL;
+    }
+    if( id->p_es->p_bitmapinfoheader )
+    {
+        free( id->p_es->p_bitmapinfoheader );
+        id->p_es->p_bitmapinfoheader = NULL;
+    }
+    input_DelES( p_sys->p_input, id->p_es );
+    vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+
     free( id );
 }
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
-    return VLC_EGENERIC;
+    es_out_sys_t *p_sys = out->p_sys;
+    vlc_bool_t  b, *pb;
+    es_out_id_t *id;
+    switch( i_query )
+    {
+        case ES_OUT_SET_SELECT:
+            id = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            b = (vlc_bool_t) va_arg( args, vlc_bool_t );
+            if( b && id->p_es->p_decoder_fifo == NULL )
+            {
+                input_SelectES( p_sys->p_input, id->p_es );
+                return id->p_es->p_decoder_fifo ? VLC_SUCCESS : VLC_EGENERIC;
+            }
+            else if( !b && id->p_es->p_decoder_fifo )
+            {
+                input_UnselectES( p_sys->p_input, id->p_es );
+            }
+            return VLC_SUCCESS;
+
+        case ES_OUT_GET_SELECT:
+            id = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
+
+            *pb = id->p_es->p_decoder_fifo ? VLC_TRUE : VLC_FALSE;
+            return VLC_SUCCESS;
+
+        default:
+            msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
+            return VLC_EGENERIC;
+    }
 }
 
 /*****************************************************************************

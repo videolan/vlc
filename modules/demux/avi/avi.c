@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.61 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: avi.c,v 1.62 2003/09/13 17:42:15 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include "codecs.h"
-
-#include "../util/sub.h"
 
 #include "libavi.h"
 #include "avi.h"
@@ -123,7 +121,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_avi;
     es_descriptor_t *p_es = NULL; /* avoid warning */
     unsigned int i;
-    mtime_t i_microsecperframe = 0; // for some subtitle format
 
     vlc_bool_t b_stream_audio, b_stream_video;
     uint8_t  *p_peek;
@@ -377,12 +374,6 @@ static int Open( vlc_object_t * p_this )
                     input_AddInfo( p_cat, _("Bits Per Pixel"), "%d",
                                    p_avi_strf_vids->p_bih->biBitCount );
                 }
-                if( i_microsecperframe == 0 )
-                {
-                    i_microsecperframe = (mtime_t)1000000 *
-                                         (mtime_t)p_info->i_scale /
-                                         (mtime_t)p_info->i_rate;
-                }
                 break;
             default:
                 msg_Warn( p_input, "stream[%d] unknown type", i );
@@ -422,11 +413,6 @@ static int Open( vlc_object_t * p_this )
             memcpy( p_es->p_bitmapinfoheader, p_init_data, i_init_size );
         }
 #undef p_info
-    }
-
-    if( ( p_avi->p_sub = subtitle_New( p_input, NULL, i_microsecperframe ) ) )
-    {
-        subtitle_Select( p_avi->p_sub );
     }
 
     if( config_GetInt( p_input, "avi-index" ) )
@@ -572,10 +558,6 @@ static void Close ( vlc_object_t * p_this )
         }
     }
     FREE( p_avi->pp_info );
-    if( p_avi->p_sub )
-    {
-        subtitle_Close( p_avi->p_sub );
-    }
     AVI_ChunkFreeRoot( p_input->s, &p_avi->ck_root );
 
     free( p_avi );
@@ -657,11 +639,6 @@ static int Demux_Seekable( input_thread_t *p_input )
 
 
     p_avi->i_time += 25*1000;  /* read 25ms */
-
-    if( p_avi->p_sub )
-    {
-        subtitle_Demux( p_avi->p_sub, p_avi->i_time );
-    }
 
     /* Check if we need to send the audio data to decoder */
     b_play_audio = !p_input->stream.control.b_mute;
@@ -1227,6 +1204,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
 static int    Control( input_thread_t *p_input, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_input->p_demux_data;
+    int i;
     double   f, *pf;
     int64_t i64, *pi64;
 
@@ -1276,10 +1254,6 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
                 f = (double)va_arg( args, double );
                 i64 = (mtime_t)(1000000.0 * p_sys->i_length * f );
                 i_ret = Seek( p_input, i64, (int)(f * 100) );
-                if( p_sys->p_sub )
-                {
-                    subtitle_Seek( p_sys->p_sub, p_sys->i_time );
-                }
                 return i_ret;
             }
             else
@@ -1299,6 +1273,21 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_length * (mtime_t)1000000;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_FPS:
+            pf = (double*)va_arg( args, double * );
+            *pf = 0.0;
+            for( i = 0; i < (int)p_sys->i_streams; i++ )
+            {
+#define tk p_sys->pp_info[i]
+                if( tk->i_cat == VIDEO_ES && tk->i_scale > 0)
+                {
+                    *pf = (float)tk->i_rate / (float)tk->i_scale;
+                    break;
+                }
+#undef tk
+            }
             return VLC_SUCCESS;
 
         default:

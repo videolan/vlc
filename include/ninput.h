@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.10 2003/09/12 18:34:44 fenrir Exp $
+ * $Id: ninput.h,v 1.11 2003/09/13 17:42:15 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,9 +36,9 @@ typedef struct
     int             i_cat;
     vlc_fourcc_t    i_codec;
 
-    int             i_group;    /* eg -1. if >= 0 then a "group" (program) is
-                                   created for each value */
-
+    int             i_group;    /* -1 : standalone
+                                   >= 0 then a "group" (program) is created
+                                        for each value */
     int             i_priority; /*  -2 : mean not selectable by the users
                                     -1 : mean not selected by default even
                                         when no other stream
@@ -78,7 +78,7 @@ static inline void es_format_Init( es_format_t *fmt,
 {
     fmt->i_cat                  = i_cat;
     fmt->i_codec                = i_codec;
-    fmt->i_group                = -1;
+    fmt->i_group                = 0;
     fmt->i_priority             = 0;
     fmt->psz_language           = NULL;
     fmt->psz_description        = NULL;
@@ -213,7 +213,9 @@ enum demux_query_e
     DEMUX_GET_TIME,             /* arg1= int64_t *      res=    */
     DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
 
-    DEMUX_GET_LENGTH            /* arg1= int64_t *      res=can fail    */
+    DEMUX_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
+
+    DEMUX_GET_FPS               /* arg1= float *        res=can fail    */
 };
 
 

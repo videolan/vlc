@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.77 2003/09/12 18:34:44 fenrir Exp $
+ * $Id: vlc_common.h,v 1.78 2003/09/13 17:42:15 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -211,6 +211,7 @@ typedef struct intf_channel_t intf_channel_t;
 
 /* Input */
 typedef struct input_thread_t input_thread_t;
+typedef struct input_thread_sys_t input_thread_sys_t;
 typedef struct input_channel_t input_channel_t;
 typedef struct input_area_t input_area_t;
 typedef struct input_buffers_t input_buffers_t;

@@ -2,7 +2,7 @@
  * demux.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: demux.c,v 1.2 2003/09/07 22:51:11 fenrir Exp $
+ * $Id: demux.c,v 1.3 2003/09/13 17:42:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -132,6 +132,9 @@ int  demux_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
                 *pi64 = 0;
                 i_ret = VLC_EGENERIC;
             }
+            break;
+        case DEMUX_GET_FPS:
+            i_ret = VLC_EGENERIC;
             break;
 
         default:
