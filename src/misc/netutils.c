@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.26 2001/04/27 16:08:26 sam Exp $
+ * $Id: netutils.c,v 1.27 2001/04/27 18:07:57 henri Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -84,7 +84,7 @@ typedef struct input_channel_s
  * network_BuildLocalAddr : fill a sockaddr_in structure for local binding
  *****************************************************************************/
 int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port, 
-                            boolean_t b_broadcast )
+                            char * psz_broadcast )
 {
     char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
     struct hostent    * p_hostent;
@@ -93,7 +93,7 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
     p_socket->sin_family = AF_INET;                                 /* family */
     p_socket->sin_port = htons( i_port );
-    if( !b_broadcast )
+    if( psz_broadcast == NULL )
     {
         /* Try to get our own IP */
         if( gethostname( psz_hostname, sizeof(psz_hostname) ) )
@@ -105,10 +105,11 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
 
     }
     else
-    {
-        /* Instead of trying to find the broadcast address using non-portable
-         * ioctl, let's bind INADDR_ANY */
-        strncpy(psz_hostname,"0.0.0.0",sizeof(psz_hostname));
+    {   
+        /* I didn't manage to make INADDR_ANYT work, even with setsockopt 
+         * so, as it's kludgy to try and determine the broadcast addr
+         * it is passed as an argument in the command line */
+        strncpy( psz_hostname, psz_broadcast, INPUT_MAX_SOURCE_LENGTH );
     }
 
     /* Try to convert address directly from in_addr - this will work if
@@ -242,7 +243,13 @@ int network_ChannelJoin( int i_channel_id )
     char                i_answer;
     fd_set              s_rfds;
     unsigned int 	i_rc;
-    
+ 
+    if( ! p_main->b_channels )
+    {
+        intf_ErrMsg( "Channels disabled. To enable them, use the --channels"
+                     " option" );
+        return( -1 );
+    }
     /* debug */ 
     intf_DbgMsg( "ChannelJoin : %d", i_channel_id );
     /* If last change is too recent, wait a while */

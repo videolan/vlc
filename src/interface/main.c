@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.87 2001/04/20 05:40:03 stef Exp $
+ * $Id: main.c,v 1.88 2001/04/27 18:07:56 henri Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -169,7 +169,7 @@ static const struct option longopts[] =
     {   "channels",         0,          0,      OPT_CHANNELS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
-    {   "broadcast",        0,          0,      OPT_BROADCAST },
+    {   "broadcast",        1,          0,      OPT_BROADCAST },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -685,7 +685,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( INPUT_PORT_VAR, optarg );
             break;
         case OPT_BROADCAST:                                   /* --broadcast */
-            main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
+            main_PutPszVariable( INPUT_BROADCAST_VAR, optarg );
             break;
 
         /* Synchro options */
@@ -834,7 +834,7 @@ static void Usage( int i_fashion )
         "\n  " INPUT_SERVER_VAR "=<hostname>          \tvideo server"
         "\n  " INPUT_PORT_VAR "=<port>            \tvideo server port"
         "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
-        "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
+        "\n  " INPUT_BROADCAST_VAR "=<addr>            \tbroadcast mode"
         "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>     \tchannel server"
         "\n  " INPUT_CHANNEL_PORT_VAR "=<port>         \tchannel server port" );
 

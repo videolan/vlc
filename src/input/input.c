@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.100 2001/04/27 16:08:26 sam Exp $
+ * $Id: input.c,v 1.101 2001/04/27 18:07:56 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -537,12 +537,14 @@ void input_FileClose( input_thread_t * p_input )
  *****************************************************************************/
 void input_NetworkOpen( input_thread_t * p_input )
 {
-    char *psz_server = NULL;
-    int   i_port = 0;
-
+    char                *psz_server = NULL;
+    int                 i_port = 0;
     int                 i_opt;
     struct sockaddr_in  sock;
-    boolean_t           b_broadcast;
+    char *              psz_broadcast;
+    
+    /* Are we broadcasting ? */
+    psz_broadcast = main_GetPszVariable( INPUT_BROADCAST_VAR, NULL );
     
     /* Get the remote server */
     if( p_input->p_source != NULL )
@@ -636,13 +638,9 @@ void input_NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* Get details about what we are supposed to do */
-    b_broadcast = (boolean_t)main_GetIntVariable( INPUT_BROADCAST_VAR, 0 );
-
-    /* TODO : here deal with channel stuff */
-    
     /* Build the local socket */
-    if ( network_BuildLocalAddr( &sock, i_port, b_broadcast ) == -1 )
+    if ( network_BuildLocalAddr( &sock, i_port, psz_broadcast ) 
+         == -1 )
     {
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -671,7 +669,8 @@ void input_NetworkOpen( input_thread_t * p_input )
     if( connect( p_input->i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg("input error: can't connect socket" );
+        intf_ErrMsg( "NetworkOpen: can't connect socket : %s", 
+                     strerror(errno) );
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -691,6 +690,5 @@ void input_NetworkOpen( input_thread_t * p_input )
 void input_NetworkClose( input_thread_t * p_input )
 {
     close( p_input->i_handle );
-    /* FIXME: deal with channels */
 }
 #endif
