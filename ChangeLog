@@ -4,6 +4,7 @@
 
 HEAD
 
+  * ./plugins/macosx: rewrote the net panel for OS X
   * ./plugins/qnx/vout_qnx.c: QNX compilation fix.
   * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
     which caused subtitles to appear slanted in odd width windows.

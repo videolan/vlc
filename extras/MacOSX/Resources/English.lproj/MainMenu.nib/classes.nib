@@ -41,8 +41,7 @@
                 openDiscTypeChanged = id; 
                 openFile = id; 
                 openNet = id; 
-                openNetBroadcast = id; 
-                openNetChannel = id; 
+                openNetProtocol = id; 
                 panelCancel = id; 
                 panelOk = id; 
             }; 
@@ -54,17 +53,10 @@
                 o_disc_panel = id; 
                 o_disc_title = id; 
                 o_disc_type = id; 
-                o_net_channel_addr = id; 
-                o_net_channel_checkbox = id; 
-                o_net_channel_port = id; 
-                o_net_channel_port_label = id; 
-                o_net_channel_pstepper = id; 
                 o_net_panel = id; 
                 o_net_protocol = id; 
                 o_net_server_addr = id; 
                 o_net_server_addr_label = id; 
-                o_net_server_baddr = id; 
-                o_net_server_bcheckbox = id; 
                 o_net_server_port = id; 
                 o_net_server_port_label = id; 
                 o_net_server_pstepper = id; 

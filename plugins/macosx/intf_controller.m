@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.4.2.2 2002/06/02 12:17:23 massiot Exp $
+ * $Id: intf_controller.m,v 1.4.2.3 2002/06/02 22:32:46 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -250,10 +250,15 @@
 - (BOOL)validateMenuItem:(id)sender
 {
     NSMenuItem * o_item = (NSMenuItem *)sender;
+    int tag = [o_item tag];
 
-    if ( [o_item tag] == 12 || [o_item tag] == 13 )
+    if ( tag == 12 || tag == 13 )
     {
         if( !config_GetIntVariable( "network-channel" ) )
+        {
+            return NO;
+        }
+        if ( tag == 12 && !p_main->p_intf->p_sys->i_channel )
         {
             return NO;
         }

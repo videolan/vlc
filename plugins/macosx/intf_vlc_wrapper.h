@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.8.2.2 2002/06/02 12:17:23 massiot Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.8.2.3 2002/06/02 22:32:46 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -72,8 +72,9 @@
 /* open file/disc/network */
 - (void)openFiles:(NSArray*)o_files;
 - (void)openDisc:(NSString*)o_type device:(NSString*)o_device title:(int)i_title chapter:(int)i_chapter;
-- (void)openNet:(NSString*)o_protocol addr:(NSString*)o_addr port:(int)i_port baddr:(NSString*)o_baddr;
+- (void)openNet:(NSString*)o_addr port:(int)i_port;
 - (void)openNetChannel:(NSString*)o_addr port:(int)i_port;
+- (void)openNetHTTP:(NSString*)o_addr;
 
 /* menus management */
 - (void)toggleProgram:(id)sender;

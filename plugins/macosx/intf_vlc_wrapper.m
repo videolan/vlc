@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.6.2.4 2002/06/02 12:17:23 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.6.2.5 2002/06/02 22:32:46 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -577,7 +577,7 @@ static Intf_VLCWrapper *o_intf = nil;
     }
 }
 
-- (void)openNet:(NSString*)o_protocol addr:(NSString*)o_addr port:(int)i_port baddr:(NSString*)o_baddr
+- (void)openNet:(NSString*)o_addr port:(int)i_port
 {
     NSString *o_source;
     int i_end = p_main->p_playlist->i_size;
@@ -588,18 +588,10 @@ static Intf_VLCWrapper *o_intf = nil;
         p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    config_PutIntVariable( "network_channel", 0 );
+    config_PutIntVariable( "network-channel", 0 );
 
-    if( o_baddr != nil )
-    {
-        o_source = [NSString stringWithFormat: @"%@://%@@:%i/%@",
-                        o_protocol, o_addr, i_port, o_baddr];
-    }
-    else
-    {
-        o_source = [NSString stringWithFormat: @"%@://%@@:%i",
-                        o_protocol, o_addr, i_port];
-    }
+    o_source = [NSString stringWithFormat: @"udpstream:@%@:%i",
+                o_addr, i_port];
 
     if ( p_intf->p_sys->b_loop )
     {
@@ -626,15 +618,46 @@ static Intf_VLCWrapper *o_intf = nil;
         p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    config_PutIntVariable( "network_channel", 1 );
+    config_PutIntVariable( "network-channel", 1 );
 
     if( p_main->p_channel == NULL )
     {
         network_ChannelCreate();
     }
 
-    config_PutPszVariable( "channel_server", (char*)[o_addr lossyCString] );
-    config_PutIntVariable( "channel_port", i_port ); 
+    config_PutPszVariable( "channel-server", (char*)[o_addr lossyCString] );
+    config_PutIntVariable( "channel-port", i_port ); 
+}
+
+- (void)openNetHTTP:(NSString*)o_addr
+{
+    NSString *o_source;
+    int i_end = p_main->p_playlist->i_size;
+    intf_thread_t * p_intf = p_main->p_intf;
+
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    config_PutIntVariable( "network-channel", 0 );
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistDelete( p_main->p_playlist,
+                             p_main->p_playlist->i_size - 1 );
+    }
+
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
+                      [o_addr fileSystemRepresentation] );
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
+    if ( p_intf->p_sys->b_loop )
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          "vlc:loop" );
+    }
 }
 
 - (void)toggleProgram:(id)sender

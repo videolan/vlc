@@ -2,7 +2,7 @@
  * intf_open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.h,v 1.2 2002/05/06 22:59:46 massiot Exp $
+ * $Id: intf_open.h,v 1.2.2.1 2002/06/02 22:32:46 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -41,15 +41,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     
     IBOutlet id o_net_panel;
     IBOutlet id o_net_protocol;
-    IBOutlet id o_net_channel_addr;
-    IBOutlet id o_net_channel_checkbox;
-    IBOutlet id o_net_channel_port;
-    IBOutlet id o_net_channel_port_label;
-    IBOutlet id o_net_channel_pstepper;
     IBOutlet id o_net_server_addr;
     IBOutlet id o_net_server_addr_label;
-    IBOutlet id o_net_server_baddr;
-    IBOutlet id o_net_server_bcheckbox;
     IBOutlet id o_net_server_port;
     IBOutlet id o_net_server_port_label;
     IBOutlet id o_net_server_pstepper;
@@ -65,8 +58,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openFile:(id)sender;
 
 - (IBAction)openNet:(id)sender;
-- (IBAction)openNetBroadcast:(id)sender;
-- (IBAction)openNetChannel:(id)sender;
+- (IBAction)openNetProtocol:(id)sender;
 
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;
