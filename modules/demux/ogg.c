@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.11 2002/11/21 09:39:39 gbazin Exp $
+ * $Id: ogg.c,v 1.12 2002/11/21 10:12:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -339,12 +339,11 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
         else
             p_stream->i_pcr = -1;
 
-        /* no granulepos available, try to interpolate the pcr */
+        /* no granulepos available, try to interpolate the pcr.
+         * If we can't then don't touch the old value. */
         if( p_stream->i_bitrate )
             p_stream->i_interpolated_pcr += ( p_oggpacket->bytes * 90000
                                               / p_stream->i_bitrate / 8 );
-        else
-            p_stream->i_interpolated_pcr = -1;
     }
 }
 
@@ -1133,14 +1132,14 @@ static int Demux( input_thread_t * p_input )
         }
     }
 
-    p_ogg->i_pcr = INT_MAX;
-    for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
+    i_stream = 0;
+    p_ogg->i_pcr = p_stream->i_interpolated_pcr;
+    for( ; i_stream < p_ogg->i_streams; i_stream++ )
     {
         if( p_stream->i_cat == SPU_ES )
             continue;
 
-        if( p_stream->i_interpolated_pcr >= 0 &&
-            p_stream->i_interpolated_pcr < p_ogg->i_pcr )
+        if( p_stream->i_interpolated_pcr < p_ogg->i_pcr )
             p_ogg->i_pcr = p_stream->i_interpolated_pcr;
     }
 #undef p_stream
