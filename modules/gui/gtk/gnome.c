@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.11 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: gnome.c,v 1.12 2003/03/07 00:53:09 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -377,6 +377,15 @@ static void Manage( intf_thread_t *p_intf )
         vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
         p_intf->p_sys->p_sub->i_start = i_start;
         vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
+
+        /* If the messages list becomes too big, just clean half of it. */
+        if( gtk_text_get_length( p_intf->p_sys->p_messages_text ) >
+            VLC_MSG_QSIZE * 1000 )
+        {
+            gtk_text_set_point( p_intf->p_sys->p_messages_text, 0 );
+            gtk_text_forward_delete( p_intf->p_sys->p_messages_text,
+                gtk_text_get_length( p_intf->p_sys->p_messages_text ) / 2 );
+        }
 
         gtk_text_set_point( p_intf->p_sys->p_messages_text,
                     gtk_text_get_length( p_intf->p_sys->p_messages_text ) );
