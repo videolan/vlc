@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.6 2002/10/28 22:25:16 gbazin Exp $
+ * $Id: directx.c,v 1.7 2002/11/26 10:55:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -83,7 +83,7 @@ static void DirectXCloseSurface   ( vout_thread_t *p_vout,
                                     LPDIRECTDRAWSURFACE2 );
 static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
 static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
-static int  DirectXGetSurfaceDesc ( picture_t *p_pic );
+static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
 
 /*****************************************************************************
  * Module descriptor
@@ -268,11 +268,14 @@ static int Init( vout_thread_t *p_vout )
     if( !I_OUTPUTPICTURES )
     {
         /* hmmm, it didn't work! Let's try commonly supported chromas */
-        p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
-        NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+        if( p_vout->output.i_chroma != VLC_FOURCC('Y','V','1','2') )
+        {
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+            NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+        }
         if( !I_OUTPUTPICTURES )
         {
-            /* hmmm, it didn't work! Let's try commonly supported chromas */
+            /* hmmm, it still didn't work! Let's try another one */
             p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
             NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
         }
@@ -541,7 +544,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
             msg_Warn( p_vout, "could not flip overlay (error %i)", dxresult );
         }
 
-        if( DirectXGetSurfaceDesc( p_pic ) )
+        if( DirectXGetSurfaceDesc( p_vout, p_pic ) )
         {
             /* AAARRGG */
             msg_Err( p_vout, "cannot get surface desc" );
@@ -990,7 +993,9 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     int i_ret = VLC_SUCCESS;
     LPDIRECTDRAWSURFACE2 p_surface;
 
-    msg_Dbg( p_vout, "NewPictureVec" );
+    msg_Dbg( p_vout, "NewPictureVec overlay:%s chroma:%.4s",
+             p_vout->p_sys->b_using_overlay ? "yes" : "no",
+             (char *)&p_vout->output.i_chroma );
 
     I_OUTPUTPICTURES = 0;
 
@@ -1055,7 +1060,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 p_pic[0].p_sys->p_front_surface;
 
             /* Reset the front buffer memory */
-            if( !DirectXGetSurfaceDesc( &front_pic ) &&
+            if( !DirectXGetSurfaceDesc( p_vout, &front_pic ) &&
                 !UpdatePictureStruct( p_vout, &front_pic,
                                       p_vout->output.i_chroma ) )
             {
@@ -1069,7 +1074,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
-            msg_Dbg( p_vout, "DirectX YUV overlay created successfully" );
+            msg_Dbg( p_vout, "YUV overlay created successfully" );
         }
     }
 
@@ -1085,7 +1090,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         {
             i_ret = DirectXCreateSurface( p_vout, &p_surface,
                                           p_vout->output.i_chroma,
-                                          p_vout->p_sys->b_using_overlay,
+                                          0 /* no overlay */,
                                           0 /* no back buffers */ );
         }
 
@@ -1130,8 +1135,19 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             i_ret = DirectXCreateSurface( p_vout, &p_surface,
                                           p_vout->output.i_chroma,
-                                          p_vout->p_sys->b_using_overlay,
+                                          0 /* no overlay */,
                                           0 /* no back buffers */ );
+
+            if( i_ret && !p_vout->p_sys->b_use_sysmem )
+            {
+                /* Give it a last try with b_use_sysmem enabled */
+                p_vout->p_sys->b_use_sysmem = 1;
+
+                i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                              p_vout->output.i_chroma,
+                                              0 /* no overlay */,
+                                              0 /* no back buffers */ );
+            }
         }
 
         if( i_ret == VLC_SUCCESS )
@@ -1148,7 +1164,8 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             I_OUTPUTPICTURES = 1;
 
-            msg_Dbg( p_vout, "DirectX plain surface created successfully" );
+            msg_Dbg( p_vout, "created plain surface of chroma:%.4s",
+                     (char *)&p_vout->output.i_chroma );
         }
     }
 
@@ -1161,7 +1178,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         p_pic[i].i_type   = DIRECT_PICTURE;
         PP_OUTPUTPICTURE[i] = &p_pic[i];
 
-        if( DirectXGetSurfaceDesc( &p_pic[i] ) )
+        if( DirectXGetSurfaceDesc( p_vout, &p_pic[i] ) )
         {
             /* AAARRGG */
             FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
@@ -1180,7 +1197,9 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         }
     }
 
-    msg_Dbg( p_vout, "End NewPictureVec");
+    msg_Dbg( p_vout, "End NewPictureVec (%s)",
+             I_OUTPUTPICTURES ? "succeeded" : "failed" );
+
     return VLC_SUCCESS;
 }
 
@@ -1379,7 +1398,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
  * This function get and stores the surface descriptor which among things
  * has the pointer to the picture data.
  *****************************************************************************/
-static int DirectXGetSurfaceDesc( picture_t *p_pic )
+static int DirectXGetSurfaceDesc( vout_thread_t *p_vout, picture_t *p_pic )
 {
     HRESULT dxresult;
 
@@ -1402,7 +1421,7 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     }
     if( dxresult != DD_OK )
     {
-//X        msg_Err( p_vout, "DirectXGetSurfaceDesc cannot lock surface" );
+        msg_Err( p_vout, "DirectXGetSurfaceDesc cannot lock surface" );
         return VLC_EGENERIC;
     }
 
