@@ -194,6 +194,8 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
     }
 
     /* look for module 'Name' */
+    p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
     for( pp_parser = (module_t **)p_list->pp_objects ;
          *pp_parser ;
          pp_parser++ )
