@@ -36,6 +36,7 @@
 #include "prefs.h"
 #include "playlist.h"
 #include "controls.h"
+#include "about.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -289,7 +290,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     } else {
         _o_sharedMainInstance = [super init];
     }
-
+    
+    o_about = [[VLAboutBox alloc] init];
+    
     return _o_sharedMainInstance;
 }
 
@@ -1275,6 +1278,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)openRecentItem:(id)sender
 {
     [self application: nil openFile: [sender title]];
+}
+
+- (IBAction)viewAbout:(id)sender
+{
+    [o_about showPanel];
 }
 
 - (IBAction)viewPreferences:(id)sender

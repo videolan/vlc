@@ -50,7 +50,7 @@ static VLAboutBox *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
-- (IBAction)showPanel:(id)sender
+- (void)showPanel
 {    
     if (!o_credits_path)
     {

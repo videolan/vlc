@@ -113,6 +113,7 @@
                 openWebsite = id; 
                 reportABug = id; 
                 timesliderUpdate = id; 
+                viewAbout = id; 
                 viewPreferences = id; 
             }; 
             CLASS = VLCMain; 

@@ -49,6 +49,6 @@
 }
 
 + (VLAboutBox *)sharedInstance;
-- (IBAction)showPanel:(id)sender;
+- (void)showPanel;
 
 @end
