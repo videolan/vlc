@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.6 2002/01/21 00:52:07 sam Exp $
+ * $Id: vout_subpictures.c,v 1.7 2002/02/13 22:10:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,10 +38,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void vout_RenderRGBSPU( const vout_thread_t *p_vout, picture_t *p_pic,
-                               const subpicture_t *p_spu );
-static void vout_RenderYUVSPU( const vout_thread_t *p_vout, picture_t *p_pic,
-                               const subpicture_t *p_spu );
+static void vout_RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                            const subpicture_t *p_spu );
 
 /* FIXME: fake palette - the real one has to be sought in the .IFO */
 static int p_palette[4] = { 0x0000, 0x0000, 0xffff, 0x8888 };
@@ -264,8 +262,7 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
         switch( p_subpic->i_type )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            vout_RenderRGBSPU( p_vout, p_pic, p_subpic );
-            vout_RenderYUVSPU( p_vout, p_pic, p_subpic );
+            vout_RenderSPU( p_vout, p_pic, p_subpic );
             break;
 
 #if 0
@@ -421,6 +418,7 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
     return p_subpic;
 }
 
+#if 0  /* code removed because we should use the FOURCC value instead */
 /*****************************************************************************
  * vout_RenderRGBSPU: draw an SPU on a picture
  *****************************************************************************
@@ -432,7 +430,6 @@ subpicture_t *vout_SortSubPictures( vout_thread_t *p_vout,
 static void vout_RenderRGBSPU( const vout_thread_t *p_vout, picture_t *p_pic,
                                const subpicture_t *p_spu )
 {
-#if 0
     int  i_len, i_color;
     u16 *p_source = (u16 *)p_spu->p_data;
 
@@ -526,19 +523,19 @@ static void vout_RenderRGBSPU( const vout_thread_t *p_vout, picture_t *p_pic,
             }
         }
     }
-#endif
 }
+#endif
 
 /*****************************************************************************
- * vout_RenderYUVSPU: draw an SPU on an YUV overlay
+ * vout_RenderSPU: draw an SPU on an YUV overlay
  *****************************************************************************
  * This is a fast implementation of the subpicture drawing code. The data
  * has been preprocessed once in spu_decoder.c, so we don't need to parse the
  * RLE buffer again and again. Most sanity checks are done in spu_decoder.c
  * so that this routine can be as fast as possible.
  *****************************************************************************/
-static void vout_RenderYUVSPU( const vout_thread_t *p_vout, picture_t *p_pic,
-                               const subpicture_t *p_spu )
+static void vout_RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+                            const subpicture_t *p_spu )
 {
     int  i_len, i_color;
     u16 *p_source = (u16 *)p_spu->p_data;

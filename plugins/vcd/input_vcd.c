@@ -229,6 +229,14 @@ static void VCDInit( input_thread_t * p_input )
         p_input->b_error = 1;
         return;
     }
+    else if( p_vcd->nb_tracks <= 1 )
+    {
+        intf_ErrMsg( "input error: no movie tracks found" );
+        input_BuffersEnd( p_input->p_method_data );
+        free( p_vcd );
+        p_input->b_error = 1;
+        return;
+    }
 
     p_vcd->p_sectors = ioctl_GetSectors( p_input->i_handle );
     if ( p_vcd->p_sectors == NULL )

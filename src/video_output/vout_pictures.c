@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.13 2002/02/08 15:57:29 sam Exp $
+ * $Id: vout_pictures.c,v 1.14 2002/02/13 22:10:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -327,7 +327,6 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
              * displaying it if there are subtitles. */
             if( p_subpic != NULL )
             {
-                    //printf("memcpy (refcount != 0)\n");
                 /* We have subtitles. First copy the picture to
                  * the spare direct buffer, then render the
                  * subtitles. */
@@ -341,14 +340,12 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
             /* No subtitles, picture is in a directbuffer so
              * we can display it directly even if it is still
              * in use. */
-                    //printf("direct (refcount == 0)\n");
             return p_pic;
         }
 
         /* Picture is in a direct buffer but isn't used by the
          * decoder. We can safely render subtitles on it and
          * display it. */
-                    //printf("direct (refcount == 0)\n");
         vout_RenderSubPictures( p_vout, p_pic, p_subpic );
 
         return p_pic;
@@ -361,7 +358,6 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
-                    //printf("memcpy (not a direct buffer)\n");
         vout_CopyPicture( p_pic, PP_OUTPUTPICTURE[0] );
 
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
@@ -376,11 +372,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
     /* This usually means software YUV, or hardware YUV with a
      * different chroma. */
 
-    /* XXX: render to the first direct buffer */
-                    //printf("render (not a direct buffer)\n");
-    p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
-
+    /* We render subtitles and convert image to the first direct buffer */
     vout_RenderSubPictures( p_vout, p_pic, p_subpic );
+    p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
 
     return &p_vout->p_picture[0];
 }

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.12 2002/01/14 23:46:35 massiot Exp $
+ * $Id: vpar_headers.c,v 1.13 2002/02/13 22:10:40 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -493,6 +493,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     {
         intf_WarnMsg( 1, "vpar: no vout present, spawning one" );
 
+        vlc_mutex_unlock( &p_vout_bank->lock );
+
         p_vpar->p_vout = vout_CreateThread(
                            NULL, p_vpar->sequence.i_width,
                            p_vpar->sequence.i_height,
@@ -503,12 +505,12 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         if( p_vpar->p_vout == NULL )
         {
             intf_ErrMsg( "vpar error: can't open vout, aborting" );
-            vlc_mutex_unlock( &p_vout_bank->lock );
-
             p_vpar->p_fifo->b_error = 1;
             return;
         }
         
+        vlc_mutex_lock( &p_vout_bank->lock );
+
         p_vout_bank->pp_vout[ p_vout_bank->i_count ] = p_vpar->p_vout;
         p_vout_bank->i_count++;
     }

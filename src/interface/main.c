@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.148 2002/02/06 20:44:23 gbazin Exp $
+ * $Id: main.c,v 1.149 2002/02/13 22:10:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -753,7 +753,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutIntVariable( AOUT_VOLUME_VAR, atoi(optarg) );
             break;
         case OPT_DESYNC:                                         /* --desync */
-            p_main->i_desync = atoi(optarg);
+            p_main->i_desync = (mtime_t)atoi(optarg) * (mtime_t)1000;
             break;
 
         /* Video options */
