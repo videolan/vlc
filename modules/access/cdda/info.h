@@ -28,11 +28,12 @@ int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                             vlc_bool_t b_single_track );
 
 /*
- Gets and saves CDDA Meta Information. In the Control routine,
+ Sets CDDA Meta Information. In the Control routine,
  we handle Meta Information requests and basically copy what we've
  saved here.
  */
-void     CDDAMetaInfo( access_t *p_access, int, /*const*/ char *psz_mrl  );
+void     CDDAMetaInfo( access_t *p_access, track_t i_track, 
+		       /*const*/ char *psz_mrl  );
 
 /*
  Saves Meta Information about the CD-DA.
@@ -40,7 +41,7 @@ void     CDDAMetaInfo( access_t *p_access, int, /*const*/ char *psz_mrl  );
  Saves information that CDDAMetaInfo uses. Should be called before
  CDDAMetaInfo is called.
  */
-void     CDDAMetaInfoInit( access_t *p_access, int i_track );
+void     CDDAMetaInfoInit( access_t *p_access );
 
 
 /*

@@ -580,7 +580,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 	    } else {
   	       snprintf(psz_mrl, psz_mrl_max, "%s%s",
 			CDDA_MRL_PREFIX, p_cdda->psz_source);
-	       CDDAMetaInfo( p_access, -1, psz_mrl );
+	       CDDAMetaInfo( p_access, CDIO_INVALID_TRACK, psz_mrl );
 	       free(psz_mrl);
 	    }
 
