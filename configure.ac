@@ -992,8 +992,7 @@ VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http access_mms])
 VLC_ADD_PLUGINS([access_ftp ipv4])
 
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGINS([access_directory sap])
-  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq])
+  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap])
 fi
 
 dnl

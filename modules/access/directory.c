@@ -48,6 +48,8 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
+#elif defined( UNDER_CE )
+#   define strcoll strcmp
 #endif
 
 #ifdef HAVE_DIRENT_H
@@ -125,6 +127,17 @@ static int Open( vlc_object_t *p_this )
 
     if( ( stat( p_access->psz_path, &stat_info ) == -1 ) ||
         !S_ISDIR( stat_info.st_mode ) )
+
+#elif defined(WIN32)
+#   ifdef UNICODE
+    wchar_t pwsz_path[MAX_PATH];
+    mbstowcs( pwsz_path, p_access->psz_path, MAX_PATH );
+    pwsz_path[MAX_PATH-1] = 0;
+    if( !(GetFileAttributes( pwsz_path ) & FILE_ATTRIBUTE_DIRECTORY) )
+#   else
+    if( !(GetFileAttributes( p_access->psz_path ) & FILE_ATTRIBUTE_DIRECTORY) )
+#   endif
+
 #else
     if( strcmp( p_access->psz_access, "dir") &&
         strcmp( p_access->psz_access, "directory") )
