@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.39 2003/11/23 18:31:54 alexis Exp $
+ * $Id: sap.c,v 1.40 2003/12/07 19:01:05 jpsaman Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -355,7 +355,6 @@ static void Run( intf_thread_t *p_intf )
         int b_message_type;
         int b_encrypted;
         int b_compressed;
-        int i_mesg_id_hash;
         unsigned char *p_decompressed_buffer;
         int i_decompressed_size;
         
