@@ -1,8 +1,8 @@
 /*****************************************************************************
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
- * $Id: rawdv.c,v 1.15 2004/02/29 19:01:22 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -35,12 +35,9 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static block_t *dv_extract_audio( input_thread_t * p_input,
-                                  block_t* p_frame_block );
-
 vlc_module_begin();
     set_description( _("raw dv demuxer") );
-    set_capability( "demux", 2 );
+    set_capability( "demux2", 2 );
     set_callbacks( Open, Close );
     add_shortcut( "rawdv" );
 vlc_module_end();
@@ -109,22 +106,26 @@ struct demux_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux     ( input_thread_t * );
+static int Demux( demux_t * );
+static int Control( demux_t *, int i_query, va_list args );
+
+static block_t *dv_extract_audio( demux_t *p_demux,
+                                  block_t* p_frame_block );
 
 /*****************************************************************************
  * Open: initializes raw dv demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
-    byte_t         *p_peek, *p_peek_backup;
+    byte_t      *p_peek, *p_peek_backup;
 
-    uint32_t       i_dword;
-    dv_header_t    dv_header;
-    dv_id_t        dv_id;
-    char           *psz_ext;
+    uint32_t    i_dword;
+    dv_header_t dv_header;
+    dv_id_t     dv_id;
+    char        *psz_ext;
 
     /* It isn't easy to recognize a raw dv stream. The chances that we'll
      * mistake a stream from another type for a raw dv stream are too high, so
@@ -132,18 +133,18 @@ static int Open( vlc_object_t * p_this )
      * it is possible to force this demux. */
 
     /* Check for dv file extension */
-    psz_ext = strrchr ( p_input->psz_name, '.' );
-    if( ( !psz_ext || strcasecmp( psz_ext, ".dv") )&&
-        ( !p_input->psz_demux || strcmp(p_input->psz_demux, "rawdv") ) )
+    psz_ext = strrchr( p_demux->psz_path, '.' );
+    if( ( !psz_ext || strcasecmp( psz_ext, ".dv") ) &&
+        strcmp(p_demux->psz_demux, "rawdv") )
     {
         return VLC_EGENERIC;
     }
 
-    if( stream_Peek( p_input->s, &p_peek, DV_PAL_FRAME_SIZE ) <
+    if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
         DV_NTSC_FRAME_SIZE )
     {
         /* Stream too short ... */
-        msg_Err( p_input, "cannot peek()" );
+        msg_Err( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
     }
     p_peek_backup = p_peek;
@@ -161,7 +162,7 @@ static int Open( vlc_object_t * p_this )
 
     if( dv_id.sct != 0 )
     {
-        msg_Warn( p_input, "not a raw dv stream header" );
+        msg_Warn( p_demux, "not a raw dv stream header" );
         return VLC_EGENERIC;
     }
 
@@ -170,7 +171,7 @@ static int Open( vlc_object_t * p_this )
     i_dword <<= 1;
     if( i_dword >> (32 - 1) ) /* incorrect bit */
     {
-        msg_Warn( p_input, "incorrect bit" );
+        msg_Warn( p_demux, "incorrect bit" );
         return VLC_EGENERIC;
     }
 
@@ -194,9 +195,9 @@ static int Open( vlc_object_t * p_this )
 
 
     /* Set p_input field */
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
 
     p_sys->i_dsf = dv_header.dsf;
     p_sys->frame_size = dv_header.dsf ? 12 * 150 * 80 : 10 * 150 * 80;
@@ -212,22 +213,14 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt_video.video.i_width = 720;
     p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;;
 
+    /* FIXME FIXME */
+#if 0
     /* necessary because input_SplitBuffer() will only get
      * INPUT_DEFAULT_BUFSIZE bytes at a time. */
     p_input->i_bufsize = p_sys->frame_size;
+#endif
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-    p_input->stream.i_mux_rate = p_sys->frame_size * p_sys->f_rate;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sys->p_es_video = es_out_Add( p_input->p_es_out, &p_sys->fmt_video );
+    p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
 
     /* Audio stuff */
     p_peek = p_peek_backup + 80*6+80*16*3 + 3; /* beginning of AAUX pack */
@@ -254,7 +247,7 @@ static int Open( vlc_object_t * p_this )
         /* 12 bits non-linear will be converted to 16 bits linear */
         p_sys->fmt_audio.audio.i_bitspersample = 16;
 
-        p_sys->p_es_audio = es_out_Add( p_input->p_es_out, &p_sys->fmt_audio );
+        p_sys->p_es_audio = es_out_Add( p_demux->out, &p_sys->fmt_audio );
     }
 
     return VLC_SUCCESS;
@@ -265,8 +258,8 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys  = p_demux->p_sys;
 
     free( p_sys );
 }
@@ -276,73 +269,60 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux( input_thread_t * p_input )
+static int Demux( demux_t *p_demux )
 {
-    demux_sys_t    *p_sys = p_input->p_demux_data;
-    block_t        *p_block;
-    vlc_bool_t     b_audio = VLC_FALSE, b_video = VLC_FALSE;
-
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        off_t i_pos = stream_Tell( p_input->s );
-
-        msg_Warn( p_input, "synchro reinit" );
-
-        /* If the user tried to seek in the stream, we need to make sure
-         * the new position is at a DIF block boundary. */
-        if( i_pos % p_sys->frame_size > 0 )
-        {
-            i_pos += p_sys->frame_size - i_pos % p_sys->frame_size;
-
-            if( stream_Seek( p_input->s, i_pos ) )
-            {
-                msg_Warn( p_input, "cannot resynch after seek (EOF?)" );
-                return -1;
-            }
-        }
-    }
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    block_t     *p_block;
+    vlc_bool_t  b_audio = VLC_FALSE;
 
     /* Call the pace control */
-    input_ClockManageRef( p_input, p_input->stream.p_selected_program,
-                          p_sys->i_pcr );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
 
-    if( ( p_block = stream_Block( p_input->s, p_sys->frame_size ) ) == NULL )
+    if( ( p_block = stream_Block( p_demux->s, p_sys->frame_size ) ) == NULL )
     {
         /* EOF */
         return 0;
     }
 
-    es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
-                    p_sys->p_es_video, &b_video );
-
     if( p_sys->p_es_audio )
     {
-        es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE,
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                         p_sys->p_es_audio, &b_audio );
     }
 
     p_block->i_dts =
-    p_block->i_pts = input_ClockGetTS( p_input,
-                                       p_input->stream.p_selected_program,
-                                       p_sys->i_pcr );
+    p_block->i_pts = p_sys->i_pcr;
+
     if( b_audio )
     {
-        block_t *p_audio_block = dv_extract_audio( p_input, p_block );
+        block_t *p_audio_block = dv_extract_audio( p_demux, p_block );
         if( p_audio_block )
         {
-            p_audio_block->i_pts = p_audio_block->i_dts = p_block->i_dts;
-            es_out_Send( p_input->p_es_out, p_sys->p_es_audio, p_audio_block );
+            p_audio_block->i_pts =
+            p_audio_block->i_dts = p_sys->i_pcr;
+            es_out_Send( p_demux->out, p_sys->p_es_audio, p_audio_block );
         }
     }
 
-    if( b_video )
-        es_out_Send( p_input->p_es_out, p_sys->p_es_video, p_block );
-    else
-        block_Release( p_block );
+    es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
-    p_sys->i_pcr += ( 90000 / p_sys->f_rate );
+    p_sys->i_pcr += ( I64C(1000000) / p_sys->f_rate );
 
     return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys  = p_demux->p_sys;
+
+    /* XXX: DEMUX_SET_TIME is precise here */
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, -1,
+                                   p_sys->frame_size * p_sys->f_rate * 8,
+                                   p_sys->frame_size, i_query, args );
 }
 
 static const uint16_t dv_audio_shuffle525[10][9] = {
@@ -351,7 +331,7 @@ static const uint16_t dv_audio_shuffle525[10][9] = {
   { 12, 42, 72,  2, 32, 62, 22, 52, 82 },
   { 18, 48, 78,  8, 38, 68, 28, 58, 88 },
   { 24, 54, 84, 14, 44, 74,  4, 34, 64 },
-  
+
   {  1, 31, 61, 21, 51, 81, 11, 41, 71 }, /* 2nd channel */
   {  7, 37, 67, 27, 57, 87, 17, 47, 77 },
   { 13, 43, 73,  3, 33, 63, 23, 53, 83 },
@@ -364,21 +344,21 @@ static const uint16_t dv_audio_shuffle625[12][9] = {
   {   6,  42,  78,  32,  68, 104,  22,  58,  94},
   {  12,  48,  84,   2,  38,  74,  28,  64, 100},
   {  18,  54,  90,   8,  44,  80,  34,  70, 106},
-  {  24,  60,  96,  14,  50,  86,   4,  40,  76},  
+  {  24,  60,  96,  14,  50,  86,   4,  40,  76},
   {  30,  66, 102,  20,  56,  92,  10,  46,  82},
-	
+
   {   1,  37,  73,  27,  63,  99,  17,  53,  89}, /* 2nd channel */
   {   7,  43,  79,  33,  69, 105,  23,  59,  95},
   {  13,  49,  85,   3,  39,  75,  29,  65, 101},
   {  19,  55,  91,   9,  45,  81,  35,  71, 107},
-  {  25,  61,  97,  15,  51,  87,   5,  41,  77},  
+  {  25,  61,  97,  15,  51,  87,   5,  41,  77},
   {  31,  67, 103,  21,  57,  93,  11,  47,  83},
 };
 
 static inline uint16_t dv_audio_12to16( uint16_t sample )
 {
     uint16_t shift, result;
-    
+
     sample = (sample < 0x800) ? sample : sample | 0xf000;
     shift = (sample & 0xf00) >> 8;
 
@@ -395,10 +375,10 @@ static inline uint16_t dv_audio_12to16( uint16_t sample )
     return result;
 }
 
-static block_t *dv_extract_audio( input_thread_t * p_input,
+static block_t *dv_extract_audio( demux_t *p_demux,
                                   block_t* p_frame_block )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
+    demux_sys_t *p_sys  = p_demux->p_sys;
     block_t *p_block;
     uint8_t *p_frame, *p_buf;
     int i_audio_quant, i_samples, i_size, i_half_ch;
@@ -413,7 +393,7 @@ static block_t *dv_extract_audio( input_thread_t * p_input,
     i_audio_quant = p_buf[4] & 0x07; /* 0 - 16bit, 1 - 12bit */
     if( i_audio_quant > 1 )
     {
-        msg_Dbg( p_input, "Unsupported quantization for DV audio");
+        msg_Dbg( p_demux, "Unsupported quantization for DV audio");
         return NULL;
     }
 
@@ -433,7 +413,7 @@ static block_t *dv_extract_audio( input_thread_t * p_input,
     }
     i_size = (i_size + i_samples) * 4; /* 2ch, 2bytes */
 
-    p_block = block_New( p_input, i_size );
+    p_block = block_New( p_demux, i_size );
 
     /* for each DIF segment */
     p_frame = p_frame_block->p_buffer;
@@ -489,3 +469,5 @@ static block_t *dv_extract_audio( input_thread_t * p_input,
 
     return p_block;
 }
+
+
