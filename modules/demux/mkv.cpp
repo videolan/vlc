@@ -1527,6 +1527,7 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
 #undef tk
     }
     
+    sys.i_start_pts = i_start_time;
     ep->Reset();
 
     return true;
