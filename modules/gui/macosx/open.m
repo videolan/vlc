@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.39 2003/10/19 23:12:16 hartman Exp $
+ * $Id: open.m,v 1.40 2003/10/31 15:54:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -67,7 +67,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         return( nil );
     }
     
-    CFDictionarySetValue( classes_to_match, CFSTR( kIOMediaEjectable ), 
+    CFDictionarySetValue( classes_to_match, CFSTR( kIOMediaEjectableKey ), 
                           kCFBooleanTrue );
     
     kern_result = IOServiceGetMatchingServices( master_port, classes_to_match, 
@@ -89,7 +89,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         do
         {
             str_bsd_path = IORegistryEntryCreateCFProperty( next_media,
-                                                            CFSTR( kIOBSDName ),
+                                                            CFSTR( kIOBSDNameKey ),
                                                             kCFAllocatorDefault,
                                                             0 );
             if( str_bsd_path == NULL )

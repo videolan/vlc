@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.31 2003/10/30 00:12:02 sigmunau Exp $
+ * $Id: mkv.cpp,v 1.32 2003/10/31 15:54:52 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -497,7 +497,7 @@ static int Open( vlc_object_t * p_this )
                     tk.p_extra_data = NULL;
                     tk.i_codec = 0;
                     tk.psz_codec = NULL;
-                    tk.psz_language = NULL;
+                    tk.psz_language = "English";
                     tk.i_default_duration = 0;
                     tk.f_timecodescale = 1.0;
 

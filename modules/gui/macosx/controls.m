@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.49 2003/09/20 19:37:53 hartman Exp $
+ * $Id: controls.m,v 1.50 2003/10/31 15:54:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -34,6 +34,7 @@
 #include "vout.h"
 #include "open.h"
 #include "controls.h"
+#include <osd.h>
 
 /*****************************************************************************
  * VLCControls implementation 
@@ -53,6 +54,7 @@
 
     if( playlist_IsPlaying( p_playlist ) )
     {
+        vout_OSDMessage( p_intf, _( "Pause" ) );
         playlist_Pause( p_playlist );
         vlc_object_release( p_playlist );
     }
@@ -61,6 +63,7 @@
         if( !playlist_IsEmpty( p_playlist ) )
         {
             playlist_Play( p_playlist );
+            vout_OSDMessage( p_intf, _( "Play" ) );
             vlc_object_release( p_playlist );
         }
         else
@@ -78,6 +81,7 @@
                                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
+        vout_OSDMessage( p_intf, _( "Stop" ) );
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
     }
@@ -93,6 +97,7 @@
         vlc_value_t val; val.b_bool = VLC_TRUE;
 
         var_Set( p_input, "rate-faster", val );
+        vout_OSDMessage( p_intf, _( "Faster" ) );
         vlc_object_release( p_input );
     }
 }
@@ -107,6 +112,7 @@
         vlc_value_t val; val.b_bool = VLC_TRUE;
 
         var_Set( p_input, "rate-slower", val );
+        vout_OSDMessage( p_intf, _( "Slower" ) );
         vlc_object_release( p_input );
     }
 }
@@ -157,6 +163,7 @@
 #undef p_area
 
     vlc_object_release( p_playlist );
+    vout_OSDMessage( p_intf, _( "Previous" ) );
 }
 
 - (IBAction)next:(id)sender
@@ -205,6 +212,7 @@
 #undef p_area
 
     vlc_object_release( p_playlist );
+    vout_OSDMessage( p_intf, _( "Next" ) );
 }
 
 - (IBAction)random:(id)sender
@@ -221,6 +229,14 @@
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "random", val );
+    if( val.b_bool )
+    {
+        vout_OSDMessage( p_intf, _( "Shuffle On" ) );
+    }
+    else
+    {
+        vout_OSDMessage( p_intf, _( "Shuffle Off" ) );
+    }    
 
     vlc_object_release( p_playlist );
 }
@@ -239,6 +255,14 @@
     var_Get( p_playlist, "repeat", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "repeat", val );
+    if( val.b_bool )
+    {
+        vout_OSDMessage( p_intf, _( "Repeat On" ) );
+    }
+    else
+    {
+        vout_OSDMessage( p_intf, _( "Repeat Off" ) );
+    }    
 
     vlc_object_release( p_playlist );
 }
@@ -257,6 +281,14 @@
     var_Get( p_playlist, "loop", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "loop", val );
+    if( val.b_bool )
+    {
+        vout_OSDMessage( p_intf, _( "Loop On" ) );
+    }
+    else
+    {
+        vout_OSDMessage( p_intf, _( "Loop Off" ) );
+    }    
 
     vlc_object_release( p_playlist );
 }
@@ -340,10 +372,14 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     audio_volume_t i_volume;
+    char string[9];
 
     aout_VolumeGet( p_intf, &i_volume );
 
-    [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)]; 
+    [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
+
+    sprintf( string, "Vol %d%%", i_volume*100/AOUT_VOLUME_MAX );
+    vout_OSDMessage( p_intf, string );
 }
 
 - (IBAction)windowAction:(id)sender
