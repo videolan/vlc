@@ -117,6 +117,8 @@ SOURCES_skins2 = \
 	src/theme.hpp \
 	src/theme_loader.cpp \
 	src/theme_loader.hpp \
+	src/theme_repository.cpp \
+	src/theme_repository.hpp \
 	src/tooltip.cpp \
 	src/tooltip.hpp \
 	src/top_window.cpp \

@@ -31,6 +31,7 @@
 #include "vlcproc.hpp"
 #include "theme_loader.hpp"
 #include "theme.hpp"
+#include "theme_repository.hpp"
 #include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_quit.hpp"
@@ -95,6 +96,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_osLoop = NULL;
     p_intf->p_sys->p_varManager = NULL;
     p_intf->p_sys->p_vlcProc = NULL;
+    p_intf->p_sys->p_repository = NULL;
 
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
@@ -129,6 +131,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     Dialogs::instance( p_intf );
+    ThemeRepository::instance( p_intf );
 
     // We support play on start
     p_intf->b_play = VLC_TRUE;
@@ -145,6 +148,7 @@ static void Close( vlc_object_t *p_this )
 
     // Destroy "singleton" objects
     OSFactory::instance( p_intf )->destroyOSLoop();
+    ThemeRepository::destroy( p_intf );
     Dialogs::destroy( p_intf );
     Interpreter::destroy( p_intf );
     AsyncQueue::destroy( p_intf );

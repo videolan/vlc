@@ -2,7 +2,7 @@
  * skin_common.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.hpp,v 1.3 2004/02/27 13:24:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -40,6 +40,7 @@ class OSLoop;
 class VarManager;
 class VlcProc;
 class Theme;
+class ThemeRepository;
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
@@ -89,6 +90,8 @@ struct intf_sys_t
     VarManager *p_varManager;
     /// VLC state handler
     VlcProc *p_vlcProc;
+    /// Theme repository
+    ThemeRepository *p_repository;
 
     /// Current theme
     Theme *p_theme;
