@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.6 2000/12/21 19:24:27 massiot Exp $
+ * $Id: input.h,v 1.7 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors:
  *
@@ -30,6 +30,8 @@
                                  * Ethernet MTU is 1500 bytes, so in a UDP   *
                                  * packet we can put : 1500/188 = 7 TS       *
                                  * packets. Have a nice day and merry Xmas.  */
+#define PADDING_PACKET_SIZE 100 /* Size of the NULL packet inserted in case
+                                 * of data loss (this should be < 188).      */
 
 /*****************************************************************************
  * input_capabilities_t
@@ -89,4 +91,57 @@ struct es_descriptor_s * input_AddES( struct input_thread_s *,
                                       size_t );
 void input_DelES( struct input_thread_s *, struct es_descriptor_s * );
 int input_SelectES( struct input_thread_s *, struct es_descriptor_s * );
+
+/*****************************************************************************
+ * Prototypes from input_dec.c
+ *****************************************************************************/
+//decoder_capabilities_s * input_ProbeDecoder( void );
+vlc_thread_t input_RunDecoder( struct decoder_capabilities_s *, void * );
+void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
+void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );
+
+/*****************************************************************************
+ * Create a NULL packet for padding in case of a data loss
+ *****************************************************************************/
+static __inline__ void input_NullPacket( input_thread_t * p_input,
+                                         es_descriptor_t * p_es )
+{
+    data_packet_t *             p_pad_data;
+    pes_packet_t *              p_pes;
+
+    if( (p_pad_data = p_input->p_plugin->pf_new_packet(
+                    p_input->p_method_data,
+                    PADDING_PACKET_SIZE )) == NULL )
+    {
+        intf_ErrMsg("Out of memory");
+        p_input->b_error = 1;
+        return;
+    }
+    memset( p_pad_data->p_buffer, 0, PADDING_PACKET_SIZE );
+    p_pad_data->b_discard_payload = 1;
+    p_pes = p_es->p_pes;
+
+    if( p_pes != NULL )
+    {
+        p_pes->b_messed_up = 1;
+        p_es->p_last->p_next = p_pad_data;
+        p_es->p_last = p_pad_data;
+    }
+    else
+    {
+        if( (p_pes = p_input->p_plugin->pf_new_pes(
+                                        p_input->p_method_data )) == NULL )
+        {
+            intf_ErrMsg("Out of memory");
+            p_input->b_error = 1;
+            return;
+        }
+
+        p_pes->p_first = p_pad_data;
+        p_pes->b_messed_up = p_pes->b_discontinuity = 1;
+        input_DecodePES( p_es->p_decoder_fifo, p_pes );
+    }
+
+    p_es->b_discontinuity = 0;
+}
 

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.25 2001/01/08 18:16:33 sam Exp $
+ * $Id: mpeg_system.c,v 1.26 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors: 
  *
@@ -41,7 +41,6 @@
 
 #include "input.h"
 #include "mpeg_system.h"
-#include "input_dec.h"
 
 #include "main.h"                           /* AC3/MPEG channel, SPU channel */
 
@@ -449,45 +448,12 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
      * for the next start code). */
     if( b_packet_lost || p_es->b_discontinuity )
     {
-        data_packet_t *             p_pad_data;
-
-        if( (p_pad_data = p_input->p_plugin->pf_new_packet(
-                                            p_input->p_method_data,
-                                            PADDING_PACKET_SIZE )) == NULL )
-        {
-            intf_ErrMsg("Out of memory");
-            p_input->b_error = 1;
-            return;
-        }
-        memset( p_data->p_buffer, 0, PADDING_PACKET_SIZE );
-        p_pad_data->b_discard_payload = 1;
-
-        if( p_pes != NULL )
-        {
-            p_pes->b_messed_up = p_pes->b_discontinuity = 1;
-            input_GatherPES( p_input, p_pad_data, p_es, 0, 0 );
-        }
-        else
-        {
-            if( (p_pes = p_input->p_plugin->pf_new_pes(
-                                            p_input->p_method_data )) == NULL )
-            {
-                intf_ErrMsg("Out of memory");
-                p_input->b_error = 1;
-                return;
-            }
-
-            p_pes->p_first = p_pad_data;
-            p_pes->b_messed_up = p_pes->b_discontinuity = 1;
-            input_DecodePES( p_es->p_decoder_fifo, p_pes );
-        }
-
-        p_es->b_discontinuity = 0;
+        input_NullPacket( p_input, p_es );
     }
 
     if( b_unit_start && p_pes != NULL )
     {
-        /* If the TS packet contains the begining of a new PES packet, and
+        /* If the data packet contains the begining of a new PES packet, and
          * if we were reassembling a PES packet, then the PES should be
          * complete now, so parse its header and give it to the decoders. */
         input_ParsePES( p_input, p_es );
@@ -535,7 +501,6 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             p_es->p_last->p_next = p_data;
         }
 
-        p_data->p_next = NULL;
         p_es->p_last = p_data;
 
         /* Size of the payload carried in the data packet */

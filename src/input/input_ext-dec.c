@@ -34,6 +34,8 @@
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
+#include "input_ext-intf.h"
+
 #include "input.h"
 
 /*****************************************************************************
@@ -73,17 +75,7 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     WORD_TYPE           buffer_left;
     ptrdiff_t           i_bytes_left;
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
-
-    /* Buffer used at the end of a decoder thread, to give it zero
-     * values if needed. */
-    static byte_t       p_zero[64] = { 0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0 };
+    boolean_t           b_new_pes;
 
     /* Put the remaining bytes (not aligned on a word boundary) in a
      * temporary buffer. */
@@ -103,47 +95,31 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
              * that's why we need to take the lock before. */
             vlc_mutex_lock( &p_fifo->data_lock );
 
-            /* Is the input thread dying ? */
-            if( p_fifo->b_die )
-            {
-                vlc_mutex_unlock( &p_fifo->data_lock );
-                p_bit_stream->p_byte = p_zero;
-                p_bit_stream->p_end = &p_zero[sizeof(p_zero) - 1];
-                return;
-            }
-
-            /* We should increase the start index of the decoder fifo, but
-             * if we do this now, the input thread could overwrite the
-             * pointer to the current PES packet, and we weren't able to
-             * give it back to the netlist. That's why we free the PES
-             * packet first. */
+            /* Free the previous PES packet. */
             p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
                                    DECODER_FIFO_START( *p_fifo ) );
             DECODER_FIFO_INCSTART( *p_fifo );
 
-            while( DECODER_FIFO_ISEMPTY( *p_fifo ) )
+            if( DECODER_FIFO_ISEMPTY( *p_fifo ) )
             {
+                /* Wait for the input to tell us when we receive a packet. */
                 vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-                if( p_fifo->b_die )
-                {
-                    vlc_mutex_unlock( &p_fifo->data_lock );
-                    p_bit_stream->p_byte = p_zero;
-                    p_bit_stream->p_end = &p_zero[sizeof(p_zero) - 1];
-                    return;
-                }
             }
 
             /* The next byte could be found in the next PES packet */
             p_bit_stream->p_data = DECODER_FIFO_START( *p_fifo )->p_first;
 
-            /* We can release the fifo's data lock */
             vlc_mutex_unlock( &p_fifo->data_lock );
+
+            b_new_pes = 1;
         }
         else
         {
             /* Perhaps the next data packet of the current PES packet contains
              * real data (ie its payload's size is greater than 0). */
             p_bit_stream->p_data = p_bit_stream->p_data->p_next;
+
+            b_new_pes = 0;
         }
     } while ( p_bit_stream->p_data->p_payload_start
                == p_bit_stream->p_data->p_payload_end );
@@ -155,7 +131,7 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     /* Call back the decoder. */
     if( p_bit_stream->pf_bitstream_callback != NULL )
     {
-        p_bit_stream->pf_bitstream_callback( p_bit_stream );
+        p_bit_stream->pf_bitstream_callback( p_bit_stream, b_new_pes );
     }
 
     /* Copy remaining bits of the previous packet */

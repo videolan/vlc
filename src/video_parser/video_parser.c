@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.63 2001/01/07 04:31:18 henri Exp $
+ * $Id: video_parser.c,v 1.64 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -67,14 +67,13 @@ static int      InitThread          ( vpar_thread_t *p_vpar );
 static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
 static void     EndThread           ( vpar_thread_t *p_vpar );
+static void     BitstreamCallback   ( bit_stream_t *p_bit_stream );
 
 /*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
  *****************************************************************************
  * This function creates a new video parser thread, and returns a pointer
  * to its description. On error, it returns NULL.
- * Following configuration properties are used:
- * XXX??
  *****************************************************************************/
 vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
 {
@@ -398,3 +397,11 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     intf_DbgMsg("vpar debug: EndThread(%p)", p_vpar);
 }
+
+/*****************************************************************************
+ * BitstreamCallback: Import parameters from the new data/PES packet
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessful
+ * initialization.
+ *****************************************************************************/
+static void     BitstreamCallback   ( bit_stream_t *p_bit_stream );

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.22 2001/01/08 18:16:33 sam Exp $
+ * $Id: input_programs.c,v 1.23 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors:
  *
@@ -40,7 +40,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input.h"
-#include "input_dec.h"
 
 #include "main.h"                                     /* --noaudio --novideo */
 
@@ -342,7 +341,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Kill associated decoder, if any. */
     if( p_es->p_decoder_fifo != NULL )
     {
-        input_EndDecoder( p_es->p_decoder_fifo, p_es->thread_id );
+        input_EndDecoder( p_input, p_es );
         free( p_es->p_decoder_fifo );
     }
 

@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.4 2000/12/26 19:14:47 massiot Exp $
+ * $Id: mpeg_system.h,v 1.5 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors:
  *
@@ -27,8 +27,6 @@
  *****************************************************************************/
 #define TS_PACKET_SIZE      188                       /* Size of a TS packet */
 #define PSI_SECTION_SIZE    4096            /* Maximum size of a PSI section */
-#define PADDING_PACKET_SIZE 100 /* Size of the NULL packet inserted in case
-                                 * of data loss (this should be < 188).      */
 
 
 /*****************************************************************************

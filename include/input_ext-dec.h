@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.9 2001/01/10 16:24:11 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.10 2001/01/10 19:22:10 massiot Exp $
  *
  * Authors:
  *
@@ -146,7 +146,8 @@ typedef struct bit_stream_s
 
     /* Callback to the decoder used when changing data packets ; set
      * to NULL if your decoder doesn't need it. */
-    void                 (* pf_bitstream_callback)( struct bit_stream_s * );
+    void                 (* pf_bitstream_callback)( struct bit_stream_s *,
+                                                    boolean_t b_new_pes );
     /* Optional argument to the callback */
     void *                  p_callback_arg;
 

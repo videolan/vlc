@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.19 2001/01/10 16:24:11 massiot Exp $
+ * $Id: input_ps.c,v 1.20 2001/01/10 19:22:11 massiot Exp $
  *
  * Authors: 
  *
@@ -423,6 +423,10 @@ static struct data_packet_s * NewPacket( void * p_garbage,
         free( p_data );
         return NULL;
     }
+
+    /* Initialize data */
+    p_data->p_next = NULL;
+    p_data->b_discard_payload = 0;
 
     p_data->p_payload_start = p_data->p_buffer;
     p_data->p_payload_end = p_data->p_buffer + i_size;
