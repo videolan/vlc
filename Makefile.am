@@ -300,6 +300,9 @@ show-libvlc-headers: FORCE
 show-libvlc-pkg-headers: FORCE
 	@echo X: $(dist_pkginclude_HEADERS)
 
+dist-hook:
+	cd $(distdir); ./toolbox --update-vc
+
 ###############################################################################
 # Building libvlc
 ###############################################################################
@@ -309,6 +312,7 @@ bin_SCRIPTS = vlc-config
 lib_LIBRARIES += lib/libvlc.a $(LIBRARIES_libvlc_pic)
 
 lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
+dist_lib_libvlc_a_SOURCES = src/misc/modules_plugin.h
 lib_libvlc_a_CFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CFLAGS_default) @CFLAGS_vlc@
 lib_libvlc_a_CXXFLAGS = $(CPPFLAGS_default) -D__VLC__ $(CXXFLAGS_default)
 lib_libvlc_a_OBJCFLAGS = $(CPPFLAGS_default) -D__VLC__ $(OBJCFLAGS_default)
