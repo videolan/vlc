@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.62 2003/08/14 19:25:56 sigmunau Exp $
+ * $Id: configuration.c,v 1.63 2003/08/23 14:26:34 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -59,6 +59,7 @@
 
 
 static int ConfigStringToKey( char * );
+static char *ConfigKeyToString( int );
 
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
