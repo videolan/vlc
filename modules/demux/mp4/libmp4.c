@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.41 2004/01/06 01:41:10 jlj Exp $
+ * $Id: libmp4.c,v 1.42 2004/01/08 00:37:18 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -2460,9 +2460,6 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
                           MP4_Box_t *p_box, char *psz_fmt, va_list args)
 {
     char    *psz_path;
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
-    size_t  i_size;
-#endif
 
     if( !p_box )
     {
@@ -2470,14 +2467,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
         return;
     }
 
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &psz_path, psz_fmt, args );
-#else
-    i_size = strlen( psz_fmt ) + 1024;
-    psz_path = calloc( i_size, sizeof( char ) );
-    vsnprintf( psz_path, i_size, psz_fmt, args );
-    psz_path[i_size - 1] = 0;
-#endif
 
     if( !psz_path || !psz_path[0] )
     {
