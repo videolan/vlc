@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.63 2003/11/06 16:28:28 hartman Exp $
+ * $Id: vout.m,v 1.64 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -995,7 +995,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            val.i_int |= CocoaConvertKey( key );
+            val.i_int |= CocoaKeyToVLC( key );
             var_Set( p_vout->p_vlc, "key-pressed", val );
         }
     }

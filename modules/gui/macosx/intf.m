@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.99 2003/11/06 18:35:19 hartman Exp $
+ * $Id: intf.m,v 1.100 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -293,7 +293,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
 static struct
 {
     unichar i_nskey;
-    int i_vlckey;
+    unsigned int i_vlckey;
 } nskeys_to_vlckeys[] = 
 {
     { NSUpArrowFunctionKey, KEY_UP },
@@ -325,9 +325,23 @@ static struct
     {0,0}
 };
 
-int CocoaConvertKey( unichar i_key )
+unichar VLCKeyToCocoa( unsigned int i_key )
 {
-    int i;
+    unsigned int i;
+    
+    for( i = 0; nskeys_to_vlckeys[i].i_vlckey != 0; i++ )
+    {
+        if( nskeys_to_vlckeys[i].i_vlckey == (i_key & ~KEY_MODIFIER) )
+        {
+            return nskeys_to_vlckeys[i].i_nskey;
+        }
+    }
+    return (unichar)(i_key & ~KEY_MODIFIER);
+}
+
+unsigned int CocoaKeyToVLC( unichar i_key )
+{
+    unsigned int i;
     
     for( i = 0; nskeys_to_vlckeys[i].i_nskey != 0; i++ )
     {
@@ -336,7 +350,21 @@ int CocoaConvertKey( unichar i_key )
             return nskeys_to_vlckeys[i].i_vlckey;
         }
     }
-    return (int)i_key;
+    return (unsigned int)i_key;
+}
+
+unsigned int VLCModifiersToCocoa( unsigned int i_key )
+{
+    unsigned int new = 0;
+    if( i_key & KEY_MODIFIER_COMMAND )
+        new |= NSCommandKeyMask;
+    if( i_key & KEY_MODIFIER_ALT )
+        new |= NSAlternateKeyMask;
+    if( i_key & KEY_MODIFIER_SHIFT )
+        new |= NSShiftKeyMask;
+    if( i_key & KEY_MODIFIER_CTRL )
+        new |= NSControlKeyMask;
+    return new;
 }
 
 /*****************************************************************************
@@ -346,8 +374,59 @@ int CocoaConvertKey( unichar i_key )
 
 - (void)awakeFromNib
 {
-    [o_window setTitle: _NS("VLC - Controller")];
+    unsigned int i_key;
+    intf_thread_t * p_intf = [NSApp getIntf];
+    
+    [self initStrings];
     [o_window setExcludedFromWindowsMenu: TRUE];
+    [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
+    [o_msgs_panel setDelegate: self];
+    
+    i_key = config_GetInt( p_intf, "key-quit" );
+    [o_mi_quit setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_quit setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-play-pause" );
+    [o_mi_play setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_play setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-stop" );
+    [o_mi_stop setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_stop setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-faster" );
+    [o_mi_faster setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_faster setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-slower" );
+    [o_mi_slower setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_slower setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-prev" );
+    [o_mi_previous setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_previous setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-next" );
+    [o_mi_next setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_next setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-jump+10sec" );
+    [o_mi_fwd setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_fwd setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-jump-10sec" );
+    [o_mi_bwd setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_bwd setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-vol-up" );
+    [o_mi_vol_up setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_vol_up setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-vol-down" );
+    [o_mi_vol_down setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_vol_down setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-fullscreen" );
+    [o_mi_fullscreen setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_fullscreen setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+
+    [self setSubmenusEnabled: FALSE];
+    [self manageVolumeSlider];
+
+}
+
+- (void)initStrings
+{
+    [o_window setTitle: _NS("VLC - Controller")];
 
     /* button controls */
     [o_btn_playlist setToolTip: _NS("Playlist")];
@@ -362,9 +441,7 @@ int CocoaConvertKey( unichar i_key )
     [o_timeslider setToolTip: _NS("Position")];
 
     /* messages panel */ 
-    [o_msgs_panel setDelegate: self];
     [o_msgs_panel setTitle: _NS("Messages")];
-    [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
     [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */
@@ -469,9 +546,6 @@ int CocoaConvertKey( unichar i_key )
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
 
     [o_info_window setTitle: _NS("Info")];
-
-    [self setSubmenusEnabled: FALSE];
-    [self manageVolumeSlider];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification

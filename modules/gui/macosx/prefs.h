@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.11 2003/06/21 22:30:21 hartman Exp $
+ * $Id: prefs.h,v 1.12 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -160,6 +160,7 @@ INTF_CONTROL_CONFIG(PopUpButton);
 INTF_CONTROL_CONFIG(ComboBox);
 INTF_CONTROL_CONFIG(TextField);
 INTF_CONTROL_CONFIG(Slider);
+INTF_CONTROL_CONFIG(Matrix);
 
 #define CONTROL_CONFIG( obj, mname, ctype, cname ) \
     { \

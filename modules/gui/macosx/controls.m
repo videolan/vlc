@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.52 2003/11/06 18:55:22 hartman Exp $
+ * $Id: controls.m,v 1.53 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -301,7 +301,7 @@
     if( p_input != NULL )
     {
         vlc_value_t time;
-        time.i_time = 5 * 1000000;
+        time.i_time = 10 * 1000000;
         var_Set( p_input, "time-offset", time );
         vlc_object_release( p_input );
     }
@@ -315,7 +315,7 @@
     if( p_input != NULL )
     {
         vlc_value_t time;
-        time.i_time = -5 * 1000000;
+        time.i_time = -10 * 1000000;
         var_Set( p_input, "time-offset", time );
         vlc_object_release( p_input );
     }

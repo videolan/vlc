@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.34 2003/09/19 23:03:27 hartman Exp $
+ * $Id: prefs.m,v 1.35 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -31,6 +31,7 @@
 
 #include "intf.h"
 #include "prefs.h"
+#include "vlc_keys.h"
 
 /*****************************************************************************
  * VLCPrefs implementation
@@ -128,9 +129,7 @@
         case CONFIG_ITEM_DIRECTORY:
             {
                 char *psz_value;
-                NSString *o_value;
-    
-                o_value = [o_vlc_config stringValue];
+                NSString *o_value = [o_vlc_config stringValue];
                 psz_value = (char *)[o_value UTF8String];
     
                 config_PutPsz( p_intf, psz_name, psz_value );
@@ -153,7 +152,43 @@
                 config_PutFloat( p_intf, psz_name, f_value );
             }
             break;
-    
+
+        case CONFIG_ITEM_KEY:
+            {
+                unsigned int i_key = config_GetInt( p_intf, psz_name );
+                unsigned int i_new_key = 0;
+
+                if( [o_vlc_config class] == [VLCMatrix class] )
+                {
+                    int i;
+                    NSButtonCell *o_current_cell;
+                    NSArray *o_cells = [o_vlc_config cells];
+                    i_new_key = (i_key & ~KEY_MODIFIER);
+                    for( i = 0; i < [o_cells count]; i++ )
+                    {
+                        o_current_cell = [o_cells objectAtIndex:i];
+                        if( [[o_current_cell title] isEqualToString:_NS("Command")] && 
+                            [o_current_cell state] == NSOnState )
+                                i_new_key |= KEY_MODIFIER_COMMAND;
+                        if( [[o_current_cell title] isEqualToString:_NS("Control")] && 
+                            [o_current_cell state] == NSOnState )
+                                i_new_key |= KEY_MODIFIER_CTRL;
+                        if( [[o_current_cell title] isEqualToString:_NS("Option/Alt")] && 
+                            [o_current_cell state] == NSOnState )
+                                i_new_key |= KEY_MODIFIER_ALT;
+                        if( [[o_current_cell title] isEqualToString:_NS("Shift")] && 
+                            [o_current_cell state] == NSOnState )
+                                i_new_key |= KEY_MODIFIER_SHIFT;
+                    }
+                }
+                else
+                {
+                    i_new_key = (i_key & KEY_MODIFIER);
+                    i_new_key |= StringToKey([[o_vlc_config stringValue] cString]);
+                }
+                config_PutInt( p_intf, psz_name, i_new_key );
+            }
+            break;
         }
     }
     config_SaveConfigFile( p_intf, NULL );
@@ -516,7 +551,7 @@
                     if ( p_item->psz_longtext != NULL )
                         psz_duptip = strdup( p_item->psz_longtext );
     
-                    s_rc.size.height = 27;
+                    s_rc.size.height = 25;
                     s_rc.size.width = 200;
                     s_rc.origin.y += 10;
     
@@ -528,6 +563,10 @@
                     [o_combo_box setTarget: self];
                     [o_combo_box setAction: @selector(configChanged:)];
                     [o_combo_box sendActionOn:NSLeftMouseUpMask];
+                    [[NSNotificationCenter defaultCenter] addObserver: self
+                        selector: @selector(configChanged:)
+                        name: NSControlTextDidChangeNotification
+                        object: o_combo_box];
 
                     if ( psz_duptip != NULL )
                     {
@@ -673,6 +712,101 @@
                 [o_view addSubview: [o_btn_bool autorelease]];
     
                 s_rc.origin.y += s_rc.size.height;
+            }
+            break;
+
+            case CONFIG_ITEM_KEY:
+            {
+                int i;
+                char *psz_duptip = NULL;
+                VLCComboBox *o_combo_box;
+
+                if ( p_item->psz_longtext != NULL )
+                    psz_duptip = strdup( p_item->psz_longtext );
+
+                s_rc.origin.y += 10;
+                s_rc.size.width = - 10;
+                s_rc.size.height = 20;
+                CHECK_VIEW_HEIGHT;
+                CONTROL_LABEL( p_item->psz_text );
+                s_rc.origin.x = X_ORIGIN;
+                s_rc.origin.y += s_rc.size.height;
+                s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2;
+                CHECK_VIEW_HEIGHT;
+                VLCMatrix *o_matrix = [[VLCMatrix alloc] initWithFrame: s_rc mode: NSHighlightModeMatrix cellClass: [NSButtonCell class] numberOfRows:2 numberOfColumns:2];
+                NSArray *o_cells = [o_matrix cells];
+                for( i=0; i < [o_cells count]; i++ )
+                {
+                    NSButtonCell *o_current_cell = [o_cells objectAtIndex:i];
+                    [o_current_cell setButtonType: NSSwitchButton];
+                    [o_current_cell setControlSize: NSSmallControlSize];
+                    if( psz_duptip != NULL )
+                    {
+                        [o_matrix setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP] forCell: o_current_cell];
+                    }
+                    switch( i )
+                    {
+                        case 0:
+                            [o_current_cell setTitle:_NS("Command")];
+                            [o_current_cell setState: p_item->i_value & KEY_MODIFIER_COMMAND];
+                            break;
+                        case 1:
+                            [o_current_cell setTitle:_NS("Control")];
+                            [o_current_cell setState: p_item->i_value & KEY_MODIFIER_CTRL];
+                            break;
+                        case 2:
+                            [o_current_cell setTitle:_NS("Option/Alt")];
+                            [o_current_cell setState: p_item->i_value & KEY_MODIFIER_ALT];
+                            break;
+                        case 3:
+                            [o_current_cell setTitle:_NS("Shift")];
+                            [o_current_cell setState: p_item->i_value & KEY_MODIFIER_SHIFT];
+                            break;
+                    }
+                    [o_current_cell setTarget: self];
+                    [o_current_cell setAction: @selector(configChanged:)];
+                    [o_current_cell sendActionOn:NSLeftMouseUpMask];
+                }
+                CONTROL_CONFIG( o_matrix, o_module_name,
+                                CONFIG_ITEM_KEY, p_item->psz_name );
+                [o_matrix sizeToCells];
+                [o_view addSubview: [o_matrix autorelease]];
+
+                s_rc.origin.x += [o_matrix frame].size.width + 20;
+                s_rc.size.height = 25;
+                s_rc.size.width = 100;
+
+                CHECK_VIEW_HEIGHT;
+
+                o_combo_box = [[VLCComboBox alloc] initWithFrame: s_rc];
+                CONTROL_CONFIG( o_combo_box, o_module_name,
+                                CONFIG_ITEM_KEY, p_item->psz_name );
+                [o_combo_box setTarget: self];
+                [o_combo_box setAction: @selector(configChanged:)];
+                [o_combo_box sendActionOn:NSLeftMouseUpMask];
+                [[NSNotificationCenter defaultCenter] addObserver: self
+                        selector: @selector(configChanged:)
+                        name: NSControlTextDidChangeNotification
+                        object: o_combo_box];
+
+                if ( psz_duptip != NULL )
+                {
+                    [o_combo_box setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
+                }
+                [o_view addSubview: [o_combo_box autorelease]];
+                
+                for( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )
+                {
+                    
+                    if( vlc_keys[i].psz_key_string && *vlc_keys[i].psz_key_string )
+                    [o_combo_box addItemWithObjectValue: [NSApp localizedString:vlc_keys[i].psz_key_string]];
+                }
+                
+                [o_combo_box setStringValue: [NSApp localizedString:KeyToString(( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ))]];
+                
+                s_rc.origin.y += s_rc.size.height;
+                s_rc.origin.x = X_ORIGIN;
+                if( psz_duptip ) free( psz_duptip );
             }
             break;
     
@@ -1009,3 +1143,4 @@ IMPL_CONTROL_CONFIG(PopUpButton);
 IMPL_CONTROL_CONFIG(ComboBox);
 IMPL_CONTROL_CONFIG(TextField);
 IMPL_CONTROL_CONFIG(Slider);
+IMPL_CONTROL_CONFIG(Matrix);

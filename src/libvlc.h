@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.103 2003/11/10 00:49:48 hartman Exp $
+ * $Id: libvlc.h,v 1.104 2003/11/11 23:50:41 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -769,6 +769,31 @@ vlc_module_begin();
 
     /* Hotkey options*/
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
+#if defined(SYS_DARWIN)
+    add_key( "key-fullscreen", KEY_MODIFIER_COMMAND|'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-play-pause", KEY_MODIFIER_COMMAND|'p', NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-pause", 0, NULL, PAUSE_KEY_TEXT, PAUSE_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play", 0, NULL, PLAY_KEY_TEXT, PLAY_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-faster", KEY_MODIFIER_COMMAND|'=', NULL, FASTER_KEY_TEXT, FASTER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-slower", KEY_MODIFIER_COMMAND|'-', NULL, SLOWER_KEY_TEXT, SLOWER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-next", KEY_MODIFIER_COMMAND|KEY_RIGHT, NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-prev", KEY_MODIFIER_COMMAND|KEY_LEFT, NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-stop", KEY_MODIFIER_COMMAND|'.', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB10SEC_KEY_TEXT, JB10SEC_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF10SEC_KEY_TEXT, JF10SEC_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-1min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT, NULL, JB1MIN_KEY_TEXT, JB1MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+1min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT, NULL, JF1MIN_KEY_TEXT, JF1MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-5min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB5MIN_KEY_TEXT, JB5MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+5min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF5MIN_KEY_TEXT, JF5MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-activate", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-up", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-down", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-left", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-right", KEY_RIGHT, NULL, NAV_RIGHT_KEY_TEXT, NAV_RIGHT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-quit", KEY_MODIFIER_COMMAND|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
+#else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-pause", 0, NULL, PAUSE_KEY_TEXT, PAUSE_KEY_LONGTEXT, VLC_TRUE );
@@ -789,9 +814,10 @@ vlc_module_begin();
     add_key( "key-nav-down", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-left", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-right", KEY_RIGHT, NULL, NAV_RIGHT_KEY_TEXT, NAV_RIGHT_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-quit", KEY_MODIFIER_CTRL|KEY_SPACE, NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-quit", KEY_MODIFIER_CTRL|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
+#endif
 
     /* Usage (mainly useful for cmd line stuff) */
     add_usage_hint( PLAYLIST_USAGE );
