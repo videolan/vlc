@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.20 2003/01/03 20:55:00 jpsaman Exp $
+ * $Id: callbacks.c,v 1.21 2003/02/26 15:47:26 marcari Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -134,23 +134,38 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         perror("scandir");
     else
     {
-        int i;
+        int i, ctr=0;
+        gchar *ppsz_text[5];
+
 
 //        msg_Dbg( p_intf, "updating interface" );
         gtk_clist_freeze( clist );
         gtk_clist_clear( clist );
+        
+        /* XXX : kludge temporaire pour yopy */
+        ppsz_text[0]="..";
+        ppsz_text[1] = get_file_perm("..");
+        ppsz_text[2] = "";
+        ppsz_text[3] = "";
+        ppsz_text[4] = "";
+        gtk_clist_insert( GTK_CLIST(clist), ctr++, ppsz_text );
+        /* /kludge */                
+
+       
         for (i=0; i<n; i++)
         {
-            gchar *ppsz_text[5];
 
-            /* This is a list of strings. */
-            ppsz_text[0] = namelist[i]->d_name;
-            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
-			ppsz_text[2] = "";
-			ppsz_text[3] = "";
-			ppsz_text[4] = "";
-//            msg_Dbg(p_intf, "(%d) file: %s permission: %s", i, ppsz_text[0], ppsz_text[1] );
-  			gtk_clist_insert( GTK_CLIST(clist), i, ppsz_text );
+            if (namelist[i]->d_name[0] != '.')
+            {
+                /* This is a list of strings. */
+                ppsz_text[0] = namelist[i]->d_name;
+                ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+                ppsz_text[2] = "";
+                ppsz_text[3] = "";
+                ppsz_text[4] = "";
+                //            msg_Dbg(p_intf, "(%d) file: %s permission: %s", i, ppsz_text[0], ppsz_text[1] );
+                gtk_clist_insert( GTK_CLIST(clist), ctr++, ppsz_text );
+            }
             free(namelist[i]);
         }
         gtk_clist_thaw( clist );
@@ -466,7 +481,7 @@ on_clistmedia_select_row               (GtkCList        *clist,
     ret = gtk_clist_get_text (p_intf->p_sys->p_clist, row, 0, text);
     if (ret)
     {
-        if (lstat((char*)text[0], &st)==0)
+        if (stat((char*)text[0], &st)==0)
         {
             if (S_ISDIR(st.st_mode))
                ReadDirectory(p_intf->p_sys->p_clist, text[0]);
@@ -485,6 +500,8 @@ void
 on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
+    intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(togglebutton) );
+    p_intf->p_sys->b_autoplayfile = !p_intf->p_sys->b_autoplayfile;
 }
 
 
