@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.170 2004/02/05 22:56:12 gbazin Exp $
+dnl $Id: configure.ac,v 1.171 2004/02/08 20:19:03 jpsaman Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1032,7 +1032,8 @@ if test -n "${with_tuning}"; then
         CFLAGS_TUNING="-mcpu=${with_tuning}"
     fi
 else
-    if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then CFLAGS_TUNING="-mcpu=pentiumpro"
+    if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
+        CFLAGS_TUNING="-mcpu=pentiumpro"
     else
         if test "${target_cpu}" = "powerpc"; then CFLAGS_TUNING="-mtune=750"; fi
     fi
@@ -1118,7 +1119,7 @@ then
   dnl
   dnl test for --with-livedotcom-tree
   dnl
-  if test "${with_livedotcom_tree}" != "no" -a -n "${with_livedotcom_tree}";then
+  if test "${with_livedotcom_tree}" != "no" -a -n "${with_livedotcom_tree}"; then
     AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_livedotcom_tree})
     real_livedotcom_tree="`cd ${with_livedotcom_tree} 2>/dev/null && pwd`"
     if test -z "${real_livedotcom_tree}"; then
@@ -1518,6 +1519,9 @@ AC_ARG_ENABLE(libcddb,
 AC_ARG_ENABLE(vcdx,
   [  --enable-vcdx           VCD support with Navigation (default enabled)])
 
+AC_ARG_ENABLE(cdda,           
+  [  --enable-cdda            CDDA plugin support (default enabled)])
+
 if test "${enable_cddax}" != "no"
 then
   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
@@ -1796,7 +1800,7 @@ then
   dnl
   dnl test for !(--with-ffmpeg-tree)
   dnl
-  if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}";then
+  if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}"; then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
@@ -1818,7 +1822,7 @@ then
   dnl
   dnl test for --with-ffmpeg-tree
   dnl
-  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}";then
+  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
     AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
     real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
     if test -z "${real_ffmpeg_tree}"; then
@@ -3260,7 +3264,7 @@ then
   dnl
   dnl test for --with-goom-tree
   dnl
-  if test "${with_goom_tree}" != "no" -a -n "${with_goom_tree}";then
+  if test "${with_goom_tree}" != "no" -a -n "${with_goom_tree}"; then
     AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
     real_goom_tree="`cd ${with_goom_tree} 2>/dev/null && pwd`"
     if test -z "${real_goom_tree}"; then
