@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.17 2004/01/18 04:53:57 fenrir Exp $
+ * $Id: es_out.c,v 1.18 2004/01/18 19:35:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -256,6 +256,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
         if( p_prgm == NULL )
         {
+            es_descriptor_t *p_pmt;
             /* create it */
             p_prgm = input_AddProgram( p_input, fmt->i_group, 0 );
 
@@ -263,7 +264,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
              * why have a look at input_SetProgram. Basicaly, it assume the first
              * es to be the PMT, how that is stupide, nevertheless it is needed for
              * the old ts demuxer */
-            input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
+            p_pmt = input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
+            p_pmt->i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
 
             /* Select the first by default */
             if( p_input->stream.p_selected_program == NULL )
