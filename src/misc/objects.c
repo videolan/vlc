@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.6 2002/06/04 00:11:12 sam Exp $
+ * $Id: objects.c,v 1.7 2002/06/05 18:29:24 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -187,6 +187,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
+    p_this = NULL;
 }
 
 /*****************************************************************************
