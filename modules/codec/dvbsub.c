@@ -842,6 +842,16 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
         p_topfield    = s->p_start + bs_pos( s ) / 8;
         p_bottomfield = p_topfield + i_topfield;
 
+        bs_skip( s, 8 * (i_segment_length - 7) );
+
+        /* Sanity check */
+        if( i_segment_length < i_topfield + i_bottomfield + 7 ||
+            s->p_start + i_topfield + i_bottomfield > s->p_end )
+        {
+            msg_Dbg( p_dec, "corrupted object data" );
+            return;
+        }
+
         for( p_region = p_sys->p_regions; p_region != NULL;
              p_region = p_region->p_next )
         {
@@ -853,18 +863,24 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
                                      p_region->p_object_defs[i].i_x,
                                      p_region->p_object_defs[i].i_y,
                                      p_topfield, i_topfield );
-                dvbsub_render_pdata( p_dec, p_region,
-                                     p_region->p_object_defs[i].i_x,
-                                     p_region->p_object_defs[i].i_y + 1,
-                                     p_bottomfield, i_bottomfield );
+
+                if( i_bottomfield )
+                {
+                    dvbsub_render_pdata( p_dec, p_region,
+                                         p_region->p_object_defs[i].i_x,
+                                         p_region->p_object_defs[i].i_y + 1,
+                                         p_bottomfield, i_bottomfield );
+                }
+                else
+                {
+                    /* Duplicate the top field */
+                    dvbsub_render_pdata( p_dec, p_region,
+                                         p_region->p_object_defs[i].i_x,
+                                         p_region->p_object_defs[i].i_y + 1,
+                                         p_topfield, i_topfield );
+                }
             }
         }
-
-        bs_skip( s, (i_topfield + i_bottomfield) * 8 );
-
-        /* Check word-alignement */
-        bs_align( s );
-        if( bs_pos( s ) % 16 ) bs_skip( s, 8 );
     }
     else
     {
