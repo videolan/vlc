@@ -177,7 +177,6 @@ DIST_skins2 = \
 	skins2/default/rev.png \
 	skins2/default/rev_disabled.png \
 	skins2/default/rev_onclick.png \
-	skins2/default/skin.dtd \
 	skins2/default/slider.png \
 	skins2/default/slider2.png \
 	skins2/default/slider_onclick.png \
@@ -209,6 +208,7 @@ DIST_skins2 = \
 	skins2/default/vout_top_right.png \
 	\
 	skins2/fonts/FreeSans.ttf \
+	skins2/skin.dtd \
 	$(NULL)
 
 DIST_http = \
