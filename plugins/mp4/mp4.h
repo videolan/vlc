@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.1 2002/07/17 21:37:27 fenrir Exp $
+ * $Id: mp4.h,v 1.2 2002/07/21 15:13:19 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -213,6 +213,7 @@ static struct
     { FOURCC_SVQ1,  SVQ1_VIDEO_ES,  "SVQ1 SampleEntry (Sorenson Video v1" },
     { FOURCC_mp4v,  MPEG4_VIDEO_ES, "MP4VisualSampleEntry (MPEG-4)" },
     { FOURCC_3IV1,  UNKNOWN_ES,     "3IV1 SampleEntry" },
+    { FOURCC_cvid,  CINEPAK_VIDEO_ES,"cvid SampleEntry (Cinepak Video Codec)" },
 
     /* Audio codec */
     { FOURCC_soun,  UNKNOWN_ES,     "Generic AudioSampleEntry" },

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.1 2002/07/17 21:37:27 fenrir Exp $
+ * $Id: libmp4.c,v 1.2 2002/07/21 15:13:19 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@
     dst = GetWBE( p_peek ); p_peek += 2; i_read -= 2
 
 #define MP4_GET3BYTES( dst ) \
-    dst = GetDWBE( p_peek ) >> 8 ; p_peek += 3; i_read -= 3
+    dst = Get24bBE( p_peek ); p_peek += 3; i_read -= 3
 
 #define MP4_GET4BYTES( dst ) \
     dst = GetDWBE( p_peek ); p_peek += 4; i_read -= 4
@@ -63,8 +63,8 @@
     MP4_GET1BYTE( p_void->i_version ); \
     MP4_GET3BYTES( p_void->i_flags )
     
-#define MP4_GETSTRING( p_str ) \
-    if( p_peek[0] ) \
+#define MP4_GETSTRINGZ( p_str ) \
+    if( ( i_read > 0 )&&(p_peek[0] ) ) \
     { \
         p_str = calloc( sizeof( char ), __MIN( strlen( p_peek ), i_read )+1);\
         memcpy( p_str, p_peek, __MIN( strlen( p_peek ), i_read ) ); \
@@ -109,6 +109,10 @@
     } \
     return( i_code )
 
+#define FREE( p ) \
+    if( p ) {free( p ); p = NULL; }
+   
+
     
 /* Some assumptions:
         * The input method HAVE to be seekable 
@@ -116,42 +120,48 @@
 */
 
 /* Some functions to manipulate memory */
-static inline u16 GetWLE( u8 *p_buff )
+static u16 GetWLE( u8 *p_buff )
 {
     return( (p_buff[0]) + ( p_buff[1] <<8 ) );
 }
 
-static inline u32 GetDWLE( u8 *p_buff )
+static u32 GetDWLE( u8 *p_buff )
 {
     return( p_buff[0] + ( p_buff[1] <<8 ) +
             ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );
 }
 
-static inline u16 GetWBE( u8 *p_buff )
+static u16 GetWBE( u8 *p_buff )
 {
     return( (p_buff[0]<<8) + p_buff[1] );
 }
 
-static inline u32 GetDWBE( u8 *p_buff )
+static u32 Get24bBE( u8 *p_buff )
+{
+    return( ( p_buff[0] <<16 ) + ( p_buff[1] <<8 ) + p_buff[2] );
+}
+
+
+static u32 GetDWBE( u8 *p_buff )
 {
     return( (p_buff[0] << 24) + ( p_buff[1] <<16 ) +
             ( p_buff[2] <<8 ) + p_buff[3] );
 }
 
-static inline u64 GetQWBE( u8 *p_buff )
+static u64 GetQWBE( u8 *p_buff )
 {
     return( ( (u64)GetDWBE( p_buff ) << 32 )|( (u64)GetDWBE( p_buff + 4 ) ) );
 }
 
 
-static inline void GetUUID( UUID_t *p_uuid, u8 *p_buff )
+static void GetUUID( UUID_t *p_uuid, u8 *p_buff )
 {
     memcpy( p_uuid, 
             p_buff,
             16 );
 }
 
-static inline void CreateUUID( UUID_t *p_uuid, u32 i_fourcc )
+static void CreateUUID( UUID_t *p_uuid, u32 i_fourcc )
 {
     /* made by 0xXXXXXXXX-0011-0010-8000-00aa00389b71 
             where XXXXXXXX is the fourcc */
@@ -571,18 +581,14 @@ int MP4_ReadBoxContainer( MP4_Stream_t *p_stream, MP4_Box_t *p_container )
 
 void MP4_FreeBox_Common( input_thread_t *p_input, MP4_Box_t *p_box )
 {
-    if( p_box->data.p_data )
-    {
-        free( p_box->data.p_data );
-        p_box->data.p_data = NULL;
-    }
+    /* Up to now do nothing */
 }
 
 int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
+    /* Nothing to do */
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "
-             Skip box: \"%c%c%c%c\"", 
+    msg_Dbg( p_stream->p_input, "Skip box: \"%c%c%c%c\"", 
             (p_box->i_type>>24)&0xff, 
             (p_box->i_type>>16)&0xff,
             (p_box->i_type>>8)&0xff, 
@@ -615,6 +621,11 @@ int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_ftyp( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_ftyp->i_compatible_brands );
 }
 
 
@@ -755,7 +766,6 @@ int MP4_ReadBox_tkhd(  MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_tref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_Box_t *p_ref;
 
     if( p_box->i_size < MP4_BOX_HEADERSIZE(p_box ) + 8 )
     {
@@ -767,49 +777,9 @@ int MP4_ReadBox_tref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     {
         return( 0 );
     }
-      
-    do
-    {
-        p_ref = malloc( sizeof( MP4_Box_t ) );
-        if( MP4_ReadBoxCommon( p_stream, p_ref ) )
-        {
-            switch( p_ref->i_type )
-            {
-                case( FOURCC_hint ):
-                case( FOURCC_dpnd ):
-                case( FOURCC_ipir ):
-                case( FOURCC_mpod ):
-                default:
-                    msg_Warn( p_stream->p_input, "Unknown TrackReferenceType %c%c%c%c (uncompletetly loaded)",
-                                       ( p_ref->i_type >> 24 )&0xff,
-                                       ( p_ref->i_type >> 16 )&0xff,
-                                       ( p_ref->i_type >>  8 )&0xff,
-                                       ( p_ref->i_type )&0xff );
-                    break;
-            }
-            /* chain this box with the father and the other at same level */
-            if( !p_box->p_first )
-            {
-                p_box->p_first = p_ref;
-                p_box->p_last = p_ref;
-            }
-            else
-            {
-                p_box->p_last->p_next = p_ref;
-                p_box->p_last = p_ref;
-            }
-            p_ref->p_father = p_box;
-        }
-        else
-        {
-            /* free memory */
-            free( p_ref );
-        }
-        
-        
-    }while( MP4_NextBox( p_stream, p_ref ) == 1 );
-    
-    
+
+    MP4_ReadBoxContainerRaw( p_stream, p_box );
+
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"tref\" " );
 
@@ -896,6 +866,11 @@ int MP4_ReadBox_hdlr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+void MP4_FreeBox_hdlr( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_hdlr->psz_name );
+}
+
 int MP4_ReadBox_vmhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;
@@ -931,7 +906,7 @@ int MP4_ReadBox_smhd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_smhd->i_balance );
 
-    MP4_GET4BYTES( p_box->data.p_smhd->i_reserved );
+    MP4_GET2BYTES( p_box->data.p_smhd->i_reserved );
     
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"smhd\" balance %f",
@@ -972,7 +947,7 @@ int MP4_ReadBox_url( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_url_t ); 
 
     MP4_GETVERSIONFLAGS( p_box->data.p_url );
-    MP4_GETSTRING( p_box->data.p_url->psz_location );
+    MP4_GETSTRINGZ( p_box->data.p_url->psz_location );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"url\" url: %s",
@@ -982,14 +957,20 @@ int MP4_ReadBox_url( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+
+void MP4_FreeBox_url( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_url->psz_location )
+}
+
 int MP4_ReadBox_urn( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_urn_t );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_urn );
 
-    MP4_GETSTRING( p_box->data.p_urn->psz_name );
-    MP4_GETSTRING( p_box->data.p_urn->psz_location ); 
+    MP4_GETSTRINGZ( p_box->data.p_urn->psz_name );
+    MP4_GETSTRINGZ( p_box->data.p_urn->psz_location ); 
    
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"urn\" name %s location %s",
@@ -998,7 +979,11 @@ int MP4_ReadBox_urn( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
-
+void MP4_FreeBox_urn( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_urn->psz_name );
+    FREE( p_box->data.p_urn->psz_location );
+}
 
 
 int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1019,6 +1004,7 @@ int MP4_ReadBox_dref( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
+
 
 int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -1046,6 +1032,13 @@ int MP4_ReadBox_stts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_stts( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stts->i_sample_count );
+    FREE( p_box->data.p_stts->i_sample_delta );
+            
 }
 
 int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1077,7 +1070,13 @@ int MP4_ReadBox_ctts( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static inline int MP4_ReadLengthDescriptor( u8 **pp_peek, s64 *i_read )
+void MP4_FreeBox_ctts( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_ctts->i_sample_count );
+    FREE( p_box->data.p_ctts->i_sample_offset );
+}
+
+static int MP4_ReadLengthDescriptor( u8 **pp_peek, s64 *i_read )
 {
     int i_b;
     int i_len = 0;
@@ -1128,6 +1127,8 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             es_descriptor.psz_URL = calloc( sizeof(char), i_len + 1 );
             memcpy( es_descriptor.psz_URL, p_peek, i_len );
             es_descriptor.psz_URL[i_len] = 0;
+            p_peek += i_len;
+            i_read -= i_len;
         }
         else
         {
@@ -1139,6 +1140,7 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         }
         MP4_GET1BYTE( i_type ); /* get next type */
     }
+
     if( i_type != 0x04)/* MP4DecConfigDescrTag */
     {
         MP4_READBOX_EXIT( 1 ); /* rest isn't interesting up to now */
@@ -1170,6 +1172,12 @@ int MP4_ReadBox_esds( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 
 #undef es_descriptor
+}
+
+void MP4_FreeBox_esds( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_esds->es_descriptor.psz_URL );
+    FREE( p_box->data.p_esds->es_descriptor.p_decConfigDescr );
 }
 
 int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1350,7 +1358,6 @@ int MP4_ReadBox_sample_mp4v( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_Box_t *p_sample;
 
     MP4_READBOX_ENTER( MP4_Box_data_stsd_t );
 
@@ -1360,66 +1367,8 @@ int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 8 ); 
 
+    MP4_ReadBoxContainerRaw( p_stream, p_box );
 
-    do
-    {
-        p_sample = malloc( sizeof( MP4_Box_t ) );
-        if( MP4_ReadBoxCommon( p_stream, p_sample ) )
-        {
-            switch( p_sample->i_type )
-            {
-                case( FOURCC_soun ):
-                case( FOURCC__mp3 ):
-                    MP4_ReadBox_sample_soun( p_stream, p_sample );
-                    break;
-                case( FOURCC_mp4a ):
-                    MP4_ReadBox_sample_mp4a( p_stream, p_sample );
-                    break;
-                case( FOURCC_DIVX ):
-                case( FOURCC_SVQ1 ):
-                case( FOURCC_vide ):
-                case( FOURCC_3IV1 ):
-                case( FOURCC_h263 ):
-                    MP4_ReadBox_sample_vide( p_stream, p_sample );
-                    break;
-                case( FOURCC_mp4v ):
-                    MP4_ReadBox_sample_mp4v( p_stream, p_sample );
-                    break;
-
-                case( FOURCC_mp4s ):
-                case( FOURCC_hint ):
-                default:
-                    msg_Warn( p_stream->p_input, "Unknown SampleEntry type %c%c%c%c (uncompletetly loaded)",
-                                       ( p_sample->i_type >> 24 )&0xff,
-                                       ( p_sample->i_type >> 16 )&0xff,
-                                       ( p_sample->i_type >>  8 )&0xff,
-                                       ( p_sample->i_type )&0xff );
-                    break;
-            }
-            
-            MP4_GotoBox( p_stream, p_sample );    
-            /* chain this box with the father and the other at same level */
-            if( !p_box->p_first )
-            {
-                p_box->p_first = p_sample;
-                p_box->p_last = p_sample;
-            }
-            else
-            {
-                p_box->p_last->p_next = p_sample;
-                p_box->p_last = p_sample;
-            }
-            p_sample->p_father = p_box;
-        }
-        else
-        {
-            /* free memory */
-            free( p_sample );
-        }
-        
-    }while( MP4_NextBox( p_stream, p_sample ) == 1 );
-    
-    
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"stsd\" entry-count %d",
                       p_box->data.p_stsd->i_entry_count );
@@ -1462,6 +1411,11 @@ int MP4_ReadBox_stsz( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+void MP4_FreeBox_stsz( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stsz->i_entry_size );
+}
+
 int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;
@@ -1493,6 +1447,13 @@ int MP4_ReadBox_stsc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_stsc( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stsc->i_first_chunk );
+    FREE( p_box->data.p_stsc->i_samples_per_chunk );
+    FREE( p_box->data.p_stsc->i_sample_description_index );
 }
 
 int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1529,6 +1490,11 @@ int MP4_ReadBox_stco_co64( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+void MP4_FreeBox_stco_co64( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_co64->i_chunk_offset );
+}
+
 int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;
@@ -1555,6 +1521,11 @@ int MP4_ReadBox_stss( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_stss( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stss->i_sample_number )
 }
 
 int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1590,6 +1561,13 @@ int MP4_ReadBox_stsh( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+void MP4_FreeBox_stsh( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stsh->i_shadowed_sample_number )
+    FREE( p_box->data.p_stsh->i_sync_sample_number )
+}
+
+
 int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;
@@ -1614,6 +1592,11 @@ int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_stdp( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_stdp->i_priority )
 }
 
 int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1654,6 +1637,14 @@ int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+void MP4_FreeBox_padb( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_padb->i_reserved1 );
+    FREE( p_box->data.p_padb->i_pad2 );
+    FREE( p_box->data.p_padb->i_reserved2 );
+    FREE( p_box->data.p_padb->i_pad1 );
 }
 
 int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1707,6 +1698,14 @@ int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+void MP4_FreeBox_elst( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_elst->i_segment_duration );
+    FREE( p_box->data.p_elst->i_media_time );
+    FREE( p_box->data.p_elst->i_media_rate_integer );
+    FREE( p_box->data.p_elst->i_media_rate_fraction );
+}
+
 int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i_language;
@@ -1723,10 +1722,10 @@ int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
             ( ( i_language >> ( (2-i)*5 ) )&0x1f ) + 0x60;
     }
     p_peek += 2; i_read -= 2;  
-    MP4_GETSTRING( p_box->data.p_cprt->psz_notice );
+    MP4_GETSTRINGZ( p_box->data.p_cprt->psz_notice );
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "Read Box: \"cprt\" language %c%c%c notivce %s",
+    msg_Dbg( p_stream->p_input, "Read Box: \"cprt\" language %c%c%c notice %s",
                       p_box->data.p_cprt->i_language[0],
                       p_box->data.p_cprt->i_language[1],
                       p_box->data.p_cprt->i_language[2],
@@ -1736,67 +1735,11 @@ int MP4_ReadBox_cprt( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-int MP4_ReadBox_hnti( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+void MP4_FreeBox_cprt( input_thread_t *p_input, MP4_Box_t *p_box )
 {
-    MP4_Box_t *p_ref;
-//    MP4_Box_t *p_rtp;
-
-    if( p_box->i_size < MP4_BOX_HEADERSIZE(p_box ) + 8 )
-    {
-        /* container is empty, 8 stand for the first header in this box */
-        return( 1 );
-    }
-   
-    if( !MP4_SeekStream( p_stream,p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) ) )
-    {
-        return( 0 );
-    }
-      
-    do
-    {
-        p_ref = malloc( sizeof( MP4_Box_t ) );
-        if( MP4_ReadBoxCommon( p_stream, p_ref ) )
-        {
-            switch( p_ref->i_type )
-            {
-                case( FOURCC_rtp ):
-                default:
-                    msg_Warn( p_stream->p_input, "Unknown moviehintinformation %c%c%c%c (uncompletetly loaded)",
-                                       ( p_ref->i_type >> 24 )&0xff,
-                                       ( p_ref->i_type >> 16 )&0xff,
-                                       ( p_ref->i_type >>  8 )&0xff,
-                                       ( p_ref->i_type )&0xff );
-                    break;
-            }
-            /* chain this box with the father and the other at same level */
-            if( !p_box->p_first )
-            {
-                p_box->p_first = p_ref;
-                p_box->p_last = p_ref;
-            }
-            else
-            {
-                p_box->p_last->p_next = p_ref;
-                p_box->p_last = p_ref;
-            }
-            p_ref->p_father = p_box;
-        }
-        else
-        {
-            /* free memory */
-            free( p_ref );
-        }
-        
-        
-    }while( MP4_NextBox( p_stream, p_ref ) == 1 );
-    
-    
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->p_input, "Read Box: \"hnti\" " );
-
-#endif
-    return( 1 );
+    FREE( p_box->data.p_cprt->psz_notice );
 }
+
 
 int MP4_ReadBox_dcom( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -1843,7 +1786,11 @@ int MP4_ReadBox_cmvd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif 
     
     MP4_READBOX_EXIT( 1 );
-}   
+}
+void MP4_FreeBox_cmvd( input_thread_t *p_input, MP4_Box_t *p_box )
+{
+    FREE( p_box->data.p_cmvd->p_data );
+}
 
 int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -1996,46 +1943,73 @@ static struct
     { FOURCC_edts,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_udta,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_nmhd,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_hnti,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
 
-    /* specific sbox */
-    { FOURCC_ftyp,  MP4_ReadBox_ftyp,       NULL },
-    { FOURCC_cmov,  MP4_ReadBox_cmov,       NULL },
-    { FOURCC_mvhd,  MP4_ReadBox_mvhd,       NULL },
-    { FOURCC_tkhd,  MP4_ReadBox_tkhd,       NULL },
-    { FOURCC_tref,  MP4_ReadBox_tref,       NULL },
-    { FOURCC_mdhd,  MP4_ReadBox_mdhd,       NULL },
-    { FOURCC_hdlr,  MP4_ReadBox_hdlr,       NULL },
-    { FOURCC_vmhd,  MP4_ReadBox_vmhd,       NULL },
-    { FOURCC_smhd,  MP4_ReadBox_smhd,       NULL },
-    { FOURCC_hmhd,  MP4_ReadBox_hmhd,       NULL },
-    { FOURCC_url,   MP4_ReadBox_url,        NULL },
-    { FOURCC_urn,   MP4_ReadBox_urn,        NULL },
-    { FOURCC_dref,  MP4_ReadBox_dref,       NULL },
-    { FOURCC_stts,  MP4_ReadBox_stts,       NULL },
-    { FOURCC_ctts,  MP4_ReadBox_ctts,       NULL },
-    { FOURCC_stsd,  MP4_ReadBox_stsd,       NULL },
-    { FOURCC_stsz,  MP4_ReadBox_stsz,       NULL },
-    { FOURCC_stsc,  MP4_ReadBox_stsc,       NULL },
-    { FOURCC_stco,  MP4_ReadBox_stco_co64,  NULL },
-    { FOURCC_co64,  MP4_ReadBox_stco_co64,  NULL },
-    { FOURCC_stss,  MP4_ReadBox_stss,       NULL },
-    { FOURCC_stsh,  MP4_ReadBox_stsh,       NULL },
-    { FOURCC_stdp,  MP4_ReadBox_stdp,       NULL },
-    { FOURCC_padb,  MP4_ReadBox_padb,       NULL },
-    { FOURCC_elst,  MP4_ReadBox_elst,       NULL },
-    { FOURCC_cprt,  MP4_ReadBox_cprt,       NULL },
-    { FOURCC_hnti,  MP4_ReadBox_hnti,       NULL },
-    { FOURCC_esds,  MP4_ReadBox_esds,       NULL },
-    { FOURCC_dcom,  MP4_ReadBox_dcom,       NULL },
-    { FOURCC_cmvd,  MP4_ReadBox_cmvd,       NULL },
+    /* specific box */
+    { FOURCC_ftyp,  MP4_ReadBox_ftyp,       MP4_FreeBox_ftyp },
+    { FOURCC_cmov,  MP4_ReadBox_cmov,       MP4_FreeBox_Common },
+    { FOURCC_mvhd,  MP4_ReadBox_mvhd,       MP4_FreeBox_Common },
+    { FOURCC_tkhd,  MP4_ReadBox_tkhd,       MP4_FreeBox_Common },
+    { FOURCC_tref,  MP4_ReadBox_tref,       MP4_FreeBox_Common },
+    { FOURCC_mdhd,  MP4_ReadBox_mdhd,       MP4_FreeBox_Common },
+    { FOURCC_hdlr,  MP4_ReadBox_hdlr,       MP4_FreeBox_hdlr },
+    { FOURCC_vmhd,  MP4_ReadBox_vmhd,       MP4_FreeBox_Common },
+    { FOURCC_smhd,  MP4_ReadBox_smhd,       MP4_FreeBox_Common },
+    { FOURCC_hmhd,  MP4_ReadBox_hmhd,       MP4_FreeBox_Common },
+    { FOURCC_url,   MP4_ReadBox_url,        MP4_FreeBox_url },
+    { FOURCC_urn,   MP4_ReadBox_urn,        MP4_FreeBox_urn },
+    { FOURCC_dref,  MP4_ReadBox_dref,       MP4_FreeBox_Common },
+    { FOURCC_stts,  MP4_ReadBox_stts,       MP4_FreeBox_stts },
+    { FOURCC_ctts,  MP4_ReadBox_ctts,       MP4_FreeBox_ctts },
+    { FOURCC_stsd,  MP4_ReadBox_stsd,       MP4_FreeBox_Common },
+    { FOURCC_stsz,  MP4_ReadBox_stsz,       MP4_FreeBox_stsz },
+    { FOURCC_stsc,  MP4_ReadBox_stsc,       MP4_FreeBox_stsc },
+    { FOURCC_stco,  MP4_ReadBox_stco_co64,  MP4_FreeBox_stco_co64 },
+    { FOURCC_co64,  MP4_ReadBox_stco_co64,  MP4_FreeBox_stco_co64 },
+    { FOURCC_stss,  MP4_ReadBox_stss,       MP4_FreeBox_stss },
+    { FOURCC_stsh,  MP4_ReadBox_stsh,       MP4_FreeBox_stsh },
+    { FOURCC_stdp,  MP4_ReadBox_stdp,       MP4_FreeBox_stdp },
+    { FOURCC_padb,  MP4_ReadBox_padb,       MP4_FreeBox_padb },
+    { FOURCC_elst,  MP4_ReadBox_elst,       MP4_FreeBox_elst },
+    { FOURCC_cprt,  MP4_ReadBox_cprt,       MP4_FreeBox_cprt },
+    { FOURCC_esds,  MP4_ReadBox_esds,       MP4_FreeBox_esds },
+    { FOURCC_dcom,  MP4_ReadBox_dcom,       MP4_FreeBox_Common },
+    { FOURCC_cmvd,  MP4_ReadBox_cmvd,       MP4_FreeBox_cmvd },
 
     /* Nothing to do with this box */
     { FOURCC_mdat,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
     { FOURCC_skip,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
     { FOURCC_free,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
     { FOURCC_wide,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
+
+    /* for codecs */
+    { FOURCC_soun,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC__mp3,  MP4_ReadBox_sample_soun,    MP4_FreeBox_Common },
+    { FOURCC_mp4a,  MP4_ReadBox_sample_mp4a,    MP4_FreeBox_Common },
+
+    { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_mp4v,  MP4_ReadBox_sample_mp4v,    MP4_FreeBox_Common },
+    { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_3IV1,  NULL,                       MP4_FreeBox_Common },
+
+    { FOURCC_mp4s,  NULL,                       MP4_FreeBox_Common },
+
+    /* XXX there is 2 box where we could find this entry stbl and tref*/
+    { FOURCC_hint,  NULL,                       MP4_FreeBox_Common },
+
+    /* found in tref box */
+    { FOURCC_dpnd,  NULL,   NULL },
+    { FOURCC_ipir,  NULL,   NULL },
+    { FOURCC_mpod,  NULL,   NULL },
+    
+    /* found in hnti */
+    { FOURCC_rtp,   NULL,   NULL },
     
     /* Last entry */
+    
     { 0,            NULL,                   NULL }
 };
 
@@ -2052,7 +2026,7 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
     
     if( !MP4_ReadBoxCommon( p_stream, p_box ) )
     {
-        msg_Err( p_stream->p_input, "Cannot read one box" );
+        msg_Warn( p_stream->p_input, "Cannot read one box" );
         return( 0 );
     }
     if( !p_box->i_size )
@@ -2100,11 +2074,6 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
  *****************************************************************************/
 void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
 {
-#define FREE( p ) \
-    if( p ) \
-    { \
-        free( p ); \
-    }
     int i_index;
 
     MP4_Box_t *p_child;
@@ -2124,7 +2093,6 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
         p_child = p_next; 
     }
 
-#if 0
     /* Now search function to call */
     if( p_box->data.p_data )
     {
@@ -2138,6 +2106,7 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
         }
         if( MP4_Box_Function[i_index].MP4_FreeBox_function == NULL )
         {
+            /* Should not happen */
             msg_Warn( p_input, 
                       "cannot free box %c%c%c%c, type unknown",
                       (p_box->i_type >> 24)&0xff,
@@ -2150,125 +2119,13 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
             MP4_Box_Function[i_index].MP4_FreeBox_function( p_input, p_box );
         }
 
+        free( p_box->data.p_data );
+        p_box->data.p_data = NULL;
     }
 
-    p_box->data.p_data = NULL;
     p_box->p_first = NULL;
     p_box->p_last = NULL;
-#endif   
     
-    if( p_box->data.p_data )
-    {
-        switch( p_box->i_type )
-        {
-            case( FOURCC_ftyp):
-                FREE(p_box->data.p_ftyp->i_compatible_brands );
-                break;
-            case( FOURCC_hdlr ):
-                FREE( p_box->data.p_hdlr->psz_name );
-                break;
-            case( FOURCC_url ):
-                FREE( p_box->data.p_url->psz_location );
-                break;
-            case( FOURCC_urn ):
-                FREE( p_box->data.p_urn->psz_name );
-                FREE( p_box->data.p_urn->psz_location );
-                break;
-            case( FOURCC_stts ):
-                FREE( p_box->data.p_stts->i_sample_count );
-                FREE( p_box->data.p_stts->i_sample_delta );
-                break;
-            case( FOURCC_ctts ):
-                FREE( p_box->data.p_ctts->i_sample_count );
-                FREE( p_box->data.p_ctts->i_sample_offset );
-                break;
-            case( FOURCC_stsz ):
-                FREE( p_box->data.p_stsz->i_entry_size );
-                break;
-            case( FOURCC_stz2 ):
-                FREE( p_box->data.p_stz2->i_entry_size );
-                break;
-            case( FOURCC_stsc ):
-                FREE( p_box->data.p_stsc->i_first_chunk );
-                FREE( p_box->data.p_stsc->i_samples_per_chunk );
-                FREE( p_box->data.p_stsc->i_sample_description_index );
-                break;
-            case( FOURCC_stco ):
-            case( FOURCC_co64 ):
-                FREE( p_box->data.p_co64->i_chunk_offset );
-                break;
-            case( FOURCC_stss ):
-                FREE( p_box->data.p_stss->i_sample_number );
-                break;
-            case( FOURCC_stsh ):
-                FREE( p_box->data.p_stsh->i_shadowed_sample_number );
-                FREE( p_box->data.p_stsh->i_sync_sample_number );
-                break;
-            case( FOURCC_stdp ):
-                FREE( p_box->data.p_stdp->i_priority );
-                break;
-            case( FOURCC_padb ):
-                FREE( p_box->data.p_padb->i_reserved1 );
-                FREE( p_box->data.p_padb->i_pad2 );
-                FREE( p_box->data.p_padb->i_reserved2 );
-                FREE( p_box->data.p_padb->i_pad1 );
-                break;
-            case( FOURCC_elst ):
-                FREE( p_box->data.p_elst->i_segment_duration );
-                FREE( p_box->data.p_elst->i_media_time );
-                FREE( p_box->data.p_elst->i_media_rate_integer );
-                FREE( p_box->data.p_elst->i_media_rate_fraction );
-                break;
-            case( FOURCC_cprt ):
-                FREE( p_box->data.p_cprt->psz_notice );
-                break;
-            case( FOURCC_cmvd ):
-                FREE( p_box->data.p_cmvd->p_data );
-                break;
-            case( FOURCC_moov ): /* theses are containers for others boxes */
-            case( FOURCC_trak ):
-            case( FOURCC_mdia ):
-            case( FOURCC_moof ):
-            case( FOURCC_minf ):
-            case( FOURCC_stbl ):
-            case( FOURCC_dinf ):
-            case( FOURCC_edts ):
-            case( FOURCC_udta ):
-            case( FOURCC_nmhd ):
-            case( FOURCC_mvhd ): /* nothing to free */
-            case( FOURCC_tkhd ):
-            case( FOURCC_mdhd ):
-            case( FOURCC_vmhd ):
-            case( FOURCC_smhd ):
-            case( FOURCC_hmhd ):
-            case( FOURCC_dref ):
-            case( FOURCC_soun ):
-            case( FOURCC_vide ):
-            case( FOURCC_SVQ1 ):
-            case( FOURCC_mp4s ):
-            case( FOURCC_mp4a ):
-            case( FOURCC_mp4v ):
-            case( FOURCC_dcom ):
-            case( FOURCC_stsd ):
-            case( FOURCC_cmov ):
-            case( FOURCC_DIVX ):
-            case( FOURCC_3IV1 ):
-            case( FOURCC_h263 ):
-                break;
-            default:
-                msg_Warn( p_input, "cannot free box %c%c%c%c, type unknown",
-                          (p_box->i_type >> 24)&0xff,
-                          (p_box->i_type >> 16)&0xff, 
-                          (p_box->i_type >>  8)&0xff, 
-                          (p_box->i_type )&0xff );
-                break;
-        }
-        free( p_box->data.p_data ); 
-    }
-    p_box->data.p_data = NULL;
-    p_box->p_first = NULL;
-    p_box->p_last = NULL;
-#undef FREE
 }
 
 /*****************************************************************************
@@ -2482,7 +2339,4 @@ MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number )
     }
     return( p_child );
 }
-
-
-
 
