@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.4 2002/08/26 20:49:49 sam Exp $
+##  $Id: bootstrap,v 1.5 2002/08/26 21:46:06 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -44,19 +44,19 @@ else
   # Yuck!
   test -f po/ChangeLog~ && mv po/ChangeLog~ po/ChangeLog
   mkdir -p m4
+  # Yuck! - don't copy anything, it makes old autoconf barf.
+  #for file in codeset.m4 gettext.m4 glibc21.m4 iconv.m4 isc-posix.m4 \
+  #            lcmessage.m4 progtest.m4
+  #  do cp ${aclocaldir}/${file} m4/
+  #done
   # Yuck!
-  for file in codeset.m4 gettext.m4 glibc21.m4 iconv.m4 isc-posix.m4 \
-              lcmessage.m4 progtest.m4
-    do cp ${aclocaldir}/${file} m4/
-  done
-  # Yuck!
-  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' >> m4/gettext.m4
+  echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/gettext.m4
 fi
 
 aclocal -I m4
+autoheader
 automake --foreign --add-missing --copy
 autoconf
-autoheader
 
 # nuahahahahaha !! overwriting Makefile.in with what *I* want!
 cp Makefile.old Makefile.in
