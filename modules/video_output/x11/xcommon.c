@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.35 2003/10/26 17:50:23 gbazin Exp $
+ * $Id: xcommon.c,v 1.36 2003/10/26 23:03:47 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -525,6 +525,43 @@ static int ManageVideo( vout_thread_t *p_vout )
                                              xevent.xkey.keycode, 0 );
             switch( (int)x_key_symbol )
             {
+            case XK_F1:
+                val.i_int = KEY_F1;
+                break;
+            case XK_F2:
+                val.i_int = KEY_F2;
+                break;
+            case XK_F3:
+                val.i_int = KEY_F3;
+                break;
+            case XK_F4:
+                val.i_int = KEY_F4;
+                break;
+            case XK_F5:
+                val.i_int = KEY_F5;
+                break;
+            case XK_F6:
+                val.i_int = KEY_F6;
+                break;
+            case XK_F7:
+                val.i_int = KEY_F7;
+                break;
+            case XK_F8:
+                val.i_int = KEY_F8;
+                break;
+            case XK_F9:
+                val.i_int = KEY_F9;
+                break;
+            case XK_F10:
+                val.i_int = KEY_F10;
+                break;
+            case XK_F11:
+                val.i_int = KEY_F11;
+                break;
+            case XK_F12:
+                val.i_int = KEY_F12;
+                break;
+                
             case XK_Return:
             case XK_KP_Enter:
                 val.i_int = KEY_ENTER;
