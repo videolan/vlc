@@ -348,8 +348,8 @@ vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 # old automake-1.5 bug (automake/279).
 DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
 
-vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
-	@rm -f $(srcdir)/vlc$(EXEEXT)
+vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
+	@rm -f $(top_builddir)/vlc$(EXEEXT)
 	case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++) $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
 	  objc) $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
@@ -436,7 +436,7 @@ package-win32:
 # Create installation script
 	cp "$(srcdir)/install-win32" "$(srcdir)/tmp/nsi"
 # Copy relevant files
-	cp "$(srcdir)/vlc$(EXEEXT)" "$(srcdir)/tmp/"
+	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/tmp/"
 	$(STRIP) "$(srcdir)/tmp/vlc$(EXEEXT)"
 	cp "$(srcdir)/INSTALL.win32" "$(srcdir)/tmp/INSTALL.txt"
 	unix2dos "$(srcdir)/tmp/INSTALL.txt"
@@ -598,18 +598,18 @@ $(SOURCES_mozilla): mozilla/vlcintf.h
 mozilla_plugin_DATA = $(LIBRARIES_mozilla)
 mozilla_plugindir = $(libdir)/mozilla/plugins
 $(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
-                      $(mozilla_libplugin_a_DEPENDENCIES)
+                      $(mozilla_libplugin_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
 	  lib/libvlc_pic.a -shared \
 	  `$(VLC_CONFIG) --libs vlc mozilla builtin pic`
 
 mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
 mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
-mozilla/vlcintf.xpt: Makefile mozilla/vlcintf.idl
+mozilla/vlcintf.xpt: mozilla/vlcintf.idl
 	$(XPIDL) -I/usr/share/idl/mozilla -m typelib \
 	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
-mozilla/vlcintf.h: Makefile mozilla/vlcintf.idl
+mozilla/vlcintf.h: mozilla/vlcintf.idl
 	$(XPIDL) -I/usr/share/idl/mozilla -m header \
 	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
@@ -621,6 +621,31 @@ mozilla/npvlc_rc.$(OBJEXT): mozilla/npvlc_rc.rc
 	$(WINDRES) --include-dir $(srcdir)/mozilla -i $< -o $@
 endif
 endif
+
+###############################################################################
+# Stamp rules
+###############################################################################
+clean: clean-stamps
+clean-stamp:
+	rm -f stamp-builtin stamp-pic
+
+stamp-builtin: FORCE
+	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
+	  if test "$${dep}" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
+	    rm -f $@; \
+	    break; \
+	  fi; \
+	done
+	@if test ! -f $@; then printf "" > $@; fi
+
+stamp-pic: FORCE
+	@for dep in "" `$(VLC_CONFIG) --target builtin pic`; do \
+	  if test "$${dep}" -nt "$(LIBRARIES_mozilla)"; then \
+	    rm -f $@; \
+	    break; \
+	  fi; \
+	done
+	@if test ! -f $@; then printf "" > $@; fi
 
 ###############################################################################
 # Force rule
