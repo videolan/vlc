@@ -14,3 +14,6 @@ SOURCES_livedotcom = livedotcom.cpp
 SOURCES_demux2 = demux2.c
 SOURCES_nsv = nsv.c
 SOURCES_real = real.c
+SOURCES_ts2 = ts.c
+SOURCES_ps2 = ps.c
+SOURCES_dvdnav = dvdnav.c

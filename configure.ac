@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.150 2004/01/12 21:08:22 gbazin Exp $
+dnl $Id: configure.ac,v 1.151 2004/01/18 11:14:22 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -869,7 +869,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
-AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv demux2 nsv real])
+AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ps2 ts avi asf aac mp4 rawdv demux2 nsv real])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -1350,6 +1350,29 @@ then
 fi
 
 dnl
+dnl  libdvdnav plugin
+dnl
+AC_ARG_ENABLE(dvdnav,
+  [  --enable-dvdnav         dvdnav input module (default enabled)])
+if test "${enable_caca}" != "no"
+then
+  DVDNAV_PATH="${PATH}"
+  AC_ARG_WITH(dvdnav-config-path,
+    [    --with-dvdnav-config-path=PATH dvdnav-config path (default search in \$PATH)],
+    [ if test "${with_dvdnav_config_path}" != "no"
+      then
+        DVDNAV_PATH="${with_dvdnav_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(DVDNAV_CONFIG, dvdnav-config, no, ${DVDNAV_PATH})
+  if test "${DVDNAV_CONFIG}" != "no"
+  then
+    AX_ADD_PLUGINS([dvdnav])
+    AX_ADD_CFLAGS([dvdnav],[`${DVDNAV_CONFIG} --cflags`])
+    AX_ADD_LDFLAGS([dvdnav],[`${DVDNAV_CONFIG} --libs`])
+  fi
+fi
+
+dnl
 dnl  Windows DirectShow access module
 dnl
 AC_ARG_ENABLE(dshow,
@@ -1381,8 +1404,8 @@ then
     if test -z "${with_dvbpsi_tree}"
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
-        [ AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi])
-          AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi],[-ldvbpsi]) ],
+        [ AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi ts2])
+          AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-ldvbpsi]) ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#if defined( HAVE_STDINT_H )
 #   include <stdint.h>
@@ -1406,9 +1429,9 @@ then
       then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        AX_ADD_BUILTINS([ts_dvbpsi mux_ts_dvbpsi])
-        AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi],[-I${real_dvbpsi_tree}/src])
-        AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
+        AX_ADD_BUILTINS([ts_dvbpsi mux_ts_dvbpsi ts2])
+        AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-I${real_dvbpsi_tree}/src])
+        AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
       else
         dnl  The given libdvbpsi wasn't built
         AC_MSG_RESULT(no)
@@ -1431,9 +1454,9 @@ then
     fi
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
-      AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi])
-      AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi],[${CPPFLAGS_test}])
-      AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi],[${LDFLAGS_test} -ldvbpsi])
+      AX_ADD_PLUGINS([ts_dvbpsi mux_ts_dvbpsi ts2])
+      AX_ADD_CPPFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[${CPPFLAGS_test}])
+      AX_ADD_LDFLAGS([ts_dvbpsi mux_ts_dvbpsi ts2],[${LDFLAGS_test} -ldvbpsi])
 
     ],[
       if test -n "${enable_dvbpsi}"
