@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.10 2002/01/05 03:49:18 sam Exp $
+ * $Id: mga.c,v 1.11 2002/01/05 15:17:12 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,6 +56,8 @@ static int  vout_Manage    ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
+static int  NewPicture     ( vout_thread_t *, picture_t * );
+
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
@@ -83,47 +85,61 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 #ifndef __LINUX_MGAVID_H
 #   define __LINUX_MGAVID_H
+
 #   define MGA_VID_CONFIG _IOR('J', 1, mga_vid_config_t)
 #   define MGA_VID_ON     _IO ('J', 2)
 #   define MGA_VID_OFF    _IO ('J', 3)
 #   define MGA_G200 0x1234
 #   define MGA_G400 0x5678
+
+#   define MGA_VID_FORMAT_YV12 0x32315659
+#   define MGA_VID_FORMAT_IYUV (('I'<<24)|('Y'<<16)|('U'<<8)|'V')
+#   define MGA_VID_FORMAT_I420 (('I'<<24)|('4'<<16)|('2'<<8)|'0')
+#   define MGA_VID_FORMAT_YUY2 (('Y'<<24)|('U'<<16)|('Y'<<8)|'2')
+#   define MGA_VID_FORMAT_UYVY (('U'<<24)|('Y'<<16)|('V'<<8)|'Y')
+
+#   define MGA_VID_VERSION     0x0201
+
 typedef struct mga_vid_config_s
 {
-    u32     card_type;
-    u32     ram_size;
-    u32     src_width;
-    u32     src_height;
-    u32     dest_width;
-    u32     dest_height;
-    u32     x_org;
-    u32     y_org;
-    u8      colkey_on;
-    u8      colkey_red;
-    u8      colkey_green;
-    u8      colkey_blue;
+    u16 version;
+    u16 card_type;
+    u32 ram_size;
+    u32 src_width;
+    u32 src_height;
+    u32 dest_width;
+    u32 dest_height;
+    u32 x_org;
+    u32 y_org;
+    u8  colkey_on;
+    u8  colkey_red;
+    u8  colkey_green;
+    u8  colkey_blue;
+    u32 format;
+    u32 frame_size;
+    u32 num_frames;
 } mga_vid_config_t;
 #endif
 
 typedef struct vout_sys_s
 {
-    /* MGA specific variables */
-    int                 i_fd;
-    int                 i_size;
     mga_vid_config_t    mga;
-    byte_t *            p_mga_vid_base;
-    boolean_t           b_g400;
+    int                 i_fd;
+    byte_t *            p_video;
+    boolean_t           b_420bug;
 
 } vout_sys_t;
 
-#define DUMMY_WIDTH 16
-#define DUMMY_HEIGHT 16
-#define DUMMY_BITS_PER_PLANE 16
-#define DUMMY_BYTES_PER_PIXEL 2
+typedef struct picture_sys_s
+{
+    /* For buggy g200s which don't do I420 properly */
+    u8 *    p_chroma;
+    u8 *    p_tmp;
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
+} picture_sys_t;
+
+#define CEIL32(x) (((x)+31)&~31)
+
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
@@ -148,7 +164,6 @@ static int vout_Probe( probedata_t *p_data )
     int i_fd;
 
     i_fd = open( "/dev/mga_vid", O_RDWR );
-
     if( i_fd == -1 )
     {
         return 0;
@@ -174,7 +189,8 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    if( (p_vout->p_sys->i_fd = open( "/dev/mga_vid", O_RDWR )) == -1 )
+    p_vout->p_sys->i_fd = open( "/dev/mga_vid", O_RDWR );
+    if( p_vout->p_sys->i_fd == -1 )
     {
         intf_ErrMsg( "vout error: can't open MGA driver /dev/mga_vid" );
         free( p_vout->p_sys );
@@ -189,53 +205,107 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+    int i_index;
+    picture_t *p_pic;
+
+    I_OUTPUTPICTURES = 0;
+
     /* create the MGA output */
     p_vout->output.i_width = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    /* FIXME: we should initialize these ones according to the streams */
-    p_vout->p_sys->mga.src_width = p_vout->output.i_width;
+    /* Set coordinates and aspect ratio */
+    p_vout->p_sys->mga.src_width = CEIL32(p_vout->output.i_width);
     p_vout->p_sys->mga.src_height = p_vout->output.i_height;
-    p_vout->p_sys->mga.dest_width = 900;
-    p_vout->p_sys->mga.dest_height = 700;
-    p_vout->p_sys->mga.x_org = 50;
-    p_vout->p_sys->mga.y_org = 50;
-    p_vout->p_sys->mga.colkey_on = 0;
+    vout_PlacePicture( p_vout, 1024, 768,
+                       &p_vout->p_sys->mga.x_org, &p_vout->p_sys->mga.y_org,
+                       &p_vout->p_sys->mga.dest_width,
+                       &p_vout->p_sys->mga.dest_height );
 
+    /* Initialize a video buffer */
+    p_vout->p_sys->mga.colkey_on = 0;
+    p_vout->p_sys->mga.num_frames = 1;
+    p_vout->p_sys->mga.frame_size = CEIL32(p_vout->output.i_width)
+                                     * p_vout->output.i_height * 2;
+    p_vout->p_sys->mga.version = MGA_VID_VERSION;
+
+    /* Assume we only do YV12 for the moment */
+    p_vout->output.i_chroma = FOURCC_YV12;
+    p_vout->p_sys->mga.format = MGA_VID_FORMAT_YV12;
+    
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )
     {
         intf_ErrMsg( "vout error: MGA config ioctl failed" );
+        return -1;
     }
+
+    p_vout->p_sys->b_420bug = 0;
 
     if( p_vout->p_sys->mga.card_type == MGA_G200 )
     {
-        intf_Msg( "vout: detected MGA G200 (%d MB Ram)",
-                  p_vout->p_sys->mga.ram_size );
-        p_vout->p_sys->b_g400 = 0;
+        intf_WarnMsg( 3, "vout info: detected MGA G200 (%d MB Ram)",
+                         p_vout->p_sys->mga.ram_size );
+        if( p_vout->output.i_chroma == FOURCC_I420
+             || p_vout->output.i_chroma == FOURCC_IYUV
+             || p_vout->output.i_chroma == FOURCC_YV12 )
+        {
+            p_vout->p_sys->b_420bug = 1;
+        }
     }
     else
     {
-        intf_Msg( "vout: detected MGA G400 (%d MB Ram)",
-                  p_vout->p_sys->mga.ram_size );
-        p_vout->p_sys->b_g400 = 1;
+        intf_WarnMsg( 3, "vout info: detected MGA G400/G450 (%d MB Ram)",
+                         p_vout->p_sys->mga.ram_size );
     }
 
+    p_vout->p_sys->p_video = mmap( 0, p_vout->p_sys->mga.frame_size
+                                       * p_vout->p_sys->mga.num_frames,
+                                   PROT_WRITE, MAP_SHARED,
+                                   p_vout->p_sys->i_fd, 0 );
+
+    /* Try to initialize up to num_frames direct buffers */
+    while( I_OUTPUTPICTURES < p_vout->p_sys->mga.num_frames )
+    {
+        p_pic = NULL;
+
+        /* Find an empty picture slot */
+        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        /* Allocate the picture */
+        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
+        {
+            break;
+        }
+
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
+
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+        I_OUTPUTPICTURES++;
+    }
+
+    /* Blank the windows */
+    for( i_index = 0; i_index < I_OUTPUTPICTURES; i_index++ )
+    {
+        memset( p_vout->p_sys->p_video
+                 + p_vout->p_sys->mga.frame_size * i_index,
+                0x00, p_vout->p_sys->mga.frame_size / 2 );
+        memset( p_vout->p_sys->p_video
+                 + p_vout->p_sys->mga.frame_size * ( 2*i_index + 1 ) / 2,
+                0x80, p_vout->p_sys->mga.frame_size / 2 );
+    }
+
+    /* Display the image */
     ioctl( p_vout->p_sys->i_fd, MGA_VID_ON, 0 );
-
-    p_vout->p_sys->i_size = ( (p_vout->p_sys->mga.src_width + 31) & ~31 )
-                             * p_vout->p_sys->mga.src_height;
-
-    p_vout->p_sys->p_mga_vid_base = mmap( 0, p_vout->p_sys->i_size
-                                             + p_vout->p_sys->i_size / 2,
-                                          PROT_WRITE, MAP_SHARED,
-                                          p_vout->p_sys->i_fd, 0 );
-
-    memset( p_vout->p_sys->p_mga_vid_base,
-            0x00, p_vout->p_sys->i_size );
-
-    memset( p_vout->p_sys->p_mga_vid_base + p_vout->p_sys->i_size,
-            0x80, p_vout->p_sys->i_size / 2 );
 
     return( 0 );
 }
@@ -245,7 +315,19 @@ static int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
+    int i_index;
+
     ioctl( p_vout->p_sys->i_fd, MGA_VID_OFF, 0 );
+
+    /* Free the output buffers we allocated */
+    for( i_index = I_OUTPUTPICTURES ; i_index ; )
+    {
+        i_index--;
+        if( p_vout->p_sys->b_420bug )
+        {
+            free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
+        }
+    }
 }
 
 /*****************************************************************************
@@ -276,7 +358,24 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    ;
+    if( p_vout->p_sys->b_420bug )
+    {
+        /* Grmbl, we have a G200 which mistakenly assumes 4:2:0 planar
+         * has *packed* chroma information! Do some conversion... */
+        u8 *p_cr, *p_cb, *p_dest;
+        int i;
+
+        /* TODO: optimize this a bit... */
+        p_dest = p_pic->p_sys->p_chroma;
+        p_cr = p_pic->U_PIXELS;
+        p_cb = p_pic->V_PIXELS;
+
+        for( i = p_vout->p_sys->mga.frame_size / 4; i--; )
+        {
+            *p_dest++ = *p_cr++;
+            *p_dest++ = *p_cb++;
+        }
+    }
 }
 
 /*****************************************************************************
@@ -285,5 +384,69 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     ;
+}
+
+/* Following functions are local */
+
+/*****************************************************************************
+ * NewPicture: allocate a picture
+ *****************************************************************************
+ * Returns 0 on success, -1 otherwise
+ *****************************************************************************/
+static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* We know the chroma, allocate a buffer which will be used
+     * directly by the decoder */
+    p_pic->p_data = p_vout->p_sys->p_video + I_OUTPUTPICTURES
+                                              * p_vout->p_sys->mga.frame_size;
+
+    p_pic->Y_PIXELS = p_pic->p_data;
+    p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
+    p_pic->p[Y_PLANE].i_pitch = CEIL32( p_vout->output.i_width );
+    p_pic->p[Y_PLANE].i_pixel_bytes = 1;
+
+    if( p_pic->p[Y_PLANE].i_pitch == p_vout->output.i_width )
+    {
+        p_pic->p[Y_PLANE].b_margin = 0;
+    }
+    else
+    {
+        /* FIXME: do something here */
+        p_pic->p[Y_PLANE].b_margin = 0;
+    }
+
+    p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2 / 4;
+    p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
+    p_pic->p[U_PLANE].i_pixel_bytes = 1;
+    p_pic->p[U_PLANE].b_margin = 0;
+
+    p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3 / 4;
+    p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
+    p_pic->p[V_PLANE].i_pixel_bytes = 1;
+    p_pic->p[V_PLANE].b_margin = 0;
+
+    if( p_vout->p_sys->b_420bug )
+    {
+        /* We need to store the chroma somewhere else */
+        p_pic->p_sys = malloc( sizeof( picture_sys_t )
+                                + p_vout->p_sys->mga.frame_size / 2 );
+
+        if( p_pic->p_sys == NULL )
+        {
+            return -1;
+        }
+
+        p_pic->p_sys->p_chroma = p_pic->U_PIXELS;
+        p_pic->p_sys->p_tmp = (u8*)p_pic->p_sys + sizeof( picture_sys_t );
+        p_pic->U_PIXELS = p_pic->p_sys->p_tmp;
+        p_pic->V_PIXELS = p_pic->p_sys->p_tmp
+                           + p_vout->p_sys->mga.frame_size / 4;
+    }
+
+    p_pic->i_planes = 3;
+
+    return 0;
 }
 

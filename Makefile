@@ -536,9 +536,9 @@ ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
 		echo "        ALLOCATE_BUILTIN("$$i"); \\" >> $@ ; \
 	done
+endif
 	@echo "    } while( 0 );" >> $@ ;
 	@echo "" >> $@ ;
-endif
 
 $(C_DEP): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.7 2002/01/05 03:49:18 sam Exp $
+ * $Id: xcommon.c,v 1.8 2002/01/05 15:17:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1220,15 +1220,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                                + p_pic->p_sys->p_image->offsets[1];
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_bytes = 1;
+            p_pic->p[U_PLANE].b_margin = 0;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[2];
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_bytes = 1;
+            p_pic->p[V_PLANE].b_margin = 0;
 
             p_pic->i_planes = 3;
             break;
@@ -1246,15 +1246,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                                + p_pic->p_sys->p_image->offsets[2];
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_bytes = 1;
+            p_pic->p[U_PLANE].b_margin = 0;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_image->data
                                + p_pic->p_sys->p_image->offsets[1];
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_bytes = 1;
+            p_pic->p[V_PLANE].b_margin = 0;
 
             p_pic->i_planes = 3;
             break;
