@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.85 2004/02/28 13:53:35 titer Exp $
+ * $Id: vout.m,v 1.86 2004/03/03 12:01:57 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1523,26 +1523,29 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     [fullScreenContext setFullScreen];
     [fullScreenContext makeCurrentContext];
 
-    /* Fix ratio */
-    unsigned width  = CGDisplayPixelsWide( kCGDirectMainDisplay );
-    unsigned height = CGDisplayPixelsHigh( kCGDirectMainDisplay );
-    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    /* Ratio */
+    unsigned width    = CGDisplayPixelsWide( kCGDirectMainDisplay );
+    unsigned height   = CGDisplayPixelsHigh( kCGDirectMainDisplay );
+    int      stretch  = config_GetInt( p_vout, "macosx-stretch" );
+    int      fill     = config_GetInt( p_vout, "macosx-fill" );
+    int      bigRatio = ( height * p_vout->output.i_aspect <
+                          width * VOUT_ASPECT_FACTOR );
+    if( stretch )
     {
         f_x = 1.0;
         f_y = 1.0;
     }
-    else if( height * p_vout->output.i_aspect <
-                 width * VOUT_ASPECT_FACTOR )
+    else if( ( bigRatio && !fill ) || ( !bigRatio && fill ) )
     {
         f_x = (float) height * p_vout->output.i_aspect /
-            width / VOUT_ASPECT_FACTOR;
+                  width / VOUT_ASPECT_FACTOR;
         f_y = 1.0;
     }
     else
     {
         f_x = 1.0;
         f_y = (float) width * VOUT_ASPECT_FACTOR /
-        p_vout->output.i_aspect / height;
+                  p_vout->output.i_aspect / height;
     }
 
     /* Update viewport, re-init textures */

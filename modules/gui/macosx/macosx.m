@@ -2,7 +2,7 @@
  * macosx.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.23 2004/03/02 13:53:14 kuehne Exp $
+ * $Id: macosx.m,v 1.24 2004/03/03 12:01:57 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -69,6 +69,11 @@ void E_(CloseVideo)   ( vlc_object_t * );
         "the faces of a rotating cube, 'Transparent cube' do make this " \
         "cube transparent." )
 
+#define FILL_TEXT N_("Fill fullscreen")
+#define FILL_LONGTEXT N_("In fullscreen mode, crop the picture if " \
+        "necessary in order to fill the screen without black" \
+        "borders (OpenGL only)." )
+
 static char * effect_list[] = { "none", "cube", "transparent-cube" };
 static char * effect_list_text[] = { N_("None"), N_("Cube"),
                                      N_("Transparent cube") };
@@ -91,6 +96,8 @@ vlc_module_begin();
         add_string( "macosx-opengl-effect", "none", NULL,
                     OPENGL_EFFECT_TEXT, OPENGL_EFFECT_LONGTEXT,
                     VLC_TRUE );
+        add_bool( "macosx-fill", 0, NULL, FILL_TEXT, FILL_LONGTEXT,
+                  VLC_TRUE );
         change_string_list( effect_list, effect_list_text, 0 );
 vlc_module_end();
 
