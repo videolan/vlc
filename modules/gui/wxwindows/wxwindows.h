@@ -819,7 +819,7 @@ private:
 };
 
 
-#if !defined(__WXX11__) && !defined(__WXMOTIF__)
+#if wxUSE_DRAG_AND_DROP
 /* Drag and Drop class */
 class DragAndDrop: public wxFileDropTarget
 {

@@ -358,7 +358,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
-#if !defined(__WXX11__) && !defined(__WXMOTIF__)
+#if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
     SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
 #endif
