@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: invert.c,v 1.10 2002/04/19 13:56:11 sam Exp $
+ * $Id: invert.c,v 1.11 2002/05/19 12:57:32 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -172,7 +172,7 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
     }
 }
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.19 2002/05/19 09:37:02 gbazin Exp $
+ * $Id: video_parser.c,v 1.20 2002/05/19 12:57:32 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -92,8 +92,10 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 
 #define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
 #define VPAR_SYNCHRO_LONGTEXT N_( \
-    "If you don't want this video decoder to decode all frames of the video, "\
-    "you can specify which synchro algorithm you want to use.")
+    "This allows you to force the synchro algorithm, by directly selecting " \
+    "the types of picture you want to decode. Please bear in mind that if " \
+    "you select more pictures than what your CPU is capable to decode, " \
+    "you won't get anything.")
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL)

@@ -45,9 +45,10 @@ N: Gildas Bazin
 E: gbazin@netcourrier.com
 C: gbazin
 D: mingw32 port, various win32 fixes
-D: DirectX audio and video output
+D: DirectX audio and video output, win32 WaveOut audio output
+D: a52 decoder using liba52
 D: Configuration file infrastructure
-S: Spain
+S: France
 
 N: Johan Bilien
 E: jobi@via.ecp.fr

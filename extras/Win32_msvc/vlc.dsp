@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "__VLC__" /YX /FD /GZ /I../../include /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "__VLC__" /FR /YX /FD /GZ /I../../include /c
 # ADD BASE RSC /l 0x414 /d "_DEBUG"
 # ADD RSC /l 0x809 /i "../" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -499,7 +499,6 @@ SOURCE=..\..\plugins\filter\distort.c
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# PROP Exclude_From_Build 1
 # ADD CPP /D "__BUILTIN__" /D MODULE_NAME=distort
 
 !ENDIF 
@@ -512,8 +511,6 @@ SOURCE=..\..\plugins\filter\filter_common.h
 !IF  "$(CFG)" == "vlc - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
-
-# PROP Exclude_From_Build 1
 
 !ENDIF 
 
@@ -528,7 +525,6 @@ SOURCE=..\..\plugins\filter\invert.c
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# PROP Exclude_From_Build 1
 # ADD CPP /D "__BUILTIN__" /D MODULE_NAME=insert
 
 !ENDIF 
@@ -544,7 +540,6 @@ SOURCE=..\..\plugins\filter\transform.c
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# PROP Exclude_From_Build 1
 # ADD CPP /D "__BUILTIN__" /D MODULE_NAME=transform
 
 !ENDIF 
@@ -560,7 +555,6 @@ SOURCE=..\..\plugins\filter\wall.c
 
 !ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
 
-# PROP Exclude_From_Build 1
 # ADD CPP /D "__BUILTIN__" /D MODULE_NAME=wall
 
 !ENDIF 

@@ -106,9 +106,9 @@ int DeactivateModule__MODULE_mpeg_vdec( module_t* );
 int InitModule__MODULE_dvd( module_t* );
 int ActivateModule__MODULE_dvd( module_t* );
 int DeactivateModule__MODULE_dvd( module_t* );
-int InitModule__MODULE_gtk( module_t* );
-int ActivateModule__MODULE_gtk( module_t* );
-int DeactivateModule__MODULE_gtk( module_t* );
+int InitModule__MODULE_wall( module_t* );
+int ActivateModule__MODULE_wall( module_t* );
+int DeactivateModule__MODULE_wall( module_t* );
 
 #define ALLOCATE_ALL_BUILTINS() \
     do \
@@ -136,4 +136,5 @@ int DeactivateModule__MODULE_gtk( module_t* );
         ALLOCATE_BUILTIN(dummy); \
         ALLOCATE_BUILTIN(mpeg_vdec); \
         ALLOCATE_BUILTIN(dvd); \
+        ALLOCATE_BUILTIN(wall); \
     } while( 0 );

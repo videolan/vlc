@@ -91,6 +91,9 @@
 /* Maximum supported data alignment */
 #define ATTRIBUTE_ALIGNED_MAX 16
 
+/* iline */
+#define inline __inline
+
 /* Simple version string */
 #define VERSION_MESSAGE "vlc 0.3.1_2002-05-17 Ourumov Copyright 1996-2002 VideoLAN"
 

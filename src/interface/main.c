@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.192 2002/05/19 11:02:46 massiot Exp $
+ * $Id: main.c,v 1.193 2002/05/19 12:57:32 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -95,7 +95,7 @@
 #define INTF_TEXT N_("interface module")
 #define INTF_LONGTEXT N_( \
     "This option allows you to select the interface used by vlc.\nNote that " \
-    "the default behavior is to automatically select the best method " \
+    "the default behavior is to automatically select the best module " \
     "available.")
 
 #define WARNING_TEXT N_("warning level (or use -v, -vv, etc...)")
@@ -254,13 +254,11 @@
 
 #define DVD_DEV_TEXT N_("DVD device")
 #define DVD_DEV_LONGTEXT N_( \
-    "This is the default DVD device to use. Under UNIX it is /dev/dvd, under " \
-    "Windows it is D:.")
+    "This is the default DVD device to use.")
 
 #define VCD_DEV_TEXT N_("VCD device")
 #define VCD_DEV_LONGTEXT N_( \
-    "This is the default VCD device to use. Under UNIX it is /dev/dvd, under " \
-    "Windows it is D:.")
+    "This is the default VCD device to use.")
 
 #define IPV6_TEXT N_("force IPv6")
 #define IPV6_LONGTEXT N_( \
@@ -281,17 +279,6 @@
 #define ADEC_AC3_LONGTEXT N_( \
     "This allows you to select the AC3/A52 audio decoder you want to use. " \
     "Common choices are builtin and a52.")
-
-#define VDEC_SMP_TEXT N_("use additional processors")
-#define VDEC_SMP_LONGTEXT N_( \
-    "This option is deprecated.")
-
-#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
-#define VPAR_SYNCHRO_LONGTEXT N_( \
-    "This allows you to force the synchro algorithm, by directly selecting " \
-    "the types of picture you want to decode. Please bear in mind that if " \
-    "you select more pictures than what your CPU is capable to decode, " \
-    "you won't get anything.")
 
 #define NOMMX_TEXT N_("disable CPU's MMX support")
 #define NOMMX_LONGTEXT N_( \
