@@ -1,3 +1,1455 @@
+2003-07-29 Tuesday 22:25  gbazin
+
+ * modules/codec/spudec/parse.c: fixed typo found by Meuuh.
+
+2003-07-29 Tuesday 22:20  gbazin
+
+ * src/video_output/video_output.c: fixed potential segfault.
+ * configure.ac: don't bail out if matroska headers are not found.
+
+2003-07-29 Tuesday 21:56  gbazin
+
+ * toolbox: fixed typo in the changelog rule.
+
+2003-07-29 Tuesday 21:46  gbazin
+
+ * modules/video_output/directx/events.c: compilation fix.
+
+2003-07-29 Tuesday 21:14  gbazin
+
+ * modules/gui/macosx/controls.m: fixed race condition in prev/next commands.
+ * modules/gui/wxwindows/wxwindows.cpp: raised the priority of the wxwin interface so it is now the default.
+     We also lower the priority if there is no DISPLAY env variable.
+ * modules/gui/wxwindows/interface.cpp: prev/next buttons are also used to navigate through titles.
+ * modules/video_output/directx/events.c: use arrow keys for DVD navigation.
+ * modules/video_output/x11/xcommon.c: page up/down now seek -10/10 secs.
+ * share/vlc_win32_rc.rc: compilation fix.
+
+2003-07-29 Tuesday 18:51  fenrir
+
+  * http.c:  under linux if no directory is specified search "share/http"
+ and then DATA_PATH"/http".
+
+2003-07-29 Tuesday 17:42  gbazin
+
+ * configure.ac: bumped version number to 0.6.1.
+     Enabled matroska support by default.
+ * extras/MacOSX/*: bumped version number to 0.6.1.
+ * INSTALL.win32: instructions update.
+ * share/Makefile.am: included the html files for the http interface.
+ * po/*: ran ./toolbox --update-po.
+
+2003-07-29 Tuesday 09:32  sam
+
+   * modules/video_output/x11/xcommon.c: Hopefully a proper fix for the Mozilla
+     event handling bug.
+
+2003-07-28 Monday 22:46  gbazin
+
+ * modules/video_output/x11/xcommon.c: reverted sam's last commit which broke the event reading loop on the video window.
+
+2003-07-28 Monday 21:41  massiot
+
+ * configure.ac: Worked around a bug in the OS X linker, with multiply
+   defined symbols and libmp3lame
+ * Makefile.am: Build po before . because we need the po files to build
+   VLC.app
+ * po/fr.po: French translation courtesy of Jean-Pierre Kuypers
+ * OS X interface: cosmetics
+
+2003-07-28 Monday 20:25  jpsaman
+
+ Added HuffYuv and A-law codes for low bitrate and CPU load encodings/transcoding
+
+2003-07-28 Monday 20:23  jpsaman
+
+ Added NEWS for iPaq port.
+
+2003-07-28 Monday 20:23  jpsaman
+
+ Updated build scripts:
+ - enabled video4linux for WebCams on handhelds
+ - enabled PDA Gtk2 interface instead of familiar interface
+ - enabled stream output and transcoding
+
+2003-07-28 Monday 18:02  massiot
+
+ * modules/video_output/x11/xcommon.*: endianness patch + arrow keys are
+   now used to browse through the DVD menus.
+
+2003-07-28 Monday 13:19  massiot
+
+ * Fixed my last commit.
+
+2003-07-28 Monday 07:16  fenrir
+
+  * rc: Fixed a bug with seek command.
+        Added support of "seek n%" (Usefull when mux_rate is nul )
+
+2003-07-28 Monday 07:05  jpsaman
+
+ Added PDA images to Makefile.am
+
+2003-07-27 Sunday 23:58  fenrir
+
+  * sub: does not issue an error message when sub-file is empty.
+
+2003-07-27 Sunday 23:05  hartman
+
+ * Brought the new options system to the OSX gui.
+   and some small fixes.
+
+2003-07-27 Sunday 21:35  jpsaman
+
+ Gtk2 port of the familiar Linux interface. The name is also changed to PDA so it reflects that it is targeted at handhelds.
+
+ The familiar interface itself is deprecreated and will be removed after the next stable version of VLC Media Player.
+
+2003-07-27 Sunday 16:20  gbazin
+
+ * modules/audio_output/alsa.c: #ifdef DEBUG -> #ifdef ALSA_DEBUG
+
+2003-07-27 Sunday 16:14  gbazin
+
+ * modules/audio_output/alsa.c: bail out if the device is already in use.
+
+2003-07-27 Sunday 15:49  gbazin
+
+ * src/input/input_ext-plugins.c: forgot to re-lock a mutex.
+
+2003-07-27 Sunday 14:10  massiot
+
+ * src/input/input_clock.c: Fixed two long-standing (> 2 years) bugs
+ - there should be fewer resampling, particularly on DVD chapter changes
+ - when you unpause a DVD, VLC will wait for the drive to spin up, so you
+ won't lose several seconds of movies
+
+ * modules/gui/macosx/controls.m: Seeking in paused mode resumes the play
+ mode, make the interface take that into account.
+
+2003-07-27 Sunday 12:31  ipkiss
+
+  * All: Removed the win32 plugin; wxwindows rulez :)
+
+2003-07-26 Saturday 18:54  titer
+
+  freetype.c: basic YUY2 rendering (Y only)
+
+2003-07-26 Saturday 15:36  gbazin
+
+ * modules/gui/skins/controls/checkbox.cpp: compilation fix.
+
+2003-07-26 Saturday 15:34  fenrir
+
+ ffmpeg: fix potential overread for mpeg4 with vol.
+
+2003-07-26 Saturday 14:19  gbazin
+
+ * modules/gui/wxwindows/open.cpp: move the "open subtitles" line into the file panel.
+
+2003-07-26 Saturday 14:04  ipkiss
+
+  * modules/gui/skins/controls/checkbox.cpp: Fixed a stupid bug (a return
+    value was always true...)
+
+2003-07-26 Saturday 12:41  gbazin
+
+ * modules/gui/wxwindows/open.cpp: workaround design problems in wxSpinCtrl (wxSpinCtrl::GetValue() triggers a value update event).
+
+2003-07-25 Friday 22:50  gbazin
+
+ * modules/gui/wxwindows/*: fixed clean-up of the dialogs provider on exit.
+ * modules/gui/skins/x11/*: proper initialization of a global var so we can start/exit the skins interface several times.
+
+2003-07-25 Friday 13:24  gbazin
+
+ * INSTALL.win32: updated build instructions (btw since the last build changes, mingw+msys can be used again to compile VLC).
+ * modules/gui/wxwindows/wxwindows.cpp: oops.
+
+2003-07-25 Friday 11:37  gbazin
+
+ * modules/video_output/directx/events.c: a couple of compiler warning fixes.
+ * msvc/vlc.dsw: relaced basic_skins plugin with the skins one.
+
+2003-07-25 Friday 11:33  gbazin
+
+ * configure.ac: libpng (logo plugin) needs to be linked with zlib.
+ * modules/gui/wxwindows/*: a couple of compilation fixes for wxWindows cvs.
+
+2003-07-25 Friday 01:11  hartman
+
+ * subsdec now uses the new options code.
+
+2003-07-25 Friday 01:09  hartman
+
+ * Updated it.po
+
+2003-07-25 Friday 01:09  hartman
+
+ * Largely updated nl.po
+ * Updated it.po
+
+2003-07-24 Thursday 23:21  gbazin
+
+ * modules/gui/wxwindows/wxwindows.cpp: temporary hack (I hope ;) to fix win32 compilation with wxWindows < 2.5.
+
+2003-07-24 Thursday 22:58  gbazin
+
+ * src/misc/modules.c: if module_Need() was passed an interface module name, respect this choice even if vlc was run with a specific interface shortcut.
+
+2003-07-24 Thursday 22:05  sam
+
+   * modules/access/v4l/v4l.c:
+     + Removed my name from this file, I didn't contribute anything major to it.
+     + Added strerror(errno) where adequate, as well as additional debug
+       information, hopefully more useful than "cannot open".
+
+2003-07-24 Thursday 21:50  gbazin
+
+ * modules/gui/wxwindows/*: you can now specify input options in the stream output MRL as well.
+ * modules/misc/freetype.c: bail out if no font has been specified.
+ * modules/demux/util/sub.h: don't forget to detach the demuxsub object.
+
+2003-07-24 Thursday 20:34  sam
+
+   * bootstrap:
+     + Run autopoint with the -f flag.
+     + Remove stamp files in the bootstrap process.
+
+2003-07-24 Thursday 19:30  sigmunau
+
+ ignore CR characters wherever they might be.
+ A little better line spaceing, but I still don't understand what this is all
+ about.
+
+2003-07-24 Thursday 19:07  sigmunau
+
+ fixed a nasty code duplication where the same function call was two places
+ with just a few lines in between, but in separate #if cases.
+
+2003-07-24 Thursday 18:30  bigben
+
+ * "frequency=" is channel frequency in kHz again
+
+ * fix  a segfault when "/dev/video0"  or "norm=" were last  arguments of
+ the command line
+
+2003-07-24 Thursday 18:27  bigben
+
+ * Changes "frequency=" syntax. New syntax is channel frequency in kHz
+ * shows a warning if frequency is in "previous syntax range"
+
+2003-07-24 Thursday 17:31  gbazin
+
+ * modules/gui/wxwindows/open.cpp: compilation fix.
+
+2003-07-24 Thursday 16:07  gbazin
+
+ * modules/gui/wxwindows/*: added support for input options in the open dialog.
+    The stream output and subtitles options use them and you can also add options in the MRL itself.
+
+2003-07-23 Wednesday 23:05  gbazin
+
+ * modules/misc/freetype.c, modules/demux/util/sub.c: cleanup.
+ * modules/demux/util/sub.h: thou shall do a vlc_object_attach().
+ * src/misc/variables.c: added VLC_VAR_FILE and VLC_VAR_DIRECTORY inheritance support.
+
+2003-07-23 Wednesday 22:55  massiot
+
+ * Updated po files. STRINGS ARE FROZEN !!!
+
+2003-07-23 Wednesday 22:02  jpsaman
+
+ Interface for Familiar v0.7 and GPE. This interface is based on gtk2 libaries.
+
+2003-07-23 Wednesday 22:01  gbazin
+
+ * include/variables.h, src/misc/variables.c: you can now use var_Create() directly to create an object variable with an inherited value.
+    eg. var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    Beware, the object in which you create the var must be attached to a parent for this to work (otherwise we can't navigate the parents hierarchy to find the value to inherit).
+
+ * src/input/input.c, src/input/input_programs.c, src/video_output/video_output.c: converted more config_GetFoo() into var_Create()/var_Get();
+
+2003-07-23 Wednesday 21:45  hartman
+
+ * include/vlc_common.h: MAX_PATH PATH_MAX, we don't wanna bother and use the
+   latter everywhere.
+ * modules/demux/util/sub.c: Bring the config options in here to the variable structure.
+ * modules/misc/freetype.c: Bring the config options in here to the variable structure.
+   Fix the linespacing. Dnumgis, it works, just define another linespacing :)
+
+2003-07-23 Wednesday 19:11  titer
+
+  freetype.c : use the default BeOS font on BeOS
+
+2003-07-23 Wednesday 17:31  ipkiss
+
+  * modules/gui/skins/src/banks.cpp: removed a useless event I had
+    forgotten
+
+2003-07-23 Wednesday 09:14  asmax
+
+ * all: fixed depcomp failure
+
+2003-07-23 Wednesday 07:37  jpsaman
+
+ When recv() returns -1 a bug is triggered inside RTPRead() and RTPChoose(). The return value of Read() is then -1. The test "if (!i_ret) return 0;" will be false and the function will continue resulting in segfault while copying from buffers that are in an undetermined state. The correct test is "if (i_ret<0) return 0;".
+
+2003-07-23 Wednesday 01:28  gbazin
+
+ * modules/misc/sap.c: oops, compilation fix.
+
+2003-07-23 Wednesday 01:13  gbazin
+
+ * ALL: changes to the playlist_Add() and VLC_AddTarget() proto to include a list of options associated with the input.
+ * src/input/input.c: parses the input options list before spawning the input and create object variables for these options. Options are of the form "[no[-]]foo[=bar]" where foo is the option name and bar is its value.
+ * src/input/input.c, src/input/input_dec.c: use the object var api to get the value of the "sout", "sout-video" and "sout-audio" options.
+ * src/libvlc.c: extended the command line parser to parse input options. Input options must always follow the input they apply to and begin with a ':'.
+
+ All these changes allow you to specify input specific options.
+ eg: ./vlc --no-sout-audio yourvideo.mpeg :sout=udp/http::8080 :sout-audio yourvideo2.mpeg
+ Here the ":sout" option will only apply to yourvideo.mpeg.
+ "--no-sout-audio" will be a global option so will apply to yourvideo2.mpeg but the global behaviour is overriden by ":sout-audio" for yourvideo.mpeg.
+
+ TODO: - the interfaces need to be modified to benefit from the new playlist_Add() api.
+       - only "sout", "sout-video", "sout-audio" implemented for now. To make it work with other options, we need to get rid of all the config_GetFoo() and replace them with var_Create()/var_Change()/var_Get().
+
+2003-07-22 Tuesday 22:02  hartman
+
+ * Fix Makefiles for removed .rle fonts
+
+2003-07-22 Tuesday 20:49  hartman
+
+ * ALL:
+   - Removed all the RLE subtitle font code.
+   - Removed the .rle and even older .psf font files.
+   - Moved the filesubtitle code from spudec to subsdec.
+   - spudec is again DVD only.
+
+2003-07-22 Tuesday 20:25  bigben
+
+ frequency is  nom frequency  in MHz * 16, as  for the  v4l input.
+ Breaks compatibility with previous syntax...
+
+2003-07-22 Tuesday 18:06  gbazin
+
+ * src/stream_output/stream_output.c: fixed segfault when muxer can't add an elementary stream.
+
+2003-07-22 Tuesday 15:59  gbazin
+
+ * src/misc/variables.c: fixed small mem leak (courtesy of Andy Lindsay)
+ * modules/gui/wxwindows/interface.cpp: small improvements to the volume control.
+
+2003-07-22 Tuesday 13:58  bigben
+
+ * We're finally parsing all parameters (including standard)
+ * syntax is now (roughly) the same as for the v4l input
+ ex : vlc pvr:/dev/video0:frequency=1242:norm=secam:size=12x42:bitrate=1200,maxbitrate=4200
+ * old syntax is still working
+ * norm can be "pal", "secam", "ntsc" or any hexa value
+
+2003-07-21 Monday 23:53  fenrir
+
+  * http: added "del" and "empty" control. (for playlist). Corrected
+ "previous" command.
+  TODO: doc :(
+
+2003-07-21 Monday 19:45  jpsaman
+
+ Forgot this one.
+
+2003-07-21 Monday 19:38  jpsaman
+
+ Added missing familiar-playlistb16x16.xpm
+
+2003-07-21 Monday 19:25  jpsaman
+
+ Updated build rules for the Sharp Zaurus.
+
+2003-07-21 Monday 19:19  jpsaman
+
+ Updated build rules for iPaq.
+
+2003-07-21 Monday 18:24  gbazin
+
+ * modules/codec/spudec/spudec.c: disabled RLE font loading as it's not used anymore.
+
+2003-07-21 Monday 17:48  gbazin
+
+ * modules/codec/quicktime.c, configure.ac: ported the audio part of the quicktime module to win32.
+
+2003-07-21 Monday 17:29  gbazin
+
+ * Makefile.am, install-win32: removed rle fonts from the win32 package and added the necessary files for the http interface.
+
+2003-07-21 Monday 01:38  hartman
+
+ * vlc.ebuild: disabled kde, fixed mad and freetype support
+ * Makefile.am: added html files for http intf to macosx.
+   windows and beos probably need to do this too.
+
+2003-07-20 Sunday 23:46  gbazin
+
+ * modules/misc/freetype.c: set default font on win32. Fixed small memleak as well.
+
+2003-07-20 Sunday 23:30  gbazin
+
+ * modules/packetizer/copy.c, modules/stream_out/transcode.c: handle raw RV15, RV16, RV24, RV32,
+ GREY.
+
+2003-07-20 Sunday 23:05  sigmunau
+
+ removed some c++ style comments, fixed some untrue comments, moved a
+ function prototype
+
+2003-07-20 Sunday 22:16  hartman
+
+ * Update of language files
+
+2003-07-20 Sunday 22:06  hartman
+
+ * bumped up version to 0.6.1-test1
+
+2003-07-20 Sunday 21:41  hartman
+
+ * Set the default font on Mac OS X to the system font.
+
+2003-07-20 Sunday 21:28  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: small cosmetic change for the streamout dialog.
+
+2003-07-20 Sunday 20:54  hartman
+
+ * removed matrox support, since the modules is broken
+   http://bugs.gentoo.org/show_bug.cgi?id=24910
+
+2003-07-20 Sunday 20:42  ipkiss
+
+  * modules/gui/skins/*: removed useless code
+
+2003-07-20 Sunday 20:33  gbazin
+
+ * src/input/input_ext-plugins.c: fixed previous commit.
+ * modules/gui/wxwindows/interface.cpp: fixed a couple of bugs.
+
+2003-07-20 Sunday 19:48  hartman
+
+ * README.MacOSX.rtf: updated section on subtitles.
+ * vlc.ebuild: added amd64 keyword. changed script to use emake again.
+   Removed MODULES from the doc installation.
+ * src/libvlc.h: added the new ffmpeg a/v encoders to the list for the prefs.
+ * share/vlc_win32_rc.rc: Changed the Win32 name of VLC from,
+   "An Opensource Media Player" to "VLC media player".
+ * other: added the new transcoding codecs, channels option and SAP option
+   to the stream output dialog.
+
+2003-07-20 Sunday 16:56  ipkiss
+
+  * modules/misc/freetype.c: compilation fix for windows
+
+2003-07-20 Sunday 16:26  sigmunau
+
+ Draw the text in the U and V planes as well. Removes the transparency effect.
+ Also check which chroma is in use and give an error message if it isn't
+ supported.
+
+ Someone (possibly me) should write some renderer functions for other
+ colorspaces.
+
+2003-07-20 Sunday 15:33  gbazin
+
+ * Added MPEG 1 to the list of encapsulation methods (useful to produce files playable by WMP).
+
+2003-07-20 Sunday 15:17  gbazin
+
+ * src/input/input_ext-plugins.c: in input_FillBuffer(), if we can't immediately allocate a new buffer, try until we manage to get one.
+
+2003-07-20 Sunday 12:34  sigmunau
+
+ some cleanup in file info code, add fourccs in hex form ( some users want
+ that ), add audio bitrate when available (untested)
+
+2003-07-20 Sunday 12:22  gbazin
+
+ * modules/gui/wxwindows/preferences.cpp: windows can't have open _and_ save file dialogs so only use open file dialogs on win32 in the preferences menu.
+ * Makefile.am: removed INSTALL.win32 from the win32 package as it's only useful for developpers anyway.
+
+2003-07-20 Sunday 10:38  gbazin
+
+ * modules/gui/wxwindows/*, include/vlc_interface.h: new generic "open file" dialog.
+ * modules/gui/skins/*: use the new generic "open file" dialog to load skins.
+
+2003-07-20 Sunday 08:30  zorglub
+
+ modules/control/joystick.c: Joystick control module (linux only)
+
+ disabled by default, use --enable-joystick & --extraintf joystick
+
+ actions are:
+ 	left-right: variable speed seek
+ 	up-down: browse the playlist
+ 	button 1: play/pause
+ 	button 2: fullscreen
+
+2003-07-19 Saturday 16:33  gbazin
+
+ * modules/gui/wxwindows/*: proper characters encoding conversions.
+    Override the popup menu only for the main interface.
+
+2003-07-19 Saturday 15:25  sigmunau
+
+ alsa is only available on linux
+
+2003-07-19 Saturday 15:15  sigmunau
+
+ Render the glyph for each character only once, and not once for each frame.
+ Should speed up things a bit.
+
+2003-07-19 Saturday 15:12  fenrir
+
+  * mp4: parse another box.
+
+2003-07-19 Saturday 14:41  sigmunau
+
+ Use proper linespacing
+
+2003-07-19 Saturday 14:22  gbazin
+
+ * src/libvlc.c: use UTF-8 internally on win32.
+
+2003-07-19 Saturday 14:14  sigmunau
+
+ fix linking with iconv for the spudec module
+
+2003-07-19 Saturday 11:29  sam
+
+   * Makefile.am: Fixed the plugins' target directory location.
+
+2003-07-19 Saturday 00:02  hartman
+
+ * NEWS: added some more stuff for the upcoming 0.6.1
+ * vlc.ebuild: removed xvid and added the debug USE variable. Also some formatting fixes.
+
+2003-07-18 Friday 23:50  hartman
+
+ * add a #include <errno.h>
+
+2003-07-18 Friday 23:41  hartman
+
+ * Add -liconv to the ldflags of the spudec module.
+ * Add -framework Carbon to the ldflags of the spudec module when Carbon is
+   present. freetype-config unfortunatly omits this on MacOSX.
+
+ I think I did this correctly, but it might be wise to review this :)
+
+2003-07-18 Friday 20:52  gbazin
+
+ * src/libvlc.h: disabled the encoders config options (encoders are not used anymore, all the encoding is done in the stream output transcode module).
+ * src/misc/win32_specific.c: added an --high-priority config option on win32 to increase the priority of the process (default enabled for now so the behaviour isn't changed.)
+
+2003-07-18 Friday 20:16  hartman
+
+ * had forgotten to actually activate mozilla :)
+
+2003-07-18 Friday 20:06  gbazin
+
+ * modules/audio_output/alsa.c: alsa is now the default audio output.
+ * src/misc/configuration.c: removed unnecessary line.
+ * modules/gui/skins/parser.*: small cosmetic change.
+
+2003-07-18 Friday 20:00  hartman
+
+ * mozilla support enabled
+ * added USE mad and libid3tag
+ * added mp3lame capability to ffmpeg.
+ * updated wxGTK requirements to 2.4.1
+
+2003-07-18 Friday 19:26  titer
+
+  Added 'CDVC' fourcc (another one for DV video)
+
+2003-07-18 Friday 14:18  gbazin
+
+ * modules/gui/wxwindows/wxwindows.cpp: oops.
+
+2003-07-18 Friday 13:22  gbazin
+
+ *  modules/gui/wxwindows/*: avoid queuing popup menu events while one is already being displayed.
+
+2003-07-18 Friday 11:39  gbazin
+
+ * modules/video_output/directx/events.c: closing the video window doesn't doesn't exit vlc anymore, it just stops the current stream.
+ * modules/gui/wxwindows/*: fix for popup menu placement.
+
+2003-07-17 Thursday 22:54  gbazin
+
+ * src/playlist/playlist.c: fixed recent playlist breakage.
+
+2003-07-17 Thursday 18:58  gbazin
+
+ * modules/gui/wxwindows/*: enable popup menu support in the "dialogs provider".
+
+2003-07-17 Thursday 17:30  gbazin
+
+ * modules/gui/wxwindows/*: The wxwindows interface is now a "dialogs provider" module as well as a normal "interface".
+    Dialog providers expose an api that allow other modules to use the GUI dialogs the module provides (open dialogs, etc...).
+    + misc small enhancements.
+
+ * modules/gui/skins/*: completely removed the dependancy on the wxwindows code (which also eliminates the need for the basic_skins module).
+    The skins module will now try to load a "dialogs provider" to display the open, messages, file info and preferences dialogs.
+
+2003-07-17 Thursday 16:34  sam
+
+   * Makefile.am: Parse mozilla after . so that the mozilla plugin gets its
+     dependencies right.
+   * src/stream_output/announce.c: Compilation fix.
+
+2003-07-17 Thursday 15:49  sam
+
+   * m4/vlc.m4: Looks like POSIX shell reduces "`eval echo '$'FOO`" to "" even
+     if $FOO contains spaces. Worked around the problem.
+
+2003-07-17 Thursday 14:54  sam
+
+   * configure.ac vlc-config.in.in: Oops, vlc-config needs top_builddir, not
+     top_srcdir.
+
+2003-07-17 Thursday 14:28  sam
+
+   * src/stream_output/announce.c:
+     + Fixed Win32 port.
+     + Speed optimizations in split().
+     + More coding style fixes.
+
+2003-07-17 Thursday 14:10  sam
+
+   * src/stream_output/announce.c:
+     + Coding style fixes.
+     + Use memcpy() instead of for() loops.
+
+2003-07-17 Thursday 13:09  sam
+
+   * mozilla/Makefile.am: Fixed stamp-pic generation, it was created in the
+     current directory but looked for in the parent directory.
+
+2003-07-17 Thursday 13:01  sam
+
+   * debian/compat:
+     + New debhelper file.
+   * debian/control:
+     + Updated debhelper build-dependency to (>= 3.4.4) because we now
+       use debian/compat.
+     + Use ${misc:Depends} everywhere.
+
+2003-07-17 Thursday 12:06  sam
+
+   * mozilla/Makefile.am: Moved mozilla plugin generation directives here.
+   * configure.ac: Propagate $(top_srcdir) to the vlc-config call.
+
+2003-07-17 Thursday 09:25  sigmunau
+
+ mozilla/vlcplugin.h: added the video/x-ms-wmv mime type
+ mozilla/npvlc_rc.rc: added all the missing types from vlcplugin.h
+
+2003-07-16 Wednesday 21:42  sam
+
+   * Makefile.am: added /usr/lib/mozilla/include/idl to the xpidl include
+     directory, because that's where Gentoo puts it.
+
+2003-07-16 Wednesday 17:19  gbazin
+
+ * modules/codec/spudec/spudec.c: oops, proper fix for the proper initialization of the proper iconv handle ;)
+
+2003-07-16 Wednesday 17:17  gbazin
+
+ * modules/codec/spudec/spudec.c: proper initialization of the iconv handle.
+
+2003-07-16 Wednesday 16:33  sam
+
+   * mozilla/*: Additional Mozilla 1.4 compilation fixes.
+
+2003-07-16 Wednesday 16:06  sam
+
+   * configure.ac: complain when mozilla-config isn't found.
+
+2003-07-16 Wednesday 15:52  sam
+
+   * bootstrap:
+     + Minor indentation fix.
+   * toolbox:
+     + Exclude vlc_symbols.h and modules_{plugins,builtins}.h from POTFILES.in.
+   * po/*:
+     + Re-ran toolbox --update po.
+
+2003-07-16 Wednesday 15:40  sam
+
+   * debian/changelog:
+     + Prepared my next Debian upload.
+   * debian/control:
+     + Set policy to 3.6.0. No changes required.
+     + Extended the package description.
+
+2003-07-16 Wednesday 15:32  sam
+
+   * modules/access/http.c:
+     + Fixed gcc 3 warnings (type punning).
+   * modules/access/mms/mmstu.c:
+     + Fixed a gcc 3 warning (long constant).
+
+2003-07-16 Wednesday 15:25  sam
+
+   * modules/video_output/x11/xcommon.c: Select events in the video subwindow
+     instead of the base window, because newer versions of Mozilla select
+     ButtonPress for the window it gives us, and XSelectInput only allows
+     one client to select this event.
+
+2003-07-15 Tuesday 18:12  sigmunau
+
+ moved Doxyfile to doc/ to make sam happy. Changed Doxyfile so the generated
+ documentation does not include information on which headers each file
+ includes, since this information isn't correct.
+
+ Clarified and doxygenized some of the documentation on subpictures
+
+2003-07-15 Tuesday 18:01  alexis
+
+ Update for the spec files.
+
+2003-07-15 Tuesday 16:07  gbazin
+
+ * modules/mux/mpeg/ps.c: save pack and system headers for http streaming.
+
+2003-07-15 Tuesday 13:12  gbazin
+
+ *  modules/mux/mpeg/ps.c,ps.c: the ps muxer can now create mpeg system (mpeg1) files as well. Also modified the ps muxer to output streams with system headers.
+
+2003-07-14 Monday 22:25  sigmunau
+
+ 	 had to forget something :)
+
+2003-07-14 Monday 21:32  sigmunau
+
+ All: My shot at improving subtitle rendering in vlc. Now each vout uses a "text renderer" module to render text on the video when needed. I decieded to make this a module type, because other api's (win32 and macosx) is supposed to do better than freetype under some circumstances.
+
+ include/video_output.h: added some members needed by text renderer modules
+ src/video_output/video_output.c: load and unload text renderer module when needed
+ src/video_output/video_text.c: implemented some functions to show text on the video
+ include/osd.h: exported the functions to show text
+ modules/misc/Modules.am, module/misc/freetype.c: new text renderer module, largly based on the old osdtext module.
+ modules/video_filter/Modules.am, modules/video_filter/osd_text.c: removed the osdtext module
+ configure.ac: changes "osdtext" to "freetype" some places
+ modules/codec/spudec/*: when iconv is available, use it to convert textual subtitles from the encoding given by --sub-encoding to utf8. Use new code to render subtitles
+ modules/control/lirc/lirc.c: use new code to give feedback on buttons pressed. untested.
+ modules/demux/util/sub.c: remove all traces of the ugly old osdtext module
+ modules/misc/dummy/*: added a "text renderer" submodule in the dummy module
+ src/misc/modules.c: included osd.h as it seems to be needed to export symbols
+
+ final notes: you need to give a proper value to --freetype-font. This should be the path to a font file freetype2 can handle (almost any format afaik) with a unicode translation table in it. Windows ttf files will do. In linux at least openoffice distributes some fonts that work. I think macosx and beos also has useable fonts.
+
+2003-07-14 Monday 20:36  sigmunau
+
+ toolbox: made a --add-include that can be used by doxygen to get proper
+          includes in the .h files, since they are parsed out of context by
+ 	 doxygen
+ Doxyfile: misc fixes, use ./toolbox --add-include as filter for sources.
+ include/vlc_common.h: doxygenized VLC_COMMON_MEMBERS
+
+ With these changes, and a slightly patched version of doxygen (which you can
+ get here: http://www.idi.ntnu.no/~sigmunau/doxygen-vlcpatched.tgz ) you should
+ be able to get some useful documentation out of the vlc sources.
+
+2003-07-14 Monday 16:10  gbazin
+
+ * configure.ac, modules/control/http.c: compilation fix for platforms without ctime_r().
+
+2003-07-13 Sunday 19:58  massiot
+
+ * Only allow 4x fast-forward, since 8x won't work on low-end machines,
+   and our dear users report it as a bug.
+
+2003-07-13 Sunday 14:55  gbazin
+
+ * modules/gui/skins/*: removed unused GTK2_SKINS code.
+
+2003-07-13 Sunday 13:18  gbazin
+
+ * modules/stream_out/transcode.c: implemented some very basic channels downmixing. Was necessary to be able to transcode a52 > stereo to mpga.
+
+2003-07-13 Sunday 12:52  sigmunau
+
+ cleanup comments
+
+2003-07-13 Sunday 12:35  massiot
+
+ * modules/demux/mpeg: 0x06 stream type can be used for something else
+   than A/52, so disabled it for the moment (we should actually check for
+   the presence of a descriptor).
+
+2003-07-13 Sunday 12:15  massiot
+
+ * modules/codec/libmpeg2.c: Fixed a major bug where the picture heap
+   would progressively empty on some DVDs.
+
+2003-07-12 Saturday 13:33  gbazin
+
+ * modules/gui/wxwindows/*: added a "simple open" entry to the "File" menu of the interface and playlist. That entry just opens a wxFileDialog().
+
+2003-07-12 Saturday 00:56  fenrir
+
+  * http.c : fix definition conflict under OS X (at least).
+
+2003-07-11 Friday 23:36  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp, wxwindows.h: added an audio channels combobox for transcoding.
+ * NEWS: update in preparation for 0.6.1.
+
+2003-07-11 Friday 23:14  gbazin
+
+ * modules/audio_output/directx.c: 5.1 audio output now works on sblive/audigy as well :)
+ * modules/audio_output/waveout.c: fixed the waveOut plugin so works on NT4 as well... that complicates the plugin a bit more than I would have wanted, but hey.
+ * modules/gui/wxwindows/messages.cpp: the verbose checkbox is set to the value of the --verbose config option.
+
+2003-07-11 Friday 19:29  fenrir
+
+  * disabled by default. (It's a nice security hole for those)
+
+2003-07-11 Friday 18:21  fenrir
+
+  * index: little fix for refresh url.
+  * browse: example.
+
+2003-07-11 Friday 18:19  fenrir
+
+  * http: * fix for double // under linux.
+          * another useless feature: can browse local files (for sout)
+
+2003-07-11 Friday 11:58  gbazin
+
+ * configure.ac: always use the built-in getop on win32 (cygwin's one is buggy).
+     Disable the gtk2/gnome2 interfaces as they are currently unuseable and this option was confusing users more than anything else.
+     Enabled the mp4 muxer (Although it doesn't yet produce streams compatible with quicktime).
+
+2003-07-11 Friday 09:50  gbazin
+
+ * include/httpd.h: compilation fix.
+ * modules/control/http.c: win32 fixes.
+
+2003-07-11 Friday 08:04  sam
+
+   * po/POTFILES.in: Updated this file from a pristine CVS tree to avoid cruft.
+
+2003-07-11 Friday 07:13  gbazin
+
+ * modules/audio_output/alsa.c: enabled 4 and 5.1 channels modes (although stereo stays the default).
+
+2003-07-10 Thursday 23:55  fenrir
+
+  * mmstu: workaround for some streams. (missing 0x11 answer).
+
+2003-07-10 Thursday 22:37  fenrir
+
+  * httpd: fix a segfault.
+
+2003-07-10 Thursday 22:29  fenrir
+
+  * all: samples pages for http interface.
+
+2003-07-10 Thursday 22:24  fenrir
+
+  * http: rework of the http interface.
+
+  There is no more hardcoded html page. The interface recursively parse a
+ directory, exporting all  files. All .htm/.html are  parsed, and special
+ macro are  used. I will commit  somes samples pages in  share/http and I
+ hope documentations.
+
+  TODO: - (re)implement access control in httpd (but in a useable way).
+        - clean login/password management. (for now .access protects
+        a whole directory).
+        - doc ;)
+
+2003-07-10 Thursday 18:29  zorglub
+
+ * http: added support for user/pass (--http-user & --http-pass)
+
+ * httpd: removed hard-coded user/pass for admin page.
+    (now: --http-admin-pass & --http-admin-user )
+
+2003-07-10 Thursday 11:15  adn
+
+ now messages can be saved to a file
+
+2003-07-10 Thursday 07:08  sam
+
+   * vlc.spec.redhat: Renamed this file to vlc.spec again. It's the expected
+     filename in a package.
+
+2003-07-10 Thursday 01:33  fenrir
+
+  * ffmpeg: some clean. Added a mutex to avoid multiple initialisation.
+
+2003-07-10 Thursday 00:47  hartman
+
+ * fixed glide header detection
+ * added matroska, dvb and pvr USE vars.
+ * enabled support for flac.
+ * removed libdv support since it's deprecated
+ * enabled freetype support if USE=truetype
+ * enabled satellite support if USE=dvb
+ * added local USE variable pvr to compile with pvr support
+ * added local USE variable matroska to compile with experimental matroska
+   support/ebuilds. See also http://forums.gentoo.org/viewtopic.php?t=63722&highlight=matroska.
+
+2003-07-09 Wednesday 22:10  gbazin
+
+ * modules/demux/ogg.c: latest change for web radios support did affect the quality of normal
+ ogg files. Make the check a bit more strict.
+
+2003-07-09 Wednesday 21:42  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: resume after pause was broken recently.
+ * src/audio_output/output.c: reverted a recent change that was screwing up the proper scheduling of audio samples after a starvation. That should improve the heavy resampling we currently have after a pause.
+ * modules/audio_output/alsa.c: improvements and fixes to the alsa audio output.
+
+2003-07-09 Wednesday 13:52  sam
+
+   * mozilla/vlcshell.cpp: free() requires <stdlib.h>.
+
+2003-07-09 Wednesday 10:59  adn
+
+ corrected a newbie notation
+
+2003-07-09 Wednesday 09:30  adn
+
+ a "clear" button now allows to clear the messages' text window
+
+2003-07-09 Wednesday 01:31  hartman
+
+ * don't sleep while committing.
+
+2003-07-09 Wednesday 01:30  hartman
+
+ * Update next/previous item routines. it descends from next chapter to
+   next title to next playlistitem. The old code for this was buggy. This
+   should work better. Especially for CDDA's, since we previously didn't support
+   titles.
+
+2003-07-08 Tuesday 16:21  sam
+
+   * toolbox: we cannot use `printf '\r'` under Cygwin; use a real ^M character
+     instead.
+
+2003-07-08 Tuesday 13:40  sam
+
+   * bootstrap: Removed dashes from makefile variables.
+
+2003-07-08 Tuesday 13:13  sam
+
+   * po/: Updated pofiles using the new toolbox.
+
+2003-07-08 Tuesday 13:09  sam
+
+   * bootstrap:
+     + Removed a useless use of cut.
+     + Do not fail in the "clean" rule if no targets were built.
+   * Makefile.am:
+     + Propagate $(srcdir) to toolbox.
+   * toolbox:
+     + Do not include .moc files in POTFILES.in.
+     + Fixed the generation of MSVC project files (untested).
+
+2003-07-07 Monday 18:14  sam
+
+   * Makefile.am: Do not try to install PIC builtins if --enable-mozilla was
+     not specified.
+
+2003-07-07 Monday 17:01  sam
+
+   * AUTHORS: Added Olivier Aubert.
+   * HACKING: Elaborated on how to add a new module as suggested by Joe Kraft.
+
+2003-07-07 Monday 16:59  sam
+
+   * modules/control/corba/: Olivier Aubert's CORBA plugin. Almost verbatim,
+     compiles cleanly (to build the medicacontrol.so library you need to cd to
+     that directory and "make medicacontrol.so") but untested.
+   * src/playlist/playlist.c: Mostly harmless fix to playlist.c suggested by
+     Olivier.
+
+2003-07-07 Monday 16:53  sam
+
+   * bootstrap: The "clean" rule now also removes generated sources.
+
+2003-07-07 Monday 15:50  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: added vorbis transcoding + fixed default codec selection.
+ * modules/stream_out/transcode.c: fixed segfault when muxer doesn't handle an audio codec, fixed mp3 transcoding support.
+ * modules/stream_out/standard.c: clean-up.
+
+2003-07-07 Monday 14:56  massiot
+
+ Do not link twice with -logg under Darwin.
+
+2003-07-07 Monday 12:04  sam
+
+   * mozilla/: Tried to fix the build with mozilla 1.4. Tested on Debian.
+
+2003-07-07 Monday 07:14  adn
+
+ * now spaces are allowed in SAP annouces.
+
+2003-07-06 Sunday 23:14  massiot
+
+ Fixed Mac OS X build.
+
+2003-07-06 Sunday 18:20  gbazin
+
+ * install-win32: fixed my last commit.
+
+2003-07-06 Sunday 16:35  sigmunau
+
+ Makefile.am: pass version strings to windres
+ share/vlc_win32_rc.rc: provide some version info in the vlc binary
+ If all is well, this should not break msvc build, but binaries built
+ with msvc will have version 0.0.0
+
+2003-07-06 Sunday 16:22  gbazin
+
+ * INSTALL.win32: added an instruction for using tar to extract the contrib.
+ * modules/stream_out/transcode.c: added mp3 fourcc.
+
+2003-07-06 Sunday 16:13  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: clean-up for sap support.
+     Added a couple of transcoding codecs (WMV2, MJPG, mp3).
+     The output filename is now surrounded by quotes and the MRL is updated correctly on codec change.
+ * install-win32: start menu shortucts are installed in the "All Users" section.
+ * configure.ac: added a --with-ffmpeg-mp3lame option for when ffmpeg was compiled with mp3lame support.
+
+2003-07-05 Saturday 21:31  alexis
+
+ es.c: fix typo.
+
+2003-07-05 Saturday 15:35  sam
+
+   * modules/gui/skins/src/skin_main.cpp, modules/gui/wxwindows/wxwindows.cpp:
+     Do not unload the WxWindows plugins on Unix, because they might be linked
+     with Gtk which makes evil use of atexit().
+
+2003-07-05 Saturday 15:00  zorglub
+
+ * sap.c: Improved IPv6 multicast detection
+
+ * announce.c:
+ 	- coding style fixes
+ 	- fixed port detection in IPv6 addresses (with ':' inside)
+
+2003-07-05 Saturday 14:47  sam
+
+   * Makefile.am: "make dist-woody" builds a tarball suitable for a Debian
+     woody package build.
+   * bootstrap:
+     + Remove config.h.in and config.h before running autoheader.
+     + Added "set -e" for better error tracking.
+     + Call autoheader and automake after autoconf so that the first build does
+       not need to call autoheader.
+   * debian/woody-buildpackage:
+     + Removed that script and put the code in toolbox.
+   * debian/control:
+     + Added a build-dependency on libmatroska-dev.
+   * debian/rules:
+     + Activated Matroska support.
+     + Re-enabled dh_installchangelogs.
+
+2003-07-04 Friday 19:00  titer
+
+  logo.c : gcc != 3 compile fix
+
+2003-07-04 Friday 16:35  sam
+
+   * debian/changelog: Changelog for the forthcoming 0.6.0+cvs-20030704-1 Debian
+     upload.
+   * debian/rules: Build builtins in the first compile pass, and build plugins
+     and PIC builtins in the second pass, so that PIC and non-PIC never get
+     messed.
+   * modules/demux/mkv.cpp: Added minor verbosity in a warning message.
+   * modules/gui/kde/preferences.cpp: Fix for woody's KDE.
+   * modules/stream_out/transcode.c: Workaround for woody's vorbisenc.h.
+
+2003-07-04 Friday 15:20  adn
+
+ * Added a SAP Announces Button for wxWindows
+
+2003-07-04 Friday 14:56  sam
+
+   * bootstrap:
+     + Disabled a redundant BUILT_SOURCES variable.
+   * debian/woody-buildpackage:
+     + Disable skins for woody (no WxWindows).
+     + Do not build a diff since we always use the pristine tarball.
+
+2003-07-04 Friday 14:26  adn
+
+ * bug fix, @ is not necessary in fact ;)
+
+2003-07-04 Friday 14:06  adn
+
+ * Fix Bug thanks to Cif: url form was "IP:port" and port 1234 was
+   systematically sent separately.
+
+ * Multicast IP form is "@IP" and not "IP". Right ?
+
+2003-07-04 Friday 13:53  sam
+
+   * bootstrap: Recursive rules now check for $(MAKE)'s return value so that
+     build errors are never ignored.
+
+2003-07-04 Friday 12:20  adn
+
+ * Added a Miscellaneous Panel in wxwindows stream output.
+
+ * Added a SAP Announce button in this panel.
+
+2003-07-03 Thursday 19:25  garf
+
+  * logo.c : a little filter to put a PNG picture on video output (use mouse features :)
+
+2003-07-03 Thursday 12:20  sam
+
+   * debian/rules: Fixed a zshism in a variable's pattern substitution.
+
+2003-07-03 Thursday 11:23  sam
+
+   * bootstrap, Makefile.am: Slightly reduced build verbosity.
+
+2003-07-03 Thursday 09:37  sam
+
+   * Makefile.am: Fixed the installation of plugins that were going one
+     directory too low.
+
+2003-07-03 Thursday 03:35  sam
+
+   * debian/rules: Fixed the package generation on !x86.
+   * .cvsignore: Do not ignore the m4 directory.
+
+2003-07-03 Thursday 02:56  sam
+
+   * Makefile.am:
+     + If a builtin has been rebuilt, rebuild vlc.
+     + Do not rebuild the Mozilla plugin's xpt when the Makefile changes.
+
+2003-07-03 Thursday 00:11  fenrir
+
+  * ps: fix a dead loop with mis-detected file or bad content.
+
+2003-07-02 Wednesday 22:47  sam
+
+   * configure.ac: pass -multiply_defined suppress to the linker under Darwin,
+     thanks to DJ.
+
+2003-07-02 Wednesday 20:01  gbazin
+
+ * toolbox: fixed ./toolbox --distclean
+
+2003-07-02 Wednesday 18:44  zorglub
+
+ * httpd.c: fixed a french string
+
+ * sap.c: use defines
+
+2003-07-02 Wednesday 16:12  sam
+
+   * debian/changelog: Debian-specific changelog for a pending upload.
+
+2003-07-02 Wednesday 14:08  sam
+
+   * bootstrap: Fix for the Mozilla plugin build.
+
+2003-07-02 Wednesday 13:50  sam
+
+   * bootstrap: Guaah. Typo.
+
+2003-07-02 Wednesday 13:32  sam
+
+   * bootstrap: Workaround for an automake1.6 issue. Not a big deal, the code
+     is actually nicer this way.
+
+2003-07-02 Wednesday 11:21  sam
+
+   * bootstrap:
+     + The clean rule properly removes generated objects.
+     + Optimized recursive builds.
+   * debian/rules:
+     + Fixed a typo in the changelog installation.
+
+2003-07-02 Wednesday 09:30  alexis
+
+ Updated vlc.spec file for Linux Mandrake.
+
+2003-07-01 Tuesday 21:32  fenrir
+
+  * http: removed a too verbose message, make vim happier.
+
+2003-07-01 Tuesday 19:17  sam
+
+   * configure.ac:
+     + Fixed a == test bashism.
+     + Cosmetic changes.
+   * toolbox, vlc-config.in.in: Cosmetic changes.
+   * Makefile.am: Fixed the Mozilla plugin build (happy bootstrap).
+
+2003-07-01 Tuesday 18:28  sam
+
+   * vlc-config.in.in: Reverted one of my first Solaris workarounds rendered
+     obsolescent by the latest ones.
+
+2003-07-01 Tuesday 17:46  sam
+
+   * configure.ac: Ooops, got the attribute(packed) check upside-down.
+
+2003-07-01 Tuesday 17:28  sam
+
+   * bootstrap: Fixed detection of older automake version that advertise
+     themselves as 1.[0-5]-* instead of 1.[0-5].*.
+
+2003-07-01 Tuesday 17:14  sam
+
+   * configure.ac: Added a compiler check for __attribute__((__packed__)).
+
+2003-07-01 Tuesday 16:34  sam
+
+   * vlc-config.in.in: Used printf instead of a sed construct, just in case
+     we reach 200 plugins one day, because Solaris (did I mention it sucked?)
+     has a crap sed.
+
+2003-07-01 Tuesday 16:25  sam
+
+   * bootstrap:
+     + Removed the Modules.am generation. To build module/foo/libfoo.so, you
+       now need to cd modules/foo and make libfoo.so.
+     + Workaround for Solaris sed. Which sucks. Did I mention that before?
+
+2003-07-01 Tuesday 15:06  sam
+
+   * configure.ac: Added a --with-v4l option like in VLS.
+
+2003-07-01 Tuesday 14:25  sam
+
+   * m4/vlc.m4: output all modules to vlc-config, not just those who define
+     their LDFLAGS.
+   * bootstrap: use grep >/dev/null 2>&1 instead of grep -q because of retarded
+     systems such as our beloved Solaris.
+   * po/:
+     + Regenerated vlc.pot.
+     + Updated British translation.
+     + Fixed fuzzy entries in the French translation.
+
+2003-07-01 Tuesday 13:13  sam
+
+   * Makefile.am: Gaaaaah, forgot to rename headers again!
+
+2003-07-01 Tuesday 13:12  sam
+
+   * modules/gui/wxwindows/interface.cpp: Display the VLC version in the about
+     dialog (Fixes: #946).
+
+2003-07-01 Tuesday 12:56  sam
+
+   * include/error.h: Renamed this file to include/vlc_error.h to avoid name
+     conflicts. Most headers in that directory should probably be renamed to
+     their vlc_ equivalent.
+
+2003-07-01 Tuesday 12:50  sam
+
+   * Makefile.am:
+     + Forward AM_MAKEFLAGS through recursive makefiles.
+     + Removed the plugins and builtins rules. This causes libintl to be built
+       before the plugins.
+   * bootstrap:
+     + Enabled recursive builds of plugins and builtins.
+   * vlc-config.in.in:
+     + Fixed a typo.
+   * debian/changelog:
+     + Next upload will fix bug #199427.
+
+2003-07-01 Tuesday 12:01  sam
+
+   * toolbox: use awk, not nawk, and fixed syntax to match older awks.
+
+2003-07-01 Tuesday 11:58  sam
+
+   * toolbox: use nawk instead of awk (Fixes: #780).
+
+2003-07-01 Tuesday 11:58  sam
+
+   * HACKING: updated doc to match the new build.
+
+2003-07-01 Tuesday 09:00  adn
+
+ * I am just a boulet :(
+
+2003-07-01 Tuesday 08:55  adn
+
+ * little fix, sorry !
+
+2003-07-01 Tuesday 08:30  adn
+
+ * thanks to Cif, added "Ban", "Unban", "Kick/Ban" options in http administration page
+
+ * added a link to return to the main administration page after a kick or ban operation
+
+2003-06-30 Monday 20:44  gbazin
+
+ * modules/stream_out/transcode.c: forgot to remove a variable used for debugging.
+
+2003-06-30 Monday 20:08  gbazin
+
+ * modules/stream_out/transcode.c: compilation fix.
+
+2003-06-30 Monday 01:52  hartman
+
+ * remove debug statements.
+
+2003-06-30 Monday 01:51  hartman
+
+ * modules/gui/macosx/controls.m:
+ * modules/gui/macosx/intf.m:
+   - Our Next/Previous commands now go from chapter trough title trough playlist.
+   - We weren't checking for titles without chapters, which made using CDDA
+     a little hard.
+ * modules/gui/macosx/playlist.m: An improved way to delete selected items.
+   - also fixes a bug where only half the items selected in the playlist got
+     actually deleted.
+
+2003-06-29 Sunday 22:07  gbazin
+
+ * modules/visualization/xosd/xosd.c: lowered the module's score.
+
+2003-06-29 Sunday 20:58  gbazin
+
+ * configure.ac, modules/mux/ogg.c, modules/stream_out/transcode.c: vorbis transcoding support (the transcoder still doesn't support vorbis decoding though, so no vorbis -> else transcoding)
+
+2003-06-29 Sunday 20:15  sam
+
+   * toolbox: fuck OS X!
+
+2003-06-29 Sunday 19:15  fenrir
+
+  * m3u: remove useless debug messages, fix element insertion.
+
+2003-06-29 Sunday 19:12  sam
+
+   * debian/rules:
+     + Enabled the video4linux input plugin.
+
+2003-06-29 Sunday 19:04  sam
+
+   * toolbox: syntax fix for OS X's retarded sed.
+
+2003-06-29 Sunday 14:57  sam
+
+   * m4/vlc.m4: Prepend LDFLAGS instead of appending them.
+
+2003-06-29 Sunday 14:00  ipkiss
+
+  * fr.po: some new translations + fixes
+
+2003-06-29 Sunday 00:14  hartman
+
+ * modules/gui/macosx/playlist.m: 10.1 is archaic. i don't know why i bother ;)
+   finally fixed, confirmed etc.
+ * doc/fortunes.txt: one more
+
+2003-06-28 Saturday 23:56  fenrir
+
+  * ffmpeg: disable direct rendering when width or height aren't a multiple
+ of 16 (on the fly not only based upon header).
+
+  * httpd: test if INADDR_ANY is bind when requesting a host. (To be able to
+ use http interface with http streaming).
+
+2003-06-28 Saturday 21:27  fenrir
+
+  * input: close all vouts (not only the first one).
+
+2003-06-28 Saturday 21:18  fenrir
+
+  video_output.c: should fix playback of file with multiple video track,
+ and usage of display in stream output.
+
+2003-06-28 Saturday 21:16  fenrir
+
+  * ffmpeg : do no try to automatically set ffmpeg-truncated (it's broken
+  with .mp4 files)
+
+2003-06-28 Saturday 21:03  hartman
+
+ * s/;T;/;D;
+   Now it seems to builb. I guess you meant this sam. If I'm wrong you can correct me ;)
+
+2003-06-28 Saturday 19:19  fenrir
+
+  * m3u: clean up and fix .m3u parsing. Please *test*.
+
+2003-06-28 Saturday 17:20  fenrir
+
+  * input.c : call input_DelInfo _after_ that all decoders have been
+ destroyed as vorbis decoder could add info.
+
+2003-06-28 Saturday 15:27  sam
+
+   * Makefile.am: fixed the location of the intl sources.
+
+2003-06-28 Saturday 14:31  sam
+
+   * configure.ac:
+     + Look for libintl in $(top_builddir)/intl, not \$(top_srcdir)/intl.
+     + Added CVS Id string.
+   * m4/vlc.m4:
+     + Added CVS Id string.
+
+2003-06-28 Saturday 13:04  sam
+
+   * Makefile.am:
+     + Call $(srcdir)/toolbox from $(builddir) instead of $(srcdir).
+     + Call $(builddir)/vlc-config instead of $(srcdir)/vlc-config, because
+       generated files end in $(builddir).
+     + Added -Imozilla to the mozilla plugin link flags.
+     + Look for mozilla/vlcintf.idl in $(srcdir).
+   * configure.ac:
+     + Set VLC_CONFIG to $(builddir)/vlc-config instead of $(srcdir)/vlc-config.
+   * toolbox:
+     + Look for Makefile.am in ${srcdir}, and Makefile in ${builddir}.
+     + Prepend ${srcdir} to header files we handle.
+   * m4/vlc.m4:
+     + Look for vlc-config.in.in in ${srcdir} but generate vlc-config.in in
+       ${builddir}.
+   * modules/gui/skins/src/dialogs.cpp, modules/gui/wxwindows/interface.cpp:
+     + Include the pixmap with a path relative to the current directory.
+
+    This commit should fix builds that use --srcdir (Closes: #319).
+
+2003-06-28 Saturday 12:07  massiot
+
+ * modules/demux/mkv.cpp: Compile fix for OS X.
+
+2003-06-28 Saturday 01:17  sam
+
+   * toolbox:
+     + toolbox --changelog now only generates this year's changelog.
+   * ChangeLog, doc/ChangeLog-*:
+     + Split the changelog into several files, one per year.
+   * debian/rules, vlc.ebuild:
+     + Distribute the new changelog files.
+
+2003-06-28 Saturday 00:29  sam
+
+   * vlc.ebuild:
+     + Apply the same changes to configure as to configure.ac.
+     + Fix autotools timestamps so that the build does not trigger useless
+       autoconf and automake runs. Our snapshots are correctly bootstrapped
+       and do not need extra fiddling.
+
 2003-06-27 Friday 23:31  sam
 
    * debian/changelog:
@@ -1184,10 +2636,6 @@
    mem leaks will kernel panic there machine or something ;)A
    This will generate less bugreports, yet keep them visible to those who
    should and will care.
-
-2003-05-27 Tuesday 22:08  gbazin
-
- * modules/gui/win32/Modules.am: strings.cpp has been removed.
 
 2003-05-27 Tuesday 21:48  gbazin
 
@@ -4475,11 +5923,6 @@
      - MRL-Combo behaviour changed a bit
      - apply handling in preferences
 
-2003-03-13 Thursday 10:33  ipkiss
-
- We don't segfault anymore when trying to go fullscreen with no input
- (closes #477)
-
 2003-03-12 Wednesday 23:59  marcari
 
   * all: added s16tofixed32 filter, so that we decode flac with iPaq !
@@ -4605,10 +6048,6 @@
 2003-03-11 Tuesday 13:52  titer
 
   modules/misc/network/ipv4.c: BeOS compile fix
-
-2003-03-11 Tuesday 13:12  alexis
-
- Added sout.* and subtitles.*
 
 2003-03-11 Tuesday 07:03  fenrir
 
@@ -5023,16 +6462,6 @@
  * src/misc/threads.c, include/vlc_threads_funcs.h: fixed gnu-pth thread
     implementation and fixed an initialization bug in libvlc.
 
-2003-03-01 Saturday 21:32  ipkiss
-
-  - about.dfm: the layout of the "About" dialog box is slightly different
-  - misc.cpp: toolbar buttons are translated too
-  - mainframe.dfm: removed the "Back" and "Eject" toolbar buttons, which
-    were rather useless, and added an "Eject disc" menu entry
-    Also hid the caption for all the toolbar buttons
-  - win32.cpp: Added a config option to display or not these captions
-  - preferences.cpp: small modification to support non-advanced mode
-
 2003-03-01 Saturday 19:25  gbazin
 
  * install-win32, Makefile.am: added the html faq to the win32 package.
@@ -5053,10 +6482,6 @@
  Internationalization now works for the win32 interface (thanks Gildas).
  I've voluntarily disabled the translation of the toolbar buttons
  strings, because it looks really awful...
-
-2003-02-27 Thursday 22:09  ipkiss
-
- A few modifications to get closer to i18n in the win32 interface
 
 2003-02-27 Thursday 16:38  gbazin
 
@@ -5688,12 +7113,6 @@
  * access/udp.c: Fixed win32 behavior when --mtu is set to a too small value,
  * demux/mpeg/ts.c: Fixed detection of PAT/PMT change.
 
-2003-02-12 Wednesday 02:11  ipkiss
-
-  * compilation fix
-  * all files are stored in dos mode, or Borland won't compile some of
-    them...
-
 2003-02-11 Tuesday 18:05  massiot
 
  * 0.5.1 German translation, courtesy of Felix Kühne <FK@aenneburghardt.de>.
@@ -5899,11 +7318,6 @@
 
   Simplified volume functions
 
-2003-02-09 Sunday 02:01  ipkiss
-
-  * modules/gui/win32/mainframe.cpp: simplifications using the new
-    aout_Volume* API
-
 2003-02-09 Sunday 01:56  massiot
 
  Fixed GTK compilation.
@@ -5985,11 +7399,6 @@
  * added half, normal and full size videowindow menuitems.
    there seems to be a bug though somewhere. you end up with black bars in
    half and double size.
-
-2003-02-07 Friday 18:43  ipkiss
-
-  * Fixed the "RichEdit line insertion error" bug (closes #246)
-  * Added a popup menu to copy log messages to the clipboard
 
 2003-02-07 Friday 16:51  massiot
 
@@ -6359,11 +7768,6 @@
    * ./INSTALL.libmad: removed that file; if one does not know how to build
      and install a library, he'd better not fiddle with VLC.
 
-2003-02-01 Saturday 22:21  ipkiss
-
-  * modules/gui/win32/win32.cpp: fixed a stupid bug (closes #155)
-  * modules/gui/win32/menu.cpp: removed some ^M chars
-
 2003-02-01 Saturday 22:03  babal
 
  - Win32 preference dialog box
@@ -6510,10 +7914,6 @@
 
    * ./modules/gui/macosx: Defeated some deadlocks.
                            World domination ... is at hand.
-
-2003-01-30 Thursday 21:35  babal
-
- - fixed a segfault occuring when the preference dialog box was destroyed
 
 2003-01-30 Thursday 20:59  sam
 
@@ -6864,15 +8264,6 @@
  * modules/gui/gtk/gnome.c, modules/gui/gtk/gtk.c: input_Seek() was incorrectly triggered while playing some
  DVD menus.
 
-2003-01-26 Sunday 18:31  babal
-
- - menu checkbox outside of title/chapter groupbox
-
-2003-01-26 Sunday 18:02  babal
-
- - buttons are left aligned and their size comforms to Windows XP visual
-   guidelines
-
 2003-01-26 Sunday 16:37  gbazin
 
  * modules/audio_output/waveout.c: multichannel and spdif support (spdif untested).
@@ -6908,23 +8299,12 @@
 
   Added some colors.
 
-2003-01-26 Sunday 03:55  ipkiss
-
-  * modules/gui/win32: replaced BitBtns with Buttons everywhere, and
-    put "OK" and "Cancel" buttons in an horizontal layout.
-    Also updated a few properties here and there.
-
 2003-01-26 Sunday 02:22  ipkiss
 
   * modules/video_output/directx: added a configuration variable and a
     "normal" one to set the vout window on top of ther windows
   * modules/gui/win32: the interface can use these variables
     (almost closes #84)
-
-2003-01-26 Sunday 00:51  sam
-
-   * ./modules/gui/win32/menu.cpp: fixed a crash in the navigation menu
-     generation.
 
 2003-01-25 Saturday 21:34  hartman
 
@@ -7033,11 +8413,6 @@
    is somewhat unclean. We should fix this on a higher level but i don't see
    how we could/should.
 
-2003-01-24 Friday 00:57  babal
-
- - added a NULL pointer test
- - cosmetic changes
-
 2003-01-24 Friday 00:53  hartman
 
  * the volume slider could only be dragged, not clicked. removed some
@@ -7092,19 +8467,10 @@
  * modules/gui/macosx/open.m: "Open File" is back,
  * modules/codec/mpeg_video/synchro.c: Fixed a counting bug.
 
-2003-01-23 Thursday 17:18  babal
-
- - menus disabled by default
- - cosmetic changes
-
 2003-01-23 Thursday 17:13  massiot
 
  Fixed a segfault with quitting when no audio output plug-in was found
  (closes #108).
-
-2003-01-23 Thursday 16:17  ipkiss
-
-  * use 'dvdold' instead of 'dvd'
 
 2003-01-23 Thursday 15:53  sam
 
@@ -7161,30 +8527,12 @@
 
   * demux: fix segfault while trying to opening files without extention...
 
-2003-01-23 Thursday 04:50  babal
-
- - allow the user to choose (and sort) several plugins for the same
-   category.
-
-2003-01-23 Thursday 03:33  ipkiss
-
-  * The stream output can't use PS with UDP
-  * Added tooltips for the subtitles dialog box
-  * Added a missing "delete"
-  * Added a menu entry to spawn new interfaces (but it's currently
-    disabled, due to a problem with the vlc_list_t struct)
-
 2003-01-22 Wednesday 22:19  sigmunau
 
   added an new config variable that takes an comma separated list of
  interface modules to be loaded in the background when vlc starts. This is
  usefull for lirc, logger and xosd. Also got rid of the hacky way the sap
  module was inserted, as this just needs to be added to this list now.
-
-2003-01-22 Wednesday 21:42  ipkiss
-
-  * Added a dialog box for subtitles selection
-  * Cosmetic here and there
 
 2003-01-22 Wednesday 19:37  lool
 
@@ -7272,19 +8620,10 @@
 
   * gtk: fixed a segfault with deinterlace.
 
-2003-01-21 Tuesday 21:20  ipkiss
-
-  * Dropped files and files added using the playlist are now enqueued
-    according to the "enqueue" config option
-
 2003-01-21 Tuesday 21:19  lool
 
    * use of service attributes to get the name of the session, insert it in
      the playlist
-
-2003-01-21 Tuesday 19:49  ipkiss
-
-  * Added a dialog box for the stream output
 
 2003-01-21 Tuesday 18:43  lool
 
@@ -7407,10 +8746,6 @@
 
  New "qte_main" module. It should be used by all plugins/modules that need QT embedded. Also ported modules/qte/qte.{cpp,h} to use it.
 
-2003-01-19 Sunday 17:55  ipkiss
-
-  * Compilation fix
-
 2003-01-19 Sunday 16:57  massiot
 
  Requalified some error messages into warnings.
@@ -7460,11 +8795,6 @@
 2003-01-17 Friday 19:36  sam
 
    * ./modules/gui/ncurses/ncurses.c: added locks and checks in navigation code.
-
-2003-01-17 Friday 19:35  sam
-
-   * ./modules/gui/win32/mainframe.cpp, ./modules/gui/win32/menu.cpp: applied
-     navigation fixes from the Gtk+ interface.
 
 2003-01-17 Friday 19:22  sam
 
@@ -7943,10 +9273,6 @@
    * configure.ac.in, modules/access/slp.c: New SLP access module,
          see <http://www.openslp.org/>
 
-2003-01-10 Friday 01:09  ipkiss
-
-  * ./modules/gui/win32: fixed a bug in the preferences (closes #60)
-
 2003-01-09 Thursday 23:43  massiot
 
  * OS X: Fixed a segfault with empty configuration strings (closes #65),
@@ -8090,12 +9416,6 @@
 
   Minor GUI fixes in the prefs window.
 
-2003-01-08 Wednesday 02:16  ipkiss
-
-  * Added sound volume management and changed a bit the menus
-  * Added audio channels selection, but it's currently disabled since
-    it's quite buggy :)
-
 2003-01-08 Wednesday 02:09  titer
 
   Fixed language and subtitle selection.
@@ -8154,11 +9474,6 @@
  - libvlc0-devel provides libvlc-devel.
  - mmx/3dn plugins are only for x86 arch (use %ifarch %ix86 to list them)
    ie. fix rpm building on ppc thx Olivier Thauvin <olivier.thauvin@aerov.jussieu.fr>
-
-2003-01-06 Monday 15:39  ipkiss
-
-  * modules/gui/win32/network.cpp: added support for ftp and mms
-  * modules/gui/win32/disc.cpp: cosmetic
 
 2003-01-06 Monday 02:45  massiot
 
