@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.35 2003/12/23 15:27:50 gbazin Exp $
+ * $Id: events.c,v 1.36 2003/12/23 17:10:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -678,7 +678,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         else
         {
-            msg_Warn( p_vout, "Created video sub-window" );
+            msg_Dbg( p_vout, "Created video sub-window" );
             SetWindowLong( p_vout->p_sys->hvideownd,
                            GWL_WNDPROC, (LONG)DirectXVideoEventProc );
         }
