@@ -46,7 +46,9 @@
 #include <ddraw.h>
 #include <commctrl.h>
 
-#include <multimon.h>
+#ifndef UNDER_CE
+#   include <multimon.h>
+#endif
 #undef GetSystemMetrics
 
 #ifndef MONITOR_DEFAULTTONEAREST
@@ -211,12 +213,16 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_display_driver = NULL;
     p_vout->p_sys->MonitorFromWindow = NULL;
     p_vout->p_sys->GetMonitorInfo = NULL;
-    if( (huser32 = GetModuleHandle( "USER32" ) ) )
+    if( (huser32 = GetModuleHandle( _T("USER32") ) ) )
     {
         p_vout->p_sys->MonitorFromWindow =
-            GetProcAddress( huser32, "MonitorFromWindow" );
+            GetProcAddress( huser32, _T("MonitorFromWindow") );
         p_vout->p_sys->GetMonitorInfo =
+#ifndef UNICODE
             GetProcAddress( huser32, "GetMonitorInfoA" );
+#else
+            GetProcAddress( huser32, _T("GetMonitorInfoW") );
+#endif
     }
 
     var_Create( p_vout, "overlay", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -850,7 +856,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "DirectXInitDDraw" );
 
     /* Load direct draw DLL */
-    p_vout->p_sys->hddraw_dll = LoadLibrary("DDRAW.DLL");
+    p_vout->p_sys->hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
     if( p_vout->p_sys->hddraw_dll == NULL )
     {
         msg_Warn( p_vout, "DirectXInitDDraw failed loading ddraw.dll" );
@@ -858,7 +864,8 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     }
 
     OurDirectDrawCreate =
-      (void *)GetProcAddress(p_vout->p_sys->hddraw_dll, "DirectDrawCreate");
+      (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
+                              _T("DirectDrawCreate") );
     if( OurDirectDrawCreate == NULL )
     {
         msg_Err( p_vout, "DirectXInitDDraw failed GetProcAddress" );
@@ -867,7 +874,11 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     OurDirectDrawEnumerateEx =
       (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
+#ifndef UNICODE
                               "DirectDrawEnumerateExA" );
+#else
+                              _T("DirectDrawEnumerateExW") );
+#endif
 
     if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
     {
@@ -1954,9 +1965,9 @@ void SwitchWallpaperMode( vout_thread_t *p_vout, vlc_bool_t b_on )
 
     if( p_vout->p_sys->b_wallpaper == b_on ) return; /* Nothing to do */
 
-    hwnd = FindWindow( "Progman", NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, "SHELLDLL_DefView", NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, "SysListView32", NULL );
+    hwnd = FindWindow( _T("Progman"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
+    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
     if( !hwnd )
     {
         msg_Warn( p_vout, "couldn't find \"SysListView32\" window, "
@@ -2041,11 +2052,15 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     p_item->i_list = 1;
 
     /* Load direct draw DLL */
-    hddraw_dll = LoadLibrary("DDRAW.DLL");
+    hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
     if( hddraw_dll == NULL ) return VLC_SUCCESS;
 
     OurDirectDrawEnumerateEx =
+#ifndef UNICODE
       (void *)GetProcAddress( hddraw_dll, "DirectDrawEnumerateExA" );
+#else
+      (void *)GetProcAddress( hddraw_dll, _T("DirectDrawEnumerateExW") );
+#endif
 
     if( OurDirectDrawEnumerateEx )
     {

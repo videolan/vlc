@@ -148,3 +148,66 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000
 #define DX_WALLPAPER_CHANGE 0x2000
+
+#ifndef _T
+#   ifdef UNICODE
+#       define _T(q) L##q
+#   else
+#       define _T(q) q
+#   endif
+#endif
+
+/*****************************************************************************
+ * WinCE helpers
+ *****************************************************************************/
+#ifdef UNDER_CE
+
+#define AdjustWindowRect(a,b,c)
+
+#ifndef GCL_HBRBACKGROUND
+#   define GCL_HBRBACKGROUND (-10)
+#endif
+
+#define FindWindowEx(a,b,c,d) 0
+
+#define GetWindowPlacement(a,b)
+#define SetWindowPlacement(a,b)
+typedef struct _WINDOWPLACEMENT {
+    UINT length;
+    UINT flags;
+    UINT showCmd;
+    POINT ptMinPosition;
+    POINT ptMaxPosition;
+    RECT rcNormalPosition;
+} WINDOWPLACEMENT;
+
+#ifndef WM_NCMOUSEMOVE
+#   define WM_NCMOUSEMOVE 160
+#endif
+#ifndef CS_OWNDC
+#   define CS_OWNDC 32
+#endif
+#ifndef SC_SCREENSAVE
+#   define SC_SCREENSAVE 0xF140
+#endif
+#ifndef SC_MONITORPOWER
+#   define SC_MONITORPOWER 0xF170
+#endif
+#ifndef WM_NCPAINT
+#   define WM_NCPAINT 133
+#endif
+#ifndef WS_OVERLAPPEDWINDOW
+#   define WS_OVERLAPPEDWINDOW 0xcf0000
+#endif
+#ifndef WS_EX_NOPARENTNOTIFY
+#   define WS_EX_NOPARENTNOTIFY 4
+#endif
+#ifndef WS_EX_APPWINDOW
+#define WS_EX_APPWINDOW 0x40000
+#endif
+
+#define SetWindowLongPtr SetWindowLong
+#define GetWindowLongPtr GetWindowLong
+#define GWLP_USERDATA GWL_USERDATA
+
+#endif //UNDER_CE

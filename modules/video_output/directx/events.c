@@ -105,12 +105,12 @@ void DirectXEventThread( event_thread_t *p_event )
     vlc_thread_ready( p_event );
 
     /* Set power management stuff */
-    if( (hkernel32 = GetModuleHandle( "KERNEL32" ) ) )
+    if( (hkernel32 = GetModuleHandle( _T("KERNEL32") ) ) )
     {
         ULONG (WINAPI* OurSetThreadExecutionState)( ULONG );
 
         OurSetThreadExecutionState =
-            GetProcAddress( hkernel32, "SetThreadExecutionState" );
+            GetProcAddress( hkernel32, _T("SetThreadExecutionState") );
 
         if( OurSetThreadExecutionState )
             /* Prevent monitor from powering off */
@@ -298,16 +298,17 @@ void DirectXEventThread( event_thread_t *p_event )
             {
 #ifdef MODULE_NAME_IS_glwin32
                 SetWindowText( p_event->p_vout->p_sys->hwnd,
-                    VOUT_TITLE " (OpenGL output)" );
+                    _T(VOUT_TITLE) _T(" (OpenGL output)") );
 #else
                 if( p_event->p_vout->p_sys->b_using_overlay )
-                    SetWindowText( p_event->p_vout->p_sys->hwnd,
-                        VOUT_TITLE " (hardware YUV overlay DirectX output)" );
+                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
+                        _T(" (hardware YUV overlay DirectX output)") );
                 else if( p_event->p_vout->p_sys->b_hw_yuv )
-                    SetWindowText( p_event->p_vout->p_sys->hwnd,
-                        VOUT_TITLE " (hardware YUV DirectX output)" );
-                else SetWindowText( p_event->p_vout->p_sys->hwnd,
-                        VOUT_TITLE " (software RGB DirectX output)" );
+                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
+                        _T(" (hardware YUV DirectX output)") );
+                else
+                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
+                        _T(" (software RGB DirectX output)") );
 #endif
             }
             else
@@ -357,7 +358,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     HINSTANCE  hInstance;
     HMENU      hMenu;
     RECT       rect_window;
-    WNDCLASSEX wc;                            /* window class components */
+    WNDCLASS   wc;                            /* window class components */
     HICON      vlc_icon = NULL;
     char       vlc_path[MAX_PATH+1];
     int        i_style;
@@ -379,13 +380,14 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Get the Icon from the main app */
     vlc_icon = NULL;
+#ifndef UNDER_CE
     if( GetModuleFileName( NULL, vlc_path, MAX_PATH ) )
     {
         vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
     }
+#endif
 
     /* Fill in the window class structure */
-    wc.cbSize        = sizeof(WNDCLASSEX);
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
     wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;       /* event handler */
     wc.cbClsExtra    = 0;                         /* no extra class data */
@@ -395,11 +397,10 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW);    /* default cursor */
     wc.hbrBackground = GetStockObject(BLACK_BRUSH);  /* background color */
     wc.lpszMenuName  = NULL;                                  /* no menu */
-    wc.lpszClassName = "VLC DirectX";             /* use a special class */
-    wc.hIconSm       = vlc_icon;              /* load the vlc small icon */
+    wc.lpszClassName = _T("VLC DirectX");         /* use a special class */
 
     /* Register the window class */
-    if( !RegisterClassEx(&wc) )
+    if( !RegisterClass(&wc) )
     {
         WNDCLASS wndclass;
 
@@ -407,7 +408,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
         /* Check why it failed. If it's because one already exists
          * then fine, otherwise return with an error. */
-        if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
+        if( !GetClassInfo( hInstance, _T("VLC DirectX"), &wndclass ) )
         {
             msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
             return VLC_EGENERIC;
@@ -415,14 +416,14 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     }
 
     /* Register the video sub-window class */
-    wc.lpszClassName = "VLC DirectX video"; wc.hIconSm = 0; wc.hIcon = 0;
-    if( !RegisterClassEx(&wc) )
+    wc.lpszClassName = _T("VLC DirectX video"); wc.hIcon = 0;
+    if( !RegisterClass(&wc) )
     {
         WNDCLASS wndclass;
 
         /* Check why it failed. If it's because one already exists
          * then fine, otherwise return with an error. */
-        if( !GetClassInfo( hInstance, "VLC DirectX video", &wndclass ) )
+        if( !GetClassInfo( hInstance, _T("VLC DirectX video"), &wndclass ) )
         {
             msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
             return VLC_EGENERIC;
@@ -449,8 +450,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     /* Create the window */
     p_vout->p_sys->hwnd =
         CreateWindowEx( WS_EX_NOPARENTNOTIFY,
-                    "VLC DirectX",                   /* name of window class */
-                    VOUT_TITLE " (DirectX Output)", /* window title bar text */
+                    _T("VLC DirectX"),               /* name of window class */
+                    _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
                     i_style,                                 /* window style */
                     (p_vout->p_sys->i_window_x < 0) ? CW_USEDEFAULT :
                         p_vout->p_sys->i_window_x,   /* default X coordinate */
@@ -483,8 +484,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
         /* Create our fullscreen window */
         p_vout->p_sys->hfswnd =
-            CreateWindowEx( WS_EX_APPWINDOW, "VLC DirectX",
-                            VOUT_TITLE " (DirectX Output)",
+            CreateWindowEx( WS_EX_APPWINDOW, _T("VLC DirectX"),
+                            _T(VOUT_TITLE) _T(" (DirectX Output)"),
                             WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_SIZEBOX,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -501,9 +502,9 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Append a "Always On Top" entry in the system menu */
     hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
-    AppendMenu( hMenu, MF_SEPARATOR, 0, "" );
+    AppendMenu( hMenu, MF_SEPARATOR, 0, _T("") );
     AppendMenu( hMenu, MF_STRING | MF_UNCHECKED,
-                       IDM_TOGGLE_ON_TOP, "Always on &Top" );
+                       IDM_TOGGLE_ON_TOP, _T("Always on &Top") );
 
     return VLC_SUCCESS;
 }
@@ -779,7 +780,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_VLC_CREATE_VIDEO_WIN:
         /* Create video sub-window */
         p_vout->p_sys->hvideownd =
-            CreateWindow( "VLC DirectX video", "",      /* window class text */
+            CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
                     WS_CHILD | WS_VISIBLE,                   /* window style */
                     CW_USEDEFAULT, CW_USEDEFAULT,     /* default coordinates */
                     CW_USEDEFAULT, CW_USEDEFAULT,
