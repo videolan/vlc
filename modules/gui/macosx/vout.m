@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.33 2003/02/14 23:07:41 hartman Exp $
+ * $Id: vout.m,v 1.34 2003/02/15 12:57:51 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -337,6 +337,9 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {    
+    vlc_bool_t b_change = 0;
+    intf_thread_t * p_intf = [NSApp getIntf];
+    
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         if( CoToggleFullscreen( p_vout ) )  
@@ -357,10 +360,9 @@ static int vout_Manage( vout_thread_t *p_vout )
     }
 
     /* hide/show mouse cursor */
-    if( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
+    if( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen && 
+                        p_intf->p_sys->b_play_status )
     {
-        vlc_bool_t b_change = 0;
-
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
             CGDisplayShowCursor( kCGDirectMainDisplay );
@@ -375,11 +377,26 @@ static int vout_Manage( vout_thread_t *p_vout )
             b_change = 1;
         }
 
-        if( b_change )
+    }
+    else if ( p_vout->b_fullscreen && !p_intf->p_sys->b_play_status )
+    {
+        if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
-            p_vout->p_sys->b_mouse_moved = 0;
-            p_vout->p_sys->i_time_mouse_last_moved = 0;
+            CGDisplayShowCursor( kCGDirectMainDisplay );
+            p_vout->p_sys->b_mouse_pointer_visible = 1;
+            b_change = 1;
         }
+        else if( p_vout->p_sys->b_mouse_pointer_visible )
+        {
+            p_vout->p_sys->i_time_mouse_last_moved = mdate();
+            p_vout->p_sys->b_mouse_moved = 1;
+        }
+    }
+    
+    if( b_change )
+    {
+        p_vout->p_sys->b_mouse_moved = 0;
+        p_vout->p_sys->i_time_mouse_last_moved = 0;
     }
 
     return( 0 );
