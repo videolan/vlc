@@ -7,3 +7,4 @@ SOURCES_stream_out_duplicate = duplicate.c
 SOURCES_stream_out_es = es.c
 SOURCES_stream_out_display = display.c
 SOURCES_stream_out_gather = gather.c
+SOURCES_stream_out_rtp = rtp.c
