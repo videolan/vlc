@@ -41,11 +41,15 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-http-"
+
 vlc_module_begin();
     set_description( _("HTTP stream ouput") );
     set_capability( "sout access", 0 );
     add_shortcut( "http" );
     add_shortcut( "mmsh" );
+    add_string( SOUT_CFG_PREFIX "user", "", NULL, "User", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "pwd", "", NULL, "Password", "", VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -53,6 +57,10 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "user", "pwd", NULL
+};
+
 static int Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
 
@@ -84,8 +92,10 @@ static int Open( vlc_object_t *p_this )
     char                *psz_bind_addr;
     int                 i_bind_port;
     char                *psz_file_name;
-
+    char                *psz_user = NULL;
+    char                *psz_pwd = NULL;
     char                *psz_mime = NULL;
+    vlc_value_t         val;
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -93,6 +103,8 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "Not enough memory" );
         return( VLC_EGENERIC );
     }
+
+    sout_ParseCfg( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     /* p_access->psz_name host.name:port/filename */
     psz_name = psz_parser = strdup( p_access->psz_name );
@@ -163,10 +175,24 @@ static int Open( vlc_object_t *p_this )
         psz_mime = "video/x-ms-asf-stream";
     }
 
+    var_Get( p_access, SOUT_CFG_PREFIX "user", &val );
+    if( val.psz_string && *val.psz_string )
+        psz_user = val.psz_string;
+    else if( val.psz_string )
+        free( val.psz_string );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "pwd", &val );
+    if( val.psz_string && *val.psz_string )
+        psz_pwd = val.psz_string;
+    else if( val.psz_string )
+        free( val.psz_string );
+
     p_sys->p_httpd_stream =
         httpd_StreamNew( p_sys->p_httpd_host, psz_file_name, psz_mime,
-                         sout_cfg_find_value( p_access->p_cfg, "user" ),
-                         sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
+                         psz_user, psz_pwd );
+    if( psz_user ) free( psz_user );
+    if( psz_pwd ) free( psz_pwd );
+
     if( p_sys->p_httpd_stream == NULL )
     {
         msg_Err( p_access, "cannot add stream %s", psz_file_name );

@@ -58,6 +58,8 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-udp-"
+
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
@@ -65,8 +67,12 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("UDP stream ouput") );
-    add_integer( "udp-sout-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, "ttl", "", VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "group", 1, NULL, "group", "", VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "late", 0, NULL, "late (ms)", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "raw",  0, NULL, "raw", "", VLC_TRUE );
+
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer
@@ -76,6 +82,16 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+
+static const char *ppsz_sout_options[] = {
+    "caching",
+    "ttl",
+    "group",
+    "late",
+    "raw",
+    NULL
+};
+
 static int  Write   ( sout_access_out_t *, block_t * );
 static int  WriteRaw( sout_access_out_t *, block_t * );
 static int  Seek    ( sout_access_out_t *, off_t  );
@@ -133,7 +149,8 @@ static int Open( vlc_object_t *p_this )
     network_socket_t    socket_desc;
 
     vlc_value_t         val;
-    char                *psz_val;
+
+    sout_ParseCfg( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -200,11 +217,10 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
-    socket_desc.i_ttl           = 0;
-    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "ttl" ) ) )
-    {
-        socket_desc.i_ttl = atoi( psz_val );
-    }
+
+    var_Get( p_access, SOUT_CFG_PREFIX "ttl", &val );
+    socket_desc.i_ttl = val.i_int;
+
     p_sys->p_thread->p_private = (void*)&socket_desc;
     if( !( p_network = module_Need( p_sys->p_thread, "network", NULL, 0 ) ) )
     {
@@ -215,27 +231,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_thread->i_handle = socket_desc.i_handle;
 
-    var_Create( p_this, "udp-sout-caching",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "udp-sout-caching", &val );
-    p_sys->p_thread->i_caching = val.i_int * 1000;
-    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "caching" ) ) )
-    {
-        p_sys->p_thread->i_caching = atoll( psz_val ) * 1000;
-    }
+    var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
+    p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
 
-    p_sys->p_thread->i_group = 1;
-    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "group" ) ) )
-    {
-        p_sys->p_thread->i_group = atoi( psz_val );
-    }
+    var_Get( p_access, SOUT_CFG_PREFIX "group", &val );
+    p_sys->p_thread->i_group = val.i_int;
 
-    p_sys->p_thread->i_late = 0;
-    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "late" ) ) )
-    {
-        p_sys->p_thread->i_late = atoll( psz_val ) * 1000;
-    }
-
+    var_Get( p_access, SOUT_CFG_PREFIX "late", &val );
+    p_sys->p_thread->i_late = (int64_t)val.i_int * 1000;
 
     p_sys->i_mtu = socket_desc.i_mtu;
 
@@ -257,7 +260,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sequence_number = rand()&0xffff;
     p_sys->i_ssrc            = rand()&0xffffffff;
 
-    if( sout_cfg_find( p_access->p_cfg, "raw" ) )
+    var_Get( p_access, SOUT_CFG_PREFIX "raw", &val );
+    if( val.b_bool )
     {
         p_access->pf_write = WriteRaw;
     }

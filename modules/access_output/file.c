@@ -58,11 +58,14 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define SOUT_CFG_PREFIX "sout-file-"
+
 vlc_module_begin();
     set_description( _("File stream ouput") );
     set_capability( "sout access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
+    add_bool( SOUT_CFG_PREFIX "append", 0, NULL, "append", "", VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -70,6 +73,10 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "append", NULL
+};
+
 static int Write( sout_access_out_t *, block_t * );
 static int Seek ( sout_access_out_t *, off_t  );
 static int Read ( sout_access_out_t *, block_t * );
@@ -86,6 +93,9 @@ static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
     int                 i_flags;
+    vlc_value_t         val;
+
+    sout_ParseCfg( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
@@ -99,7 +109,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     i_flags = O_RDWR|O_CREAT;
-    if( sout_cfg_find_value( p_access->p_cfg, "append" ) )
+
+    var_Get( p_access, SOUT_CFG_PREFIX "append", &val );
+    if( val.b_bool )
     {
         i_flags |= O_APPEND;
     }
