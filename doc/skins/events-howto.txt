@@ -16,7 +16,7 @@ How to create an event ?
 ========================
 
 An event describes a simple action as seen above.
-All attiributes are explained in the 'skins-howto.txt' file except the 'event'
+All attributes are explained in the 'skins-howto.txt' file except the 'event'
 attribute wich is a bit special.
 In the 'event' attribute you will enter a simple script with the following
 syntax :
@@ -52,6 +52,10 @@ EVENT is the action to execute, it can be one of the following:
 
  - VLC_LOAD_SKIN:
    Action    : Open an "open file dialog box" to change the current skin.
+   Parameters: none.
+
+ - VLC_ON_TOP:
+   Action    : Toggle the "Always on top" status
    Parameters: none.
 
  - VLC_LOG_SHOW:
@@ -185,7 +189,7 @@ shortcut.
 
   ID           Shortcut     Description
 
-  tray         CTRL+T       Hide or show in the system tray.
+  tray                      Hide or show in the system tray.
   taskbar      CTRL+B       Hide or show in the taskbar.
   play         X            Play.
   pause        C            Pause.
@@ -200,6 +204,7 @@ shortcut.
   open         CTRL+O       Open a file.
   add_file     CTRL+A       Add a file.
   load_skin    CTRL+S       Change skin.
+  on_top       CTRL+T       Toggle the "Always on top" status
   show_prefs                Show the preferences dialog box.
   show_info                 Show the FileInfo dialog box.
   show_log                  Show the Messages dialog box.
