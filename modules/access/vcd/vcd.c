@@ -78,7 +78,6 @@ struct access_sys_t
 static block_t *Block( access_t * );
 static int      Seek( access_t *, int64_t );
 static int      Control( access_t *, int, va_list );
-
 static int      EntryPoints( access_t * );
 
 /*****************************************************************************
@@ -189,13 +188,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sector = p_sys->p_sectors[1+i_title];
     if( i_chapter > 0 )
     {
-        int64_t i_off = p_sys->title[i_title]->seekpoint[i_chapter]->i_byte_offset;
-        p_sys->i_sector += i_off / VCD_DATA_SIZE;
+        p_sys->i_sector +=
+            ( p_sys->title[i_title]->seekpoint[i_chapter]->i_byte_offset /
+              VCD_DATA_SIZE );
     }
     p_access->info.i_title = i_title;
     p_access->info.i_seekpoint = i_chapter;
     p_access->info.i_size = p_sys->title[i_title]->i_size;
-    p_access->info.i_pos = ( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) * VCD_DATA_SIZE;
+    p_access->info.i_pos = ( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
+        VCD_DATA_SIZE;
 
     p_access->psz_demux = strdup( "ps" );
 
@@ -250,7 +251,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger( p_access, "vcd-caching" ) * I64C(1000);
+            *pi_64 = var_GetInteger( p_access, "vcd-caching" ) * 1000;
             break;
 
         /* */
@@ -263,7 +264,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
             /* Duplicate title infos */
             *pi_int = p_sys->i_titles;
-            *ppp_title = malloc( sizeof( input_title_t ** ) * p_sys->i_titles );
+            *ppp_title = malloc( sizeof(input_title_t **) * p_sys->i_titles );
             for( i = 0; i < p_sys->i_titles; i++ )
             {
                 (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->title[i] );
@@ -275,7 +276,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             if( i != p_access->info.i_title )
             {
                 /* Update info */
-                p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_SIZE;
+                p_access->info.i_update |=
+                  INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_SIZE;
                 p_access->info.i_title = i;
                 p_access->info.i_seekpoint = 0;
                 p_access->info.i_size = p_sys->title[i]->i_size;
@@ -296,10 +298,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 p_access->info.i_seekpoint = i;
 
                 p_sys->i_sector = p_sys->p_sectors[1+p_access->info.i_title] +
-                                  t->seekpoint[i]->i_byte_offset / VCD_DATA_SIZE;
+                    t->seekpoint[i]->i_byte_offset / VCD_DATA_SIZE;
 
-                p_access->info.i_pos = (int64_t)(p_sys->i_sector - p_sys->p_sectors[1+p_access->info.i_title] ) *
-                                       (int64_t)VCD_DATA_SIZE;
+                p_access->info.i_pos = (int64_t)(p_sys->i_sector -
+                    p_sys->p_sectors[1+p_access->info.i_title]) *VCD_DATA_SIZE;
             }
             return VLC_SUCCESS;
         }
@@ -319,88 +321,78 @@ static block_t *Block( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_skip = p_access->info.i_pos % VCD_DATA_SIZE;
-    block_t      *p_block;
-    int          i_blocks;
-    int          i_read;
-    int          i;
+    int i_blocks = VCD_BLOCKS_ONCE;
+    block_t *p_block;
+    int i_read;
 
-    if( p_access->info.b_eof )
-        return NULL;
+    /* Check end of file */
+    if( p_access->info.b_eof ) return NULL;
 
-    /* Read raw data */
-    i_blocks = VCD_BLOCKS_ONCE;
-
-    /* Don't read after a title */
-    if( p_sys->i_sector + i_blocks >= p_sys->p_sectors[p_access->info.i_title + 2] )
+    /* Check end of title */
+    while( p_sys->i_sector >= p_sys->p_sectors[p_access->info.i_title + 2] )
     {
-        i_blocks = p_sys->p_sectors[p_access->info.i_title + 2 ] - p_sys->i_sector;
-        if( i_blocks <= 0 ) i_blocks = 1;   /* Should never occur */
+        if( p_access->info.i_title + 2 >= p_sys->i_titles )
+        {
+            p_access->info.b_eof = VLC_TRUE;
+            return NULL;
+        }
+
+        p_access->info.i_update |=
+            INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT | INPUT_UPDATE_SIZE;
+        p_access->info.i_title++;
+        p_access->info.i_seekpoint = 0;
+        p_access->info.i_size =
+            p_sys->title[p_access->info.i_title]->i_size;
+        p_access->info.i_pos = 0;
     }
 
-    p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE );
+    /* Don't read after the end of a title */
+    if( p_sys->i_sector + i_blocks >=
+        p_sys->p_sectors[p_access->info.i_title + 2] )
+    {
+        i_blocks = p_sys->p_sectors[p_access->info.i_title + 2 ] -
+                   p_sys->i_sector;
+    }
 
-    if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev, p_sys->i_sector,
-                           p_block->p_buffer, i_blocks, VCD_TYPE ) < 0 )
+    /* Do the actual reading */
+    if( !( p_block = block_New( p_access, i_blocks * VCD_DATA_SIZE ) ) )
+    {
+        msg_Err( p_access, "cannot get a new block of size: %i",
+		 i_blocks * VCD_DATA_SIZE );
+        return NULL;
+    }
+
+    if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
+            p_sys->i_sector, p_block->p_buffer, i_blocks, VCD_TYPE ) < 0 )
     {
         msg_Err( p_access, "cannot read a sector" );
         block_Release( p_block );
-
-        p_block = NULL;
-        i_blocks = 1;   /* Next sector */
+        return NULL;
     }
 
-
-    i_read = 0;
-    for( i = 0; i < i_blocks; i++ )
+    for( i_read = 0; i_read < i_blocks; i_read++ )
     {
         input_title_t *t = p_sys->title[p_access->info.i_title];
 
         /* A good sector read */
-        i_read++;
         p_sys->i_sector++;
 
-        /* Check end of title */
-        if( p_sys->i_sector >= p_sys->p_sectors[p_access->info.i_title + 2] )
+        if( t->i_seekpoint > 0 &&
+            p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
+            p_access->info.i_pos - i_skip + i_read * VCD_DATA_SIZE >=
+            t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
         {
-            if( p_access->info.i_title + 2 >= p_sys->i_titles )
-            {
-                p_access->info.b_eof = VLC_TRUE;
-                break;
-            }
-            p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_SIZE;
-            p_access->info.i_title++;
-            p_access->info.i_seekpoint = 0;
-            p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
-            p_access->info.i_pos = 0;
-        }
-        else if( t->i_seekpoint > 0 &&
-                 p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
-                 p_access->info.i_pos - i_skip + i_read * VCD_DATA_SIZE >= t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
-        {
-            fprintf( stderr, "seekpoint change\n" );
+            msg_Dbg( p_access, "seekpoint change" );
             p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;
             p_access->info.i_seekpoint++;
         }
-        /* TODO */
     }
 
-    if( i_read <= 0 )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    if( p_block )
-    {
-
-        /* Really read data */
-        p_block->i_buffer = i_read * VCD_DATA_SIZE;
-        /* */
-        p_block->i_buffer -= i_skip;
-        p_block->p_buffer += i_skip;
-
-        p_access->info.i_pos += p_block->i_buffer;
-    }
+    /* Update a few values */
+    p_block->i_buffer = i_read * VCD_DATA_SIZE;
+    p_block->i_buffer -= i_skip;
+    p_block->p_buffer += i_skip;
+    p_access->info.i_pos += p_block->i_buffer;
 
     return p_block;
 }
@@ -410,11 +402,33 @@ static block_t *Block( access_t *p_access )
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
-    return VLC_EGENERIC;
+    access_sys_t *p_sys = p_access->p_sys;
+    input_title_t *t = p_sys->title[p_access->info.i_title];
+    int i_seekpoint;
+
+    /* Next sector to read */
+    p_sys->i_sector = i_pos / VCD_DATA_SIZE +
+        p_sys->p_sectors[p_access->info.i_title + 1];
+
+    /* Update current seekpoint */
+    for( i_seekpoint = 0; i_seekpoint < t->i_seekpoint; i_seekpoint++ )
+    {
+        if( i_seekpoint + 1 >= t->i_seekpoint ) break;
+        if( i_pos < t->seekpoint[i_seekpoint + 1]->i_byte_offset ) break;
+    }
+
+    if( i_seekpoint != p_access->info.i_seekpoint )
+    {
+        msg_Dbg( p_access, "seekpoint change" );
+        p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+        p_access->info.i_seekpoint = i_seekpoint;
+    }
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * EntryPoints:
+ * EntryPoints: Reads the information about the entry points on the disc.
  *****************************************************************************/
 static int EntryPoints( access_t *p_access )
 {
@@ -422,9 +436,7 @@ static int EntryPoints( access_t *p_access )
     uint8_t      sector[VCD_DATA_SIZE];
 
     entries_sect_t entries;
-    int i_nb;
-    int i;
-
+    int i_nb, i;
 
     /* Read the entry point sector */
     if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
@@ -458,369 +470,19 @@ static int EntryPoints( access_t *p_access )
                           BCD_TO_BIN( entries.entry[i].msf.frame  ) ));
         seekpoint_t *s;
 
-        if( i_title < 0 )
-            continue;   /* Should not occur */
-        if( i_title >= p_sys->i_titles )
-            continue;
+        if( i_title < 0 ) continue;   /* Should not occur */
+        if( i_title >= p_sys->i_titles ) continue;
 
-        fprintf( stderr, "Entry[%d] title=%d sector=%d\n",
+        msg_Dbg( p_access, "Entry[%d] title=%d sector=%d\n",
                  i, i_title, i_sector );
 
         s = vlc_seekpoint_New();
-        s->i_byte_offset = (i_sector - p_sys->p_sectors[i_title+1]) * VCD_DATA_SIZE;
+        s->i_byte_offset = (i_sector - p_sys->p_sectors[i_title+1]) *
+            VCD_DATA_SIZE;
 
-        TAB_APPEND( p_sys->title[i_title]->i_seekpoint, p_sys->title[i_title]->seekpoint, s );
+        TAB_APPEND( p_sys->title[i_title]->i_seekpoint,
+                    p_sys->title[i_title]->seekpoint, s );
     }
 
-#if 0
-#define i_track BCD_TO_BIN(entries.entry[i].i_track)
-    /* Reset the i_part_nb for each track */
-    for( i = 0 ; i < i_nb ; i++ )
-    {
-        if( i_track <= p_input->stream.i_area_nb )
-        {
-            p_input->stream.pp_areas[i_track-1]->i_part_nb = 0;
-        }
-    }
-
-    for( i = 0 ; i < i_nb ; i++ )
-    {
-        if( i_track <= p_input->stream.i_area_nb )
-        {
-            p_sys->p_entries[i_entry_index] =
-                (MSF_TO_LBA2( BCD_TO_BIN( entries.entry[i].msf.minute ),
-                              BCD_TO_BIN( entries.entry[i].msf.second ),
-                              BCD_TO_BIN( entries.entry[i].msf.frame  ) ));
-            p_input->stream.pp_areas[i_track-1]->i_part_nb ++;
-            /* if this entry belongs to a new track */
-            if( i_track != i_previous_track )
-            {
-                /* i_plugin_data is used to store the first entry of the area*/
-                p_input->stream.pp_areas[i_track-1]->i_plugin_data =
-                                                            i_entry_index;
-                i_previous_track = i_track;
-            }
-            msg_Dbg( p_input, "entry point %i begins at LBA: %i",
-                     i_entry_index, p_sys->p_entries[i_entry_index] );
-
-            i_entry_index ++;
-            p_sys->i_entries_nb ++;
-        }
-        else
-            msg_Warn( p_input, "wrong track number found in entry points" );
-    }
-#undef i_track
-    return 0;
-#endif
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
-
-#if 0
-/*****************************************************************************
- * VCDRead: reads from the VCD into PES packets.
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
- * bytes.
- *****************************************************************************/
-static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
-                     size_t i_len )
-{
-    access_sys_t *p_sys;
-    int                     i_blocks;
-    int                     i_index;
-    int                     i_read;
-    byte_t                  p_last_sector[ VCD_DATA_SIZE ];
-
-    p_sys = p_input->p_access_data;
-
-    i_read = 0;
-
-    /* Compute the number of blocks we have to read */
-
-    i_blocks = i_len / VCD_DATA_SIZE;
-
-    for ( i_index = 0 ; i_index < i_blocks ; i_index++ )
-    {
-        if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_sys->vcddev,
-             p_sys->i_sector, p_buffer + i_index * VCD_DATA_SIZE, 1,
-             VCD_TYPE ) < 0 )
-        {
-            msg_Err( p_input, "could not read sector %d", p_sys->i_sector );
-            return -1;
-        }
-
-        p_sys->i_sector ++;
-        if ( p_sys->i_sector == p_sys->p_sectors[p_sys->i_track + 1] )
-        {
-            input_area_t *p_area;
-
-            if ( p_sys->i_track >= p_sys->i_nb_tracks - 1 )
-                return 0; /* EOF */
-
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_area = p_input->stream.pp_areas[
-                    p_input->stream.p_selected_area->i_id + 1 ];
-
-            msg_Dbg( p_input, "new title" );
-
-            p_area->i_part = 1;
-            VCDSetArea( p_input, p_area );
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-        }
-
-        /* Update chapter */
-        else if( p_sys->b_valid_ep &&
-                /* FIXME kludge so that read does not update chapter
-                 * when a manual chapter change was requested and not
-                 * yet accomplished */
-                !p_input->stream.p_new_area )
-        {
-            int i_entry;
-
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            i_entry = p_input->stream.p_selected_area->i_plugin_data
-                /* 1st entry point of the track (area)*/
-                        + p_input->stream.p_selected_area->i_part - 1;
-            if( i_entry + 1 < p_sys->i_entries_nb &&
-                    p_sys->i_sector >= p_sys->p_entries[i_entry + 1] )
-            {
-                vlc_value_t val;
-
-                msg_Dbg( p_input, "new chapter" );
-                p_input->stream.p_selected_area->i_part ++;
-
-                /* Update the navigation variables without triggering
-                 * a callback */
-                val.i_int = p_input->stream.p_selected_area->i_part;
-                var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
-            }
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-        }
-
-        i_read += VCD_DATA_SIZE;
-    }
-
-    if ( i_len % VCD_DATA_SIZE ) /* this should not happen */
-    {
-        if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_sys->vcddev,
-             p_sys->i_sector, p_last_sector, 1, VCD_TYPE ) < 0 )
-        {
-            msg_Err( p_input, "could not read sector %d", p_sys->i_sector );
-            return -1;
-        }
-
-        p_input->p_vlc->pf_memcpy( p_buffer + i_blocks * VCD_DATA_SIZE,
-                                   p_last_sector, i_len % VCD_DATA_SIZE );
-        i_read += i_len % VCD_DATA_SIZE;
-    }
-
-    return i_read;
-}
-
-/*****************************************************************************
- * VCDSetProgram: Does nothing since a VCD is mono_program
- *****************************************************************************/
-static int VCDSetProgram( input_thread_t * p_input,
-                          pgrm_descriptor_t * p_program)
-{
-    return 0;
-}
-
-/*****************************************************************************
- * VCDSetArea: initialize input data for title x, chapter y.
- * It should be called for each user navigation request.
- ****************************************************************************/
-static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
-{
-    access_sys_t *p_sys = p_input->p_access_data;
-    vlc_value_t val;
-
-    /* we can't use the interface slider until initilization is complete */
-    p_input->stream.b_seekable = 0;
-
-    if( p_area != p_input->stream.p_selected_area )
-    {
-        unsigned int i;
-
-        /* Reset the Chapter position of the current title */
-        p_input->stream.p_selected_area->i_part = 1;
-        p_input->stream.p_selected_area->i_tell = 0;
-
-        /* Change the default area */
-        p_input->stream.p_selected_area = p_area;
-
-        /* Change the current track */
-        /* The first track is not a valid one  */
-        p_sys->i_track = p_area->i_id;
-        p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
-
-        /* Update the navigation variables without triggering a callback */
-        val.i_int = p_area->i_id;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
-        var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
-        for( i = 1; i <= p_area->i_part_nb; i++ )
-        {
-            val.i_int = i;
-            var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
-        }
-    }
-
-    if( p_sys->b_valid_ep )
-    {
-        int i_entry = p_area->i_plugin_data /* 1st entry point of
-                                               the track (area)*/
-                            + p_area->i_part - 1;
-        p_sys->i_sector = p_sys->p_entries[i_entry];
-    }
-    else
-        p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
-
-    p_input->stream.p_selected_area->i_tell =
-        (off_t)p_sys->i_sector * (off_t)VCD_DATA_SIZE
-         - p_input->stream.p_selected_area->i_start;
-
-    /* warn interface that something has changed */
-    p_input->stream.b_seekable = 1;
-    p_input->stream.b_changed = 1;
-
-    /* Update the navigation variables without triggering a callback */
-    val.i_int = p_area->i_part;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
-
-    return 0;
-}
-
-/****************************************************************************
- * VCDSeek
- ****************************************************************************/
-static void VCDSeek( input_thread_t * p_input, off_t i_off )
-{
-    access_sys_t * p_sys = p_input->p_access_data;
-    unsigned int i_index;
-
-    p_sys->i_sector = p_sys->p_sectors[p_sys->i_track]
-                       + i_off / (off_t)VCD_DATA_SIZE;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-#define p_area p_input->stream.p_selected_area
-    /* Find chapter */
-    if( p_sys->b_valid_ep )
-    {
-        for( i_index = 2 ; i_index <= p_area->i_part_nb; i_index ++ )
-        {
-            if( p_sys->i_sector < p_sys->p_entries[p_area->i_plugin_data
-                + i_index - 1] )
-            {
-                vlc_value_t val;
-
-                p_area->i_part = i_index - 1;
-
-                /* Update the navigation variables without triggering
-                 * a callback */
-                val.i_int = p_area->i_part;
-                var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
-                break;
-            }
-        }
-    }
-#undef p_area
-
-    p_input->stream.p_selected_area->i_tell =
-        (off_t)p_sys->i_sector * (off_t)VCD_DATA_SIZE
-         - p_input->stream.p_selected_area->i_start;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-}
-
-/*****************************************************************************
- * VCDEntryPoints: Reads the information about the entry points on the disc.
- *****************************************************************************/
-static int VCDEntryPoints( input_thread_t * p_input )
-{
-    access_sys_t * p_sys = p_input->p_access_data;
-    byte_t *                          p_sector;
-    entries_sect_t                    entries;
-    uint16_t                          i_nb;
-    int                               i, i_entry_index = 0;
-    int                               i_previous_track = -1;
-
-    p_sector = malloc( VCD_DATA_SIZE * sizeof( byte_t ) );
-    if( p_sector == NULL )
-    {
-        msg_Err( p_input, "not enough memory for entry points treatment" );
-        return -1;
-    }
-
-    if( ioctl_ReadSectors( VLC_OBJECT(p_input), p_sys->vcddev,
-        VCD_ENTRIES_SECTOR, p_sector, 1, VCD_TYPE ) < 0 )
-    {
-        msg_Err( p_input, "could not read entry points sector" );
-        free( p_sector );
-        return( -1 );
-    }
-
-    memcpy( &entries, p_sector, CD_SECTOR_SIZE );
-    free( p_sector );
-
-    if( (i_nb = U16_AT( &entries.i_entries_nb )) > 500 )
-    {
-        msg_Err( p_input, "invalid entry points number" );
-        return( -1 );
-    }
-
-    p_sys->p_entries = malloc( sizeof( int ) * i_nb );
-    if( p_sys->p_entries == NULL )
-    {
-        msg_Err( p_input, "not enough memory for entry points treatment" );
-        return -1;
-    }
-
-    if( strncmp( entries.psz_id, "ENTRYVCD", sizeof( entries.psz_id ) )
-     && strncmp( entries.psz_id, "ENTRYSVD", sizeof( entries.psz_id ) ))
-    {
-        msg_Err( p_input, "unrecognized entry points format" );
-        free( p_sys->p_entries );
-        return -1;
-    }
-
-    p_sys->i_entries_nb = 0;
-
-#define i_track BCD_TO_BIN(entries.entry[i].i_track)
-    /* Reset the i_part_nb for each track */
-    for( i = 0 ; i < i_nb ; i++ )
-    {
-        if( i_track <= p_input->stream.i_area_nb )
-        {
-            p_input->stream.pp_areas[i_track-1]->i_part_nb = 0;
-        }
-    }
-
-    for( i = 0 ; i < i_nb ; i++ )
-    {
-        if( i_track <= p_input->stream.i_area_nb )
-        {
-            p_sys->p_entries[i_entry_index] =
-                (MSF_TO_LBA2( BCD_TO_BIN( entries.entry[i].msf.minute ),
-                              BCD_TO_BIN( entries.entry[i].msf.second ),
-                              BCD_TO_BIN( entries.entry[i].msf.frame  ) ));
-            p_input->stream.pp_areas[i_track-1]->i_part_nb ++;
-            /* if this entry belongs to a new track */
-            if( i_track != i_previous_track )
-            {
-                /* i_plugin_data is used to store the first entry of the area*/
-                p_input->stream.pp_areas[i_track-1]->i_plugin_data =
-                                                            i_entry_index;
-                i_previous_track = i_track;
-            }
-            msg_Dbg( p_input, "entry point %i begins at LBA: %i",
-                     i_entry_index, p_sys->p_entries[i_entry_index] );
-
-            i_entry_index ++;
-            p_sys->i_entries_nb ++;
-        }
-        else
-            msg_Warn( p_input, "wrong track number found in entry points" );
-    }
-#undef i_track
-    return 0;
-}
-#endif
