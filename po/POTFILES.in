@@ -7,7 +7,6 @@ include/beos_specific.h
 include/codecs.h
 include/configuration.h
 include/darwin_specific.h
-include/encoder.h
 include/httpd.h
 include/input_ext-dec.h
 include/input_ext-intf.h
