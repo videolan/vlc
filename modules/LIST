@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.4 2002/11/18 13:02:16 gbazin Exp $
+$Id: LIST,v 1.5 2002/11/21 21:37:46 gbazin Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -136,6 +136,10 @@ $Id: LIST,v 1.4 2002/11/18 13:02:16 gbazin Exp $
  * sdl: audio output and video output module using the SDL library.
 
  * spudec: DVD subtitles decoder.
+
+ * theora: a theora video decoder using the libtheora library.
+
+ * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library.
 
  * vcd: input module for accessing Video CDs.
 

@@ -1506,6 +1506,19 @@ then
 fi
 
 dnl
+dnl  Tremor plugin
+dnl
+AC_ARG_ENABLE(tremor,
+  [  --enable-tremor         Tremor decoder support (default disabled)])
+if test "x${enable_tremor}" = "xyes"
+then
+  AC_CHECK_HEADERS(tremor/ivorbiscodec.h, [
+    PLUGINS="${PLUGINS} tremor"
+    LDFLAGS_tremor="${LDFLAGS_tremor} -lvorbisidec -logg"
+   ],[])
+fi
+
+dnl
 dnl  tarkin decoder plugin
 dnl
 AC_ARG_ENABLE(tarkin,

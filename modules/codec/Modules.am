@@ -4,5 +4,6 @@ SOURCES_araw = modules/codec/araw.c
 SOURCES_vorbis = modules/codec/vorbis.c
 SOURCES_tarkin = modules/codec/tarkin.c
 SOURCES_theora = modules/codec/theora.c
+SOURCES_tremor = modules/codec/vorbis.c
 SOURCES_dv = modules/codec/dv.c
 SOURCES_xvid = modules/codec/xvid.c

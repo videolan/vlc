@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.6 2002/11/15 00:41:00 gbazin Exp $
+ * $Id: vorbis.c,v 1.7 2002/11/21 21:37:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -35,7 +35,11 @@
 #include <vlc/input.h>
 
 #include <ogg/ogg.h>
+#ifdef MODULE_NAME_IS_tremor
+#include <tremor/ivorbiscodec.h>
+#else
 #include <vorbis/codec.h>
+#endif
 
 /*****************************************************************************
  * dec_thread_t : vorbis decoder thread descriptor
@@ -95,7 +99,11 @@ static void CloseDecoder ( dec_thread_t * );
 static void DecodePacket ( dec_thread_t * );
 static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
 
+#ifdef MODULE_NAME_IS_tremor
+static void Interleave   ( int32_t *, const int32_t **, int, int );
+#else
 static void Interleave   ( float *, const float **, int, int );
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -184,7 +192,11 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     vorbis_synthesis_init( &p_dec->vd, &p_dec->vi );
     vorbis_block_init( &p_dec->vd, &p_dec->vb );
 
+#ifdef MODULE_NAME_IS_tremor
+    p_dec->output_format.i_format = VLC_FOURCC('f','i','3','2');
+#else
     p_dec->output_format.i_format = VLC_FOURCC('f','l','3','2');
+#endif
     p_dec->output_format.i_physical_channels =
         p_dec->output_format.i_original_channels =
             pi_channels_maps[p_dec->vi.channels];
@@ -241,7 +253,11 @@ static void DecodePacket( dec_thread_t *p_dec )
 {
     aout_buffer_t *p_aout_buffer;
     ogg_packet    oggpacket;
+#ifdef MODULE_NAME_IS_tremor
+    int32_t       **pp_pcm;
+#else
     float         **pp_pcm;
+#endif
     int           i_samples;
     mtime_t       i_pts;
 
@@ -278,8 +294,13 @@ static void DecodePacket( dec_thread_t *p_dec )
         }
 
         /* Interleave the samples */
-        Interleave( (float *)p_aout_buffer->p_buffer, (const float **)pp_pcm,
-                    p_dec->vi.channels, i_samples );
+#ifdef MODULE_NAME_IS_tremor
+        Interleave( (int32_t *)p_aout_buffer->p_buffer,
+                    (const int32_t **)pp_pcm, p_dec->vi.channels, i_samples );
+#else
+        Interleave( (float *)p_aout_buffer->p_buffer,
+                    (const float **)pp_pcm, p_dec->vi.channels, i_samples );
+#endif
 
         /* Tell libvorbis how many samples we actually consumed */
         vorbis_synthesis_read( &p_dec->vd, i_samples );
@@ -324,8 +345,12 @@ static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( float *p_out, const float **pp_in, int i_nb_channels,
-                        int i_samples )
+#ifdef MODULE_NAME_IS_tremor
+static void Interleave( int32_t *p_out, const int32_t **pp_in,
+#else
+static void Interleave( float *p_out, const float **pp_in,
+#endif
+                        int i_nb_channels, int i_samples )
 {
     int i, j;
 
