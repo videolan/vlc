@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.30 2001/07/17 09:48:07 massiot Exp $
+ * $Id: input_ps.c,v 1.31 2001/07/31 21:13:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -387,7 +387,22 @@ static void PSInit( input_thread_t * p_input )
  *****************************************************************************/
 static void PSEnd( input_thread_t * p_input )
 {
-    vlc_mutex_destroy( &((packet_cache_t *)p_input->p_plugin_data)->lock );
+#define p_packet_cache ((packet_cache_t *)p_input->p_method_data)
+
+    vlc_mutex_destroy( &p_packet_cache->lock );
+
+    if( p_packet_cache->data.p_stack )
+        free( p_packet_cache->data.p_stack );
+    if( p_packet_cache->pes.p_stack )
+        free( p_packet_cache->pes.p_stack );
+    if( p_packet_cache->smallbuffer.p_stack )
+        free( p_packet_cache->smallbuffer.p_stack );
+    if( p_packet_cache->largebuffer.p_stack )
+        free( p_packet_cache->largebuffer.p_stack );
+
+#undef p_packet_cache
+
+    free( p_input->p_method_data );
     free( p_input->p_plugin_data );
 }
 

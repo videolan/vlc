@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.55 2001/07/18 17:05:39 massiot Exp $
+ * $Id: video_decoder.c,v 1.56 2001/07/31 21:13:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -130,11 +130,16 @@ void vdec_InitThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
 
-#if !defined(SYS_BEOS) && !defined(WIN32)
+#if !defined(SYS_BEOS)
 #   if VDEC_NICE
     /* Re-nice ourself - otherwise we would steal CPU time from the video
      * output, which would make a poor display. */
+#if !defined(WIN32)
     if( nice(VDEC_NICE) == -1 )
+#else
+    if( !SetThreadPriority( GetCurrentThread(),
+                            THREAD_PRIORITY_BELOW_NORMAL ) )
+#endif
     {
         intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
                       strerror(errno) );
