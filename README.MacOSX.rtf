@@ -5,47 +5,66 @@
 \vieww14280\viewh13680\viewkind0
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
 
-\f0\fs48 \cf0 VideoLAN Client (VLC) version 0.5\
+\f0\fs48 \cf0 VLC media player, version 0.5\
 Mac OS X-specific information
 \fs24 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
 \cf0 \
 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
-\cf0 Welcome to the VideoLAN Client ! VLC is a multi-purpose multimedia tool : it can play DVDs and VCDs, or read a stream from the network. It also supports DivX/MPEG-4 files and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in Quicktime. VLC has originally been developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is a bit young, but slowly maturing. But there will probably remain bugs we have missed during our testing period. We are working hard to improve it, and if you think you can help us in any way, please drop us a line.\
+\cf0 Welcome to the VideoLAN Client! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file.\
+For a full list of features visit: \ul http://www.videolan.org/vlc/features.html\ulnone \
 \
-You may find the following frequently asked questions useful :\
+VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. The Mac OS X port is a bit young, but slowly maturing. There are probably still bugs remaining that we have missed during our testing period. We are working hard to improve VLC media player and if you think you can help us in any way, please drop us a line.\
+\
+The following frequently asked questions are answered below :\
+
+\f1\b \ul 1. How do I install ?\
+2. How do I use VLC media player ?\
+3. How do I read an SVCD ?\
+4. The video is choppy! It's like we're dropping frames.\
+5. How do I remove VLC media player ?\
+6. Where can I find an older version for Mac OS 9 ?\
+7. How do I change the size of the video window ?\
+8. I think I found a bug. What should I do ?\
+9. Support for files with subtitles.\
+10. What do all the options in the preferences do ?\
+11. How do I enable deinterlacing ? \
+12. How do i get fullscreen video on my other monitor ?\
+13. Multiple sound-devices and multi-channel sound?
+\f0\b0 \ulnone \
+\
 \
 
 \f1\b \ul 1. How do I install ?
 \f0\b0 \ulnone \
-When you download VLC, you will end up with a VLC-0.5.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
+When you download VLC media player, you will end up with a VLC-0.5.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
 \
 \
 
-\f1\b \ul 2. How do I use VLC?
+\f1\b \ul 2. How do I use VLC media player ?
 \f0\b0 \ulnone \
-To use VLC, you will need to open the application first and then from the "File" menu open the file or disk, you would like to view. Doubleclicking a file will result in QuickTime Player trying to open it. If you prefer you can change this by selecting your file and choosing "Get Info" from the "File" menu. In the "Open With" section you can select VLC and if you check the checkbox, then all files of the type you have selected will be opened in VLC if you double-click them.\
+To use VLC media player, you will need to open the application first and then from the "File" menu open the file or disk, you would like to view. Double-clicking a file will result in QuickTime Player trying to open it. If you prefer you can change this by selecting your file and choosing "Get Info" from the "File" menu. In the "Open With" section you can select VLC and if you check the checkbox, then all files of the type you have selected will be opened in VLC media player if you double-click them from that moment on.\
 
 \f1\b \ul \
 \
 3. How do I read an SVCD ?
 \f0\b0 \ulnone \
-VLC is currently unable to read SVCD directly from the drive. SVCDs contain plain MPEG-2 files which can be directly read. Just copy the .dat files in the SVCD onto your hard drive, and use the "Open File" menu item in VLC. Some SVCDs can be read if you tell VLC they're VCDs, in the "Open Disc" dialog.\
+VLC media player is currently unable to read SVCD directly from the drive. SVCDs contain plain MPEG-2 files which can be directly read. Just copy the .dat files in the SVCD onto your hard drive, and use the "Open File" menu item in VLC. Some SVCDs can be read if you tell VLC they're VCDs, in the "Open Disc" dialog.\
 \
 \
 
-\f1\b \ul 4. The video is choppy ! It's like we're dropping frames\
+\f1\b \ul 4. The video is choppy! It's like we're dropping frames.\
 
-\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all frames. Though there is some room for improvement, do never expect VLC to be able to decode MPEG-2 streams on a low-end G3 machine. Apple DVD player uses specific hardware accelerations from the video board of those systems, and we currently lack documentation to do the same. If you think you have information which might help us, please contact us, otherwise please don't complain about this.\
+\f0\b0 \ulnone That's the normal behavior when the CPU isn't fast enough to decode all frames. Though there is some room for improvement, don't ever expect VLC to be able to decode MPEG-2 streams on a low-end G3 machine. Apple DVD player uses specific hardware accelerations from the video board of those systems, and we currently lack documentation to do the same. If you think you have information which might help us, please contact us, otherwise please don't complain about this.\
 \
-If VLC is slow on your G4 system, try and quit or hide all running applications. See with 
+If VLC media player is slow on your G4 system, try to quit or hide all running applications. See with 
 \f2 top -u
-\f0  in a terminal window which applications take the CPU. Minimizing the VLC controller window might help, too. Be aware of bouncing icons in the dock. Bounces seriously effect the performance of VLC. The same goes for any time interval process (Checking mail every 2 minutes).\
+\f0  in a terminal window which applications take the CPU. Be aware of bouncing icons in the dock. Bounces seriously effect the performance of VLC. The same goes for any time interval process (Checking mail every 2 minutes).\
 \
 \
 
-\f1\b \ul 5. How do I remove VLC ?
+\f1\b \ul 5. How do I remove VLC media player ?
 \f0\b0 \ulnone \
 Simply drag VLC from the place where you have installed it, to the Trash.\
 \
@@ -53,61 +72,62 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 
 \f1\b \ul 6. Where can I find an older version for Mac OS 9 ?\
 
-\f0\b0 \ulnone There is no version for Mac OS 9. VLC is originally a UNIX application and has never been ported to Mac OS 9. Considering the amount of differences between Mac OS 9 and modern systems, it would require a tremendous work to port VLC. We do not plan to do it. So please don't ask.\
+\f0\b0 \ulnone There is no version for Mac OS 9. VLC is originally a UNIX application and has never been ported to Mac OS 9. Considering the amount of differences between Mac OS 9 and modern systems, it would require a tremendous work to port VLC. We do not plan to do it, because we prefer to focus on creating a very good Mac OX X application. So please don't ask.\
 \
 \
 
-\f1\b \ul 7. How do I change the size of the video window?\
+\f1\b \ul 7. How do I change the size of the video window ?\
 
-\f0\b0 \ulnone Grab the bottom-right corner of the video window and drag the window to its desired size.\
+\f0\b0 \ulnone Grab the bottom-right corner of the video window and drag the window to its desired size. You can also set half, normal and double sizes from the Video menu.\
 \
 \
 
-\f1\b \ul 8. I think I found a bug. What should I do?\
+\f1\b \ul 8. I think I found a bug. What should I do ?\
 
 \f0\b0 \ulnone Report the exact conditions under which the bug/crash occurred back to the VLC team. For more information on bugreporting please read http://www.videolan.org/support/bug-reporting.html\
 \
 \
 
-\f1\b \ul 9. Support for files with subtitles \
+\f1\b \ul 9. Support for files with subtitles.\
 
 \f0\b0 \ulnone Support for subtitles in separate files is still very much in a testing phase. DVD subtitles can be used trough the Controls->Subtitles menu-item.\
 - Subfiles need to be opened at the same moment as the video to which you want to add subtitles. You can do this in the File->Open menu.\
-- As of yet it is not yet possible to adapt the font, size of the text and/or position.\
+- As of yet it is not yet possible to adapt the font, size and/or position of the subtitles.\
 - You need to specify the subtitle when you open the file.\
 - A subtitle is global instead of bound to a playlist-item.  This will be fixed in a future version.\
 - Only MicroDVD, SubRIP and SSA1-4 subtitle files are supported at the moment.\
-- Subs can only be added to .avi movie files at the moment\
+- Subs can only be added to .avi movie files at the moment.\
+- Don't bug is asking for the features mentioned above.\
 \
 \
 
-\f1\b \ul 10. Sound issues \
-
-\f0\b0 \ulnone We are aware of several problems regarding low quality sound and problems with 3rd party sound cards like the Sonica for instance. We are trying to fix them, but if you have a brilliant idea about what is causing this or if you know a thing or two about CoreAudio, then you are welcome to help out. Just mail us.\
+\f1\b \ul 10. What do all the options in the preferences do ?
+\f0\b0 \ulnone \
+Hold your mouse still on top of an option for just over a second and a ToolTip will come up explaining what the option does. Be very careful with the Advanced options. Changing the an option in the wrong value  (usually selecting a module by hand instead of letting it be selected automatically) can cause VLC to no longer start. In this case you will need to remove the preference file located in your HOME -> Library -> Preferences -> VLC.\
 \
 \
 
-\f1\b \ul 11. How do I enable deinterlacing? \
+\f1\b \ul 11. How do I enable deinterlacing ? \
 
 \f0\b0 \ulnone You must select the "Deinterlace" menu-item before opening any file. If the item is selected while reading a file, nothing will happen. This is a known issue, please do not report it.\
 \
 \
 
-\f1\b \ul 12. Multiple screens. \
-
-\f0\b0 \ulnone If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: macosx->Configure->Video.\
+\f1\b \ul 12. How do i get fullscreen video on my other monitor ? 
+\f0\b0 \ulnone \
+If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: Mac OXx->Configure->Video (Choose "Show Advanced options first").\
 \
 \
 
-\f1\b \ul 13. Multiple sound-devices and 5:1 sound? \
+\f1\b \ul 13. Multiple sound-devices and multi-channel sound? \
 
-\f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: macosx->Configure->Audio.\
-- AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug and has been reported to M-Audio.\
-- Many problems might still exist. Multiple channel audio support is pretty new on Mac OS X and there are many bugs in the system software, the device drivers and probably in VLC as well.\
+\f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: Mac OXx->Configure->Audio (Choose "Show Advanced options first").\
+- AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug which has been reported to M-Audio.\
+- Many problems might still exist. Multiple channel audio support is pretty new on Mac OS X and there are many bugs in the system software, the device drivers and probably in VLC media player as well.\
 \
 \
-Thanks for reading this file. For additional information, subscribe to the vlc mailing list on \ul http://www.videolan.org/support/lists.html\ulnone .\
+Thanks for reading this file. For additional information, subscribe to the VLC mailing list on \ul http://www.videolan.org/support/lists.html\ulnone .\
 -- \
 Christophe Massiot <massiot@via.ecp.fr> and\
 Derk-Jan Hartman <thedj@users.sourceforge.net> for the VideoLAN team.\
-$Id: README.MacOSX.rtf,v 1.13 2003/03/03 19:39:48 hartman Exp $}
+$Id: README.MacOSX.rtf,v 1.14 2003/03/06 22:17:11 hartman Exp $}
