@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.102 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: vlc_common.h,v 1.103 2004/01/20 17:44:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -502,18 +502,18 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties. */
-static inline uint16_t U16_AT( void * _p )
+static inline uint16_t U16_AT( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint16_t)p[0] << 8) | p[1] );
 }
-static inline uint32_t U32_AT( void * _p )
+static inline uint32_t U32_AT( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
               | ((uint32_t)p[2] << 8) | p[3] );
 }
-static inline uint64_t U64_AT( void * _p )
+static inline uint64_t U64_AT( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)
@@ -522,18 +522,18 @@ static inline uint64_t U64_AT( void * _p )
               | ((uint64_t)p[6] << 8) | p[7] );
 }
 
-static inline uint16_t GetWLE( void * _p )
+static inline uint16_t GetWLE( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint16_t)p[1] << 8) | p[0] );
 }
-static inline uint32_t GetDWLE( void * _p )
+static inline uint32_t GetDWLE( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
               | ((uint32_t)p[1] << 8) | p[0] );
 }
-static inline uint64_t GetQWLE( void * _p )
+static inline uint64_t GetQWLE( void const * _p )
 {
     uint8_t * p = (uint8_t *)_p;
     return ( ((uint64_t)p[7] << 56) | ((uint64_t)p[6] << 48)
