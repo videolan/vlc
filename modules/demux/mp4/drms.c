@@ -341,6 +341,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             {
                 static char const p_secret[] = "tr1-th3n.y00_by3";
                 memcpy( p_drms->p_key, p_secret, 16 );
+                REVERSE( p_drms->p_key, 4 );
             }
             else
             {
