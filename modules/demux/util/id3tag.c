@@ -63,23 +63,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
-    input_thread_t *p_input;
-    vlc_value_t val;
     int i = 0;
-
-    p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input) return;
-
-    var_Get( p_input, "demuxed-id3", &val );
-    if( val.b_bool )
-    {
-        msg_Dbg( p_demux, "the ID3 tag was already parsed" );
-        vlc_object_release( p_input );
-        return;
-    }
-
-    val.b_bool = VLC_TRUE;
-    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 
     p_id3_tag = id3_tag_parse( p_data, i_size );
     if( !p_id3_tag ) return;
@@ -132,8 +116,6 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
         i++;
     }
     id3_tag_delete( p_id3_tag );
-
-    vlc_object_release( p_input );
 }
 
 /*****************************************************************************
