@@ -1,3 +1,3147 @@
+2003-06-22 Sunday 15:43  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: disabled mp4 muxer.
+ * include/interface.h: updated comment.
+
+2003-06-22 Sunday 15:30  hartman
+
+ * Removed mp4 muxer support (temporarily)
+
+2003-06-22 Sunday 15:07  asmax
+
+ * x11/x11_dragdrop.cpp: unbelievable, Xdnd works !!
+
+2003-06-22 Sunday 15:03  hartman
+
+ * NEWS: Checked the NEWS file. added some missing items. Fixed a couple of spelling errors etc.
+ * vlc.ebuild: Set the correct urls for ffmpeg and mpeg2dec snapshots
+
+2003-06-22 Sunday 14:36  fenrir
+
+  * mkv: better seeking support.
+
+2003-06-22 Sunday 14:06  gbazin
+
+ * configure.ac: compile fix for sunos
+
+2003-06-22 Sunday 13:31  gbazin
+
+ * configure.ac, modules/demux/Modules.am: matroska configure detection (disabled by default).
+ Due to the way matroska headers directly reference ebml headers, you'll have to configure like this:
+ CPPFLAGS=-I/usr/local/include/ebml ./configure --enable-mkv
+
+2003-06-22 Sunday 13:27  sigmunau
+
+ turned a debug message into a comment
+
+2003-06-22 Sunday 13:06  asmax
+
+ * x11/x11_window.cpp: raise a window when clicking on it
+
+2003-06-22 Sunday 12:54  asmax
+
+ * at least it compiles now ;)
+
+2003-06-22 Sunday 12:46  asmax
+
+ * reverted my previous commit: cannot work as expected
+ * src/theme.cpp: fixed a delete[] / free mismatch
+
+2003-06-22 Sunday 12:27  fenrir
+
+  * mkv: basic seek support (only with file with cues, it doesn't search key
+  frame, ...)
+         clean up.
+
+2003-06-22 Sunday 08:49  fenrir
+
+  * faad: can read stream with multiple frames per pes_packet_t (for mkv).
+
+2003-06-22 Sunday 07:39  fenrir
+
+  * mkv.cpp : begin of a matroska demuxer
+   TODO:
+     * seek support
+     * vorbis support (it's a decoder problem, as matroska embded raw
+       vorbis data)
+     * utf8 subtitles handling (probably at the decoder stage too)
+     * clean up.
+     * support of stream other than files.
+     * ...
+
+2003-06-22 Sunday 01:08  sam
+
+   * Makefile.dep: the file that would never die.
+
+2003-06-22 Sunday 00:40  titer
+
+  beos/* : - cleaned the way to mute/unmute
+           - save the volume when exiting
+
+2003-06-22 Sunday 00:00  asmax
+
+ * src/theme.cpp, src/event.* : no more VLC_SHOW event
+ * src/window.* : replaced p_intf->p_sys->WindowList by a singleton
+   class SkinWindowList (to be tested under windows)
+ * removed useless gtk2 files
+
+2003-06-21 Saturday 22:30  hartman
+
+ * added a new set of widgets for CONFIG_ITEM_FILE and DIRECTORY
+ * only set prefs on safe, not earlier.
+
+2003-06-21 Saturday 21:59  sam
+
+   * src/libvlc.c: got rid of type-punning warnings.
+
+2003-06-21 Saturday 20:45  sam
+
+   * THANKS: spelling fixes.
+   * configure.ac:
+     + Added curly braces around variables.
+     + Got rid of the "x$foo" constructs.
+     + Renamed *_plugin conditionals into *_p.
+   * debian/changelog:
+     + Fixed a duplicate entry.
+     + Added an entry for an old Debian upload that fixed #117180.
+   * debian/control:
+     + Added a build dependency on libimlib2-dev for skins.
+   * debian/rules:
+     + Activated support for skins.
+
+2003-06-21 Saturday 17:26  sigmunau
+
+ removed a duplicate entry from the NEWS file
+
+2003-06-21 Saturday 17:05  sam
+
+   * .cvsignore:
+     + Removed configure.ac from the ignore list.
+
+2003-06-21 Saturday 17:04  sam
+
+   * configure.ac.in is no more, we can now use configure.ac like normal people,
+     bootstrap generates the proper magic for us.
+
+2003-06-21 Saturday 16:09  sam
+
+   * debian/rules:
+     + Use the -s flag instead of -a so that debhelper properly handles the
+       i386-only plugin packages.
+     + Split the build rule into configure and build.
+
+2003-06-21 Saturday 14:24  gbazin
+
+ * modules/access_output/file.c: make the output file writeable by the owner.
+
+2003-06-20 Friday 23:13  hartman
+
+ * added missing support for CONFIG_ITEM_DIRECTORY to gtk prefs.
+
+2003-06-20 Friday 21:34  ipkiss
+
+  * ./doc/skins/events-howto.txt: added some events
+  * ./modules/gui/skins/*: fixed my last commit
+
+2003-06-20 Friday 19:50  ipkiss
+
+  * ./modules/gui/skins/src/vlcproc.cpp: added the "title" option to the
+    "display" attribute of ControlText. It allows to show the title of
+    the current stream, without the full path.
+  * ./doc/skins/*: updated the doc
+
+2003-06-20 Friday 15:34  hartman
+
+ * Made the search path configuration options, directory instead of string options.
+
+2003-06-20 Friday 11:42  alexis
+
+ modules/misc/sap.c: fix for the default scope of the IPv6 announces.
+ python/setup.py: a configuration that should work better.
+
+2003-06-20 Friday 01:27  hartman
+
+ * vlc.ebuild: added support for faad2 and skins. See the wiki page for info.
+ * README.MacOSX.rtf: More updates because of new prefs dialog.
+
+2003-06-19 Thursday 21:09  gbazin
+
+ * modules/codec/ffmpeg/video.c: disabled direct rendering when hurry-up is
+ enabled. ffmpeg doesn't properly release old pictures when frames are skipped.
+
+2003-06-19 Thursday 18:45  gbazin
+
+ * modules/access_output/udp.c: removed unnecessary code.
+
+2003-06-19 Thursday 18:44  titer
+
+  beos/VideoOutput.cpp : fixed a visual bug in fullscreen that happens with
+   a few Dano/Zeta themes
+
+2003-06-19 Thursday 18:22  gbazin
+
+ * modules/access_output/udp.c: implemented a caching mechanism which solves all the bad quality streaming issues that have been reported. The caching value can be modified with the --udp-sout-caching config option (the default value being DEFAULT_PTS_DELAY ==  300 milisec).
+
+2003-06-19 Thursday 13:08  sam
+
+   * ./modules/misc/screensaver.c: the screensaver was disabled way too often
+     because I forgot to reinitialise an index.
+
+2003-06-19 Thursday 12:21  gbazin
+
+ * modules/gui/wxwindows/*: changed the preferences panel to use textctrls for float values as spinctrls don't support floats. The advanced checkbox is only displayed if needed. Fixed the play/pause buttons tooltip.
+
+2003-06-19 Thursday 02:14  sam
+
+   * debian/rules:
+     + Replaced $(DEB_BUILD_ARCH) with `dpkg-architecture -qDEB_BUILD_GNU_CPU`
+       so that the rules can be called directly.
+   * debian/control:
+     + Removed leading "a"s from package descriptions.
+     + Set policy to 3.5.10.
+   * debian/copyright:
+     + Removed debian/vlc.copyright.
+
+2003-06-18 Wednesday 12:18  zorglub
+
+ SAP can now listen for IPv6 announces
+
+ To enable this, start vlc with --sap-ipv6
+ To disable IPv4 listening, use --no-sap-ipv4
+
+ You can also set the scope of the announces (default is 3)
+
+2003-06-17 Tuesday 21:52  asmax
+
+ * moved the ttl help in the right section
+
+2003-06-17 Tuesday 21:07  gbazin
+
+ * modules/codec/ffmpeg/video.h: forgot to remove a reference to the old postprocessing code.
+
+2003-06-17 Tuesday 20:56  asmax
+
+ * fixed another compilation issue of python module
+
+2003-06-17 Tuesday 20:47  asmax
+
+ * fixed a very old bug preventing the whole thing from working :(
+
+2003-06-17 Tuesday 20:10  hartman
+
+ * Fixes to the german translation
+
+2003-06-17 Tuesday 20:03  hartman
+
+ * moved the capability definition up one line. the config options follow the capability now. Circumvents a bug with OSX prefs dialog.
+
+2003-06-17 Tuesday 18:13  asmax
+
+ * tooltips are now updated during scrolling
+
+2003-06-17 Tuesday 16:09  gbazin
+
+ * modules/*: got rid of empty module objects.
+ * modules/gui/wxwindows/preferences.cpp: fixed the config options display for submodules.
+
+2003-06-17 Tuesday 14:43  hartman
+
+ modules/codec/quicktime.c: Disabled all video codecs accept SVQ3
+ modules/gui/macosx/intf.m: Fixed an inconsistenty in the translation
+ cvS: ----------------------------------------------------------------------
+
+2003-06-17 Tuesday 14:38  hartman
+
+ * modules/gui/macosx/output.m: Fixed a bug in the transcoding dialog.
+ * extras/MacOSX/Resources/English.lproj/MainMenu.nib:
+   Fixed two cosmetic issues in the stream output dialog.
+ * po/de.po: Update german translation courtesy of: Felix Kuhne <FK at aenneburghardt.de>
+
+2003-06-16 Monday 21:55  gbazin
+
+ * modules/gui/wxwindows/preferences.cpp: fixed the preferences to also show the config options of sub-modules.
+ * include/modules_inner.h: removed unneeded initialization.
+
+2003-06-16 Monday 20:49  gbazin
+
+ * modules/codec/ffmpeg/video.c: fixed the last direct rendering bug.
+
+2003-06-16 Monday 20:23  gbazin
+
+ * configure.ac.in, modules/codec/ffmpeg/*: a few direct rendering fixes and got rid of the old post-processing code.
+
+2003-06-16 Monday 15:39  zorglub
+
+ * SAP can now handle SAP-announced IPv6 streams
+
+2003-06-15 Sunday 22:32  hartman
+
+ * NEWS: small corrections
+ * modules/codec/ffmpeg: I had disabled IV31 support on intel instead of on ppc
+ * modules/codec/quicktime.c: cosmetic fix
+
+2003-06-15 Sunday 15:20  hartman
+
+ * Fixed applescript Fullscreen command.
+
+2003-06-15 Sunday 15:16  sigmunau
+
+ id3tag.c: Do not try to seek on network streams even if they have b_seekable set to
+ true, since this seems to break playback of some streams over http. It also
+ takes to much time just to get some fancy metadata
+
+2003-06-15 Sunday 14:00  hartman
+
+ * ./po/it.po: Fresh Italien translation, courtesy of by Bruno <allevb at tin.it>
+ * ./po/nl.po: New Dutch Translation by /me ;)
+ * README.MacOSX.rtf: Updated instructions of Prefence usage.
+
+2003-06-15 Sunday 01:23  massiot
+
+ * Removed the ugly dependancy on glibc in the ipv6 module.
+ * po/fr.po: French translation courtesy of Jean-Pierre Kuypers.
+ * Miscellaneous clean-ups.
+
+2003-06-14 Saturday 22:14  hartman
+
+ * We should be compatible with older versions of faad again
+
+2003-06-14 Saturday 22:12  gbazin
+
+ * configure.ac.in: old faad2 detection.
+
+2003-06-14 Saturday 21:18  gbazin
+
+ * modules/gui/wxwindows/open.cpp: fixed a couple of bugs with the open dialog.
+
+2003-06-14 Saturday 21:06  hartman
+
+ * Dramatically improved the ebuild.
+   - To be done before 0.6.0 release: insert correct contrib links for ffmpeg and libmpeg2
+   - fix faad2? currently disabled
+
+2003-06-14 Saturday 18:49  gbazin
+
+ * modules/gui/skins/x11/x11_window.cpp: small bugfix for icons support.
+
+2003-06-14 Saturday 16:29  gbazin
+
+ * src/misc/configuration.c: in config_SaveConfigFile() don't save options that
+ kept their original value (thanks fenrir for the suggestion).
+
+2003-06-14 Saturday 15:43  gbazin
+
+ * modules/codec/ffmpeg/*: fix for ffmpeg direct rendering. Direct rendering is now
+ enabled by default.
+
+2003-06-14 Saturday 12:32  titer
+
+  beos/VideoOutput.cpp : make the BPopUpMenu stickable
+
+2003-06-14 Saturday 00:49  titer
+
+  include/vlc_threads.h: more BeOS' priorities tuning.
+
+2003-06-13 Friday 21:18  asmax
+
+ * X11 skin windows should have an icon now
+
+2003-06-13 Friday 15:54  gbazin
+
+ modules/gui/wxwindows/*: fix for the volume control under win32.
+
+2003-06-13 Friday 12:08  gbazin
+
+ * modules/misc/network/ipv6.c: fixed multicast support on win32. Well, it is working on Win2k but might require run-time OS version checking to have it woking on XP as well. (you might have to add a multicast route: ipv6 rtu FF00::/8 #intfnum)
+
+2003-06-13 Friday 03:21  sam
+
+   * ./src/misc/messages.c: ouch. when the message queue was full, we were
+     using our va_list twice, which caused crashes on architectures where
+     va_list is a pointer; we now use va_copy whenever possible.
+
+2003-06-13 Friday 00:15  titer
+
+  modules/gui/beos/Interface.cpp : fixed a possible crash
+
+2003-06-12 Thursday 23:03  gbazin
+
+ * modules/misc/network/ipv6.c: gave a quick try to implementing ttl for ipv6.
+
+2003-06-12 Thursday 22:27  massiot
+
+ * modules/codec/spudec/spudec.c: Take small font by default
+
+2003-06-12 Thursday 22:03  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: fixed compile issue.
+
+2003-06-12 Thursday 21:28  gbazin
+
+ * modules/gui/wxwindows/*: added a volume control.
+
+2003-06-12 Thursday 15:56  gbazin
+
+ * modules/access_output/file.c: win32 compilation fix.
+
+2003-06-12 Thursday 11:37  zorglub
+
+ Code cleanup
+
+2003-06-12 Thursday 08:14  gbazin
+
+ * share/Makefile.am: fixed my previous fix ;)
+
+2003-06-12 Thursday 06:56  gbazin
+
+ * Makefile.am: fixed inclusion of skins in make dist.
+
+2003-06-11 Wednesday 22:46  gbazin
+
+ * ALL: bumped version number to 0.6.0-test3 + po updates
+
+2003-06-11 Wednesday 21:46  asmax
+
+ * skin_main.cpp,x11_theme.cpp: better way to fix the "open skin bug" !
+ * share/Makefile.am: install skins at make install (closes bug #856)
+
+2003-06-11 Wednesday 21:41  gbazin
+
+ * modules/access_output/file.c: use open() instead of fopen(). This allows us to use _lseeki64() on win32.
+
+2003-06-11 Wednesday 20:36  gbazin
+
+ * modules/video_filter/osd_text.c: small compile fix that seems to be needed on
+ some platforms.
+
+2003-06-11 Wednesday 18:45  gbazin
+
+ * NEWS: updated.
+
+2003-06-11 Wednesday 18:20  gbazin
+
+ * modules/audio_output/directx.c: fixed mem leak in 5.1 audio.
+
+2003-06-11 Wednesday 15:53  gbazin
+
+ * modules/demux/ogg.c, modules/codec/theora.c: updated the ogg demuxer and theora decoder to the latest libtheora alpha 2 release.
+
+2003-06-11 Wednesday 10:42  gbazin
+
+ * modules/gui/skins/*: fix for msvc .dsp generation, replaced the BASIC_SKINS macro with the standard MODULE_NAME_IS_foo one and a couple of compilation fixes for msvc.
+ * msvc/vlc.dsw: added basic_skins and renamed mpeg_video into mpeg_video_old.
+ * modules/codec/mpeg_video/parser.c: fixed segfault when idct/motion modules can't be loaded.
+
+2003-06-10 Tuesday 23:01  massiot
+
+ * configure.ac.in: Renamed mpeg_video to mpeg_video_old, so that even
+   people who explicitely set mpeg_video in the previous version will end
+   up with libmpeg2 in 0.6.0.
+ * modules/codec/libmpeg2.c: Fixed a potential segfault, especially
+   with DVDs.
+ * modules/codec/lpcm.c: Send two PES packets in one aout buffer, because
+   some audio filters (read: coreaudio resampler) don't like too small
+   packets (I know, this is ugly).
+
+2003-06-10 Tuesday 22:42  gbazin
+
+ * modules/packetizer/mpegvideo.c, modules/mux/mpeg/*: fixed the dts/pts calculation in the mpegvideo packetizer. It should now handle streams where all the pictures don't have the same duration (eg. 3:2 pulldown). We don't calculate anymore the pts for every frame as it is impossible to do so for non low-delay streams.
+
+2003-06-10 Tuesday 11:43  gbazin
+
+ * configure.ac.in: added an --enable-mostly-builtin option to avoid having too many plugins.
+ * modules/gui/skins/src/*: reverted the last BASIC_SKINS patch (BASIC_SKINS was not broken, the changes were done on purpose).
+ * modules/gui/skins/src/dialogs.[cpp,h]: ran dos2unix on these 2 files.
+
+2003-06-10 Tuesday 11:12  massiot
+
+ Fixed a potential segfault.
+
+2003-06-09 Monday 22:02  asmax
+
+ * x11_api.c: implemented OSAPI_GetNonTransparentColor (needed for fonts !)
+
+2003-06-09 Monday 21:14  asmax
+
+ * X11 skins are now loaded from home directory or if it fails, from
+   the share directory
+
+2003-06-09 Monday 19:56  jpsaman
+
+ Run opie-vlc and zaurus-vlc as GuiServer. (Didn't I commit this before???).
+
+2003-06-09 Monday 19:51  jpsaman
+
+ Updated build packages for test2 release.
+
+2003-06-09 Monday 19:08  asmax
+
+ * fixed a segfault in FileInfo when p_info->psz_name == NULL
+   but there are still other segfaults sometimes in FileInfo !!
+
+2003-06-09 Monday 14:04  asmax
+
+ * now selection method in the playlist depends on the state of the
+   CTRL button (as expected in a normal playlist !)
+   TODO: - do the same under windows
+         - replace all button constants 1/2 by MOUSE_LEFT/MOUSE_RIGHT
+
+2003-06-09 Monday 12:33  asmax
+
+ * repaired basic_skins
+ * removed all the compilation warnings
+ * fixed LOTS of memory leaks in skins (gibalou, you should try valgrind
+   on wxwindows plugin ;)
+
+2003-06-09 Monday 09:29  massiot
+
+ * modules/access/file.c: Fixed a compile issue (thanks michael.mauch at gmx.de)
+
+2003-06-09 Monday 07:16  gbazin
+
+ * modules/mux/mpeg/pes.c: allow cases where we don't write a pts.
+ * modules/stream_out/display.c: handle cases where we don't have a pts/dts.
+
+2003-06-09 Monday 06:52  gbazin
+
+ * modules/gui/skins/src/vlcproc.cpp: the "play" action will trigger the open dialog if the playlist is empty.
+
+2003-06-09 Monday 00:33  massiot
+
+ * include/video.h include/video_output.h src/video_output/vout_pictures.c:
+   In vout_CreatePicture() replace i_repeat_first_field by the more useful
+   i_nb_fields
+ * modules/gui/macosx/intf.m: Fixed a warning
+ * modules/codec/libmpeg2.c include/vout_synchro.h src/video_output/vout_synchro.c:
+   Re-added support for slice-I streams, plus miscellaneous tweakings
+
+2003-06-09 Monday 00:32  asmax
+
+ * drag & drop works with gnome file manager now
+
+2003-06-09 Monday 00:07  asmax
+
+ * drag & drop for X11 skins. Still mysterious problems but it's better
+   than nothing
+
+2003-06-08 Sunday 18:40  gbazin
+
+ * modules/gui/skins/x11/x11_window.cpp: avoid flicker when mapping a window.
+ * share/skins/default/theme.xml: playlist is hidden by default.
+
+2003-06-08 Sunday 18:17  asmax
+
+ * very beginning of drag and drop support in X11 skins
+
+2003-06-08 Sunday 16:56  gbazin
+
+ * modules/gui/skins/*: display the popupmenu when you right click on the interface.
+
+2003-06-08 Sunday 16:04  titer
+
+  Minor fix
+
+2003-06-08 Sunday 15:22  asmax
+
+ * share/skins/default/theme.xml: fixed playlist size
+ * modules/gui/skins/controls/playlist.cpp: fixed a segfault when deleting
+   items
+ * modules/gui/skins/x11/x11_graphics.cpp: implemented DrawRect
+
+2003-06-08 Sunday 12:45  gbazin
+
+ * modules/gui/skins/x11/*: fixed transparency problem. XShapeCombineRegion() needs to be called before the window is mapped.
+
+2003-06-08 Sunday 11:33  asmax
+
+ * better implementation of timers for X11 skins
+
+2003-06-08 Sunday 00:32  asmax
+
+ * x11_font.cpp: fixed font placement
+ * x11_window.*: real tooltip windows ! not perfect yet but it looks cool !
+ * removed compilation of gtk2 skins module. If you want it back, good luck ;)
+
+2003-06-07 Saturday 19:19  gbazin
+
+ * share/Makefile.ami, doc/Makefile.am: forgot to include some files in the "make dist".
+
+2003-06-07 Saturday 19:05  gbazin
+
+ * doc/subtitles/*, share/font-eutopiabold21.rle: new (smaller) font + scripts
+ and instructions to generate new fonts.
+
+2003-06-07 Saturday 12:19  asmax
+
+ * beginning of tooltips (only in the console at the moment ;)
+
+2003-06-07 Saturday 10:18  gbazin
+
+ * modules/gui/skins/x11/x11_theme.cpp: removed unnecessary stuff.
+
+2003-06-07 Saturday 03:45  titer
+
+  modules/access/pvr/pvr.c : compile fix
+
+2003-06-07 Saturday 03:25  titer
+
+  missing cvsignore
+
+2003-06-07 Saturday 00:36  asmax
+
+ * implemented double click event for X11 skins. The delay is hard-coded
+   (400ms) , maybe it could be stored in the vlc config file
+
+2003-06-06 Friday 23:34  asmax
+
+ * got rid of this useless error message
+
+2003-06-06 Friday 21:47  asmax
+
+ * x11/x11_window.cpp: fixed clipping and text attributes
+
+2003-06-06 Friday 19:40  asmax
+
+ * key shortcuts for X11 skins are now working
+
+2003-06-06 Friday 14:50  gbazin
+
+ * modules/gui/skins/src/themeloader.cpp: small fix for tgz skins.
+
+2003-06-06 Friday 13:34  gbazin
+
+ * modules/packetizer/mpegvideo.c: Fixed a 3:2 pulldown bug (not tested).
+
+2003-06-06 Friday 11:09  gbazin
+
+ * modules/misc/network/ipv6.c: oups, ipv6 multicast wasn't enabled on win32. Also fixed the interface name parsing in the MRL.
+
+2003-06-06 Friday 02:48  hartman
+
+ * Typo's by me. ( Cool i included a dutch sentence a while ago and noone noticed ?)
+
+2003-06-06 Friday 02:23  hartman
+
+ * All: some spelling corrections and description string clarifications.
+   There is a lot of improvement left here.
+
+2003-06-06 Friday 00:38  hartman
+
+ * modules/gui/macosx/prefs.?:
+   - Changed modules list to use Default instead of None. probably clearer to
+     users.
+   - Have a warning before resetting the prefs.
+
+2003-06-05 Thursday 22:16  asmax
+
+ * x11/x11_timer.* : classes to implement platform-independant timers
+ * controls/text.cpp : text scrolling works ! (at least in the main window)
+
+2003-06-05 Thursday 21:22  gbazin
+
+ * modules/gui/skins/*, modules/gui/wxwindows/*: added the wxWin popup menu to the skins interface.
+
+2003-06-05 Thursday 11:52  gbazin
+
+ * include/vlc_common.h: fixed the I64C() macro for mingw.
+ * src/misc/mtime.c: implemented the heuristic described in http://www.cs.man.ac.uk/fellowsd-bin/TIP/7.html to test whether the win32 performance counter is reliable. That should fix the clock problems that a few users reported on win32.
+
+2003-06-04 Wednesday 23:17  massiot
+
+ VLC 0.6 codename is Trevelyan.
+
+2003-06-04 Wednesday 21:41  titer
+
+  Added a special access module for PVR MPEG-2 encoding boards.
+  It allows to change the frequency and such things quite easily, from VLC.
+  You'll have to --enable-pvr to build it.
+
+2003-06-04 Wednesday 18:47  asmax
+
+ * added <unistd.h> or it doesn't compile !
+
+2003-06-04 Wednesday 17:44  gbazin
+
+ * modules/gui/skins/x11/x11_api.cpp: implemented OSAPI_GetTime() and OSAPI_RmDir().
+
+2003-06-04 Wednesday 16:44  gbazin
+
+ * modules/gui/skins/src/vlcproc.cpp: compilation fix.
+
+2003-06-04 Wednesday 16:03  gbazin
+
+ * modules/gui/skins/*: misc fixes and clean-up. There are still thread issues when passing messages between the skins thread and the wxWindows dialogs thread that will need to be fixed.
+ * modules/gui/wxwindows/timer.cpp: fixed comment.
+
+2003-06-03 Tuesday 23:17  massiot
+
+ * OS X users can now browse the DVD menus with the arrow keys.
+
+2003-06-03 Tuesday 22:21  hartman
+
+ * When choosing a autogenerated menuitem, we now create a new thread to
+   do the actual execution of this command. this is a (very ugly) workaround
+   to the problem we were having with the deinterlace menu on osx.
+
+   It works now, but now i'm running into the black screen and continous
+   "late picture skipped (-218000)" again which is also plagueing us when you
+   enter fullscreen with a filter enabled. This ought to be fixed before 0.6.0
+   as well.
+
+2003-06-03 Tuesday 22:20  gbazin
+
+ * modules/gui/skins/src/*: oops, forgot to add a bunch of files.
+
+2003-06-03 Tuesday 22:18  gbazin
+
+ * configure.ac.in: bail out with an error message if the x11 skins are enabled and we couldn't find imlib2.
+ * modules/gui/wxwindows/*: fixed bug in sout dialog box.
+ * modules/gui/skins/*: factorised the wxwindows dialogs code in dialogs.cpp. wxWindows is also initialised earlier on to allow opening a skins file with a wxWin dialog box. (Note: I badly broke the GTK2 skins).
+
+2003-06-03 Tuesday 12:06  titer
+
+  modules/gui/beos/* : fixed the screenshot format selection I broke lately
+
+2003-06-02 Monday 16:01  sigmunau
+
+ http.c: if the webserver doesn't return 206 the stream is not seekable.
+
+2003-06-02 Monday 12:42  hartman
+
+ * modules/codec/libmpeg2.c: fixed a crasher with invalid pictures
+ * modules/gui/macosx/playlist.m: better fix for playlists on 10.1
+
+2003-06-01 Sunday 23:48  hartman
+
+ * ALL:
+   - Changed the autogenerated menu's in a system working similar to wxWindows.
+   - The deinterlace menu is autogenerated now. However it seems the problem
+     with on the fly filter changes still exists.
+
+2003-06-01 Sunday 22:11  asmax
+
+ * modules/gui/skins/x11/x11_api.cpp: fixed OSAPI_GetScreenSize
+ * all: added locks around X calls to make them thread safe (will be
+   useful in the next commit ;-)
+
+2003-06-01 Sunday 17:13  asmax
+
+ * mouse wheel scroll for X11 skins
+
+2003-06-01 Sunday 16:39  asmax
+
+ * configure.ac.in : fixed linking of skins modules
+ * modules/gui/skins/*:
+   - fixed the wxwindows bug, due to a huge bug with broadcast events
+   - beginning of fonts in X11 skins
+ so, you can test the X11 skins module: it should work now !
+
+2003-06-01 Sunday 00:26  fenrir
+
+  * ts: fix current_next value.
+
+2003-05-31 Saturday 23:41  sam
+
+   * ./debian/vlc.mime: the vlc packages registers with the Debian MIME system.
+
+2003-05-31 Saturday 23:23  ipkiss
+
+  * skins/controls/button.cpp: Fixed a nasty bug.
+  * skins/controls/generic.h: Some public fields are now protected
+  * skins/src/window.cpp:
+     - Added a few debug messages
+     - Invisible controls don't receive events anymore
+
+ Note: There are still a few bugs in the code handling the controls and
+ their different states, and I think they will be difficult to fix with
+ the current code structure. A rewrite of this part of code could be a
+ good idea (perhaps using states and transitions between states, like
+ Zinf does?).
+
+2003-05-31 Saturday 21:49  fenrir
+
+  * ts: proper fix for both.
+
+2003-05-31 Saturday 16:15  fenrir
+
+  * ts: reverse my last commit (the proper way should be to modify also the
+  muxer but this will break compatibility).
+
+2003-05-31 Saturday 12:24  titer
+
+  * src/input/input_ext-intf.c :  added an input_SetRate function; it is
+    quite more convenient than, e.g, calling input_SetStatus( STATUS_FASTER )
+    two times if you want to switch from 1:1 to 4:1 from the interface.
+    Old functions still work.
+  * modules/gui/beos/VlcWrapper.cpp : use it
+
+2003-05-31 Saturday 01:23  fenrir
+
+  * mjpeg grabbing added, thanks to Paul Forgey <paulf at aphrodite dot com>
+  that had done all the work.
+
+ Paul Forgey's notes:
+ --------------------
+
+ Unfortunatley, the v4l interface shows how much it sucks here.  I can't
+ wait for v4l2 to become more common.  Anyway, the mjpeg mechanism
+ captures completely differently than the uncompressed frame capture
+ mechanism.  This means the code has to split off a bunch to do similar
+ things depending on mjpeg being set or not.  For some reason, I can't
+ use non v4l2 calls to capture uncompressed frames from the lml33,
+ however I do have another bttv card on my system to test that I didn't
+ break the non-mjpeg stuff.
+
+ The Zoran encoders don't use square pixels.  So the 4:3 (or 16:9)
+ picture is going to show up as 720x480.  I don't know my way around the
+ code well enough to know how to specify a non-square pixel aspect
+ ratio.  If there isn't a way to do it, it would be nice to be able to
+ specify as an option the aspect ratio of the sourc.  Either 4:3 or 16:9
+ in the case of anamorphic S-Video, which does occur.
+
+ I stole the videodev_mjpeg.h header from the lavrec project.  Despite
+ the linux kernels having support for the Zoran cards, there doesn't seem
+ to be a reliable way to pick up this header, which is probably why
+ lavrec did it this way.  Since it only defines ioctl definitions, I
+ don't think using it is a legal problem.
+
+ I also modified the audio handling a bit.  If the card supports audio,
+ great, we'll set the card's parameters as we did before.  But if adev=
+ is specified, use it regardless.  The reason to do this is to capture
+ audio from the sound card with video coming from, say, a web cam or in
+ my case, an encoder card which doesn't have any audio capabilities at
+ all.
+
+2003-05-31 Saturday 00:10  fenrir
+
+  * mux/ts.c : allowed sending mjpeg (who said that's ugly ?)
+  * demux/ts.c : fixed an endian problem with such private stream.
+
+2003-05-30 Friday 18:43  titer
+
+  modules/gui/beos/* : fixed "Goto Menu" menuitem enabling
+
+2003-05-30 Friday 17:30  titer
+
+  modules/gui/beos/* : misc fixes & enhancements
+
+2003-05-29 Thursday 21:40  asmax
+
+ * X11 skins now use imlib2 -> you need to bootstrap
+   wxwindows dialogs are not supposed to work yet, if they do you are
+   lucky ;)
+
+2003-05-29 Thursday 16:48  asmax
+
+ * x11/x11_theme.cpp: better timing for SkinManage
+ * src/vlcproc.cpp: hack to make OpenDialog work, but it MUST be
+   changed !
+
+2003-05-28 Wednesday 23:56  asmax
+
+ * AT LAST events work in X11 skins !
+
+2003-05-28 Wednesday 03:53  hartman
+
+ * src/libvlc.h:
+   - added "en" to the list of languages in the preferences.
+   - added DIV1, DIV2, i263, WMV1 to video encoding options in prefs.
+     FENRIR: is this correct this way?
+
+2003-05-28 Wednesday 00:52  titer
+
+  modules/video_output/x11/xcommon.c : compile fix for gcc != 3
+
+2003-05-27 Tuesday 22:57  gbazin
+
+ * install-win32: fixed the nsi script to not include the FAQ.
+
+2003-05-27 Tuesday 22:42  hartman
+
+ * Turn mem leaks into warning's instead of errors. Users seem to think that
+   mem leaks will kernel panic there machine or something ;)A
+   This will generate less bugreports, yet keep them visible to those who
+   should and will care.
+
+2003-05-27 Tuesday 22:08  gbazin
+
+ * modules/gui/win32/Modules.am: strings.cpp has been removed.
+
+2003-05-27 Tuesday 21:48  gbazin
+
+ * ALL: bumped version to 0.6.0-test2
+ * Makefile.am: got rid of the faq in the package-win32 target.
+
+2003-05-27 Tuesday 20:43  gbazin
+
+ * modules/access/vcd/cdrom.c: On winNT/2K/XP we set the track format to YellowMode2 when issuing raw read requests. Otherwise we can't read the SVCD DATA track which is in Mode2 Form1.
+
+2003-05-27 Tuesday 13:22  titer
+
+  * src/stream_output/announce.c : BeOS compile fix.
+    setsockopt( IP_MULTICAST_TTL ) is done in network/ipvx.c (if supported),
+    so there is no need to do it here again.
+  * modules/gui/beos/* : minor fixes
+
+2003-05-27 Tuesday 11:35  gbazin
+
+ * modules/gui/wxwindows/*: fixed context menu problem on win32.
+
+2003-05-27 Tuesday 01:48  hartman
+
+ * removed vlc_wraptext
+
+2003-05-26 Monday 19:26  gbazin
+
+ * modules/video_output/directx/events.c: fixed breakage.
+
+2003-05-26 Monday 19:06  gbazin
+
+ * modules/audio_output/alsa.c: the aout-device obj var wasn't destroyed properly on probe() failure, preventing other audio plugins from working afterwards.
+ * modules/gui/skins/src/skin_main.cpp: got rid of the skins shortcut.
+ * modules/gui/wxwindows/*: the popupmenu is not created inside the timer anymore so the slider will still be active when the popup is triggered.
+ * modules/video_output/directx/events.c, modules/video_output/x11/xcommon.c, src/playlist/playlist.c: new intf-popupmenu obj var to handle popup context menu requests from the vouts.
+
+2003-05-26 Monday 16:06  gbazin
+
+ * modules/gui/wxwindows/*: replaced the Advanced button with a checkbox. Small strings changes.
+
+2003-05-26 Monday 14:59  hartman
+
+ * modules/codec/quicktime.c: i had accidently upgraded this plugin to 100
+ * modules/demux/avi/avi.c: fixed a spelling error reported by emulynx
+ * modules/gui/macosx/intf.?: added a wrapString:toWidth function
+ * modules/gui/macosx/prefs.?: removed the use of vlc_wraptext, because it
+   was ugly. now we use our own, osx method. This fixes tooltips in japanese
+   I'm not sure, but i think src/extras/libc.c vlc_wraptext is now unused.
+
+2003-05-26 Monday 13:45  zorglub
+
+ * The VLC-integrated SAP server now sends compliant packets. They can
+   only be viewed with the CVS version of VLC
+
+2003-05-26 Monday 02:09  gbazin
+
+ * modules/gui/skins: got rid of init_lock and init_cond which aren't needed if you use vlc_thread_ready().
+    started to implement X11Region and integrated the wxWindows dialogs.
+ * configure.ac.in: the X11 skins are the default ones when you use --enable-skins. To select the GTK2 version, you also need to use --with-gtk2-skins.
+
+2003-05-26 Monday 02:03  hartman
+
+ * modules/gui/macosx/prefs.m: fixed the module selectors.
+ * modules/video_filter/crop.c: clarified the use of crop. someone please
+   check, i'm not entirely sure this is correct. Actually i think we should
+   split this up in more then one config item, for GUI preferences clarity.
+   Something like crop-width, crop-height, crop-h-offset, crop-v-offset, or
+   like ffmpeg has which uses left, right, top and bottom offsets.
+
+2003-05-26 Monday 01:25  hartman
+
+ * extras/MacOSX/Resources/English.lproj/MainMenu.nib
+ * modules/gui/macosx/output.m:
+   - changed the textfields for bitrate into comboboxes with suggested values
+     identical to the ones in wxwindows intf.
+   - changed "bitrate (bps)" into "bitrate (kb/s)
+ * modules/gui/macosx/prefs.?:
+   - update the current view when advanced is changed.
+   - module_lists now use the description strings.
+   - always wraptext on tooltips. Currently japanese language is breaking.
+   - we now have sliders for int/float config options with ranges.
+   - fixed a warning message about an un-init'ed module_t.
+ * modules/video_filter/adjust.c:
+   - added the ranges to the description strings of the config options.
+   - blur-factor now uses a range as according to it's description string
+     it already should have used this.
+
+2003-05-25 Sunday 23:08  titer
+
+  modules/gui/beos/MediaControlView.cpp: fixed a strange crash that happens
+    since the gettext behaviour changed
+
+2003-05-25 Sunday 22:36  titer
+
+  * bootstrap: remove a -shared flag as ./configure already adds it for
+    platforms which need it
+  * configure.ac.in: don't use -shared on BeOS
+
+2003-05-25 Sunday 20:16  gbazin
+
+ * configure.ac.in, modules/video_output/x11/xcommon.c: fixed configure check for the Xinerama extension.
+
+2003-05-25 Sunday 19:24  gbazin
+
+ * modules/video_output/x11/*, configure.ac.in: Xinerama support remotely based from an old patch by Xavier Maillard.
+
+2003-05-25 Sunday 18:32  sigmunau
+
+ convert the strings in the id3tags to utf8 before storing them.
+
+2003-05-25 Sunday 18:02  nitrox
+
+ . SAP/SDP packets parsing: ability to parse RFC compliant packets
+   parse_sap returns the SAP header length
+   parse_sdp only parse the SDP payload
+   note that VLC will discard messages from the old miniSAP-server
+   (You have to use CVS version of miniSAP-server)
+   (Messages from the new miniSAP-server will be discarded with old VLC)
+
+2003-05-25 Sunday 17:27  massiot
+
+ * We now use UTF-8 internally under Mac OS X. This requires a libiconv-
+ enabled version of gettext. (patch courtesy of the DJ)
+
+2003-05-25 Sunday 17:21  titer
+
+  modules/gui/beos/PreferencesWindow.* :
+   * added a BBox around each panel (looks nicer)
+   * now use BSliders for {integer,float}_with_range
+
+2003-05-25 Sunday 11:31  gbazin
+
+ * src/video_output/video_output.c, modules/video_output/directx/*, modules/video_output/x11/xcommon.c: fullscreen state is now attached to the input, so it will be remembered even if the vout is restarted (switching filters, dvd menus, etc...).
+ * modules/video_filter/deinterlace/deinterlace.c: small change.
+
+2003-05-25 Sunday 10:14  gbazin
+
+ * modules/codec/ffmpeg/ffmpeg.c: fixed typo.
+
+2003-05-25 Sunday 00:16  gbazin
+
+ * modules/codec/ffmpeg/ffmpeg.c: clean-up for the ffmpeg config options.
+
+2003-05-24 Saturday 23:40  gbazin
+
+ * src/misc/variables.c, include/variables.h: first pass at object var inheritance.
+ * rc/video_output/video_output.c, modules/video_filter/deinterlace/deinterlace.c: fixes to the deinterlace object var.
+
+2003-05-24 Saturday 21:28  asmax
+
+ * events aren't perfect yet, but it is better enough to commit
+
+2003-05-24 Saturday 20:54  gbazin
+
+ * src/video_output/video_output.c: new "deinterlace" object variable.
+ * modules/gui/macosx/prefs.m: compilation fix.
+ * modules/gui/wxwindows/menus.cpp: use the "deinterlace" object var.
+ * modules/gui/skins/*: couple of fixes.
+
+2003-05-24 Saturday 17:52  gbazin
+
+ * modules/gui/skins/*: compilation fixes.
+ * modules/gui/wxwindows/*: fixed the open dialog to switch to the requested file/disc/net section.
+
+2003-05-24 Saturday 15:11  titer
+
+  * Makefile.am: minor change in BeOS packages generation
+  * doc/release-howto.txt: remove outdated info about how to build BeOS
+    packages
+
+2003-05-24 Saturday 13:14  gbazin
+
+ * configure.ac.in: ffmpeg is now enabled by default. Also got rid of the --intf-win option which was deprecated.
+
+2003-05-24 Saturday 13:05  massiot
+
+ * modules/codec/libmpeg2.c: Fixed synchro with field pictures.
+
+2003-05-24 Saturday 12:55  jpsaman
+
+ Added option to run vlc as a Qt Embedded Gui Server. Use --qte-guiserver to enable this feature. The default is to run as a normal GuiClient.
+
+2003-05-24 Saturday 12:53  sam
+
+   * ./po/*: re-ran toolbox --update-po.
+   * ./po/en_GB.po: the British translation is up to date.
+
+2003-05-24 Saturday 12:35  sam
+
+   * ./Makefile.am: used $(srcdir) where necessary (Closes: #319).
+
+2003-05-24 Saturday 12:34  sam
+
+   * ./toolbox: we no longer translate the Borland plugin.
+
+2003-05-24 Saturday 12:10  sam
+
+   * ./configure.ac.in: the help message now says libmad is enabled by
+     default (Closes: #704).
+
+2003-05-24 Saturday 11:53  sam
+
+    * ./modules/access_output/udp.c: if the clock needs to be reset, we do not
+      wait or we will face delay issues as reported in #794. Fix inspired from
+      a suggestion by John Michael Zorko.
+
+2003-05-24 Saturday 02:48  hartman
+
+ * modules/codec/quicktime.c: cleaning up of the code. mostly cosmetic.
+ * modules/demux/mp4/mp4.c: added SVQ1 for the quicktime decoder.
+ * modules/gui/macosx/macosx.m: typo
+ * modules/gui/macosx/prefs.m: fix of the module selectors.
+ * po/nl.po: i've taken a head start on the translations.
+ * src/libvlc.h: removed unused string RT_PRIORITY_TEXT
+
+2003-05-23 Friday 23:53  sigmunau
+
+ the http interface should now output valid xhtml 1.0.
+
+2003-05-23 Friday 13:02  hartman
+
+ * Updated the informal message to report the ip and port the http intf was
+   started on. This will help ppl to actually use the thing ;)
+
+2003-05-23 Friday 11:41  sam
+
+   * Built-in modules were linked twice in the mozilla plugin; removed the
+     non-PIC ones (Closes Debian bug #194384).
+
+2003-05-23 Friday 00:00  hartman
+
+ * vlc.ebuild: fixed the ebuild. Now i know it should work with a test2 ;)
+ * modules/gui/macosx/vout.m: removed some code that was preventing us from
+   using chroma converters.
+ * modules/codec/quicktime.c:
+   - added the video decoder. only works with SVQ3 atm, returns Invalid
+     BITMAPHEADER for some reason in all other cases.
+   - did some cleaning up. this might just work under Win32 now aswell,
+     gibalou will do some testing tomorrow ;)
+   - SVQ3 QT degrades faster then the ffmpeg version, but also recovers
+     faster. I'm not yet sure which one i prefer.
+
+2003-05-22 Thursday 22:24  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: fixed typo.
+
+2003-05-22 Thursday 21:42  gbazin
+
+ * src/libvlc.h: fixed spelling mistake.
+ * modules/gui/wxwindows/preferences.cpp: allow negative numbers in spinctrls.
+ * modules/demux/asf,avi,mp4: use p_input->stream.control.b_mute.
+
+2003-05-22 Thursday 20:56  hartman
+
+ * spelling error in description string
+
+2003-05-22 Thursday 20:45  hartman
+
+ * added an ifdef for SVQ3
+
+2003-05-22 Thursday 20:06  asmax
+
+ * at last the python module works again !
+  (so stupid: the flag -lavcodec had to be at the *end* of the line !)
+
+2003-05-22 Thursday 18:30  asmax
+
+ * started to repair build of python module
+
+2003-05-22 Thursday 16:01  gbazin
+
+ * src/audio_output/*, src/input/*: fixed the audio desync option. You can use positive as well as negative values.
+
+2003-05-22 Thursday 15:34  hartman
+
+ * modules/control/http.c: strings for the address and the port variable were switched.
+
+2003-05-22 Thursday 14:40  hartman
+
+ * fixed a localization issue
+
+2003-05-22 Thursday 14:25  hartman
+
+ * modules/gui/macosx/playlist.m: fixed my fix
+ * modules/gui/macosx/output.m: removed a debug statement
+ * modules/gui/macosx/prefs.m: fixed localizations of the prefs panel.
+
+2003-05-22 Thursday 13:40  hartman
+
+ * Fixed an issue that was preventing the use of the playlist in Mac OS 10.1
+
+2003-05-22 Thursday 12:00  gbazin
+
+ * INSTALL.win32: added a small note about running vlc under the msvc debugger.
+ * modules/gui/wxwindows/*: small fixes.
+ * modules/access/vcd/*, modules/access/cdda.c: re-activated autodetection of vcd and cdda on win32.
+ * src/misc/cpu.c, src/stream_output/announce.c: msvc fixes.
+
+2003-05-21 Wednesday 21:30  hartman
+
+ * modules/gui/macosx/output.m: fixed the stream/transcode dialog. test1
+   version was broken.
+ * extras/MacOSX/vlc.pbproj/project.pbxproj: darn, absolute paths.
+
+2003-05-21 Wednesday 19:55  hartman
+
+ * vlc.ebuild: This ebuild should work if we release a test2.
+ * modules/codec/quicktime.c: I added all the audio formats I know QT can handle.
+   except for mp3 ;)
+ * modules/codec/ffmpeg: added asv1 (disabled), and enabled IV31 on little endian,
+   since the problems with this decoder are endian specific according to it's creator.
+
+2003-05-21 Wednesday 18:09  jpsaman
+
+ Reverting previous --with-libmpeg2-prefix commit. Thanks Gildas for reminding me!
+
+2003-05-21 Wednesday 18:04  jpsaman
+
+ More buildscript fixes.
+
+2003-05-21 Wednesday 15:54  gbazin
+
+ *  modules/audio_output/directx.c, modules/audio_output/waveout.c: we destroy the audio-device variable if the probing has failed.
+
+2003-05-21 Wednesday 15:40  hartman
+
+ * include/main.h
+   src/libvlc.c: Added a quicktime_lock on SYS_DARWIN
+ * ALL: QT on OSX is not threadsafe in certain areas. i have found the proces
+   of identifying the right Codec to use for decoding to be one of these areas.
+   So when we do this, only one thread at a time can use QT.
+   Watching QT trailers is doable now, as soon as ffmpeg fix their altivec optimizations again ;)
+
+2003-05-21 Wednesday 13:27  gbazin
+
+ * modules/gui/skins/src/vlcproc.cpp: fixed yesterday's breakage.
+ * modules/gui/wxwindows/menus.cpp: fixes for menu auto-generation.
+ * src/video_output/video_output.c: added a "fullscreen" object variable.
+ * modules/video_output/directx/*: added an always-on-top object variable and modified to take into account the fullscreen object variable.
+
+2003-05-21 Wednesday 13:19  sigmunau
+
+ removed the desctiption texts of a nonexisting config option
+
+2003-05-21 Wednesday 13:10  sigmunau
+
+ removed the --playlist option as it doesn't seem to be used
+
+2003-05-21 Wednesday 10:02  fenrir
+
+ * wav: fix a parsing bug.
+
+2003-05-20 Tuesday 23:17  gbazin
+
+ * modules/gui/wxwindows/*, modules/gui/skins/src/vlcproc.cpp: The open dialog box now handles multiple files selection.
+
+2003-05-20 Tuesday 21:35  hartman
+
+ * ALL: added a quicktime module.
+   - This module provides QDM2 and QDMC sound support on OSX by linking to
+     the native QT libraries. We now have FULL QT trailer support on OSX.
+   - The video part of this decoder is not yet working on OSX.
+   - This can be used for a future win32dll loader system as well.
+
+2003-05-20 Tuesday 20:09  jpsaman
+
+ Modified build scripts
+
+2003-05-20 Tuesday 18:53  hartman
+
+ * NEWS: updated some OSX info
+ * ALL:
+   - added CDDA support
+   - added a "Online Documentation" item to the Help menu
+   - removed some debugging strings
+
+2003-05-20 Tuesday 16:20  zorglub
+
+ All: Support for SAP advertising in stream output
+
+ 	add sap, or sap="Name" in the stream output options
+
+2003-05-20 Tuesday 16:08  sigmunau
+
+ kde.cpp: explicitly tell kde with icons to use. Should fix a crash that
+ caused AIGALRM.
+ kde.cpp, interface.cpp: turn --kdeuirc into --kde-uirc to comply with naming
+ conventions
+
+2003-05-20 Tuesday 15:51  hartman
+
+ * THANKS: Added Davor Orel who created the OS X icons.
+ * modules/gui/macosx/macosx.m: changed a float into a float with range
+
+2003-05-20 Tuesday 15:23  hartman
+
+ * Added a Reset prefs option
+ * New prefs dialog much like the wxWindows and BeOS one.
+   - translated instances might be broken.
+   - still need sliders for min/max values
+   - improved sizing should be done.
+
+2003-05-20 Tuesday 11:44  titer
+
+  modules/gui/beos/PreferencesWindow.* : cleaning
+
+2003-05-19 Monday 23:36  gbazin
+
+ * modules/audio_output/alsa.c: fixed a breakage I introduced a couple of weeks ago.
+
+2003-05-19 Monday 21:39  asmax
+
+ * a lot of cleaning in X11 skins, but some problems remain with
+   event handling :(
+
+2003-05-19 Monday 21:04  gbazin
+
+ * modules/gui/wxwindows/Modules.am: included the 2 new bitmaps.
+ * po/*: updated the po files.
+
+2003-05-19 Monday 20:47  gbazin
+
+ * Bumped version to 0.6.0-test1
+ * modules/access/cdda.c: decreased the priority of the cdda plugin.
+
+2003-05-19 Monday 11:38  gbazin
+
+ * src/stream_output/stream_output.c, modules/stream_out/duplicate.c: bug fixes for when the stream output duplication fails for whatever reasons.
+
+2003-05-19 Monday 09:57  gbazin
+
+ * modules/gui/wxwindows/bitmaps/*: forgot to add 2 files in my last commit.
+
+2003-05-18 Sunday 23:16  fenrir
+
+  * input_program.c: input_DelES destroyed the decoder (if any) without
+  removing this ES from the list of selected ES. So, instead we call
+  input_UnselectES.
+
+2003-05-18 Sunday 22:30  titer
+
+  modules/gui/beos/MessagesWindow.cpp : fixed a minor scrolling issue
+
+2003-05-18 Sunday 20:54  jpsaman
+
+ Updated release numbering of packages.
+
+2003-05-18 Sunday 19:46  gbazin
+
+ * modules/gui/wxwindows/*: removed the text from the toolbar. Added play slower and play faster buttons.
+
+ PS: We really need nicer toolbar icons for the wxWindows interface. Anybody would like to design some ?
+
+2003-05-18 Sunday 18:56  hartman
+
+ * fixed a few spelling errors, and added a note about QDM2 sound which is still unsupported
+
+2003-05-18 Sunday 17:48  asmax
+
+ * added transparency in X11 skins
+
+2003-05-18 Sunday 16:27  gbazin
+
+ * modules/gui/wxwindows/*: the open dialog box is created only once and reused when needed. This allows to have the previous settings displayed when you re-open the dialog.
+
+2003-05-18 Sunday 15:44  gbazin
+
+ * modules/access/vcd/*, modules/access/cdda.c: changed ioctl_ReadSector() into ioctl_ReadSectors(), a function that can read multiple sectors at a time.
+   Modified the cdda plugin to read 20 sectors at a time. This was necessary because it was overkill to read the data sectors by sectors and was creating problems under Windows.
+
+2003-05-18 Sunday 12:18  gbazin
+
+ * modules/gui/wxwindows/open.cpp: small fixes.
+ * modules/access/vcd/cdrom.c: win32 fix for cue file parsing.
+ * modules/video_filter/osd_text.c: small win32 fix.
+
+2003-05-18 Sunday 11:25  asmax
+
+ * first BMP loader for X11 skins : it can only handle 24bbp uncompressed
+   images, but it works !
+
+2003-05-17 Saturday 23:57  gbazin
+
+ * INSTALL.win32: finally updated the instructions on how to build vlc for win32 :)
+ * install-win32, Makefile.am: updates for the win32 package.
+ * NEWS: added a few missing things.
+
+2003-05-17 Saturday 22:48  gbazin
+
+ * modules/gui/wxwindows/menus.cpp: don't display choices menu when there is only 1 choice available.
+ * modules/gui/wxwindows/streamout.cpp: small cosmetic changes.
+ * modules/gui/wxwindows/open.cpp: added a CD Audio entry.
+
+2003-05-17 Saturday 22:00  gbazin
+
+ * include/input_ext-intf.h: forgot this file in my last commit.
+ * src/input/input_programs.c: prev/next-chapter and prev/next-title navigation variables are created only when necessary.
+
+2003-05-17 Saturday 20:30  gbazin
+
+ * modules/access/cdda.c, modules/access/vcd/*: New CD digital audio module (by me and fenrir).
+   You can now listen to your favorite CDDAs with vlc, or even stream them :)
+   (Their is not yet any support for jitter correction).
+ * modules/codec/araw.c: small clean-up.
+
+2003-05-17 Saturday 18:30  titer
+
+  * modules/gui/beos/MessagesWindow.* : cleaning
+  * modules/gui/beos/PreferencesWindow.* : split the main modules into
+    its categories
+
+2003-05-17 Saturday 15:20  titer
+
+  modules/gui/beos/* : cosmetic
+
+2003-05-17 Saturday 14:36  gbazin
+
+ * modules/video_output/directx/events.c: implemented the same shortcuts as in the x11/xvideo output.
+
+2003-05-17 Saturday 11:35  gbazin
+
+ * configure.ac.in: removed the encoders from the list of plugins as they are not used currently.
+ * src/libvlc.h, modules/audio_filter/resampler/bandlimited.c: added an hq-resampling option to enable/disable the high quality resampling.
+
+2003-05-16 Friday 23:02  gbazin
+
+ * modules/packetizer/copy.c, modules/stream_out/transcode.c: added SVQ3 fourcc so we can transcode SVQ3. Small bug fix as well.
+
+2003-05-15 Thursday 23:05  gbazin
+
+ * src/input/input_programs.c: a few fixes to the navigation object variable.
+
+2003-05-15 Thursday 22:27  massiot
+
+ * now 0.6.0-cvs
+ * ALL: Capitalize all preferences text strings
+
+2003-05-15 Thursday 21:31  gbazin
+
+ * src/input/input_programs.c: implemented prev-title, next-title, prev-chapter and next-chapter object variables.
+ * modules/gui/wxwindows/menus.cpp: put the above variables into the Navigation menu.
+
+2003-05-15 Thursday 20:45  jpsaman
+
+ Added --with-libmpeg2-prefix= option to support cross-compiling for arm-target.
+
+2003-05-15 Thursday 20:28  jpsaman
+
+ Updating version to 0.5.4.
+ Enable building with libmpeg2.
+
+2003-05-15 Thursday 16:02  sam
+
+   * ./Makefile.am: fixed LDFLAGS when using --enable-gprof.
+
+2003-05-15 Thursday 15:59  gbazin
+
+ * modules/gui/wxwindows/*: small fixes and improvements.
+
+2003-05-15 Thursday 15:50  sam
+
+   * ./toolbox: toolbox --update.po now updates po/POTFILES.in as well.
+
+2003-05-15 Thursday 15:35  hartman
+
+ * Makefile.am: on make dist move vlc.ebuild
+ * vlc.ebuild: small spelling correction
+
+2003-05-15 Thursday 02:02  hartman
+
+ * Went trough my maillogs and filled out large parts of the NEWS file.
+   please check and add your own. (i was bored ;)
+ * Updated the README.MacOSX.rtf with some more pointers and changed version
+   to 0.6.0
+
+2003-05-15 Thursday 01:33  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: updated the stream output dialog to use the new stream output syntax and features.
+
+2003-05-15 Thursday 01:23  hartman
+
+ * variable callback for the playlist. the input, audio and video still need
+   to be done, waiting for gibalou to work his magic on that ;)
+ cvs: ----------------------------------------------------------------------
+
+2003-05-15 Thursday 00:46  hartman
+
+ * added vlc.ebuild, vlc.spec.redhat to dist.
+ * added all the new icons to the dist.
+ * on make dist i would like to do
+   mv vlc.ebuild vlc-${VERSION}.ebuild
+   I don't know how to do this. Who does?
+
+2003-05-15 Thursday 00:32  hartman
+
+ * ./vlc.ebuild: a ebuild for the Gentoo Linux distribution.
+   Because of the cvs snapshots of libmpeg2 and ffmpeg, this ebuild will
+   need to be updated before release, to point out the correct links to
+   these libraries.
+
+2003-05-14 Wednesday 21:29  fenrir
+
+  * aac: compilation fix.
+  * libvlc.h : set correct value for sout-a/vcodec
+
+2003-05-14 Wednesday 19:47  hartman
+
+ * Resized some elements to allow for better translations.
+
+2003-05-14 Wednesday 17:17  sam
+
+   * ./debian/control: Debian packages now build with an mpeg2dec CVS tree in
+     the extras/ directory.
+
+2003-05-14 Wednesday 14:58  fenrir
+
+  * aac: use extention based detection.
+
+2003-05-14 Wednesday 14:57  hartman
+
+ * Forgot one
+
+2003-05-14 Wednesday 14:56  hartman
+
+ ALL: Davor won the vote, New icons in place.
+
+2003-05-14 Wednesday 11:15  fenrir
+
+  * ts: do not use DVB reserved pid(s) (thanks Miguel Barreiro Paz)
+
+2003-05-14 Wednesday 09:00  gbazin
+
+ * modules/gui/skins/Modules.am: include module/gui/wxwindows/subtitles.cpp.
+
+2003-05-13 Tuesday 23:41  gbazin
+
+ * modules/gui/wxwindows/menus.cpp: forgot a vlc_object_release(). The popup menu is now created on the stack.
+
+2003-05-13 Tuesday 22:59  gbazin
+
+ * modules/gui/wxwindows/*: added a navigation menu in the interface menubar.
+ * modules/gui/wxwindows/subtitles.cpp: forgot this one in my last commit.
+
+2003-05-13 Tuesday 22:33  gbazin
+
+ * modules/gui/wxwindows/*: new subtitles file dialog box.
+ * modules/demux/util/sub.c: fixed a few description strings.
+ * Makefile.am: small cosmetic change to package-win32 target.
+
+2003-05-13 Tuesday 20:36  asmax
+
+ * beginning of event processing in X11 skins
+ * graphics should work, but....
+
+2003-05-13 Tuesday 19:25  asmax
+
+ * changed OSGraphics constructor (needed for X11)
+
+2003-05-13 Tuesday 14:11  titer
+
+  modules/gui/beos/PreferencesWindow.*:
+   - use BMenuFields for string_from_list config items
+   - cleaning
+
+2003-05-13 Tuesday 12:09  gbazin
+
+ * modules/control/rc/rc.c: win32 fixes for the handling of special control keys.
+
+2003-05-13 Tuesday 11:44  gbazin
+
+ * modules/gui/wxwindows/preferences.cpp: small fixes.
+
+2003-05-13 Tuesday 11:18  titer
+
+  modules/gui/beos/PreferencesWindow.*: use config_ResetAll()
+
+2003-05-12 Monday 21:55  gbazin
+
+ * modules/gui/wxwindows/preferences.cpp: the config panels are now generated on demand instead of generating everything at the beginning. ResetAll now also takes care of resetting the values shown in the config panels.
+ * modules/gui/wxwindows/open.cpp: small cosmetic changes.
+
+2003-05-12 Monday 19:59  titer
+
+  modules/gui/beos/VlcWrapper.h: compile fix
+
+2003-05-12 Monday 19:11  gbazin
+
+ * include/vlc_common.h: small change to shut-up some memory checkers.
+
+2003-05-12 Monday 17:33  gbazin
+
+ * modules/gui/skins/*: got rid of wxdialogs.h, the skins plugin is now sharing wxwindows.h with the wxwindows plugin.
+ * modules/video_output/directx/events.c: fixed non-initialized variable.
+ * modules/gui/wxwindows/*: misc improvements to the playlist window (added an "Open MRL" menu as well as menus to load and save a playlist, we also make use of the "intf-change" playlist object variable now).
+ * src/playlist/playlist.c: the playlist file is opened in text mode, no win32 eol hack is needed.
+ * src/misc/configuration.c, include/configuration.h: new config_ResetAll() function to reset all config options to their original values (you still need to config_SaveConfigFile()).
+ * modules/gui/wxwindows/preferences.cpp: new "Reset All" button in the preferences panel.
+
+2003-05-12 Monday 01:17  hartman
+
+ * First set config variable, then add the files (and therefore potentially
+   play them) in the playlist. Otherwise we can be too late.
+
+2003-05-11 Sunday 23:17  hartman
+
+ * extras/MacOSX/vlc.pbproj/project.pbxproj:
+   - Add the THANKS file to the Mac OS X application
+ * modules/gui/macosx/about.?:
+   - Use c-style comments instead of //
+   - Open the AUTHORS file with the correct Encoding
+   - Display the THANKS file as well
+   - Rotate the scrolling when at the end
+ * modules/gui/macosx/intf.m:
+   - put Cocoa into multithreaded mode as soon as possible. Not really
+     causing any problems now, but is cleaner.
+ * modules/gui/macosx/prefs.m:
+   - Select the current setting when we create a combobox.
+
+2003-05-11 Sunday 19:09  hartman
+
+ * ALL:
+   - removed a bit too much code from the interface files previous commit.
+     Menu's were enabled if there was no input.
+   - removed a NSLog which was used for bugtracking
+
+2003-05-11 Sunday 18:49  hartman
+
+ * modules/po/.cvsignore: i guess the following doesn't belong in CVS, so i want
+ cvs to stop bugging me about it ;)
+
+ *.sed
+ *.sin
+ *.header
+ Rules-quot
+
+2003-05-11 Sunday 18:43  gbazin
+
+ * src/input/input_programs.c: small bug fix.
+ * src/misc/variables.c: compilation fix for MSVC.
+
+2003-05-11 Sunday 18:41  hartman
+
+ * forgot one file. see previous intf.m commit for details.
+
+2003-05-11 Sunday 18:40  hartman
+
+ * src/input/input_programs.c: Added a 'intf-changed' variable as vout, aout
+   and playlist already have, to be notified of menu changes.
+ * src/video_output/video_output.c: Changed a 1 to a VLC_TRUE
+ * modules/gui/macosx/intf.?: Interface listens for changes in the input
+   menu's now.
+
+2003-05-11 Sunday 15:55  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: work-around a bug in wxWindows for menus auto-generation.
+
+2003-05-11 Sunday 14:33  sigmunau
+
+ Added code to render subtitles with the freetype module (disabled by default).
+ To test it out define USE_FREETYPE in the top of modules/demux/util/sub.c
+ and  modules/codec/spudec/text.c and run with --filter osdtext
+
+2003-05-11 Sunday 13:45  gbazin
+
+ * configure.ac.in: fixed the wx-config detection by the skins plugin.
+ * modules/gui/wxwindows/*: fixed a couple of breakage.
+
+2003-05-11 Sunday 13:22  gbazin
+
+ * modules/gui/wxwindows/*: the wxWindows plugin is now UNICODE happy.
+
+2003-05-11 Sunday 13:14  sigmunau
+
+ use c comment, and not c++
+
+2003-05-11 Sunday 08:42  sigmunau
+
+ * osd_test.c: better size calculations. Use VLC_VAR_TIME for precise timing
+ (doesn't seem to work)
+
+2003-05-11 Sunday 01:00  massiot
+
+ * modules/audio_filter/resampler/coreaudio.c: more accurate frame length
+   calculation
+ * modules/audio_output/coreaudio.c: apparently the audio card clock can
+   be screwed, so probe it at every buffer
+ * src/audio_output/output.c: Thou shalt not drop buffers
+
+2003-05-10 Saturday 20:49  hartman
+
+ * fix titer's language commit. The list needs to end with a NULL, or VLC will
+   no longer start. (it fails on the duplication of the config of this variable)
+
+2003-05-10 Saturday 18:16  fenrir
+
+  * ffmpeg : fix for svq3.
+
+2003-05-10 Saturday 13:52  titer
+
+  POTFILES.in: forgot a file yesterday...
+
+2003-05-10 Saturday 13:40  titer
+
+  * src/libvlc.[ch]: removed --translation to avoid breaking compatibility
+  with old config files; --language is now a string_from_list you can use
+  to specify the language (default is auto-detection).
+
+2003-05-10 Saturday 11:08  gbazin
+
+ * src/input/input_programs.c: misc fixes/improvements to the video-es/audio-es/spu-es object variables.
+
+2003-05-10 Saturday 11:05  hartman
+
+ * added VP31 fourcc's.
+ * disabled the vp31 and iv31 iv32. In it's current state it is too ugly too
+   actually use it. It would generate too many bugreports.
+
+2003-05-10 Saturday 10:32  hartman
+
+ * Finished the sout dialog on OSX.
+
+2003-05-09 Friday 23:23  fenrir
+
+  * ffmpeg: now ffmpeg has a SVQ3 decoder, so use it :)
+
+2003-05-09 Friday 22:03  sigmunau
+
+ oss.c: give a warning if --spdif is set but the sourndcard don't support it.
+
+2003-05-09 Friday 20:30  massiot
+
+ France 1 - Italy 0
+
+2003-05-09 Friday 19:53  fenrir
+
+  * faad: better support of AAC without ESDS.
+
+2003-05-09 Friday 19:30  titer
+
+  Updated POTFILES.in for BeOS' i18n
+
+2003-05-09 Friday 19:29  fenrir
+
+ * mp4: fixed mace3/6 decoding. Only mono audio is working on the sample I
+ have found.
+
+2003-05-09 Friday 16:01  gbazin
+
+ * modules/misc/httpd.c: win32 fixes.
+ * modules/control/http.c: fixed a problem with IE that sends POST requests instead of GET ones.
+
+2003-05-09 Friday 02:39  fenrir
+
+  * mmstu: fixed a lookup.
+
+2003-05-09 Friday 01:19  hartman
+
+ * modules/gui/macosx/prefs.m:
+   - possibly fixed a crash situation when clicking the OK button (not sure though)
+ * modules/gui/macosx/macosx.m:
+   - made the transparency option an advanced option.
+
+2003-05-09 Friday 00:58  titer
+
+  * src/misc/messages.c: forget a defined(SYS_BEOS) in my last commit
+  * src/misc/configuration.c: config_PutPsz now sets the variable to NULL
+    if the string is empty
+  * modules/gui/macosx/prefs.m: remove duplicate (now) code with config_PutPsz
+
+2003-05-09 Friday 00:41  hartman
+
+ * modules/gui/macosx/prefs.?:
+   - made the advanced button better.
+   - added missing CONFIG_ITEM_DIRECTORY support
+ * extras/MacOSX/Resources/English.lproj/MainMenu.nib/*:
+   - added the semi 'apple' default of com-, as a hotkey for the prefs.
+
+2003-05-08 Thursday 23:11  hartman
+
+ modules/gui/macosx/intf.m: We shouldn't save the config file when the interface closes. This explains a lot of bugreports ;)
+
+2003-05-08 Thursday 19:51  fenrir
+
+  * ftp : updated copyright info.
+
+2003-05-08 Thursday 19:26  fenrir
+
+  * v4l: clean up.
+
+2003-05-08 Thursday 19:21  fenrir
+
+  * v4l: remove __V4L_AUDIO_ (useless)
+
+2003-05-08 Thursday 19:06  titer
+
+  ALL: fixed BeOS-specific warnings (ssize_t is not a int but a long,
+ vasprintf if defined but not declared in the system headers...)
+
+2003-05-08 Thursday 17:13  massiot
+
+ * modules/gui/macosx: Fixed crashes with the new submenus when used on a
+   localized system
+ * Removed the "EXPERIMENTAL" in "DVD menus (EXPERIMENTAL)", and enabled
+   the DVD menus by default.
+
+2003-05-08 Thursday 15:58  gbazin
+
+ * modules/access/file.c: fixed large file support on win32.
+ * src/libvlc.[ch]: made the description of the translation option more explicit.
+
+2003-05-08 Thursday 14:15  titer
+
+  src/libvlc.*: --translation is now a string. Usefull if want to specify
+  a different language than your OS, or if your OS is not localized...
+
+2003-05-08 Thursday 12:09  gbazin
+
+ * modules/gui/wxwindows/menus.cpp: misc small fixes.
+
+2003-05-08 Thursday 10:45  titer
+
+  modules/gui/beos/PreferencesWindow.cpp: cosmetic
+
+2003-05-08 Thursday 10:40  titer
+
+  * modules/gui/beos/AudioOutput.cpp: more cleaning
+  * modules/gui/beos/VideoOutput.cpp: in fullscreen, add an item "Show
+    Interface" to the popup
+
+2003-05-08 Thursday 01:16  hartman
+
+ ALL: autogenerated menu's for chapter,title,program,audio-es,spu-es and video-es.
+   - video-es seems broken. it always starts with -1 (Disabled) selected.
+   - moved some menuitems to other menu's for gui interface consistency with
+     other gui's.
+   - added a "fit to screen" menuitem.
+
+2003-05-08 Thursday 01:05  titer
+
+  src/misc/beos_specific.cpp:
+      Fixed a very old bug: if the user hit Alt+Q, don't let the be_app
+      exit without any cleaning (that made VLC crash badly)
+
+2003-05-07 Wednesday 23:13  hartman
+
+ * changed "Gayscale video output" option back into "Grayscale video output"
+
+2003-05-07 Wednesday 19:20  titer
+
+  modules/gui/beos/AudioOutput.cpp: cleaning
+
+2003-05-07 Wednesday 17:27  titer
+
+  * modules/gui/beos/MessagesWindow.cpp: fixed a nasty bug
+  * modules/gui/beos/PreferencesWindow.*: now you can save preferences
+
+2003-05-07 Wednesday 16:47  titer
+
+  modules/gui/beos/PreferencesWindow.cpp:
+   Misc enhancements
+
+2003-05-07 Wednesday 15:54  gbazin
+
+ * modules/gui/wxwindows/*: Fix (use different id numbers for each menus).
+
+2003-05-07 Wednesday 15:44  fenrir
+
+  * ffmpeg: --ffmpeg-truncated is now an int :
+   * -1 -> CODEC_FLAG_TRUNCATED is set only if width == height == 0 (only TS should produce this)
+   * 0  -> disable CODEC_FLAG_TRUNCATED
+   * 1  -> force CODEC_FLAG_TRUNCATED
+
+2003-05-07 Wednesday 14:49  titer
+
+  modules/gui/beos/*: fixed a few things I broke recently (dvd menus,
+                      screenshots...)
+
+2003-05-07 Wednesday 12:23  gbazin
+
+ * modules/gui/wxwindows/*: misc fixes.
+
+2003-05-07 Wednesday 02:31  fenrir
+
+  * mp4: raaaah, sometime moov box are masqueraded by a free box, so I look
+ at free box content to see if it could be moov box, I hope there won't be
+ any misdetection. (Even when there is a spec, nobody follows it :((
+
+2003-05-07 Wednesday 00:28  fenrir
+
+  * ffmpeg: do not use CODEC_FLAG_TRUNCATED by default as it seems buggy
+ with valid files. You have to use --ffmpeg-truncated to force it.
+  MPEG-4 in TS won't work unless you use --ffmpeg-truncated :((
+
+2003-05-07 Wednesday 00:18  gbazin
+
+ * modules/gui/wxwindows/open.cpp: removed the channels server entry.
+
+2003-05-06 Tuesday 21:01  gbazin
+
+ * modules/demux/mpeg/ts.c: fixed my last f*ckage + a bit of clean-up.
+
+2003-05-06 Tuesday 20:12  hartman
+
+ * ALL: there were reports of crashes in the menucode. i think it was that
+   the VLCWindow could suddenly disappear (the vout closed) and therefore we
+   could no longer reference it. This should fix that. Also made this code
+   more generic to avoid code duplication.
+
+2003-05-06 Tuesday 16:05  fenrir
+
+  * mp4: fix a segfault and play .3gp with h263 video track.
+
+2003-05-06 Tuesday 14:19  fenrir
+
+  * http: redirect to main page each time we pass arguments. (it's done by
+ an html header and not by the http protocol. I know it's bad but it's a
+ lot easier ;)
+
+2003-05-06 Tuesday 12:57  fenrir
+
+  * http: fix 'add mrl'.
+
+2003-05-06 Tuesday 02:17  titer
+
+  Makefile.am: fixed BeOS package generation when all modules are built-in
+
+2003-05-06 Tuesday 02:01  fenrir
+
+  * mms: fix for builtin compilation.
+
+2003-05-06 Tuesday 01:15  titer
+
+  configure.ac.in: fixed static linking with libintl and libiconv
+
+2003-05-05 Monday 22:48  gbazin
+
+ * modules/demux/mpeg/ts.c: compiler warning fix.
+ * src/input/input_programs.c: a "Disable" choice is added by default to "audio-es", "video-es" and "spu-es".
+
+2003-05-05 Monday 22:23  gbazin
+
+ * ALL: changed the prototype of input_AddES() to include enough information so we can build an "video-es", "audio-es" and "spu-es" object variable. These variables can be used by the interfaces to navigate between the elementary streams.
+ * modules/gui/wxwindows/menus.cpp: use the "foo-es" object variables.
+
+2003-05-05 Monday 22:04  hartman
+
+ * fixed the autogenerated menu's.
+
+2003-05-05 Monday 21:35  titer
+
+  configure.ac.in: fixed libdvbpsi detection for people who don't have
+    stdint.h but inttypes.h
+
+2003-05-05 Monday 16:29  gbazin
+
+ * modules/gui/skins/src/*: forgot a few references to the channels server.
+
+2003-05-05 Monday 16:09  gbazin
+
+ * ALL: removed the old channels server stuff (was deprecated).
+
+2003-05-05 Monday 15:52  fenrir
+
+  * bits.h: clean up
+
+2003-05-05 Monday 15:21  sigmunau
+
+ implemented VLC_VAR_TIME using two ints
+
+2003-05-05 Monday 14:58  sigmunau
+
+ Implemented support for CONFIG_ITEM_DIRECTORY
+
+2003-05-05 Monday 13:15  titer
+
+  Updated NEWS for 0.5.4 release
+
+2003-05-05 Monday 13:06  titer
+
+  modules/gui/beos/*: Partial fix for Preferences resizing
+
+2003-05-05 Monday 13:03  hartman
+
+ NEWS: preparing for 0.5.4 release. Please update the NEWS file everyone.
+ README.MacOSX.rtf: clarified some things.
+
+2003-05-05 Monday 12:15  gbazin
+
+ * modules/gui/skins/src/*: compilation fixes under win32.
+
+2003-05-05 Monday 11:49  sam
+
+   * ./src/video_output/video_output.c: fixed a crash that occurs when the
+     width and height variables are set to their default values.
+
+2003-05-04 Sunday 23:39  gbazin
+
+ * src/audio_output/output.c: fixed warning.
+
+2003-05-04 Sunday 23:38  massiot
+
+ * First round of capitalization of description strings.
+
+2003-05-04 Sunday 23:03  gbazin
+
+ * po/POTFILES.in: added the new modules since 0.5.3
+
+2003-05-04 Sunday 22:42  gbazin
+
+ * src/misc/variables.c, ALL: improvements to the object variables api.
+    - added another argument to var_Change().
+    - added a VLC_VAR_SETTEXT and VLC_VAR_GETTEXT method to var_Change()
+      that are used to set/get a friendly name to an object variable.
+    - added VLC_VAR_CHOICESCOUNT to var_Change() to be able to retrieve
+      the number of availabel choices without having to get their value
+      as well.
+    - VLC_VAR_ADDCHOICE uses the extra var_Change() argument to assign
+      a friendly name to the choice value.
+    - VLC_VAR_GETCHOICES retrieves the choices values and their friendly
+      names.
+
+ * modules/gui/wxwindows/*: first step in implementing menu auto-generation in the wxWindows interface.
+
+2003-05-04 Sunday 22:33  massiot
+
+ * modules/codec/libmpeg2.c: fixed the "main: cannot delete object with
+   children" bug.
+
+2003-05-04 Sunday 18:51  fenrir
+
+  * transcode: follow the same logic for ab than vb. (ie for a small value
+ it's used as kb/s for higher ones it's b/s).
+ Just a remember, transcode options are:
+ acodec= mpga,a52
+     ab (kb/s)
+ vcodec= mpgv,mp4v,h263,DIV1,DIV2,DIV3,I420,I422,I444,RV24,YUY2
+     width
+     height
+     vb (kb/s)
+     vt (b/s)
+     deinterlace
+     croptop
+     cropbottom
+     cropleft
+     cropright
+     keyint
+     hq
+     qmin (between 1 and 32)
+     qmax (between 1 and 32)
+ only acodec and/or vcodec are mandatories (and it's a good idea to always
+ define vb,vt, and/or ab)
+
+2003-05-04 Sunday 15:02  massiot
+
+ * modules/audio_output/coreaudio.c: worked around a CoreAudio bug (should
+   fix the "sound drops after half an hour" bug)
+ * modules/audio_filter/resampler/coreaudio.c: reenabled the coreaudio
+   resampler which works perfectly fine here
+ Please test that I didn't break S/PDIF output on OS X.
+
+2003-05-04 Sunday 12:40  sam
+
+   * ./modules/video_output/sdl.c: avoid crashes at exit due to SDL being
+     linked with svgalib and svgalib using atexit().
+
+2003-05-04 Sunday 10:46  fenrir
+
+  * mpga_audio: should fix an infinite loop when miss-detected free
+ bitrate stream.
+
+2003-05-04 Sunday 01:36  massiot
+
+ More cleaning of the STATE_INVALID stuff (still not perfect though).
+
+2003-05-03 Saturday 22:25  massiot
+
+ Fixed handling of STATE_INVALID states.
+
+2003-05-03 Saturday 18:11  fenrir
+
+  * transcode: added qmin, qmax and hq(high quality) options.
+
+2003-05-03 Saturday 14:33  fenrir
+
+  * transcode: fix cropping code.
+
+2003-05-03 Saturday 14:22  fenrir
+
+  * transcode: fixed video resizing.
+
+2003-05-03 Saturday 13:37  titer
+
+  beos/* : New Preferences window that lets you configure everything.
+           It is not complete yet (see the TODO in PreferencesWindow.cpp)
+
+2003-05-03 Saturday 13:18  fenrir
+
+  * transcode: added two options:
+     - vt : video bitrate tolerance
+     - keyint : number of inter frames between intra frames.
+
+2003-05-03 Saturday 12:36  fenrir
+
+  * v4l: used the same trick than vls to avoid too much resampling.
+
+2003-05-03 Saturday 02:18  fenrir
+
+  * ts: fix a memory leak.
+
+2003-05-03 Saturday 02:09  fenrir
+
+ [no log message]
+
+2003-05-03 Saturday 01:52  fenrir
+
+  * v4l: fix a stupid bug that broke audio.
+
+2003-05-03 Saturday 01:12  fenrir
+
+  * all: shut up valgrind ;) (memory leacks and one overead/overwrite).
+
+2003-05-02 Friday 19:37  fenrir
+
+  * transcode: fix about raw audio.
+
+2003-05-02 Friday 17:35  fenrir
+
+  * v4l: audio grabbing part begin to work :)
+
+2003-05-02 Friday 16:25  fenrir
+
+  * transcode: compilation fix.
+
+2003-05-02 Friday 15:53  gbazin
+
+ * modules/gui/skins/*: compilation fixes for MSVC. Almost working, we just to find a way to have flex.c not include unistd.h on win32 and not compile the wxwindows files when SKINS_BASIC is defined.
+
+2003-05-02 Friday 15:36  titer
+
+  Missing files
+
+2003-05-02 Friday 14:51  fenrir
+
+  * transcode: should be able to compress raw audio, need to be cleaned up.
+  u8,s8,s16 big and little endian should be supported but not all tested.
+
+2003-05-02 Friday 12:18  sam
+
+   * ./configure.ac.in: another kludge to avoid linking twice with libavcodec.
+
+2003-05-02 Friday 03:41  fenrir
+
+  * transcode: accept and create raw video(I420,I422,I444,YUY2,RV24).
+
+2003-05-02 Friday 03:40  fenrir
+
+  * rawvideo.c: fix a bug while filling picture.
+
+2003-05-02 Friday 00:33  fenrir
+
+  * copy: added raw audio/video support.
+  * avi: added raw audio support (little endian only).
+
+2003-05-01 Thursday 13:51  ipkiss
+
+  * ./modules/gui/skins/gtk2/gtk2_run.cpp: fixed compilation of the
+    basic-skins plugin with GTK2
+  * modules/gui/skins/parser/skin.*: small compilation fix, but i don't
+    really understand why it is necessary :)
+
+2003-05-01 Thursday 01:11  hartman
+
+ * modules/gui/macosx/macosx.m
+   - added a macosx-float config option
+   - changed 'opaqueness' into 'macosx-opaqueness'
+ * modules/gui/macosx/vout.?
+   - let vout respect 'float' on top option.
+   - added a toggle function to toggle float on top.
+ ALL:
+   - menuitem and corresponding code for float on top.
+
+2003-04-30 Wednesday 23:58  hartman
+
+ ALL: New output dialog that uses the new --sout syntax.
+   - it is not so powerful as --sout (does not allow for multiple unicasts ie)
+   - there is a bug in the transcode settings. not sure what is causing it.
+
+2003-04-30 Wednesday 21:45  fenrir
+
+  * mp4: fix playback of some stream with raw audio. I also split
+ big audio chunk. (Avoid 100000 samples at once :(
+
+2003-04-30 Wednesday 21:16  asmax
+
+ * enable basic-skins for GTK2 (not tested yet ;)
+
+2003-04-30 Wednesday 19:22  ipkiss
+
+  * ./configure.ac.in:
+     - added a basic-skins plugin, which doesn't make use of wxWindows
+       dialogs (currently only works for win32)
+     - renamed with-wx-config-path in with-skins-wx-config-path for the
+       skins plugin, to avoid problems with the wxwindows plugin
+
+2003-04-30 Wednesday 19:20  gbazin
+
+ * modules/access/v4l/v4l.c: fixed breakage for devices supporting I420.
+
+2003-04-30 Wednesday 14:04  hartman
+
+ modules/gui/macosx/controls.m: fixed cosmetic issue with deinterlace menu.
+
+2003-04-30 Wednesday 09:11  gbazin
+
+ * modules/access/ftp.c, modules/access/http.c: slightly changed atoll() replacement.
+
+2003-04-30 Wednesday 04:13  hartman
+
+ modules/access/http.c:
+ modules/access/ftp.c:
+ * fixed a very serious bug in the atoll code. this contained a never ending while loop.
+   It showed on systems without atoll() (MacOSX) as an inability to view http
+   and ftp streams.
+
+2003-04-29 Tuesday 22:44  fenrir
+
+  all: use /* */ instead of // (we write c code)
+
+2003-04-29 Tuesday 22:38  fenrir
+
+  * stream_output.c: some sanity checks and bypass default behavour of
+ module_Need (when I ask for udp I want udp or an error, but not file
+ or something else) by adding ",none" when a module name is specified.
+  I will clean up that by adding a flag to module_Need or something like
+ that.
+
+2003-04-29 Tuesday 21:32  fenrir
+
+  * stream_output.c: fix segfault when not specifying mux name.
+
+2003-04-29 Tuesday 20:36  ipkiss
+
+  * ./modules/gui/skins/src/theme.cpp: avoid infinite recursion with
+    circular anchoring
+
+2003-04-29 Tuesday 20:29  fenrir
+
+  * vlc_config.h: increased AOUT_PTS_TOLERANCE to 40ms, it avoids a lot of
+ resampling with some files while keeping good synchronisation.
+  Anybody has an idea of the maximum desynchronisation between audio and
+ video that still be imperceptible ?
+
+2003-04-29 Tuesday 20:17  hartman
+
+ * modules/gui/macosx/playlist.m:
+   - When we delete an item, update playlist with to indicate 'currently playing'
+
+2003-04-29 Tuesday 16:03  gbazin
+
+ * modules/audio_output/directx.c: fixed the "no sound on NT4" problem. The directx audio plugin wasn't freeing its resources properly in case Probe() failed so the waveout plugin couldn't open the audio device afterwards.
+ * modules/video_output/directx/directx.c: work-around buggy video drivers that create unsupported surfaces without shouting. Hopefully, non overlay YUV surfaces shouldn't be created anymore if not supported.
+
+2003-04-29 Tuesday 15:40  fenrir
+
+  * file: use - to write on stdout. (but you can only use ts and ps muxer,
+ as the others need to seek).
+
+2003-04-29 Tuesday 12:54  gbazin
+
+ * modules/gui/skins/*, configure.ac.in: removed the skins plugin depandancy on msimg32.dll. Additionnaly, TransparentBlt() and SetLayeredWindowAttributes() are only used if present on the system. This allows us to run the plugin (without transparency though) on NT4/win95/98 as well.
+
+2003-04-28 Monday 23:25  fenrir
+
+  * avi: fixed playback of broken stream....
+
+2003-04-28 Monday 22:44  ipkiss
+
+  * modules/gui/skins/win32/win32_run.cpp: clean exit of wxWindows thread
+
+2003-04-28 Monday 20:46  ipkiss
+
+  * ./modules/gui/skins/src/banks.cpp: fixed a segfault triggered by
+    missing tags in the XML.
+
+2003-04-28 Monday 14:32  asmax
+
+ * skeleton of X11 skins
+
+2003-04-28 Monday 14:12  asmax
+
+ * skeleton of X11 skins
+
+2003-04-28 Monday 12:25  asmax
+
+ * changed Region into SkinRegion to prepare the X11 port
+
+2003-04-28 Monday 12:00  asmax
+
+ * fixed compilation under linux
+ * added a flag GTK2_SKINS
+
+2003-04-28 Monday 00:18  ipkiss
+
+  * ./modules/gui/skins/*: first attempt at porting the skins to Win9x
+    There is still a lot to do but some things are working.
+
+2003-04-27 Sunday 23:16  gbazin
+
+ * src/video_output/vout_pictures.c, include/video_output.h: added a vout_InitPicture() function that initializes a picture_t structure based on the given chroma and sizes.
+ * modules/encoder/ffmpeg/video.c: misc improvements. Should also be able to handle more input chroma format.
+ * modules/codec/rawvideo.c: a few fixes.
+ * modules/access/v4l/v4l.c: misc improvments and cleanup. Should be able to handle more source chroma formats. On the fly video encoding is also working perfectly now.
+
+2003-04-27 Sunday 17:53  gbazin
+
+ * src/video_output/video_output.c: small bugfix + vout_Create() is now blocking until InitThread() has been run.
+ * src/video_output/vout_pictures.[ch]: added support for FOURCC I411.
+ * modules/codec/rawvideo.c: support for more chroma formats.
+
+2003-04-27 Sunday 15:25  gbazin
+
+ * modules/codec/ffmpeg/*: added chroma conversion capabilities to the ffmpeg plugin (using libavcodec's img_convert() facility).
+   (I can finaly watch my RGB tarkin samples :))
+ * modules/demux/rawdv.c: fixed a couple of compiler warnings.
+
+2003-04-27 Sunday 14:56  gbazin
+
+ * modules/demux/rawdv.c: fixes for when the video and audio sub-streams are not both selected.
+
+2003-04-27 Sunday 14:11  gbazin
+
+ * modules/misc/httpd.c: win32 fix for non-blocking sockets.
+
+2003-04-27 Sunday 13:55  fenrir
+
+  * avi: clean up. Some standard file (ie with 1 RIFF chunk ) has OpenDML
+ index, so use it when normal index (idx1 chunk) isn't found.
+
+2003-04-27 Sunday 13:03  fenrir
+
+  * ffmpeg: stop skipping video sometime ;).
+
+2003-04-27 Sunday 11:55  fenrir
+
+  * avi: Support for OpenDML file.
+  Not tested with file size > 2Go, so report status.
+
+2003-04-27 Sunday 03:08  fenrir
+
+  * httpd: added "Cache-Control: no-cache" by default.
+
+2003-04-27 Sunday 02:00  jlj
+
+  * ./configure.ac.in: Added --with-libmpeg2-tree
+
+2003-04-27 Sunday 00:02  gbazin
+
+ * modules/control/http.c: fixed buffer allocation problem.
+
+2003-04-26 Saturday 22:06  fenrir
+
+  * video: spelling error.
+
+2003-04-26 Saturday 21:45  fenrir
+
+  * ffmpeg: we always skip video if we have more than 5 second of late video.
+ (This should avoid 'decoder stuck' message.)
+
+2003-04-26 Saturday 21:36  gbazin
+
+ * modules/control/http.c: brand new (and also basic) HTTP interface plugin for vlc (uses port 8080 by default).
+
+2003-04-26 Saturday 20:51  fenrir
+
+  * mpegaudio: if the file name end by .mp3, use a stronger dectection.
+ (over the first 2ko).
+
+2003-04-26 Saturday 14:54  gbazin
+
+ * configure.ac.in: enabled xvid and ffmpeg encoders
+ * modules/encoder/ffmpeg/*: misc fixes + support for I422 and YUY2 input chroma.
+
+2003-04-26 Saturday 12:26  gbazin
+
+ * modules/codec/rawvideo.c: added support for YUY2 and I422 and fixed a bug in FillPicture(). ( The v4l input is working here now :) )
+
+2003-04-25 Friday 21:47  fenrir
+
+  * libmp4: clean up and preliminary work to read mp4 file through http.
+  * mp4: don't return a failed value when recognize a ref file, but use
+ a dummy Demux function that return EOF.
+
+2003-04-25 Friday 18:57  fenrir
+
+  * ffmpeg: use bigger split size (~8000 samples) as it avoid too much
+ resampling with my samples. Fix a potential divide by 0 (thx meuuh).
+
+2003-04-25 Friday 17:35  fenrir
+
+  *ffmpeg: split huge audio packets as aout didn't like them.
+
+2003-04-25 Friday 17:33  fenrir
+
+  * mms: reduce mtu (avoid too much delay with slow connection)
+
+2003-04-25 Friday 12:37  gbazin
+
+ * modules/gui/skins/src/vlcproc.cpp: small compilation fix.
+
+2003-04-24 Thursday 20:49  fenrir
+
+  * mp4: fix a buffer overflow.
+
+2003-04-24 Thursday 20:33  fenrir
+
+  * .cvsignore: forgot this file.
+
+2003-04-24 Thursday 20:26  fenrir
+
+  * asf: fix to play stream over mmsh.
+
+2003-04-24 Thursday 20:24  fenrir
+
+  * mpeg4video.c: use video size when available from bitmapinfoheader.
+
+2003-04-24 Thursday 17:44  gbazin
+
+ * src/libvlc.c: forgot to reload the command line options after we reload the main module when the user disables the translation.
+
+2003-04-24 Thursday 16:13  gbazin
+
+ * Makefile.am: added a dist-hook target to include the auto-generated msvc files into the dist. added src/misc/modules_plugins.h to the dist.
+
+2003-04-24 Thursday 15:57  gbazin
+
+ * modules/gui/skins/src/themeloader.*: dropped the dependancy on libtar
+    for the .vlt skins support. libtar is still used if present, otherwise
+    we use our small implementation of untar.
+
+2003-04-24 Thursday 14:39  fenrir
+
+  * mp4: select only first enabled track.
+
+2003-04-24 Thursday 14:38  asmax
+
+ * get screen size with gtk2
+
+2003-04-23 Wednesday 15:18  titer
+
+  modules/gui/beos/VlcWrapper.cpp: fixed the issue with untranslated
+   strings and "...". i18n seems OK under BeOS now.
+
+2003-04-23 Wednesday 10:29  asmax
+
+ * fixed some constructors and destructors
+
+2003-04-22 Tuesday 23:31  gbazin
+
+ * modules/codec/libmpeg2.c: make sure there are no more linked pictures
+    left when closing the decoder.
+
+2003-04-22 Tuesday 22:57  ipkiss
+
+  * ./modules/gui/skins/src/theme.cpp: fixed a bug with anchored windows
+
+2003-04-22 Tuesday 22:25  gbazin
+
+ * modules/audio_filter/converter/s16tofloat32swab.c:
+    added an #ifdef HAVE_ALLOCA.
+
+2003-04-22 Tuesday 21:45  gbazin
+
+ * configure.ac.in: don't link with the math library on win32. It isn't
+    needed and will even screw up things under cygwin with -mno-cygwin.
+
+2003-04-22 Tuesday 19:26  asmax
+
+ * output.c: avoid a floating point exception when aout-rate==0
+ * gtk2_api.cpp: made valgrind happy ;)
+
+2003-04-22 Tuesday 18:21  ipkiss
+
+  * ./modules/gui/wxwindows/fileinfo.cpp: cosmetic changes
+
+2003-04-22 Tuesday 17:56  asmax
+
+ * fixed the volume slider bug
+
+2003-04-22 Tuesday 16:36  titer
+
+  * Makefile.am: fixed 'make package-beos'
+  * modules/gui/beos/*: added _()s so the whole interface is translated
+  * src/libvlc.c: ask gettext for UTF-8 strings (under BeOS only for now)
+    FIXME: currently, untranslated strings are not converted to UTF-8
+
+2003-04-22 Tuesday 16:28  fenrir
+
+  * mp4: fix "mov playlist" handling. (raaah strncpy doesn't add '\0' :(
+
+2003-04-22 Tuesday 12:54  gbazin
+
+ * modules/codec/libmpeg2.c: fixed aspect ratio problem.
+
+2003-04-22 Tuesday 11:38  fenrir
+
+  * mp4: preliminary support of "mov playlist(ref) file"
+
+2003-04-22 Tuesday 08:51  fenrir
+
+  * mp4: more mov fields are parsed.
+
+2003-04-21 Monday 22:12  asmax
+
+ * changed "Font" into "SkinFont" (see previous commit)
+
+2003-04-21 Monday 21:51  asmax
+
+ * changed "Window" into "SkinWindow" to prepare X11 port
+  (Window is already a Xlib type !)
+   *** not tested under win32, please check ! ***
+
+2003-04-21 Monday 18:39  asmax
+
+ * at last fixed transparency under linux !!
+
+2003-04-21 Monday 16:55  anil
+
+ *All: fixed unwanted fileinfo window refresh under windows.
+
+2003-04-21 Monday 16:22  gbazin
+
+ * modules/misc/network/ipv4.c: a bit of cleanup.
+
+2003-04-21 Monday 14:26  asmax
+
+ * raise the skin window on top when clicked
+ * a bit of code cleaning
+
+2003-04-21 Monday 12:54  gbazin
+
+ * configure.ac.in: print an error message if libmpeg2 is not found or too old.
+
+2003-04-21 Monday 12:22  gbazin
+
+ * configure.ac.in: the libmpeg2 plugin is now enabled by default when the right version of libmpeg2 is detected (0.3.2 aka cvs).
+
+2003-04-21 Monday 11:47  asmax
+
+ * added a preferences button in the default skin
+
+2003-04-21 Monday 03:37  asmax
+
+ * fixed the previous commit for linux
+
+2003-04-21 Monday 02:50  asmax
+
+ * fixed a timing issue under windows ?
+
+2003-04-21 Monday 02:12  ipkiss
+
+  * we now use a wxwindow dialog to load the skins, so we can get rid
+    of our custom dialog
+
+2003-04-21 Monday 01:47  asmax
+
+ * shortcut handling under linux
+
+2003-04-21 Monday 00:54  ipkiss
+
+  * added preferences, file info and stream output dialogs to the skins
+
+2003-04-21 Monday 00:33  massiot
+
+ * configure.ac.in : finished disabling the old mpeg_video plug-ins.
+
+2003-04-21 Monday 00:18  asmax
+
+ * fixed refresh of the playlist (and a segfault...)
+
+2003-04-20 Sunday 23:42  massiot
+
+ * modules/codec/libmpeg2.c: fixed a problem with some frame rates (thx
+   gibalou)
+
+2003-04-20 Sunday 23:09  asmax
+
+ * fixed a segfault at exit
+
+2003-04-20 Sunday 22:52  asmax
+
+ * a few segfaults but wxwindows works under linux !
+
+2003-04-20 Sunday 22:52  gbazin
+
+ * modules/audio_output/file.c: fixed a mismatch in a config name.
+
+2003-04-20 Sunday 21:19  sam
+
+   * ./modules/audio_output/oss.c: code comments.
+
+2003-04-20 Sunday 21:15  sam
+
+   * ./modules/video_output/fb.c: fixed a bug that prevented proper console
+     resetting.
+
+2003-04-20 Sunday 21:14  sam
+
+   * ./mozilla/npvlc_rc.rc: fixed a typo in the MIME types.
+
+2003-04-20 Sunday 20:28  ipkiss
+
+  * added wxwindows Open and Messages dialog boxes into the windows skins
+    (it may break things on linux...)
+
+2003-04-20 Sunday 20:22  asmax
+
+ * added wxwindows for skins !!
+
+2003-04-20 Sunday 19:53  gbazin
+
+ * configure.ac.in: removed useless --with-ffmpeg=PATH ./configure option.
+
+2003-04-20 Sunday 19:29  fenrir
+
+  * mms/* : begining of a m$-http-for-asf-streaming support.
+  Proxy aren't yet supported. Use mmsh to force it, else mms will try it
+ at the end (after mmst and mmsu). Some http url are in fact mmsh but
+ not yet auto-detected.
+  *Please report* not working url and any regression for mmst and mmsu.
+
+2003-04-20 Sunday 19:03  jlj
+
+   * ./modules/gui/skins/src/themeloader.cpp: compile fix (include errno.h)
+
+2003-04-20 Sunday 16:45  karibu
+
+ * Fixed mouse wheel
+
+2003-04-20 Sunday 16:16  asmax
+
+ * fixed the "always on top" bug
+
+2003-04-20 Sunday 15:06  karibu
+
+ * Added support of wheel with win32
+
+2003-04-20 Sunday 15:00  karibu
+
+ * Fixed support of wheel for playlist with GTK2
+ * Added support of whell for slider with GTK2
+
+2003-04-20 Sunday 14:11  gbazin
+
+ * configure.ac.in, modules/codec/ffmpeg/ffmpeg.c: fixed my last breakage in the ffmpeg detection code.
+
+2003-04-20 Sunday 13:14  asmax
+
+ * enabled scrolling in the playlist with the mouse wheel
+
+2003-04-20 Sunday 12:59  massiot
+
+ * The libmpeg2 plug-in is now completely operational ;
+ * configure.ac.in : disabled compiling the old mpeg_video plug-in, so :
+ DO NOT FORGET TO INSTALL LIBMPEG2 AND COMPILE WITH --enable-libmpeg2
+
+2003-04-20 Sunday 11:57  gbazin
+
+ * configure.ac.in, modules/codec/ffmpeg/*, modules/encoder/ffmpeg/*, modules/stream_out/transcode.c: fixed detection of the ffmpeg headers/libs when they are installed in their default location.
+
+2003-04-20 Sunday 01:05  asmax
+
+ * fixed a typo with dvbpsi
+
+2003-04-19 Saturday 13:55  hartman
+
+ * Added a 'opaqueness' configoption to macosx-vout. Yeah i know, useles.
+   But it's coooooool. http://sidekick.student.utwente.nl/videolan/transparent.jpg
+
+2003-04-19 Saturday 12:39  karibu
+
+ * Font fixed
+
+2003-04-19 Saturday 12:33  hartman
+
+ * There was a problem where deinterlace could not be turned off via it's
+   corresponding menu. On thy fly filter changes are still not possible.
+
+2003-04-19 Saturday 11:46  asmax
+
+ * fixed a segfault
+
+2003-04-19 Saturday 11:16  asmax
+
+ * drag&drop works ! (at least with mozilla)
+
+2003-04-19 Saturday 02:34  karibu
+
+ * Fixed wrapping for texts
+ * Filling GTK2Graphics and GTK2Region destructors
+
+2003-04-19 Saturday 00:12  fenrir
+
+  * mp4: some memory leaks fixed.
+
+2003-04-18 Friday 22:51  sam
+
+   * ./configure.ac.in: workaround for a bug in the OS X ld who sees symbol
+     redefinitions when linking twice with the same static libary.
+
+2003-04-18 Friday 22:43  fenrir
+
+  * mp4.c : begining of a mp4/mov muxer.
+
+  It's far from stable, produce file unplayable by mplayer at least,
+ and doesn't yet take care of video/audio synchro.
+ Becarefull that the header is written only when closing, and there is
+ no way to repair a mp4 file without its header.
+
+2003-04-18 Friday 22:38  fenrir
+
+  * stream_output.c: add a vlc_mutex_lock/unlock ...
+
+2003-04-18 Friday 19:26  titer
+
+  Added a few keyboard shortcuts
+
+2003-04-18 Friday 16:38  titer
+
+  Under BeOS, disable the screensaver if playing in fullscreen.
+
+2003-04-18 Friday 16:10  titer
+
+  beos/*: fixed fullscreen shortcuts
+
+2003-04-18 Friday 16:04  asmax
+
+ * network stream now work
+ * double-click is now implemented
+
+2003-04-18 Friday 15:25  titer
+
+  ALL: fixed i18n under BeOS
+
+2003-04-17 Thursday 19:56  karibu
+
+ * Ask tooney to know ! (fix minor bug)
+
+2003-04-17 Thursday 17:45  asmax
+
+ * small fix
+
+2003-04-17 Thursday 16:34  karibu
+
+ * Scrolling text now works on linux
+
+2003-04-17 Thursday 16:32  karibu
+
+ * Fixed kludge
+
+2003-04-17 Thursday 16:30  karibu
+
+ * Added AddEllipse: the slider now works ! :)
+
+2003-04-17 Thursday 16:11  karibu
+
+ * Added clip region to graphics
+ * Added functionnality to region
+
+2003-04-17 Thursday 15:43  karibu
+
+ * Improved font support for linux (just missing underline parameter )
+
+2003-04-17 Thursday 14:18  anil
+
+ * oups forgot to commit this one. still the hide/show thing.
+
+2003-04-17 Thursday 14:00  anil
+
+ * We now use hide/show for the file info window
+
+2003-04-17 Thursday 13:46  karibu
+
+ * Can get size of a text
+
+2003-04-17 Thursday 13:08  karibu
+
+ * SkinManage is called by a timer
+ * Timer for text control are working badly but it's the first step
+
+2003-04-17 Thursday 10:58  fenrir
+
+  * ffmpeg: remove some #ifdef (you need at least libavcodec build >= 4655)
+ and use ffmpeg postprocessing instead of vlc builtins. (It's a lot faster).
+
+2003-04-17 Thursday 10:53  karibu
+
+ * Fixed dewtructor
+
+2003-04-17 Thursday 10:42  asmax
+
+ * beginning of font support !
+
+2003-04-16 Wednesday 21:50  karibu
+
+ * gtk2_theme.cpp: window are not automatically visibled
+ * gtk2_window.cpp: removed fading transition delay
+ * vlcproc.cpp: removed warning
+
+2003-04-16 Wednesday 21:40  ipkiss
+
+  *  modules/gui/skins/*: we now #include skin files using a relative
+     path, so that MSVC is happy :)
+
+2003-04-16 Wednesday 21:39  karibu
+
+ * Removed debug calls
+
+2003-04-16 Wednesday 21:30  karibu
+
+ * Can now quit the interface
+
+2003-04-16 Wednesday 19:22  karibu
+
+ * gtk2_bitmap.cpp: fixed constructor bug
+ * Events work better: controls are working, not still perfectly...
+
+2003-04-16 Wednesday 16:33  fenrir
+
+  * transcode: tried to fix compilation with older libavcodec.
+
+2003-04-16 Wednesday 16:32  fenrir
+
+  * mp4: fix a string format.
+
+2003-04-16 Wednesday 16:20  fenrir
+
+  * mp4: removed empty strings in msg_Dbg.
+
+2003-04-16 Wednesday 15:34  asmax
+
+ * small fix
+
+2003-04-16 Wednesday 14:38  asmax
+
+ * at last, transpareny WORKS !!!!!
+
+2003-04-16 Wednesday 11:47  gbazin
+
+ * modules/misc/dummy/input.c, modules/access/file.c, include/vlc_common.h:
+    msvc compilation fixes.
+
+2003-04-16 Wednesday 00:12  fenrir
+
+  * modules/packetizer/mpegvideo.c : cut after a complete picture. (Not
+ before first slice).
+  * ffmpeg: use indeo v3 decoder (untested).
+  * stream_ouput.c,libvlc.h : take care of:
+  --sout-acodec,--sout-vcodec : use transcoding. (You can specify bitrate
+ using --sout-abitrate and --sout-vbitrate in kilobits/s).
+  --sout-display: to display while streaming.
+ (Btw there is a problem with vout and display, it leads to a ref count = -1)
+
+2003-04-15 Tuesday 22:16  asmax
+
+  * remove a small kludge
+  * tried to add transparency, but it doesn't work :(
+
+2003-04-15 Tuesday 20:54  karibu
+
+ * GTK2 events work even better
+
+2003-04-15 Tuesday 20:42  karibu
+
+ * Fixed GTK2 events
+
+2003-04-15 Tuesday 20:33  karibu
+
+ * Events are even better, not yet perfect !
+
+2003-04-15 Tuesday 17:55  ipkiss
+
+  * event broadcasting should work
+
+2003-04-15 Tuesday 16:49  karibu
+
+ * Fixed mouse leave notification
+
+2003-04-15 Tuesday 16:47  karibu
+
+ * Fixed mouse leaving notification for windows
+ * Added mouse leaving notification for gdk
+
+2003-04-15 Tuesday 16:42  karibu
+
+ * Fixed mouse events
+
+2003-04-15 Tuesday 15:53  gbazin
+
+ * modules/codec/libmpeg2.c: small bugfix.
+
+2003-04-15 Tuesday 14:05  hartman
+
+ modules/gui/macosx/controls.m:
+  * present the open dialog when pressing play button instead of 'standard'
+    open dialog, to make users more aware of this dialog and the functions
+    it has.
+ ALL:
+  * when opening a file NOT trough the Open dialog, make sure sout and
+    suboptions are reset to ""
+
+2003-04-15 Tuesday 12:40  hartman
+
+ * reselect current playlist item when reordering items.
+
+2003-04-15 Tuesday 11:46  ipkiss
+
+  * compilation fix
+
+2003-04-15 Tuesday 01:19  ipkiss
+
+  * basic event handling
+
+2003-04-14 Monday 23:10  sam
+
+   * ./toolbox: the Solaris diff does not understand -q, just replaced it
+     with 2>&1 >/dev/null.
+
+2003-04-14 Monday 23:07  sam
+
+   * ./toolbox: fixed a bashism.
+
+2003-04-14 Monday 22:29  gbazin
+
+ * modules/gui/skins/src/event.cpp: fixed another small buffer overrun.
+
+2003-04-14 Monday 22:22  massiot
+
+ * Implementation of a frame-dropping algorithm for the libmpeg2 plug-in
+   (incomplete).
+
+2003-04-14 Monday 21:38  asmax
+
+ * implemented OSAPI_GetTime() with glib
+
+2003-04-14 Monday 20:17  asmax
+
+ * it works event better !!
+
+2003-04-14 Monday 20:07  asmax
+
+ * it works !
+
+2003-04-14 Monday 18:10  sam
+
+   * ./configure.ac.in: skins _disabled_ by default on [!win32].
+
+2003-04-14 Monday 18:05  asmax
+
+ * better window size
+
+2003-04-14 Monday 17:56  karibu
+
+ * Controls coordinate are available
+
+2003-04-14 Monday 17:16  sam
+
+   * ./debian/rules: we now build the static objects twice: once the normal
+     way before we link them with VLC, and once with -fPIC so that they can
+     be linked to the Mozilla plugin. Don't worry, it's Debian-specific, and
+     we don't need it on x86.
+
+2003-04-14 Monday 17:03  asmax
+
+ * get the size of a bitmap
+
+2003-04-14 Monday 10:18  asmax
+
+ * bad directory
+
+2003-04-14 Monday 10:00  karibu
+
+ * Added use of channel server for skins: still experimental
+
+2003-04-14 Monday 03:23  fenrir
+
+  * all: correctly set p_payload_end when using input_NewPacket.(But
+ we should perhaps change the behavour of input_NewPacket).
+
+2003-04-14 Monday 03:13  fenrir
+
+  * transcode.c: removed an absolute header path...
+
+2003-04-14 Monday 02:26  fenrir
+
+  * display.c: fixed decoding problem with mpeg1/2. (input_NewPacket doesn't
+ set p_payload_end to the good value -> some packets are bigger than
+ requested).
+
+2003-04-13 Sunday 22:55  asmax
+
+ * at last an image !!
+
+2003-04-13 Sunday 20:07  asmax
+
+ * something will be visible soon, be patient...
+  (this silly GDK doesn't know BMP images :(
+
+2003-04-13 Sunday 20:00  fenrir
+
+  * all: new sout scheme. Now a chain of module are created that can
+ modify/apply on all streams, --sout has the same behavour expect when
+ starting with a '#'.
+
+  With a starting '#' you can specify a chain of modules, it's still
+ unstable but a lot more powerfull.
+  You have access to duplicate(that duplicate all stream), transcode
+ (using only ffmpeg), standard/std and es (that apply muxers and access),
+ and display. You could chain them with ':' and specify options with
+ {option1=value,option2=value[,...]}.
+
+ ex: * to stream and see the stream to udp/ts:ip
+  --sout '#duplicate{dst=display,dst=std{access=udp,mux=ts,url=ip}}'
+     * to transcode,see and stream
+  --sout '#transcode{acodec=mpga}:duplicate{dst=display,dst=std{access=udp,mux=ts,url=ip}}'
+
+  Without a starting '#', the url is converted into '#std{acces=,mux=,url}'
+ Test and report bugs :)
+
+2003-04-13 Sunday 19:09  asmax
+
+ * should have repaired win32 skins
+
+2003-04-13 Sunday 17:46  asmax
+
+ * Gtk2 skins: it doesn't work but it runs without any segfault, so
+   I commit ;)
+   (I probably broke skins under windows....)
+
+2003-04-12 Saturday 22:50  asmax
+
+ * now the skin module compiles AND links !
+   (and segfaults... ;)
+
+2003-04-12 Saturday 21:43  asmax
+
+ * at last made the skin module compile under linux !
+   It does absolutely nothing, but it compiles ;)
+
+2003-04-12 Saturday 13:17  asmax
+
+ * renamed "kernel" into "vlc" ;)
+
+2003-04-12 Saturday 13:06  asmax
+
+ * added libraries to please Bill ;)
+
+2003-04-12 Saturday 10:34  asmax
+
+ * fixed dependencies and added options
+
+2003-04-12 Saturday 10:01  asmax
+
+ * fixed a typo
+
+2003-04-12 Saturday 09:57  asmax
+
+ * more options in menuconfig script
+   Only tested under linux; please give feedback if something is wrong
+   Some help should be written in doc/Configure.help; if you know what
+   to write there, please contribute !
+
+2003-04-11 Friday 22:08  videolan
+
+ * New message: VLC_NET_ADDUDP, to add an UDP stream to the playlist. Still
+                experimental
+
+2003-04-11 Friday 21:19  videolan
+
+ * Fixed bug: When button or checkbox are disabled, the previous control can't
+              take the hand
+
+2003-04-11 Friday 20:45  asmax
+
+ * user-friendly(?) build system, based on linux Menuconfig script.
+   Just run ./menuconfig and ./build-vlc (or just ./build-vlc)
+   It's actually a wrapper which calls configure, but only a small number
+   of vlc functionalities has been implemented at the moment.
+   Please try it however ;)
+   (you must have libncurses-dev installed)
+
+2003-04-11 Friday 19:15  sam
+
+   * ./debian/control: changed the libvlc0-dev section to libdevel (to match
+     the Debian installer's override file).
+   * ./debian/woody-buildpackage: updated accordingly.
+
+2003-04-09 Wednesday 20:53  hartman
+
+ * All : added an about VLC panel. It scrolls the names and the work of the
+         AUTHORS file.
+
+ * AUTHORS: updated my own info
+
+2003-04-09 Wednesday 20:07  jpsaman
+
+ Familiar Linux (GPE/GTK+,OPIE) packaging and building scripts.
+
+2003-04-09 Wednesday 19:58  gbazin
+
+ * src/libvlc.c: fixed the "color" config option.
+ * src/misc/messages.c: removed an unnecessary #ifdef WIN32 in PrintMsg().
+
+2003-04-09 Wednesday 17:27  sam
+
+   * ./Makefile.am: we call pbxbuilder with the explicit target name, because
+     we might have an additional target one day, such as vlcplugin :)
+   * ./mozilla/vlc.r: OS X specific resource file for an OS X plugin.
+   * ./mozilla/vlcshell.cpp: added required OS X functions.
+
+2003-04-09 Wednesday 16:18  sam
+
+   * ./mozilla/*: moved support files in a separate directory.
+   * ./mozilla/support/npmac.cpp: added a hacked version of Mozilla's npmac.cpp
+     that builds with g++ instead of CodeWarrior.
+
+2003-04-09 Wednesday 16:05  sam
+
+   * ./toolbox: implemented toolbox --distclean to clean the tree without
+     having to bootstrap/configure/whatever.
+
+2003-04-09 Wednesday 14:12  hartman
+
+ * modules/gui/macosx/*:
+   - when adding multiple files, we sort them alphabetically before adding them.
+     stupid finder ;)
+
+ * modules/demux/asf/asf.c:
+   - avoid a duplicate translation of a string
+
+2003-04-09 Wednesday 12:33  sam
+
+   * ./debian/rules: mouahaha, cutting off the branch I was sitting on.
+
+2003-04-09 Wednesday 12:03  sam
+
+   * ./modules/gui/kde/preferences.cpp: KDE 2 backport.
+
+2003-04-09 Wednesday 11:43  sam
+
+   * ./debian/woody-buildpackage: additional error checking.
+
+2003-04-09 Wednesday 10:34  sam
+
+   * ./debian/rules: we now remove spurious woody build files in the clean rule.
+
+2003-04-09 Wednesday 10:17  sam
+
+   * ./debian/rules: fixed a clock skew issue in debian/rules.
+
+2003-04-09 Wednesday 09:59  titer
+
+  v4l.c: compile fix
+
+2003-04-09 Wednesday 09:40  titer
+
+  - fixed my last fix for BeOS/BONE
+  - fixed v4l detection
+
+2003-04-08 Tuesday 22:38  massiot
+
+ Now 0.5.4-cvs.
+
+2003-04-08 Tuesday 21:31  massiot
+
+ * Updated ChangeLog.
+
 2003-04-08 Tuesday 21:26  gbazin
 
  * modules/audio_output/waveout.c: compilation fix for builtins only build.
@@ -893,13 +4037,6 @@
 2003-03-15 Saturday 22:10  jlj
 
  Another attempt at fixing the soundstick issue (unconfirmed).
-
-2003-03-15 Saturday 20:17  lool
-
-   * attempt at a docbook-xml version of the FAQ with XSL
-     customizations, if people want to help or just have a look
-   (use "xsltproc faq-alone.xsl faq-alone.xml" with the
-    docbook-xml-simple package installed or saxon if you feel bored)
 
 2003-03-15 Saturday 19:26  fenrir
 
@@ -2043,10 +5180,6 @@
    * ./debian/rules: the deprecated vlc-* packages have a proper link to
      /usr/share/doc/vlc/.
 
-2003-02-16 Sunday 16:58  ipkiss
-
-  * added an entry for the "subtitles don"t work on windows" problem
-
 2003-02-16 Sunday 16:22  jpsaman
 
  Updated release numbering for all ipk's
@@ -2525,11 +5658,6 @@
    - position of top left corner should not change
    - more efficient code
 
-2003-02-07 Friday 20:49  alexis
-
- - FAQ : the first question of the "troubleshooting" section now tells the
- user to delete VLC's configuration file.
-
 2003-02-07 Friday 20:23  hartman
 
  * added half, normal and full size videowindow menuitems.
@@ -2626,10 +5754,6 @@
    * ./configure.ac.in: libmad and liba52 need to be explicitely disabled,
      otherwise we fail with an error when they are not found.
 
-2003-02-06 Thursday 00:45  sam
-
-   * ./doc/faq/faq.sgml: updated config file location for OS X.
-
 2003-02-05 Wednesday 22:48  hartman
 
  * Changed the wrong property in my recent commit. FIXED
@@ -2723,15 +5847,6 @@
  	- added reverse sort command to edit menu
  	- added view menu, to allow the user to display paths
  		or only names in the list
-
-2003-02-03 Monday 16:07  alexis
-
- Small fix.
-
-2003-02-03 Monday 11:25  alexis
-
- Article format, instead of book format.
- Few typos.
 
 2003-02-03 Monday 02:26  sam
 
@@ -3001,12 +6116,6 @@
 
  Changes done since Feb 28 2003:
 
-2003-02-01 Saturday 11:48  alexis
-
- * common/stylesheet-print-noicones.dsl : stylesheet for PS/PDF/RTF output
- * faq/Makefile: added PS/PDF/RTF targets
- * faq/faq.sgml: SGML enhancements and few modifications
-
 2003-02-01 Saturday 09:40  babal
 
  - fixed a compilation issue with C compilers
@@ -3032,13 +6141,6 @@
 
    * ./configure.ac.in: I was told some versions of mingw32 support neither
      -mms-bitfields nor -fnative-struct.
-
-2003-01-31 Friday 15:24  zorglub
-
- * doc/faq/Makefile: added "text" and "clean" targets.
- * doc/faq/faq-alone.sgml: Fixed build issues, added FDL, and legal notice.
- * doc/faq/faq.sgml: Fixed build issues, improved the SGML translation.
- * doc/faq/fdl.sgml: text of the FSF Free Documentation License.
 
 2003-01-31 Friday 13:52  sam
 
@@ -5784,11 +8886,11 @@
 
 2002-12-04 Wednesday 20:51  jpsaman
 
- Build scripts for building cross-compiling vlc for Opie and GPE.
+ file rules.opie was initially added on branch v0_4_1_branch.
 
 2002-12-04 Wednesday 20:51  jpsaman
 
- file rules.opie was initially added on branch v0_4_1_branch.
+ Build scripts for building cross-compiling vlc for Opie and GPE.
 
 2002-12-04 Wednesday 20:51  jpsaman
 
@@ -7719,11 +10821,11 @@
 
 2002-10-06 Sunday 20:23  jpsaman
 
- file gpe-configure.in.patch was initially added on branch v0_4_1_branch.
+ Patch for using libgpewidget library for full GPE support.
 
 2002-10-06 Sunday 20:23  jpsaman
 
- Patch for using libgpewidget library for full GPE support.
+ file gpe-configure.in.patch was initially added on branch v0_4_1_branch.
 
 2002-10-06 Sunday 19:59  jpsaman
 
@@ -7735,14 +10837,14 @@
 
 2002-10-06 Sunday 19:39  jpsaman
 
+ file control.gpe was initially added on branch v0_4_1_branch.
+
+2002-10-06 Sunday 19:39  jpsaman
+
  Added control file for Familiar GPE build. There are three control files now:
  - control : depends on task-x and sdl only for backwards compatibility of familiar v0.5.3.
  - control.gpe : depends on gpe specific libraries (gpe.handhelds.org) for familiar v0.6 and onwards.
  - control.opie : depends on qt embedded libraries (opie.handhelds.org) for familiar v0.6 and onwards.
-
-2002-10-06 Sunday 19:39  jpsaman
-
- file control.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-06 Sunday 19:35  jpsaman
 
@@ -7782,19 +10884,19 @@
 
 2002-10-06 Sunday 18:56  jpsaman
 
- file postrm.gpe was initially added on branch v0_4_1_branch.
+ More GPE packaging stuff for Familiar Linux distribution.
 
 2002-10-06 Sunday 18:56  jpsaman
 
- More GPE packaging stuff for Familiar Linux distribution.
-
-2002-10-06 Sunday 11:47  jpsaman
-
- file vlc.gpe was initially added on branch v0_4_1_branch.
+ file postrm.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-06 Sunday 11:47  jpsaman
 
  GPE menu launch script for iPaq port.
+
+2002-10-06 Sunday 11:47  jpsaman
+
+ file vlc.gpe was initially added on branch v0_4_1_branch.
 
 2002-10-05 Saturday 19:26  jlj
 
@@ -7863,11 +10965,11 @@
 
 2002-10-03 Thursday 21:10  jpsaman
 
- file vlc.opie was initially added on branch v0_4_1_branch.
+ vlc launch script for opie.
 
 2002-10-03 Thursday 21:10  jpsaman
 
- vlc launch script for opie.
+ file vlc.opie was initially added on branch v0_4_1_branch.
 
 2002-10-03 Thursday 21:01  jpsaman
 
@@ -9937,15 +13039,23 @@
 
 2002-06-09 Sunday 22:33  massiot
 
- file mpeg2.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
  file mpeg4.icns was initially added on branch v0_4_1_branch.
 
 2002-06-09 Sunday 22:33  massiot
 
  file generic.icns was initially added on branch v0_4_1_branch.
+
+2002-06-09 Sunday 22:33  massiot
+
+ file mpeg.icns was initially added on branch v0_4_1_branch.
+
+2002-06-09 Sunday 22:33  massiot
+
+ file mpeg2.icns was initially added on branch v0_4_1_branch.
+
+2002-06-09 Sunday 22:33  massiot
+
+ file divx.icns was initially added on branch v0_4_1_branch.
 
 2002-06-09 Sunday 22:33  massiot
 
@@ -9955,14 +13065,6 @@
 2002-06-09 Sunday 22:33  massiot
 
  file mpeg1.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file divx.icns was initially added on branch v0_4_1_branch.
-
-2002-06-09 Sunday 22:33  massiot
-
- file mpeg.icns was initially added on branch v0_4_1_branch.
 
 2002-06-08 Saturday 14:08  sam
 
@@ -20215,11 +23317,11 @@
 
 1999-08-08 Sunday 12:42  maxx
 
- Initial revision
-
-1999-08-08 Sunday 12:42  maxx
-
  * CVS Creation
 
  -- MaXX
+
+1999-08-08 Sunday 12:42  maxx
+
+ Initial revision
 
