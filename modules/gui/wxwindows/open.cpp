@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.69 2004/02/14 12:36:16 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -243,7 +243,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                wxU(_("Open :")) );
+                                                wxU(_("Open:")) );
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1),
                                 0, NULL );
@@ -421,7 +421,7 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
     wxFlexGridSizer *subsfile_sizer = new wxFlexGridSizer( 2, 1, 20 );
     subsfile_checkbox = new wxCheckBox( panel, SubsFileEnable_Event,
                                         wxU(_("Subtitle options")) );
-    subsfile_checkbox->SetToolTip( wxU(_("Force options for seperate subtitle files.")) );
+    subsfile_checkbox->SetToolTip( wxU(_("Force options for separate subtitle files.")) );
     subsfile_sizer->Add( subsfile_checkbox, 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subsfile_button = new wxButton( panel, SubsFileSettings_Event,

@@ -71,8 +71,8 @@ void E_(Close)   ( vlc_object_t * );
 #define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
-#define PROBE_TEXT N_("Probe dvb card for capabilities")
-#define PROBE_LONGTEXT N_("Some dvb cards do not like to be probed for their capabilities.")
+#define PROBE_TEXT N_("Probe DVB card for capabilities")
+#define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their capabilities.")
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")

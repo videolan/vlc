@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.54 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -98,7 +98,7 @@
 #define SAP_TIMEOUT_TEXT N_("SAP timeout (seconds)")
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Sets the time before SAP items get deleted if no new announce" \
-       "is received")
+       "is received.")
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.17 2004/02/23 20:45:52 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -53,7 +53,7 @@ static void AccessClose( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for rtsp streams. This " \
+    "Allows you to modify the default caching value for RTSP streams. This " \
     "value should be set in miliseconds units." )
 
 vlc_module_begin();
@@ -69,8 +69,8 @@ vlc_module_begin();
         set_capability( "access", 0 );
         set_callbacks( AccessOpen, AccessClose );
         add_bool( "rtsp-tcp", 0, NULL,
-                  N_("Use rtp over rtsp (tcp)"),
-                  N_("Use rtp over rtsp (tcp)"), VLC_TRUE );
+                  N_("Use RTP over RTSP (TCP)"),
+                  N_("Use RTP over RTSP (TCP)"), VLC_TRUE );
         add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
             CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 vlc_module_end();

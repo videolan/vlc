@@ -2,7 +2,7 @@
  * v4l.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: v4l.cpp,v 1.7 2004/01/25 03:29:02 hartman Exp $
+ * $Id$
  *
  * Authors: Mohammed Adnène Trojette <adn@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ V4LDialog::V4LDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
                                 wxPoint(20,25), wxSize(200, -1), 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
         "the full MRL you want to open.\n Alternatively, the field will be "
-        "filled automatically when you use the controls below")) );
+        "filled automatically when you use the controls below.")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );

@@ -2,7 +2,7 @@
  * ntservice.c: Windows NT/2K/XP service interface
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ntservice.c,v 1.5 2004/01/25 16:17:03 anil Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,24 +36,24 @@
 static int  Activate( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-#define INSTALL_TEXT N_( "Install NT/2K/XP service" )
+#define INSTALL_TEXT N_( "Install Windows Service" )
 #define INSTALL_LONGTEXT N_( \
-    "If enabled the interface will install the service and exit." )
-#define UNINSTALL_TEXT N_( "Uninstall NT/2K/XP service" )
+    "If enabled the interface will install the Service and exit." )
+#define UNINSTALL_TEXT N_( "Uninstall Windows Service" )
 #define UNINSTALL_LONGTEXT N_( \
-    "If enabled the interface will uninstall the service and exit." )
-#define NAME_TEXT N_( "Display name of the service" )
+    "If enabled the interface will uninstall the Service and exit." )
+#define NAME_TEXT N_( "Display name of the Service" )
 #define NAME_LONGTEXT N_( \
-    "This allows you to change the display name of the service." )
+    "This allows you to change the display name of the Service." )
 #define EXTRAINTF_TEXT N_("Extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
     "This option allows you to select additional interfaces spawned by the " \
-    "service. It should be specified at install time so the service is " \
+    "Service. It should be specified at install time so the Service is " \
     "properly configured. Use a comma separated list of interface modules. " \
     "(common values are: logger, sap, rc, http)")
 
 vlc_module_begin();
-    set_description( _("Windows NT/2K/XP service interface") );
+    set_description( _("Windows Service interface") );
     add_bool( "ntservice-install", 0, NULL,
               INSTALL_TEXT, INSTALL_LONGTEXT, VLC_TRUE );
     add_bool( "ntservice-uninstall", 0, NULL,

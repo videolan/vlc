@@ -1048,14 +1048,14 @@ create_pda (void)
   gtk_table_attach (GTK_TABLE (tableTranscode), comboStdMuxer, 1, 2, 8, 9,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("ps"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("ts"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("mpeg1"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("avi"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("ogg"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("mp4"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("mov"));
-  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("asf"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("PS"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("TS"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("MPEG1"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("AVI"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("OGG"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("MP4"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("MOV"));
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("ASF"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboStdMuxer), comboStdMuxer_items);
   g_list_free (comboStdMuxer_items);
 
@@ -1331,7 +1331,7 @@ create_pda (void)
   gtk_fixed_put (GTK_FIXED (fixed2), aboutImage, 0, 0);
   gtk_widget_set_size_request (aboutImage, 48, 48);
 
-  labelDescription = gtk_label_new (_("VLC Media Player is an MPEG, MPEG 2, MP3 and DivX player that accepts input from local or network sources and is licensed under the GPL (http://www.gnu.org/copyleft/gpl.html)."));
+  labelDescription = gtk_label_new (_("VLC media player is an MPEG, MPEG 2, MP3 and DivX player that accepts input from local or network sources and is licensed under the GPL (http://www.gnu.org/copyleft/gpl.html)."));
   gtk_widget_set_name (labelDescription, "labelDescription");
   gtk_widget_show (labelDescription);
   gtk_fixed_put (GTK_FIXED (fixed2), labelDescription, 16, 112);

@@ -2,7 +2,7 @@
  * directory.c: expands a directory (directory: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: directory.c,v 1.6 2004/02/17 13:13:31 gbazin Exp $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -83,12 +83,12 @@ int ReadDir( input_thread_t *p_input, char *psz_name , int i_mode );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define RECURSIVE_TEXT N_("Includes subdirectories ?")
+#define RECURSIVE_TEXT N_("Includes subdirectories?")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
-        "none : subdirectories do not appear in the playlist.\n" \
-        "collapse : subdirectories appear but are expanded on first play.\n" \
-        "expand : all subdirectories are expanded.\n" )
+        "none: subdirectories do not appear in the playlist.\n" \
+        "collapse: subdirectories appear but are expanded on first play.\n" \
+        "expand: all subdirectories are expanded.\n" )
 
 static char *psz_recursive_list[] = { "none", "collapse", "expand" };
 static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),

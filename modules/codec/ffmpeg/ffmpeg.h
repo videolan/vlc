@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.32 2004/01/25 18:20:12 bigben Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -103,7 +103,8 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "but it can produce distorted pictures.")
 
 #define TRUNC_TEXT N_("Truncated stream")
-#define TRUNC_LONGTEXT N_("Truncated stream -1:auto,0:disable,:1:enable")
+#define TRUNC_LONGTEXT N_("Truncated stream "\
+    "-1: auto, 0: disable, 1: enable")
 
 #define PP_Q_TEXT N_("Post processing quality")
 #define PP_Q_LONGTEXT N_( \

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.45 2004/01/26 16:52:31 zorglub Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -369,11 +369,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
 
         case OPEN_FILE:
-        	_ShowFilePanel( B_REFS_RECEIVED, _("VLC Media Player: Open Media Files") );
+        	_ShowFilePanel( B_REFS_RECEIVED, _("VLC media player: Open Media Files") );
             break;
 
         case LOAD_SUBFILE:
-        	_ShowFilePanel( SUBFILE_RECEIVED, _("VLC Media Player: Open Subtitle File") );
+        	_ShowFilePanel( SUBFILE_RECEIVED, _("VLC media player: Open Subtitle File") );
             break;
 
         case OPEN_PLAYLIST:

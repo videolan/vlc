@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.135 2004/03/02 13:53:14 kuehne Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -326,23 +326,23 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
-    "Automatically detect a subtitle file, if no subtitle filename is " \
-    "specified."
+    N_("Automatically detect a subtitle file, if no subtitle filename is " \
+    "specified.")
 
 #define SUB_FUZZY_TEXT N_("Subtitle autodection fuzziness")
 #define SUB_FUZZY_LONGTEXT \
-    "This determines how fuzzy subtitle and movie filenaming matching " \
+    N_("This determines how fuzzy subtitle and movie filenaming matching " \
     "will be. Options are:\n" \
     "0 = no subtitles autodetected\n" \
     "1 = any subtitle file\n" \
     "2 = any subtitle file containing the movie name\n" \
     "3 = subtitle file matching the movie name with additional chars\n" \
-    "4 = subtitle file matching the movie name exactly"
+    "4 = subtitle file matching the movie name exactly")
 
 #define SUB_FILE_TEXT N_("Use subtitle file")
 #define SUB_FILE_LONGTEXT \
-    "Load this subtitle file. To be used when autodetect cannot detect " \
-    "your subtitlefile."
+    N_("Load this subtitle file. To be used when autodetect cannot detect " \
+    "your subtitle file.")
 
 #define DVD_DEV_TEXT N_("DVD device")
 #ifdef WIN32
@@ -525,7 +525,7 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 
 #define RT_OFFSET_TEXT N_("Adjust VLC priority")
 #define RT_OFFSET_LONGTEXT N_( \
-    "This options adds an offset (positive or negative) to VLC default " \
+    "This option adds an offset (positive or negative) to VLC default " \
     "priorities. You can use it to tune VLC priority against other " \
     "programs, or against other VLC instances.")
 
@@ -609,17 +609,17 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
 #define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward.")
 
 #define QUIT_KEY_TEXT N_("Quit")
-#define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the applicatioN.")
+#define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
 #define NAV_UP_KEY_TEXT N_("Navigate up")
-#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in dvd menus.")
+#define NAV_UP_KEY_LONGTEXT N_("Select the key to move the selector up in DVD menus.")
 #define NAV_DOWN_KEY_TEXT N_("Navigate down")
-#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in dvd menus.")
+#define NAV_DOWN_KEY_LONGTEXT N_("Select the key to move the selector down in DVD menus.")
 #define NAV_LEFT_KEY_TEXT N_("Navigate left")
-#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in dvd menus.")
+#define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in DVD menus.")
 #define NAV_RIGHT_KEY_TEXT N_("Navigate right")
 #define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in dvd menus.")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
-#define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in dvd menus.")
+#define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in DVD menus.")
 #define VOL_UP_KEY_TEXT N_("Volume up")
 #define VOL_UP_KEY_LONGTEXT N_("Select the key to increase audio volume.")
 #define VOL_DOWN_KEY_TEXT N_("Volume down")

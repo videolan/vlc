@@ -2,7 +2,7 @@
  * mod.c: MOD file demuxer (using libmodplug)
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: mod.c,v 1.2 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ vlc_module_begin();
 
     add_bool( "mod-megabass", VLC_FALSE, NULL, N_("Mega bass"), N_("Mega bass"), VLC_FALSE );
     add_integer_with_range( "mod-megabass-level", 0, 0, 100, NULL, N_("Mega bass level (0-100)"), N_("Mega bass level (0-100 defaults to 0)"), VLC_FALSE );
-    add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL, N_("Mega bass cutt off (Hz)"), N_("Mega bass cutt off (10-100Hz)"), VLC_FALSE );
+    add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL, N_("Mega bass cut off (Hz)"), N_("Mega bass cut off (10-100Hz)"), VLC_FALSE );
 
     add_bool( "mod-surround", VLC_FALSE, NULL, N_("Surround"), N_("Surround"), VLC_FALSE );
     add_integer_with_range( "mod-surround-level", 0, 0, 100, NULL, N_("Surround level (0-100)"), N_("Surround level (0-100 defaults to 0)"), VLC_FALSE );
