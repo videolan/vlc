@@ -2,7 +2,7 @@
  * pes.h
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.h,v 1.3 2003/01/08 10:34:58 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -35,5 +35,5 @@
 
 
 int E_( EStoPES )( sout_instance_t *p_sout,
-                   sout_buffer_t **pp_pes, sout_buffer_t *p_es, 
+                   block_t **pp_pes, block_t *p_es,
                    int i_stream_id, int b_mpeg2 );

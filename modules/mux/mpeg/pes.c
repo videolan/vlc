@@ -2,7 +2,7 @@
  * pes.c: PES packetizer used by the MPEG multiplexers
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.15 2004/03/03 11:34:41 massiot Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -229,12 +229,12 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 }
 
 int E_( EStoPES )( sout_instance_t *p_sout,
-                   sout_buffer_t **pp_pes,
-                   sout_buffer_t *p_es,
+                   block_t **pp_pes,
+                   block_t *p_es,
                    int i_stream_id,
                    int b_mpeg2 )
 {
-    sout_buffer_t *p_es_sav, *p_pes;
+    block_t *p_es_sav, *p_pes;
     mtime_t i_pts, i_dts, i_length;
 
     uint8_t *p_data;
@@ -258,7 +258,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
     i_pts = p_es->i_pts <= 0 ? 0 : p_es->i_pts * 9 / 100; // 90000 units clock
     i_dts = p_es->i_dts <= 0 ? 0 : p_es->i_dts * 9 / 100; // 90000 units clock
 
-    i_size = p_es->i_size;
+    i_size = p_es->i_buffer;
     p_data = p_es->p_buffer;
 
     *pp_pes = p_pes = NULL;
@@ -274,12 +274,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
 
         if( p_es )
         {
-            if( sout_BufferReallocFromPreHeader( p_sout, p_es, i_pes_header ) )
-            {
-                msg_Err( p_sout,
-                         "cannot realloc preheader (should never happen)" );
-                return( -1 );
-            }
+            p_es = block_Realloc( p_es, i_pes_header, 0 );
             /* reuse p_es for first frame */
             *pp_pes = p_pes = p_es;
             /* don't touch i_dts, i_pts, i_length as are already set :) */
@@ -287,8 +282,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
         }
         else
         {
-            p_pes->p_next = sout_BufferNew( p_sout,
-                                            i_pes_header + i_pes_payload );
+            p_pes->p_next = block_New( p_sout, i_pes_header + i_pes_payload );
             p_pes = p_pes->p_next;
 
             p_pes->i_dts    = 0;
@@ -307,15 +301,9 @@ int E_( EStoPES )( sout_instance_t *p_sout,
 
         i_size -= i_pes_payload;
         p_data += i_pes_payload;
-        p_pes->i_size =  i_pes_header + i_pes_payload;
+        p_pes->i_buffer =  i_pes_header + i_pes_payload;
 
     } while( i_size > 0 );
-
-    /* save some space */
-    if( p_es_sav->i_size + 10*1024 < p_es_sav->i_buffer_size )
-    {
-        sout_BufferRealloc( p_sout, p_es_sav, p_es_sav->i_size );
-    }
 
     /* Now redate all pes */
     i_dts    = (*pp_pes)->i_dts;

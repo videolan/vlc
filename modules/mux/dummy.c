@@ -2,7 +2,7 @@
  * dummy.c: dummy muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.10 2003/12/14 22:49:28 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -28,10 +28,8 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-#include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include "codecs.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -130,21 +128,17 @@ static int Mux( sout_mux_t *p_mux )
 
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
+        block_fifo_t *p_fifo;
         int i_count;
-        sout_fifo_t *p_fifo;
 
         if( p_sys->b_header && p_mux->pp_inputs[i]->p_fmt->i_extra )
         {
             /* Write header data */
-            sout_buffer_t *p_data;
-            p_data = sout_BufferNew( p_mux->p_sout,
-                                     p_mux->pp_inputs[i]->p_fmt->i_extra );
+            block_t *p_data;
+            p_data = block_New( p_mux, p_mux->pp_inputs[i]->p_fmt->i_extra );
 
             memcpy( p_data->p_buffer, p_mux->pp_inputs[i]->p_fmt->p_extra,
                     p_mux->pp_inputs[i]->p_fmt->i_extra );
-
-            p_data->i_size = p_mux->pp_inputs[i]->p_fmt->i_extra;
-            p_data->i_dts = p_data->i_pts = p_data->i_length = 0;
 
             msg_Dbg( p_mux, "writing header data" );
             sout_AccessOutWrite( p_mux->p_access, p_data );
@@ -154,15 +148,12 @@ static int Mux( sout_mux_t *p_mux )
         i_count = p_fifo->i_depth;
         while( i_count > 0 )
         {
-            sout_buffer_t *p_data;
-
-            p_data = sout_FifoGet( p_fifo );
+            block_t *p_data = block_FifoGet( p_fifo );
 
             sout_AccessOutWrite( p_mux->p_access, p_data );
 
             i_count--;
         }
-
     }
     p_sys->b_header = VLC_FALSE;
 

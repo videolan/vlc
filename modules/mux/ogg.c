@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.28 2004/02/06 23:43:32 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -41,22 +41,11 @@
 #include <ogg/ogg.h>
 
 /*****************************************************************************
- * Exported prototypes
+ * Module descriptor
  *****************************************************************************/
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
-static int Capability(sout_mux_t *, int, void *, void * );
-static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
-static int Mux      ( sout_mux_t * );
-
-static sout_buffer_t *OggCreateHeader( sout_mux_t *, mtime_t );
-static sout_buffer_t *OggCreateFooter( sout_mux_t *, mtime_t );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin();
     set_description( _("Ogg/ogm muxer") );
     set_capability( "sout mux", 10 );
@@ -64,6 +53,18 @@ vlc_module_begin();
     add_shortcut( "ogm" );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static int Capability(sout_mux_t *, int, void *, void * );
+static int AddStream( sout_mux_t *, sout_input_t * );
+static int DelStream( sout_mux_t *, sout_input_t * );
+static int Mux      ( sout_mux_t * );
+
+static block_t *OggCreateHeader( sout_mux_t *, mtime_t );
+static block_t *OggCreateFooter( sout_mux_t *, mtime_t );
 
 /*****************************************************************************
  * Misc declarations
@@ -137,7 +138,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
-        sout_fifo_t  *p_fifo;
+        block_fifo_t  *p_fifo;
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
 
@@ -150,9 +151,9 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
             ( p_mux->pp_inputs[i]->p_fmt->i_cat == SPU_ES &&
               p_fifo->i_depth > 0 ) )
         {
-            sout_buffer_t *p_buf;
+            block_t *p_buf;
 
-            p_buf = sout_FifoShow( p_fifo );
+            p_buf = block_FifoShow( p_fifo );
             if( i_stream < 0 || p_buf->i_dts < i_dts )
             {
                 i_dts = p_buf->i_dts;
@@ -195,7 +196,7 @@ typedef struct
 
     oggds_header_t oggds_header;
 
-    sout_buffer_t *pp_sout_headers[3];
+    block_t *pp_sout_headers[3];
     int           i_sout_headers;
 
 } ogg_stream_t;
@@ -215,8 +216,8 @@ struct sout_mux_sys_t
     ogg_stream_t **pp_del_streams;
 };
 
-static void OggSetDate( sout_buffer_t *, mtime_t , mtime_t  );
-static sout_buffer_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *,
+static void OggSetDate( block_t *, mtime_t , mtime_t  );
+static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *,
                                       mtime_t );
 
 /*****************************************************************************
@@ -240,7 +241,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
-    p_mux->i_preheader  = 1;
 
     /* First serial number is random.
      * (Done like this because on win32 you need to seed the random number
@@ -263,13 +263,13 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->i_del_streams )
     {
-        sout_buffer_t *p_og = NULL;
+        block_t *p_og = NULL;
         mtime_t i_dts = -1;
         int i;
 
         /* Close the current ogg stream */
         msg_Dbg( p_mux, "writing footer" );
-        sout_BufferChain( &p_og, OggCreateFooter( p_mux, 0 ) );
+        block_ChainAppend( &p_og, OggCreateFooter( p_mux, 0 ) );
 
         /* Remove deleted logical streams */
         for( i = 0; i < p_sys->i_del_streams; i++ )
@@ -455,7 +455,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys  = p_mux->p_sys;
     ogg_stream_t   *p_stream = (ogg_stream_t*)p_input->p_sys;
-    sout_buffer_t  *p_og;
+    block_t  *p_og;
 
     msg_Dbg( p_mux, "removing input" );
 
@@ -473,7 +473,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
         for( i = 0; i < p_stream->i_sout_headers; i++ )
         {
-            sout_BufferDelete( p_mux->p_sout, p_stream->pp_sout_headers[i] );
+            block_Release( p_stream->pp_sout_headers[i] );
             p_stream->i_sout_headers = 0;
         }
 
@@ -502,10 +502,10 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 /*****************************************************************************
  * Ogg bitstream manipulation routines
  *****************************************************************************/
-static sout_buffer_t *OggStreamFlush( sout_mux_t *p_mux,
+static block_t *OggStreamFlush( sout_mux_t *p_mux,
                                       ogg_stream_state *p_os, mtime_t i_pts )
 {
-    sout_buffer_t *p_og, *p_og_first = NULL;
+    block_t *p_og, *p_og_first = NULL;
     ogg_page      og;
 
     for( ;; )
@@ -519,27 +519,26 @@ static sout_buffer_t *OggStreamFlush( sout_mux_t *p_mux,
         }
 
         i_size = og.header_len + og.body_len;
-        p_og = sout_BufferNew( p_mux->p_sout, i_size);
+        p_og = block_New( p_mux, i_size);
 
         memcpy( p_og->p_buffer, og.header, og.header_len );
         memcpy( p_og->p_buffer + og.header_len, og.body, og.body_len );
-        p_og->i_size    = i_size;
         p_og->i_dts     = 0;
         p_og->i_pts     = i_pts;
         p_og->i_length  = 0;
 
         i_pts   = 0; // write it only once
 
-        sout_BufferChain( &p_og_first, p_og );
+        block_ChainAppend( &p_og_first, p_og );
     }
 
     return( p_og_first );
 }
 
-static sout_buffer_t *OggStreamPageOut( sout_mux_t *p_mux,
+static block_t *OggStreamPageOut( sout_mux_t *p_mux,
                                         ogg_stream_state *p_os, mtime_t i_pts )
 {
-    sout_buffer_t *p_og, *p_og_first = NULL;
+    block_t *p_og, *p_og_first = NULL;
     ogg_page      og;
 
     for( ;; )
@@ -553,27 +552,26 @@ static sout_buffer_t *OggStreamPageOut( sout_mux_t *p_mux,
         }
 
         i_size = og.header_len + og.body_len;
-        p_og = sout_BufferNew( p_mux->p_sout, i_size);
+        p_og = block_New( p_mux, i_size);
 
         memcpy( p_og->p_buffer, og.header, og.header_len );
         memcpy( p_og->p_buffer + og.header_len, og.body, og.body_len );
-        p_og->i_size    = i_size;
         p_og->i_dts     = 0;
         p_og->i_pts     = i_pts;
         p_og->i_length  = 0;
 
         i_pts   = 0; // write them only once
 
-        sout_BufferChain( &p_og_first, p_og );
+        block_ChainAppend( &p_og_first, p_og );
     }
 
     return( p_og_first );
 }
 
-static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
+static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 {
-    sout_buffer_t *p_hdr = NULL;
-    sout_buffer_t *p_og;
+    block_t *p_hdr = NULL;
+    block_t *p_og;
     ogg_packet    op;
     int i;
 
@@ -600,9 +598,9 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             /* first packet in order: vorbis/speex/theora info */
             if( !p_stream->i_sout_headers )
             {
-                p_og = sout_FifoGet( p_mux->pp_inputs[i]->p_fifo );
+                p_og = block_FifoGet( p_mux->pp_inputs[i]->p_fifo );
                 op.packet = p_og->p_buffer;
-                op.bytes  = p_og->i_size;
+                op.bytes  = p_og->i_buffer;
                 op.b_o_s  = 1;
                 op.e_o_s  = 0;
                 op.granulepos = 0;
@@ -612,8 +610,7 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
                     OggStreamFlush( p_mux, &p_stream->os, 0 );
                 p_stream->i_sout_headers++;
             }
-            p_og = sout_BufferDuplicate( p_mux->p_sout,
-                                         p_stream->pp_sout_headers[0] );
+            p_og = block_Duplicate( p_stream->pp_sout_headers[0] );
 
             /* Get keyframe_granule_shift for theora granulepos calculation */
             if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
@@ -655,7 +652,7 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
         }
 
-        sout_BufferChain( &p_hdr, p_og );
+        block_ChainAppend( &p_hdr, p_og );
     }
 
     /* Take care of the non b_o_s headers */
@@ -675,9 +672,9 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
                 if( p_stream->i_sout_headers < j + 2 )
                 {
                     /* next packets in order: comments and codebooks */
-                    p_og = sout_FifoGet( p_mux->pp_inputs[i]->p_fifo );
+                    p_og = block_FifoGet( p_mux->pp_inputs[i]->p_fifo );
                     op.packet = p_og->p_buffer;
-                    op.bytes  = p_og->i_size;
+                    op.bytes  = p_og->i_buffer;
                     op.b_o_s  = 0;
                     op.e_o_s  = 0;
                     op.granulepos = 0;
@@ -688,9 +685,8 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
                     p_stream->i_sout_headers++;
                 }
 
-                p_og = sout_BufferDuplicate( p_mux->p_sout,
-                                             p_stream->pp_sout_headers[j+1] );
-                sout_BufferChain( &p_hdr, p_og );
+                p_og = block_Duplicate( p_stream->pp_sout_headers[j+1] );
+                block_ChainAppend( &p_hdr, p_og );
             }
         }
         else if( p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
@@ -709,7 +705,7 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             op.packetno = p_stream->i_packet_no++;
             ogg_stream_packetin( &p_stream->os, &op );
             p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-            sout_BufferChain( &p_hdr, p_og );
+            block_ChainAppend( &p_hdr, p_og );
         }
 
         /* Special case for mp4v and flac */
@@ -734,23 +730,23 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
             op.packetno = p_stream->i_packet_no++;
             ogg_stream_packetin( &p_stream->os, &op );
             p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-            sout_BufferChain( &p_hdr, p_og );
+            block_ChainAppend( &p_hdr, p_og );
         }
     }
 
     /* set HEADER flag */
     for( p_og = p_hdr; p_og != NULL; p_og = p_og->p_next )
     {
-        p_og->i_flags |= SOUT_BUFFER_FLAGS_HEADER;
+        p_og->i_flags |= BLOCK_FLAG_HEADER;
     }
     return( p_hdr );
 }
 
-static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
+static block_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    sout_buffer_t *p_hdr = NULL;
-    sout_buffer_t *p_og;
+    block_t *p_hdr = NULL;
+    block_t *p_og;
     ogg_packet    op;
     int i;
 
@@ -786,7 +782,7 @@ static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
         ogg_stream_packetin( &p_stream->os, &op );
 
         p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-        sout_BufferChain( &p_hdr, p_og );
+        block_ChainAppend( &p_hdr, p_og );
         ogg_stream_clear( &p_stream->os );
     }
 
@@ -801,17 +797,17 @@ static sout_buffer_t *OggCreateFooter( sout_mux_t *p_mux, mtime_t i_dts )
         ogg_stream_packetin( &p_sys->pp_del_streams[i]->os, &op );
 
         p_og = OggStreamFlush( p_mux, &p_sys->pp_del_streams[i]->os, 0 );
-        sout_BufferChain( &p_hdr, p_og );
+        block_ChainAppend( &p_hdr, p_og );
         ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
     }
 
     return( p_hdr );
 }
 
-static void OggSetDate( sout_buffer_t *p_og, mtime_t i_dts, mtime_t i_length )
+static void OggSetDate( block_t *p_og, mtime_t i_dts, mtime_t i_length )
 {
     int i_count;
-    sout_buffer_t *p_tmp;
+    block_t *p_tmp;
     mtime_t i_delta;
 
     for( p_tmp = p_og, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->p_next )
@@ -835,7 +831,7 @@ static void OggSetDate( sout_buffer_t *p_og, mtime_t i_dts, mtime_t i_length )
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    sout_buffer_t  *p_og = NULL;
+    block_t  *p_og = NULL;
     int            i_stream;
     mtime_t        i_dts;
 
@@ -854,7 +850,7 @@ static int Mux( sout_mux_t *p_mux )
             int i;
 
             msg_Dbg( p_mux, "writing footer" );
-            sout_BufferChain( &p_og, OggCreateFooter( p_mux, 0 ) );
+            block_ChainAppend( &p_og, OggCreateFooter( p_mux, 0 ) );
 
             /* Remove deleted logical streams */
             for( i = 0; i < p_sys->i_del_streams; i++ )
@@ -870,7 +866,7 @@ static int Mux( sout_mux_t *p_mux )
         p_sys->i_streams = p_mux->i_nb_inputs;
         p_sys->i_del_streams = 0;
         p_sys->i_add_streams = 0;
-        sout_BufferChain( &p_og, OggCreateHeader( p_mux, i_dts ) );
+        block_ChainAppend( &p_og, OggCreateHeader( p_mux, i_dts ) );
 
         /* Write header and/or footer */
         OggSetDate( p_og, i_dts, 0 );
@@ -882,7 +878,7 @@ static int Mux( sout_mux_t *p_mux )
     {
         sout_input_t  *p_input;
         ogg_stream_t  *p_stream;
-        sout_buffer_t *p_data;
+        block_t *p_data;
         ogg_packet    op;
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
@@ -892,19 +888,19 @@ static int Mux( sout_mux_t *p_mux )
 
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (ogg_stream_t*)p_input->p_sys;
-        p_data   = sout_FifoGet( p_input->p_fifo );
+        p_data   = block_FifoGet( p_input->p_fifo );
 
         if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
-            sout_BufferReallocFromPreHeader( p_mux->p_sout, p_data, 1 );
+            p_data = block_Realloc( p_data, 1, 0 );
             p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
         }
 
         op.packet   = p_data->p_buffer;
-        op.bytes    = p_data->i_size;
+        op.bytes    = p_data->i_buffer;
         op.b_o_s    = 0;
         op.e_o_s    = 0;
         op.packetno = p_stream->i_packet_no++;
@@ -952,12 +948,12 @@ static int Mux( sout_mux_t *p_mux )
         {
             /* Subtitles or Speex packets are quite small so they 
              * need to be flushed to be sent on time */
-            sout_BufferChain( &p_og, OggStreamFlush( p_mux, &p_stream->os,
+            block_ChainAppend( &p_og, OggStreamFlush( p_mux, &p_stream->os,
                                                      p_data->i_dts ) );
         }
         else
         {
-            sout_BufferChain( &p_og, OggStreamPageOut( p_mux, &p_stream->os,
+            block_ChainAppend( &p_og, OggStreamPageOut( p_mux, &p_stream->os,
                                                        p_data->i_dts ) );
         }
 
@@ -980,8 +976,8 @@ static int Mux( sout_mux_t *p_mux )
             p_stream->i_length += p_data->i_length;
         }
 
-        sout_BufferDelete( p_mux->p_sout, p_data );
+        block_Release( p_data );
     }
 
-    return( VLC_SUCCESS );
+    return VLC_SUCCESS;
 }

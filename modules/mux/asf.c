@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.10 2004/01/25 13:37:12 kuehne Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,7 +92,7 @@ struct sout_mux_sys_t
 
     vlc_bool_t      b_write_header;
 
-    sout_buffer_t   *pk;
+    block_t   *pk;
     int             i_pk_used;
     int             i_pk_frame;
     mtime_t         i_pk_dts;
@@ -110,10 +110,10 @@ struct sout_mux_sys_t
 
 static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
 
-static sout_buffer_t *asf_header_create( sout_mux_t *, vlc_bool_t b_broadcast );
-static sout_buffer_t *asf_packet_create( sout_mux_t *,
-                                         asf_track_t *, sout_buffer_t * );
-static sout_buffer_t *asf_stream_end_create( sout_mux_t *);
+static block_t *asf_header_create( sout_mux_t *, vlc_bool_t b_broadcast );
+static block_t *asf_packet_create( sout_mux_t *,
+                                         asf_track_t *, block_t * );
+static block_t *asf_stream_end_create( sout_mux_t *);
 
 typedef struct
 {
@@ -215,7 +215,7 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    sout_buffer_t  *out;
+    block_t  *out;
     int i;
 
     msg_Dbg( p_mux, "Asf muxer closed" );
@@ -499,9 +499,9 @@ static int Mux      ( sout_mux_t *p_mux )
 
     if( p_sys->b_write_header )
     {
-        sout_buffer_t *out = asf_header_create( p_mux, VLC_TRUE );
+        block_t *out = asf_header_create( p_mux, VLC_TRUE );
 
-        out->i_flags |= SOUT_BUFFER_FLAGS_HEADER;
+        out->i_flags |= BLOCK_FLAG_HEADER;
         sout_AccessOutWrite( p_mux->p_access, out );
 
         p_sys->b_write_header = VLC_FALSE;
@@ -513,8 +513,8 @@ static int Mux      ( sout_mux_t *p_mux )
         asf_track_t   *tk;
         int           i_stream;
         mtime_t       i_dts;
-        sout_buffer_t *data;
-        sout_buffer_t *pk;
+        block_t *data;
+        block_t *pk;
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts ) )
         {
@@ -534,7 +534,7 @@ static int Mux      ( sout_mux_t *p_mux )
         p_input = p_mux->pp_inputs[i_stream];
         tk      = (asf_track_t*)p_input->p_sys;
 
-        data = sout_FifoGet( p_input->p_fifo );
+        data = block_FifoGet( p_input->p_fifo );
 
         if( ( pk = asf_packet_create( p_mux, tk, data ) ) )
         {
@@ -557,7 +557,7 @@ static int MuxGetStream( sout_mux_t *p_mux,
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
         sout_input_t  *p_input = p_mux->pp_inputs[i];
-        sout_buffer_t *p_data;
+        block_t *p_data;
 
         if( p_input->p_fifo->i_depth <= 0 )
         {
@@ -571,7 +571,7 @@ static int MuxGetStream( sout_mux_t *p_mux,
             continue;
         }
 
-        p_data = sout_FifoShow( p_input->p_fifo );
+        p_data = block_FifoShow( p_input->p_fifo );
         if( i_stream == -1 ||
             p_data->i_dts < i_dts )
         {
@@ -790,7 +790,7 @@ static void asf_chunk_add( bo_t *bo,
     bo_addle_u16( bo, i_len + 8 );
 }
 
-static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
+static block_t *asf_header_create( sout_mux_t *p_mux,
                                          vlc_bool_t b_broadcast )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -800,7 +800,7 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     int i_size;
     int i_ci_size;
     int i_cd_size = 0;
-    sout_buffer_t *out;
+    block_t *out;
     bo_t          bo;
     int           i;
 
@@ -843,13 +843,13 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
 
     if( p_sys->b_asf_http )
     {
-        out = sout_BufferNew( p_mux->p_sout, i_size + 50 + 12 );
+        out = block_New( p_mux, i_size + 50 + 12 );
         bo_init( &bo, out->p_buffer, i_size + 50 + 12 );
         asf_chunk_add( &bo, 0x4824, i_size + 50, 0xc00, p_sys->i_seq++ );
     }
     else
     {
-        out = sout_BufferNew( p_mux->p_sout, i_size + 50 );
+        out = block_New( p_mux, i_size + 50 );
         bo_init( &bo, out->p_buffer, i_size + 50 );
     }
     /* header object */
@@ -965,15 +965,15 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
 /****************************************************************************
  *
  ****************************************************************************/
-static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
-                                         asf_track_t *tk, sout_buffer_t *data )
+static block_t *asf_packet_create( sout_mux_t *p_mux,
+                                         asf_track_t *tk, block_t *data )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
-    int     i_data = data->i_size;
+    int     i_data = data->i_buffer;
     int     i_pos  = 0;
     uint8_t *p_data= data->p_buffer;
-    sout_buffer_t *first = NULL, **last = &first;
+    block_t *first = NULL, **last = &first;
     int     i_preheader = p_sys->b_asf_http ? 12 : 0;
 
     while( i_pos < i_data )
@@ -983,8 +983,8 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
 
         if( p_sys->pk == NULL )
         {
-            p_sys->pk = sout_BufferNew( p_mux->p_sout,
-                                        p_sys->i_packet_size + i_preheader);
+            p_sys->pk = block_New( p_mux,
+                                   p_sys->i_packet_size + i_preheader);
             /* reserve 14 bytes for the packet header */
             p_sys->i_pk_used = 14 + i_preheader;
             p_sys->i_pk_frame = 0;
@@ -1043,21 +1043,21 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
     }
 
     tk->i_sequence++;
-    sout_BufferDelete( p_mux->p_sout, data );
+    block_Release( data );
 
     return first;
 }
 
-static sout_buffer_t *asf_stream_end_create( sout_mux_t *p_mux )
+static block_t *asf_stream_end_create( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
-    sout_buffer_t *out = NULL;
+    block_t *out = NULL;
     bo_t          bo;
 
     if( p_sys->b_asf_http )
     {
-        out = sout_BufferNew( p_mux->p_sout, 12 );
+        out = block_New( p_mux, 12 );
         bo_init( &bo, out->p_buffer, 12 );
         asf_chunk_add( &bo, 0x4524, 0, 0x00, p_sys->i_seq++ );
     }

@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.46 2004/03/03 11:34:41 massiot Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -95,13 +95,13 @@ vlc_module_end();
 /*****************************************************************************
  * Local data structures
  *****************************************************************************/
-#define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << SOUT_BUFFER_FLAGS_PRIVATE_SHIFT )
-#define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << SOUT_BUFFER_FLAGS_PRIVATE_SHIFT )
+#define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << BLOCK_FLAG_PRIVATE_SHIFT )
+#define SOUT_BUFFER_FLAGS_PRIVATE_CSA  ( 2 << BLOCK_FLAG_PRIVATE_SHIFT )
 typedef struct
 {
     int           i_depth;
-    sout_buffer_t *p_first;
-    sout_buffer_t **pp_last;
+    block_t *p_first;
+    block_t **pp_last;
 } sout_buffer_chain_t;
 
 static inline void BufferChainInit  ( sout_buffer_chain_t *c )
@@ -110,7 +110,7 @@ static inline void BufferChainInit  ( sout_buffer_chain_t *c )
     c->p_first = NULL;
     c->pp_last = &c->p_first;
 }
-static inline void BufferChainAppend( sout_buffer_chain_t *c, sout_buffer_t *b )
+static inline void BufferChainAppend( sout_buffer_chain_t *c, block_t *b )
 {
     *c->pp_last = b;
     c->i_depth++;
@@ -122,9 +122,9 @@ static inline void BufferChainAppend( sout_buffer_chain_t *c, sout_buffer_t *b )
     }
     c->pp_last = &b->p_next;
 }
-static inline sout_buffer_t *BufferChainGet( sout_buffer_chain_t *c )
+static inline block_t *BufferChainGet( sout_buffer_chain_t *c )
 {
-    sout_buffer_t *b = c->p_first;
+    block_t *b = c->p_first;
 
     if( b )
     {
@@ -140,19 +140,19 @@ static inline sout_buffer_t *BufferChainGet( sout_buffer_chain_t *c )
     }
     return b;
 }
-static inline sout_buffer_t *BufferChainPeek( sout_buffer_chain_t *c )
+static inline block_t *BufferChainPeek( sout_buffer_chain_t *c )
 {
-    sout_buffer_t *b = c->p_first;
+    block_t *b = c->p_first;
 
     return b;
 }
 static inline void BufferChainClean( sout_instance_t *p_sout, sout_buffer_chain_t *c )
 {
-    sout_buffer_t *b;
+    block_t *b;
 
     while( ( b = BufferChainGet( c ) ) )
     {
-        sout_BufferDelete( p_sout, b );
+        block_Release( b );
     }
     BufferChainInit( c );
 }
@@ -260,10 +260,10 @@ static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 static void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 
-static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_t b_pcr );
-static void TSSetPCR( sout_buffer_t *p_ts, mtime_t i_dts );
+static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_t b_pcr );
+static void TSSetPCR( block_t *p_ts, mtime_t i_dts );
 
-static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, sout_buffer_t *, ts_stream_t * );
+static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, block_t *, ts_stream_t * );
 
 /*****************************************************************************
  * Open:
@@ -283,7 +283,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
-    p_mux->i_preheader  = 30; // really enough for a pes header
 
     srand( (uint32_t)mdate() );
 
@@ -773,7 +772,7 @@ static int Mux( sout_mux_t *p_mux )
         for( ;; )
         {
             vlc_bool_t b_ok = VLC_TRUE;
-            sout_buffer_t *p_data;
+            block_t *p_data;
 
             /* Accumulate enough data in the pcr stream (>i_shaping_delay) */
             /* Accumulate enough data in all other stream ( >= length of pcr) */
@@ -804,10 +803,10 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     b_ok = VLC_FALSE;
 
-                    p_data = sout_FifoGet( p_input->p_fifo );
+                    p_data = block_FifoGet( p_input->p_fifo );
                     if( p_input->p_fifo->i_depth > 0 )
                     {
-                        sout_buffer_t *p_next = sout_FifoShow( p_input->p_fifo );
+                        block_t *p_next = block_FifoShow( p_input->p_fifo );
 
                         p_data->i_length = p_next->i_dts - p_data->i_dts;
                     }
@@ -820,7 +819,7 @@ static int Mux( sout_mux_t *p_mux )
                                   p_data->i_dts,
                                   p_stream->i_pes_dts,
                                   p_pcr_stream->i_pes_dts );
-                        sout_BufferDelete( p_mux->p_sout, p_data );
+                        block_Release( p_data );
 
                         BufferChainClean( p_mux->p_sout, &p_stream->chain_pes );
                         p_stream->i_pes_dts = 0;
@@ -853,8 +852,7 @@ static int Mux( sout_mux_t *p_mux )
                         BufferChainAppend( &p_stream->chain_pes, p_data );
 
                         if( p_sys->b_use_key_frames && p_stream == p_pcr_stream
-                            && (p_data->i_flags & (BLOCK_FLAG_TYPE_I
-                                            << SOUT_BUFFER_FLAGS_BLOCK_SHIFT))
+                            && (p_data->i_flags & BLOCK_FLAG_TYPE_I )
                             && (p_stream->i_pes_length > 300000) )
                         {
                             i_shaping_delay = p_stream->i_pes_length;
@@ -881,12 +879,12 @@ static int Mux( sout_mux_t *p_mux )
         for( i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i]->p_sys;
-            sout_buffer_t *p_pes;
+            block_t *p_pes;
 
             /* False for pcr stream but it will be enough to do PCR algo */
             for( p_pes = p_stream->chain_pes.p_first; p_pes != NULL; p_pes = p_pes->p_next )
             {
-                int i_size = p_pes->i_size;
+                int i_size = p_pes->i_buffer;
                 if( p_pes->i_dts + p_pes->i_length > p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
                 {
                     mtime_t i_frag = p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length - p_pes->i_dts;
@@ -895,7 +893,7 @@ static int Mux( sout_mux_t *p_mux )
                         /* Next stream */
                         break;
                     }
-                    i_size = p_pes->i_size * i_frag / p_pes->i_length;
+                    i_size = p_pes->i_buffer * i_frag / p_pes->i_length;
                 }
                 i_packet_count += ( i_size + 183 ) / 184;
             }
@@ -918,7 +916,7 @@ static int Mux( sout_mux_t *p_mux )
             int         i_stream;
             mtime_t     i_dts;
             ts_stream_t *p_stream;
-            sout_buffer_t *p_ts;
+            block_t *p_ts;
             vlc_bool_t   b_pcr;
 
             /* Select stream (lowest dts) */
@@ -987,7 +985,7 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 
     for( i = 0; i < i_packet_count; i++ )
     {
-        sout_buffer_t *p_ts = BufferChainGet( p_chain_ts );
+        block_t *p_ts = BufferChainGet( p_chain_ts );
         mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
 
         BufferChainAppend( &new_chain, p_ts );
@@ -1069,7 +1067,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     /* msg_Dbg( p_mux, "real pck=%d", i_packet_count ); */
     for( i = 0; i < i_packet_count; i++ )
     {
-        sout_buffer_t *p_ts = BufferChainGet( p_chain_ts );
+        block_t *p_ts = BufferChainGet( p_chain_ts );
         mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
 
         p_ts->i_dts    = i_new_dts;
@@ -1092,10 +1090,10 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     }
 }
 
-static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_t b_pcr )
+static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_t b_pcr )
 {
-    sout_buffer_t *p_pes = p_stream->chain_pes.p_first;
-    sout_buffer_t *p_ts;
+    block_t *p_pes = p_stream->chain_pes.p_first;
+    block_t *p_ts;
 
     vlc_bool_t b_new_pes = VLC_FALSE;
     vlc_bool_t b_adaptation_field = VLC_FALSE;
@@ -1107,14 +1105,14 @@ static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_
     {
         b_new_pes = VLC_TRUE;
     }
-    i_payload = __MIN( (int)p_pes->i_size - p_stream->i_pes_used, i_payload_max );
+    i_payload = __MIN( (int)p_pes->i_buffer - p_stream->i_pes_used, i_payload_max );
 
     if( b_pcr || i_payload < i_payload_max )
     {
         b_adaptation_field = VLC_TRUE;
     }
 
-    p_ts = sout_BufferNew( p_mux->p_sout, 188 );
+    p_ts = block_New( p_mux, 188 );
     p_ts->i_dts = p_pes->i_dts;
 
     p_ts->p_buffer[0] = 0x47;
@@ -1168,13 +1166,13 @@ static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_
     memcpy( &p_ts->p_buffer[188 - i_payload], &p_pes->p_buffer[p_stream->i_pes_used], i_payload );
 
     p_stream->i_pes_used += i_payload;
-    p_stream->i_pes_dts      = p_pes->i_dts + p_pes->i_length * p_stream->i_pes_used / p_pes->i_size;
-    p_stream->i_pes_length  -= p_pes->i_length * i_payload / p_pes->i_size;
+    p_stream->i_pes_dts      = p_pes->i_dts + p_pes->i_length * p_stream->i_pes_used / p_pes->i_buffer;
+    p_stream->i_pes_length  -= p_pes->i_length * i_payload / p_pes->i_buffer;
 
-    if( p_stream->i_pes_used >= (int)p_pes->i_size )
+    if( p_stream->i_pes_used >= (int)p_pes->i_buffer )
     {
         p_pes = BufferChainGet( &p_stream->chain_pes );
-        sout_BufferDelete( p_mux->p_sout, p_pes );
+        block_Release( p_pes );
 
         p_pes = p_stream->chain_pes.p_first;
         if( p_pes )
@@ -1200,7 +1198,7 @@ static sout_buffer_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, vlc_bool_
 }
 
 
-static void TSSetPCR( sout_buffer_t *p_ts, mtime_t i_dts )
+static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
 {
     mtime_t i_pcr = 9 * i_dts / 100;
 
@@ -1232,7 +1230,7 @@ static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c, mtime_t
 
     if( i_packets < i_packets_min && i_packets_min > 0 )
     {
-        sout_buffer_t *p_pk;
+        block_t *p_pk;
         int i_div = ( i_packets_min - i_packets ) / i_packets;
         int i_mod = ( i_packets_min - i_packets ) % i_packets;
         int i_rest = 0;
@@ -1254,7 +1252,7 @@ static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c, mtime_t
 
             for( i = 0; i < i_null; i++ )
             {
-                sout_buffer_t *p_null;
+                block_t *p_null;
 
                 p_null = sout_BufferNew( p_mux->p_sout, 188 );
                 p_null->p_buffer[0] = 0x47;
@@ -1273,7 +1271,7 @@ static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c, mtime_t
     }
     else if( i_packets > i_packets_max && i_packets_max > 0 )
     {
-        sout_buffer_t *p_pk;
+        block_t *p_pk;
         int           i;
 
         /* Arg, we need to drop packets, I don't do something clever (like
@@ -1298,7 +1296,7 @@ static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c, mtime_t
 #endif
 
 static void PEStoTS( sout_instance_t *p_sout,
-                     sout_buffer_chain_t *c, sout_buffer_t *p_pes,
+                     sout_buffer_chain_t *c, block_t *p_pes,
                      ts_stream_t *p_stream )
 {
     uint8_t *p_data;
@@ -1306,7 +1304,7 @@ static void PEStoTS( sout_instance_t *p_sout,
     int     b_new_pes;
 
     /* get PES total size */
-    i_size = p_pes->i_size;
+    i_size = p_pes->i_buffer;
     p_data = p_pes->p_buffer;
 
     b_new_pes = VLC_TRUE;
@@ -1315,9 +1313,9 @@ static void PEStoTS( sout_instance_t *p_sout,
     {
         int           b_adaptation_field;
         int           i_copy;
-        sout_buffer_t *p_ts;
+        block_t *p_ts;
 
-        p_ts = sout_BufferNew( p_sout, 188 );
+        p_ts = block_New( p_sout, 188 );
         /* write header
          * 8b   0x47    sync byte
          * 1b           transport_error_indicator
@@ -1366,17 +1364,17 @@ static void PEStoTS( sout_instance_t *p_sout,
 
         if( i_size <= 0 )
         {
-            sout_buffer_t *p_next = p_pes->p_next;
+            block_t *p_next = p_pes->p_next;
 
             p_pes->p_next = NULL;
-            sout_BufferDelete( p_sout, p_pes );
+            block_Release( p_pes );
             if( p_next == NULL )
             {
                 break;
             }
             b_new_pes = VLC_TRUE;
             p_pes = p_next;
-            i_size = p_pes->i_size;
+            i_size = p_pes->i_buffer;
             p_data = p_pes->p_buffer;
         }
     }
@@ -1472,10 +1470,10 @@ static void GetPAT( sout_mux_t *p_mux,
                     sout_buffer_chain_t *c )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    sout_buffer_t       *p_pat;
+    block_t       *p_pat;
     bits_buffer_t bits;
 
-    p_pat = sout_BufferNew( p_mux->p_sout, 1024 );
+    p_pat = block_New( p_mux, 1024 );
 
     p_pat->i_pts = 0;
     p_pat->i_dts = 0;
@@ -1502,7 +1500,7 @@ static void GetPAT( sout_mux_t *p_mux,
 
     bits_write( &bits, 32, CalculateCRC( bits.p_data + 1, bits.i_data - 1) );
 
-    p_pat->i_size = bits.i_data;
+    p_pat->i_buffer = bits.i_data;
 
     PEStoTS( p_mux->p_sout, c, p_pat, &p_sys->pat );
 }
@@ -1511,11 +1509,11 @@ static void GetPMT( sout_mux_t *p_mux,
                     sout_buffer_chain_t *c )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    sout_buffer_t       *p_pmt;
+    block_t       *p_pmt;
     bits_buffer_t bits;
     int           i_stream;
 
-    p_pmt = sout_BufferNew( p_mux->p_sout, 1024 );
+    p_pmt = block_New( p_mux, 1024 );
 
     p_pmt->i_pts = 0;
     p_pmt->i_dts = 0;
@@ -1558,16 +1556,16 @@ static void GetPMT( sout_mux_t *p_mux,
 
     bits_write( &bits, 32, CalculateCRC( bits.p_data + 1, bits.i_data - 1) );
 
-    p_pmt->i_size = bits.i_data;
+    p_pmt->i_buffer = bits.i_data;
 
     PEStoTS( p_mux->p_sout, c, p_pmt, &p_sys->pmt );
 }
 #elif defined MODULE_NAME_IS_mux_ts_dvbpsi
 
-static sout_buffer_t *WritePSISection( sout_instance_t *p_sout,
+static block_t *WritePSISection( sout_instance_t *p_sout,
                                        dvbpsi_psi_section_t* p_section )
 {
-    sout_buffer_t   *p_psi, *p_first = NULL;
+    block_t   *p_psi, *p_first = NULL;
 
 
     while( p_section )
@@ -1577,18 +1575,18 @@ static sout_buffer_t *WritePSISection( sout_instance_t *p_sout,
         i_size =  (uint32_t)( p_section->p_payload_end - p_section->p_data )+
                   ( p_section->b_syntax_indicator ? 4 : 0 );
 
-        p_psi = sout_BufferNew( p_sout, i_size + 1 );
+        p_psi = block_New( p_sout, i_size + 1 );
         p_psi->i_pts = 0;
         p_psi->i_dts = 0;
         p_psi->i_length = 0;
-        p_psi->i_size = i_size + 1;
+        p_psi->i_buffer = i_size + 1;
 
         p_psi->p_buffer[0] = 0; // pointer
         memcpy( p_psi->p_buffer + 1,
                 p_section->p_data,
                 i_size );
 
-        sout_BufferChain( &p_first, p_psi );
+        block_ChainAppend( &p_first, p_psi );
 
         p_section = p_section->p_next;
     }
@@ -1600,7 +1598,7 @@ static void GetPAT( sout_mux_t *p_mux,
                     sout_buffer_chain_t *c )
 {
     sout_mux_sys_t       *p_sys = p_mux->p_sys;
-    sout_buffer_t        *p_pat;
+    block_t        *p_pat;
     dvbpsi_pat_t         pat;
     dvbpsi_psi_section_t *p_section;
 
@@ -1639,7 +1637,7 @@ static void GetPMT( sout_mux_t *p_mux,
                     sout_buffer_chain_t *c )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    sout_buffer_t   *p_pmt;
+    block_t   *p_pmt;
 
     dvbpsi_pmt_t        pmt;
     dvbpsi_pmt_es_t     *p_es;

@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.18 2004/02/06 23:43:32 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -119,8 +119,8 @@ struct sout_mux_sys_t
 #define AVIIF_KEYFRAME      0x00000010L /* this frame is a key frame.*/
 
 
-static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t * );
-static sout_buffer_t *avi_HeaderCreateidx1( sout_mux_t * );
+static block_t *avi_HeaderCreateRIFF( sout_mux_t * );
+static block_t *avi_HeaderCreateidx1( sout_mux_t * );
 
 static void SetFCC( uint8_t *p, char *fcc )
 {
@@ -154,7 +154,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
-    p_mux->i_preheader  = 8;    /* (fourcc,length) header */
 
     return VLC_SUCCESS;
 }
@@ -167,14 +166,14 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
 
-    sout_buffer_t       *p_hdr, *p_idx1;
+    block_t       *p_hdr, *p_idx1;
     int                 i_stream;
 
     msg_Dbg( p_mux, "AVI muxer closed" );
 
     /* first create idx1 chunk (write at the end of the stream */
     p_idx1 = avi_HeaderCreateidx1( p_mux );
-    p_sys->i_idx1_size = p_idx1->i_size;
+    p_sys->i_idx1_size = p_idx1->i_buffer;
     sout_AccessOutWrite( p_mux->p_access, p_idx1 );
 
     /* calculate some value for headers creations */
@@ -388,7 +387,7 @@ static int Mux      ( sout_mux_t *p_mux )
 
     if( p_sys->b_write_header )
     {
-        sout_buffer_t *p_hdr;
+        block_t *p_hdr;
 
         msg_Dbg( p_mux, "writing header" );
 
@@ -401,7 +400,7 @@ static int Mux      ( sout_mux_t *p_mux )
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         int i_count;
-        sout_fifo_t *p_fifo;
+        block_fifo_t *p_fifo;
 
         i_stream = *((int*)p_mux->pp_inputs[i]->p_sys );
         p_stream = &p_sys->stream[i_stream];
@@ -411,27 +410,32 @@ static int Mux      ( sout_mux_t *p_mux )
         while( i_count > 0 )
         {
             avi_idx1_entry_t *p_idx;
-            sout_buffer_t *p_data;
+            block_t *p_data;
 
-            p_data = sout_FifoGet( p_fifo );
+            p_data = block_FifoGet( p_fifo );
+            if( p_fifo->i_depth > 0 )
+            {
+                block_t *p_next = block_FifoShow( p_fifo );
+                p_data->i_length = p_next->i_dts - p_data->i_dts;
+            }
 
             p_stream->i_frames++;
             if( p_data->i_length < 0 )
             {
                 msg_Warn( p_mux, "argg length < 0 l" );
-                sout_BufferDelete( p_mux->p_sout, p_data );
+                block_Release( p_data );
                 i_count--;
                 continue;
             }
             p_stream->i_duration  += p_data->i_length;
-            p_stream->i_totalsize += p_data->i_size;
+            p_stream->i_totalsize += p_data->i_buffer;
 
             /* add idx1 entry for this frame */
             p_idx = &p_sys->idx1.entry[p_sys->idx1.i_entry_count];
             memcpy( p_idx->fcc, p_stream->fcc, 4 );
             p_idx->i_flags = AVIIF_KEYFRAME;
             p_idx->i_pos   = p_sys->i_movi_size + 4;
-            p_idx->i_length= p_data->i_size;
+            p_idx->i_length= p_data->i_buffer;
             p_sys->idx1.i_entry_count++;
             if( p_sys->idx1.i_entry_count >= p_sys->idx1.i_entry_max )
             {
@@ -440,34 +444,20 @@ static int Mux      ( sout_mux_t *p_mux )
                                              p_sys->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
             }
 
-
-            if( sout_BufferReallocFromPreHeader( p_mux->p_sout, p_data, 8 ) )
-            {
-                /* there isn't enough data in preheader */
-                sout_buffer_t *p_hdr;
-
-                p_hdr = sout_BufferNew( p_mux->p_sout, 8 );
-                SetFCC( p_hdr->p_buffer, p_stream->fcc );
-                SetDWLE( p_hdr->p_buffer + 4, p_data->i_size );
-
-                sout_AccessOutWrite( p_mux->p_access, p_hdr );
-                p_sys->i_movi_size += p_hdr->i_size;
-
-            }
-            else
+            p_data = block_Realloc( p_data, 8, 0 );
+            if( p_data )
             {
                 SetFCC( p_data->p_buffer, p_stream->fcc );
-                SetDWLE( p_data->p_buffer + 4, p_data->i_size - 8 );
-            }
+                SetDWLE( p_data->p_buffer + 4, p_data->i_buffer - 8 );
 
-            if( p_data->i_size & 0x01 )
-            {
-                sout_BufferRealloc( p_mux->p_sout, p_data, p_data->i_size + 1 );
-                p_data->i_size += 1;
-            }
+                if( p_data->i_buffer & 0x01 )
+                {
+                    p_data = block_Realloc( p_data, 0, p_data->i_buffer + 1 );
+                }
 
-            p_sys->i_movi_size += p_data->i_size;
-            sout_AccessOutWrite( p_mux->p_access, p_data );
+                p_sys->i_movi_size += p_data->i_buffer;
+                sout_AccessOutWrite( p_mux->p_access, p_data );
+            }
 
             i_count--;
         }
@@ -774,16 +764,16 @@ static int avi_HeaderAdd_strl( sout_mux_t *p_mux,
     AVI_BOX_EXIT( 0 );
 }
 
-static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
+static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    sout_buffer_t       *p_hdr;
+    block_t       *p_hdr;
     int                 i_stream;
     int                 i_maxbytespersec;
     int                 i_junk;
     buffer_out_t        bo;
 
-    p_hdr = sout_BufferNew( p_mux->p_sout, HDR_SIZE );
+    p_hdr = block_New( p_mux, HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
 
     bo_Init( &bo, HDR_SIZE, p_hdr->p_buffer );
@@ -814,17 +804,17 @@ static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     return( p_hdr );
 }
 
-static sout_buffer_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
+static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    sout_buffer_t       *p_idx1;
+    block_t       *p_idx1;
     uint32_t            i_idx1_size;
     unsigned int        i;
     buffer_out_t        bo;
 
     i_idx1_size = 16 * p_sys->idx1.i_entry_count;
 
-    p_idx1 = sout_BufferNew( p_mux->p_sout, i_idx1_size + 8 );
+    p_idx1 = block_New( p_mux, i_idx1_size + 8 );
     memset( p_idx1->p_buffer, 0, i_idx1_size );
 
     bo_Init( &bo, i_idx1_size, p_idx1->p_buffer );

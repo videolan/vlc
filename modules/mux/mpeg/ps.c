@@ -3,7 +3,7 @@
  *       multiplexer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -72,8 +72,8 @@ static int Mux      ( sout_mux_t * );
  *****************************************************************************/
 static int  MuxGetStream        ( sout_mux_t *, int *, mtime_t * );
 
-static void MuxWritePackHeader  ( sout_mux_t *, sout_buffer_t **, mtime_t );
-static void MuxWriteSystemHeader( sout_mux_t *, sout_buffer_t ** );
+static void MuxWritePackHeader  ( sout_mux_t *, block_t **, mtime_t );
+static void MuxWriteSystemHeader( sout_mux_t *, block_t ** );
 
 static void StreamIdInit        ( vlc_bool_t *id, int i_range );
 static int  StreamIdGet         ( vlc_bool_t *id, int i_id_min, int i_id_max );
@@ -120,7 +120,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
-    p_mux->i_preheader  = 30; // really enough for a pes header
     p_mux->p_sys        = p_sys = malloc( sizeof( sout_mux_sys_t ) );
 
     /* Init free stream id */
@@ -149,11 +148,11 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
 
-    sout_buffer_t   *p_end;
+    block_t   *p_end;
 
     msg_Info( p_mux, "Close" );
 
-    p_end = sout_BufferNew( p_mux->p_sout, 4 );
+    p_end = block_New( p_mux, 4 );
     p_end->p_buffer[0] = 0x00;
     p_end->p_buffer[1] = 0x00;
     p_end->p_buffer[2] = 0x01;
@@ -297,7 +296,7 @@ static int Mux( sout_mux_t *p_mux )
         sout_input_t *p_input;
         ps_stream_t *p_stream;
 
-        sout_buffer_t *p_ps, *p_data;
+        block_t *p_ps, *p_data;
 
         mtime_t        i_dts;
         int            i_stream;
@@ -320,25 +319,25 @@ static int Mux( sout_mux_t *p_mux )
         /* Write regulary SystemHeader */
         if( p_sys->i_pes_count % 300 == 0 )
         {
-            sout_buffer_t *p_pk;
+            block_t *p_pk;
 
             MuxWriteSystemHeader( p_mux, &p_ps );
 
             /* For MPEG1 streaming, set HEADER flag */
             for( p_pk = p_ps; p_pk != NULL; p_pk = p_pk->p_next )
             {
-                p_pk->i_flags |= SOUT_BUFFER_FLAGS_HEADER;
+                p_pk->i_flags |= BLOCK_FLAG_HEADER;
             }
         }
 
         /* Get and mux a packet */
-        p_data = sout_FifoGet( p_input->p_fifo );
+        p_data = block_FifoGet( p_input->p_fifo );
         E_( EStoPES )( p_mux->p_sout,
                        &p_data, p_data,
                        p_stream->i_stream_id,
                        p_mux->p_sys->b_mpeg2 );
 
-        sout_BufferChain( &p_ps, p_data );
+        block_ChainAppend( &p_ps, p_data );
         sout_AccessOutWrite( p_mux->p_access, p_ps );
 
         /* Increase counter */
@@ -381,16 +380,16 @@ static void StreamIdRelease( vlc_bool_t *id, int i_id_min, int i_id )
     id[i_id - i_id_min] = VLC_TRUE;
 }
 
-static void MuxWritePackHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf,
+static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
                                mtime_t i_dts )
 {
-    sout_buffer_t   *p_hdr;
+    block_t   *p_hdr;
     bits_buffer_t   bits;
     mtime_t         i_src;
 
     i_src = i_dts * 9 / 100;
 
-    p_hdr = sout_BufferNew( p_mux->p_sout, 18 );
+    p_hdr = block_New( p_mux, 18 );
     bits_initwrite( &bits, 14, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01ba );
 
@@ -426,15 +425,15 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf,
         bits_write( &bits, 3,  0 );     // stuffing bytes
     }
 
-    p_hdr->i_size = p_mux->p_sys->b_mpeg2 ? 14: 12;
+    p_hdr->i_buffer = p_mux->p_sys->b_mpeg2 ? 14: 12;
 
-    sout_BufferChain( p_buf, p_hdr );
+    block_ChainAppend( p_buf, p_hdr );
 }
 
-static void MuxWriteSystemHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf )
+static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    sout_buffer_t   *p_hdr;
+    block_t   *p_hdr;
     bits_buffer_t   bits;
     vlc_bool_t      b_private;
     int             i_nb_private, i_nb_stream;
@@ -456,7 +455,7 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf )
     /* Private stream are declared only one time */
     i_nb_stream = p_mux->i_nb_inputs - ( i_nb_private > 0 ? i_nb_private - 1 : 0 );
 
-    p_hdr = sout_BufferNew( p_mux->p_sout, 12 + i_nb_stream * 3 );
+    p_hdr = block_New( p_mux, 12 + i_nb_stream * 3 );
 
     bits_initwrite( &bits, 12 + i_nb_stream * 3, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bb );
@@ -520,7 +519,7 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf )
         }
     }
 
-    sout_BufferChain( p_buf, p_hdr );
+    block_ChainAppend( p_buf, p_hdr );
 }
 
 /*
@@ -537,7 +536,7 @@ static int MuxGetStream( sout_mux_t *p_mux,
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
         sout_input_t  *p_input = p_mux->pp_inputs[i];
-        sout_buffer_t *p_data;
+        block_t *p_data;
 
         if( p_input->p_fifo->i_depth <= 0 )
         {
@@ -551,7 +550,7 @@ static int MuxGetStream( sout_mux_t *p_mux,
             continue;
         }
 
-        p_data = sout_FifoShow( p_input->p_fifo );
+        p_data = block_FifoShow( p_input->p_fifo );
         if( i_stream == -1 ||
             p_data->i_dts < i_dts )
         {

@@ -151,7 +151,7 @@ static void  box_gather  ( bo_t *box, bo_t *box2 );
 
 static void box_send( sout_mux_t *p_mux,  bo_t *box );
 
-static sout_buffer_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
+static block_t *bo_to_sout( sout_instance_t *p_sout,  bo_t *box );
 
 static bo_t *GetMoovBox( sout_mux_t *p_mux );
 
@@ -217,7 +217,7 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    sout_buffer_t   *p_hdr;
+    block_t   *p_hdr;
     bo_t            bo, *moov;
     vlc_value_t     val;
 
@@ -260,14 +260,14 @@ static void Close( vlc_object_t * p_this )
     {
         /* Move data to the end of the file so we can fit the moov header
          * at the start */
-        sout_buffer_t *p_buf;
+        block_t *p_buf;
         int64_t i_chunk, i_size = p_sys->i_pos - p_sys->i_mdat_pos;
         int i_moov_size = moov->i_buffer;
 
         while( i_size > 0 )
         {
             i_chunk = __MIN( 32768, i_size );
-            p_buf = sout_BufferNew( p_mux->p_sout, i_chunk );
+            p_buf = block_New( p_mux, i_chunk );
             sout_AccessOutSeek( p_mux->p_access,
                                 p_sys->i_mdat_pos + i_size - i_chunk );
             if( sout_AccessOutRead( p_mux->p_access, p_buf ) < i_chunk )
@@ -420,15 +420,15 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 
     for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
     {
-        sout_fifo_t   *p_fifo = p_mux->pp_inputs[i]->p_fifo;
-        sout_buffer_t *p_buf;
+        block_fifo_t   *p_fifo = p_mux->pp_inputs[i]->p_fifo;
+        block_t *p_buf;
 
         if( p_fifo->i_depth <= 1 )
         {
             return -1; // wait that all fifo have at least 2 packets
         }
 
-        p_buf = sout_FifoShow( p_fifo );
+        p_buf = block_FifoShow( p_fifo );
         if( i_stream < 0 || p_buf->i_dts < i_dts )
         {
             i_dts = p_buf->i_dts;
@@ -458,7 +458,7 @@ static int Mux( sout_mux_t *p_mux )
         sout_input_t    *p_input;
         int             i_stream;
         mp4_stream_t    *p_stream;
-        sout_buffer_t   *p_data;
+        block_t   *p_data;
         mtime_t         i_dts;
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
@@ -469,10 +469,10 @@ static int Mux( sout_mux_t *p_mux )
         p_input  = p_mux->pp_inputs[i_stream];
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
-        p_data  = sout_FifoGet( p_input->p_fifo );
+        p_data  = block_FifoGet( p_input->p_fifo );
         if( p_input->p_fifo->i_depth > 0 )
         {
-            sout_buffer_t *p_next = sout_FifoShow( p_input->p_fifo );
+            block_t *p_next = block_FifoShow( p_input->p_fifo );
             int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
 
             if( i_diff < I64C(1000000 ) )   /* protection */
@@ -509,7 +509,7 @@ static int Mux( sout_mux_t *p_mux )
 
         /* add index entry */
         p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
-        p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_size;
+        p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_buffer;
         p_stream->entry[p_stream->i_entry_count].i_pts_dts=
             __MAX( p_data->i_pts - p_data->i_dts, 0 );
         p_stream->entry[p_stream->i_entry_count].i_length = p_data->i_length;
@@ -526,7 +526,7 @@ static int Mux( sout_mux_t *p_mux )
 
         /* update */
         p_stream->i_duration += p_data->i_length;
-        p_sys->i_pos += p_data->i_size;
+        p_sys->i_pos += p_data->i_buffer;
 
         /* write data */
         sout_AccessOutWrite( p_mux->p_access, p_data );
@@ -1116,8 +1116,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     stss = NULL;
     for( i = 0, i_index = 0; i < p_stream->i_entry_count; i++ )
     {
-        if( p_stream->entry[i].i_flags &
-            (BLOCK_FLAG_TYPE_I << SOUT_BUFFER_FLAGS_BLOCK_SHIFT) )
+        if( p_stream->entry[i].i_flags & BLOCK_FLAG_TYPE_I )
         {
             if( stss == NULL )
             {
@@ -1704,24 +1703,22 @@ static void box_gather ( bo_t *box, bo_t *box2 )
     box_free( box2 );
 }
 
-static sout_buffer_t * bo_to_sout( sout_instance_t *p_sout,  bo_t *box )
+static block_t * bo_to_sout( sout_instance_t *p_sout,  bo_t *box )
 {
-    sout_buffer_t *p_buf;
+    block_t *p_buf;
 
-    p_buf = sout_BufferNew( p_sout, box->i_buffer );
+    p_buf = block_New( p_sout, box->i_buffer );
     if( box->i_buffer > 0 )
     {
         memcpy( p_buf->p_buffer, box->p_buffer, box->i_buffer );
     }
-
-    p_buf->i_size = box->i_buffer;
 
     return p_buf;
 }
 
 static void box_send( sout_mux_t *p_mux,  bo_t *box )
 {
-    sout_buffer_t *p_buf;
+    block_t *p_buf;
 
     p_buf = bo_to_sout( p_mux->p_sout, box );
     box_free( box );
