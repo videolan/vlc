@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.58 2003/12/16 13:35:12 gbazin Exp $
+ * $Id: open.cpp,v 1.59 2003/12/16 19:02:44 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -587,7 +587,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
         subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
         label = new wxStaticText( net_subpanels[i], -1, wxU(_("URL")) );
         net_addrs[i] = new wxTextCtrl( net_subpanels[i], NetAddr1_Event + i,
-                                       wxT((i == 2) ? "" : "rtsp://"),
+                                       (i == 2) ? wxT("") : wxT("rtsp://"),
                                        wxDefaultPosition, wxSize( 200, -1 ),
                                        wxTE_PROCESS_ENTER);
         subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
