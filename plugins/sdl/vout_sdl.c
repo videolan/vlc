@@ -85,17 +85,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
 
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_overlay = NULL;
+    p_vout->p_sys->b_must_acquire = 0;
 
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO) < 0 )
-    {
-        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
-                     SDL_GetError() );
-        free( p_vout->p_sys );
-        return( 1 );
-    }
-
-    if( SDLOpenDisplay(p_vout) )
     {
         intf_ErrMsg( "error: can't initialize SDL library: %s\n",
                      SDL_GetError() );
@@ -111,13 +104,24 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
     {
         p_vout->p_sys->b_fullscreen = 1;
-    } else {
+    }
+    else
+    {
         p_vout->p_sys->b_fullscreen = 0;
     }
+
     p_vout->p_sys->b_reopen_display = 1;
 
+    if( SDLOpenDisplay(p_vout) )
+    {
+        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+                     SDL_GetError() );
+        free( p_vout->p_sys );
+        return( 1 );
+    }
+
     return( 0 );
-}
+ }
 
 /*****************************************************************************
  * vout_SDLInit: initialize SDL video thread output method
@@ -186,8 +190,8 @@ int vout_SDLManage( vout_thread_t *p_vout )
 
         if( SDLOpenDisplay(p_vout) )
         {
-          intf_ErrMsg( "error: can't open DISPLAY default display\n" );
-          return( 1 );
+            intf_ErrMsg( "error: can't open DISPLAY default display\n" );
+            return( 1 );
         }
         p_vout->p_sys->b_reopen_display = 0;
     }
@@ -292,7 +296,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
             p_vout->i_height, 
             0, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF  );
+            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
         SDL_ShowCursor( 1 );
     }
 	
@@ -301,24 +305,24 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         intf_ErrMsg( "error: can't open DISPLAY default display\n" );
         return( 1 );
     }
-    p_vout->p_sys->p_overlay = NULL;
+    SDL_LockSurface(p_vout->p_sys->p_display);
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
 
     /* Check buffers properties */	
     p_vout->p_sys->b_must_acquire = 1;		/* always acquire */
-	p_vout->p_sys->p_buffer[ 0 ] =
-             p_vout->p_sys->p_display->pixels;
-	
-	SDL_Flip(p_vout->p_sys->p_display);
-	p_vout->p_sys->p_buffer[ 1 ] =
-             p_vout->p_sys->p_display->pixels;
-	SDL_Flip(p_vout->p_sys->p_display);
+    p_vout->p_sys->p_buffer[ 0 ] =
+         p_vout->p_sys->p_display->pixels;
+
+    SDL_Flip(p_vout->p_sys->p_display);
+    p_vout->p_sys->p_buffer[ 1 ] =
+         p_vout->p_sys->p_display->pixels;
+    SDL_Flip(p_vout->p_sys->p_display);
 
     /* Set graphic context colors */
 
 /*
-	col_fg.r = col_fg.g = col_fg.b = -1;
+    col_fg.r = col_fg.g = col_fg.b = -1;
     col_bg.r = col_bg.g = col_bg.b = 0;
     if( ggiSetGCForeground(p_vout->p_sys->p_display,
                            ggiMapColor(p_vout->p_sys->p_display,&col_fg)) ||
@@ -346,7 +350,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     p_vout->i_height =          p_vout->p_sys->p_display->h;
 
     p_vout->i_bytes_per_line = p_vout->p_sys->p_display->format->BytesPerPixel *
-	    			p_vout->p_sys->p_display->w ;
+                               p_vout->p_sys->p_display->w ;
 		
     p_vout->i_screen_depth =    p_vout->p_sys->p_display->format->BitsPerPixel;
     p_vout->i_bytes_per_pixel = p_vout->p_sys->p_display->format->BytesPerPixel;
