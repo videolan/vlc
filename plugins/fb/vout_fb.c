@@ -174,13 +174,21 @@ int vout_FBManage( vout_thread_t *p_vout )
 void vout_FBDisplay( vout_thread_t *p_vout )
 {
     /* swap the two Y offsets */
+    
+#ifdef FB_NOYPAN
+    
+    /* if the fb doesn't supports ypan, we only use one buffer */
+
+#else
     p_vout->p_sys->var_info.yoffset = p_vout->i_buffer_index ? p_vout->p_sys->var_info.yres : 0;
+   
     /* the X offset should be 0, but who knows ...
      * some other app might have played with the framebuffer */
     p_vout->p_sys->var_info.xoffset = 0;
 
     //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
+#endif
 }
 
 /*****************************************************************************
@@ -335,8 +343,16 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Set and initialize buffers */
+
     vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
-                     p_vout->p_sys->p_video + p_vout->p_sys->i_page_size );
+
+#ifdef FB_NOYPAN /* If the fb doesn't support ypan */
+            p_vout->p_sys->p_video 
+#else
+            p_vout->p_sys->p_video + p_vout->p_sys->i_page_size 
+#endif
+                );
+    
     intf_DbgMsg("framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d\n",
                 fix_info.type, fix_info.visual, fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
     return( 0 );
