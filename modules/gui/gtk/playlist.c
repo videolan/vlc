@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: playlist.c,v 1.9 2004/01/05 13:07:03 zorglub Exp $
+ * $Id$
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -696,7 +696,7 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
     for( i_dummy = p_playlist->i_size ; i_dummy-- ; )
     {
         char psz_duration[MSTRTIME_MAX_SIZE];
-        mtime_t dur = p_playlist->pp_items[i_dummy]->i_duration;
+        mtime_t dur = p_playlist->pp_items[i_dummy]->input.i_duration;
         if ( dur != -1 )
         {
             secstotimestr( psz_duration, dur/1000000 );
@@ -705,7 +705,7 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
         {
             memcpy( psz_duration ,"no info",sizeof("no info" ));
         }
-        ppsz_text[0] = p_playlist->pp_items[i_dummy]->psz_name;
+        ppsz_text[0] = p_playlist->pp_items[i_dummy]->input.psz_name;
         ppsz_text[1] = strdup( psz_duration );
         gtk_clist_insert( p_clist, 0, ppsz_text );
     }

@@ -333,7 +333,6 @@ SOURCES_libvlc_common = \
 	src/input/input_dec.c \
 	src/input/input_programs.c \
 	src/input/input_clock.c \
-	src/input/input_info.c \
 	src/video_output/video_output.c \
 	src/video_output/vout_pictures.c \
 	src/video_output/vout_pictures.h \

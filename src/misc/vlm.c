@@ -167,7 +167,6 @@ int vlm_ExecuteCommand( vlm_t *vlm, char *command, vlm_message_t **message)
     return result;
 }
 
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -922,12 +921,19 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm , char *psz_name, int i_type )
     media->psz_output = NULL;
     media->i_option = 0;
     media->option = NULL;
-    media->i_input_option = 0;
-    media->input_option = NULL;
     media->i_type = i_type;
     media->p_input = NULL;
 
-    TAB_APPEND( vlm->i_media , vlm->media , media );
+    media->item.psz_uri = strdup( psz_name );
+    media->item.psz_name = NULL;
+    media->item.i_duration = -1;
+    media->item.ppsz_options = NULL;
+    media->item.i_options = 0;
+    media->item.i_categories = 0;
+    media->item.pp_categories = NULL;
+    vlc_mutex_init( vlm, &media->item.lock );
+
+    TAB_APPEND( vlm->i_media, vlm->media, media );
 
     return media;
 }
@@ -972,11 +978,15 @@ static int vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     }
     if(media->option) free( media->option );
 
-    for( i = 0; i < media->i_input_option; i++ )
+    if( media->item.psz_uri ) free( media->item.psz_uri );
+    if( media->item.psz_name ) free( media->item.psz_name );
+    vlc_mutex_destroy( &media->item.lock );
+    for( i = 0; i < media->item.i_options; i++ )
     {
-        free( media->input_option[i] );
+        free( media->item.ppsz_options[i] );
     }
-    if( media->input_option ) free( media->input_option );
+    if( media->item.ppsz_options ) free( media->item.ppsz_options );
+    /* FIXME: free the info categories. */
 
     free( media );
 
@@ -1043,7 +1053,8 @@ static int vlm_MediaSetup( vlm_media_t *media, char *psz_cmd, char *psz_value )
     return 0;
 }
 
-static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, char *psz_args )
+static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name,
+                             char *psz_args )
 {
     if( strcmp( psz_name, "play" ) == 0 )
     {
@@ -1051,7 +1062,8 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
 
         if( media->b_enabled == VLC_TRUE && media->i_input > 0 )
         {
-            if( psz_args != NULL && sscanf( psz_args, "%d", &i ) == 1 && i < media->i_input )
+            if( psz_args != NULL && sscanf( psz_args, "%d", &i ) == 1 &&
+                i < media->i_input )
             {
                 media->i_index = i;
             }
@@ -1060,28 +1072,34 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
                 media->i_index = 0;
             }
 
+            /* FIXME!!! we need an input_item_t per input spawned */
+            //input_ItemNew( &media->item );
             if( media->psz_output != NULL )
             {
-                media->input_option = malloc( sizeof( char* ) );
-                media->input_option[0] = malloc( strlen(media->psz_output) + 1 + 6 );
-                sprintf( media->input_option[0], ":sout=%s" , media->psz_output );
-                media->i_input_option = 1;
+                media->item.ppsz_options = malloc( sizeof( char* ) );
+                media->item.ppsz_options[0] =
+                    malloc( strlen(media->psz_output) + sizeof("sout=") );
+                sprintf( media->item.ppsz_options[0], "sout=%s",
+                         media->psz_output );
+                media->item.i_options = 1;
             }
             else
             {
-                media->input_option = NULL;
-                media->i_input_option = 0;
+                media->item.ppsz_options = NULL;
+                media->item.i_options = 0;
             }
 
-            for( i=0 ; i < media->i_option ; i++ )
+            for( i = 0; i < media->i_option; i++ )
             {
-                media->i_input_option++;
-                media->input_option = realloc( media->input_option, (media->i_input_option) * sizeof( char* ) );
-                media->input_option[ media->i_input_option - 1 ] = malloc( strlen(media->option[i]) + 1 + 1 );
-                sprintf( media->input_option[ media->i_input_option - 1 ], ":%s" , media->option[i] );
+                media->item.i_options++;
+                media->item.ppsz_options =
+                    realloc( media->item.ppsz_options,
+                             media->item.i_options * sizeof( char* ) );
+                media->item.ppsz_options[ media->item.i_options - 1 ] =
+                    strdup( media->option[i] );
             }
 
-            media->p_input = input_CreateThread( vlm, media->input[media->i_index], media->input_option, media->i_input_option );
+            media->p_input = input_CreateThread( vlm, &media->item );
 
             return 0;
         }
@@ -1104,8 +1122,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
     }
     else if( strcmp( psz_name, "stop" ) == 0 )
     {
-        int i;
-
+        /* FIXME!!! we need an input_item_t per input spawned */
         if( media->p_input )
         {
             input_StopThread( media->p_input );
@@ -1114,14 +1131,7 @@ static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_name, cha
             vlc_object_destroy( media->p_input );
             media->p_input = NULL;
 
-            for( i=0 ; i < media->i_input_option ; i++ )
-            {
-                free( media->input_option[i] );
-            }
-            if( media->input_option) free( media->input_option );
-
-            media->input_option = NULL;
-            media->i_input_option = 0;
+            //input_ItemDelete( &media->item );
         }
 
         return 0;
@@ -2175,4 +2185,3 @@ static vlm_message_t* vlm_MessageAdd( vlm_message_t* message , vlm_message_t* ch
 
     return child;
 }
-

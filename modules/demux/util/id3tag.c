@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: id3tag.c,v 1.22 2004/03/03 11:38:14 fenrir Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -61,10 +61,8 @@ vlc_module_end();
  *****************************************************************************/
 static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 {
-    playlist_t            *p_playlist;
     struct id3_tag        *p_id3_tag;
     struct id3_frame      *p_frame;
-    input_info_category_t *p_category;
     char                  *psz_temp;
     vlc_value_t val;
     int i;
@@ -76,24 +74,13 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
         return;
     }
 
-    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
-
     val.b_bool = VLC_FALSE;
     p_id3_tag = id3_tag_parse( p_data, i_size );
-    p_category = input_InfoCategory( p_input, "ID3" );
     i = 0;
 
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         int i_strings;
-        playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, -1 );
-        if( !p_item )
-        {
-            msg_Err( p_input, "Unable to get item" );
-            return;
-        }
-
-        vlc_mutex_lock( &p_item->lock );
 
         i_strings = id3_field_getnstrings( &p_frame->fields[1] );
 
@@ -107,82 +94,42 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
                 i_genre = strtol( psz_temp, &psz_endptr, 10 );
                 if( psz_temp != psz_endptr && i_genre >= 0 && i_genre < NUM_GENRES )
                 {
-                    input_AddInfo( p_category, (char *)p_frame->description,
+                    input_Control( p_input, INPUT_ADD_INFO, "ID3",
+                                   (char *)p_frame->description,
                                    ppsz_genres[atoi(psz_temp)]);
-                    playlist_ItemAddInfo( p_item, "ID3",
-                                    (char *)p_frame->description,
-                                    ppsz_genres[atoi(psz_temp)]);
                 }
                 else
                 {
-                    input_AddInfo( p_category, (char *)p_frame->description,
-                                                psz_temp );
-                    playlist_ItemAddInfo( p_item, "ID3",
-                                    (char *)p_frame->description,
-                                    psz_temp);
+                    input_Control( p_input, INPUT_ADD_INFO, "ID3",
+                                   (char *)p_frame->description, psz_temp);
                 }
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
             {
-                if( p_item )
-                {
-                    if( p_item->psz_name )
-                    {
-                        free( p_item->psz_name );
-                    }
-                    p_item->psz_name = strdup( psz_temp );;
-
-                    val.b_bool = VLC_TRUE;
-                }
-                input_AddInfo( p_category, (char *)p_frame->description,
-                                            psz_temp );
-                playlist_ItemAddInfo( p_item, "ID3",
-                                        (char *)p_frame->description,
-                                    psz_temp);
+                input_Control( p_input, INPUT_SET_NAME, psz_temp );
+                input_Control( p_input, INPUT_ADD_INFO, "ID3",
+                               (char *)p_frame->description, psz_temp );
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
-                if( p_item )
-                {
-                    playlist_ItemAddInfo( p_item,
-                                          _("General"), _("Author"), psz_temp);
-                    val.b_bool = VLC_TRUE;
-                }
-                input_AddInfo( p_category, (char *)p_frame->description,
-                                            psz_temp );
-                playlist_ItemAddInfo( p_item, "ID3",
-                                           (char *)p_frame->description,
-                                           psz_temp);
+                input_Control( p_input, INPUT_ADD_INFO,
+                               _("General"), _("Author"), psz_temp );
+                input_Control( p_input, INPUT_ADD_INFO, "ID3",
+                               (char *)p_frame->description, psz_temp );
             }
             else
             {
-                input_AddInfo( p_category, (char *)p_frame->description,
-                                            psz_temp );
-                playlist_ItemAddInfo( p_item, "ID3",
-                                           (char *)p_frame->description,
-                                           psz_temp);
+                input_Control( p_input, INPUT_ADD_INFO, "ID3",
+                               (char *)p_frame->description, psz_temp );
             }
             free( psz_temp );
         }
         i++;
-        vlc_mutex_unlock( &p_item->lock );
     }
     id3_tag_delete( p_id3_tag );
-    if(val.b_bool == VLC_TRUE )
-    {
-        if( p_playlist )
-        {
-            val.b_bool = p_playlist->i_index;
-            var_Set( p_playlist, "item-change", val );
-        }
-    }
+
     val.b_bool = VLC_TRUE;
     var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
-
-    if( p_playlist )
-    {
-        vlc_object_release( p_playlist );
-    }
 }
 
 /*****************************************************************************

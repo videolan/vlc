@@ -295,12 +295,10 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 {
     es_out_sys_t      *p_sys = out->p_sys;
-    playlist_t        *p_playlist = NULL;
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
     char              psz_cat[sizeof( _("Stream ") ) + 10];
-    input_info_category_t *p_cat;
     char              *psz_description;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -362,111 +360,73 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         break;
     }
 
+    /* Add stream info */
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
     sprintf( psz_cat, _("Stream %d"), out->p_sys->i_id - 1 );
-    /* Get a category and the playlist */
-    if( ( p_cat = input_InfoCategory( p_input, psz_cat ) ) &&
-        ( p_playlist = (playlist_t *)vlc_object_find( p_input,
-                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE ) ) )
+
+    input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Codec"),
+                   "%.4s", (char*)&fmt->i_codec );
+
+    if( *psz_description )
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Language"),
+                       "%s", psz_description );
+
+    if( fmt->psz_description && *fmt->psz_description )
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Description"),
+                       "%s", fmt->psz_description );
+
+    /* Add information */
+    switch( fmt->i_cat )
     {
-        char *psz_type;
-        switch( fmt->i_cat )
-        {
-            case AUDIO_ES:
-                psz_type = _("Audio");
-                break;
-            case VIDEO_ES:
-                psz_type = _("Video");
-                break;
-            case SPU_ES:
-                psz_type = _("Subtitle");
-                break;
-            default:
-                psz_type = NULL;
-                break;
-        }
-        if( psz_type )
-        {
-            input_AddInfo( p_cat, _("Type"), psz_type );
-            playlist_AddInfo( p_playlist, -1, psz_cat, _("Type"), psz_type );
-        }
-        input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&fmt->i_codec );
-        playlist_AddInfo( p_playlist, -1, psz_cat, _("Codec"),
-                          "%.4s",(char*)&fmt->i_codec );
-        if( *psz_description )
-        {
-            input_AddInfo( p_cat, _("Language"), psz_description );
-            playlist_AddInfo( p_playlist, -1, psz_cat, _("Language"),
-                              "%s", psz_description );
-        }
-        if( fmt->psz_description && *fmt->psz_description )
-        {
-            input_AddInfo( p_cat, _("Description"), "%s", fmt->psz_description );
-            playlist_AddInfo( p_playlist, -1, psz_cat, _("Description"),
-                              "%s", fmt->psz_description );
-        }
+    case AUDIO_ES:
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                       _("Type"), _("Audio") );
 
-        /* Add information */
-        switch( fmt->i_cat )
-        {
-            case AUDIO_ES:
-                if( fmt->audio.i_channels > 0 )
-                {
-                    input_AddInfo( p_cat, _("Channels"),
-                                   "%d", fmt->audio.i_channels );
-                    playlist_AddInfo( p_playlist, -1, psz_cat, _("Channels"),
-                                      "%d", fmt->audio.i_channels );
-                }
-                if( fmt->audio.i_rate > 0 )
-                {
-                    input_AddInfo( p_cat, _("Sample rate"),
-                                   _("%d Hz"), fmt->audio.i_rate );
-                    playlist_AddInfo( p_playlist, -1, psz_cat, _("Sample rate"),
-                                      _("%d Hz"), fmt->audio.i_rate );
-                }
-                if( fmt->audio.i_bitspersample > 0 )
-                {
-                    input_AddInfo( p_cat, _("Bits per sample"),
-                                   "%d", fmt->audio.i_bitspersample );
-                    playlist_AddInfo( p_playlist, -1, psz_cat, _("Bits per sample"),
-                                      "%d", fmt->audio.i_bitspersample );
-                }
-                if( fmt->i_bitrate > 0 )
-                {
-                    input_AddInfo( p_cat, _("Bitrate"),
-                                   _("%d bps"), fmt->i_bitrate );
-                    playlist_AddInfo( p_playlist, -1, psz_cat, _("Bitrate"),
-                                      _("%d bps"), fmt->i_bitrate );
-                }
-                break;
+        if( fmt->audio.i_channels > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
+                           "%d", fmt->audio.i_channels );
 
-            case VIDEO_ES:
-                if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
-                {
-                    input_AddInfo( p_cat, _("Resolution"), "%dx%d",
-                                   fmt->video.i_width, fmt->video.i_height );
-                    playlist_AddInfo( p_playlist, -1, psz_cat,
-                                    _("Resolution"), "%dx%d",
-                                    fmt->video.i_width, fmt->video.i_height );
-                }
-                if( fmt->video.i_visible_width > 0 &&
-                    fmt->video.i_visible_height > 0 )
-                {
-                    input_AddInfo( p_cat, _("Display resolution"), "%dx%d",
-                                   fmt->video.i_visible_width,
-                                   fmt->video.i_visible_height);
-                     playlist_AddInfo( p_playlist, -1, psz_cat,
-                                       _("Display resolution"), "%dx%d",
-                                       fmt->video.i_visible_width,
-                                       fmt->video.i_visible_height);
-                }
-                break;
+        if( fmt->audio.i_rate > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Sample rate"),
+                           _("%d Hz"), fmt->audio.i_rate );
 
-            case SPU_ES:
-            default:
-                break;
-        }
-        if( p_playlist ) vlc_object_release( p_playlist );
+        if( fmt->audio.i_bitspersample > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                           _("Bits per sample"), "%d",
+                           fmt->audio.i_bitspersample );
+
+        if( fmt->i_bitrate > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Bitrate"),
+                           _("%d bps"), fmt->i_bitrate );
+        break;
+
+    case VIDEO_ES:
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                       _("Type"), _("Video") );
+
+        if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                           _("Resolution"), "%dx%d",
+                           fmt->video.i_width, fmt->video.i_height );
+
+        if( fmt->video.i_visible_width > 0 &&
+            fmt->video.i_visible_height > 0 )
+            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                           _("Display resolution"), "%dx%d",
+                           fmt->video.i_visible_width,
+                           fmt->video.i_visible_height);
+        break;
+
+    case SPU_ES:
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                       _("Type"), _("Subtitle") );
+        break;
+
+    default:
+        break;
     }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     free( psz_description );
 
     es_format_Copy( &es->p_es->fmt, fmt );

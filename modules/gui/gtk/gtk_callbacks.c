@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: gtk_callbacks.c,v 1.16 2003/12/22 14:32:56 sam Exp $
+ * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -445,7 +445,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
         return FALSE;
     }
 
-    psz_current = p_playlist->pp_items[ p_playlist->i_index ]->psz_name;
+    psz_current = p_playlist->pp_items[ p_playlist->i_index ]->input.psz_name;
 
     /*
      * Get the active input

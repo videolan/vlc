@@ -2,7 +2,7 @@
  * old.c : Old playlist format import/export
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: old.c,v 1.1 2004/01/11 00:45:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -54,7 +54,8 @@ int Export_Old( vlc_object_t *p_this )
 
     for ( i = 0 ; i < p_playlist->i_size ; i++ )
     {
-        fprintf( p_export->p_file , "%s\n" , p_playlist->pp_items[i]->psz_uri );
-     }
+        fprintf( p_export->p_file , "%s\n" ,
+        p_playlist->pp_items[i]->input.psz_uri );
+    }
     return VLC_SUCCESS;
 }

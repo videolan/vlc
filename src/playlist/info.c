@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.10 2004/02/28 17:10:23 gbazin Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -25,8 +25,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/sout.h>
+#include <vlc/input.h>
 
 #include "vlc_playlist.h"
 
@@ -46,20 +45,16 @@ char * playlist_GetInfo( playlist_t *p_playlist, int i_pos,
 {
     playlist_item_t *p_item;
     char *psz_buffer;
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return strdup("");
-    }
+
+    /* Sanity check */
+    if( p_playlist == NULL) return strdup("");
+
     p_item = playlist_ItemGetByPos( p_playlist, i_pos );
-    if( !p_item )
-    {
-        return strdup("");
-    }
-    vlc_mutex_lock( &p_item->lock );
-    psz_buffer = playlist_ItemGetInfo( p_item ,
-                                       psz_cat, psz_name );
-    vlc_mutex_unlock( &p_item->lock );
+    if( !p_item ) return strdup("");
+
+    vlc_mutex_lock( &p_item->input.lock );
+    psz_buffer = playlist_ItemGetInfo( p_item , psz_cat, psz_name );
+    vlc_mutex_unlock( &p_item->input.lock );
 
     return psz_buffer;
 }
@@ -73,52 +68,25 @@ char * playlist_GetInfo( playlist_t *p_playlist, int i_pos,
  * \return the info value if any, an empty string else
 */
 char * playlist_ItemGetInfo( playlist_item_t *p_item,
-                      const char * psz_cat, const char *psz_name )
+                             const char * psz_cat, const char *psz_name )
 {
-     int i,j ;
-     for( i = 0 ; i< p_item->i_categories ; i++ )
+     int i, j;
+
+     for( i = 0 ; i< p_item->input.i_categories ; i++ )
      {
-         if( !strcmp( p_item->pp_categories[i]->psz_name , psz_cat ) )
+         info_category_t *p_category = p_item->input.pp_categories[i];
+
+         if( strcmp( p_category->psz_name , psz_cat ) ) continue;
+
+         for( j = 0 ; j< p_category->i_infos ; j++ )
          {
-             for( j = 0 ; j< p_item->pp_categories[i]->i_infos ; j++ )
+             if( !strcmp( p_category->pp_infos[j]->psz_name, psz_name) )
              {
-                 if( !strcmp( p_item->pp_categories[i]->pp_infos[j]->psz_name,
-                                         psz_name ) )
-                 {
-                     return
-                     strdup(p_item->pp_categories[i]->pp_infos[j]->psz_value );
-                 }
+                 return strdup( p_category->pp_infos[j]->psz_value );
              }
          }
      }
      return strdup("");
-}
-
-/**
- * Get one info category. Create it if it does not exist
- *
- * \param p_playlist the playlist to get the category from
- * \param i_item the position of the item on which we want
- *               the info ( -1 for current )
- * \param psz_cat the category we want
- * \return the info category.
- */
-item_info_category_t *
-playlist_GetCategory( playlist_t *p_playlist, int i_pos,
-                      const char * psz_cat )
-{
-    playlist_item_t *p_item;
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return NULL;
-    }
-    p_item=  playlist_ItemGetByPos( p_playlist , i_pos );
-    if( !p_item )
-    {
-        return NULL;
-    }
-    return playlist_ItemGetCategory( p_item , psz_cat );
 }
 
 /**
@@ -128,51 +96,21 @@ playlist_GetCategory( playlist_t *p_playlist, int i_pos,
  * \param psz_cat the category we want
  * \return the info category.
  */
-item_info_category_t *playlist_ItemGetCategory( playlist_item_t *p_item,
-                                                const char *psz_cat )
+info_category_t * playlist_ItemGetCategory( playlist_item_t *p_item,
+                                            const char *psz_cat )
 {
     int i;
     /* Search the category */
-    for( i = 0 ; i< p_item->i_categories ; i++ )
+    for( i = 0 ; i< p_item->input.i_categories ; i++ )
     {
-        if( !strncmp( p_item->pp_categories[i]->psz_name , psz_cat,
-                                strlen(psz_cat) ) )
+        if( !strncmp( p_item->input.pp_categories[i]->psz_name, psz_cat,
+                      strlen(psz_cat) ) )
         {
-            return p_item->pp_categories[i];
+            return p_item->input.pp_categories[i];
         }
     }
 
     /* We did not find the category, create it */
-    return playlist_ItemCreateCategory( p_item, psz_cat );
-}
-
-
-/**
- * Create one info category.
- *
- * \param p_playlist the playlist
- * \param i_item the position of the item for which we create
- *               the category ( -1 for current )
- * \param psz_cat the category we want to create
- * \return the info category.
- */
-item_info_category_t *
-playlist_CreateCategory( playlist_t *p_playlist, int i_pos,
-                         const char * psz_cat )
-{
-    playlist_item_t *p_item = NULL;
-
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return NULL;
-    }
-    p_item = playlist_ItemGetByPos( p_playlist , i_pos );
-    if( !p_item )
-    {
-        return NULL;
-    }
-
     return playlist_ItemCreateCategory( p_item, psz_cat );
 }
 
@@ -184,19 +122,21 @@ playlist_CreateCategory( playlist_t *p_playlist, int i_pos,
  * \param psz_cat the category we want to create
  * \return the info category.
  */
-item_info_category_t *
-playlist_ItemCreateCategory( playlist_item_t *p_item, const char *psz_cat )
+info_category_t * playlist_ItemCreateCategory( playlist_item_t *p_item,
+					       const char *psz_cat )
 {
-    item_info_category_t *p_cat;
+    info_category_t *p_cat;
     int i;
-    for( i = 0 ; i< p_item->i_categories ; i++)
+
+    for( i = 0 ; i< p_item->input.i_categories ; i++)
     {
-        if( !strcmp( p_item->pp_categories[i]->psz_name,psz_cat ) )
+        if( !strcmp( p_item->input.pp_categories[i]->psz_name,psz_cat ) )
         {
-            return p_item->pp_categories[i];
+            return p_item->input.pp_categories[i];
         }
     }
-    if( ( p_cat = malloc( sizeof( item_info_category_t) ) ) == NULL )
+
+    if( ( p_cat = malloc( sizeof( info_category_t) ) ) == NULL )
     {
         return NULL;
     }
@@ -205,10 +145,8 @@ playlist_ItemCreateCategory( playlist_item_t *p_item, const char *psz_cat )
     p_cat->i_infos = 0;
     p_cat->pp_infos = NULL;
 
-    INSERT_ELEM( p_item->pp_categories ,
-                 p_item->i_categories ,
-                 p_item->i_categories ,
-                 p_cat );
+    INSERT_ELEM( p_item->input.pp_categories, p_item->input.i_categories,
+                 p_item->input.i_categories, p_cat );
 
     return p_cat;
 }
@@ -234,30 +172,23 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
     playlist_item_t *p_item;
     char *psz_value;
 
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return VLC_EGENERIC;
-    }
+    /* Sanity check */
+    if( p_playlist == NULL) return VLC_EGENERIC;
 
     p_item = playlist_ItemGetByPos( p_playlist, i_item );
-    if( !p_item )
-    {
-            return VLC_ENOOBJ;
-    }
+    if( !p_item ) return VLC_ENOOBJ;
 
     va_start( args, psz_format );
     vasprintf( &psz_value, psz_format, args );
     va_end( args );
 
-    vlc_mutex_lock( &p_item->lock );
-    i_ret = playlist_ItemAddInfo( p_item , psz_cat , psz_name , psz_value );
-    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_lock( &p_item->input.lock );
+    i_ret = playlist_ItemAddInfo( p_item, psz_cat, psz_name, psz_value );
+    vlc_mutex_unlock( &p_item->input.lock );
 
     free( psz_value );
     return i_ret;
 }
-
 
 /**
  *  Add info to one item ( no need for p_playlist )
@@ -269,21 +200,18 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
  * \return VLC_SUCCESS on success
 */
 int playlist_ItemAddInfo( playlist_item_t *p_item,
-                      const char *psz_cat, const char *psz_name,
-                      const char *psz_format, ... )
+                          const char *psz_cat, const char *psz_name,
+                          const char *psz_format, ... )
 {
     va_list args;
     int i;
     int i_new = VLC_TRUE;
-    item_info_t *p_info = NULL;
-    item_info_category_t *p_cat;
+    info_t *p_info = NULL;
+    info_category_t *p_cat;
 
     /* Find or create the category */
     p_cat = playlist_ItemGetCategory( p_item, psz_cat );
-    if( p_cat == NULL)
-    {
-        return VLC_EGENERIC;
-    }
+    if( p_cat == NULL) return VLC_EGENERIC;
 
     for( i = 0 ; i< p_cat->i_infos ; i++)
     {
@@ -299,7 +227,7 @@ int playlist_ItemAddInfo( playlist_item_t *p_item,
     /* New info, create it */
     if( p_info == NULL )
     {
-        if( ( p_info = malloc( sizeof( item_info_t) ) ) == NULL )
+        if( ( p_info = malloc( sizeof( info_t) ) ) == NULL )
         {
             return VLC_EGENERIC;
         }
@@ -317,10 +245,7 @@ int playlist_ItemAddInfo( playlist_item_t *p_item,
     /* If this is new, insert it */
     if( i_new == VLC_TRUE )
     {
-        INSERT_ELEM( p_cat->pp_infos,
-                     p_cat->i_infos,
-                     p_cat->i_infos,
-                     p_info );
+        INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
     }
 
     return VLC_SUCCESS;

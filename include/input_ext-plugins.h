@@ -83,13 +83,6 @@ VLC_EXPORT( void, input_ClockManageRef, ( input_thread_t *, pgrm_descriptor_t *,
 VLC_EXPORT( mtime_t, input_ClockGetTS, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
 
 /*****************************************************************************
- * Prototypes from input_info.c
- *****************************************************************************/
-VLC_EXPORT( input_info_category_t *, input_InfoCategory, ( input_thread_t *, char * ) );
-VLC_EXPORT( int, input_AddInfo, ( input_info_category_t *, char *, char *, ... ) );
-int input_DelInfo( input_thread_t * p_input ); /* no need to export this */
-
-/*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
 #define input_BuffersInit(a) __input_BuffersInit(VLC_OBJECT(a))

@@ -433,7 +433,7 @@ static void Run( intf_thread_t *p_intf )
                 if( p_playlist )
                 {
                     mtime_t dur =
-                        p_playlist->pp_items[p_playlist->i_index]->i_duration;
+                        p_playlist->pp_items[p_playlist->i_index]->input.i_duration;
 
                     i_seconds = time.i_time / 1000000;
                     secstotimestr ( psz_time, i_seconds );
@@ -545,7 +545,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
         char *psz_bookmark = strdup( val.psz_string );
         for( i_position = 0 ; i_position < p_playlist->i_size ; i_position++)
         {
-            if( !strcmp( psz_bookmark, p_playlist->pp_items[i_position]->psz_uri ) )
+            if( !strcmp( psz_bookmark, p_playlist->pp_items[i_position]->input.psz_uri ) )
             {
                 playlist_Goto( p_playlist, i_position );
                 break;
@@ -565,7 +565,7 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         char psz_bookmark_name[11];
         sprintf( psz_bookmark_name, "bookmark%i", i_num );
         var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-        val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->psz_uri );
+        val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->input.psz_uri );
         var_Set( p_intf, psz_bookmark_name, val );
         msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, val.psz_string );
         vlc_object_release( p_playlist );

@@ -848,9 +848,9 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
         sprintf( value, "%d", i );
         mvar_AppendNewVar( itm, "index", value );
 
-        mvar_AppendNewVar( itm, "name", p_pl->pp_items[i]->psz_name );
+        mvar_AppendNewVar( itm, "name", p_pl->pp_items[i]->input.psz_name );
 
-        mvar_AppendNewVar( itm, "uri", p_pl->pp_items[i]->psz_uri );
+        mvar_AppendNewVar( itm, "uri", p_pl->pp_items[i]->input.psz_uri );
 
         sprintf( value, "%d", p_pl->pp_items[i]->i_group );
         mvar_AppendNewVar( itm, "group", value );
@@ -865,9 +865,7 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
 static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
 {
     mvar_t *s = mvar_New( name, "set" );
-
-    input_info_category_t * p_category;
-    input_info_t * p_info;
+    int i, j;
 
     fprintf( stderr," mvar_InfoSetNew: name=`%s'\n", name );
     if( p_input == NULL )
@@ -875,31 +873,30 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
         return s;
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_category = p_input->stream.p_info;
-    while ( p_category )
+    vlc_mutex_lock( &p_input->p_item->lock );
+    for ( i = 0; i < p_input->p_item->i_categories; i++ )
     {
+        info_category_t *p_category = p_input->p_item->pp_categories[i];
         mvar_t *cat  = mvar_New( name, "set" );
         mvar_t *iset = mvar_New( "info", "set" );
 
         mvar_AppendNewVar( cat, "name", p_category->psz_name );
         mvar_AppendVar( cat, iset );
 
-        p_info = p_category->p_info;
-        while ( p_info )
+        for ( j = 0; j < p_category->i_infos; j++ )
         {
+            info_t *p_info = p_category->pp_infos[j];
             mvar_t *info = mvar_New( "info", "" );
 
-            msg_Dbg( p_input, "adding info name=%s value=%s", p_info->psz_name, p_info->psz_value );
+            msg_Dbg( p_input, "adding info name=%s value=%s",
+                     p_info->psz_name, p_info->psz_value );
             mvar_AppendNewVar( info, "name",  p_info->psz_name );
             mvar_AppendNewVar( info, "value", p_info->psz_value );
             mvar_AppendVar( iset, info );
-            p_info = p_info->p_next;
         }
         mvar_AppendVar( s, cat );
-        p_category = p_category->p_next;
     }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_input->p_item->lock );
 
     return s;
 }
@@ -1779,7 +1776,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     uri_decode_url_encoded( mrl );
                     p_item = parse_MRL( p_intf, mrl );
 
-                    if( !p_item || !p_item->psz_uri || !*p_item->psz_uri )
+                    if( !p_item || !p_item->input.psz_uri ||
+                        !*p_item->input.psz_uri )
                     {
                         msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
                     } else

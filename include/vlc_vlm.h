@@ -55,8 +55,7 @@ typedef struct
     char    **option;
 
     /* global options for all inputs */
-    char    **input_option;
-    int     i_input_option;
+    input_item_t    item;
     input_thread_t  *p_input;
 
 } vlm_media_t;

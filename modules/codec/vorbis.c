@@ -2,9 +2,9 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vorbis.c,v 1.32 2004/02/22 15:57:41 fenrir Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
-#include <vlc/input.h>
-#include "vlc_playlist.h"
 
 #include <ogg/ogg.h>
 
@@ -453,11 +451,6 @@ static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 static void ParseVorbisComments( decoder_t *p_dec )
 {
     input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
-    input_info_category_t *p_cat =
-        input_InfoCategory( p_input, _("Vorbis comment") );
-    playlist_t *p_playlist = vlc_object_find( p_dec, VLC_OBJECT_PLAYLIST,
-                                              FIND_ANYWHERE );
-    playlist_item_t *p_item;
     int i = 0;
     char *psz_name, *psz_value, *psz_comment;
     while ( i < p_dec->p_sys->vc.comments )
@@ -474,24 +467,12 @@ static void ParseVorbisComments( decoder_t *p_dec )
         {
             *psz_value = '\0';
             psz_value++;
-            input_AddInfo( p_cat, psz_name, psz_value );
-            vlc_mutex_lock( &p_playlist->object_lock );
-            p_item = playlist_ItemGetByPos( p_playlist, -1 );
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            if( !p_item)
-            {
-                    msg_Err(p_dec, "unable to find item" );
-                    return;
-            }
-            vlc_mutex_lock( &p_item->lock );
-            playlist_ItemAddInfo( p_item, _("Vorbis comment") ,
-                            psz_name, psz_value );
-            vlc_mutex_unlock( &p_item->lock );
+            input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
+                           psz_name, psz_value );
         }
         free( psz_comment );
         i++;
     }
-    if( p_playlist ) vlc_object_release( p_playlist );
 }
 
 /*****************************************************************************

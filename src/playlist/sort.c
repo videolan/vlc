@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sort.c,v 1.9 2004/01/23 10:48:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -25,6 +25,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
 
@@ -87,18 +88,18 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
             }
             else if( i_mode == SORT_TITLE )
             {
-                i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
-                                 p_playlist->pp_items[i_small]->psz_name );
+                i_test = strcasecmp( p_playlist->pp_items[i]->input.psz_name,
+                             p_playlist->pp_items[i_small]->input.psz_name );
             }
             else if( i_mode == SORT_GROUP )
             {
                 i_test = p_playlist->pp_items[i]->i_group -
-                                 p_playlist->pp_items[i_small]->i_group;
+                             p_playlist->pp_items[i_small]->i_group;
             }
             else if( i_mode == SORT_DURATION )
             {
-                i_test = p_playlist->pp_items[i]->i_duration -
-                                 p_playlist->pp_items[i_small]->i_duration;
+                i_test = p_playlist->pp_items[i]->input.i_duration -
+                             p_playlist->pp_items[i_small]->input.i_duration;
             }
             else if( i_mode == SORT_AUTHOR )
             {

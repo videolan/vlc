@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: group.c,v 1.9 2004/01/25 17:16:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -25,11 +25,9 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/sout.h>
+#include <vlc/input.h>
 
 #include "vlc_playlist.h"
-
 
 /**
  * Create a group
@@ -39,7 +37,7 @@
  * \param psz_name the name of the group to be created
  * \return a pointer to the created group, or NULL on error
  */
-playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
+playlist_group_t *playlist_CreateGroup( playlist_t *p_playlist, char *psz_name)
 {
     playlist_group_t *p_group;
     int i;
@@ -144,7 +142,7 @@ int playlist_GroupToId( playlist_t *p_playlist, char *psz_name )
     {
         if( p_playlist->pp_groups[i]->psz_name)
         {
-            if( ! strcasecmp( p_playlist->pp_groups[i]->psz_name ,  psz_name ) )
+            if( ! strcasecmp( p_playlist->pp_groups[i]->psz_name, psz_name ) )
             {
                 return p_playlist->pp_groups[i]->i_id;
             }

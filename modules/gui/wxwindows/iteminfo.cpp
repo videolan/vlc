@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: iteminfo.cpp,v 1.8 2004/01/29 17:51:08 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -143,10 +143,9 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     wxStaticText *uri_label =
            new wxStaticText( info_panel, -1, wxU(_("URI")) );
 
-    uri_text =  new wxTextCtrl( info_panel, Uri_Event,
-                                wxU(p_item->psz_uri),
-                                wxDefaultPosition, wxSize( 300, -1 ),
-                                wxTE_PROCESS_ENTER);
+    uri_text = new wxTextCtrl( info_panel, Uri_Event,
+        wxU(p_item->input.psz_uri), wxDefaultPosition, wxSize( 300, -1 ),
+        wxTE_PROCESS_ENTER );
 
     wxBoxSizer *uri_sizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -159,11 +158,9 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     wxStaticText *name_label =
            new wxStaticText(  info_panel, -1, wxU(_("Name")) );
 
-    name_text =
-                   new wxTextCtrl( info_panel, Uri_Event,
-                                   wxU(p_item->psz_name),
-                                   wxDefaultPosition, wxSize( 300, -1 ),
-                                   wxTE_PROCESS_ENTER);
+    name_text = new wxTextCtrl( info_panel, Uri_Event,
+        wxU(p_item->input.psz_name), wxDefaultPosition, wxSize( 300, -1 ),
+        wxTE_PROCESS_ENTER );
 
     wxBoxSizer *name_sizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -282,25 +279,25 @@ void ItemInfoDialog::UpdateInfo()
 {
     if( !info_root )
     {
-       info_root = info_tree->AddRoot( wxU( p_item->psz_name) );
+       info_root = info_tree->AddRoot( wxU( p_item->input.psz_name) );
     }
 
     /* Rebuild the tree */
-    for( int i = 0; i< p_item->i_categories ; i++)
+    for( int i = 0; i< p_item->input.i_categories ; i++)
     {
-        if( !strcmp( p_item->pp_categories[i]->psz_name, _("Options") ) )
+        if( !strcmp( p_item->input.pp_categories[i]->psz_name, _("Options") ) )
         {
             continue;
         }
         wxTreeItemId cat = info_tree->AppendItem( info_root,
-                            wxU( p_item->pp_categories[i]->psz_name) );
+                            wxU( p_item->input.pp_categories[i]->psz_name) );
 
-        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
+        for( int j = 0 ; j < p_item->input.pp_categories[i]->i_infos ; j++ )
         {
            info_tree->AppendItem( cat , (wxString)
-                      wxU(p_item->pp_categories[i]->pp_infos[j]->psz_name) +
-                      wxT(": ") +
-                      wxU(p_item->pp_categories[i]->pp_infos[j]->psz_value) );
+               wxU(p_item->input.pp_categories[i]->pp_infos[j]->psz_name) +
+               wxT(": ") +
+               wxU(p_item->input.pp_categories[i]->pp_infos[j]->psz_value) );
         }
     }
 }
@@ -310,9 +307,9 @@ void ItemInfoDialog::UpdateInfo()
  *****************************************************************************/
 void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
-    vlc_mutex_lock( &p_item->lock );
-    p_item->psz_name = strdup( name_text->GetLineText(0).mb_str() );
-    p_item->psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
+    vlc_mutex_lock( &p_item->input.lock );
+    p_item->input.psz_name = strdup( name_text->GetLineText(0).mb_str() );
+    p_item->input.psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
     playlist_ItemAddInfo( p_item,"General","Author",
                             author_text->GetLineText(0).mb_str() );
     vlc_bool_t b_old_enabled = p_item->b_enabled;
@@ -341,7 +338,7 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     }
 
     p_item->b_enabled = enabled_checkbox->IsChecked() ? VLC_TRUE : VLC_FALSE ;
-    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_unlock( &p_item->input.lock );
     EndModal( wxID_OK );
 }
 

@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.7 2004/02/27 13:24:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -122,7 +122,7 @@ void Playlist::buildList()
     for( int i = 0; i < m_pPlaylist->i_size; i++ )
     {
         // Get the name of the playlist item
-        UString *pName = convertName( m_pPlaylist->pp_items[i]->psz_name );
+        UString *pName = convertName( m_pPlaylist->pp_items[i]->input.psz_name );
         // Is it the played stream ?
         bool playing = (i == m_pPlaylist->i_index );
         // Add the item in the list

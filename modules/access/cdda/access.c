@@ -352,55 +352,44 @@ CDDAUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 }
 #endif
 
-#define meta_info_add_str(title, str)                          \
-  if ( str ) {                                                 \
-    dbg_print( INPUT_DBG_META, "field %s: %s\n", title, str);  \
-    input_AddInfo( p_cat, _(title), "%s", str );               \
-    vlc_mutex_lock( &p_playlist->object_lock );                \
-    p_item = playlist_ItemGetByPos( p_playlist, -1 );          \
-    vlc_mutex_unlock( &p_playlist->object_lock );              \
-    vlc_mutex_lock( &p_item->lock );                           \
-    playlist_ItemAddInfo( p_item, p_cat->psz_name,             \
-                      _(title), "%s" , str );                  \
-    vlc_mutex_unlock( &p_item->lock );                         \
-  }
-
-
 static void InformationCreate( input_thread_t *p_input  )
 {
   cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
-  playlist_t *p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                            FIND_PARENT );
-  input_info_category_t *p_cat;
-
-  p_cat = input_InfoCategory( p_input, "General" );
-
 
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled) {
-    playlist_item_t *p_item;
 
-    meta_info_add_str( "Title", p_cdda->cddb.disc->title );
-    meta_info_add_str( "Artist", p_cdda->cddb.disc->artist );
-    meta_info_add_str( "Genre", p_cdda->cddb.disc->genre );
-    meta_info_add_str( "Extended Data", p_cdda->cddb.disc->ext_data );
-    {
-      char year[5];
-      if (p_cdda->cddb.disc->year != 0) {
-        snprintf(year, 5, "%d", p_cdda->cddb.disc->year);
-        meta_info_add_str( "Year", year );
-      }
-      if ( p_cdda->cddb.disc->discid ) {
-        input_AddInfo( p_cat, _("CDDB Disc ID"), "%x",
-                       p_cdda->cddb.disc->discid );
-      }
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", "Title",
+               p_cdda->cddb.disc->title );
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Title"),
+                   "%s", p_cdda->cddb.disc->title );
 
-      if ( p_cdda->cddb.disc->category != CDDB_CAT_INVALID ) {
-        input_AddInfo( p_cat, _("CDDB Disc Category"), "%s",
-                       CDDB_CATEGORY[p_cdda->cddb.disc->category] );
-      }
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", "Artist",
+               p_cdda->cddb.disc->artist );
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Artist"),
+                   "%s", p_cdda->cddb.disc->artist );
 
-    }
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", "Genre",
+               p_cdda->cddb.disc->genre );
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Genre"),
+                   "%s", p_cdda->cddb.disc->genre );
+
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", "Extended Data",
+               p_cdda->cddb.disc->ext_data );
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Extended Data"),
+                   "%s", p_cdda->cddb.disc->ext_data );
+
+    if (p_cdda->cddb.disc->year != 0)
+      input_Control( p_input, INPUT_ADD_INFO, _("General"),
+                     _("Year"), "%d", p_cdda->cddb.disc->year );
+    if ( p_cdda->cddb.disc->discid )
+      input_Control( p_input, INPUT_ADD_INFO, _("General"),
+                     _("CDDB Disc ID"), "%x", p_cdda->cddb.disc->discid );
+
+    if ( p_cdda->cddb.disc->category != CDDB_CAT_INVALID )
+      input_Control( p_input, INPUT_ADD_INFO, _("General"),
+                     _("CDDB Disc Category"), "%s",
+                     CDDB_CATEGORY[p_cdda->cddb.disc->category] );
   }
 
 #endif /*HAVE_LIBCDDB*/
@@ -414,40 +403,40 @@ static void InformationCreate( input_thread_t *p_input  )
       / CDIO_CD_FRAMES_PER_SEC;
 
     dbg_print( INPUT_DBG_META, "Duration %ld", (long int) i_duration );
-    input_AddInfo( p_cat, _("Duration"), "%s",
-                   secstotimestr( psz_buffer, i_duration ) );
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"), "%s",
+		   secstotimestr( psz_buffer, i_duration ) );
 
     for( i_track = 0 ; i_track < p_cdda->i_nb_tracks ; i_track++ ) {
       char track_str[TITLE_MAX];
       mtime_t i_duration =
-	(p_cdda->p_sectors[i_track+1] - p_cdda->p_sectors[i_track])
-	/ CDIO_CD_FRAMES_PER_SEC;
+        (p_cdda->p_sectors[i_track+1] - p_cdda->p_sectors[i_track])
+        / CDIO_CD_FRAMES_PER_SEC;
       snprintf(track_str, TITLE_MAX, "%s %02d", _("Track"), i_track+1);
-      p_cat = input_InfoCategory( p_input, track_str );
-      input_AddInfo( p_cat, _("Duration"), "%s",
-		     secstotimestr( psz_buffer, i_duration ) );
+      input_Control( p_input, INPUT_ADD_INFO, track_str, _("Duration"), "%s",
+                     secstotimestr( psz_buffer, i_duration ) );
 
 #ifdef HAVE_LIBCDDB
       if (p_cdda->i_cddb_enabled) {
         cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                             i_track);
         if (t != NULL) {
-	  if ( t->artist != NULL && strlen(t->artist) ) {
-	    input_AddInfo( p_cat, _("Artist"), "%s", t->artist );
-	  }
-	  if ( t->title != NULL && strlen(t->title) ) {
-	    input_AddInfo( p_cat, _("Title"), "%s",  t->title );
-	  }
-	  if ( t->ext_data != NULL && strlen(t->ext_data) ) {
-	    input_AddInfo( p_cat, _("Extended Data"), "%s",  t->ext_data );
-	  }
-	}
+          if ( t->artist != NULL && strlen(t->artist) ) {
+            input_Control( p_input, INPUT_ADD_INFO, track_str,
+                           _("Artist"), "%s", t->artist );
+          }
+          if ( t->title != NULL && strlen(t->title) ) {
+            input_Control( p_input, INPUT_ADD_INFO, track_str,
+                           _("Title"), "%s",  t->title );
+          }
+          if ( t->ext_data != NULL && strlen(t->ext_data) ) {
+            input_Control( p_input, INPUT_ADD_INFO, track_str,
+                           _("Extended Data"), "%s",  t->ext_data );
+          }
+        }
       }
 #endif
     }
   }
-
-  if( p_playlist ) vlc_object_release( p_playlist );
 }
 
 
@@ -759,7 +748,7 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
   if( !p_item )
       return;
 
-  vlc_mutex_lock( &p_item->lock );
+  vlc_mutex_lock( &p_item->input.lock );
 
   p_author =
     CDDAFormatStr( p_input, p_cdda,
@@ -804,7 +793,7 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
   }
 #endif /*HAVE_LIBCDDB*/
 
-  vlc_mutex_unlock( &p_item->lock );
+  vlc_mutex_unlock( &p_item->input.lock );
 }
 
 static int

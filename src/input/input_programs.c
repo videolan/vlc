@@ -600,7 +600,6 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     es_descriptor_t * p_es;
     vlc_value_t val, text;
     char *psz_var = NULL;
-    char *psz_type = NULL;
 
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
     if( p_es == NULL )
@@ -663,37 +662,13 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     {
     case AUDIO_ES:
         psz_var = "audio-es";
-        psz_type = _("audio");
         break;
     case SPU_ES:
         psz_var = "spu-es";
-        psz_type = _("subtitle");
         break;
     case VIDEO_ES:
         psz_var = "video-es";
-        psz_type = _("video");
         break;
-    case NAV_ES:
-        psz_type = _("navigation");
-        break;
-    case UNKNOWN_ES:
-        psz_type = _("unknown");
-        break;
-    default:
-        psz_type = _("error");
-    }
-
-#define TITLE_MAX 30
-    /* Add stream info. */
-    {
-        input_info_category_t *p_cat;
-	char psz_streamid[TITLE_MAX];
-
-	snprintf(psz_streamid, TITLE_MAX, "%s%04x", _("Stream "), i_es_id);
-	p_cat = input_InfoCategory( p_input, psz_streamid );
-	input_AddInfo( p_cat, _("Type"), "%s", psz_type );
-	if ( psz_desc && *psz_desc )
-	  input_AddInfo( p_cat, _("Description"), "%s", psz_desc );
     }
 
     if( psz_var )

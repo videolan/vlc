@@ -26,8 +26,7 @@
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
-#include <vlc/vout.h>
-#include <vlc/sout.h>
+#include <vlc/input.h>
 
 #include "vlc_playlist.h"
 
@@ -55,8 +54,9 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      mtime_t i_duration, const char **ppsz_options,
                      int i_options )
 {
-    playlist_item_t * p_item =
+    playlist_item_t *p_item =
         playlist_ItemNew( p_playlist , psz_uri, psz_name );
+
     int i;
 
     if( p_item == NULL )
@@ -65,23 +65,23 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
         return -1;
     }
 
-    p_item->i_duration = i_duration;
+    p_item->input.i_duration = i_duration;
 
-    p_item->i_options = i_options;
-    p_item->ppsz_options = NULL;
+    p_item->input.i_options = i_options;
+    p_item->input.ppsz_options = NULL;
     for( i = 0; i < i_options; i++ )
     {
         if( i == 0 )
         {
-            p_item->ppsz_options = malloc( i_options * sizeof(char *) );
-            if( !p_item->ppsz_options )
+            p_item->input.ppsz_options = malloc( i_options * sizeof(char *) );
+            if( !p_item->input.ppsz_options )
             {
-                p_item->i_options = 0;
+                p_item->input.i_options = 0;
                 break;
             }
         }
 
-        p_item->ppsz_options[i] = strdup( ppsz_options[i] );
+        p_item->input.ppsz_options[i] = strdup( ppsz_options[i] );
     }
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
@@ -99,113 +99,11 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  *        regardless of it's size
  * \return The id of the playlist item
 */
-int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
-                     const char *psz_name, int i_mode, int i_pos )
+int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
+                  const char *psz_name, int i_mode, int i_pos )
 {
-    return playlist_AddExt ( p_playlist, psz_uri, psz_name, i_mode, i_pos,
+    return playlist_AddExt( p_playlist, psz_uri, psz_name, i_mode, i_pos,
                             -1, NULL, 0 );
-}
-
-/**
- * Create a new item, without adding it to the playlist
- *
- * \param psz_uri the mrl of the item
- * \param psz_name a text giving a name or description of the item
- * \return the new item or NULL on failure
- */
-playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
-                                    const char *psz_uri,
-                                    const char *psz_name )
-{
-    playlist_item_t * p_item;
-
-    p_item = malloc( sizeof( playlist_item_t ) );
-    if( p_item == NULL )
-    {
-        return NULL;
-    }
-    if( psz_uri == NULL)
-    {
-        return NULL;
-    }
-    memset( p_item, 0, sizeof( playlist_item_t ) );
-    p_item->psz_uri    = strdup( psz_uri );
-    if( psz_name != NULL )
-    {
-        p_item->psz_name   = strdup( psz_name );
-    }
-    else
-    {
-        p_item->psz_name = strdup ( psz_uri );
-    }
-    p_item->b_enabled = VLC_TRUE;
-    p_item->i_group = PLAYLIST_TYPE_MANUAL;
-
-    p_item->i_duration = -1;
-    p_item->ppsz_options = NULL;
-    p_item->i_options = 0;
-
-    vlc_mutex_init( p_obj->p_vlc , &p_item->lock );
-
-    playlist_ItemCreateCategory( p_item, _("General") );
-    return p_item;
-}
-
-/**
- * Deletes a playlist item
- *
- * \param p_item the item to delete
- * \return nothing
- */
-void playlist_ItemDelete( playlist_item_t *p_item)
-{
-    int i,j;
-
-    vlc_mutex_lock( &p_item->lock );
-
-    if( p_item->psz_name )
-    {
-        free( p_item->psz_name );
-    }
-    if( p_item->psz_uri )
-    {
-        free( p_item->psz_uri );
-    }
-
-    /* Free the info categories. Welcome to the segfault factory */
-    if( p_item->i_categories > 0 )
-    {
-        for( i = 0; i < p_item->i_categories; i++ )
-        {
-            for( j= 0 ; j < p_item->pp_categories[i]->i_infos; j++)
-            {
-                if( p_item->pp_categories[i]->pp_infos[j]->psz_name)
-                {
-                    free( p_item->pp_categories[i]->
-                                  pp_infos[j]->psz_name);
-                }
-                if( p_item->pp_categories[i]->pp_infos[j]->psz_value)
-                {
-                    free( p_item->pp_categories[i]->
-                                  pp_infos[j]->psz_value);
-                }
-                free( p_item->pp_categories[i]->pp_infos[j] );
-            }
-            if( p_item->pp_categories[i]->i_infos )
-                free( p_item->pp_categories[i]->pp_infos );
-            if( p_item->pp_categories[i]->psz_name)
-            {
-                free( p_item->pp_categories[i]->psz_name );
-            }
-            free( p_item->pp_categories[i] );
-       }
-       free( p_item->pp_categories );
-   }
-
-    vlc_mutex_unlock( &p_item->lock );
-    vlc_mutex_destroy( &p_item->lock );
-
-    free( p_item );
 }
 
 /***************************************************************************
@@ -232,7 +130,6 @@ int playlist_GetPositionById( playlist_t * p_playlist , int i_id )
     }
     return VLC_EGENERIC;
 }
-
 
 /**
  * Search an item by its id
@@ -321,9 +218,9 @@ int playlist_SetGroup( playlist_t *p_playlist, int i_pos, int i_group )
         return VLC_ENOOBJ;
     }
 
-    vlc_mutex_lock( &p_item->lock );
+    vlc_mutex_lock( &p_item->input.lock );
     playlist_ItemSetGroup( p_item , i_group );
-    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_unlock( &p_item->input.lock );
 
     val.b_bool = (i_pos >= 0 && i_pos < p_playlist->i_size ) ? i_pos : -1;
     var_Set( p_playlist, "item-change", val );
@@ -342,7 +239,7 @@ int playlist_ItemSetName( playlist_item_t *p_item, char *psz_name )
 {
     if( psz_name && p_item )
     {
-        p_item->psz_name = strdup( psz_name );
+        p_item->input.psz_name = strdup( psz_name );
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
@@ -373,9 +270,9 @@ int playlist_SetName( playlist_t *p_playlist, int i_pos, char *psz_name )
         return VLC_ENOOBJ;
     }
 
-    vlc_mutex_lock( &p_item->lock );
+    vlc_mutex_lock( &p_item->input.lock );
     playlist_ItemSetName( p_item , psz_name );
-    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_unlock( &p_item->input.lock );
 
     val.b_bool = (i_pos >= 0 && i_pos < p_playlist->i_size ) ? i_pos : -1;
     var_Set( p_playlist, "item-change", val );
@@ -396,7 +293,7 @@ int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
     char psz_buffer[MSTRTIME_MAX_SIZE];
     if( p_item )
     {
-        p_item->i_duration = i_duration;
+        p_item->input.i_duration = i_duration;
         if( i_duration != -1 )
         {
             secstotimestr( psz_buffer, i_duration/1000000 );
@@ -406,7 +303,7 @@ int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
             memcpy( psz_buffer, "--:--:--", sizeof("--:--:--") );
         }
         playlist_ItemAddInfo( p_item, _("General") , _("Duration"),
-                      "%s", psz_buffer );
+                              "%s", psz_buffer );
 
         return VLC_SUCCESS;
     }
@@ -438,9 +335,9 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration 
         return VLC_ENOOBJ;
     }
 
-    vlc_mutex_lock( &p_item->lock );
+    vlc_mutex_lock( &p_item->input.lock );
     playlist_ItemSetDuration( p_item , i_duration );
-    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_unlock( &p_item->input.lock );
 
     val.b_bool = (i_pos >= 0 && i_pos < p_playlist->i_size ) ? i_pos : -1;
     var_Set( p_playlist, "item-change", val );
@@ -451,7 +348,6 @@ int playlist_SetDuration( playlist_t *p_playlist, int i_pos, mtime_t i_duration 
 /**********************************************************************
  * Actions on existing playlist items
  **********************************************************************/
-
 
 /**
  * delete an item from a playlist.
@@ -477,7 +373,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         playlist_item_t *p_item = p_playlist->pp_items[i_pos];
 
         msg_Dbg( p_playlist, "deleting playlist item `%s'",
-                 p_item->psz_name );
+                 p_item->input.psz_name );
 #if 0
         int i,j;
 
@@ -535,11 +431,9 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         }
 
         /* Renumber the playlist */
-        REMOVE_ELEM( p_playlist->pp_items,
-                     p_playlist->i_size,
-                     i_pos );
-        if( p_playlist->i_enabled > 0 )
-            p_playlist->i_enabled--;
+        REMOVE_ELEM( p_playlist->pp_items, p_playlist->i_size, i_pos );
+
+        if( p_playlist->i_enabled > 0 ) p_playlist->i_enabled--;
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
@@ -556,7 +450,8 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
  * \param p_playlist the playlist to be cleared.
  * \return returns 0
  */
-int playlist_Clear( playlist_t * p_playlist ) {
+int playlist_Clear( playlist_t * p_playlist )
+{
 
     while( p_playlist->i_groups > 0 )
     {
@@ -578,7 +473,6 @@ int playlist_Clear( playlist_t * p_playlist ) {
     return 0;
 }
 
-
 /**
  * Disables a playlist item
  *
@@ -595,7 +489,7 @@ int playlist_Disable( playlist_t * p_playlist, int i_pos )
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
         msg_Dbg( p_playlist, "disabling playlist item `%s'",
-                             p_playlist->pp_items[i_pos]->psz_name );
+                 p_playlist->pp_items[i_pos]->input.psz_name );
 
         if( p_playlist->pp_items[i_pos]->b_enabled == VLC_TRUE )
             p_playlist->i_enabled--;
@@ -625,7 +519,7 @@ int playlist_Enable( playlist_t * p_playlist, int i_pos )
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
         msg_Dbg( p_playlist, "enabling playlist item `%s'",
-                             p_playlist->pp_items[i_pos]->psz_name );
+                 p_playlist->pp_items[i_pos]->input.psz_name );
 
         if( p_playlist->pp_items[i_pos]->b_enabled == VLC_FALSE )
             p_playlist->i_enabled++;
@@ -648,19 +542,19 @@ int playlist_Enable( playlist_t * p_playlist, int i_pos )
  * \param i_group the id of the group to disable
  * \return returns 0
  */
-int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
+int playlist_DisableGroup( playlist_t * p_playlist, int i_group )
 {
     vlc_value_t     val;
     int i;
     vlc_mutex_lock( &p_playlist->object_lock );
 
-    msg_Dbg(p_playlist,"disabling group %i",i_group);
+    msg_Dbg( p_playlist, "disabling group %i", i_group );
     for( i = 0 ; i< p_playlist->i_size; i++ )
     {
         if( p_playlist->pp_items[i]->i_group == i_group )
         {
             msg_Dbg( p_playlist, "disabling playlist item `%s'",
-                           p_playlist->pp_items[i]->psz_name );
+                     p_playlist->pp_items[i]->input.psz_name );
 
             if( p_playlist->pp_items[i]->b_enabled == VLC_TRUE )
                 p_playlist->i_enabled--;
@@ -682,18 +576,18 @@ int playlist_DisableGroup( playlist_t * p_playlist, int i_group)
  * \param i_group the id of the group to enable
  * \return returns 0
  */
-int playlist_EnableGroup( playlist_t * p_playlist, int i_group)
+int playlist_EnableGroup( playlist_t * p_playlist, int i_group )
 {
-    vlc_value_t     val;
+    vlc_value_t val;
     int i;
     vlc_mutex_lock( &p_playlist->object_lock );
 
-    for( i = 0 ; i< p_playlist->i_size; i++ )
+    for( i = 0; i< p_playlist->i_size; i++ )
     {
         if( p_playlist->pp_items[i]->i_group == i_group )
         {
             msg_Dbg( p_playlist, "enabling playlist item `%s'",
-                           p_playlist->pp_items[i]->psz_name );
+                     p_playlist->pp_items[i]->input.psz_name );
 
             if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
                 p_playlist->i_enabled++;
@@ -719,22 +613,21 @@ int playlist_EnableGroup( playlist_t * p_playlist, int i_group)
  *        after the move
  * \return returns VLC_SUCCESS
  */
-int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
+int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos )
 {
-    vlc_value_t     val;
+    vlc_value_t val;
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /* take into account that our own row disappears. */
-    if ( i_pos < i_newpos ) i_newpos--;
+    if( i_pos < i_newpos ) i_newpos--;
 
-    if( i_pos >= 0 && i_newpos >=0 && i_pos <= p_playlist->i_size
-                     && i_newpos <= p_playlist->i_size )
+    if( i_pos >= 0 && i_newpos >=0 && i_pos <= p_playlist->i_size &&
+        i_newpos <= p_playlist->i_size )
     {
         playlist_item_t * temp;
 
         msg_Dbg( p_playlist, "moving playlist item `%s' (%i -> %i)",
-                             p_playlist->pp_items[i_pos]->psz_name, i_pos,
-                             i_newpos );
+                 p_playlist->pp_items[i_pos]->input.psz_name, i_pos, i_newpos);
 
         if( i_pos == p_playlist->i_index )
         {
@@ -775,40 +668,6 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
 
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
-
-    return VLC_SUCCESS;
-}
-
-/**
- * Add a special info : option
- *
- * \param p_playlist the playlist
- * \param i_item the position of the item on which we
- *               add the option ( -1 for current )
- * \param psz_value the option to add
- * \return the info category.
- */
-int playlist_AddOption( playlist_t *p_playlist, int i_pos,
-                        const char *psz_option )
-{
-    playlist_item_t *p_item;
-
-    /* Check the existence of the playlist */
-    if( p_playlist == NULL)
-    {
-        return VLC_EGENERIC;
-    }
-
-    p_item = playlist_ItemGetByPos( p_playlist , i_pos );
-    if( !p_item )
-    {
-            return VLC_ENOOBJ;
-    }
-
-    vlc_mutex_lock( &p_item->lock );
-    INSERT_ELEM( p_item->ppsz_options, p_item->i_options, p_item->i_options,
-                 strdup( psz_option ) );
-    vlc_mutex_unlock( &p_item->lock );
 
     return VLC_SUCCESS;
 }

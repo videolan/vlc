@@ -25,6 +25,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "vlc_playlist.h"
+
 #include "ninput.h"
 #include "../../modules/demux/util/sub.h"
 
@@ -64,10 +66,127 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     int i_bkmk, *pi_bkmk;
     int i, *pi;
     vlc_value_t val, text;
+    char *psz_option, *psz_value;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     switch( i_query )
     {
+        case INPUT_ADD_OPTION:
+        {
+            psz_option = (char *)va_arg( args, char * );
+            psz_value = (char *)va_arg( args, char * );
+            i_ret = VLC_EGENERIC;
+
+	    vlc_mutex_lock( &p_input->p_item->lock );
+	    vlc_mutex_unlock( &p_input->p_item->lock );
+
+            i_ret = VLC_SUCCESS;
+            break;
+	}
+
+        case INPUT_SET_NAME:
+        {
+            char *psz_name = (char *)va_arg( args, char * );
+            i_ret = VLC_EGENERIC;
+            if( !psz_name ) break;
+            vlc_mutex_lock( &p_input->p_item->lock );
+            if( p_input->p_item->psz_name ) free( p_input->p_item->psz_name );
+            p_input->p_item->psz_name = strdup( psz_name );
+            vlc_mutex_unlock( &p_input->p_item->lock );
+            i_ret = VLC_SUCCESS;
+
+            /* Notify playlist */
+            {
+                vlc_value_t val;
+                playlist_t *p_playlist =
+                (playlist_t *)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                               FIND_PARENT );
+                if( p_playlist )
+                {
+                    val.i_int = p_playlist->i_index;
+                    var_Set( p_playlist, "item-change", val );
+                    vlc_object_release( p_playlist );
+                }
+            }
+            break;
+        }
+
+        case INPUT_ADD_INFO:
+	{
+            char *psz_cat = (char *)va_arg( args, char * );
+            char *psz_name = (char *)va_arg( args, char * );
+            char *psz_format = (char *)va_arg( args, char * );
+
+	    info_category_t *p_cat;
+            info_t *p_info;
+	    int i;
+
+            i_ret = VLC_EGENERIC;
+
+	    vlc_mutex_lock( &p_input->p_item->lock );
+	    for( i = 0; i < p_input->p_item->i_categories; i++ )
+	    {
+	        if( !strcmp( p_input->p_item->pp_categories[i]->psz_name,
+			     psz_cat ) )
+		    break;
+	    }
+
+	    if( i == p_input->p_item->i_categories )
+	    {
+	        p_cat = malloc( sizeof( info_category_t ) );
+		if( !p_cat ) break;
+		p_cat->psz_name = strdup( psz_cat );
+		p_cat->i_infos = 0;
+		p_cat->pp_infos = NULL;
+		INSERT_ELEM( p_input->p_item->pp_categories,
+			     p_input->p_item->i_categories,
+			     p_input->p_item->i_categories, p_cat );
+	    }
+
+	    p_cat = p_input->p_item->pp_categories[i];
+
+            for( i = 0; i < p_cat->i_infos; i++ )
+            {
+                if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+                {
+                    if( p_cat->pp_infos[i]->psz_value )
+                        free( p_cat->pp_infos[i]->psz_value );
+                    break;
+                }
+            }
+
+	    if( i == p_cat->i_infos )
+	    {
+	        p_info = malloc( sizeof( info_t ) );
+		if( !p_info ) break;
+		INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos,
+			     p_cat->i_infos, p_info );
+		p_info->psz_name = strdup( psz_name );
+	    }
+
+	    p_info = p_cat->pp_infos[i];
+	    vasprintf( &p_info->psz_value, psz_format, args );
+
+	    vlc_mutex_unlock( &p_input->p_item->lock );
+
+	    i_ret = VLC_SUCCESS;
+
+            /* Notify playlist */
+            {
+                vlc_value_t val;
+                playlist_t *p_playlist =
+                (playlist_t *)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                               FIND_PARENT );
+                if( p_playlist )
+                {
+                    val.i_int = p_playlist->i_index;
+                    var_Set( p_playlist, "item-change", val );
+                    vlc_object_release( p_playlist );
+                }
+            }
+	}
+	break;
+
         case INPUT_ADD_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
             p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );

@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: vlc_playlist.h,v 1.27 2004/01/29 17:51:07 zorglub Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,29 +34,6 @@
  */
 
 /**
- * Playlist info item
- * \see playlist_item_t
- */
-
-struct item_info_t
-{
-    char * psz_name;            /**< Name of this info */
-    char * psz_value;           /**< Value of the info */
-};
-
-/**
- * playlist item info category
- * \see playlist_item_t
- * \see item_info_t
- */
-struct item_info_category_t
-{
-    char * psz_name;            /**< Name of this category */
-    int i_infos;                /**< Number of infos in the category */
-    item_info_t **pp_infos;     /**< Pointer to an array of infos */
-};
-
-/**
  * playlist export helper structure
  */
 struct playlist_export_t
@@ -71,15 +48,8 @@ struct playlist_export_t
  */
 struct playlist_item_t
 {
-    char *     psz_name;       /**< text describing this item */
-    char *     psz_uri;        /**< mrl of this item */
-    mtime_t    i_duration;     /**< A hint about the duration of this
-                                * item, in milliseconds*/
-    int        i_categories;   /**< Number of info categories */
-    item_info_category_t **
-               pp_categories;  /**< Pointer to the first info category */
-    int        i_options;      /**< Number of options */
-    char **    ppsz_options;   /**< Array of options */
+    input_item_t input;        /**< input item descriptor */
+
     int        i_nb_played;    /**< How many times was this item played ? */
     vlc_bool_t b_autodeletion; /**< Indicates whther this item is to
                                 * be deleted after playback. True mean
@@ -89,7 +59,6 @@ struct playlist_item_t
                                 * played or skipped */
     int        i_group;        /**< Which group does this item belongs to ? */
     int        i_id;           /**< Unique id to track this item */
-    vlc_mutex_t lock;          /**< Item cannot be changed without this lock */
 };
 
 /**
@@ -211,17 +180,14 @@ VLC_EXPORT( int, playlist_GroupToId, (playlist_t *, char * ) );
 VLC_EXPORT( char * , playlist_GetInfo, ( playlist_t * , int, const char *, const char *) );
 VLC_EXPORT( char * , playlist_ItemGetInfo, ( playlist_item_t * , const char *, const char *) );
 
-VLC_EXPORT( item_info_category_t*, playlist_GetCategory, ( playlist_t *, int, const char *) );
-VLC_EXPORT( item_info_category_t*, playlist_ItemGetCategory, ( playlist_item_t *, const char *) );
+VLC_EXPORT( info_category_t*, playlist_ItemGetCategory, ( playlist_item_t *, const char *) );
 
-VLC_EXPORT( item_info_category_t*, playlist_CreateCategory, ( playlist_t *, int, const char *) );
-VLC_EXPORT( item_info_category_t*, playlist_ItemCreateCategory, ( playlist_item_t *, const char *) );
+VLC_EXPORT( info_category_t*, playlist_ItemCreateCategory, ( playlist_item_t *, const char *) );
 
 VLC_EXPORT( int, playlist_AddInfo, (playlist_t *, int, const char * , const char *, const char *, ...) );
 VLC_EXPORT( int, playlist_ItemAddInfo, (playlist_item_t *, const char * , const char *, const char *, ...) );
 
 /* Option functions */
-VLC_EXPORT( int, playlist_AddOption, (playlist_t *, int, const char *) );
 VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 
 /* Playlist sorting */

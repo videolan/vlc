@@ -192,8 +192,6 @@ typedef struct msg_subscription_t msg_subscription_t;
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct playlist_group_t playlist_group_t;
-typedef struct item_info_t item_info_t;
-typedef struct item_info_category_t item_info_category_t;
 typedef struct playlist_export_t playlist_export_t;
 
 /* Modules */
@@ -212,11 +210,10 @@ typedef struct intf_channel_t intf_channel_t;
 /* Input */
 typedef struct input_thread_t input_thread_t;
 typedef struct input_thread_sys_t input_thread_sys_t;
+typedef struct input_item_t input_item_t;
 typedef struct input_area_t input_area_t;
 typedef struct input_buffers_t input_buffers_t;
 typedef struct input_socket_t input_socket_t;
-typedef struct input_info_t input_info_t;
-typedef struct input_info_category_t input_info_category_t;
 typedef struct access_sys_t access_sys_t;
 typedef struct demux_sys_t demux_sys_t;
 typedef struct es_descriptor_t es_descriptor_t;
@@ -225,6 +222,8 @@ typedef struct pgrm_descriptor_t pgrm_descriptor_t;
 typedef struct pgrm_sys_t pgrm_sys_t;
 typedef struct stream_descriptor_t stream_descriptor_t;
 typedef struct seekpoint_t seekpoint_t;
+typedef struct info_t info_t;
+typedef struct info_category_t info_category_t;
 
 /* Format */
 typedef struct audio_format_t audio_format_t;

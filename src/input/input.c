@@ -37,8 +37,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "vlc_playlist.h"
-
 #include "stream_output.h"
 
 #include "vlc_interface.h"
@@ -86,8 +84,8 @@ static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
-                                      char **ppsz_options, int i_options )
+input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
+                                      input_item_t *p_item )
 
 {
     input_thread_t *p_input;                        /* thread descriptor */
@@ -102,12 +100,17 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
         return NULL;
     }
 
+    /* Store pointer to input item descriptor */
+    p_input->p_item = p_item;
+
     /* Parse input options */
-    for( i = 0; i < i_options; i++ )
+    vlc_mutex_lock( &p_item->lock );
+    for( i = 0; i < p_item->i_options; i++ )
     {
-        msg_Dbg( p_input, "option: %s", ppsz_options[i] );
-        ParseOption( p_input, ppsz_options[i] );
+        msg_Dbg( p_input, "option: %s", p_item->ppsz_options[i] );
+        ParseOption( p_input, p_item->ppsz_options[i] );
     }
+    vlc_mutex_unlock( &p_item->lock );
 
     /* Create a few object variables we'll need later on */
     var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -115,8 +118,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     var_Create( p_input, "audio-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Create( p_input, "spu-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |
+                VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER |
+                VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-all",   VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -184,7 +189,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     p_input->p_sys      = NULL;
 
     /* Set target */
-    p_input->psz_source = strdup( psz_uri );
+    vlc_mutex_lock( &p_item->lock );
+    p_input->psz_source = strdup( p_item->psz_uri );
+    vlc_mutex_unlock( &p_item->lock );
 
     /* Stream */
     p_input->s = NULL;
@@ -309,11 +316,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
         free( val.psz_string );
     }
 
-    /* Initialize input info */
-    p_input->stream.p_info = NULL;
-    p_input->stream.p_info = input_InfoCategory( p_input, _("General") );
-    input_AddInfo( p_input->stream.p_info, _("Playlist Item"),
-                   p_input->psz_source );
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
@@ -321,7 +323,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
                            VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         msg_Err( p_input, "cannot create input thread" );
-        input_DelInfo( p_input );
         free( p_input );
         return NULL;
     }
@@ -383,8 +384,6 @@ static int RunThread( input_thread_t *p_input )
 
         /* Tell we're dead */
         p_input->b_dead = 1;
-
-        input_DelInfo( p_input );
 
         return 0;
     }
@@ -623,7 +622,6 @@ static int InitThread( input_thread_t * p_input )
     vlc_meta_t *p_meta = NULL, *p_meta_user = NULL;
 //    float f_fps;
     double f_fps;
-    playlist_t *p_playlist;
     mtime_t i_length;
 
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
@@ -936,52 +934,29 @@ static int InitThread( input_thread_t * p_input )
     if( !demux_Control( p_input, DEMUX_GET_META, &p_meta ) ||
         ( p_meta_user && p_meta_user->i_meta ) )
     {
-        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
-                                         VLC_OBJECT_PLAYLIST,  FIND_PARENT);
-        playlist_item_t *p_item = NULL;
-        input_info_category_t *p_cat;
         int i;
 
         /* Merge demux and user metadata */
         if( !p_meta ){ p_meta = p_meta_user; p_meta_user = NULL; }
         else if( p_meta && p_meta_user ) vlc_meta_Merge( p_meta, p_meta_user );
 
-        if( p_playlist )
-        {
-            vlc_mutex_lock( &p_playlist->object_lock );
-            p_item = playlist_ItemGetByPos( p_playlist, -1 );
-            if( p_item )
-            {
-                vlc_mutex_lock( &p_item->lock );
-            }
-            vlc_mutex_unlock( &p_playlist->object_lock );
-        }
-
         msg_Dbg( p_input, "meta informations:" );
         if( p_meta->i_meta > 0 )
         {
-            p_cat = input_InfoCategory( p_input, _("File") );
             for( i = 0; i < p_meta->i_meta; i++ )
             {
                 msg_Dbg( p_input, "  - '%s' = '%s'", _(p_meta->name[i]),
                          p_meta->value[i] );
-                if( !strcmp( p_meta->name[i], VLC_META_TITLE ) )
-                {
-                    playlist_ItemSetName( p_item, p_meta->value[i] );
-                }
+                if( !strcmp( p_meta->name[i], VLC_META_TITLE ) &&
+                    p_meta->value[i] )
+                    input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
+
                 if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
-                {
-                    playlist_ItemAddInfo( p_item, _("General"), _("Author"),
-                                          p_meta->value[i] );
-                }
-                input_AddInfo( p_cat, _(p_meta->name[i]), "%s",
-                               p_meta->value[i] );
-                if( p_item )
-                {
-                    playlist_ItemAddInfo( p_item, _("File"),
-                                          _(p_meta->name[i]), "%s",
-                                          p_meta->value[i] );
-                }
+                    input_Control( p_input, INPUT_ADD_INFO, _("General"),
+                                   _("Author"), p_meta->value[i] );
+
+                input_Control( p_input, INPUT_ADD_INFO, _("File"),
+                              _(p_meta->name[i]), "%s", p_meta->value[i] );
             }
         }
         for( i = 0; i < p_meta->i_track; i++ )
@@ -994,27 +969,17 @@ static int InitThread( input_thread_t * p_input )
             {
                 char *psz_cat = malloc( strlen(_("Stream")) + 10 );
                 sprintf( psz_cat, "%s %d", _("Stream"), i );
-                p_cat = input_InfoCategory( p_input, psz_cat );
 
                 for( j = 0; j < tk->i_meta; j++ )
                 {
                     msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]),
                              tk->value[j] );
-                    input_AddInfo( p_cat, _(tk->name[j]), "%s", tk->value[j] );
-                    if( p_item )
-                    {
-                        playlist_ItemAddInfo( p_item, psz_cat, _(tk->name[j]),
-                                              "%s", tk->value[j] );
-                    }
+
+                    input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                                   _(tk->name[j]), "%s", tk->value[j] );
                 }
             }
         }
-
-        if( p_item )
-        {
-            vlc_mutex_unlock( &p_item->lock );
-        }
-        if( p_playlist ) vlc_object_release( p_playlist );
 
         if( p_input->stream.p_sout && p_input->stream.p_sout->p_meta == NULL )
         {
@@ -1031,24 +996,14 @@ static int InitThread( input_thread_t * p_input )
     if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) &&
         i_length > 0 )
     {
-        input_info_category_t *p_cat =
-            input_InfoCategory( p_input, _("File") );
-        p_playlist =
-            (playlist_t*)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                          FIND_PARENT );
-        if( p_playlist )
-        {
-            playlist_SetDuration( p_playlist, -1 , i_length );
-            val.b_bool = p_playlist->i_index;
-            var_Set( p_playlist, "item-change", val );
-            vlc_object_release( p_playlist );
-        }
-        if( p_cat )
-        {
-            char psz_buffer[MSTRTIME_MAX_SIZE];
-            input_AddInfo( p_cat, _("Duration"),
-                           msecstotimestr( psz_buffer, i_length / 1000 ) );
-        }
+        char psz_buffer[MSTRTIME_MAX_SIZE];
+
+        vlc_mutex_lock( &p_input->p_item->lock );
+        p_input->p_item->i_duration = i_length;
+        vlc_mutex_unlock( &p_input->p_item->lock );
+
+        input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
+                       msecstotimestr( psz_buffer, i_length / 1000 ) );
 
         /* Set start time */
         var_Get( p_input, "start-time", &val );
@@ -1264,7 +1219,6 @@ static void EndThread( input_thread_t * p_input )
 
     /* Free info structures XXX destroy es before 'cause vorbis */
     msg_Dbg( p_input, "freeing info structures...");
-    input_DelInfo( p_input );
 
     free( p_input->psz_source );
     if( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );

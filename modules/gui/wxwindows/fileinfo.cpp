@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: fileinfo.cpp,v 1.23 2004/01/25 03:29:01 hartman Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -115,26 +115,23 @@ void FileInfo::UpdateFileInfo()
     fileinfo_tree->DeleteChildren( fileinfo_root );
     fileinfo_root_label = wxL2U(p_input->psz_name);
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    input_info_category_t *p_cat = p_input->stream.p_info;
-
-    while( p_cat )
+    vlc_mutex_lock( &p_input->p_item->lock );
+    for( int i = 0; i < p_input->p_item->i_categories; i++ )
     {
+        info_category_t *p_cat = p_input->p_item->pp_categories[i];
+
         wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
                                                       wxL2U(p_cat->psz_name) );
-        input_info_t *p_info = p_cat->p_info;
-        while( p_info )
+        for( int j = 0; j < p_cat->i_infos; j++ )
         {
+            info_t *p_info = p_cat->pp_infos[j];
+
             fileinfo_tree->AppendItem( cat, (wxString)wxL2U(p_info->psz_name) +
                                        wxT(": ") + wxL2U(p_info->psz_value) );
-            p_info = p_info->p_next;
         }
-        p_cat = p_cat->p_next;
         fileinfo_tree->Expand( cat );
     }
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_input->p_item->lock );
 
     return;
 }

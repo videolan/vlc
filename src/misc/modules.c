@@ -82,7 +82,6 @@
 #include "vlc_error.h"
 
 #include "vlc_interface.h"
-#include "vlc_playlist.h"
 #include "intf_eject.h"
 
 #include "stream_control.h"
@@ -90,6 +89,8 @@
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
 #include "ninput.h"
+
+#include "vlc_playlist.h"
 
 #include "vlc_video.h"
 #include "video_output.h"

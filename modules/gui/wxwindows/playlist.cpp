@@ -431,7 +431,7 @@ void Playlist::UpdateItem( int i )
         return;
     }
 
-    listview->SetItem( i, 0, wxL2U(p_item->psz_name) );
+    listview->SetItem( i, 0, wxL2U(p_item->input.psz_name) );
     listview->SetItem( i, 1, wxU( playlist_ItemGetInfo( p_item,
                                        _("General") , _("Author") ) ) );
     char *psz_group = playlist_FindGroup(p_playlist,
@@ -448,7 +448,7 @@ void Playlist::UpdateItem( int i )
     }
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = p_item->i_duration;
+    mtime_t dur = p_item->input.i_duration;
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
     listview->SetItem( i, 2, wxU(psz_duration) );
@@ -491,7 +491,7 @@ void Playlist::Rebuild()
     vlc_mutex_lock( &p_playlist->object_lock );
     for( int i = 0; i < p_playlist->i_size; i++ )
     {
-        wxString filename = wxL2U(p_playlist->pp_items[i]->psz_name);
+        wxString filename = wxL2U(p_playlist->pp_items[i]->input.psz_name);
         listview->InsertItem( i, filename );
         UpdateItem( i );
     }

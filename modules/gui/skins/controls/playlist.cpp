@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.15 2003/06/23 20:35:36 asmax Exp $
+ * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -375,13 +375,13 @@ char * ControlPlayList::GetFileName( int i )
 {
     if( LongFileName )
     {
-        return PlayList->pp_items[i]->psz_name;
+        return PlayList->pp_items[i]->input.psz_name;
     }
     else
     {
-        string f = PlayList->pp_items[i]->psz_name;
+        string f = PlayList->pp_items[i]->input.psz_name;
         int pos  = f.rfind( DIRECTORY_SEPARATOR, f.size() );
-        return PlayList->pp_items[i]->psz_name + pos + 1;
+        return PlayList->pp_items[i]->input.psz_name + pos + 1;
     }
 }
 //---------------------------------------------------------------------------
@@ -554,12 +554,12 @@ bool ControlPlayList::ToolTipTest( int x, int y )
         if( x >= CaseLeft[i] && x <= CaseRight[i] && y >=
             TextTop + i * CaseHeight  && y < TextTop + (i + 1) * CaseHeight )
         {
-            TextFont->GetSize( PlayList->pp_items[i + StartIndex]->psz_name, w,
+            TextFont->GetSize( PlayList->pp_items[i + StartIndex]->input.psz_name, w,
                                h );
             if( w > FileWidth )
             {
                 ParentWindow->ChangeToolTipText(
-                    (string)PlayList->pp_items[i + StartIndex]->psz_name );
+                    (string)PlayList->pp_items[i + StartIndex]->input.psz_name );
                 return true;
             }
         }

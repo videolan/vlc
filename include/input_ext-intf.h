@@ -153,57 +153,8 @@ struct input_area_t
     off_t                   i_plugin_data;
 };
 
-/**
- * \brief A list of info items.
- *
- * Composes a linked list of name/value pairs intended to inform the
- * user about the current stream
- * \see input_AddInfo
- */
-struct input_info_t {
-    /**
-     * Name of this item
-     */
-    char *         psz_name;
-
-    /**
-     * Value of this item
-     */
-    char *         psz_value;
-
-    /**
-     * Pointer to next item in list, or NULL it at end of list
-     */
-    input_info_t * p_next;
-};
-
-/**
- * \brief A list of info categories.
- *
- * Composes a NULL terminated linked list of categories in which to
- * place info about the stream.
- *
- * \see input_InfoCategory
- */
-struct input_info_category_t {
-    /**
-     * The name of this category
-     */
-    char *                  psz_name;
-
-    /**
-     * first element of a linked list containing info items
-     */
-    input_info_t *          p_info;
-
-    /**
-     * Pointer to next element in this list, or NULL if at end of list
-     */
-    input_info_category_t * p_next;
-};
-
 /*****************************************************************************
-* stream_descriptor_t
+ * stream_descriptor_t
  *****************************************************************************
  * Describes a stream and list its associated programs. Build upon
  * the information carried in program association sections (for instance)
@@ -262,9 +213,6 @@ struct stream_descriptor_t
     /* Optional stream output */
     sout_instance_t *       p_sout;
 
-    /* Input info */
-    input_info_category_t * p_info;
-
     /* Statistics */
     count_t                 c_packets_read;                  /* packets read */
     count_t                 c_packets_trashed;            /* trashed packets */
@@ -285,6 +233,53 @@ struct stream_position_t
 };
 
 #define MUTE_NO_CHANGE      -1
+
+/*****************************************************************************
+ * info_t
+ *****************************************************************************/
+
+/**
+ * Info item
+ */
+
+struct info_t
+{
+    char *psz_name;            /**< Name of this info */
+    char *psz_value;           /**< Value of the info */
+};
+
+/**
+ * Info category
+ * \see info_t
+ */
+struct info_category_t
+{
+    char   *psz_name;      /**< Name of this category */
+    int    i_infos;        /**< Number of infos in the category */
+    struct info_t **pp_infos;     /**< Pointer to an array of infos */
+};
+
+/*****************************************************************************
+ * input_item_t
+ *****************************************************************************
+ * Describes an input and is used to spawn input_thread_t objects.
+ *****************************************************************************/
+struct input_item_t
+{
+    char       *psz_name;            /**< text describing this item */
+    char       *psz_uri;             /**< mrl of this item */
+
+    int        i_options;            /**< Number of input options */
+    char       **ppsz_options;       /**< Array of input options */
+
+    mtime_t    i_duration;           /**< A hint about the duration of this
+                                      * item, in milliseconds*/
+
+    int        i_categories;         /**< Number of info categories */
+    info_category_t **pp_categories; /**< Pointer to the first info category */
+
+    vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
+};
 
 /*****************************************************************************
  * input_thread_t
@@ -334,6 +329,9 @@ struct input_thread_t
 
     /* General stream description */
     stream_descriptor_t     stream;
+
+    /* Input item description */
+    input_item_t *p_item;
 
     /* Playlist item */
     char *  psz_source;
@@ -388,8 +386,8 @@ struct input_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define input_CreateThread(a,b,c,d) __input_CreateThread(VLC_OBJECT(a),b,c,d)
-VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, char *psz_uri, char **ppsz_options, int i_options ) );
+#define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
+VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 

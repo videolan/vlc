@@ -2,7 +2,7 @@
  * m3u.c :  M3U playlist export module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: m3u.c,v 1.1 2004/01/11 00:45:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -53,17 +53,18 @@ int Export_M3U( vlc_object_t *p_this )
     /* Go through the playlist and add items */
     for( i = 0; i< p_playlist->i_size ; i++)
     {
-        if( strcmp( p_playlist->pp_items[i]->psz_name,
-                    p_playlist->pp_items[i]->psz_uri ) )
+        if( strcmp( p_playlist->pp_items[i]->input.psz_name,
+                    p_playlist->pp_items[i]->input.psz_uri ) )
         {
             char *psz_author = playlist_GetInfo( p_playlist, i, _("General"),
                                                  _("Author") );
             fprintf( p_export->p_file,"#EXTINF:%i,%s%s\n",
-                     (int)(p_playlist->pp_items[i]->i_duration/1000000),
+                     (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
                      psz_author ? psz_author : "",
-                     p_playlist->pp_items[i]->psz_name );
+                     p_playlist->pp_items[i]->input.psz_name );
         }
-        fprintf( p_export->p_file, "%s\n", p_playlist->pp_items[i]->psz_uri );
+        fprintf( p_export->p_file, "%s\n",
+                 p_playlist->pp_items[i]->input.psz_uri );
     }
     return VLC_SUCCESS;
 }

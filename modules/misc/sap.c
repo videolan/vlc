@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * sap.c :  SAP interface module
  *****************************************************************************
@@ -848,9 +849,9 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                                     p_intf->p_sys->pp_announces[i]->i_id );
 
                     /* Change the name in the item */
-                    if( p_item->psz_name )
-                        free( p_item->psz_name );
-                    p_item->psz_name = strdup( p_sd->psz_sessionname);
+                    if( p_item->input.psz_name )
+                        free( p_item->input.psz_name );
+                    p_item->input.psz_name = strdup( p_sd->psz_sessionname);
 
                     /* Update the stored name */
                     if( p_intf->p_sys->pp_announces[i]->psz_name )
@@ -874,9 +875,9 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         p_item = playlist_ItemGetById( p_playlist, i_id );
         if( p_item )
         {
-            vlc_mutex_lock( &p_item->lock );
+            vlc_mutex_lock( &p_item->input.lock );
             playlist_ItemSetGroup( p_item, i_group );
-            vlc_mutex_unlock( &p_item->lock );
+            vlc_mutex_unlock( &p_item->input.lock );
         }
 
         /* Then remember it */

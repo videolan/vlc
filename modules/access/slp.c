@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: slp.c,v 1.20 2004/01/25 17:31:22 gbazin Exp $
+ * $Id$
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -132,7 +132,10 @@ static SLPBoolean AttrCallback( SLPHandle slph_slp,
         return SLP_TRUE;
     }
 
-    p_playlist_item->psz_name = strdup(psz_attrlist);     /* NULL is checked */
+    if( p_playlist_item->input.psz_name )
+        free( p_playlist_item->input.psz_name );
+
+    p_playlist_item->input.psz_name = strdup(psz_attrlist); /* NULL is checked */
     return SLP_TRUE;
 }
 
@@ -145,7 +148,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
                            SLPError slpe_errcode,
                            void * p_cookie )
 {
-    input_thread_t * p_input = (input_thread_t  *)p_cookie;
+    input_thread_t *p_input = (input_thread_t  *)p_cookie;
     playlist_t * p_playlist;
     char psz_item[42] = ""; //"udp:@";
     char * psz_s;                           /* to hold the uri of the stream */
@@ -159,7 +162,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
         return SLP_TRUE;
     }
 
-    msg_Dbg(p_input,"URL: %s",psz_srvurl);
+    msg_Dbg( p_input,"URL: %s", psz_srvurl );
 
     /* or there was a problem with getting the data we requested */
     if( (slpe_errcode != SLP_OK) )
@@ -173,7 +176,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     psz_s = strstr( psz_srvurl, "//" );
     if( psz_s == NULL )
     {
-        msg_Err( (input_thread_t *)p_input,
+        msg_Err( p_input,
                  "SrvUrlCallback got a strange string of your libslp" );
         return SLP_TRUE;
     }
@@ -185,17 +188,13 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
                      sizeof(psz_item) - strlen(psz_item) - 1 );
 
     /* create a playlist  item */
-    p_playlist_item = malloc( sizeof( playlist_item_t ) );
-    memset( p_playlist_item, 0, sizeof( playlist_item_t ) );
+    p_playlist_item = playlist_ItemNew( p_input, psz_s, NULL );
     if( p_playlist_item == NULL )
     {
         msg_Err( p_input, "out of memory" );
         return SLP_TRUE;
     }
 
-    p_playlist_item->psz_name = NULL;
-    p_playlist_item->psz_uri  = strdup( psz_s );
-    p_playlist_item->i_duration = -1;
     p_playlist_item->i_group = i_group;
     p_playlist_item->b_enabled = VLC_TRUE;
 
@@ -217,32 +216,21 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
         SLPClose( slph_slp3 );
     }
 
-    /* add a default name if we found no attribute */
-    if( p_playlist_item->psz_name == NULL )
-    {
-        p_playlist_item->psz_name = strdup( psz_s );
-    }
-
     /* search the main playlist object */
-    p_playlist = vlc_object_find( (input_thread_t *)p_input,
-                                  VLC_OBJECT_PLAYLIST,
+    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
                                   FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
-        msg_Warn( (input_thread_t *)p_input,
-                  "could not find playlist, not adding entries" );
+        msg_Warn( p_input, "could not find playlist, not adding entries" );
         return SLP_TRUE;
     }
 
-    playlist_AddItem( p_playlist,
-                      p_playlist_item,
-                      PLAYLIST_APPEND,
-                      PLAYLIST_END );
-    vlc_object_release( (vlc_object_t *)p_playlist );
+    playlist_AddItem( p_playlist, p_playlist_item,
+                      PLAYLIST_APPEND, PLAYLIST_END );
+    vlc_object_release( p_playlist );
 
-    msg_Info( (input_thread_t *)p_input,
-              "added « %s » (lifetime %i) to playlist",
-               psz_srvurl, i_lifetime );
+    msg_Info( p_input, "added « %s » (lifetime %i) to playlist",
+              psz_srvurl, i_lifetime );
 
     return SLP_TRUE;
 }
