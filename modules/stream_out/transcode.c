@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.57 2003/11/30 22:47:55 gbazin Exp $
+ * $Id: transcode.c,v 1.58 2003/12/05 00:03:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -891,6 +891,16 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         {
             int i, j;
 
+            /* This is for liba52 which is what ffmpeg uses to decode ac3 */
+            static const int translation[7][6] =
+            {{ 0, 0, 0, 0, 0, 0 },      /* 0 channels (rarely used) */
+             { 0, 0, 0, 0, 0, 0 },       /* 1 ch */
+             { 0, 1, 0, 0, 0, 0 },       /* 2 */
+             { 1, 2, 0, 0, 0, 0 },       /* 3 */
+             { 1, 3, 2, 0, 0, 0 },       /* 4 */
+             { 1, 3, 4, 2, 0, 0 },       /* 5 */
+             { 1, 3, 4, 5, 2, 0 }};      /* 6 */
+
             /* dumb downmixing */
             for( i = 0; i < aout_buf.i_nb_samples; i++ )
             {
@@ -898,7 +908,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                 for( j = 0 ; j < id->p_encoder->fmt_in.audio.i_channels; j++ )
                 {
                     p_buffer[i*id->p_encoder->fmt_in.audio.i_channels+j] =
-                        p_buffer[i*id->f_src.audio.i_channels+j];
+                        p_buffer[i*id->f_src.audio.i_channels+
+                                 translation[id->f_src.audio.i_channels][j]];
                 }
             }
             aout_buf.i_nb_bytes = i*id->p_encoder->fmt_in.audio.i_channels * 2;
