@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.45 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.46 2003/10/16 16:04:25 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -279,6 +279,8 @@ void VlcProc::InterfaceRefresh()
     // Refresh
     if( PlayList != NULL )
     {
+        vlc_mutex_lock( &PlayList->object_lock );
+
         // Refresh stream control controls ! :)
         switch( PlayList->i_status )
         {
@@ -314,7 +316,7 @@ void VlcProc::InterfaceRefresh()
             EnabledEvent( "next", true );
 
         // Update file name
-        if( PlayList->i_index != Sys->i_index )
+        if( PlayList->i_index >= 0 && PlayList->i_index != Sys->i_index )
         {
             string long_name = PlayList->pp_items[PlayList->i_index]->psz_name;
             int pos = long_name.rfind( DIRECTORY_SEPARATOR, long_name.size() );
@@ -335,6 +337,8 @@ void VlcProc::InterfaceRefresh()
             Sys->i_size  = PlayList->i_size;
             Sys->i_index = PlayList->i_index;
         }
+
+        vlc_mutex_unlock( &PlayList->object_lock );
     }
     else
     {
