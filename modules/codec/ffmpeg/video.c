@@ -245,6 +245,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         ffmpeg_PixFmtToChroma( p_sys->p_context->pix_fmt ) &&
         /* Apparently direct rendering doesn't work with YUV422P */
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
+        p_sys->i_codec_id != CODEC_ID_H264 &&   /* H264 use too many reference frames */
         !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
