@@ -1,4 +1,4 @@
-$Id: README,v 1.15 2003/02/02 04:01:29 sam Exp $
+$Id: README,v 1.16 2004/01/24 21:06:51 hartman Exp $
 
 README for the VLC media player
 ===============================
@@ -14,11 +14,12 @@ INSTALL.win32      - Installation instructions for the Win32 version of vlc.
 README             - This file.
 README.MacOSX.rtf  - Information specific to the MacOS X port.
 THANKS             - All VLC contributors.
-doc/               - miscellaneous documentation.
+doc/               - Miscellaneous documentation.
 
 Resources
 =========
 
 The VideoLAN web site : http://www.videolan.org/
-Mailing-lists : http://www.videolan.org/lists.html
+Mailing-lists : http://developers.videolan.org/lists.html
+Forums: http://forum.videolan.org/
 

@@ -1,13 +1,13 @@
 %define mozver 1.4.1
 
-Summary: The VideoLAN client, also a very good standalone video player.
+Summary: VLC media player, a multimedia player and streaming application.
 Name: vlc
 Version: 0.7.0
 Release: 1
 Group: Applications/Multimedia
 License: GPL
 URL: http://www.videolan.org/
-Source: http://www.videolan.org/pub/videolan/vlc/vlc-%{version}-%{release}.tar.bz2
+Source: http://download.videolan.org/pub/videolan/vlc/vlc-%{version}-%{release}.tar.bz2
 Buildroot: %{_tmppath}/%{name}-root
 Packager: Jason Luka <jason@geshp.com>
 Buildrequires: XFree86-devel, desktop-file-utils, libpostproc >= 1.0
@@ -79,9 +79,10 @@ Requires: XFree86, desktop-file-utils
 %{!?_without_fribidi:Requires: fribidi}
 
 %description
-VideoLAN Client (VLC) is a highly portable multimedia player for various
-audio and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as
-well as DVDs, VCDs, and various streaming protocols.
+VLC media player is a highly portable multimedia player for various audio and 
+video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as well as DVD's, 
+VCD's, and various streaming protocols. It can also be used as a server to 
+stream in unicast or multicast in IPv4 or IPv6 on a high-bandwidth network.
 
 Available rpmbuild rebuild options :
 --without dvd dvdread dvdplay dvbpsi dv v4l avi asf aac ogg rawdv mad ffmpeg xvid
@@ -93,14 +94,15 @@ Options that would need not yet existing add-on packages :
 
 
 %package devel
-Summary: Header files and static library from the Videolan Client.
+Summary: Header files and static library from VLC media player.
 Group: Development/Libraries
 Requires: %{name} = %{version}
 
 %description devel
-VideoLAN Client (VLC) is a highly portable multimedia player for various
-audio and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as
-well as DVDs, VCDs, and various streaming protocols.
+VLC media player is a highly portable multimedia player for various audio and 
+video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as well as DVD's, 
+VCD's, and various streaming protocols. It can also be used as a server to 
+stream in unicast or multicast in IPv4 or IPv6 on a high-bandwidth network.
 
 Install this package if you need to build Videolan Client plugins or intend
 to link statically to it.
@@ -194,7 +196,7 @@ find  %{buildroot}%{_libdir}/vlc -name "*.so" | xargs strip
 
 cat > %{name}.desktop << EOF
 [Desktop Entry]
-Name=VideoLAN Media Player
+Name=VLC Media Player
 Comment=%{summary}
 Icon=%{_datadir}/vlc/vlc48x48.png
 Exec=vlc

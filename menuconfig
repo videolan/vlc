@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# VideoLAN Client configuration script, borrowed from linux menuconfig
+# VLC media player configuration script, borrowed from linux menuconfig
 # Cyril Deguet <asmax@videolan.org>
 #
 #-----------------------------------------------------------------

@@ -134,18 +134,18 @@
 %{?_with_slp:		%{expand: %%global with_slp 1}}
 %{?_with_tar:		%{expand: %%global with_tar 1}}
 
-Summary:	VLC is a free MPEG, MPEG2, DVD and DivX player.
+Summary:	VLC media player, a multimedia player and streaming application.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
 
 %if %{cvs}
-Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
+Source0:	http://download.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
 %else
-Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.bz2
+Source0:	http://download.videolan.org/packages/%{version}/%{name}-%{version}.tar.bz2
 %endif
-Source1:	http://www.videolan.org/pub/videolan/vlc/0.6.0/contrib/ffmpeg-%ffcvs.tar.bz2
-Source2:	http://www.videolan.org/pub/videolan/vlc/0.6.0/contrib/mpeg2dec-%mpegcvs.tar.bz2	
+Source1:	http://download.videolan.org/pub/videolan/vlc/0.6.0/contrib/ffmpeg-%ffcvs.tar.bz2
+Source2:	http://download.videolan.org/pub/videolan/vlc/0.6.0/contrib/mpeg2dec-%mpegcvs.tar.bz2	
 #gw remove NP_GetValue, as it was already defined in the mozilla headers
 Patch:		vlc-0.6.0-mozilla-conflict.patch.bz2
 License:	GPL
@@ -269,10 +269,11 @@ BuildRequires: kernel-source
 VideoLAN is an OpenSource streaming solution for every OS developed by
 students from the Ecole Centrale Paris and developers from all over the
 World.
-VLC (VideoLAN Client) is a media player that can play MPEG1, MPEG2 and
-MPEG4 (aka DivX) files, DVDs, VCDs, SVCDs, from a satellite card, from
-a stream sent by VLS (VideoLAN Server), from another VLC, or from a Web
-server.
+VLC media player is a highly portable multimedia player for various audio 
+and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, ogg, ...) as well as 
+DVD's, VCD's, and various streaming protocols. It can also be used as a 
+server to stream in unicast or multicast in IPv4 or IPv6 on a 
+high-bandwidth network.
 You may install vlc-gnome or vlc-gtk to have a nice graphical interface.
 This package contains no CSS unscrambling functionality for DVDs ;
 you need the libdvdcss library available from

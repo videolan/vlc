@@ -1,4 +1,4 @@
-# $Id: MAINTAINERS,v 1.6 2003/02/27 12:44:01 marcari Exp $
+# $Id: MAINTAINERS,v 1.7 2004/01/24 21:06:51 hartman Exp $
 #
 #                            VLC MAINTAINERS
 #
@@ -25,7 +25,7 @@
   - Mandrake Linux : Yves Duret
   - BeOS : Eric Petit (Stephan Assmus)
   - Windows : [gibalou]
-  - Mac OS X : [jlj] ([meuuh])
+  - Mac OS X : [thedj])
   - QNX RTOS : [jlj]
   - Solaris : [meuuh]
   - *BSD : [meuuh]
@@ -103,3 +103,4 @@
 [saman] = Jean-Paul Saman
 [sigmund] = Sigmund Augdal
 [stef] = Stéphane Borel
+[thedj] = Derk-Jan Hartman

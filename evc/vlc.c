@@ -2,7 +2,7 @@
  * vlc.c: the vlc player, WinCE version
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc.c,v 1.5 2002/11/21 13:53:31 sam Exp $
+ * $Id: vlc.c,v 1.6 2004/01/24 21:06:52 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -88,7 +88,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     RegisterClass(&wc);
 
     /* Print the version information */
-    sprintf( psz_title, "VideoLAN Client %s", VLC_Version() );
+    sprintf( psz_title, "VLC media player %s", VLC_Version() );
     MultiByteToWideChar( CP_ACP, 0, psz_title, -1, pwz_title, 100 );
 
     /* Create our nice window */

@@ -1,10 +1,11 @@
 # ***************************************************************************
-# src/packages.mak : Archives locations
+# src/packages.mak : Archive locations
 # ***************************************************************************
-# Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.11 2004/01/21 19:21:23 hartman Exp $
+# Copyright (C) 2003, 2004 VideoLAN
+# $Id: packages.mak,v 1.12 2004/01/24 21:06:52 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
+#          Derk-Jan Hartman <hartman at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,6 +90,4 @@ LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCO
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.8
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
-LIBMODPLUG_VERSION=0.7
-LIBMODPLUG_URL=$(SF)/modplug-xmms/libmodplug-$(LIBMODPLUG_VERSION).tar.gz
 

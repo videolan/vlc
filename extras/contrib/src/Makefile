@@ -1,10 +1,11 @@
 # ***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.13 2004/01/19 01:11:47 hartman Exp $
+# Copyright (C) 2003, 2004 VideoLAN
+# $Id: Makefile,v 1.14 2004/01/24 21:06:52 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
+#          Derk-Jan Hartman <hartman at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +43,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom .caca
+	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca
 FORCE:
 
 # ***************************************************************************
@@ -613,6 +614,25 @@ CLEAN_PKG += libdvdplay
 DISTCLEAN_PKG += libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
 
 # ***************************************************************************
+# libdvdnav
+# ***************************************************************************
+
+libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
+	$(WGET) $(LIBDVDNAV_URL)
+
+libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.dvdnav: libdvdnav .dvdread
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .dvdnav
+CLEAN_PKG += libdvdnav
+DISTCLEAN_PKG += libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
+
+# ***************************************************************************
 # libdvbpsi
 # ***************************************************************************
 
@@ -686,7 +706,6 @@ CLEAN_FILE += .caca
 CLEAN_PKG += libcaca
 DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 
-# ***************************************************************************
 # ***************************************************************************
 # Some cleansing
 # ***************************************************************************

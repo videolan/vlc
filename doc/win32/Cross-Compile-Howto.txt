@@ -50,7 +50,7 @@ Get vlc from:
 (who needs a release version? you're compiling, after all :)
 or grab the cvs at:
 
-        http://www.videolan.org/cvs.html
+        http://developers.videolan.org/cvs.html
 
 using the command:
 
