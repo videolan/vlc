@@ -601,7 +601,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
                 goto error;
             }
 
-#if !defined( SYS_BEOS )
+#if !defined( SYS_BEOS ) && !defined( UNDER_CE )
             if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt,
                             &i_opt_size ) == -1 || i_opt != 0 )
             {
