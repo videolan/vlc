@@ -353,7 +353,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
 
         case AOUT_ADEC_MONO_FIFO:
         case AOUT_ADEC_STEREO_FIFO:
-            p_aout->b_die = 0;
+            p_aout->fifo[i_fifo].b_die = 0;
 
             p_aout->fifo[i_fifo].b_stereo = p_fifo->b_stereo;
             p_aout->fifo[i_fifo].l_rate = p_fifo->l_rate;
@@ -602,6 +602,14 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
 
 	        case AOUT_INTF_MONO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer ); /* !! */
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
 		    {
                         l_buffer = 0;
@@ -633,6 +641,14 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
 
                 case AOUT_INTF_STEREO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer ); /* !! */
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
 		    {
                         l_buffer = 0;
@@ -664,6 +680,15 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
 
                 case AOUT_ADEC_MONO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer );
+                        free( p_aout->fifo[i_fifo].date );
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
                     l_units = p_aout->l_units;
                     l_buffer = 0;
                     while ( l_units > 0 )
@@ -732,6 +757,15 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     break;
 
                 case AOUT_ADEC_STEREO_FIFO:
+                    if ( p_aout->fifo[i_fifo].b_die )
+                    {
+                        free( p_aout->fifo[i_fifo].buffer );
+                        free( p_aout->fifo[i_fifo].date );
+                        p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO; /* !! */
+                        intf_DbgMsg("aout debug: audio output fifo (%p) destroyed\n", &p_aout->fifo[i_fifo]);
+                        continue;
+                    }
+
                     l_units = p_aout->l_units;
                     l_buffer = 0;
                     while ( l_units > 0 )

@@ -710,6 +710,11 @@ static int InitThread( adec_thread_t * p_adec )
     while ( DECODER_FIFO_ISEMPTY(p_adec->fifo) )
     {
         vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
+        if ( p_adec->bit_stream.p_input->b_die )
+        {
+            vlc_mutex_unlock( &p_adec->fifo.data_lock );
+            return( -1 );
+        }
     }
     p_adec->bit_stream.p_ts = DECODER_FIFO_START( p_adec->fifo )->p_first_ts;
     p_adec->bit_stream.i_byte = p_adec->bit_stream.p_ts->i_payload_start;
