@@ -984,7 +984,7 @@ VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au voc xa])
-VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
+VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp access_fake])
 VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
@@ -1995,8 +1995,8 @@ then
   then
     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
     AC_CHECK_HEADERS(postproc/postprocess.h)
-    VLC_ADD_PLUGINS([ffmpeg])
-    VLC_ADD_CFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --cflags`])
+    VLC_ADD_PLUGINS([ffmpeg stream_out_switcher])
+    VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   else
     AC_ARG_WITH(ffmpeg-mp3lame,
@@ -2031,7 +2031,7 @@ then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
       AC_CHECK_LIB(avcodec, avcodec_init, [
-        VLC_ADD_BUILTINS([ffmpeg])
+        VLC_ADD_BUILTINS([ffmpeg stream_out_switcher])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
       AC_CHECK_LIB(avformat, av_open_input_stream, [
@@ -2096,14 +2096,14 @@ then
         VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
       fi
 
-      VLC_ADD_BUILTINS([ffmpeg])
+      VLC_ADD_BUILTINS([ffmpeg stream_out_switcher])
       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
-      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
+      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
       if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
         AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
         VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
-        VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
+        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
       fi
     fi
   fi
@@ -2146,6 +2146,8 @@ then
       VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavformat -lavformataltivec -lz])
       VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavformat])
     fi
+    VLC_ADD_LDFLAGS([stream_out_switcher],[-L${real_ffmpeg_tree}/libavcodec])
+    VLC_ADD_CPPFLAGS([stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
   fi
 fi
 

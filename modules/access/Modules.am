@@ -8,6 +8,7 @@ SOURCES_access_smb = smb.c
 SOURCES_dvdnav = dvdnav.c
 SOURCES_dvdread = dvdread.c
 SOURCES_slp = slp.c
+SOURCES_access_fake = fake.c
 SOURCES_cdda = \
         cdda.c \
         vcd/cdrom.c \
